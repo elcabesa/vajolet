@@ -33,6 +33,11 @@
 
 class Position{
 public:
+	/*! \brief define the index of the bitboards
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
 	enum bitboardIndex{
 		occupiedSquares=0,				//0		00000000
 		whiteKing=1,					//1		00000001
@@ -69,100 +74,166 @@ public:
 		wCastleOOO=2,
 		bCastleOO=4,
 		bCastleOOO=8,
-	};					// castleRight
+	};					// castleRights
 
 
-
+	/*! \brief define the state of the board
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
 	struct state{
-		U64 key,pawnKey,materialKey;
-		Score nonPawnMaterial[4];
-		eNextMove nextMove;
-		eCastle castleRights;
-
-
-		tSquare epSquare;
-		int fiftyMoveCnt,pliesFromNull,ply;
-		bitboardIndex capturedPiece;
-		Score material[2];
+		U64 key,		/*!<  hashkey identifying the position*/
+			pawnKey,	/*!<  hashkey identifying the pawn formation*/
+			materialKey;/*!<  hashkey identifying the material signature*/
+		Score nonPawnMaterial[4]; /*!< four score used for white/black opening/endgame non pawn material sum*/
+		eNextMove nextMove; /*!< who is the active player*/
+		eCastle castleRights; /*!<  actual castle rights*/
+		tSquare epSquare;	/*!<  en passant square*/
+		int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
+			pliesFromNull,	/*!<  plies from null move*/
+			ply;			/*!<  ply from the start*/
+		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
+		Score material[2];	/*!<  two values for opening/endgame score*/
 
 	};
 
+	/*! \brief helper mask used to speedup castle right management
+		\author STOCKFISH
+		\version 1.0
+		\date 27/10/2013
+	*/
+	static int castleRightsMask[squareNumber];
+private:
+	/*! \brief array of char to create the fen string
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	const char PIECE_NAMES_FEN[lastBitboard]={' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
+
+	/*! \brief piece values used to calculate scores
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	static simdScore pieceValue[lastBitboard];
+public:
 
 
 	void init(void);
 	static void initScoreValues(void);
 	void display(void) const;
 	void displayFen(void) const;
-
-	Position(){
-	}
-
-	inline char isPawn(bitboardIndex piece) const {
-		return (piece&7)==6;
-	}
-	inline char isKing(bitboardIndex piece) const {
-			return (piece&7)==1;
-		}
-	inline char isblack(bitboardIndex piece) const {
-		return piece&8;
-	}
-
-inline void putPiece(bitboardIndex piece,tSquare s) {
-	bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
-	board[s] = piece;
-	bitBoard[piece] |= bitSet(s);
-	bitBoard[occupiedSquares] |= bitSet(s);
-	bitBoard[color]|= bitSet(s);
-	index[s] = pieceCount[piece]++;
-	pieceList[piece][index[s]] = s;
-	}
-
-inline void movePiece(bitboardIndex piece, tSquare from, tSquare to) {
-
-	// index[from] is not updated and becomes stale. This works as long
-	// as index[] is accessed just by known occupied squares.
-	bitMap fromTo = bitSet(from) ^ bitSet(to);
-	bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
-	bitBoard[occupiedSquares] ^= fromTo;
-	bitBoard[piece] ^= fromTo;
-	bitBoard[color] ^= fromTo;
-	board[from] = empty;
-	board[to] = piece;
-	index[to] = index[from];
-	pieceList[piece][index[to]] = to;
-
-
-}
-
-inline void removePiece( bitboardIndex piece, tSquare s) {
-
-	// WARNING: This is not a reversible operation. If we remove a piece in
-	// do_move() and then replace it in undo_move() we will put it at the end of
-	// the list and not in its original place, it means index[] and pieceList[]
-	// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
-	bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
-	bitBoard[occupiedSquares]^= bitSet(s);
-	bitBoard[piece] ^= bitSet(s);
-	bitBoard[color] ^= bitSet(s);
-	board[s] = empty;
-	tSquare lastSquare = pieceList[piece][--pieceCount[piece]];
-	index[lastSquare] = index[s];
-	pieceList[piece][index[lastSquare]] = lastSquare;
-	pieceList[piece][pieceCount[piece]] = squareNone;
-}
-
-
-inline void undoNullMove(void){
-	stateInfo.pop_back();
-}
-
-	static int castleRightsMask[squareNumber];
 	void doNullMove(void);
 	void doMove(Move m);
 	void undoMove(Move m);
 	static void initCastlaRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
 	Score eval(void) const;
+
+	/*! \brief constructor
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	Position(){
+	}
+
+	/*! \brief tell if the piece is a pawn
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline char isPawn(bitboardIndex piece) const {
+		return (piece&7)==6;
+	}
+	/*! \brief tell if the piece is a king
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline char isKing(bitboardIndex piece) const {
+		return (piece&7)==1;
+	}
+	/*! \brief tell the color of a piece
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline char isblack(bitboardIndex piece) const {
+		return piece&8;
+	}
+
+	/*! \brief put a piece on the board
+		\author STOCKFISH
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline void putPiece(bitboardIndex piece,tSquare s) {
+		bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
+		board[s] = piece;
+		bitBoard[piece] |= bitSet(s);
+		bitBoard[occupiedSquares] |= bitSet(s);
+		bitBoard[color]|= bitSet(s);
+		index[s] = pieceCount[piece]++;
+		pieceList[piece][index[s]] = s;
+	}
+
+	/*! \brief move a piece on the board
+		\author STOCKFISH
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline void movePiece(bitboardIndex piece, tSquare from, tSquare to) {
+
+		// index[from] is not updated and becomes stale. This works as long
+		// as index[] is accessed just by known occupied squares.
+		bitMap fromTo = bitSet(from) ^ bitSet(to);
+		bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
+		bitBoard[occupiedSquares] ^= fromTo;
+		bitBoard[piece] ^= fromTo;
+		bitBoard[color] ^= fromTo;
+		board[from] = empty;
+		board[to] = piece;
+		index[to] = index[from];
+		pieceList[piece][index[to]] = to;
+
+
+	}
+	/*! \brief remove a piece from the board
+		\author STOCKFISH
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline void removePiece( bitboardIndex piece, tSquare s) {
+
+		// WARNING: This is not a reversible operation. If we remove a piece in
+		// do_move() and then replace it in undo_move() we will put it at the end of
+		// the list and not in its original place, it means index[] and pieceList[]
+		// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
+		bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
+		bitBoard[occupiedSquares]^= bitSet(s);
+		bitBoard[piece] ^= bitSet(s);
+		bitBoard[color] ^= bitSet(s);
+		board[s] = empty;
+		tSquare lastSquare = pieceList[piece][--pieceCount[piece]];
+		index[lastSquare] = index[s];
+		pieceList[piece][index[lastSquare]] = lastSquare;
+		pieceList[piece][pieceCount[piece]] = squareNone;
+	}
+
+	/*! \brief undo a null move
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline void undoNullMove(void){
+		stateInfo.pop_back();
+	}
+
+
+
 
 private:
 
@@ -174,12 +245,22 @@ private:
 	bool checkPosConsistency(void);
 	void clear();
 
+	/*! \brief list of the past states, this is the history of the position
+
+	  the last element is the actual state
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
 	std::list<state> stateInfo;
 
-	const char PIECE_NAMES_FEN[lastBitboard]={' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
 
-	static simdScore pieceValue[lastBitboard];
 
+	/*! \brief board rapresentation
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
 	bitboardIndex board[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
 	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
 	unsigned int pieceCount[lastBitboard];	// number of pieces indexed by bitboardIndex enum

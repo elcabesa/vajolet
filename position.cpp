@@ -30,7 +30,11 @@
 simdScore Position::pieceValue[lastBitboard];
 int Position::castleRightsMask[squareNumber];
 
-
+/*! \brief setup a position from a fen string
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 void Position::setupFromFen(const std::string& fenStr){
 	char col,row,token;
 	tSquare sq = A8;
@@ -151,9 +155,16 @@ void Position::setupFromFen(const std::string& fenStr){
 	x.pawnKey=calcPawnKey();
 	x.materialKey=calcMaterialKey();
 }
+
+
+/*! \brief init the score value in the static const
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 void Position::initScoreValues(void){
-	for(int i=0;i<lastBitboard;i++){
-		pieceValue[i]=0;
+	for(auto &val :pieceValue){
+		val=0;
 	}
 	pieceValue[whitePawns]=10000;
 	pieceValue[whiteKnights]=30000;
@@ -170,7 +181,11 @@ void Position::initScoreValues(void){
 	pieceValue[blackKing]=-pieceValue[whiteKing];
 
 }
-
+/*! \brief clear a position and his history
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 void Position::clear() {
 	for (int i = 0; i < squareNumber; i++) {
 		board[i] = empty;
@@ -307,6 +322,11 @@ void Position::displayFen() const {
 }
 
 
+/*! \brief calc the hash key of the position
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 U64 Position::calcKey(void) const {
 	U64 hash=0;
 	for (int i = 0; i < squareNumber; i++)
@@ -329,6 +349,11 @@ U64 Position::calcKey(void) const {
 	return hash;
 }
 
+/*! \brief calc the hash key of the pawn formation
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 U64 Position::calcPawnKey(void) const {
 	U64 hash=0;
 	for (int i = 0; i < squareNumber; i++)
@@ -338,11 +363,14 @@ U64 Position::calcPawnKey(void) const {
 		}
 	}
 
-
-
 	return hash;
 }
 
+/*! \brief calc the hash key of the material signature
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 U64 Position::calcMaterialKey(void) const {
 	U64 hash=0;
 	for (int i = 0; i < lastBitboard; i++)
@@ -355,31 +383,39 @@ U64 Position::calcMaterialKey(void) const {
 	return hash;
 }
 
-
+/*! \brief calc the material value of the position
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 simdScore Position::calcMaterialValue(void) const{
 	simdScore s=0;
-	for (int i = 0; i < squareNumber; i++)
+	for (auto const &val :board)
 	{
-		s+=pieceValue[board[i]];
+		s+=pieceValue[val];
 	}
 	return s;
 
 }
-
+/*! \brief calc the non pawn material value of the position
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 void Position::calcNonPawnMaterialValue(Score* s){
 
 	simdScore t[2];
 	t[0]=0;
 	t[1]=0;
 
-	for (int i = 0; i < squareNumber; i++)
+	for (auto const &val :board)
 	{
-		if(!isPawn(board[i]) && !isKing(board[i])){
-			if(board[i]>emptyBitmap){
-				t[1]-=pieceValue[board[i]];
+		if(!isPawn(val) && !isKing(val)){
+			if(val>emptyBitmap){
+				t[1]-=pieceValue[val];
 			}
 			else{
-				t[0]+=pieceValue[board[i]];
+				t[0]+=pieceValue[val];
 			}
 		}
 	}
@@ -387,7 +423,11 @@ void Position::calcNonPawnMaterialValue(Score* s){
 	t[1].store_partial(2,&s[2]);
 
 }
-
+/*! \brief do a null move
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 void Position::doNullMove(void){
 	state n=stateInfo.back();
 	stateInfo.push_back(n);
@@ -404,7 +444,11 @@ void Position::doNullMove(void){
 
 
 }
-
+/*! \brief do a move
+	\author STOCKFISH
+	\version 1.0
+	\date 27/10/2013
+*/
 void Position::doMove(Move m){
 	state n=stateInfo.back();
 	stateInfo.push_back(n);
@@ -524,7 +568,11 @@ void Position::doMove(Move m){
 
 }
 
-
+/*! \brief undo a move
+	\author STOCKFISH
+	\version 1.0
+	\date 27/10/2013
+*/
 void Position::undoMove(Move m){
 
 	state x=stateInfo.back();
@@ -565,7 +613,11 @@ void Position::undoMove(Move m){
 
 }
 
-
+/*! \brief init the helper castle mash
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 void Position::initCastlaRightsMask(void){
 	for(int i=0;i<squareNumber;i++){
 		castleRightsMask[i]=0;
@@ -579,6 +631,11 @@ void Position::initCastlaRightsMask(void){
 }
 
 
+/*! \brief do a sanity check on the board
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 bool Position::checkPosConsistency(void){
 	state x =stateInfo.back();
 	if(x.nextMove !=whiteTurn && x.nextMove !=blackTurn){
@@ -665,6 +722,12 @@ bool Position::checkPosConsistency(void){
 	return true;
 }
 
+
+/*! \brief do a pretty simple evalutation
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
 Score Position::eval(void) const {
 	if(stateInfo.back().nextMove)
 	{
