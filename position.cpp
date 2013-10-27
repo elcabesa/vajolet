@@ -15,6 +15,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <sstream>
+#include <string>
 #include "vajolet.h"
 #include "position.h"
 #include "data.h"
@@ -25,9 +27,130 @@
 
 
 
-Score Position::pieceValue[lastBitboard];
+simdScore Position::pieceValue[lastBitboard];
 int Position::castleRightsMask[squareNumber];
 
+
+void Position::setupFromFen(const std::string& fenStr){
+	char col,row,token;
+	tSquare sq = A8;
+	std::istringstream ss(fenStr);
+
+	clear();
+	ss >> std::noskipws;
+
+	while ((ss >> token) && !std::isspace(token))
+	{
+		if (isdigit(token))
+			sq += tSquare(token - '0'); // Advance the given number of files
+		else if (token == '/')
+			sq -= tSquare(16);
+		else
+		{
+			switch (token)
+			{
+			case 'P':
+				putPiece(whitePawns,sq);
+				break;
+			case 'N':
+				putPiece(whiteKnights,sq);
+				break;
+			case 'B':
+				putPiece(whiteBishops,sq);
+				break;
+			case 'R':
+				putPiece(whiteRooks,sq);
+				break;
+			case 'Q':
+				putPiece(whiteQueens,sq);
+				break;
+			case 'K':
+				putPiece(whiteKing,sq);
+				break;
+			case 'p':
+				putPiece(blackPawns,sq);
+				break;
+			case 'n':
+				putPiece(blackKnights,sq);
+				break;
+			case 'b':
+				putPiece(blackBishops,sq);
+				break;
+			case 'r':
+				putPiece(blackRooks,sq);
+				break;
+			case 'q':
+				putPiece(blackQueens,sq);
+				break;
+			case 'k':
+				putPiece(blackKing,sq);
+				break;
+			}
+			sq++;
+		}
+	}
+	state s;
+	stateInfo.push_back(s);
+	state &x= stateInfo.back();
+
+
+	ss >> token;
+	x.nextMove = (token == 'w' ? whiteTurn : blackTurn);
+	ss >> token;
+
+	x.castleRights=(eCastle)0;
+	while ((ss >> token) && !isspace(token))
+	{
+		switch(token){
+		case 'K':
+			x.castleRights =(eCastle)(x.castleRights|wCastleOO);
+			break;
+		case 'Q':
+			x.castleRights =(eCastle)(x.castleRights|wCastleOOO);
+			break;
+		case 'k':
+			x.castleRights =(eCastle)(x.castleRights|bCastleOO);
+			break;
+		case 'q':
+			x.castleRights =(eCastle)(x.castleRights|bCastleOOO);
+			break;
+		}
+	}
+
+	x.epSquare=squareNone;
+	if (((ss >> col) && (col >= 'a' && col <= 'h'))
+		&& ((ss >> row) && (row == '3' || row == '6')))
+	{
+		x.epSquare = ((int) col - 'a') + 8 * (row - '1') ;
+		// TODO RIAGGIUNGERE QUESTO CODICE
+		/*if (!(attackers_to(st->epSquare) & pieces(sideToMove, PAWN)))
+			st->epSquare = SQ_NONE;*/
+	}
+
+
+
+	ss >> std::skipws >> x.fiftyMoveCnt;
+	if(ss.eof()){
+		x.ply=0;
+		x.fiftyMoveCnt=0;
+
+	}else{
+		ss>> x.ply;
+		x.ply = std::max(2 * (x.ply - 1), 0) + int(x.nextMove == blackTurn);
+	}
+
+	x.pliesFromNull=0;
+	x.capturedPiece=empty;
+
+
+
+	calcNonPawnMaterialValue(x.nonPawnMaterial);
+	calcMaterialValue().store_partial(2,x.material);
+
+	x.key=calcKey();
+	x.pawnKey=calcPawnKey();
+	x.materialKey=calcMaterialKey();
+}
 void Position::initScoreValues(void){
 	for(int i=0;i<lastBitboard;i++){
 		pieceValue[i]=0;
@@ -46,96 +169,22 @@ void Position::initScoreValues(void){
 	pieceValue[blackQueens]=-pieceValue[whiteQueens];
 	pieceValue[blackKing]=-pieceValue[whiteKing];
 
-	/*for(int i=0;i<lastBitboard;i++){
-		sync_cout<<(pieceValue[i]/100)[0]<<sync_endl;
-	}*/
-
-
 }
-/*	\brief init a position with the starting position
-	\author Marco Belli
-	\version 1.0
-	\date 21/10/2013
-*/
-void Position::init(void){
 
-
-	for (int i = 0; i < squareNumber; i++){
+void Position::clear() {
+	for (int i = 0; i < squareNumber; i++) {
 		board[i] = empty;
 		index[i] = 0;
 	};
-
-	for (int i = 0; i < lastBitboard; i++){
-		pieceCount[i]=0;
-		bitBoard[i]=0;
-		for (int n = 0; n < 16; n++){
-			pieceList[i][n]=0;
+	for (int i = 0; i < lastBitboard; i++) {
+		pieceCount[i] = 0;
+		bitBoard[i] = 0;
+		for (int n = 0; n < 16; n++) {
+			pieceList[i][n] = 0;
 		}
 	}
-
-
-	putPiece( whiteKing,E1);
-	putPiece( whiteQueens,D1);
-	putPiece( whiteRooks,A1);
-	putPiece( whiteRooks,H1);
-	putPiece( whiteKnights,B1);
-	putPiece( whiteKnights,G1);
-	putPiece( whiteBishops,C1);
-	putPiece( whiteBishops,F1);
-	putPiece( whitePawns,A2);
-	putPiece( whitePawns,B2);
-	putPiece( whitePawns,C2);
-	putPiece( whitePawns,D2);
-	putPiece( whitePawns,E2);
-	putPiece( whitePawns,F2);
-	putPiece( whitePawns,G2);
-	putPiece( whitePawns,H2);
-
-	putPiece( blackKing,E8);
-	putPiece( blackQueens,D8);
-	putPiece( blackRooks,A8);
-	putPiece( blackRooks,H8);
-	putPiece( blackKnights,B8);
-	putPiece( blackKnights,G8);
-	putPiece( blackBishops,C8);
-	putPiece( blackBishops,F8);
-	putPiece( blackPawns,A7);
-	putPiece( blackPawns,B7);
-	putPiece( blackPawns,C7);
-	putPiece( blackPawns,D7);
-	putPiece( blackPawns,E7);
-	putPiece( blackPawns,F7);
-	putPiece( blackPawns,G7);
-	putPiece( blackPawns,H7);
-
-
-
 	stateInfo.clear();
-	state s;
-
-	s.nextMove=whiteTurn;
-	s.castleRights=(eCastle)(wCastleOO|wCastleOOO|bCastleOO|bCastleOOO);
-	s.epSquare=squareNone;
-	s.fiftyMoveCnt=0;
-	s.pliesFromNull=0;
-	s.ply=0;
-	s.capturedPiece=empty;
-
-	calcNonPawnMaterialValue(s.nonPawnMaterial);
-	calcMaterialValue().store_partial(2,s.material);
-
-	stateInfo.push_back(s);
-	state & x=stateInfo.back();
-
-	x.key=calcKey();
-	x.pawnKey=calcPawnKey();
-	x.materialKey=calcMaterialKey();
-
-
-
 }
-
-
 
 
 /*	\brief display a board for debug purpose
@@ -164,7 +213,13 @@ void Position::display()const {
 	}
 	std::cout <<(stateInfo.back().nextMove?"BLACK TO MOVE":"WHITE TO MOVE") <<std::endl;
 	std::cout <<"50 move counter "<<stateInfo.back().fiftyMoveCnt<<std::endl;
-	std::cout <<"castleRights " <<stateInfo.back().castleRights<<std::endl;
+	std::cout <<"castleRights ";
+	if(stateInfo.back().castleRights&wCastleOO) std::cout<<"K";
+	if(stateInfo.back().castleRights&wCastleOOO) std::cout<<"Q";
+	if(stateInfo.back().castleRights&bCastleOO) std::cout<<"k";
+	if(stateInfo.back().castleRights&bCastleOOO) std::cout<<"q";
+	if(stateInfo.back().castleRights==0) std::cout<<"-";
+	std::cout<<std::endl;
 	std::cout <<"epsquare ";
 
 	if(stateInfo.back().epSquare!=squareNone){
@@ -248,7 +303,7 @@ void Position::displayFen() const {
 	}
 	std::cout<<' ';
 	std::cout<<stateInfo.back().fiftyMoveCnt;
-	std::cout<<" 1"<<sync_endl;
+	std::cout<<" "<<1 + (stateInfo.back().ply - int(stateInfo.back().nextMove == blackTurn)) / 2<<sync_endl;
 }
 
 
@@ -301,8 +356,8 @@ U64 Position::calcMaterialKey(void) const {
 }
 
 
-Score Position::calcMaterialValue(void) const{
-	Score s=0;
+simdScore Position::calcMaterialValue(void) const{
+	simdScore s=0;
 	for (int i = 0; i < squareNumber; i++)
 	{
 		s+=pieceValue[board[i]];
@@ -311,9 +366,9 @@ Score Position::calcMaterialValue(void) const{
 
 }
 
-void Position::calcNonPawnMaterialValue(unpackedScore* s){
+void Position::calcNonPawnMaterialValue(Score* s){
 
-	Score t[2];
+	simdScore t[2];
 	t[0]=0;
 	t[1]=0;
 
@@ -608,4 +663,15 @@ bool Position::checkPosConsistency(void){
 
 
 	return true;
+}
+
+Score Position::eval(void) const {
+	if(stateInfo.back().nextMove)
+	{
+		return -stateInfo.back().material[0];
+	}
+	else{
+		return stateInfo.back().material[0];
+	}
+
 }

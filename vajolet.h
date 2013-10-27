@@ -33,8 +33,8 @@
 typedef unsigned long long bitMap;
 typedef unsigned long long U64;
 typedef unsigned int tSquare;
-typedef Vec4i Score;
-typedef signed int unpackedScore;
+typedef Vec4i simdScore;
+typedef signed int Score;
 
 
 

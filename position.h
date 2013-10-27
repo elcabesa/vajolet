@@ -18,8 +18,9 @@
 #define POSITION_H_
 
 #include <list>
+#include <string>
 #include "data.h"
-#include "vectorClass/vectorclass.h"
+#include "vectorclass/vectorclass.h"
 #include "hashKeys.h"
 #include "move.h"
 #include "io.h"
@@ -74,7 +75,7 @@ public:
 
 	struct state{
 		U64 key,pawnKey,materialKey;
-		unpackedScore nonPawnMaterial[4];
+		Score nonPawnMaterial[4];
 		eNextMove nextMove;
 		eCastle castleRights;
 
@@ -82,7 +83,7 @@ public:
 		tSquare epSquare;
 		int fiftyMoveCnt,pliesFromNull,ply;
 		bitboardIndex capturedPiece;
-		unpackedScore material[2];
+		Score material[2];
 
 	};
 
@@ -94,8 +95,6 @@ public:
 	void displayFen(void) const;
 
 	Position(){
-		init();
-		checkPosConsistency();
 	}
 
 	inline char isPawn(bitboardIndex piece) const {
@@ -162,23 +161,24 @@ inline void undoNullMove(void){
 	void doMove(Move m);
 	void undoMove(Move m);
 	static void initCastlaRightsMask(void);
+	void setupFromFen(const std::string& fenStr);
+	Score eval(void) const;
 
 private:
 
 	U64 calcKey(void) const;
 	U64 calcPawnKey(void) const;
 	U64 calcMaterialKey(void) const;
-	Score calcMaterialValue(void) const;
-	void calcNonPawnMaterialValue(unpackedScore* s);
+	simdScore calcMaterialValue(void) const;
+	void calcNonPawnMaterialValue(Score* s);
 	bool checkPosConsistency(void);
-
-
+	void clear();
 
 	std::list<state> stateInfo;
 
 	const char PIECE_NAMES_FEN[lastBitboard]={' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
 
-	static Score pieceValue[lastBitboard];
+	static simdScore pieceValue[lastBitboard];
 
 	bitboardIndex board[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
 	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum

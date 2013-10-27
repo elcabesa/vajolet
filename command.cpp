@@ -24,16 +24,41 @@
 #include "io.h"
 #include "position.h"
 
+
+const static char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 /*	\brief print the uci reply
 	\author Marco Belli
 	\version 1.0
 	\date 21/10/2013
 */
-void printUciInfo(void){
-	sync_cout<< "id name "<<PROGRAM_NAME<<" "<<VERSION<<std::endl<<
-			"id author Belli Marco"<<std::endl<< "uciok"<<sync_endl;
+void static printUciInfo(void){
+	sync_cout<< "id name "<<PROGRAM_NAME<<" "<<VERSION<<std::endl;
+	std::cout<<"id author Belli Marco"<<std::endl;
+	std::cout<<"uciok"<<sync_endl;
 }
 
+void static position(std::istringstream& is, Position & pos){
+	std::string token, fen;
+	is >> token;
+	if (token == "startpos")
+	{
+		fen = StartFEN;
+		is >> token; // Consume "moves" token if any
+	}
+	else if (token == "fen")
+		while (is >> token && token != "moves")
+			fen += token + " ";
+	else
+		return;
+	pos.setupFromFen(fen);
+
+/*	// Parse move list (if any)
+	while (is >> token && (m = move_from_uci(pos, token)) != MOVE_NONE)
+	{
+		SetupStates->push(StateInfo());
+		pos.do_move(m, SetupStates->top());
+	}*/
+}
 
 
 /*	\brief manage the uci loop
@@ -43,9 +68,10 @@ void printUciInfo(void){
 */
 void uciLoop(){
 	Position pos;
+	pos.setupFromFen(StartFEN);
 	std::string token, cmd;
 
-	Move m1,m2,m3,m4,m5,m6,m7;
+/*	Move m1,m2,m3,m4,m5,m6,m7;
 	//pos.display();
 	m1.from=E2;
 	m1.to=E4;
@@ -84,7 +110,7 @@ void uciLoop(){
 	pos.undoMove(m2);
 	pos.undoMove(m1);
 	//pos.display();
-
+*/
 
 	do{
 		if (!std::getline(std::cin, cmd)) // Block here waiting for input
@@ -104,6 +130,10 @@ void uciLoop(){
 			pos.display();
 		}
 		else if (token =="position"){
+			position(is,pos);
+		}
+		else if (token =="eval"){
+			sync_cout<<"Eval:" <<pos.eval()/10000.0<<sync_endl;
 		}
 		else if (token =="isready"){
 			sync_cout<<"readyok"<<sync_endl;
