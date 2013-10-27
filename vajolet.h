@@ -21,7 +21,7 @@
 #include "vectorclass/vectorclass.h"
 
 #define PROGRAM_NAME	"Vajolet"
-#define VERSION			"0.01"
+#define VERSION			"0.02"
 
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
