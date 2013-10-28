@@ -43,7 +43,6 @@ void HashKeys::init()
 
 	for (auto & val :ep){
 		val = uint_dist(rnd);
-		//sync_cout<<val<<sync_endl;
 	}
 
 	for(auto & outerArray :keys)

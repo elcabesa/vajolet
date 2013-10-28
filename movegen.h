@@ -23,7 +23,7 @@
 #include "vajolet.h"
 #include "move.h"
 
-template<typename Type>
+/*template<typename Type>
 class BasicPool
     {
     public:
@@ -91,22 +91,22 @@ class BasicPool
 
     //stack to hold pointers to free chunks:
     std::stack<Type*> free;
-};
+};*/
+
+/*void pippo(void){
+	BasicPool<int> p;
+	//create an instance of SomeObject from the pool:
+	int * o = p.create();
+	//destroy it when done, putting memory back into the pool:
+	p.remove(o);
+
+
+}*/
 
 
 class Movegen{
 private:
 	Move moveList[MAX_MOVE_PER_POSITION];
-
-	/*void pippo(void){
-		BasicPool<int> p;
-	    //create an instance of SomeObject from the pool:
-	    int * o = p.create();
-	    //destroy it when done, putting memory back into the pool:
-	    p.remove(o);
-
-
-	}*/
 };
 
 

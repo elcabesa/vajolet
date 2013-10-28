@@ -233,16 +233,6 @@ public:
 		stateInfo.pop_back();
 	}
 
-	/*inline Movegen *getMovegen(void){
-		return MovegenPool.create();
-	}
-
-	inline void releaseMovegen(Movegen * mg){
-		return MovegenPool.remove(mg);
-	}*/
-
-
-
 private:
 
 	U64 calcKey(void) const;
@@ -262,7 +252,7 @@ private:
 	*/
 	std::list<state> stateInfo;
 
-	BasicPool<Movegen> MovegenPool;
+
 
 
 
