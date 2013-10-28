@@ -29,8 +29,6 @@ struct HashKeys
 
 
 	static void init();       // initialize the random data
-
-	static U64 rand64();      // 64-bit random number generator
 };
 
 

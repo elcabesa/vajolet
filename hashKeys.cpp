@@ -15,6 +15,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <random>
 #include "hashKeys.h"
 #include "io.h"
 
@@ -34,25 +35,28 @@ void HashKeys::init()
 	// initialize all random 64-bit numbers
 	int i,j;
 	U64 temp[16];
+	std::mt19937_64 rnd;
+	std::uniform_int_distribution<uint64_t> uint_dist;
 
 	// use current time (in seconds) as random seed:
-	srand(19091979);
+	rnd.seed(19091979);
 
 	for (auto & val :ep){
-		val = rand64();
+		val = uint_dist(rnd);
+		//sync_cout<<val<<sync_endl;
 	}
 
 	for(auto & outerArray :keys)
 	{
 		for(auto & val :outerArray)
 		{
-			val= rand64();
+			val= uint_dist(rnd);
 		}
 
 	}
 
-	side = rand64();
-	exclusion=rand64();
+	side = uint_dist(rnd);
+	exclusion=uint_dist(rnd);
 
 	for(auto & val :castlingRight ){
 		val=0;
@@ -60,7 +64,7 @@ void HashKeys::init()
 
 
 	for(auto & val :temp){
-		val=rand64();
+		val=uint_dist(rnd);
 	}
 
 	for(i=0;i<16;i++){
@@ -71,18 +75,8 @@ void HashKeys::init()
 		}
 	}
 
-
-	return;
 }
 
-/*!	\brief get a random 64 bit number
-    \author Marco Belli
-	\version 1.0
-	\date 27/10/2013
- */
-U64 HashKeys::rand64()
-{
-	return rand()^((U64)rand()<<15)^((U64)rand()<<30)^((U64)rand()<<45)^((U64)rand()<<60);
-}
+
 
 
