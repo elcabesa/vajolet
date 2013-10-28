@@ -37,6 +37,9 @@ typedef Vec4i simdScore;
 typedef signed int Score;
 
 
-
+//---------------------------------------------
+//	define
+//---------------------------------------------
+#define MAX_MOVE_PER_POSITION (512)
 
 #endif /* VAJOLET_H_ */

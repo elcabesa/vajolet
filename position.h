@@ -24,6 +24,7 @@
 #include "hashKeys.h"
 #include "move.h"
 #include "io.h"
+#include "movegen.h"
 
 
 //---------------------------------------------------
@@ -232,6 +233,13 @@ public:
 		stateInfo.pop_back();
 	}
 
+	/*inline Movegen *getMovegen(void){
+		return MovegenPool.create();
+	}
+
+	inline void releaseMovegen(Movegen * mg){
+		return MovegenPool.remove(mg);
+	}*/
 
 
 
@@ -253,6 +261,8 @@ private:
 		\date 27/10/2013
 	*/
 	std::list<state> stateInfo;
+
+	BasicPool<Movegen> MovegenPool;
 
 
 
