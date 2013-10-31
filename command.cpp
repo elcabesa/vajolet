@@ -19,10 +19,16 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <chrono>
 #include "vajolet.h"
 #include "command.h"
 #include "io.h"
 #include "position.h"
+#include "movegen.h"
+#include "move.h"
+
+
+
 
 
 const static char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -35,6 +41,46 @@ void static printUciInfo(void){
 	sync_cout<< "id name "<<PROGRAM_NAME<<" "<<VERSION<<std::endl;
 	std::cout<<"id author Belli Marco"<<std::endl;
 	std::cout<<"uciok"<<sync_endl;
+}
+
+Move moveFromUci(const Position& pos, std::string& str) {
+
+	// TODO accettare solo mosse valide , generare lista mosse valide e accettare mossa per la quale la stringa UCI ricevuta e quella generata è identica
+	Move m;
+	m.packed=0;
+	if (str.length() == 5){ // Junior could send promotion piece in uppercase
+		str[4] = char(tolower(str[4]));
+		switch ( str[4] )
+		{
+		case 'b':
+			m.flags =Move::fpromotion;
+			m.promotion= Move::promBishop;
+			break;
+		case 'n':
+			m.flags =Move::fpromotion;
+			m.promotion= Move::promKnight;
+			break;
+		case 'r':
+			m.flags =Move::fpromotion;
+			m.promotion= Move::promRook;
+			break;
+		case 'q':
+			m.flags =Move::fpromotion;
+			m.promotion= Move::promQueen;
+			break;
+		}
+	}
+
+	unsigned int fx = (str[0]| 32) - 'a';
+	unsigned int fy = (str[1])-'1';
+	unsigned int tx = (str[2] | 32) - 'a';
+	unsigned int ty = (str[3])-'1';
+	m.from = (fy << 3) + fx;
+	m.to = (ty << 3) + tx;
+
+
+
+	return m;
 }
 
 void static position(std::istringstream& is, Position & pos){
@@ -52,12 +98,12 @@ void static position(std::istringstream& is, Position & pos){
 		return;
 	pos.setupFromFen(fen);
 
-/*	// Parse move list (if any)
-	while (is >> token && (m = move_from_uci(pos, token)) != MOVE_NONE)
+	Move m;
+	// Parse move list (if any)
+	while (is >> token && (m = moveFromUci(pos, token)).packed != 0)
 	{
-		SetupStates->push(StateInfo());
-		pos.do_move(m, SetupStates->top());
-	}*/
+		pos.doMove(m);
+	}
 }
 
 
@@ -119,6 +165,7 @@ void uciLoop(){
 
 		is >> std::skipws >> token;
 
+
 		if(token== "uci"){
 			printUciInfo();
 		}
@@ -128,6 +175,8 @@ void uciLoop(){
 		}
 		else if (token =="d"){
 			pos.display();
+			Movegen m;
+			m.generateMoves(pos);
 		}
 		else if (token =="position"){
 			position(is,pos);
@@ -137,6 +186,21 @@ void uciLoop(){
 		}
 		else if (token =="isready"){
 			sync_cout<<"readyok"<<sync_endl;
+		}
+		else if (token =="perft" && (is>>token)){
+
+			unsigned long elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+			unsigned long res=pos.perft(stoi(token));
+			elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-elapsed;
+			sync_cout<<"perft Res="<<res<<" "<<elapsed<<"ms"<<sync_endl;
+			sync_cout<<((double)res)/elapsed<<"kN/s"<<sync_endl;
+
+
+		}
+		else if (token =="divide" && (is>>token)){
+
+			unsigned long res=pos.divide(stoi(token));
+			sync_cout<<"divide Res="<<res<<sync_endl;
 		}
 		else{
 			sync_cout<<"unknown command"<<sync_endl;

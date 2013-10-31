@@ -24,7 +24,7 @@
 #include "hashKeys.h"
 #include "move.h"
 #include "io.h"
-#include "movegen.h"
+
 
 
 //---------------------------------------------------
@@ -127,11 +127,13 @@ public:
 	void display(void) const;
 	void displayFen(void) const;
 	void doNullMove(void);
-	void doMove(Move m);
-	void undoMove(Move m);
+	void doMove(Move &m);
+	void undoMove(Move &m);
 	static void initCastlaRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
 	Score eval(void) const;
+	unsigned long perft(unsigned int depth);
+	unsigned long divide(unsigned int depth);
 
 	/*! \brief constructor
 		\author Marco Belli
@@ -232,6 +234,29 @@ public:
 	inline void undoNullMove(void){
 		stateInfo.pop_back();
 	}
+	inline state& getActualState(void){
+		return stateInfo.back();
+	}
+
+	std::string displayUci(Move & m) const{
+
+		std::string s;
+	//from
+	s+=char('a'+FILES[m.from]);
+	s+=char('1'+RANKS[m.from]);
+
+
+	//to
+	s+=char('a'+FILES[m.to]);
+	s+=char('1'+RANKS[m.to]);
+	//promotion
+	if(m.flags == Move::fpromotion){
+		s += Position::PIECE_NAMES_FEN[m.promotion+Position::whiteQueens];
+	}
+	return s;
+
+}
+
 
 private:
 
@@ -254,7 +279,7 @@ private:
 
 
 
-
+public:
 
 	/*! \brief board rapresentation
 		\author Marco Belli

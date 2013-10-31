@@ -69,7 +69,7 @@ void HashKeys::init()
 	for(i=0;i<16;i++){
 		for(j=0;j<4;j++){
 			if(i&(1<<j)){
-				castlingRight[i]^=temp[i];
+				castlingRight[i]^=temp[j];
 			}
 		}
 	}

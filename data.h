@@ -47,9 +47,11 @@ enum enSquare{
 #ifdef PRECALCULATED_BITSET
 extern bitMap BITSET[squareNumber];
 #endif
-extern int BOARDINDEX[8][8];
+extern unsigned int BOARDINDEX[8][8];
 extern const int FILES[squareNumber];
 extern const int RANKS[squareNumber];
+extern bitMap RANKMASK[squareNumber];
+extern bitMap FILEMASK[squareNumber];
 
 //------------------------------------------------
 //	inline functions

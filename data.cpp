@@ -23,7 +23,7 @@
 #ifdef PRECALCULATED_BITSET
 bitMap BITSET[squareNumber];
 #endif
-int BOARDINDEX[8][8];
+unsigned int BOARDINDEX[8][8];
 
 const int FILES[squareNumber] = {
 	0, 1, 2, 3, 4, 5, 6, 7,
@@ -47,6 +47,9 @@ const int RANKS[squareNumber] = {
 	7, 7, 7, 7, 7, 7, 7, 7,
 };
 
+bitMap RANKMASK[squareNumber];
+bitMap FILEMASK[squareNumber];
+
 
 //--------------------------------------------------------------
 //	function bodies
@@ -59,6 +62,25 @@ void initData(void){
 #endif
 	for(int i=0; i<squareNumber;i++){
 		BOARDINDEX[i%8][i/8] = i;
+	}
+
+	for (int file = 0; file < 8; file++)
+	{
+		for (int rank = 0; rank < 8; rank++)
+		{
+			//===========================================================================
+			//initialize 8-bit rank mask
+			//===========================================================================
+
+			RANKMASK[BOARDINDEX[file][rank]]  = bitSet(BOARDINDEX[0][rank]) | bitSet(BOARDINDEX[1][rank]) | bitSet(BOARDINDEX[2][rank]) | bitSet(BOARDINDEX[3][rank]) ;
+			RANKMASK[BOARDINDEX[file][rank]] |= bitSet(BOARDINDEX[4][rank]) | bitSet(BOARDINDEX[5][rank]) | bitSet(BOARDINDEX[6][rank]) | bitSet(BOARDINDEX[7][rank]) ;
+
+			//===========================================================================
+			//initialize 8-bit file mask
+			//===========================================================================
+			FILEMASK[BOARDINDEX[file][rank]]  = bitSet(BOARDINDEX[file][0]) | bitSet(BOARDINDEX[file][1]) | bitSet(BOARDINDEX[file][2]) | bitSet(BOARDINDEX[file][3]) ;
+			FILEMASK[BOARDINDEX[file][rank]] |= bitSet(BOARDINDEX[file][4]) | bitSet(BOARDINDEX[file][5]) | bitSet(BOARDINDEX[file][6]) | bitSet(BOARDINDEX[file][7]) ;
+		}
 	}
 }
 

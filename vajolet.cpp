@@ -22,6 +22,7 @@
 #include "data.h"
 #include "hashKeys.h"
 #include "position.h"
+#include "movegen.h"
 
 /*!	\brief	print the startup information
 	\author Marco Belli
@@ -44,6 +45,8 @@ int main()
 	HashKeys::init();
 	Position::initScoreValues();
 	Position::initCastlaRightsMask();
+	Movegen::initMovegenConstant();
+
 
 	uciLoop();
 }

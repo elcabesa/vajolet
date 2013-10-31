@@ -46,11 +46,15 @@ struct Move
 	};
 
 
+
+
 };
 
 inline int pawnPush(int color){
 	return color? -8:8;
 }
+
+
 
 
 

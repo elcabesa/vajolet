@@ -22,91 +22,51 @@
 #include <utility>
 #include "vajolet.h"
 #include "move.h"
-
-/*template<typename Type>
-class BasicPool
-    {
-    public:
-    BasicPool() {}
-
-    //delete the copy constructor; we can't copy it:
-    BasicPool(const BasicPool &)=delete;
-
-    //move constructor; we can move it:
-    BasicPool(BasicPool && other)
-        {
-        this->free(std::move(other.free));
-        }
-
-    //#### create an instance of Type:
-    template<typename... Args>
-    Type * create(Args && ...args)
-        {
-        Type * place = (Type*)(allocate());
-        try{ new (place) Type(std::forward<Args>(args)...); }
-        catch(...) { free.push(place); throw; }
-        return place;
-        }
-
-    //#### remove an instance of Type (add memory to the pool):
-    void remove(Type * o)
-        {
-        o->~Type();
-        free.push(o);
-        }
-
-    //allocate a chunk of memory as big as Type needs:
-    void * allocate()
-        {
-        void * place;
-        if(!free.empty())
-            {
-            place = static_cast<void*>(free.top());
-            free.pop();
-            }
-        else
-            {
-            place = operator new(sizeof(Type));
-            }
-        return place;
-        }
-
-    //mark some memory as available (no longer used):
-    void deallocate(void * o)
-        {
-        free.push(static_cast<Type*>(o));
-        }
-
-    //delete all of the available memory chunks:
-    ~BasicPool()
-        {
-        while(!free.empty())
-            {
-            ::operator delete(free.top());
-            free.pop();
-            }
-        }
-
-    private:
-
-    //stack to hold pointers to free chunks:
-    std::stack<Type*> free;
-};*/
-
-/*void pippo(void){
-	BasicPool<int> p;
-	//create an instance of SomeObject from the pool:
-	int * o = p.create();
-	//destroy it when done, putting memory back into the pool:
-	p.remove(o);
-
-
-}*/
-
+#include "position.h"
 
 class Movegen{
 private:
-	Move moveList[MAX_MOVE_PER_POSITION];
+	/*static */Move moveList/*pool[1024]*/[MAX_MOVE_PER_POSITION];
+	//static unsigned int moveListAllocated;
+	//Move * moveList;
+	unsigned int moveListIndex;
+
+public:
+	static void initMovegenConstant(void);
+	void generateMoves(Position &p);
+	inline unsigned int getGeneratedMoveNumber(void){ return moveListIndex;}
+	inline Move  & getGeneratedMove(unsigned int x){ return moveList[x];}
+
+	/*Movegen(){
+		moveList=moveListPool[moveListAllocated++];
+	}
+
+	~Movegen(){
+		moveListAllocated--;
+	}*/
+
+private:
+	// Move generator shift for ranks:
+	static const int RANKSHIFT[squareNumber];
+
+	static bitMap MG_RANKMASK[squareNumber];
+	static bitMap MG_FILEMASK[squareNumber];
+	static bitMap MG_DIAGA8H1MASK[squareNumber];
+	static bitMap MG_DIAGA1H8MASK[squareNumber];
+	static bitMap MG_RANK_ATTACK[squareNumber][64];
+	static bitMap MG_FILE_ATTACK[squareNumber][64];
+	static bitMap MG_DIAGA8H1_ATTACK[squareNumber][64];
+	static bitMap MG_DIAGA1H8_ATTACK[squareNumber][64];
+	static bitMap MG_FILEMAGIC[64];
+	static bitMap MG_DIAGA8H1MAGIC[64];
+	static bitMap MG_DIAGA1H8MAGIC[64];
+
+	// Move generator magic multiplication numbers for files:
+	static const bitMap FILEMAGICS[8];
+	static const bitMap DIAGA8H1MAGICS[15];
+	static const bitMap DIAGA1H8MAGICS[15];
+	static bitMap KNIGHT_MOVE[squareNumber];
+	static bitMap KING_MOVE[squareNumber];
 };
 
 

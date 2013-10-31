@@ -24,6 +24,7 @@
 #include "io.h"
 #include "hashKeys.h"
 #include "move.h"
+#include "movegen.h"
 
 
 
@@ -449,7 +450,7 @@ void Position::doNullMove(void){
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::doMove(Move m){
+void Position::doMove(Move & m){
 	state n=stateInfo.back();
 	stateInfo.push_back(n);
 	state &x=stateInfo.back();
@@ -563,7 +564,7 @@ void Position::doMove(Move m){
 
 	x.nextMove= (eNextMove)(blackTurn-x.nextMove);
 
-	checkPosConsistency();
+	//checkPosConsistency();
 
 
 }
@@ -573,7 +574,7 @@ void Position::doMove(Move m){
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::undoMove(Move m){
+void Position::undoMove(Move & m){
 
 	state x=stateInfo.back();
 
@@ -609,7 +610,7 @@ void Position::undoMove(Move m){
 	}
 	stateInfo.pop_back();
 
-	checkPosConsistency();
+	//checkPosConsistency();
 
 }
 
@@ -649,6 +650,11 @@ bool Position::checkPosConsistency(void){
 		return false;
 	}
 	if((bitBoard[whitePieces] | bitBoard[blackPieces]) !=bitBoard[occupiedSquares]){
+		display();
+		displayBitMap(bitBoard[whitePieces]);
+		displayBitMap(bitBoard[blackPieces]);
+		displayBitMap(bitBoard[occupiedSquares]);
+		while(1){}
 		sync_cout<<"all piece problem"<<sync_endl;
 		return false;
 	}
@@ -706,6 +712,7 @@ bool Position::checkPosConsistency(void){
 	}
 	if(x.key != calcKey()){
 		sync_cout<<"hashKey error"<<sync_endl;
+		while(1){}
 		return false;
 	}
 	if(x.pawnKey != calcPawnKey()){
@@ -736,5 +743,50 @@ Score Position::eval(void) const {
 	else{
 		return stateInfo.back().material[0];
 	}
+
+}
+
+
+unsigned long Position::perft(unsigned int depth){
+
+	Movegen mg;
+	mg.generateMoves(*this);
+	unsigned long tot = 0;
+	/*if (depth == 0) {
+		return 1;
+	}*/
+	if(depth==1){
+		return mg.getGeneratedMoveNumber();
+	}
+
+	unsigned int mn=0;
+	while (mn <mg.getGeneratedMoveNumber()) {
+		//sync_cout<<"domove:"<< mg.getGeneratedMove(mn).from<< " "<< mg.getGeneratedMove(mn).to<<sync_endl;
+		doMove(mg.getGeneratedMove(mn));
+		tot += perft(depth - 1);
+		//sync_cout<<"undomove:"<< mg.getGeneratedMove(mn).from<< " "<< mg.getGeneratedMove(mn).to<<sync_endl;
+		undoMove(mg.getGeneratedMove(mn));
+		mn++;
+	}
+	return tot;
+
+}
+
+unsigned long Position::divide(unsigned int depth){
+
+	Movegen mg;
+	unsigned long tot = 0;
+	unsigned int mn=0;
+	mg.generateMoves(*this);
+	while (mn <mg.getGeneratedMoveNumber()) {
+
+		doMove(mg.getGeneratedMove(mn));
+		unsigned long n= perft(depth - 1);
+		sync_cout<<displayUci(mg.getGeneratedMove(mn))<<": "<<n<<sync_endl;
+		tot+=n;
+		undoMove(mg.getGeneratedMove(mn));
+		mn++;
+	}
+	return tot;
 
 }
