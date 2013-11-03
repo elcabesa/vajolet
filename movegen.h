@@ -20,15 +20,14 @@
 
 #include <stack>
 #include <utility>
+#include <cassert>
 #include "vajolet.h"
 #include "move.h"
 #include "position.h"
 
 class Movegen{
 private:
-	/*static */Move moveList/*pool[1024]*/[MAX_MOVE_PER_POSITION];
-	//static unsigned int moveListAllocated;
-	//Move * moveList;
+	Move moveList[MAX_MOVE_PER_POSITION];
 	unsigned int moveListIndex;
 
 public:
@@ -37,13 +36,41 @@ public:
 	inline unsigned int getGeneratedMoveNumber(void){ return moveListIndex;}
 	inline Move  & getGeneratedMove(unsigned int x){ return moveList[x];}
 
-	/*Movegen(){
-		moveList=moveListPool[moveListAllocated++];
+
+	inline static bitMap attackFromRook(tSquare from,bitMap & occupancy){
+		assert(from>=0 && from <=squareNumber);
+		bitMap res = MG_RANK_ATTACK[from][((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from])];
+		res |= MG_FILE_ATTACK[from][((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
+		return res;
+	}
+	inline static bitMap attackFromBishop(tSquare from,bitMap & occupancy){
+		assert(from>=0 && from <=squareNumber);
+		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
+		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
+		return res;
 	}
 
-	~Movegen(){
-		moveListAllocated--;
-	}*/
+	inline static bitMap attackFromKnight(tSquare from,bitMap occupancy){
+		assert(from>=0 && from <=squareNumber);
+		return KNIGHT_MOVE[from];
+	}
+	inline static bitMap attackFromKing(tSquare from,bitMap occupancy){
+		assert(from>=0 && from <=squareNumber);
+		return KING_MOVE[from];
+	}
+	inline static bitMap attackFromPawn(tSquare from,unsigned int color ){
+		assert(color>=0 && color <=1);
+		assert(from>=0 && from <=squareNumber);
+		return PAWN_ATTACK[color][from];
+	}
+
+	inline static bitMap getRookPseudoAttack(tSquare from){
+		return ROOK_PSEUDO_ATTACK[from];
+	}
+
+	inline static bitMap getBishopPseudoAttack(tSquare from){
+		return BISHOP_PSEUDO_ATTACK[from];
+	}
 
 private:
 	// Move generator shift for ranks:
@@ -67,6 +94,10 @@ private:
 	static const bitMap DIAGA1H8MAGICS[15];
 	static bitMap KNIGHT_MOVE[squareNumber];
 	static bitMap KING_MOVE[squareNumber];
+	static bitMap PAWN_ATTACK[2][squareNumber];
+	static bitMap ROOK_PSEUDO_ATTACK[squareNumber];
+	static bitMap BISHOP_PSEUDO_ATTACK[squareNumber];
+
 };
 
 

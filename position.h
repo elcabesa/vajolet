@@ -96,6 +96,10 @@ public:
 			ply;			/*!<  ply from the start*/
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
 		Score material[2];	/*!<  two values for opening/endgame score*/
+		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
+		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
+		bitMap pinnedPieces;	/*!< pinned pieces*/
+		bitMap checkers;	/*!< checking pieces*/
 
 	};
 
@@ -122,7 +126,6 @@ private:
 public:
 
 
-	void init(void);
 	static void initScoreValues(void);
 	void display(void) const;
 	void displayFen(void) const;
@@ -134,6 +137,7 @@ public:
 	Score eval(void) const;
 	unsigned long perft(unsigned int depth);
 	unsigned long divide(unsigned int depth);
+	bool moveGivesCheck(Move& m);
 
 	/*! \brief constructor
 		\author Marco Belli
@@ -167,6 +171,71 @@ public:
 	inline char isblack(bitboardIndex piece) const {
 		return piece&8;
 	}
+
+
+
+	/*! \brief undo a null move
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline void undoNullMove(void){
+		stateInfo.pop_back();
+	}
+	inline state& getActualState(void){
+		return stateInfo.back();
+	}
+
+	std::string displayUci(Move & m) const{
+
+		std::string s;
+		//from
+		s+=char('a'+FILES[m.from]);
+		s+=char('1'+RANKS[m.from]);
+
+
+		//to
+		s+=char('a'+FILES[m.to]);
+		s+=char('1'+RANKS[m.to]);
+		//promotion
+		if(m.flags == Move::fpromotion){
+			s += Position::PIECE_NAMES_FEN[m.promotion+Position::whiteQueens];
+		}
+		return s;
+
+	}
+
+	inline bitMap getAttackersTo(tSquare to){
+		return getAttackersTo(to, bitBoard[occupiedSquares]);
+	}
+
+	bitMap getAttackersTo(tSquare to, bitMap occupancy);
+
+
+
+
+
+
+private:
+
+	U64 calcKey(void) const;
+	U64 calcPawnKey(void) const;
+	U64 calcMaterialKey(void) const;
+	simdScore calcMaterialValue(void) const;
+	void calcNonPawnMaterialValue(Score* s);
+	bool checkPosConsistency(void);
+	void clear();
+	inline void calcCheckingSquares(void);
+	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next);
+
+
+	/*! \brief list of the past states, this is the history of the position
+	  	the last element is the actual state
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	std::list<state> stateInfo;
 
 	/*! \brief put a piece on the board
 		\author STOCKFISH
@@ -225,57 +294,6 @@ public:
 		pieceList[piece][index[lastSquare]] = lastSquare;
 		pieceList[piece][pieceCount[piece]] = squareNone;
 	}
-
-	/*! \brief undo a null move
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	inline void undoNullMove(void){
-		stateInfo.pop_back();
-	}
-	inline state& getActualState(void){
-		return stateInfo.back();
-	}
-
-	std::string displayUci(Move & m) const{
-
-		std::string s;
-	//from
-	s+=char('a'+FILES[m.from]);
-	s+=char('1'+RANKS[m.from]);
-
-
-	//to
-	s+=char('a'+FILES[m.to]);
-	s+=char('1'+RANKS[m.to]);
-	//promotion
-	if(m.flags == Move::fpromotion){
-		s += Position::PIECE_NAMES_FEN[m.promotion+Position::whiteQueens];
-	}
-	return s;
-
-}
-
-
-private:
-
-	U64 calcKey(void) const;
-	U64 calcPawnKey(void) const;
-	U64 calcMaterialKey(void) const;
-	simdScore calcMaterialValue(void) const;
-	void calcNonPawnMaterialValue(Score* s);
-	bool checkPosConsistency(void);
-	void clear();
-
-	/*! \brief list of the past states, this is the history of the position
-
-	  the last element is the actual state
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	std::list<state> stateInfo;
 
 
 

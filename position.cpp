@@ -155,6 +155,12 @@ void Position::setupFromFen(const std::string& fenStr){
 	x.key=calcKey();
 	x.pawnKey=calcPawnKey();
 	x.materialKey=calcMaterialKey();
+
+	calcCheckingSquares();
+
+	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
+	x.pinnedPieces=getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
+	x.checkers= getAttackersTo(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0]);
 }
 
 
@@ -455,6 +461,9 @@ void Position::doMove(Move & m){
 	stateInfo.push_back(n);
 	state &x=stateInfo.back();
 
+	bool moveIsCheck=moveGivesCheck(m);
+
+
 	tSquare from =m.from;
 	tSquare to =m.to;
 	tSquare captureSquare =m.to;
@@ -563,6 +572,37 @@ void Position::doMove(Move & m){
 
 
 	x.nextMove= (eNextMove)(blackTurn-x.nextMove);
+
+	if(moveIsCheck){
+
+		//TODO aggiungere gestione checkers!!
+		/*
+		if (type_of(m) != NORMAL)
+			st->checkersBB = attackers_to(king_square(them)) & pieces(us);
+		else
+		{
+			// Direct checks
+			if (ci.checkSq[pt] & to)
+				st->checkersBB |= to;
+
+			// Discovery checks
+			if (ci.dcCandidates && (ci.dcCandidates & from))
+			{
+				if (pt != ROOK)
+					st->checkersBB |= attacks_from<ROOK>(king_square(them)) & pieces(us, QUEEN, ROOK);
+
+				if (pt != BISHOP)
+					st->checkersBB |= attacks_from<BISHOP>(king_square(them)) & pieces(us, QUEEN, BISHOP);
+			}
+		}*/
+	}
+
+	calcCheckingSquares();
+	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
+	x.pinnedPieces=getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
+
+
+
 
 	//checkPosConsistency();
 
@@ -752,12 +792,12 @@ unsigned long Position::perft(unsigned int depth){
 	Movegen mg;
 	mg.generateMoves(*this);
 	unsigned long tot = 0;
-	/*if (depth == 0) {
+	if (depth == 0) {
 		return 1;
-	}*/
-	if(depth==1){
-		return mg.getGeneratedMoveNumber();
 	}
+	/*if(depth==1){
+		return mg.getGeneratedMoveNumber();
+	}*/
 
 	unsigned int mn=0;
 	while (mn <mg.getGeneratedMoveNumber()) {
@@ -789,4 +829,127 @@ unsigned long Position::divide(unsigned int depth){
 	}
 	return tot;
 
+}
+
+inline void Position::calcCheckingSquares(void){
+		state & s=stateInfo.back();
+		bitboardIndex opponentKing=(bitboardIndex)(blackKing-s.nextMove);
+		bitboardIndex attackingPieces=(bitboardIndex)s.nextMove;
+
+
+		tSquare kingSquare=pieceList[opponentKing][0];
+		bitMap occupancy=bitBoard[occupiedSquares];
+
+		s.checkingSquares[whiteKing+attackingPieces]=0;
+		s.checkingSquares[whiteRooks+attackingPieces]=Movegen::attackFromRook(kingSquare,occupancy);
+		s.checkingSquares[whiteBishops+attackingPieces]=Movegen::attackFromBishop(kingSquare,occupancy);
+		s.checkingSquares[whiteQueens+attackingPieces]=s.checkingSquares[whiteRooks+attackingPieces]|s.checkingSquares[whiteBishops+attackingPieces];
+		s.checkingSquares[whiteKnights+attackingPieces]=Movegen::attackFromKnight(kingSquare,occupancy);
+
+		if(attackingPieces){
+			s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFromPawn(kingSquare,0);
+		}else{
+			s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFromPawn(kingSquare,1);
+		}
+
+		/*displayBitMap(s.checkingSquares[whiteKing]);
+		displayBitMap(s.checkingSquares[whiteRooks]);
+		displayBitMap(s.checkingSquares[whiteBishops]);
+		displayBitMap(s.checkingSquares[whiteKnights]);
+		displayBitMap(s.checkingSquares[whiteQueens]);
+		displayBitMap(s.checkingSquares[whitePawns]);
+		displayBitMap(s.checkingSquares[whiteKing]);
+		displayBitMap(s.checkingSquares[blackRooks]);
+		displayBitMap(s.checkingSquares[blackBishops]);
+		displayBitMap(s.checkingSquares[blackKnights]);
+		displayBitMap(s.checkingSquares[blackQueens]);
+		displayBitMap(s.checkingSquares[blackPawns]);*/
+
+	}
+
+bitMap Position::getHiddenCheckers(tSquare kingSquare,eNextMove next){
+	bitMap result=0;
+	bitMap pinners= Movegen::getBishopPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteBishops+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
+	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteRooks+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
+
+	while(pinners){
+		bitMap b = SQUARES_BETWEEN[kingSquare][firstOne(pinners)] & bitBoard[occupiedSquares];
+		if (!moreThanOneBit(b)){
+			result |= b & bitBoard[(bitboardIndex)(whitePieces+stateInfo.back().nextMove)];
+		}
+		pinners&= pinners-1;
+	}
+	return result;
+
+}
+
+bitMap Position::getAttackersTo(tSquare to, bitMap occupancy){
+	return (Movegen::attackFromPawn(to,1) & bitBoard[whitePawns])
+			|(Movegen::attackFromPawn(to,0) & bitBoard[blackPawns])
+
+			|(Movegen::attackFromKnight(to,occupancy) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))
+			|(Movegen::attackFromBishop(to,occupancy) & (bitBoard[blackBishops]|bitBoard[whiteBishops]|bitBoard[blackQueens]|bitBoard[whiteQueens]))
+			|(Movegen::attackFromRook(to,occupancy) & (bitBoard[blackRooks]|bitBoard[whiteRooks]|bitBoard[blackQueens]|bitBoard[whiteQueens]))
+			|(Movegen::attackFromKing(to,occupancy) & (bitBoard[blackKing]|bitBoard[whiteKing]));
+}
+
+bool Position::moveGivesCheck(Move& m){
+	tSquare from = m.from;
+	tSquare to = m.to;
+	bitboardIndex piece = board[from];
+	state s=getActualState();
+
+	// Direct check ?
+	if (s.checkingSquares[piece] & bitSet(to)){
+		return true;
+	}
+
+	// Discovery check ?
+	if(s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from)))
+	{
+		// For pawn and king moves we need to verify also direction
+		if ( (!isPawn(piece)&& !isKing(piece)) || !squaresAligned(from, to, pieceList[whiteKing+s.nextMove][0]))
+	          return true;
+	  }
+
+	//TODO RIAGGIUNGERE tutti questi casi
+	// Can we skip the ugly special cases ?
+	/*  if (type_of(m) == NORMAL)
+	      return false;
+
+	  Color us = sideToMove;
+	  Square ksq = king_square(~us);
+
+	  switch (type_of(m))
+	  {
+	  case PROMOTION:
+	      return attacks_from(Piece(promotion_type(m)), to, pieces() ^ from) & ksq;
+
+	  // En passant capture with check ? We have already handled the case
+	  // of direct checks and ordinary discovered check, the only case we
+	  // need to handle is the unusual case of a discovered check through
+	  // the captured pawn.
+	  case ENPASSANT:
+	  {
+	      Square capsq = file_of(to) | rank_of(from);
+	      Bitboard b = (pieces() ^ from ^ capsq) | to;
+
+	      return  (attacks_bb<  ROOK>(ksq, b) & pieces(us, QUEEN, ROOK))
+	            | (attacks_bb<BISHOP>(ksq, b) & pieces(us, QUEEN, BISHOP));
+	  }
+	  case CASTLE:
+	  {
+	      Square kfrom = from;
+	      Square rfrom = to; // 'King captures the rook' notation
+	      Square kto = relative_square(us, rfrom > kfrom ? SQ_G1 : SQ_C1);
+	      Square rto = relative_square(us, rfrom > kfrom ? SQ_F1 : SQ_D1);
+
+	      return   (PseudoAttacks[ROOK][rto] & ksq)
+	            && (attacks_bb<ROOK>(rto, (pieces() ^ kfrom ^ rfrom) | rto | kto) & ksq);
+	  }
+	  default:
+	      assert(false);
+	      return false;
+	  }*/
+	return false;
 }

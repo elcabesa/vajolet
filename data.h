@@ -52,6 +52,11 @@ extern const int FILES[squareNumber];
 extern const int RANKS[squareNumber];
 extern bitMap RANKMASK[squareNumber];
 extern bitMap FILEMASK[squareNumber];
+extern bitMap DIAGA1H8MASK[squareNumber];
+extern bitMap DIAGA8H1MASK[squareNumber];
+extern bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
+
+
 
 //------------------------------------------------
 //	inline functions
@@ -63,6 +68,11 @@ inline bitMap bitSet(tSquare n){
 	//return (Vec2uq(1,0)<<n)[0];
 	return (1ull)<<n;
 #endif
+}
+
+inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3){
+	return  (SQUARES_BETWEEN[s1][s2] | SQUARES_BETWEEN[s1][s3] | SQUARES_BETWEEN[s2][s3])
+			& (     bitSet(s1) |        bitSet(s2) |        bitSet(s3));
 }
 //------------------------------------------------
 //	function prototype

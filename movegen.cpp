@@ -37,6 +37,10 @@ bitMap Movegen::MG_DIAGA1H8MAGIC[64];
 
 bitMap Movegen::KNIGHT_MOVE[squareNumber];
 bitMap Movegen::KING_MOVE[squareNumber];
+bitMap Movegen::PAWN_ATTACK[2][squareNumber];
+
+bitMap Movegen::ROOK_PSEUDO_ATTACK[squareNumber];
+bitMap Movegen::BISHOP_PSEUDO_ATTACK[squareNumber];
 
 //Move Movegen::moveListPool[1024][MAX_MOVE_PER_POSITION];
 //unsigned int Movegen::moveListAllocated=0;
@@ -156,6 +160,11 @@ void Movegen::initMovegenConstant(void){
 		MG_DIAGA8H1MAGIC[square] = 0x0;
 		MG_DIAGA1H8MAGIC[square] = 0x0;
 
+		PAWN_ATTACK[0][square] = 0x0;
+		PAWN_ATTACK[1][square] = 0x0;
+
+
+
 		for (int state = 0; state < 64; state++)
 		{
 			MG_RANK_ATTACK[square][state] = 0x0;
@@ -165,6 +174,31 @@ void Movegen::initMovegenConstant(void){
 
 		}
 	}
+
+	// pawn attacks
+	for (int square = 0; square < 64; square++)
+	{
+		int file = FILES[square];
+		int rank = RANKS[square];
+		int tofile = file - 1;
+		int torank = rank + 1;
+		if ((tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7)){
+			PAWN_ATTACK[0][square] |= bitSet(BOARDINDEX[tofile][torank]);
+		}
+		tofile = file + 1;
+		torank = rank + 1;
+		if ((tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7))
+			PAWN_ATTACK[0][square] |= bitSet(BOARDINDEX[tofile][torank]);
+		tofile = file - 1;
+		torank = rank - 1;
+		if ((tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7))
+			PAWN_ATTACK[1][square] |= bitSet(BOARDINDEX[tofile][torank]);
+		tofile = file + 1;
+		torank = rank - 1;
+		if ((tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7))
+			PAWN_ATTACK[1][square] |= bitSet(BOARDINDEX[tofile][torank]);
+	}
+
 
 	// KNIGHT attacks;
 	for (int square = 0; square < squareNumber; square++)
@@ -444,7 +478,11 @@ void Movegen::initMovegenConstant(void){
 
 
 
-
+	for (unsigned int square = 0; square < 64; square++){
+		bitMap x=0;
+		ROOK_PSEUDO_ATTACK[square]=attackFromRook((tSquare)square,x);
+		BISHOP_PSEUDO_ATTACK[square]=attackFromBishop((tSquare)square,x);
+	}
 }
 
 
@@ -474,13 +512,15 @@ void Movegen::generateMoves(Position& p){
 	{
 		tSquare from=p.pieceList[piece][0];
 		m.from=from;
-		moves=KING_MOVE[from] & target;
+		moves= attackFromKing(from,occupiedSquares)& target;
 		while (moves){
-
 			m.to=firstOne(moves);
-			moveList[moveListIndex].packed=m.packed;
+			if(!(p.getAttackersTo(m.to) & p.bitBoard[Position::blackPieces-p.getActualState().nextMove]))
+			{
+				moveList[moveListIndex].packed=m.packed;
+				moveListIndex++;
+			}
 			moves &= moves-1;
-			moveListIndex++;
 		}
 	}
 
@@ -492,10 +532,8 @@ void Movegen::generateMoves(Position& p){
 	for(unsigned int i=0;i<p.pieceCount[piece];i++){
 		tSquare from=p.pieceList[piece][i];
 		m.from=from;
-		moves = MG_RANK_ATTACK[from][((occupiedSquares & MG_RANKMASK[from]) >> RANKSHIFT[from])];
-		moves |= MG_FILE_ATTACK[from][((occupiedSquares & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
-		moves |= MG_DIAGA8H1_ATTACK[from][((occupiedSquares & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
-		moves |= MG_DIAGA1H8_ATTACK[from][((occupiedSquares & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
+		moves= attackFromRook(from,occupiedSquares);
+		moves |= attackFromBishop(from,occupiedSquares);
 		moves &=target;
 		while (moves){
 			m.to=firstOne(moves);
@@ -513,8 +551,7 @@ void Movegen::generateMoves(Position& p){
 	for(unsigned int i=0;i<p.pieceCount[piece];i++){
 		tSquare from=p.pieceList[piece][i];
 		m.from=from;
-		moves = MG_RANK_ATTACK[from][((occupiedSquares & MG_RANKMASK[from]) >> RANKSHIFT[from])];
-		moves |= MG_FILE_ATTACK[from][((occupiedSquares & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
+		moves= attackFromRook(from,occupiedSquares);
 		moves &=target;
 		while (moves){
 			m.to=firstOne(moves);
@@ -533,8 +570,7 @@ void Movegen::generateMoves(Position& p){
 	for(unsigned int i=0;i<p.pieceCount[piece];i++){
 		tSquare from=p.pieceList[piece][i];
 		m.from=from;
-		moves = MG_DIAGA8H1_ATTACK[from][((occupiedSquares & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
-		moves |= MG_DIAGA1H8_ATTACK[from][((occupiedSquares & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
+		moves= attackFromBishop(from,occupiedSquares);
 		moves &=target;
 		while (moves){
 			m.to=firstOne(moves);
@@ -553,7 +589,7 @@ void Movegen::generateMoves(Position& p){
 	for(unsigned int i=0;i<p.pieceCount[piece];i++){
 		tSquare from=p.pieceList[piece][i];
 		m.from=from;
-		moves = KNIGHT_MOVE[p.pieceList[piece][i]]& target;
+		moves = attackFromKnight(p.pieceList[piece][i],occupiedSquares)& target;
 		while (moves){
 			m.to=firstOne(moves);
 			moveList[moveListIndex].packed=m.packed;
@@ -611,6 +647,8 @@ void Movegen::generateMoves(Position& p){
 		moves &= moves-1;
 		moveListIndex++;
 		}
+
+	assert(moveListIndex<=MAX_MOVE_PER_POSITION);
 
 
 

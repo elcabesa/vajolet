@@ -72,6 +72,10 @@ static inline unsigned int firstOne(bitMap bitmap)
 #endif
 }
 
+inline bool moreThanOneBit(bitMap b) {
+  return b & (b - 1);
+}
+
 //-----------------------------------------------------------------------------
 //	function prototype
 //-----------------------------------------------------------------------------
