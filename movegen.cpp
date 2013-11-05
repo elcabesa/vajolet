@@ -47,9 +47,7 @@ bitMap Movegen::castlePath[2][2];
 Move Movegen::moveListPool[1024][MAX_MOVE_PER_POSITION];
 unsigned int Movegen::moveListAllocated=0;
 */
-inline unsigned int makeMove(unsigned int from, unsigned int to){
-	return from|(to<<6);
-}
+
 
 const int Movegen::RANKSHIFT[squareNumber] = {
 	1,  1,  1,  1,  1,  1,  1,  1,

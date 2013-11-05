@@ -44,43 +44,17 @@ void static printUciInfo(void){
 	std::cout<<"uciok"<<sync_endl;
 }
 
-Move moveFromUci(const Position& pos, std::string& str) {
+Move moveFromUci(Position& pos, std::string& str) {
 
-	// TODO accettare solo mosse valide , generare lista mosse valide e accettare mossa per la quale la stringa UCI ricevuta e quella generata è identica
-	Move m;
-	m.packed=0;
-	if (str.length() == 5){ // Junior could send promotion piece in uppercase
-		str[4] = char(tolower(str[4]));
-		switch ( str[4] )
-		{
-		case 'b':
-			m.flags =Move::fpromotion;
-			m.promotion= Move::promBishop;
-			break;
-		case 'n':
-			m.flags =Move::fpromotion;
-			m.promotion= Move::promKnight;
-			break;
-		case 'r':
-			m.flags =Move::fpromotion;
-			m.promotion= Move::promRook;
-			break;
-		case 'q':
-			m.flags =Move::fpromotion;
-			m.promotion= Move::promQueen;
-			break;
+	Movegen mg;
+	mg.generateMoves(pos);
+	for(unsigned int i=0;i< mg.getGeneratedMoveNumber();i++){
+		if(str==pos.displayUci(mg.getGeneratedMove(i))){
+			return mg.getGeneratedMove(i);
 		}
 	}
-
-	unsigned int fx = (str[0]| 32) - 'a';
-	unsigned int fy = (str[1])-'1';
-	unsigned int tx = (str[2] | 32) - 'a';
-	unsigned int ty = (str[3])-'1';
-	m.from = (fy << 3) + fx;
-	m.to = (ty << 3) + tx;
-
-
-
+	Move m;
+	m.packed=0;
 	return m;
 }
 
