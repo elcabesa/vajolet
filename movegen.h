@@ -25,6 +25,8 @@
 #include "move.h"
 #include "position.h"
 
+#define KING_SIDE_CASTLE (0)
+#define QUEEN_SIDE_CASTLE (1)
 class Movegen{
 private:
 	Move moveList[MAX_MOVE_PER_POSITION];
@@ -36,31 +38,64 @@ public:
 	inline unsigned int getGeneratedMoveNumber(void){ return moveListIndex;}
 	inline Move  & getGeneratedMove(unsigned int x){ return moveList[x];}
 
+	inline static bitMap attackFrom(Position::bitboardIndex piece,tSquare from,bitMap & occupancy){
+		switch(piece){
+		case Position::whiteKing:
+		case Position::blackKing:
+			return attackFromKing(from);
+			break;
+		case Position::whiteQueens:
+		case Position::blackQueens:
+			return attackFromRook(from,occupancy) | attackFromBishop(from,occupancy);
+			break;
+		case Position::whiteRooks:
+		case Position::blackRooks:
+			return attackFromRook(from,occupancy);
+			break;
+		case Position::whiteBishops:
+		case Position::blackBishops:
+			return attackFromBishop(from,occupancy);
+			break;
+		case Position::whiteKnights:
+		case Position::blackKnights:
+			return attackFromKnight(from);
+			break;
+		case Position::whitePawns:
+			return attackFromPawn(from,0);
+			break;
+		case Position::blackPawns:
+			return attackFromPawn(from,1);
+			break;
+		default:
+			return 0;
+
+		}
+	}
 
 	inline static bitMap attackFromRook(tSquare from,bitMap & occupancy){
-		assert(from>=0 && from <=squareNumber);
+		assert(from <=squareNumber);
 		bitMap res = MG_RANK_ATTACK[from][((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from])];
 		res |= MG_FILE_ATTACK[from][((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
 		return res;
 	}
 	inline static bitMap attackFromBishop(tSquare from,bitMap & occupancy){
-		assert(from>=0 && from <=squareNumber);
+		assert(from <=squareNumber);
 		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
 		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
 		return res;
 	}
 
-	inline static bitMap attackFromKnight(tSquare from,bitMap occupancy){
-		assert(from>=0 && from <=squareNumber);
+	inline static bitMap attackFromKnight(tSquare from){
+		assert(from <=squareNumber);
 		return KNIGHT_MOVE[from];
 	}
-	inline static bitMap attackFromKing(tSquare from,bitMap occupancy){
-		assert(from>=0 && from <=squareNumber);
+	inline static bitMap attackFromKing(tSquare from){
+		assert(from <=squareNumber);
 		return KING_MOVE[from];
 	}
 	inline static bitMap attackFromPawn(tSquare from,unsigned int color ){
-		assert(color>=0 && color <=1);
-		assert(from>=0 && from <=squareNumber);
+		assert(color <=1);
+		assert(from <=squareNumber);
 		return PAWN_ATTACK[color][from];
 	}
 
@@ -97,6 +132,7 @@ private:
 	static bitMap PAWN_ATTACK[2][squareNumber];
 	static bitMap ROOK_PSEUDO_ATTACK[squareNumber];
 	static bitMap BISHOP_PSEUDO_ATTACK[squareNumber];
+	static bitMap castlePath[2][2];
 
 };
 

@@ -20,6 +20,7 @@
 #include <sstream>
 #include <string>
 #include <chrono>
+#include <iterator>
 #include "vajolet.h"
 #include "command.h"
 #include "io.h"
@@ -119,26 +120,32 @@ void uciLoop(){
 
 /*	Move m1,m2,m3,m4,m5,m6,m7;
 	//pos.display();
-	m1.from=E2;
-	m1.to=E4;
+	m1.packed=0;
+	m1.from=A2;
+	m1.to=A4;
 	pos.doMove(m1);
 	//pos.display();
-	m2.from=E7;
-	m2.to=E5;
+	m2.packed=0;
+	m2.from=G8;
+	m2.to=F6;
 	pos.doMove(m2);
 	//pos.display();
-	m3.from=G1;
-	m3.to=F3;
+	m3.packed=0;
+	m3.from=A4;
+	m3.to=A5;
 	pos.doMove(m3);
 	//pos.display();
-	m4.from=B8;
-	m4.to=C6;
+	m4.packed=0;
+	m4.from=B7;
+	m4.to=B5;
 	pos.doMove(m4);
 	//pos.display();
-	m5.from=F1;
-	m5.to=C4;
+	m5.packed=0;
+	m5.from=A5;
+	m5.to=B6;
+	m5.flags=Move::fenpassant;
 	pos.doMove(m5);
-	//pos.display();
+	pos.display();
 	m6.from=F8;
 	m6.to=C5;
 	pos.doMove(m6);
@@ -155,8 +162,8 @@ void uciLoop(){
 	pos.undoMove(m3);
 	pos.undoMove(m2);
 	pos.undoMove(m1);
-	//pos.display();
-*/
+	pos.display();*/
+
 
 	do{
 		if (!std::getline(std::cin, cmd)) // Block here waiting for input

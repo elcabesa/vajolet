@@ -59,7 +59,17 @@ public:
 		blackPieces=15,					//15	00001111
 
 
+
+
 		lastBitboard=16,
+
+		King=whiteKing,
+		Queens,
+		Rooks,
+		Bishops,
+		Knights,
+		Pawns,
+		Pieces,
 
 		empty=occupiedSquares
 
@@ -100,6 +110,7 @@ public:
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
 		bitMap checkers;	/*!< checking pieces*/
+		bitMap *Us,*Them;
 
 	};
 
@@ -135,8 +146,8 @@ public:
 	static void initCastlaRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
 	Score eval(void) const;
-	unsigned long perft(unsigned int depth);
-	unsigned long divide(unsigned int depth);
+	unsigned long long perft(unsigned int depth);
+	unsigned long long divide(unsigned int depth);
 	bool moveGivesCheck(Move& m);
 
 	/*! \brief constructor
@@ -162,6 +173,22 @@ public:
 	*/
 	inline char isKing(bitboardIndex piece) const {
 		return (piece&7)==1;
+	}
+	/*! \brief tell if the piece is a rook
+		\author Marco Belli
+		\version 1.0
+		\date 04/11/2013
+	*/
+	inline char isRook(bitboardIndex piece) const {
+		return (piece&7)==3;
+	}
+	/*! \brief tell if the piece is a bishop
+		\author Marco Belli
+		\version 1.0
+		\date 04/11/2013
+	*/
+	inline char isBishop(bitboardIndex piece) const {
+		return (piece&7)==4;
 	}
 	/*! \brief tell the color of a piece
 		\author Marco Belli
@@ -223,7 +250,7 @@ private:
 	U64 calcMaterialKey(void) const;
 	simdScore calcMaterialValue(void) const;
 	void calcNonPawnMaterialValue(Score* s);
-	bool checkPosConsistency(void);
+	bool checkPosConsistency(int nn);
 	void clear();
 	inline void calcCheckingSquares(void);
 	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next);
