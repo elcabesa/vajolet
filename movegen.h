@@ -29,9 +29,21 @@
 #define QUEEN_SIDE_CASTLE (1)
 class Movegen{
 private:
+
 	Move moveList[MAX_MOVE_PER_POSITION];
 	unsigned int moveListIndex;
 
+	/*Move *moveList;//[MAX_MOVE_PER_POSITION];
+	static Move moveListPool[1024][MAX_MOVE_PER_POSITION];
+	static unsigned int moveListAllocated;
+
+public:
+	Movegen(){
+		moveList=moveListPool[moveListAllocated++];
+	}
+	~Movegen(){
+		moveListAllocated--;
+	}*/
 public:
 	static void initMovegenConstant(void);
 	void generateMoves(Position &p);

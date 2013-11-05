@@ -43,10 +43,10 @@ bitMap Movegen::ROOK_PSEUDO_ATTACK[squareNumber];
 bitMap Movegen::BISHOP_PSEUDO_ATTACK[squareNumber];
 
 bitMap Movegen::castlePath[2][2];
-
-//Move Movegen::moveListPool[1024][MAX_MOVE_PER_POSITION];
-//unsigned int Movegen::moveListAllocated=0;
-
+/*
+Move Movegen::moveListPool[1024][MAX_MOVE_PER_POSITION];
+unsigned int Movegen::moveListAllocated=0;
+*/
 inline unsigned int makeMove(unsigned int from, unsigned int to){
 	return from|(to<<6);
 }
@@ -536,7 +536,6 @@ void Movegen::generateMoves(Position& p){
 		moves= attackFromKing(from)& kingTarget;
 		while (moves){
 			m.to=firstOne(moves);
-			tSquare to=firstOne(moves);
 			if(!(p.getAttackersTo(m.to,p.bitBoard[Position::occupiedSquares] & ~s.Us[Position::King]) & s.Them[Position::Pieces]))
 			{
 				moveList[moveListIndex].packed=m.packed;
