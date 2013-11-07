@@ -47,7 +47,7 @@ void static printUciInfo(void){
 Move moveFromUci(Position& pos, std::string& str) {
 
 	Movegen mg;
-	mg.generateMoves(pos);
+	mg.generateMoves<Movegen::allMg>(pos);
 	for(unsigned int i=0;i< mg.getGeneratedMoveNumber();i++){
 		if(str==pos.displayUci(mg.getGeneratedMove(i))){
 			return mg.getGeneratedMove(i);
@@ -157,7 +157,7 @@ void uciLoop(){
 		else if (token =="d"){
 			pos.display();
 			Movegen m;
-			m.generateMoves(pos);
+			m.generateMoves<Movegen::allMg>(pos);
 		}
 		else if (token =="position"){
 			position(is,pos);

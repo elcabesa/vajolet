@@ -824,7 +824,7 @@ unsigned long long Position::perft(unsigned int depth){
 	}
 #endif
 	Movegen mg;
-	mg.generateMoves(*this);
+	mg.generateMoves<Movegen::allMg>(*this);
 	unsigned long long tot = 0;
 #ifdef FAST_PERFT
 	if(depth==1){
@@ -850,7 +850,7 @@ unsigned long long Position::divide(unsigned int depth){
 	Movegen mg;
 	unsigned long long tot = 0;
 	unsigned int mn=0;
-	mg.generateMoves(*this);
+	mg.generateMoves<Movegen::allMg>(*this);
 	while (mn <mg.getGeneratedMoveNumber()) {
 
 		doMove(mg.getGeneratedMove(mn));

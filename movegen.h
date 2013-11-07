@@ -28,6 +28,16 @@
 #define KING_SIDE_CASTLE (0)
 #define QUEEN_SIDE_CASTLE (1)
 class Movegen{
+public:
+	enum genType{
+		captureMg,			// generate capture moves
+		quietMg,			// generate quiet moves
+		quietChecksMg,		// generate quiet moves giving check
+		allNonEvasionMg,	// generate all moves while not in check
+		allEvasionMg,		// generate all moves while in check
+		allMg				// general generate all move
+
+	};
 private:
 
 	Move moveList[MAX_MOVE_PER_POSITION];
@@ -46,6 +56,7 @@ public:
 	}*/
 public:
 	static void initMovegenConstant(void);
+	template<Movegen::genType type>
 	void generateMoves(Position &p);
 	inline unsigned int getGeneratedMoveNumber(void){ return moveListIndex;}
 	inline Move  & getGeneratedMove(unsigned int x){ return moveList[x];}
