@@ -270,6 +270,11 @@ public:
 		return s;
 	}
 
+	/*! \brief return the mvvlva score
+		\author Marco Belli
+		\version 1.0
+		\date 08/11/2013
+	*/
 	inline unsigned int getGamePhase() const{
 		Score tot=stateInfo.back().nonPawnMaterial[0]+stateInfo.back().nonPawnMaterial[2];
 		if(tot>570000){ //opening
