@@ -62,16 +62,22 @@ static inline unsigned int bitCnt(bitMap bitmap)
 	\version 1.0
 	\date 22/10/2013
 */
-static inline unsigned int firstOne(bitMap bitmap)
+static inline tSquare firstOne(bitMap bitmap)
 {
 #if __x86_64__
 	return __builtin_ctzll(bitmap);
 #else
 
-	return ((unsigned long)bitmap)?((unsigned int)__builtin_ctzl((unsigned long) bitmap)):((unsigned int)__builtin_ctzl(bitmap>>32))+32;
+	return ((unsigned long)bitmap)?((tSquare)__builtin_ctzl((unsigned long) bitmap)):((tSquare)__builtin_ctzl(bitmap>>32))+(tSquare)32;
 #endif
 }
 
+
+/*	\brief return true if the bitmap has more than one bit set
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 inline bool moreThanOneBit(bitMap b) {
   return b & (b - 1);
 }

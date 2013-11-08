@@ -40,7 +40,9 @@ static void printStartInfo(void){
 */
 int main()
 {
-	printStartInfo();
+	//----------------------------------
+	//	init global data
+	//----------------------------------
 	initData();
 	HashKeys::init();
 	Position::initScoreValues();
@@ -48,5 +50,9 @@ int main()
 	Movegen::initMovegenConstant();
 
 
+	//----------------------------------
+	//	main loop
+	//----------------------------------
+	printStartInfo();
 	uciLoop();
 }

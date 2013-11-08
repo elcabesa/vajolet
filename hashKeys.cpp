@@ -15,15 +15,23 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+//---------------------------------
+//	includes
+//---------------------------------
+
 #include <random>
 #include "hashKeys.h"
 #include "io.h"
 
-U64  HashKeys::keys[squareNumber][30];  // position, piece (not all the keys are used)
-U64  HashKeys::side;          // side to move (black)
-U64  HashKeys::ep[squareNumber];        // ep targets (only 16 used)
-U64  HashKeys::castlingRight[16];            // white king-side castling right
-U64  HashKeys::exclusion;
+//---------------------------------
+//	global static hashKeys
+//---------------------------------
+
+U64  HashKeys::keys[squareNumber][30];  	// position, piece (not all the keys are used)
+U64  HashKeys::side;          				// side to move (black)
+U64  HashKeys::ep[squareNumber];        	// ep targets (only 16 used)
+U64  HashKeys::castlingRight[16];			// white king-side castling right
+U64  HashKeys::exclusion;					// position with an exluded move
 
 /*!	\brief init the hashkeys
     \author Marco Belli

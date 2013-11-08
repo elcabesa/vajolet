@@ -18,16 +18,22 @@
 #ifndef MOVE_H_
 #define MOVE_H_
 
+
+/*!	\brief struct move
+    \author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+ */
 struct Move
 {
 	union
 	{
 		struct
 		{
-	unsigned from		:6;
-	unsigned to			:6;
-	unsigned promotion	:2;
-	unsigned flags		:2;
+			unsigned from		:6;
+			unsigned to			:6;
+			unsigned promotion	:2;
+			unsigned flags		:2;
 		};
 		unsigned short packed;
 	};
@@ -50,8 +56,13 @@ struct Move
 
 };
 
-inline int pawnPush(int color){
-	return color? -8:8;
+/*!	\brief return the offset of a pawn push
+    \author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+ */
+inline tSquare pawnPush(int color){
+	return color? sud:north;
 }
 
 

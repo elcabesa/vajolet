@@ -23,9 +23,9 @@
 #ifdef PRECALCULATED_BITSET
 bitMap BITSET[squareNumber];
 #endif
-unsigned int BOARDINDEX[8][8];
+tSquare BOARDINDEX[8][8];	//<! precalculated index of a square given file and rank
 
-const int FILES[squareNumber] = {
+const int FILES[squareNumber] = {		//!< precalculated file from square number
 	0, 1, 2, 3, 4, 5, 6, 7,
 	0, 1, 2, 3, 4, 5, 6, 7,
 	0, 1, 2, 3, 4, 5, 6, 7,
@@ -36,7 +36,7 @@ const int FILES[squareNumber] = {
 	0, 1, 2, 3, 4, 5, 6, 7,
 };
 
-const int RANKS[squareNumber] = {
+const int RANKS[squareNumber] = {		//!< precalculated rank from square number
 	0, 0, 0, 0, 0, 0, 0, 0,
 	1, 1, 1, 1, 1, 1, 1, 1,
 	2, 2, 2, 2, 2, 2, 2, 2,
@@ -47,23 +47,29 @@ const int RANKS[squareNumber] = {
 	7, 7, 7, 7, 7, 7, 7, 7,
 };
 
-bitMap RANKMASK[squareNumber];
-bitMap FILEMASK[squareNumber];
+bitMap RANKMASK[squareNumber];			//!< bitmask of a rank given a square on the rank
+bitMap FILEMASK[squareNumber];			//!< bitmask of a file given a square on the rank
 
-bitMap DIAGA1H8MASK[squareNumber];
-bitMap DIAGA8H1MASK[squareNumber];
-bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
+bitMap DIAGA1H8MASK[squareNumber];		//!< bitmask of a diagonal given a square on the diagonal
+bitMap DIAGA8H1MASK[squareNumber];		//!< bitmask of a diagonal given a square on the diagonal
+bitMap SQUARES_BETWEEN[squareNumber][squareNumber];		//bitmask with the squares btween 2 alinged squares, 0 otherwise
 
 //--------------------------------------------------------------
 //	function bodies
 //--------------------------------------------------------------
+
+/*	\brief init global data structures
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 void initData(void){
 #ifdef PRECALCULATED_BITSET
-	for(int i=0;i<squareNumber;i++){
+	for(tSquare i=(tSquare)0;i<squareNumber;i++){
 		BITSET[i]=(1ull)<<i;
 	}
 #endif
-	for(int i=0; i<squareNumber;i++){
+	for(tSquare i=(tSquare)0; i<squareNumber;i++){
 		BOARDINDEX[i%8][i/8] = i;
 		DIAGA1H8MASK[i]=0;
 		DIAGA8H1MASK[i]=0;

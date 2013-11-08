@@ -128,7 +128,7 @@ void Position::setupFromFen(const std::string& fenStr){
 	if (((ss >> col) && (col >= 'a' && col <= 'h'))
 		&& ((ss >> row) && (row == '3' || row == '6')))
 	{
-		x.epSquare = ((int) col - 'a') + 8 * (row - '1') ;
+		x.epSquare =(tSquare) (((int) col - 'a') + 8 * (row - '1')) ;
 		if (!(getAttackersTo(x.epSquare) & bitBoard[whitePawns+x.nextMove]))
 			x.epSquare = squareNone;
 	}
@@ -197,7 +197,7 @@ void Position::initScoreValues(void){
 	\date 27/10/2013
 */
 void Position::clear() {
-	for (int i = 0; i < squareNumber; i++) {
+	for (tSquare i = square0; i < squareNumber; i++) {
 		board[i] = empty;
 		index[i] = 0;
 	};
@@ -205,7 +205,7 @@ void Position::clear() {
 		pieceCount[i] = 0;
 		bitBoard[i] = 0;
 		for (int n = 0; n < 16; n++) {
-			pieceList[i][n] = 0;
+			pieceList[i][n] = square0;
 		}
 	}
 	stateInfo.clear();
@@ -470,9 +470,9 @@ void Position::doMove(Move & m){
 
 
 
-	tSquare from =m.from;
-	tSquare to =m.to;
-	tSquare captureSquare =m.to;
+	tSquare from =(tSquare)m.from;
+	tSquare to =(tSquare)m.to;
+	tSquare captureSquare =(tSquare)m.to;
 	bitboardIndex piece= board[from];
 	bitboardIndex capture = (m.flags ==Move::fenpassant ? (x.nextMove?whitePawns:blackPawns) :board[to]);
 
@@ -493,9 +493,9 @@ void Position::doMove(Move & m){
 	// do castle additional instruction
 	if(m.flags==Move::fcastle){
 		bool kingSide=to > from;
-		tSquare rFrom = kingSide? to+1: to-2;
+		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		bitboardIndex rook = board[rFrom];
-		tSquare rTo = kingSide? to-1: to+1;
+		tSquare rTo = kingSide? to+ovest: to+est;
 		movePiece(rook,rFrom,rTo);
 		x.key ^=HashKeys::keys[rFrom][rook];
 		x.key ^=HashKeys::keys[rTo][rook];
@@ -556,9 +556,9 @@ void Position::doMove(Move & m){
 	if(isPawn(piece)){
 		if(
 				abs(from-to)==16
-				&& (getAttackersTo((from+to)>>1) & x.Them[Pawns])
+				&& (getAttackersTo((tSquare)((from+to)>>1)) & x.Them[Pawns])
 		){
-			x.epSquare=(from+to)>>1;
+			x.epSquare=(tSquare)((from+to)>>1);
 			x.key ^=HashKeys::ep[x.epSquare];
 		}
 		if(m.flags ==Move::fpromotion){
@@ -620,8 +620,8 @@ void Position::undoMove(Move & m){
 
 	state x=stateInfo.back();
 
-	tSquare to = m.to;
-	tSquare from = m.from;
+	tSquare to = (tSquare)m.to;
+	tSquare from = (tSquare)m.from;
 	bitboardIndex piece= board[to];
 
 	if(m.flags == Move::fpromotion){
@@ -632,8 +632,8 @@ void Position::undoMove(Move & m){
 
 	if(m.flags== Move::fcastle){
 		bool kingSide=to > from;
-		tSquare rFrom = kingSide? to+1: to-2;
-		tSquare rTo = kingSide? to-1: to+1;
+		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
+		tSquare rTo = kingSide? to+ovest: to+est;
 		bitboardIndex rook = board[rTo];
 
 		movePiece(rook,rTo,rFrom);
@@ -706,7 +706,7 @@ bool Position::checkPosConsistency(int nn){
 		while(1){}
 		return false;
 	}
-	for(int i=0;i<squareNumber;i++){
+	for(tSquare i=square0;i<squareNumber;i++){
 		bitboardIndex id=board[i];
 
 		if(id != empty && (bitBoard[id] & bitSet(i))==0){
@@ -935,8 +935,8 @@ bitMap Position::getAttackersTo(tSquare to, bitMap occupancy){
 }
 
 bool Position::moveGivesCheck(Move& m){
-	tSquare from = m.from;
-	tSquare to = m.to;
+	tSquare from = (tSquare)m.from;
+	tSquare to = (tSquare)m.to;
 	bitboardIndex piece = board[from];
 	state s=getActualState();
 
@@ -969,8 +969,8 @@ bool Position::moveGivesCheck(Move& m){
 	{
 		tSquare kFrom = from;
 		tSquare kTo = to;
-		tSquare rFrom=to>from?to+1:to-2;
-		tSquare rTo=to>from?to-1:to+1;
+		tSquare rFrom=to>from?to+est:to+ovest+ovest;
+		tSquare rTo=to>from?to+ovest:to+est;
 
 		bitMap occ = (bitBoard[occupiedSquares] ^ bitSet(kFrom) ^ bitSet(rFrom)) | bitSet(rTo) | bitSet(kTo);
 		return   (Movegen::getRookPseudoAttack(rTo) & bitSet(kingSquare))
@@ -980,7 +980,7 @@ bool Position::moveGivesCheck(Move& m){
 	case Move::fenpassant:
 	{
 		bitMap captureSquare= FILEMASK[m.to] & RANKMASK[m.from];
-		bitMap occ= bitBoard[occupiedSquares]^bitSet(m.from)^bitSet(m.to)^captureSquare;
+		bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.from)^bitSet((tSquare)m.to)^captureSquare;
 		return
 				(Movegen::attackFromRook(kingSquare, occ) & (s.Us[Queens] |s.Us[Rooks]))
 			   | (Movegen::attackFromBishop(kingSquare, occ) & (s.Us[Queens] |s.Us[Bishops]));

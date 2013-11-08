@@ -15,6 +15,9 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+//---------------------------------------------
+//	include
+//---------------------------------------------
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -31,8 +34,17 @@
 
 
 
+//---------------------------------------------
+//	local global constant
+//---------------------------------------------
 
 const static char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+
+//---------------------------------------------
+//	function implementation
+//---------------------------------------------
+
 /*	\brief print the uci reply
 	\author Marco Belli
 	\version 1.0
@@ -44,8 +56,15 @@ void static printUciInfo(void){
 	std::cout<<"uciok"<<sync_endl;
 }
 
+
+/*	\brief get an input string and convert it to a valid move;
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
 Move moveFromUci(Position& pos, std::string& str) {
 
+	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
 	Movegen mg;
 	mg.generateMoves<Movegen::allMg>(pos);
 	for(unsigned int i=0;i< mg.getGeneratedMoveNumber();i++){
@@ -53,11 +72,18 @@ Move moveFromUci(Position& pos, std::string& str) {
 			return mg.getGeneratedMove(i);
 		}
 	}
+	// move not found
 	Move m;
 	m.packed=0;
 	return m;
 }
 
+
+/*	\brief handle position command
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
 void static position(std::istringstream& is, Position & pos){
 	std::string token, fen;
 	is >> token;
@@ -81,6 +107,21 @@ void static position(std::istringstream& is, Position & pos){
 	}
 }
 
+/*	\brief handle perft command
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
+void static doPerft(unsigned int n, Position & pos){
+	std::string token;
+	unsigned long elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+	unsigned long res=pos.perft(n);
+	elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-elapsed;
+	sync_cout<<"Perft "<<n<<" leaf nodes: "<<res<<sync_endl;
+	sync_cout<<elapsed<<"ms "<<((double)res)/elapsed<<"kN/s"<<sync_endl;
+}
+
+
 
 /*	\brief manage the uci loop
 	\author Marco Belli
@@ -91,53 +132,6 @@ void uciLoop(){
 	Position pos;
 	pos.setupFromFen(StartFEN);
 	std::string token, cmd;
-
-/*	Move m1,m2,m3,m4,m5,m6,m7;
-	//pos.display();
-	m1.packed=0;
-	m1.from=A2;
-	m1.to=A4;
-	pos.doMove(m1);
-	//pos.display();
-	m2.packed=0;
-	m2.from=G8;
-	m2.to=F6;
-	pos.doMove(m2);
-	//pos.display();
-	m3.packed=0;
-	m3.from=A4;
-	m3.to=A5;
-	pos.doMove(m3);
-	//pos.display();
-	m4.packed=0;
-	m4.from=B7;
-	m4.to=B5;
-	pos.doMove(m4);
-	//pos.display();
-	m5.packed=0;
-	m5.from=A5;
-	m5.to=B6;
-	m5.flags=Move::fenpassant;
-	pos.doMove(m5);
-	pos.display();
-	m6.from=F8;
-	m6.to=C5;
-	pos.doMove(m6);
-	//pos.display();
-	m7.from=E1;
-	m7.to=G1;
-	m7.flags= Move::fcastle;
-	pos.doMove(m7);
-	//pos.display();
-	pos.undoMove(m7);
-	pos.undoMove(m6);
-	pos.undoMove(m5);
-	pos.undoMove(m4);
-	pos.undoMove(m3);
-	pos.undoMove(m2);
-	pos.undoMove(m1);
-	pos.display();*/
-
 
 	do{
 		if (!std::getline(std::cin, cmd)) // Block here waiting for input
@@ -169,17 +163,10 @@ void uciLoop(){
 			sync_cout<<"readyok"<<sync_endl;
 		}
 		else if (token =="perft" && (is>>token)){
-
-			unsigned long elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-			unsigned long res=pos.perft(stoi(token));
-			elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-elapsed;
-			sync_cout<<"perft Res="<<res<<" "<<elapsed<<"ms"<<sync_endl;
-			sync_cout<<((double)res)/elapsed<<"kN/s"<<sync_endl;
-
+			doPerft(stoi(token), pos);
 
 		}
 		else if (token =="divide" && (is>>token)){
-
 			unsigned long res=pos.divide(stoi(token));
 			sync_cout<<"divide Res="<<res<<sync_endl;
 		}

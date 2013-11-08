@@ -24,18 +24,7 @@
 //enum
 //------------------------------------------------
 
-enum enSquare{
-	A1,	B1,	C1,	D1,	E1,	F1,	G1,	H1,
-	A2,	B2,	C2,	D2,	E2,	F2,	G2,	H2,
-	A3,	B3,	C3,	D3,	E3,	F3,	G3,	H3,
-	A4,	B4,	C4,	D4,	E4,	F4,	G4,	H4,
-	A5,	B5,	C5,	D5,	E5,	F5,	G5,	H5,
-	A6,	B6,	C6,	D6,	E6,	F6,	G6,	H6,
-	A7,	B7,	C7,	D7,	E7,	F7,	G7,	H7,
-	A8,	B8,	C8,	D8,	E8,	F8,	G8,	H8,
-	squareNone,
-	squareNumber=64
-};
+
 
 //------------------------------------------------
 //	const
@@ -47,7 +36,7 @@ enum enSquare{
 #ifdef PRECALCULATED_BITSET
 extern bitMap BITSET[squareNumber];
 #endif
-extern unsigned int BOARDINDEX[8][8];
+extern tSquare BOARDINDEX[8][8];
 extern const int FILES[squareNumber];
 extern const int RANKS[squareNumber];
 extern bitMap RANKMASK[squareNumber];
@@ -61,6 +50,12 @@ extern bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
 //------------------------------------------------
 //	inline functions
 //------------------------------------------------
+
+/*	\brief set the Nth bit to 1
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 inline bitMap bitSet(tSquare n){
 #ifdef PRECALCULATED_BITSET
 	return BITSET[n];
@@ -70,6 +65,11 @@ inline bitMap bitSet(tSquare n){
 #endif
 }
 
+/*	\brief return true if the 3 squares are aligned
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3){
 	return  (SQUARES_BETWEEN[s1][s2] | SQUARES_BETWEEN[s1][s3] | SQUARES_BETWEEN[s2][s3])
 			& (     bitSet(s1) |        bitSet(s2) |        bitSet(s3));

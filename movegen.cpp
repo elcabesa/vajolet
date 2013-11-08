@@ -117,7 +117,7 @@ void Movegen::initMovegenConstant(void){
 
 	unsigned char GEN_SLIDING_ATTACKS[8][64];
 	// loop over rank, file or diagonal squares:
-	for (int square = 0; square <= 7; square++)
+	for (tSquare square =square0; square <= 7; square++)
 	{
 		// loop of occupancy states
 		// state6Bit represents the 64 possible occupancy states of a rank,
@@ -128,12 +128,12 @@ void Movegen::initMovegenConstant(void){
 			unsigned char attack8Bit = 0;
 			if (square < 7)
 			{
-				attack8Bit |= bitSet(square + 1);
+				attack8Bit |= bitSet(square + (tSquare)1);
 			}
-			int slide = square + 2;
-			while (slide <= 7) // slide in '+' direction
+			tSquare slide = square + (tSquare)2;
+			while (slide <= (tSquare)7) // slide in '+' direction
 			{
-				if ((~state8Bit) & (bitSet(slide - 1)))
+				if ((~state8Bit) & (bitSet(slide - (tSquare)1)))
 				{
 					attack8Bit |= bitSet(slide);
 				}
@@ -142,12 +142,12 @@ void Movegen::initMovegenConstant(void){
 			}
 			if (square > 0)
 			{
-				attack8Bit |= bitSet(square - 1);
+				attack8Bit |= bitSet(square - (tSquare)1);
 			}
-			slide = square - 2;
+			slide = square - (tSquare)2;
 			while (slide >= 0) // slide in '-' direction
 			{
-				if ((~state8Bit) & (bitSet(slide + 1)))
+				if ((~state8Bit) & (bitSet(slide + (tSquare)1)))
 				{
 					attack8Bit |= bitSet(slide);
 				}
@@ -393,14 +393,14 @@ void Movegen::initMovegenConstant(void){
 	//                                                      . . . . . s . .
 	//                                                 LSB  . . . . . t . .
 	//
-	for (int square = 0; square < 64; square++)
+	for (tSquare square = square0; square < squareNumber; square++)
 	{
 		for (int state6Bit = 0; state6Bit < 64; state6Bit++)
 		{
 			MG_FILE_ATTACK[square][state6Bit] = 0x0;
 
 			// check to see if attackbit'-th  bit is set in GEN_SLIDING_ATTACKS, for this combination of square/occupancy state
-			for (int attackbit = 0; attackbit < 8; attackbit++) // from LSB to MSB
+			for (tSquare attackbit = square0; attackbit < 8; attackbit++) // from LSB to MSB
 			{
 				//  conversion from 64 board squares to the 8 corresponding positions in the GEN_SLIDING_ATTACKS array: "8-RANKS[square]"
 				if (GEN_SLIDING_ATTACKS[7-RANKS[square]][state6Bit] &bitSet(attackbit))
@@ -418,11 +418,11 @@ void Movegen::initMovegenConstant(void){
 
 
 	//  DIAGA8H1_ATTACKS attacks (BISHOPS and QUEENS):
-	for (int square = 0; square < squareNumber; square++)
+	for ( tSquare square = square0; square < squareNumber; square++)
 	{
 		for (int state6Bit = 0; state6Bit < 64; state6Bit++)
 		{
-			for (int attackbit = 0; attackbit < 8; attackbit++) // from LSB to MSB
+			for (tSquare attackbit = square0; attackbit < 8; attackbit++) // from LSB to MSB
 			{
 				//  conversion from 64 board squares to the 8 corresponding positions in the GEN_SLIDING_ATTACKS array: MIN((8-RANKS[square]),(FILES[square]-1))
 				if (GEN_SLIDING_ATTACKS[(7-RANKS[square]) < (FILES[square]) ? (7-RANKS[square]) : (FILES[square])][state6Bit] & bitSet(attackbit))
@@ -456,7 +456,7 @@ void Movegen::initMovegenConstant(void){
 	{
 		for (int state6Bit = 0; state6Bit < 64; state6Bit++)
 		{
-			for (int attackbit = 0; attackbit < 8; attackbit++) // from LSB to MSB
+			for (tSquare attackbit = square0; attackbit < 8; attackbit++) // from LSB to MSB
 			{
 				//  conversion from 64 board squares to the 8 corresponding positions in the GEN_SLIDING_ATTACKS array: MIN((8-RANKS[square]),(FILES[square]-1))
 				if (GEN_SLIDING_ATTACKS[(RANKS[square]) < (FILES[square]) ? (RANKS[square]) : (FILES[square])][state6Bit] & bitSet(attackbit))
@@ -540,7 +540,7 @@ void Movegen::generateMoves(Position& p){
 		moves= attackFromKing(from)& kingTarget;
 		while (moves){
 			m.to=firstOne(moves);
-			if(!(p.getAttackersTo(m.to,p.bitBoard[Position::occupiedSquares] & ~s.Us[Position::King]) & s.Them[Position::Pieces]))
+			if(!(p.getAttackersTo((tSquare)m.to,p.bitBoard[Position::occupiedSquares] & ~s.Us[Position::King]) & s.Them[Position::Pieces]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
 					moveList[moveListIndex].packed=m.packed;
@@ -571,7 +571,7 @@ void Movegen::generateMoves(Position& p){
 
 			m.to=firstOne(moves);
 			if(!(s.pinnedPieces & bitSet(from)) ||
-					squaresAligned(from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+					squaresAligned(from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
 					moveList[moveListIndex].packed=m.packed;
@@ -596,7 +596,7 @@ void Movegen::generateMoves(Position& p){
 		while (moves){
 			m.to=firstOne(moves);
 			if(!(s.pinnedPieces & bitSet(from)) ||
-					squaresAligned(from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+					squaresAligned(from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
 					moveList[moveListIndex].packed=m.packed;
@@ -622,7 +622,7 @@ void Movegen::generateMoves(Position& p){
 		while (moves){
 			m.to=firstOne(moves);
 			if(!(s.pinnedPieces & bitSet(from)) ||
-				squaresAligned(from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+				squaresAligned(from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
 					moveList[moveListIndex].packed=m.packed;
@@ -672,8 +672,8 @@ void Movegen::generateMoves(Position& p){
 		while(moves){
 			m.to=firstOne(moves);
 			m.from=m.to-pawnPush(s.nextMove);
-			if(!(s.pinnedPieces & bitSet(m.from)) ||
-				squaresAligned(m.from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
+				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
 					moveList[moveListIndex].packed=m.packed;
@@ -687,8 +687,8 @@ void Movegen::generateMoves(Position& p){
 		while(moves){
 			m.to=firstOne(moves);
 			m.from=m.to-2*pawnPush(s.nextMove);
-			if(!(s.pinnedPieces & bitSet(m.from)) ||
-				squaresAligned(m.from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
+				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
 					moveList[moveListIndex].packed=m.packed;
@@ -707,8 +707,8 @@ void Movegen::generateMoves(Position& p){
 		while(moves){
 			m.to=firstOne(moves);
 			m.from=m.to-delta;
-			if(!(s.pinnedPieces & bitSet(m.from)) ||
-				squaresAligned(m.from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
+				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				moveList[moveListIndex].packed=m.packed;
 				moveListIndex++;
@@ -722,8 +722,8 @@ void Movegen::generateMoves(Position& p){
 		while(moves){
 			m.to=firstOne(moves);
 			m.from=m.to-delta;
-			if(!(s.pinnedPieces & bitSet(m.from)) ||
-				squaresAligned(m.from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
+				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				moveList[moveListIndex].packed=m.packed;
 				moveListIndex++;
@@ -741,8 +741,8 @@ void Movegen::generateMoves(Position& p){
 			m.to=firstOne(moves);
 			m.from=m.to-pawnPush(s.nextMove);
 			m.flags=Move::fpromotion;
-			if(!(s.pinnedPieces & bitSet(m.from)) ||
-				squaresAligned(m.from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
+				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
@@ -765,8 +765,8 @@ void Movegen::generateMoves(Position& p){
 			m.to=firstOne(moves);
 			m.from=m.to-delta;
 			m.flags=Move::fpromotion;
-			if(!(s.pinnedPieces & bitSet(m.from)) ||
-				squaresAligned(m.from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
+				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
@@ -784,8 +784,8 @@ void Movegen::generateMoves(Position& p){
 			m.to=firstOne(moves);
 			m.from=m.to-delta;
 			m.flags=Move::fpromotion;
-			if(!(s.pinnedPieces & bitSet(m.from)) ||
-				squaresAligned(m.from,m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
+			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
+				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
@@ -832,7 +832,7 @@ void Movegen::generateMoves(Position& p){
 			if((s.castleRights &((Position::wCastleOO)<<(2*color))) &&!s.checkers &&!(castlePath[color][KING_SIDE_CASTLE] & p.bitBoard[Position::occupiedSquares])){
 				tSquare kingSquare=p.pieceList[Position::whiteKing+s.nextMove][0];
 				bool castleDenied=false;
-				for( int x=1;x<3;x++){
+				for( tSquare x=(tSquare)1;x<3;x++){
 					if(p.getAttackersTo(kingSquare+x,p.bitBoard[Position::occupiedSquares]) & s.Them[Position::Pieces]){
 						castleDenied=true;
 						break;
@@ -853,7 +853,7 @@ void Movegen::generateMoves(Position& p){
 			if((s.castleRights &((Position::wCastleOOO)<<(2*color))) &&!s.checkers && !(castlePath[color][QUEEN_SIDE_CASTLE] & p.bitBoard[Position::occupiedSquares])){
 				tSquare kingSquare=p.pieceList[Position::whiteKing+s.nextMove][0];
 				bool castleDenied=false;
-				for( int x=1;x<3;x++){
+				for( tSquare x=(tSquare)1;x<3;x++){
 					if(p.getAttackersTo(kingSquare-x,p.bitBoard[Position::occupiedSquares]) & s.Them[Position::Pieces]){
 						castleDenied=true;
 						break;

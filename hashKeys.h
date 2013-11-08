@@ -17,8 +17,16 @@
 #ifndef HASHKEYS_H_
 #define HASHKEYS_H_
 
+
+//---------------------------------
+//	includes
+//---------------------------------
 #include "vajolet.h"
 #include "data.h"
+
+//---------------------------------
+//	structure
+//---------------------------------
 struct HashKeys
 {
 	static U64 keys[squareNumber][30];	// position, piece (not all the keys are used)
