@@ -110,7 +110,7 @@ public:
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
 		bitMap checkers;	/*!< checking pieces*/
-		bitMap *Us,*Them;
+		bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 
 	};
 
@@ -209,10 +209,21 @@ public:
 	inline void undoNullMove(void){
 		stateInfo.pop_back();
 	}
+	/*! \brief return a reference to the actual state
+		\author Marco Belli
+		\version 1.0
+		\date 08/11/2013
+	*/
 	inline state& getActualState(void){
 		return stateInfo.back();
 	}
 
+
+	/*! \brief return the uci string for a given move
+		\author Marco Belli
+		\version 1.0
+		\date 08/11/2013
+	*/
 	std::string displayUci(Move & m) const{
 
 		std::string s;
@@ -232,11 +243,46 @@ public:
 
 	}
 
+	/*! \brief return a bitmap with all the attacker/defender of a given square
+		\author Marco Belli
+		\version 1.0
+		\date 08/11/2013
+	*/
 	inline bitMap getAttackersTo(tSquare to){
 		return getAttackersTo(to, bitBoard[occupiedSquares]);
 	}
 
 	bitMap getAttackersTo(tSquare to, bitMap occupancy);
+
+
+	/*! \brief return the mvvlva score
+		\author Marco Belli
+		\version 1.0
+		\date 08/11/2013
+	*/
+	inline Score getMvvLvaScore(Move & m){
+		Score s=Position::pieceValue[board[m.to]%emptyBitmap][0]-(board[m.from]%emptyBitmap);
+		if (m.flags == Move::fpromotion){
+			s += (Position::pieceValue[whiteQueens +m.promotion] - Position::pieceValue[whitePawns])[0];
+		}else if(m.flags == Move::fenpassant){
+			s +=Position::pieceValue[whitePawns][0];
+		}
+		return s;
+	}
+
+	inline unsigned int getGamePhase() const{
+		Score tot=stateInfo.back().nonPawnMaterial[0]+stateInfo.back().nonPawnMaterial[2];
+		if(tot>570000){ //opening
+			return 0;
+		}
+		if(tot<120000){	//endgame
+			return 65535;
+		}
+		return (570000-tot)*(65535.0/(570000-120000));
+
+	}
+
+
 
 
 

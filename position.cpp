@@ -814,7 +814,11 @@ Score Position::eval(void) const {
 
 }
 
-
+/*! \brief calculate the perft result
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 unsigned long long Position::perft(unsigned int depth){
 
 #define FAST_PERFT
@@ -834,10 +838,8 @@ unsigned long long Position::perft(unsigned int depth){
 
 	unsigned int mn=0;
 	while (mn <mg.getGeneratedMoveNumber()) {
-		//sync_cout<<"domove:"<< mg.getGeneratedMove(mn).from<< " "<< mg.getGeneratedMove(mn).to<<sync_endl;
 		doMove(mg.getGeneratedMove(mn));
 		tot += perft(depth - 1);
-		//sync_cout<<"undomove:"<< mg.getGeneratedMove(mn).from<< " "<< mg.getGeneratedMove(mn).to<<sync_endl;
 		undoMove(mg.getGeneratedMove(mn));
 		mn++;
 	}
@@ -845,6 +847,11 @@ unsigned long long Position::perft(unsigned int depth){
 
 }
 
+/*! \brief calculate the divide result
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 unsigned long long Position::divide(unsigned int depth){
 
 	Movegen mg;
@@ -864,50 +871,47 @@ unsigned long long Position::divide(unsigned int depth){
 
 }
 
+
+/*! \brief calculate the checking squares given the king position
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 inline void Position::calcCheckingSquares(void){
-		state & s=stateInfo.back();
-		bitboardIndex opponentKing=(bitboardIndex)(blackKing-s.nextMove);
-		bitboardIndex attackingPieces=(bitboardIndex)s.nextMove;
+	state & s=stateInfo.back();
+	bitboardIndex opponentKing=(bitboardIndex)(blackKing-s.nextMove);
+	bitboardIndex attackingPieces=(bitboardIndex)s.nextMove;
 
 
-		tSquare kingSquare=pieceList[opponentKing][0];
-		bitMap occupancy=bitBoard[occupiedSquares];
+	tSquare kingSquare=pieceList[opponentKing][0];
+	bitMap occupancy=bitBoard[occupiedSquares];
 
-		s.checkingSquares[whiteKing+attackingPieces]=0;
-		s.checkingSquares[whiteRooks+attackingPieces]=Movegen::attackFromRook(kingSquare,occupancy);
-		s.checkingSquares[whiteBishops+attackingPieces]=Movegen::attackFromBishop(kingSquare,occupancy);
-		s.checkingSquares[whiteQueens+attackingPieces]=s.checkingSquares[whiteRooks+attackingPieces]|s.checkingSquares[whiteBishops+attackingPieces];
-		s.checkingSquares[whiteKnights+attackingPieces]=Movegen::attackFromKnight(kingSquare);
+	s.checkingSquares[whiteKing+attackingPieces]=0;
+	s.checkingSquares[whiteRooks+attackingPieces]=Movegen::attackFromRook(kingSquare,occupancy);
+	s.checkingSquares[whiteBishops+attackingPieces]=Movegen::attackFromBishop(kingSquare,occupancy);
+	s.checkingSquares[whiteQueens+attackingPieces]=s.checkingSquares[whiteRooks+attackingPieces]|s.checkingSquares[whiteBishops+attackingPieces];
+	s.checkingSquares[whiteKnights+attackingPieces]=Movegen::attackFromKnight(kingSquare);
 
-		if(attackingPieces){
-			s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFromPawn(kingSquare,0);
-		}else{
-			s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFromPawn(kingSquare,1);
-		}
-
-		s.checkingSquares[blackKing-attackingPieces]=0;
-		s.checkingSquares[blackRooks-attackingPieces]=0;
-		s.checkingSquares[blackBishops-attackingPieces]=0;
-		s.checkingSquares[blackQueens-attackingPieces]=0;
-		s.checkingSquares[blackKnights-attackingPieces]=0;
-		s.checkingSquares[blackPawns-attackingPieces]=0;
-
-
-		/*displayBitMap(s.checkingSquares[whiteKing]);
-		displayBitMap(s.checkingSquares[whiteRooks]);
-		displayBitMap(s.checkingSquares[whiteBishops]);
-		displayBitMap(s.checkingSquares[whiteKnights]);
-		displayBitMap(s.checkingSquares[whiteQueens]);
-		displayBitMap(s.checkingSquares[whitePawns]);
-		displayBitMap(s.checkingSquares[whiteKing]);
-		displayBitMap(s.checkingSquares[blackRooks]);
-		displayBitMap(s.checkingSquares[blackBishops]);
-		displayBitMap(s.checkingSquares[blackKnights]);
-		displayBitMap(s.checkingSquares[blackQueens]);
-		displayBitMap(s.checkingSquares[blackPawns]);*/
-
+	if(attackingPieces){
+		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFromPawn(kingSquare,0);
+	}else{
+		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFromPawn(kingSquare,1);
 	}
 
+	s.checkingSquares[blackKing-attackingPieces]=0;
+	s.checkingSquares[blackRooks-attackingPieces]=0;
+	s.checkingSquares[blackBishops-attackingPieces]=0;
+	s.checkingSquares[blackQueens-attackingPieces]=0;
+	s.checkingSquares[blackKnights-attackingPieces]=0;
+	s.checkingSquares[blackPawns-attackingPieces]=0;
+
+}
+
+/*! \brief get the hidden checkers/pinners of a position
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 bitMap Position::getHiddenCheckers(tSquare kingSquare,eNextMove next){
 	bitMap result=0;
 	bitMap pinners= Movegen::getBishopPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteBishops+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
@@ -924,6 +928,11 @@ bitMap Position::getHiddenCheckers(tSquare kingSquare,eNextMove next){
 
 }
 
+/*! \brief get all the attackers/defender of a given square with a ginven occupancy
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 bitMap Position::getAttackersTo(tSquare to, bitMap occupancy){
 	return (Movegen::attackFromPawn(to,1) & bitBoard[whitePawns])
 			|(Movegen::attackFromPawn(to,0) & bitBoard[blackPawns])
@@ -934,6 +943,12 @@ bitMap Position::getAttackersTo(tSquare to, bitMap occupancy){
 			|(Movegen::attackFromKing(to) & (bitBoard[blackKing]|bitBoard[whiteKing]));
 }
 
+
+/*! \brief tell us if a move gives check before doing the move
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
 bool Position::moveGivesCheck(Move& m){
 	tSquare from = (tSquare)m.from;
 	tSquare to = (tSquare)m.to;
