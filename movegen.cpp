@@ -947,6 +947,7 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 		return false;
 	}
 	//arrocco impossibile
+	// TODO arrocco malformato
 	if(m.flags==Move::fcastle && !p.isKing(piece)){
 		p.display();
 		sync_cout<<p.displayUci(m)<<": castle impossibile"<<sync_endl;
@@ -1033,6 +1034,12 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 
 			//TODO gestire spinte, doppie spinte, catture, enpassant e promozioni
 		case Position::whitePawns:
+			if(p.board[m.to]==Position::empty &&  m.from+pawnPush(s.nextMove)!= m.to){
+				p.display();
+				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
+				while(1){}
+				return false;
+			}
 			break;
 		case Position::blackPawns:
 			break;
