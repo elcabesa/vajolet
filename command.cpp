@@ -115,7 +115,7 @@ void static position(std::istringstream& is, Position & pos){
 void static doPerft(unsigned int n, Position & pos){
 	std::string token;
 	unsigned long elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-	unsigned long res=pos.perft(n);
+	unsigned long long res=pos.perft(n);
 	elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-elapsed;
 	sync_cout<<"Perft "<<n<<" leaf nodes: "<<res<<sync_endl;
 	sync_cout<<elapsed<<"ms "<<((double)res)/elapsed<<"kN/s"<<sync_endl;
