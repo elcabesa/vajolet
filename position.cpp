@@ -838,6 +838,9 @@ unsigned long long Position::perft(unsigned int depth){
 
 	unsigned int mn=0;
 	while (mn <mg.getGeneratedMoveNumber()) {
+		if(!mg.isMoveLegal(*this,mg.getGeneratedMove(mn))){
+			sync_cout<<"errore"<<sync_endl;
+		}
 		doMove(mg.getGeneratedMove(mn));
 		tot += perft(depth - 1);
 		undoMove(mg.getGeneratedMove(mn));
@@ -861,7 +864,7 @@ unsigned long long Position::divide(unsigned int depth){
 	while (mn <mg.getGeneratedMoveNumber()) {
 
 		doMove(mg.getGeneratedMove(mn));
-		unsigned long n= perft(depth - 1);
+		unsigned long long n= perft(depth - 1);
 		sync_cout<<displayUci(mg.getGeneratedMove(mn))<<": "<<n<<sync_endl;
 		tot+=n;
 		undoMove(mg.getGeneratedMove(mn));

@@ -890,7 +890,160 @@ void Movegen::generateMoves<Movegen::allMg>(Position& p){
 
 }
 
+bool Movegen::isMoveLegal(Position&p, Move m){
+	Position::state &s =p.getActualState();
+	Position::bitboardIndex piece=p.board[m.from];
+	// pezzo inesistente
+	if(piece==Position::empty){
+		p.display();
+		sync_cout<<p.displayUci(m)<<": empty square"<<sync_endl;
+		while(1){}
+		return false;
+	}
+	// pezzo del colore sbagliato
+	if(s.nextMove?!p.isblack(piece):p.isblack(piece)){
+		p.display();
+		sync_cout<<p.displayUci(m)<<": wrong color"<<sync_endl;
+		while(1){}
+		return false;
+	}
 
+	//casa di destinazione irraggiungibile
+	if(bitSet((tSquare)m.to) & s.Us[Position::Pieces]){
+		p.display();
+		sync_cout<<p.displayUci(m)<<": occupied square"<<sync_endl;
+		while(1){}
+
+		return false;
+	}
+	//scacco
+	if(s.checkers){
+		if( moreThanOneBit(s.checkers)){ //scacco doppio posso solo muovere il re
+			if(!p.isKing(piece)){
+				p.display();
+				sync_cout<<p.displayUci(m)<<": double check"<<sync_endl;
+				while(1){}
+				return false;
+			}
+		}
+		else{
+			// scacco singolo i pezzi che non sono re possono catturare il pezzo attaccante oppure mettersi nel mezzo
+			if(!p.isKing(piece) && !( ((bitSet((tSquare)(m.to-(m.flags==Move::fenpassant?pawnPush(s.nextMove):0)))) & s.checkers)  || squaresAligned(firstOne(s.Us[Position::King]), (tSquare)m.to, firstOne(s.checkers)))){
+				p.display();
+				sync_cout<<p.displayUci(m)<<": single check"<<sync_endl;
+				while(1){}
+				return false;
+			}
+		}
+	}
+
+
+
+	// promozione impossibile!!
+	if(m.flags==Move::fpromotion && ((RANKS[m.from]!=(s.nextMove?1:6)) || !(p.isPawn(piece)))){
+		p.display();
+		sync_cout<<p.displayUci(m)<<": promotion flag"<<sync_endl;
+		while(1){}
+		return false;
+	}
+	//arrocco impossibile
+	if(m.flags==Move::fcastle && !p.isKing(piece)){
+		p.display();
+		sync_cout<<p.displayUci(m)<<": castle impossibile"<<sync_endl;
+		while(1){}
+		return false;
+	}
+	//en passant impossibile
+	if(m.flags==Move::fenpassant && (!p.isPawn(piece) || ((tSquare)m.to)!=s.epSquare)){
+		p.display();
+		sync_cout<<p.displayUci(m)<<": enpassant error"<<sync_endl;
+		while(1){}
+		return false;
+	}
+
+
+
+
+	switch(piece){
+		case Position::whiteKing:
+		case Position::blackKing:
+			//king moves should not leave king in check
+			if((p.getAttackersTo((tSquare)m.to,p.bitBoard[Position::occupiedSquares] & ~s.Us[Position::King]) & s.Them[Position::Pieces])){
+				p.display();
+				sync_cout<<p.displayUci(m)<<": king leaved on chess"<<sync_endl;
+				while(1){}
+				return false;
+			}
+			//TODO gestire arrocco
+			break;
+
+		case Position::whiteRooks:
+		case Position::blackRooks:
+			if(!(getRookPseudoAttack((tSquare)m.from) & bitSet((tSquare)m.to)) || !(attackFromRook((tSquare)m.from,p.bitBoard[Position::occupiedSquares])& bitSet((tSquare)m.to))){
+				p.display();
+				sync_cout<<p.displayUci(m)<<": rook problem"<<sync_endl;
+				while(1){}
+				return false;
+			}
+			break;
+
+		case Position::whiteQueens:
+		case Position::blackQueens:
+			if(
+				!(
+					(getBishopPseudoAttack((tSquare)m.from) | getRookPseudoAttack((tSquare)m.from))
+					& bitSet((tSquare)m.to)
+				)
+				||
+				!(
+					(
+						attackFromBishop((tSquare)m.from,p.bitBoard[Position::occupiedSquares])
+						|attackFromRook((tSquare)m.from,p.bitBoard[Position::occupiedSquares])
+					)
+					& bitSet((tSquare)m.to)
+				)
+			){
+				p.display();
+				sync_cout<<p.displayUci(m)<<": queen problem"<<sync_endl;
+				while(1){}
+				return false;
+			}
+			break;
+
+		case Position::whiteBishops:
+		case Position::blackBishops:
+			if(!(getBishopPseudoAttack((tSquare)m.from) & bitSet((tSquare)m.to)) || !(attackFromBishop((tSquare)m.from,p.bitBoard[Position::occupiedSquares])& bitSet((tSquare)m.to))){
+				p.display();
+				sync_cout<<p.displayUci(m)<<": bishop flag"<<sync_endl;
+				while(1){}
+				return false;
+			}
+			break;
+
+		case Position::whiteKnights:
+		case Position::blackKnights:
+			if(!(attackFromKnight((tSquare)m.from)& bitSet((tSquare)m.to))){
+				p.display();
+				sync_cout<<p.displayUci(m)<<": knight"<<sync_endl;
+				while(1){}
+				return false;
+			}
+
+			break;
+
+			//TODO gestire spinte, doppie spinte, catture, enpassant e promozioni
+		case Position::whitePawns:
+			break;
+		case Position::blackPawns:
+			break;
+		default:
+			return false;
+
+	}
+
+
+	return true;
+}
 
 
 

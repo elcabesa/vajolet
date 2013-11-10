@@ -58,6 +58,7 @@ public:
 	static void initMovegenConstant(void);
 	template<Movegen::genType type>
 	void generateMoves(Position &p);
+	bool isMoveLegal(Position&p, Move m);
 	inline unsigned int getGeneratedMoveNumber(void){ return moveListIndex;}
 	inline Move  & getGeneratedMove(unsigned int x){ return moveList[x];}
 
