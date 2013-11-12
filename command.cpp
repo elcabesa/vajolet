@@ -150,8 +150,6 @@ void uciLoop(){
 		}
 		else if (token =="d"){
 			pos.display();
-			Movegen m;
-			m.generateMoves<Movegen::allMg>(pos);
 		}
 		else if (token =="position"){
 			position(is,pos);

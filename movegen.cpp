@@ -880,13 +880,23 @@ void Movegen::generateMoves(Position& p){
 
 template<>
 void Movegen::generateMoves<Movegen::allMg>(Position& p){
-	Position::state &s =p.getActualState();
+	Move m;
+	moveListIndex=0;
+	for (int i=0;i<65535;i++){
+		m.packed=i;
+		if(isMoveLegal(p,m)){
+			moveList[moveListIndex].packed=m.packed;
+			//sync_cout<<p.displayUci(m)<<sync_endl;
+			moveListIndex++;
+		}
+	}
+	/*Position::state &s =p.getActualState();
 	if(s.checkers){
 		return generateMoves<Movegen::allEvasionMg>(p);
 	}
 	else{
 		return generateMoves<Movegen::allNonEvasionMg>(p);
-	}
+	}*/
 
 }
 
@@ -895,71 +905,85 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 	Position::bitboardIndex piece=p.board[m.from];
 	// pezzo inesistente
 	if(piece==Position::empty){
-		p.display();
+/*		p.display();
 		sync_cout<<p.displayUci(m)<<": empty square"<<sync_endl;
 		while(1){}
-		return false;
+*/		return false;
 	}
 	// pezzo del colore sbagliato
 	if(s.nextMove?!p.isblack(piece):p.isblack(piece)){
-		p.display();
+/*		p.display();
 		sync_cout<<p.displayUci(m)<<": wrong color"<<sync_endl;
 		while(1){}
-		return false;
+*/		return false;
 	}
 
 	//casa di destinazione irraggiungibile
 	if(bitSet((tSquare)m.to) & s.Us[Position::Pieces]){
-		p.display();
+/*		p.display();
 		sync_cout<<p.displayUci(m)<<": occupied square"<<sync_endl;
 		while(1){}
 
-		return false;
+*/		return false;
 	}
 	//scacco
 	if(s.checkers){
 		if( moreThanOneBit(s.checkers)){ //scacco doppio posso solo muovere il re
 			if(!p.isKing(piece)){
-				p.display();
+/*				p.display();
 				sync_cout<<p.displayUci(m)<<": double check"<<sync_endl;
 				while(1){}
-				return false;
+*/				return false;
 			}
 		}
 		else{
 			// scacco singolo i pezzi che non sono re possono catturare il pezzo attaccante oppure mettersi nel mezzo
 			if(!p.isKing(piece) && !( ((bitSet((tSquare)(m.to-(m.flags==Move::fenpassant?pawnPush(s.nextMove):0)))) & s.checkers)  || squaresAligned(firstOne(s.Us[Position::King]), (tSquare)m.to, firstOne(s.checkers)))){
-				p.display();
+/*				p.display();
 				sync_cout<<p.displayUci(m)<<": single check"<<sync_endl;
 				while(1){}
-				return false;
+*/				return false;
 			}
 		}
 	}
-
+	// todo gestire pinned pieces, pezzo pinned non può muoversi se non nella direzione re-pinned
+	if((s.pinnedPieces & bitSet((tSquare)m.from) && !squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))){
+/*		p.display();
+		sync_cout<<p.displayUci(m)<<": promotion flag"<<sync_endl;
+		while(1){}
+*/		return false;
+	}
 
 
 	// promozione impossibile!!
 	if(m.flags==Move::fpromotion && ((RANKS[m.from]!=(s.nextMove?1:6)) || !(p.isPawn(piece)))){
-		p.display();
+/*		p.display();
 		sync_cout<<p.displayUci(m)<<": promotion flag"<<sync_endl;
 		while(1){}
-		return false;
+*/		return false;
 	}
+
+	if(m.flags!=Move::fpromotion && m.promotion!=0){
+	/*		p.display();
+			sync_cout<<p.displayUci(m)<<": promotion flag"<<sync_endl;
+			while(1){}
+	*/		return false;
+		}
 	//arrocco impossibile
-	// TODO arrocco malformato
-	if(m.flags==Move::fcastle && !p.isKing(piece)){
-		p.display();
-		sync_cout<<p.displayUci(m)<<": castle impossibile"<<sync_endl;
-		while(1){}
-		return false;
+	if(m.flags==Move::fcastle){
+		if(!p.isKing(piece) || (FILES[m.from]!=FILES[E1]) || (abs(m.from-m.to)!=2 ) || (RANKS[m.from]!=RANKS[A1] && RANKS[m.from]!=RANKS[A8])){
+/*			p.display();
+			sync_cout<<p.displayUci(m)<<": castle impossibile"<<sync_endl;
+			while(1){}
+*/			return false;
+		}
 	}
 	//en passant impossibile
 	if(m.flags==Move::fenpassant && (!p.isPawn(piece) || ((tSquare)m.to)!=s.epSquare)){
-		p.display();
+/*		p.display();
 		sync_cout<<p.displayUci(m)<<": enpassant error"<<sync_endl;
 		while(1){}
-		return false;
+*/		return false;
 	}
 
 
@@ -968,23 +992,47 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 	switch(piece){
 		case Position::whiteKing:
 		case Position::blackKing:
+		{
 			//king moves should not leave king in check
 			if((p.getAttackersTo((tSquare)m.to,p.bitBoard[Position::occupiedSquares] & ~s.Us[Position::King]) & s.Them[Position::Pieces])){
-				p.display();
+/*				p.display();
 				sync_cout<<p.displayUci(m)<<": king leaved on chess"<<sync_endl;
 				while(1){}
-				return false;
+*/				return false;
 			}
-			//TODO gestire arrocco
+			if(m.flags== Move::fcastle){
+				//TODO gestire arrocco, non valido se re in presa e non valido se passa da case in presa compresa la casa di arrivo.
+				int color = s.nextMove?1:0;
+				if(!(s.castleRights &  bitSet((tSquare)(((m.from-m.to)>0)+2*color)))
+					|| castlePath[color][(m.from-m.to)>0] & p.bitBoard[Position::occupiedSquares]
+				){
+/*					p.display();
+					sync_cout<<p.displayUci(m)<<": king castle error"<<sync_endl;
+					while(1){}
+*/					return false;
+				}
+			}
+			else{
+				if(!(attackFromKing((tSquare)m.from) &bitSet((tSquare)m.to)) || (bitSet((tSquare)m.to)&s.Us[Position::Pieces])){
+/*					p.display();
+					sync_cout<<p.displayUci(m)<<": king move"<<sync_endl;
+					while(1){}
+*/					return false;
+				}
+			}
+
+
+
+		}
 			break;
 
 		case Position::whiteRooks:
 		case Position::blackRooks:
 			if(!(getRookPseudoAttack((tSquare)m.from) & bitSet((tSquare)m.to)) || !(attackFromRook((tSquare)m.from,p.bitBoard[Position::occupiedSquares])& bitSet((tSquare)m.to))){
-				p.display();
+/*				p.display();
 				sync_cout<<p.displayUci(m)<<": rook problem"<<sync_endl;
 				while(1){}
-				return false;
+*/				return false;
 			}
 			break;
 
@@ -1004,44 +1052,64 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 					& bitSet((tSquare)m.to)
 				)
 			){
-				p.display();
+/*				p.display();
 				sync_cout<<p.displayUci(m)<<": queen problem"<<sync_endl;
 				while(1){}
-				return false;
+*/				return false;
 			}
 			break;
 
 		case Position::whiteBishops:
 		case Position::blackBishops:
 			if(!(getBishopPseudoAttack((tSquare)m.from) & bitSet((tSquare)m.to)) || !(attackFromBishop((tSquare)m.from,p.bitBoard[Position::occupiedSquares])& bitSet((tSquare)m.to))){
-				p.display();
+/*				p.display();
 				sync_cout<<p.displayUci(m)<<": bishop flag"<<sync_endl;
 				while(1){}
-				return false;
+*/				return false;
 			}
 			break;
 
 		case Position::whiteKnights:
 		case Position::blackKnights:
 			if(!(attackFromKnight((tSquare)m.from)& bitSet((tSquare)m.to))){
-				p.display();
+/*				p.display();
 				sync_cout<<p.displayUci(m)<<": knight"<<sync_endl;
 				while(1){}
-				return false;
+*/				return false;
 			}
 
 			break;
 
-			//TODO gestire spinte, doppie spinte, catture, enpassant e promozioni
+			// todo gestire caso particolare en passant. re va sotto scacco dopo aver fatto enpassant
 		case Position::whitePawns:
-			if(p.board[m.to]==Position::empty &&  m.from+pawnPush(s.nextMove)!= m.to){
-				p.display();
+			if(
+				// not valid pawn push
+				(m.from+pawnPush(s.nextMove)!= m.to || (bitSet((tSquare)m.to)&p.bitBoard[Position::occupiedSquares]))
+				// not valid pawn double push
+				&& ((m.from+2*pawnPush(s.nextMove)!= m.to) || (RANKS[m.from]!=1) || ((bitSet((tSquare)m.to) | bitSet((tSquare)(m.to-8)))&p.bitBoard[Position::occupiedSquares]))
+				// not valid pawn attack
+				&& (!(attackFromPawn((tSquare)m.from,s.nextMove!=Position::whiteTurn)&bitSet((tSquare)m.to)) || !((bitSet((tSquare)m.to)) &(s.Them[Position::Pieces]|bitSet(s.epSquare))))
+			){
+/*				p.display();
 				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
 				while(1){}
-				return false;
+*/				return false;
 			}
 			break;
 		case Position::blackPawns:
+			if(
+				// not valid pawn push
+				(m.from+pawnPush(s.nextMove)!= m.to || (bitSet((tSquare)m.to)&p.bitBoard[Position::occupiedSquares]))
+				// not valid pawn double push
+				&& ((m.from+2*pawnPush(s.nextMove)!= m.to) || (RANKS[m.from]!=6) || ((bitSet((tSquare)m.to) | bitSet((tSquare)(m.to+8)))&p.bitBoard[Position::occupiedSquares]))
+				// not valid pawn attack
+				&& (!(attackFromPawn((tSquare)m.from,s.nextMove!=Position::whiteTurn)&bitSet((tSquare)m.to)) || !((bitSet((tSquare)m.to)) &(s.Them[Position::Pieces]| bitSet(s.epSquare))))
+			){
+/*				p.display();
+				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
+				while(1){}
+*/				return false;
+			}
 			break;
 		default:
 			return false;
