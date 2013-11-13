@@ -148,7 +148,7 @@ public:
 	Score eval(void) const;
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
-	bool moveGivesCheck(Move& m);
+	bool moveGivesCheck(Move& m)const ;
 
 	/*! \brief constructor
 		\author Marco Belli
@@ -214,8 +214,8 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline state& getActualState(void){
-		return stateInfo.back();
+	inline state& getActualState(void)const {
+		return (state& )(stateInfo.back());
 	}
 
 
@@ -227,6 +227,7 @@ public:
 	std::string displayUci(Move & m) const{
 
 		std::string s;
+
 		//from
 		s+=char('a'+FILES[m.from]);
 		s+=char('1'+RANKS[m.from]);
@@ -242,6 +243,46 @@ public:
 		return s;
 
 	}
+
+	/*! \brief return the uci string for a given move
+		\author Marco Belli
+		\version 1.0
+		\date 08/11/2013
+	*/
+	std::string displayMove(Move & m)const {
+
+		std::string s;
+		state st=getActualState();
+
+		bool capture = (bitSet((tSquare)m.to) & st.Them[Pieces]);
+		if(!isPawn(board[m.from])){
+			s+=PIECE_NAMES_FEN[board[m.from]%Position::emptyBitmap];
+		}
+		if(capture && isPawn(board[m.from])){
+			s+=char('a'+FILES[m.from]);
+		}
+		if(capture){
+			s+="x";
+		}
+
+
+
+
+		//to
+		s+=char('a'+FILES[m.to]);
+		s+=char('1'+RANKS[m.to]);
+		if(moveGivesCheck(m)){
+			s+"+";
+		}
+		//promotion
+		if(m.flags == Move::fpromotion){
+			s +"=";
+			s += Position::PIECE_NAMES_FEN[m.promotion+Position::whiteQueens];
+		}
+		return s;
+
+	}
+
 
 	/*! \brief return a bitmap with all the attacker/defender of a given square
 		\author Marco Belli

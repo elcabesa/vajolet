@@ -821,7 +821,7 @@ Score Position::eval(void) const {
 */
 unsigned long long Position::perft(unsigned int depth){
 
-//#define FAST_PERFT
+#define FAST_PERFT
 #ifndef FAST_PERFT
 	if (depth == 0) {
 		return 1;
@@ -865,9 +865,10 @@ unsigned long long Position::divide(unsigned int depth){
 
 		doMove(mg.getGeneratedMove(mn));
 		unsigned long long n= perft(depth - 1);
-		sync_cout<<displayUci(mg.getGeneratedMove(mn))<<": "<<n<<sync_endl;
+
 		tot+=n;
 		undoMove(mg.getGeneratedMove(mn));
+		sync_cout<<mn+1<<") "<<displayMove(mg.getGeneratedMove(mn))<<": "<<n<<sync_endl;
 		mn++;
 	}
 	return tot;
@@ -952,7 +953,7 @@ bitMap Position::getAttackersTo(tSquare to, bitMap occupancy){
 	\version 1.0
 	\date 08/11/2013
 */
-bool Position::moveGivesCheck(Move& m){
+bool Position::moveGivesCheck(Move& m)const {
 	tSquare from = (tSquare)m.from;
 	tSquare to = (tSquare)m.to;
 	bitboardIndex piece = board[from];
