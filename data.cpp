@@ -53,6 +53,7 @@ bitMap FILEMASK[squareNumber];			//!< bitmask of a file given a square on the ra
 bitMap DIAGA1H8MASK[squareNumber];		//!< bitmask of a diagonal given a square on the diagonal
 bitMap DIAGA8H1MASK[squareNumber];		//!< bitmask of a diagonal given a square on the diagonal
 bitMap SQUARES_BETWEEN[squareNumber][squareNumber];		//bitmask with the squares btween 2 alinged squares, 0 otherwise
+bitMap LINES[squareNumber][squareNumber];
 
 //--------------------------------------------------------------
 //	function bodies
@@ -142,12 +143,18 @@ void initData(void){
 	}
 
 	for(int square=0;square<squareNumber;square++){
-		for(int i=0;i<64;i++){
-			if(square==i){
-				SQUARES_BETWEEN[square][i]=0;
+		for(int i=0;i<squareNumber;i++){
+			LINES[square][i]=0;
+			SQUARES_BETWEEN[square][i]=0;
+
+			if(i==square){
+				continue;
 			}
+
 			if(FILES[square]==FILES[i]){
 				// stessa colonna
+
+				LINES[square][i]=FILEMASK[square];
 				if(RANKS[i]>RANKS[square]){ // in salita
 					int temp=RANKS[square]+1;
 					while(temp<RANKS[i]){
@@ -164,6 +171,7 @@ void initData(void){
 				}
 			}
 			if(RANKS[square]==RANKS[i]){/// stessa riga
+				LINES[square][i]=RANKMASK[square];
 				if(FILES[i]>FILES[square]){ // in salita
 					int temp=FILES[square]+1;
 					while(temp<FILES[i]){
@@ -180,6 +188,7 @@ void initData(void){
 				}
 			}
 			if(DIAGA1H8MASK[square]& BITSET[i]){
+				LINES[square][i]=DIAGA1H8MASK[square];
 				if(FILES[i]>FILES[square]){ // in salita
 					int temp=FILES[square]+1;
 					int temp2=RANKS[square]+1;
@@ -200,6 +209,7 @@ void initData(void){
 				}
 			}
 			if(DIAGA8H1MASK[square]& BITSET[i]){
+				LINES[square][i]=DIAGA8H1MASK[square];
 				if(FILES[i]>FILES[square]){ // in salita
 					int temp=FILES[square]+1;
 					int temp2=RANKS[square]-1;
