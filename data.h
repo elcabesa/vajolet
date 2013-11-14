@@ -34,7 +34,7 @@
 //	extern variables
 //------------------------------------------------
 #ifdef PRECALCULATED_BITSET
-extern bitMap BITSET[squareNumber];
+extern bitMap BITSET[squareNumber+1];
 #endif
 extern tSquare BOARDINDEX[8][8];
 extern const int FILES[squareNumber];

@@ -21,7 +21,7 @@
 //	global variables
 //--------------------------------------------------------------
 #ifdef PRECALCULATED_BITSET
-bitMap BITSET[squareNumber];
+bitMap BITSET[squareNumber+1];
 #endif
 tSquare BOARDINDEX[8][8];	//<! precalculated index of a square given file and rank
 
@@ -68,6 +68,7 @@ void initData(void){
 	for(tSquare i=(tSquare)0;i<squareNumber;i++){
 		BITSET[i]=(1ull)<<i;
 	}
+	BITSET[squareNone]=0;
 #endif
 	for(tSquare i=(tSquare)0; i<squareNumber;i++){
 		BOARDINDEX[i%8][i/8] = i;
