@@ -795,6 +795,7 @@ void Movegen::generateMoves(Position& p){
 			}
 			moves &= moves-1;
 		}
+		m.promotion=0;
 
 		// ep capture
 
@@ -905,35 +906,35 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 	Position::bitboardIndex piece=p.board[m.from];
 	// pezzo inesistente
 	if(piece==Position::empty){
-/*		p.display();
+		p.display();
 		sync_cout<<p.displayUci(m)<<": empty square"<<sync_endl;
 		while(1){}
-*/		return false;
+		return false;
 	}
 	// pezzo del colore sbagliato
 	if(s.nextMove?!p.isblack(piece):p.isblack(piece)){
-/*		p.display();
+		p.display();
 		sync_cout<<p.displayUci(m)<<": wrong color"<<sync_endl;
 		while(1){}
-*/		return false;
+		return false;
 	}
 
 	//casa di destinazione irraggiungibile
 	if(bitSet((tSquare)m.to) & s.Us[Position::Pieces]){
-/*		p.display();
+		p.display();
 		sync_cout<<p.displayUci(m)<<": occupied square"<<sync_endl;
 		while(1){}
 
-*/		return false;
+		return false;
 	}
 	//scacco
 	if(s.checkers){
 		if( moreThanOneBit(s.checkers)){ //scacco doppio posso solo muovere il re
 			if(!p.isKing(piece)){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": double check"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 			}
 		}
 		else{
@@ -945,58 +946,58 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 					|| ((bitSet((tSquare)m.to) & SQUARES_BETWEEN[p.pieceList[Position::whiteKing+s.nextMove][0]][firstOne(s.checkers)]) &~ s.Us[Position::Pieces])
 				)
 			){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": single check"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 			}
 		}
 	}
 	// todo gestire pinned pieces, pezzo pinned non può muoversi se non nella direzione re-pinned
 	if((s.pinnedPieces & bitSet((tSquare)m.from) && !squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))){
-/*		p.display();
-		sync_cout<<p.displayUci(m)<<": promotion flag"<<sync_endl;
+		p.display();
+		sync_cout<<p.displayUci(m)<<": pinned problem"<<sync_endl;
 		while(1){}
-*/		return false;
+		return false;
 	}
 
 
 	// promozione impossibile!!
 	if(m.flags==Move::fpromotion && ((RANKS[m.from]!=(s.nextMove?1:6)) || !(p.isPawn(piece)))){
-/*		p.display();
+		p.display();
 		sync_cout<<p.displayUci(m)<<": promotion flag"<<sync_endl;
 		while(1){}
-*/		return false;
+		return false;
 	}
 
 	if(m.flags!=Move::fpromotion && m.promotion!=0){
-	/*		p.display();
-			sync_cout<<p.displayUci(m)<<": promotion flag"<<sync_endl;
+			p.display();
+			sync_cout<<p.displayUci(m)<<": promotion2 flag"<<sync_endl;
 			while(1){}
-	*/		return false;
+			return false;
 		}
 	//arrocco impossibile
 	if(m.flags==Move::fcastle){
 		if(!p.isKing(piece) || (FILES[m.from]!=FILES[E1]) || (abs(m.from-m.to)!=2 ) || (RANKS[m.from]!=RANKS[A1] && RANKS[m.from]!=RANKS[A8])){
-/*			p.display();
+			p.display();
 			sync_cout<<p.displayUci(m)<<": castle impossibile"<<sync_endl;
 			while(1){}
-*/			return false;
+			return false;
 		}
 	}
 	//en passant impossibile
 	if(m.flags==Move::fenpassant && (!p.isPawn(piece) || ((tSquare)m.to)!=s.epSquare)){
-/*		p.display();
+		p.display();
 		sync_cout<<p.displayUci(m)<<": enpassant error"<<sync_endl;
 		while(1){}
-*/		return false;
+		return false;
 	}
 	//en passant impossibile
 	if(m.flags!=Move::fenpassant && p.isPawn(piece) && ((tSquare)m.to==s.epSquare)){
-/*		p.display();
+		p.display();
 		sync_cout<<p.displayUci(m)<<": enpassant error"<<sync_endl;
 		while(1){}
-*/		return false;
+		return false;
 	}
 
 
@@ -1011,10 +1012,10 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 				if(!(s.castleRights &  bitSet((tSquare)(((m.from-m.to)>0)+2*color)))
 					|| castlePath[color][(m.from-m.to)>0] & p.bitBoard[Position::occupiedSquares]
 				){
-/*					p.display();
+					p.display();
 					sync_cout<<p.displayUci(m)<<": king castle error"<<sync_endl;
 					while(1){}
-*/					return false;
+					return false;
 				}
 				if(m.to>m.from){
 					for(tSquare x=(tSquare)m.from;x<=(tSquare)m.to ;x++){
@@ -1032,17 +1033,17 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 			}
 			else{
 				if(!(attackFromKing((tSquare)m.from) &bitSet((tSquare)m.to)) || (bitSet((tSquare)m.to)&s.Us[Position::Pieces])){
-/*					p.display();
+					p.display();
 					sync_cout<<p.displayUci(m)<<": king move"<<sync_endl;
 					while(1){}
-*/					return false;
+					return false;
 				}
 				//king moves should not leave king in check
 				if((p.getAttackersTo((tSquare)m.to,p.bitBoard[Position::occupiedSquares] & ~s.Us[Position::King]) & s.Them[Position::Pieces])){
-	/*				p.display();
+					p.display();
 					sync_cout<<p.displayUci(m)<<": king leaved on chess"<<sync_endl;
 					while(1){}
-	*/				return false;
+					return false;
 				}
 			}
 
@@ -1056,10 +1057,10 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 		case Position::whiteRooks:
 		case Position::blackRooks:
 			if(!(getRookPseudoAttack((tSquare)m.from) & bitSet((tSquare)m.to)) || !(attackFromRook((tSquare)m.from,p.bitBoard[Position::occupiedSquares])& bitSet((tSquare)m.to))){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": rook problem"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 			}
 			break;
 
@@ -1079,30 +1080,30 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 					& bitSet((tSquare)m.to)
 				)
 			){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": queen problem"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 			}
 			break;
 
 		case Position::whiteBishops:
 		case Position::blackBishops:
 			if(!(getBishopPseudoAttack((tSquare)m.from) & bitSet((tSquare)m.to)) || !(attackFromBishop((tSquare)m.from,p.bitBoard[Position::occupiedSquares])& bitSet((tSquare)m.to))){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": bishop flag"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 			}
 			break;
 
 		case Position::whiteKnights:
 		case Position::blackKnights:
 			if(!(attackFromKnight((tSquare)m.from)& bitSet((tSquare)m.to))){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": knight"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 			}
 
 			break;
@@ -1118,16 +1119,16 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 				// not valid pawn attack
 				&& (!(attackFromPawn((tSquare)m.from,s.nextMove!=Position::whiteTurn)&bitSet((tSquare)m.to)) || !((bitSet((tSquare)m.to)) &(s.Them[Position::Pieces]|bitSet(s.epSquare))))
 			){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 			}
 			if(RANKS[m.from]==6 && m.flags!=Move::fpromotion){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 
 			}
 			if(m.flags== Move::fenpassant){
@@ -1136,10 +1137,10 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 				tSquare kingSquare=p.pieceList[Position::whiteKing+s.nextMove][0];
 				if((attackFromRook(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Rooks]))|
 							(attackFromBishop(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Bishops]))){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 				}
 			}
 
@@ -1153,17 +1154,17 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 				// not valid pawn attack
 				&& (!(attackFromPawn((tSquare)m.from,s.nextMove!=Position::whiteTurn)&bitSet((tSquare)m.to)) || !((bitSet((tSquare)m.to)) &(s.Them[Position::Pieces]| bitSet(s.epSquare))))
 			){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 			}
 
 			if(RANKS[m.from]==1 && m.flags!=Move::fpromotion){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 
 			}
 			if(m.flags== Move::fenpassant){
@@ -1172,10 +1173,10 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 				tSquare kingSquare=p.pieceList[Position::whiteKing+s.nextMove][0];
 				if((attackFromRook(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Rooks]))|
 							(attackFromBishop(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Bishops]))){
-/*				p.display();
+				p.display();
 				sync_cout<<p.displayUci(m)<<": pawn push"<<sync_endl;
 				while(1){}
-*/				return false;
+				return false;
 				}
 			}
 			break;
