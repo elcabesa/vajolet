@@ -1,0 +1,1151 @@
+Vajolet 0.03 by Marco Belli
+Perft 1 leaf nodes: 20
+0ms infkN/s
+Perft 2 leaf nodes: 400
+0ms infkN/s
+Perft 3 leaf nodes: 8902
+1ms 8902kN/s
+Perft 4 leaf nodes: 197281
+16ms 12330.1kN/s
+Perft 5 leaf nodes: 4865609
+192ms 25341.7kN/s
+Perft 6 leaf nodes: 119060324
+4771ms 24955kN/s
+Perft 1 leaf nodes: 21
+0ms infkN/s
+Perft 2 leaf nodes: 463
+0ms infkN/s
+Perft 3 leaf nodes: 11138
+1ms 11138kN/s
+Perft 4 leaf nodes: 274234
+12ms 22852.8kN/s
+Perft 5 leaf nodes: 7290026
+265ms 27509.5kN/s
+Perft 6 leaf nodes: 195464529
+7010ms 27883.7kN/s
+Perft 1 leaf nodes: 27
+0ms infkN/s
+Perft 2 leaf nodes: 734
+0ms infkN/s
+Perft 3 leaf nodes: 20553
+0ms infkN/s
+Perft 4 leaf nodes: 579004
+21ms 27571.6kN/s
+Perft 5 leaf nodes: 16988496
+587ms 28941.2kN/s
+Perft 6 leaf nodes: 494216738
+17628ms 28035.9kN/s
+Perft 1 leaf nodes: 28
+0ms infkN/s
+Perft 2 leaf nodes: 837
+0ms infkN/s
+Perft 3 leaf nodes: 22536
+1ms 22536kN/s
+Perft 4 leaf nodes: 699777
+24ms 29157.4kN/s
+Perft 5 leaf nodes: 19118920
+714ms 26777.2kN/s
+Perft 6 leaf nodes: 611385160
+20930ms 29210.9kN/s
+Perft 1 leaf nodes: 29
+0ms infkN/s
+Perft 2 leaf nodes: 827
+0ms infkN/s
+Perft 3 leaf nodes: 24815
+1ms 24815kN/s
+Perft 4 leaf nodes: 701084
+28ms 25038.7kN/s
+Perft 5 leaf nodes: 21819626
+771ms 28300.4kN/s
+Perft 6 leaf nodes: 622445426
+23909ms 26033.9kN/s
+Perft 1 leaf nodes: 25
+0ms infkN/s
+Perft 2 leaf nodes: 976
+0ms infkN/s
+Perft 3 leaf nodes: 23465
+1ms 23465kN/s
+Perft 4 leaf nodes: 872551
+27ms 32316.7kN/s
+Perft 5 leaf nodes: 21984216
+928ms 23689.9kN/s
+Perft 6 leaf nodes: 798306998
+25058ms 31858.4kN/s
+Perft 1 leaf nodes: 36
+0ms infkN/s
+Perft 2 leaf nodes: 957
+0ms infkN/s
+Perft 3 leaf nodes: 33542
+1ms 33542kN/s
+Perft 4 leaf nodes: 891412
+36ms 24761.4kN/s
+Perft 5 leaf nodes: 31155934
+994ms 31344kN/s
+Perft 6 leaf nodes: 840073244
+35059ms 23961.7kN/s
+Perft 1 leaf nodes: 29
+0ms infkN/s
+Perft 2 leaf nodes: 927
+0ms infkN/s
+Perft 3 leaf nodes: 25822
+1ms 25822kN/s
+Perft 4 leaf nodes: 832461
+27ms 30831.9kN/s
+Perft 5 leaf nodes: 23480361
+936ms 25085.9kN/s
+Perft 6 leaf nodes: 768311001
+24505ms 31353.2kN/s
+Perft 1 leaf nodes: 31
+0ms infkN/s
+Perft 2 leaf nodes: 834
+0ms infkN/s
+Perft 3 leaf nodes: 25926
+1ms 25926kN/s
+Perft 4 leaf nodes: 715605
+29ms 24676kN/s
+Perft 5 leaf nodes: 22575950
+746ms 30262.7kN/s
+Perft 6 leaf nodes: 635681844
+25476ms 24952.2kN/s
+Perft 1 leaf nodes: 29
+0ms infkN/s
+Perft 2 leaf nodes: 900
+0ms infkN/s
+Perft 3 leaf nodes: 25008
+1ms 25008kN/s
+Perft 4 leaf nodes: 781431
+28ms 27908.2kN/s
+Perft 5 leaf nodes: 22075119
+858ms 25728.6kN/s
+Perft 6 leaf nodes: 699176752
+23794ms 29384.6kN/s
+Perft 1 leaf nodes: 30
+0ms infkN/s
+Perft 2 leaf nodes: 856
+0ms infkN/s
+Perft 3 leaf nodes: 26922
+1ms 26922kN/s
+Perft 4 leaf nodes: 784949
+30ms 26165kN/s
+Perft 5 leaf nodes: 25488551
+852ms 29916.1kN/s
+Perft 6 leaf nodes: 760364787
+29251ms 25994.5kN/s
+Perft 1 leaf nodes: 30
+0ms infkN/s
+Perft 2 leaf nodes: 839
+0ms infkN/s
+Perft 3 leaf nodes: 25287
+1ms 25287kN/s
+Perft 4 leaf nodes: 743330
+25ms 29733.2kN/s
+Perft 5 leaf nodes: 22844888
+848ms 26939.7kN/s
+Perft 6 leaf nodes: 698863604
+23238ms 30074.2kN/s
+Perft 1 leaf nodes: 36
+0ms infkN/s
+Perft 2 leaf nodes: 857
+0ms infkN/s
+Perft 3 leaf nodes: 29373
+1ms 29373kN/s
+Perft 4 leaf nodes: 807330
+32ms 25229.1kN/s
+Perft 5 leaf nodes: 26996998
+802ms 33662.1kN/s
+Perft 6 leaf nodes: 806839269
+29973ms 26918.9kN/s
+Perft 1 leaf nodes: 28
+0ms infkN/s
+Perft 2 leaf nodes: 1002
+0ms infkN/s
+Perft 3 leaf nodes: 27640
+1ms 27640kN/s
+Perft 4 leaf nodes: 960905
+30ms 32030.2kN/s
+Perft 5 leaf nodes: 28434554
+1057ms 26901.2kN/s
+Perft 6 leaf nodes: 970730912
+30784ms 31533.6kN/s
+Perft 1 leaf nodes: 35
+0ms infkN/s
+Perft 2 leaf nodes: 1122
+0ms infkN/s
+Perft 3 leaf nodes: 38831
+1ms 38831kN/s
+Perft 4 leaf nodes: 1259372
+44ms 28622.1kN/s
+Perft 5 leaf nodes: 43220869
+1340ms 32254.4kN/s
+Perft 6 leaf nodes: 1429113787
+50287ms 28419.1kN/s
+Perft 1 leaf nodes: 32
+0ms infkN/s
+Perft 2 leaf nodes: 983
+0ms infkN/s
+Perft 3 leaf nodes: 29665
+1ms 29665kN/s
+Perft 4 leaf nodes: 924296
+26ms 35549.8kN/s
+Perft 5 leaf nodes: 28997034
+884ms 32802.1kN/s
+Perft 6 leaf nodes: 911965560
+25061ms 36389.8kN/s
+Perft 1 leaf nodes: 35
+0ms infkN/s
+Perft 2 leaf nodes: 1196
+0ms infkN/s
+Perft 3 leaf nodes: 38978
+1ms 38978kN/s
+Perft 4 leaf nodes: 1342725
+37ms 36289.9kN/s
+Perft 5 leaf nodes: 42582894
+1144ms 37222.8kN/s
+Perft 6 leaf nodes: 1489481053
+41052ms 36282.8kN/s
+Perft 1 leaf nodes: 42
+0ms infkN/s
+Perft 2 leaf nodes: 1234
+0ms infkN/s
+Perft 3 leaf nodes: 49419
+1ms 49419kN/s
+Perft 4 leaf nodes: 1463588
+41ms 35697.3kN/s
+Perft 5 leaf nodes: 57455473
+1423ms 40376.3kN/s
+Perft 6 leaf nodes: 1712959062
+48394ms 35396.1kN/s
+Perft 1 leaf nodes: 33
+0ms infkN/s
+Perft 2 leaf nodes: 1470
+0ms infkN/s
+Perft 3 leaf nodes: 44165
+2ms 22082.5kN/s
+Perft 4 leaf nodes: 1909468
+45ms 42432.6kN/s
+Perft 5 leaf nodes: 56317737
+1629ms 34572kN/s
+Perft 6 leaf nodes: 2375760546
+58736ms 40448.1kN/s
+Perft 1 leaf nodes: 51
+0ms infkN/s
+Perft 2 leaf nodes: 1687
+0ms infkN/s
+Perft 3 leaf nodes: 73846
+1ms 73846kN/s
+Perft 4 leaf nodes: 2271390
+65ms 34944.5kN/s
+Perft 5 leaf nodes: 95410956
+2363ms 40377kN/s
+Perft 6 leaf nodes: 2858179589
+84041ms 34009.3kN/s
+Perft 1 leaf nodes: 38
+0ms infkN/s
+Perft 2 leaf nodes: 1935
+0ms infkN/s
+Perft 3 leaf nodes: 61403
+1ms 61403kN/s
+Perft 4 leaf nodes: 2903019
+70ms 41471.7kN/s
+Perft 5 leaf nodes: 89326625
+2615ms 34159.3kN/s
+Perft 6 leaf nodes: 4018746673
+99442ms 40413kN/s
+Perft 1 leaf nodes: 53
+0ms infkN/s
+Perft 2 leaf nodes: 1796
+0ms infkN/s
+Perft 3 leaf nodes: 84197
+2ms 42098.5kN/s
+Perft 4 leaf nodes: 2567078
+77ms 33338.7kN/s
+Perft 5 leaf nodes: 113930150
+2682ms 42479.5kN/s
+Perft 6 leaf nodes: 3401183860
+102527ms 33173.5kN/s
+Perft 1 leaf nodes: 24
+0ms infkN/s
+Perft 2 leaf nodes: 1036
+0ms infkN/s
+Perft 3 leaf nodes: 25308
+1ms 25308kN/s
+Perft 4 leaf nodes: 1095789
+25ms 43831.6kN/s
+Perft 5 leaf nodes: 27999381
+936ms 29913.9kN/s
+Perft 6 leaf nodes: 1209827199
+28249ms 42827.3kN/s
+Perft 1 leaf nodes: 1
+0ms infkN/s
+Perft 2 leaf nodes: 18
+0ms infkN/s
+Perft 3 leaf nodes: 888
+0ms infkN/s
+Perft 4 leaf nodes: 16244
+1ms 16244kN/s
+Perft 5 leaf nodes: 779306
+18ms 43294.8kN/s
+Perft 6 leaf nodes: 14947584
+606ms 24666kN/s
+Perft 1 leaf nodes: 24
+0ms infkN/s
+Perft 2 leaf nodes: 1155
+0ms infkN/s
+Perft 3 leaf nodes: 26440
+1ms 26440kN/s
+Perft 4 leaf nodes: 1218982
+29ms 42033.9kN/s
+Perft 5 leaf nodes: 27780951
+1014ms 27397.4kN/s
+Perft 6 leaf nodes: 1246603688
+30002ms 41550.7kN/s
+Perft 1 leaf nodes: 40
+0ms infkN/s
+Perft 2 leaf nodes: 877
+0ms infkN/s
+Perft 3 leaf nodes: 33568
+1ms 33568kN/s
+Perft 4 leaf nodes: 756910
+30ms 25230.3kN/s
+Perft 5 leaf nodes: 28087359
+743ms 37802.6kN/s
+Perft 6 leaf nodes: 648643302
+23951ms 27082.1kN/s
+Perft 1 leaf nodes: 18
+0ms infkN/s
+Perft 2 leaf nodes: 778
+0ms infkN/s
+Perft 3 leaf nodes: 15302
+1ms 15302kN/s
+Perft 4 leaf nodes: 631901
+15ms 42126.7kN/s
+Perft 5 leaf nodes: 13282551
+525ms 25300.1kN/s
+Perft 6 leaf nodes: 526146675
+13435ms 39162.4kN/s
+Perft 1 leaf nodes: 42
+0ms infkN/s
+Perft 2 leaf nodes: 890
+0ms infkN/s
+Perft 3 leaf nodes: 34042
+1ms 34042kN/s
+Perft 4 leaf nodes: 751251
+28ms 26830.4kN/s
+Perft 5 leaf nodes: 28408063
+736ms 38597.9kN/s
+Perft 6 leaf nodes: 654106063
+23187ms 28210kN/s
+Perft 1 leaf nodes: 26
+0ms infkN/s
+Perft 2 leaf nodes: 824
+0ms infkN/s
+Perft 3 leaf nodes: 21597
+1ms 21597kN/s
+Perft 4 leaf nodes: 697477
+20ms 34873.8kN/s
+Perft 5 leaf nodes: 18277943
+587ms 31137.9kN/s
+Perft 6 leaf nodes: 601047697
+17457ms 34430.2kN/s
+Perft 1 leaf nodes: 30
+0ms infkN/s
+Perft 2 leaf nodes: 826
+0ms infkN/s
+Perft 3 leaf nodes: 24543
+1ms 24543kN/s
+Perft 4 leaf nodes: 660957
+20ms 33047.8kN/s
+Perft 5 leaf nodes: 19956404
+609ms 32769.1kN/s
+Perft 6 leaf nodes: 533917094
+16957ms 31486.5kN/s
+Perft 1 leaf nodes: 28
+0ms infkN/s
+Perft 2 leaf nodes: 669
+0ms infkN/s
+Perft 3 leaf nodes: 18695
+0ms infkN/s
+Perft 4 leaf nodes: 483244
+18ms 26846.9kN/s
+Perft 5 leaf nodes: 13436830
+414ms 32456.1kN/s
+Perft 6 leaf nodes: 366895496
+12259ms 29928.7kN/s
+Perft 1 leaf nodes: 28
+0ms infkN/s
+Perft 2 leaf nodes: 720
+0ms infkN/s
+Perft 3 leaf nodes: 18852
+1ms 18852kN/s
+Perft 4 leaf nodes: 489620
+16ms 30601.2kN/s
+Perft 5 leaf nodes: 13402409
+466ms 28760.5kN/s
+Perft 6 leaf nodes: 351329828
+11426ms 30748.3kN/s
+Perft 1 leaf nodes: 22
+0ms infkN/s
+Perft 2 leaf nodes: 494
+0ms infkN/s
+Perft 3 leaf nodes: 11765
+0ms infkN/s
+Perft 4 leaf nodes: 281677
+11ms 25607kN/s
+Perft 5 leaf nodes: 6961428
+238ms 29249.7kN/s
+Perft 6 leaf nodes: 175251672
+6330ms 27685.9kN/s
+Perft 1 leaf nodes: 21
+0ms infkN/s
+Perft 2 leaf nodes: 574
+0ms infkN/s
+Perft 3 leaf nodes: 12583
+0ms infkN/s
+Perft 4 leaf nodes: 337049
+11ms 30640.8kN/s
+Perft 5 leaf nodes: 7727643
+327ms 23631.9kN/s
+Perft 6 leaf nodes: 205099292
+6535ms 31384.7kN/s
+Perft 1 leaf nodes: 25
+0ms infkN/s
+Perft 2 leaf nodes: 557
+0ms infkN/s
+Perft 3 leaf nodes: 13980
+1ms 13980kN/s
+Perft 4 leaf nodes: 314612
+13ms 24200.9kN/s
+Perft 5 leaf nodes: 7936760
+272ms 29179.3kN/s
+Perft 6 leaf nodes: 183398372
+7693ms 23839.6kN/s
+Perft 1 leaf nodes: 25
+0ms infkN/s
+Perft 2 leaf nodes: 660
+0ms infkN/s
+Perft 3 leaf nodes: 15951
+1ms 15951kN/s
+Perft 4 leaf nodes: 415723
+13ms 31978.7kN/s
+Perft 5 leaf nodes: 10139775
+397ms 25541kN/s
+Perft 6 leaf nodes: 263840094
+8803ms 29971.6kN/s
+Perft 1 leaf nodes: 25
+0ms infkN/s
+Perft 2 leaf nodes: 652
+0ms infkN/s
+Perft 3 leaf nodes: 16626
+1ms 16626kN/s
+Perft 4 leaf nodes: 412224
+16ms 25764kN/s
+Perft 5 leaf nodes: 10731721
+363ms 29564kN/s
+Perft 6 leaf nodes: 263414671
+10574ms 24911.5kN/s
+Perft 1 leaf nodes: 26
+0ms infkN/s
+Perft 2 leaf nodes: 706
+0ms infkN/s
+Perft 3 leaf nodes: 16548
+1ms 16548kN/s
+Perft 4 leaf nodes: 439782
+15ms 29318.8kN/s
+Perft 5 leaf nodes: 10469492
+435ms 24067.8kN/s
+Perft 6 leaf nodes: 278444889
+9369ms 29719.8kN/s
+Perft 1 leaf nodes: 27
+0ms infkN/s
+Perft 2 leaf nodes: 596
+0ms infkN/s
+Perft 3 leaf nodes: 15759
+0ms infkN/s
+Perft 4 leaf nodes: 362146
+16ms 22634.1kN/s
+Perft 5 leaf nodes: 9601859
+308ms 31174.9kN/s
+Perft 6 leaf nodes: 226462631
+9397ms 24099.5kN/s
+Perft 1 leaf nodes: 22
+0ms infkN/s
+Perft 2 leaf nodes: 579
+0ms infkN/s
+Perft 3 leaf nodes: 12243
+1ms 12243kN/s
+Perft 4 leaf nodes: 318916
+10ms 31891.6kN/s
+Perft 5 leaf nodes: 7127386
+313ms 22771.2kN/s
+Perft 6 leaf nodes: 186298595
+6090ms 30590.9kN/s
+Perft 1 leaf nodes: 32
+0ms infkN/s
+Perft 2 leaf nodes: 729
+0ms infkN/s
+Perft 3 leaf nodes: 21803
+0ms infkN/s
+Perft 4 leaf nodes: 509994
+21ms 24285.4kN/s
+Perft 5 leaf nodes: 14720753
+454ms 32424.6kN/s
+Perft 6 leaf nodes: 355107619
+14747ms 24080kN/s
+Perft 1 leaf nodes: 27
+0ms infkN/s
+Perft 2 leaf nodes: 701
+0ms infkN/s
+Perft 3 leaf nodes: 16816
+0ms infkN/s
+Perft 4 leaf nodes: 442872
+16ms 27679.5kN/s
+Perft 5 leaf nodes: 10918832
+448ms 24372.4kN/s
+Perft 6 leaf nodes: 288843367
+10177ms 28382kN/s
+Perft 1 leaf nodes: 27
+0ms infkN/s
+Perft 2 leaf nodes: 621
+0ms infkN/s
+Perft 3 leaf nodes: 16508
+0ms infkN/s
+Perft 4 leaf nodes: 392378
+16ms 24523.6kN/s
+Perft 5 leaf nodes: 10462755
+351ms 29808.4kN/s
+Perft 6 leaf nodes: 257103708
+10284ms 25000.4kN/s
+Perft 1 leaf nodes: 30
+0ms infkN/s
+Perft 2 leaf nodes: 633
+0ms infkN/s
+Perft 3 leaf nodes: 15810
+1ms 15810kN/s
+Perft 4 leaf nodes: 355398
+14ms 25385.6kN/s
+Perft 5 leaf nodes: 8842726
+352ms 25121.4kN/s
+Perft 6 leaf nodes: 205254422
+7954ms 25805.2kN/s
+Perft 1 leaf nodes: 23
+0ms infkN/s
+Perft 2 leaf nodes: 565
+0ms infkN/s
+Perft 3 leaf nodes: 12698
+0ms infkN/s
+Perft 4 leaf nodes: 327247
+12ms 27270.6kN/s
+Perft 5 leaf nodes: 7504855
+292ms 25701.6kN/s
+Perft 6 leaf nodes: 197773383
+7133ms 27726.5kN/s
+Perft 1 leaf nodes: 28
+0ms infkN/s
+Perft 2 leaf nodes: 680
+0ms infkN/s
+Perft 3 leaf nodes: 16989
+1ms 16989kN/s
+Perft 4 leaf nodes: 386325
+14ms 27594.6kN/s
+Perft 5 leaf nodes: 9821066
+387ms 25377.4kN/s
+Perft 6 leaf nodes: 222582860
+8669ms 25675.7kN/s
+Perft 1 leaf nodes: 27
+0ms infkN/s
+Perft 2 leaf nodes: 577
+0ms infkN/s
+Perft 3 leaf nodes: 13661
+1ms 13661kN/s
+Perft 4 leaf nodes: 322047
+14ms 23003.4kN/s
+Perft 5 leaf nodes: 7601839
+291ms 26123.2kN/s
+Perft 6 leaf nodes: 189928128
+7790ms 24381kN/s
+Perft 1 leaf nodes: 23
+0ms infkN/s
+Perft 2 leaf nodes: 379
+0ms infkN/s
+Perft 3 leaf nodes: 8948
+0ms infkN/s
+Perft 4 leaf nodes: 143529
+8ms 17941.1kN/s
+Perft 5 leaf nodes: 3601361
+147ms 24499.1kN/s
+Perft 6 leaf nodes: 57854175
+3044ms 19006kN/s
+Perft 1 leaf nodes: 17
+0ms infkN/s
+Perft 2 leaf nodes: 443
+0ms infkN/s
+Perft 3 leaf nodes: 7038
+0ms infkN/s
+Perft 4 leaf nodes: 187436
+8ms 23429.5kN/s
+Perft 5 leaf nodes: 2928081
+151ms 19391.3kN/s
+Perft 6 leaf nodes: 80196329
+2995ms 26776.7kN/s
+Perft 1 leaf nodes: 34
+0ms infkN/s
+Perft 2 leaf nodes: 664
+0ms infkN/s
+Perft 3 leaf nodes: 19608
+1ms 19608kN/s
+Perft 4 leaf nodes: 348692
+15ms 23246.1kN/s
+Perft 5 leaf nodes: 10006963
+353ms 28348.3kN/s
+Perft 6 leaf nodes: 172851987
+7847ms 22027.8kN/s
+Perft 1 leaf nodes: 22
+0ms infkN/s
+Perft 2 leaf nodes: 585
+0ms infkN/s
+Perft 3 leaf nodes: 10957
+1ms 10957kN/s
+Perft 4 leaf nodes: 287677
+10ms 28767.7kN/s
+Perft 5 leaf nodes: 5057569
+230ms 21989.4kN/s
+Perft 6 leaf nodes: 132126664
+4997ms 26441.2kN/s
+Perft 1 leaf nodes: 5
+0ms infkN/s
+Perft 2 leaf nodes: 72
+0ms infkN/s
+Perft 3 leaf nodes: 1904
+0ms infkN/s
+Perft 4 leaf nodes: 29157
+2ms 14578.5kN/s
+Perft 5 leaf nodes: 786112
+29ms 27107.3kN/s
+Perft 6 leaf nodes: 12796696
+638ms 20057.5kN/s
+Perft 1 leaf nodes: 11
+0ms infkN/s
+Perft 2 leaf nodes: 361
+0ms infkN/s
+Perft 3 leaf nodes: 3590
+0ms infkN/s
+Perft 4 leaf nodes: 108753
+4ms 27188.2kN/s
+Perft 5 leaf nodes: 1152635
+81ms 14230.1kN/s
+Perft 6 leaf nodes: 33862240
+1219ms 27778.7kN/s
+Perft 1 leaf nodes: 38
+0ms infkN/s
+Perft 2 leaf nodes: 246
+1ms 246kN/s
+Perft 3 leaf nodes: 8542
+0ms infkN/s
+Perft 4 leaf nodes: 74867
+6ms 12477.8kN/s
+Perft 5 leaf nodes: 2469417
+81ms 30486.6kN/s
+Perft 6 leaf nodes: 24788494
+1789ms 13856.1kN/s
+Perft 1 leaf nodes: 11
+0ms infkN/s
+Perft 2 leaf nodes: 361
+0ms infkN/s
+Perft 3 leaf nodes: 3628
+1ms 3628kN/s
+Perft 4 leaf nodes: 108745
+4ms 27186.2kN/s
+Perft 5 leaf nodes: 1192409
+78ms 15287.3kN/s
+Perft 6 leaf nodes: 34321020
+1243ms 27611.4kN/s
+Perft 1 leaf nodes: 33
+0ms infkN/s
+Perft 2 leaf nodes: 348
+0ms infkN/s
+Perft 3 leaf nodes: 10253
+1ms 10253kN/s
+Perft 4 leaf nodes: 109696
+8ms 13712kN/s
+Perft 5 leaf nodes: 3244070
+114ms 28456.8kN/s
+Perft 6 leaf nodes: 35680310
+2455ms 14533.7kN/s
+Perft 1 leaf nodes: 11
+0ms infkN/s
+Perft 2 leaf nodes: 296
+0ms infkN/s
+Perft 3 leaf nodes: 3301
+0ms infkN/s
+Perft 4 leaf nodes: 85445
+3ms 28481.7kN/s
+Perft 5 leaf nodes: 976836
+62ms 15755.4kN/s
+Perft 6 leaf nodes: 25005923
+995ms 25131.6kN/s
+Perft 1 leaf nodes: 33
+0ms infkN/s
+Perft 2 leaf nodes: 377
+0ms infkN/s
+Perft 3 leaf nodes: 10572
+1ms 10572kN/s
+Perft 4 leaf nodes: 125127
+8ms 15640.9kN/s
+Perft 5 leaf nodes: 3449824
+126ms 27379.6kN/s
+Perft 6 leaf nodes: 41620286
+2595ms 16038.6kN/s
+Perft 1 leaf nodes: 15
+0ms infkN/s
+Perft 2 leaf nodes: 418
+0ms infkN/s
+Perft 3 leaf nodes: 5061
+1ms 5061kN/s
+Perft 4 leaf nodes: 133804
+5ms 26760.8kN/s
+Perft 5 leaf nodes: 1609522
+99ms 16257.8kN/s
+Perft 6 leaf nodes: 42418189
+1666ms 25461.1kN/s
+Perft 1 leaf nodes: 35
+0ms infkN/s
+Perft 2 leaf nodes: 434
+0ms infkN/s
+Perft 3 leaf nodes: 13169
+1ms 13169kN/s
+Perft 4 leaf nodes: 153820
+10ms 15382kN/s
+Perft 5 leaf nodes: 4443875
+156ms 28486.4kN/s
+Perft 6 leaf nodes: 53243547
+3460ms 15388.3kN/s
+Perft 1 leaf nodes: 13
+0ms infkN/s
+Perft 2 leaf nodes: 429
+0ms infkN/s
+Perft 3 leaf nodes: 5040
+0ms infkN/s
+Perft 4 leaf nodes: 157837
+6ms 26306.2kN/s
+Perft 5 leaf nodes: 1921415
+130ms 14780.1kN/s
+Perft 6 leaf nodes: 59286441
+2059ms 28793.8kN/s
+Perft 1 leaf nodes: 36
+0ms infkN/s
+Perft 2 leaf nodes: 372
+0ms infkN/s
+Perft 3 leaf nodes: 12010
+0ms infkN/s
+Perft 4 leaf nodes: 135981
+10ms 13598.1kN/s
+Perft 5 leaf nodes: 4297511
+148ms 29037.2kN/s
+Perft 6 leaf nodes: 52475032
+3772ms 13911.7kN/s
+Perft 1 leaf nodes: 10
+0ms infkN/s
+Perft 2 leaf nodes: 291
+0ms infkN/s
+Perft 3 leaf nodes: 2992
+0ms infkN/s
+Perft 4 leaf nodes: 90496
+4ms 22624kN/s
+Perft 5 leaf nodes: 1013174
+82ms 12355.8kN/s
+Perft 6 leaf nodes: 30909673
+1115ms 27721.7kN/s
+Perft 1 leaf nodes: 38
+0ms infkN/s
+Perft 2 leaf nodes: 331
+0ms infkN/s
+Perft 3 leaf nodes: 11927
+0ms infkN/s
+Perft 4 leaf nodes: 120416
+9ms 13379.6kN/s
+Perft 5 leaf nodes: 4169323
+137ms 30433kN/s
+Perft 6 leaf nodes: 46571292
+3205ms 14530.8kN/s
+Perft 1 leaf nodes: 14
+0ms infkN/s
+Perft 2 leaf nodes: 490
+0ms infkN/s
+Perft 3 leaf nodes: 6278
+1ms 6278kN/s
+Perft 4 leaf nodes: 208386
+7ms 29769.4kN/s
+Perft 5 leaf nodes: 2800497
+166ms 16870.5kN/s
+Perft 6 leaf nodes: 89526750
+3137ms 28539kN/s
+Perft 1 leaf nodes: 26
+0ms infkN/s
+Perft 2 leaf nodes: 478
+0ms infkN/s
+Perft 3 leaf nodes: 11790
+1ms 11790kN/s
+Perft 4 leaf nodes: 204499
+10ms 20449.9kN/s
+Perft 5 leaf nodes: 4930059
+211ms 23365.2kN/s
+Perft 6 leaf nodes: 83220242
+4284ms 19425.8kN/s
+Perft 1 leaf nodes: 11
+0ms infkN/s
+Perft 2 leaf nodes: 338
+0ms infkN/s
+Perft 3 leaf nodes: 3510
+0ms infkN/s
+Perft 4 leaf nodes: 99518
+4ms 24879.5kN/s
+Perft 5 leaf nodes: 1095683
+78ms 14047.2kN/s
+Perft 6 leaf nodes: 29595829
+1144ms 25870.5kN/s
+Perft 1 leaf nodes: 30
+0ms infkN/s
+Perft 2 leaf nodes: 477
+0ms infkN/s
+Perft 3 leaf nodes: 12371
+0ms infkN/s
+Perft 4 leaf nodes: 202322
+10ms 20232.2kN/s
+Perft 5 leaf nodes: 4997277
+199ms 25111.9kN/s
+Perft 6 leaf nodes: 83801521
+4178ms 20057.8kN/s
+Perft 1 leaf nodes: 19
+0ms infkN/s
+Perft 2 leaf nodes: 481
+0ms infkN/s
+Perft 3 leaf nodes: 8111
+0ms infkN/s
+Perft 4 leaf nodes: 198356
+9ms 22039.6kN/s
+Perft 5 leaf nodes: 3210337
+167ms 19223.6kN/s
+Perft 6 leaf nodes: 77007113
+3436ms 22411.8kN/s
+Perft 1 leaf nodes: 26
+0ms infkN/s
+Perft 2 leaf nodes: 412
+0ms infkN/s
+Perft 3 leaf nodes: 10548
+0ms infkN/s
+Perft 4 leaf nodes: 163093
+8ms 20386.6kN/s
+Perft 5 leaf nodes: 4116528
+146ms 28195.4kN/s
+Perft 6 leaf nodes: 65172297
+3381ms 19276kN/s
+Perft 1 leaf nodes: 10
+0ms infkN/s
+Perft 2 leaf nodes: 238
+0ms infkN/s
+Perft 3 leaf nodes: 3078
+0ms infkN/s
+Perft 4 leaf nodes: 70356
+3ms 23452kN/s
+Perft 5 leaf nodes: 1038374
+57ms 18217.1kN/s
+Perft 6 leaf nodes: 23760716
+924ms 25715.1kN/s
+Perft 1 leaf nodes: 21
+0ms infkN/s
+Perft 2 leaf nodes: 361
+0ms infkN/s
+Perft 3 leaf nodes: 8211
+0ms infkN/s
+Perft 4 leaf nodes: 128257
+7ms 18322.4kN/s
+Perft 5 leaf nodes: 3061565
+115ms 26622.3kN/s
+Perft 6 leaf nodes: 47317841
+2522ms 18762kN/s
+Perft 1 leaf nodes: 18
+0ms infkN/s
+Perft 2 leaf nodes: 209
+0ms infkN/s
+Perft 3 leaf nodes: 3734
+1ms 3734kN/s
+Perft 4 leaf nodes: 54477
+3ms 18159kN/s
+Perft 5 leaf nodes: 954283
+48ms 19880.9kN/s
+Perft 6 leaf nodes: 16003896
+820ms 19516.9kN/s
+Perft 1 leaf nodes: 15
+0ms infkN/s
+Perft 2 leaf nodes: 302
+0ms infkN/s
+Perft 3 leaf nodes: 4537
+0ms infkN/s
+Perft 4 leaf nodes: 84303
+4ms 21075.8kN/s
+Perft 5 leaf nodes: 1448252
+75ms 19310kN/s
+Perft 6 leaf nodes: 25929658
+1248ms 20777kN/s
+Perft 1 leaf nodes: 23
+0ms infkN/s
+Perft 2 leaf nodes: 623
+0ms infkN/s
+Perft 3 leaf nodes: 11654
+1ms 11654kN/s
+Perft 4 leaf nodes: 322322
+12ms 26860.2kN/s
+Perft 5 leaf nodes: 5523536
+289ms 19112.6kN/s
+Perft 6 leaf nodes: 155183754
+5768ms 26904.3kN/s
+Perft 1 leaf nodes: 31
+0ms infkN/s
+Perft 2 leaf nodes: 656
+0ms infkN/s
+Perft 3 leaf nodes: 18160
+1ms 18160kN/s
+Perft 4 leaf nodes: 342342
+18ms 19019kN/s
+Perft 5 leaf nodes: 9440766
+409ms 23082.6kN/s
+Perft 6 leaf nodes: 164576855
+8791ms 18721.1kN/s
+Perft 1 leaf nodes: 25
+0ms infkN/s
+Perft 2 leaf nodes: 394
+0ms infkN/s
+Perft 3 leaf nodes: 8219
+0ms infkN/s
+Perft 4 leaf nodes: 116986
+7ms 16712.3kN/s
+Perft 5 leaf nodes: 2283351
+110ms 20757.7kN/s
+Perft 6 leaf nodes: 31501697
+2383ms 13219.3kN/s
+Perft 1 leaf nodes: 15
+0ms infkN/s
+Perft 2 leaf nodes: 246
+0ms infkN/s
+Perft 3 leaf nodes: 3728
+0ms infkN/s
+Perft 4 leaf nodes: 62176
+4ms 15544kN/s
+Perft 5 leaf nodes: 876278
+56ms 15647.8kN/s
+Perft 6 leaf nodes: 14756640
+859ms 17178.9kN/s
+Perft 1 leaf nodes: 19
+0ms infkN/s
+Perft 2 leaf nodes: 186
+0ms infkN/s
+Perft 3 leaf nodes: 3184
+0ms infkN/s
+Perft 4 leaf nodes: 40252
+3ms 13417.3kN/s
+Perft 5 leaf nodes: 679381
+37ms 18361.6kN/s
+Perft 6 leaf nodes: 8627238
+604ms 14283.5kN/s
+Perft 1 leaf nodes: 12
+0ms infkN/s
+Perft 2 leaf nodes: 223
+0ms infkN/s
+Perft 3 leaf nodes: 2387
+0ms infkN/s
+Perft 4 leaf nodes: 43315
+3ms 14438.3kN/s
+Perft 5 leaf nodes: 514348
+40ms 12858.7kN/s
+Perft 6 leaf nodes: 9050627
+488ms 18546.4kN/s
+Perft 1 leaf nodes: 23
+0ms infkN/s
+Perft 2 leaf nodes: 267
+0ms infkN/s
+Perft 3 leaf nodes: 5178
+0ms infkN/s
+Perft 4 leaf nodes: 60640
+5ms 12128kN/s
+Perft 5 leaf nodes: 1146671
+59ms 19435.1kN/s
+Perft 6 leaf nodes: 13926198
+980ms 14210.4kN/s
+Perft 1 leaf nodes: 10
+0ms infkN/s
+Perft 2 leaf nodes: 219
+0ms infkN/s
+Perft 3 leaf nodes: 2313
+1ms 2313kN/s
+Perft 4 leaf nodes: 47069
+2ms 23534.5kN/s
+Perft 5 leaf nodes: 535923
+37ms 14484.4kN/s
+Perft 6 leaf nodes: 10526260
+497ms 21179.6kN/s
+Perft 1 leaf nodes: 19
+0ms infkN/s
+Perft 2 leaf nodes: 250
+0ms infkN/s
+Perft 3 leaf nodes: 4795
+1ms 4795kN/s
+Perft 4 leaf nodes: 54526
+3ms 18175.3kN/s
+Perft 5 leaf nodes: 1028885
+50ms 20577.7kN/s
+Perft 6 leaf nodes: 11864066
+816ms 14539.3kN/s
+Perft 1 leaf nodes: 10
+0ms infkN/s
+Perft 2 leaf nodes: 213
+0ms infkN/s
+Perft 3 leaf nodes: 2332
+0ms infkN/s
+Perft 4 leaf nodes: 47793
+2ms 23896.5kN/s
+Perft 5 leaf nodes: 551787
+40ms 13794.7kN/s
+Perft 6 leaf nodes: 11049823
+537ms 20577kN/s
+Perft 1 leaf nodes: 5
+0ms infkN/s
+Perft 2 leaf nodes: 90
+0ms infkN/s
+Perft 3 leaf nodes: 1950
+0ms infkN/s
+Perft 4 leaf nodes: 27716
+1ms 27716kN/s
+Perft 5 leaf nodes: 585553
+27ms 21687.1kN/s
+Perft 6 leaf nodes: 7814002
+489ms 15979.6kN/s
+Perft 1 leaf nodes: 11
+0ms infkN/s
+Perft 2 leaf nodes: 222
+0ms infkN/s
+Perft 3 leaf nodes: 2552
+1ms 2552kN/s
+Perft 4 leaf nodes: 48238
+2ms 24119kN/s
+Perft 5 leaf nodes: 595884
+40ms 14897.1kN/s
+Perft 6 leaf nodes: 11156196
+589ms 18940.9kN/s
+Perft 1 leaf nodes: 20
+0ms infkN/s
+Perft 2 leaf nodes: 400
+0ms infkN/s
+Perft 3 leaf nodes: 8902
+1ms 8902kN/s
+Perft 4 leaf nodes: 197281
+6ms 32880.2kN/s
+Perft 5 leaf nodes: 4865609
+146ms 33326.1kN/s
+Perft 6 leaf nodes: 119060324
+3902ms 30512.6kN/s
+Perft 1 leaf nodes: 21
+0ms infkN/s
+Perft 2 leaf nodes: 441
+0ms infkN/s
+Perft 3 leaf nodes: 10227
+0ms infkN/s
+Perft 4 leaf nodes: 242685
+8ms 30335.6kN/s
+Perft 5 leaf nodes: 6164778
+207ms 29781.5kN/s
+Perft 6 leaf nodes: 161038368
+4693ms 34314.6kN/s
+Perft 1 leaf nodes: 19
+0ms infkN/s
+Perft 2 leaf nodes: 398
+0ms infkN/s
+Perft 3 leaf nodes: 8820
+0ms infkN/s
+Perft 4 leaf nodes: 204573
+6ms 34095.5kN/s
+Perft 5 leaf nodes: 5072498
+161ms 31506.2kN/s
+Perft 6 leaf nodes: 129375227
+3810ms 33956.8kN/s
+Perft 1 leaf nodes: 26
+0ms infkN/s
+Perft 2 leaf nodes: 470
+0ms infkN/s
+Perft 3 leaf nodes: 13090
+0ms infkN/s
+Perft 4 leaf nodes: 284308
+10ms 28430.8kN/s
+Perft 5 leaf nodes: 8296635
+230ms 36072.3kN/s
+Perft 6 leaf nodes: 202882781
+6427ms 31567.3kN/s
+Perft 1 leaf nodes: 27
+0ms infkN/s
+Perft 2 leaf nodes: 666
+0ms infkN/s
+Perft 3 leaf nodes: 18637
+0ms infkN/s
+Perft 4 leaf nodes: 493990
+17ms 29058.2kN/s
+Perft 5 leaf nodes: 14425855
+428ms 33705.3kN/s
+Perft 6 leaf nodes: 405138216
+12883ms 31447.5kN/s
+Perft 1 leaf nodes: 25
+0ms infkN/s
+Perft 2 leaf nodes: 703
+0ms infkN/s
+Perft 3 leaf nodes: 18885
+1ms 18885kN/s
+Perft 4 leaf nodes: 549873
+16ms 34367.1kN/s
+Perft 5 leaf nodes: 15608368
+470ms 33209.3kN/s
+Perft 6 leaf nodes: 472614722
+13680ms 34547.9kN/s
+Perft 1 leaf nodes: 24
+0ms infkN/s
+Perft 2 leaf nodes: 576
+0ms infkN/s
+Perft 3 leaf nodes: 15712
+0ms infkN/s
+Perft 4 leaf nodes: 417380
+14ms 29812.9kN/s
+Perft 5 leaf nodes: 12214998
+371ms 32924.5kN/s
+Perft 6 leaf nodes: 350439421
+10737ms 32638.5kN/s
+Perft 1 leaf nodes: 27
+0ms infkN/s
+Perft 2 leaf nodes: 729
+0ms infkN/s
+Perft 3 leaf nodes: 20665
+1ms 20665kN/s
+Perft 4 leaf nodes: 613681
+19ms 32299kN/s
+Perft 5 leaf nodes: 18161673
+523ms 34726kN/s
+Perft 6 leaf nodes: 570898339
+16599ms 34393.5kN/s
+Perft 1 leaf nodes: 30
+0ms infkN/s
+Perft 2 leaf nodes: 689
+0ms infkN/s
+Perft 3 leaf nodes: 21830
+0ms infkN/s
+Perft 4 leaf nodes: 556204
+18ms 30900.2kN/s
+Perft 5 leaf nodes: 18152100
+524ms 34641.4kN/s
+Perft 6 leaf nodes: 497167912
+15633ms 31802.5kN/s
+Perft 1 leaf nodes: 23
+0ms infkN/s
+Perft 2 leaf nodes: 685
+0ms infkN/s
+Perft 3 leaf nodes: 17480
+0ms infkN/s
+Perft 4 leaf nodes: 532817
+16ms 33301.1kN/s
+Perft 5 leaf nodes: 14672791
+445ms 32972.6kN/s
