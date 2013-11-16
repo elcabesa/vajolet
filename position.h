@@ -426,7 +426,7 @@ public:
 	bitboardIndex board[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
 	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
 	unsigned int pieceCount[lastBitboard];	// number of pieces indexed by bitboardIndex enum
-	tSquare pieceList[lastBitboard][16];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 16 pezzi di ogni tipo)
+	tSquare pieceList[lastBitboard][64];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 64 pezzi di ogni tipo)
 	unsigned int index[squareNumber];		// indice del pezzo all'interno della sua lista
 
 
