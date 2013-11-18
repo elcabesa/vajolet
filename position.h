@@ -134,6 +134,7 @@ private:
 		\date 27/10/2013
 	*/
 	static simdScore pieceValue[lastBitboard];
+	static simdScore pstValue[lastBitboard][squareNumber];
 public:
 
 

@@ -29,6 +29,7 @@
 
 
 simdScore Position::pieceValue[lastBitboard];
+simdScore Position::pstValue[lastBitboard][squareNumber];
 int Position::castleRightsMask[squareNumber];
 
 /*! \brief setup a position from a fen string
@@ -189,6 +190,22 @@ void Position::initScoreValues(void){
 	pieceValue[blackRooks]=-pieceValue[whiteRooks];
 	pieceValue[blackQueens]=-pieceValue[whiteQueens];
 	pieceValue[blackKing]=-pieceValue[whiteKing];
+
+	for(int piece=0;piece<lastBitboard;piece++){
+		for(tSquare s=(tSquare)0;s<squareNumber;s++){
+			int rank=RANKS[s];
+			int file=FILES[s];
+			if(piece >occupiedSquares && piece <whitePieces ){
+				pstValue[piece][s]=-10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
+			}
+			else if(piece >emptyBitmap && piece <blackPieces ){
+				pstValue[piece][s]=10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
+			}
+			else{
+				pstValue[piece][s]=0;
+			}
+		}
+	}
 
 }
 /*! \brief clear a position and his history
@@ -399,12 +416,15 @@ U64 Position::calcMaterialKey(void) const {
 	\date 27/10/2013
 */
 simdScore Position::calcMaterialValue(void) const{
-	simdScore s=0;
-	for (auto const &val :board)
-	{
-		s+=pieceValue[val];
+	simdScore score=0;
+	for (tSquare s=(tSquare)0;s<squareNumber;s++){
+		bitboardIndex val=board[s];
+		score+=pieceValue[val];
+		score+=pstValue[val][s];
+
+
 	}
-	return s;
+	return score;
 
 }
 /*! \brief calc the non pawn material value of the position
@@ -418,14 +438,18 @@ void Position::calcNonPawnMaterialValue(Score* s){
 	t[0]=0;
 	t[1]=0;
 
-	for (auto const &val :board)
-	{
-		if(!isPawn(val) && !isKing(val)){
+	for (tSquare s=(tSquare)0;s<squareNumber;s++){
+		bitboardIndex val=board[s];
+		if(!isPawn(val)){
 			if(val>emptyBitmap){
-				t[1]-=pieceValue[val];
+				if(!isKing(val)){
+					t[1]-=pieceValue[val];
+				}
 			}
 			else{
-				t[0]+=pieceValue[val];
+				if(!isKing(val)){
+					t[0]+=pieceValue[val];
+				}
 			}
 		}
 	}
@@ -475,6 +499,7 @@ void Position::doMove(Move & m){
 	tSquare captureSquare =(tSquare)m.to;
 	bitboardIndex piece= board[from];
 	bitboardIndex capture = (m.flags ==Move::fenpassant ? (x.nextMove?whitePawns:blackPawns) :board[to]);
+	simdScore mv= simdScore(x.material[0],x.material[1],0,0);
 
 	// change side
 	x.key^=HashKeys::side;
@@ -497,6 +522,8 @@ void Position::doMove(Move & m){
 		bitboardIndex rook = board[rFrom];
 		tSquare rTo = kingSide? to+ovest: to+est;
 		movePiece(rook,rFrom,rTo);
+		mv+=pstValue[rook][rTo]-pstValue[rook][rFrom];
+
 		x.key ^=HashKeys::keys[rFrom][rook];
 		x.key ^=HashKeys::keys[rTo][rook];
 
@@ -528,10 +555,9 @@ void Position::doMove(Move & m){
 
 		// remove piece
 		removePiece(capture,captureSquare);
-
 		// update material
-		x.material[0]-=pieceValue[capture][0];
-		x.material[1]-=pieceValue[capture][1];
+		mv-=pieceValue[capture]+pstValue[capture][captureSquare];
+
 		// update keys
 		x.key ^= HashKeys::keys[captureSquare][capture];
 		x.materialKey ^= HashKeys::keys[capture][pieceCount[capture]]; // ->after removing the piece
@@ -543,6 +569,10 @@ void Position::doMove(Move & m){
 	// update hashKey
 	x.key^= HashKeys::keys[from][piece]^HashKeys::keys[to][piece];
 	movePiece(piece,from,to);
+
+	mv+=pstValue[piece][to]-pstValue[piece][from];
+
+
 	// Update castle rights if needed
 	if (x.castleRights && (castleRightsMask[from] | castleRightsMask[to]))
 	{
@@ -566,6 +596,19 @@ void Position::doMove(Move & m){
 			removePiece(piece,to);
 			putPiece(promotedPiece,to);
 
+			mv+=pieceValue[promotedPiece]-pieceValue[piece]+pstValue[promotedPiece][to]-pstValue[piece][to];
+
+			if(piece>emptyBitmap){
+				// black piece promoted
+				x.nonPawnMaterial[2]+=pieceValue[promotedPiece][0];
+				x.nonPawnMaterial[3]+=pieceValue[promotedPiece][1];
+			}
+			else{
+				//white piece captured
+				x.nonPawnMaterial[0]-=pieceValue[promotedPiece][0];
+				x.nonPawnMaterial[1]-=pieceValue[promotedPiece][1];
+			}
+
 			x.key ^= HashKeys::keys[to][piece]^ HashKeys::keys[to][promotedPiece];
 			x.pawnKey ^= HashKeys::keys[to][piece];
 			x.materialKey ^= HashKeys::keys[promotedPiece][pieceCount[promotedPiece]-1]^HashKeys::keys[piece][pieceCount[piece]];
@@ -573,6 +616,8 @@ void Position::doMove(Move & m){
 		x.pawnKey ^= HashKeys::keys[from][piece] ^ HashKeys::keys[to][piece];
 		x.fiftyMoveCnt=0;
 	}
+
+	mv.store_partial(2,x.material);
 
 	x.capturedPiece=capture;
 
@@ -792,6 +837,29 @@ bool Position::checkPosConsistency(int nn){
 		while(1){}
 		return false;
 	}
+
+	simdScore sc=calcMaterialValue();
+	if(sc[0]!=x.material[0] || sc[1]!=x.material[1]){
+		sync_cout<<"material error"<<sync_endl;
+		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
+		while(1){}
+		return false;
+	}
+	Score score[4];
+	calcNonPawnMaterialValue(score);
+	if(score[0]!= x.nonPawnMaterial[0] ||
+		score[1]!= x.nonPawnMaterial[1] ||
+		score[2]!= x.nonPawnMaterial[2] ||
+		score[3]!= x.nonPawnMaterial[3]
+	){
+		sync_cout<<"non pawn material error"<<sync_endl;
+		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
+		while(1){}
+		return false;
+	}
+
+
+
 
 
 	return true;
