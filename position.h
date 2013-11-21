@@ -17,7 +17,7 @@
 #ifndef POSITION_H_
 #define POSITION_H_
 
-#include <list>
+#include <vector>
 #include <string>
 #include "data.h"
 #include "vectorclass/vectorclass.h"
@@ -121,6 +121,8 @@ public:
 	*/
 	static int castleRightsMask[squareNumber];
 private:
+
+	unsigned int stateIndex;
 	/*! \brief array of char to create the fen string
 		\author Marco Belli
 		\version 1.0
@@ -135,6 +137,7 @@ private:
 	*/
 	static simdScore pieceValue[lastBitboard];
 	static simdScore pstValue[lastBitboard][squareNumber];
+	static simdScore nonPawnValue[lastBitboard][squareNumber];
 public:
 
 
@@ -157,6 +160,7 @@ public:
 		\date 27/10/2013
 	*/
 	Position(){
+		stateIndex=0;
 	}
 
 	/*! \brief tell if the piece is a pawn
@@ -164,7 +168,7 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline char isPawn(bitboardIndex piece) const {
+	inline static char isPawn(bitboardIndex piece) {
 		return (piece&7)==6;
 	}
 	/*! \brief tell if the piece is a king
@@ -172,7 +176,7 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline char isKing(bitboardIndex piece) const {
+	inline static char isKing(bitboardIndex piece){
 		return (piece&7)==1;
 	}
 	/*! \brief tell if the piece is a rook
@@ -180,7 +184,7 @@ public:
 		\version 1.0
 		\date 04/11/2013
 	*/
-	inline char isRook(bitboardIndex piece) const {
+	inline static char isRook(bitboardIndex piece){
 		return (piece&7)==3;
 	}
 	/*! \brief tell if the piece is a bishop
@@ -188,7 +192,7 @@ public:
 		\version 1.0
 		\date 04/11/2013
 	*/
-	inline char isBishop(bitboardIndex piece) const {
+	inline static char isBishop(bitboardIndex piece){
 		return (piece&7)==4;
 	}
 	/*! \brief tell the color of a piece
@@ -196,7 +200,7 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline char isblack(bitboardIndex piece) const {
+	inline static char isblack(bitboardIndex piece){
 		return piece&8;
 	}
 
@@ -208,15 +212,43 @@ public:
 		\date 27/10/2013
 	*/
 	inline void undoNullMove(void){
-		stateInfo.pop_back();
+		removeState();
 	}
 	/*! \brief return a reference to the actual state
 		\author Marco Belli
 		\version 1.0
-		\date 08/11/2013
+		\version 1.1 get rid of continuos malloc/free
+		\date 21/11/2013
 	*/
 	inline state& getActualState(void)const {
-		return (state& )(stateInfo.back());
+		return (state&) stateInfo[stateIndex-1];
+	}
+
+	/*! \brief insert a new state in memory
+		\author Marco Belli
+		\version 1.0
+		\version 1.1 get rid of continuos malloc/free
+		\date 21/11/2013
+	*/
+	inline void insertState(state & s){
+		if(stateIndex>=stateInfo.size()){
+			stateInfo.push_back(s);
+		}
+		else{
+			stateInfo[stateIndex]=s;
+		}
+
+		stateIndex++;
+	}
+
+	/*! \brief  remove the last state
+		\author Marco Belli
+		\version 1.0
+		\version 1.1 get rid of continuos malloc/free
+		\date 21/11/2013
+	*/
+	inline void removeState(){
+		stateIndex--;
 	}
 
 
@@ -318,7 +350,7 @@ public:
 		\date 08/11/2013
 	*/
 	inline unsigned int getGamePhase() const{
-		Score tot=stateInfo.back().nonPawnMaterial[0]+stateInfo.back().nonPawnMaterial[2];
+		Score tot=getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
 		if(tot>570000){ //opening
 			return 0;
 		}
@@ -355,7 +387,7 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::list<state> stateInfo;
+	std::vector<state> stateInfo;
 
 	/*! \brief put a piece on the board
 		\author STOCKFISH
