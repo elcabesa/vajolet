@@ -14,60 +14,26 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#ifndef SEARCH_H_
+#define SEARCH_H_
 
-#ifndef MOVE_H_
-#define MOVE_H_
+#include "position.h"
+#include "move.h"
+#include <list>
 
-#include "vajolet.h"
+class searcLimits{
+public:
+	bool ponder,infinite;
+	unsigned int wtime,btime,winc,binc,movesToGo,depth,nodes,mate,moveTime;
 
-/*!	\brief struct move
-    \author Marco Belli
-	\version 1.0
-	\date 08/11/2013
- */
-struct Move
-{
-	union
-	{
-		struct
-		{
-			unsigned from		:6;
-			unsigned to			:6;
-			unsigned promotion	:2;
-			unsigned flags		:2;
-		};
-		unsigned short packed;
-	};
-	enum eflags{
-		fnone,
-		fpromotion,
-		fenpassant,
-		fcastle,
-	};
-
-	enum epromotion{
-		promQueen,
-		promRook,
-		promBishop,
-		promKnight,
-	};
-
-
-
+	std::list<Move> searchMoves;
 
 };
 
-/*!	\brief return the offset of a pawn push
-    \author Marco Belli
-	\version 1.0
-	\date 08/11/2013
- */
-inline tSquare pawnPush(int color){
-	return color? sud:north;
-}
 
+class search{
+public:
+	void startThinking(Position & p);
+};
 
-
-
-
-#endif /* MOVE_H_ */
+#endif /* SEARCH_H_ */

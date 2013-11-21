@@ -30,6 +30,7 @@
 #include "position.h"
 #include "movegen.h"
 #include "move.h"
+#include "search.h"
 
 
 
@@ -122,6 +123,36 @@ void static doPerft(unsigned int n, Position & pos){
 }
 
 
+void static go(std::istringstream& is, Position & pos) {
+
+	searcLimits limits;
+	std::string token;
+
+
+    while (is >> token)
+    {
+        if (token == "searchmoves")
+            while (is >> token){
+                limits.searchMoves.push_back(moveFromUci(pos,token));
+            }
+        else if (token == "wtime")     is >> limits.wtime;
+        else if (token == "btime")     is >> limits.btime;
+        else if (token == "winc")      is >> limits.winc;
+        else if (token == "binc")      is >> limits.binc;
+        else if (token == "movestogo") is >> limits.movesToGo;
+        else if (token == "depth")     is >> limits.depth;
+        else if (token == "nodes")     is >> limits.nodes;
+        else if (token == "movetime")  is >> limits.moveTime;
+        else if (token == "mate")      is >> limits.mate;
+        else if (token == "infinite")  limits.infinite = true;
+        else if (token == "ponder")    limits.ponder = true;
+    }
+
+    search src;
+    src.startThinking(pos);
+  }
+
+
 
 /*	\brief manage the uci loop
 	\author Marco Belli
@@ -168,6 +199,9 @@ void uciLoop(){
 		else if (token =="divide" && (is>>token)){
 			unsigned long res=pos.divide(stoi(token));
 			sync_cout<<"divide Res="<<res<<sync_endl;
+		}
+		else if (token =="go"){
+			go(is,pos);
 		}
 		else{
 			sync_cout<<"unknown command"<<sync_endl;
