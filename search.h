@@ -17,8 +17,10 @@
 #ifndef SEARCH_H_
 #define SEARCH_H_
 
+#include "vajolet.h"
 #include "position.h"
 #include "move.h"
+#include <vector>
 #include <list>
 
 class searcLimits{
@@ -33,7 +35,16 @@ public:
 
 class search{
 public:
+	typedef enum eNodeType{
+		ROOT_NODE,
+		PV_NODE,
+		ALL_NODE,
+		CUT_NODE
+	} nodeType;
 	void startThinking(Position & p);
+private:
+	template<nodeType type>Score alphaBeta(Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
+	unsigned long long visitedNodes;
 };
 
 #endif /* SEARCH_H_ */

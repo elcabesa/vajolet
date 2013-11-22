@@ -271,7 +271,7 @@ public:
 		s+=char('1'+RANKS[m.to]);
 		//promotion
 		if(m.flags == Move::fpromotion){
-			s += Position::PIECE_NAMES_FEN[m.promotion+Position::whiteQueens];
+			s += Position::PIECE_NAMES_FEN[m.promotion+Position::blackQueens];
 		}
 		return s;
 

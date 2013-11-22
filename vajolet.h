@@ -29,7 +29,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet"
-#define VERSION			"0.03"
+#define VERSION			"0.04"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
 
@@ -37,6 +37,13 @@
 //	define
 //---------------------------------------------
 #define MAX_MOVE_PER_POSITION (512)
+#define ONE_PLY		(16)
+
+//---------------------------------------------
+//SCORE DEFINITION
+//---------------------------------------------
+
+#define SCORE_INFINITE	(2000000000)
 
 //---------------------------------------------
 //
@@ -92,6 +99,7 @@ ENABLE_OPERATORS_ON(tSquare);
 
 typedef Vec4i simdScore;					/*!< score saved as a vector of 4 signed int scores*/
 typedef signed int Score;					/*!< score saved as a single signed int value*/
+
 
 
 
