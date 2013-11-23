@@ -510,18 +510,23 @@ void Movegen::generateMoves(Position& p){
 	bitMap pawns =  s.Us[Position::Pawns]&~seventhRankMask;
 	bitMap promotionPawns =  s.Us[Position::Pawns] &seventhRankMask;
 
-	bitMap kingTarget = ~ s.Us[Position::Pieces];
+	bitMap kingTarget;
 	bitMap target;
 	if(type==Movegen::allEvasionMg){
 		target=(s.checkers | SQUARES_BETWEEN[p.pieceList[Position::whiteKing+s.nextMove][0]][firstOne(s.checkers)]) &~ s.Us[Position::Pieces];
+		kingTarget= ~ s.Us[Position::Pieces];
 	}else if(type== Movegen::allNonEvasionMg){
 		target= ~ s.Us[Position::Pieces];
+		kingTarget= ~ s.Us[Position::Pieces];
 	}else if(type== Movegen::captureMg){
 		target= s.Them[Position::Pieces];
+		kingTarget = s.Them[Position::Pieces];
 	}else if(type== Movegen::quietMg){
 		target= ~p.bitBoard[Position::occupiedSquares];
+		kingTarget= ~ p.bitBoard[Position::occupiedSquares];
 	}else if(type== Movegen::quietChecksMg){
 		target= ~p.bitBoard[Position::occupiedSquares];
+		kingTarget= ~ p.bitBoard[Position::occupiedSquares];
 	}
 	bitMap enemy = s.Them[Position::Pieces];
 	bitMap & occupiedSquares = p.bitBoard[Position::occupiedSquares];

@@ -58,7 +58,7 @@ void search::startThinking(Position & p){
 		Score res=alphaBeta<search::nodeType::ROOT_NODE>(p,depth,-SCORE_INFINITE,SCORE_INFINITE,PV);
 		unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 		sync_cout<<"info depth "<<depth/ONE_PLY<<" score cp "<<(int)((float)res/100.0)<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(endTime-startTime))<<" time "<<(endTime-startTime);
-		sync_cout<<" pv ";
+		std::cout<<" pv ";
 		for (auto & m :PV){
 			std::cout<<p.displayUci(m)<<" ";
 		}
@@ -104,6 +104,7 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 		else{
 			val=-alphaBeta<search::nodeType::PV_NODE>(pos,depth-ONE_PLY,-alpha-1,-alpha,childPV);
 			if(val>alpha && val < beta ){
+				childPV.clear();
 				val=-alphaBeta<search::nodeType::PV_NODE>(pos,depth-ONE_PLY,-beta,-alpha,childPV);
 			}
 		}
@@ -160,6 +161,7 @@ template<search::nodeType type> Score search::qsearch(Position & pos,int depth,S
 	// try the moves
 	Movegen mg;
 	mg.generateMoves<Movegen::captureMg>(pos);
+
 	unsigned int moveNumber=0;
 	while (bestScore <beta  && moveNumber <mg.getGeneratedMoveNumber()) {
 		pos.doMove(mg.getGeneratedMove(moveNumber));
