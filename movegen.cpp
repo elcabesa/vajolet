@@ -878,6 +878,8 @@ void Movegen::generateMoves(Position& p){
 
 
 }
+template void Movegen::generateMoves<Movegen::captureMg>(Position& p);
+
 
 template<>
 void Movegen::generateMoves<Movegen::allMg>(Position& p){
@@ -953,7 +955,6 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 			}
 		}
 	}
-	// todo gestire pinned pieces, pezzo pinned non può muoversi se non nella direzione re-pinned
 	if((s.pinnedPieces & bitSet((tSquare)m.from) && !squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))){
 		p.display();
 		sync_cout<<p.displayUci(m)<<": pinned problem"<<sync_endl;
