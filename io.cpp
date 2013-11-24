@@ -115,13 +115,15 @@ void start_logger(bool b) { Logger::start(b); }
 	\version 1.0
 	\date 14/10/2013
 */
-std::ostream& operator<<(std::ostream& os, SyncCout sc) {
 
-	static mutex m;
-	if (sc == io_lock)
+
+
+std::ostream& operator<<(std::ostream& os, SyncCout sc) {
+	static std::mutex m;
+	if (sc == SyncCout::io_lock)
 		m.lock();
 
-	if (sc == io_unlock)
+	if (sc == SyncCout::io_unlock)
 		m.unlock();
 
 	return os;
