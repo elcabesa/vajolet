@@ -535,7 +535,6 @@ void Movegen::generateMoves(Position& p){
 	Move m;
 	m.packed=0;
 
-	moveListIndex=0;
 	//------------------------------------------------------
 	// king
 	//------------------------------------------------------
@@ -884,6 +883,7 @@ void Movegen::generateMoves(Position& p){
 
 }
 template void Movegen::generateMoves<Movegen::captureMg>(Position& p);
+template void Movegen::generateMoves<Movegen::quietMg>(Position& p);
 
 
 template<>
@@ -900,10 +900,12 @@ void Movegen::generateMoves<Movegen::allMg>(Position& p){
 	}*/
 	Position::state &s =p.getActualState();
 	if(s.checkers){
-		return generateMoves<Movegen::allEvasionMg>(p);
+		generateMoves<Movegen::allEvasionMg>(p);
 	}
 	else{
-		return generateMoves<Movegen::allNonEvasionMg>(p);
+		generateMoves<Movegen::genType::captureMg>(p);
+		generateMoves<Movegen::genType::quietMg>(p);
+		//generateMoves<Movegen::allNonEvasionMg>(p);
 	}
 
 }

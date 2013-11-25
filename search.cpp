@@ -58,7 +58,7 @@ void search::startThinking(Position & p){
 		Score res=alphaBeta<search::nodeType::ROOT_NODE>(p,depth,-SCORE_INFINITE,SCORE_INFINITE,PV);
 		unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 		sync_cout<<"info depth "<<depth/ONE_PLY<<" score cp "<<(int)((float)res/100.0)<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(endTime-startTime))<<" time "<<(endTime-startTime);
-		sync_cout<<" pv ";
+		std::cout<<" pv ";
 		for (auto & m :PV){
 			std::cout<<p.displayUci(m)<<" ";
 		}
@@ -79,6 +79,7 @@ void search::startThinking(Position & p){
 template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
 
 	visitedNodes++;
+	unsigned long long tempVisitedNodes=visitedNodes;
 
 	const search::nodeType childNodesType=
 			type==search::nodeType::ALL_NODE?
@@ -110,13 +111,29 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 			type==search::nodeType::ROOT_NODE ){
 			if(searchFirstMove){
 				searchFirstMove=false;
+				if(type==search::nodeType::ROOT_NODE){
+					sync_cout<<"FIRST alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<sync_endl;
+				}
 				val=-alphaBeta<search::nodeType::PV_NODE>(pos,depth-ONE_PLY,-beta,-alpha,childPV);
+
 			}
 			else{
+				if(type==search::nodeType::ROOT_NODE){
+					sync_cout<<"OTHER alpha "<<(alpha)/10000.0<<" beta "<<(alpha+1)/10000.0<<sync_endl;
+				}
 				val=-alphaBeta<search::nodeType::CUT_NODE>(pos,depth-ONE_PLY,-alpha-1,-alpha,childPV);
+
 				if(val>alpha && val < beta ){
+					if(type==ROOT_NODE){
+						sync_cout<<"info currmove "<<pos.displayUci(mg.getGeneratedMove(moveNumber))<<" val "<<val/10000.0<<" nodes "<<visitedNodes<<" deltaNodes "<<visitedNodes-tempVisitedNodes<< sync_endl;
+						tempVisitedNodes=visitedNodes;
+							}
 					childPV.clear();
+					if(type==search::nodeType::ROOT_NODE){
+						sync_cout<<"RESEARCH alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<sync_endl;
+					}
 					val=-alphaBeta<search::nodeType::PV_NODE>(pos,depth-ONE_PLY,-beta,-alpha,childPV);
+
 				}
 
 			}
@@ -130,9 +147,10 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 		pos.undoMove(mg.getGeneratedMove(moveNumber));
 
 
-		//if(type==ROOT_NODE){
-		//	sync_cout<<pos.displayUci(mg.getGeneratedMove(moveNumber))<<" "<<val/10000.0<<sync_endl;
-		//}
+		if(type==ROOT_NODE){
+			sync_cout<<"info currmove "<<pos.displayUci(mg.getGeneratedMove(moveNumber))<<" val "<<val/10000.0<<" nodes "<<visitedNodes<<" deltaNodes "<<visitedNodes-tempVisitedNodes<< sync_endl;
+			tempVisitedNodes=visitedNodes;
+		}
 
 		if(val>=bestScore){
 			bestScore=val;

@@ -55,6 +55,10 @@ public:
 		moveListAllocated--;
 	}*/
 public:
+	Movegen(){
+		moveListIndex=0;
+	}
+
 	static void initMovegenConstant(void);
 	template<Movegen::genType type>	void generateMoves(Position &p);
 	bool isMoveLegal(Position&p, Move m);
