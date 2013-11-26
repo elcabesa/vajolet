@@ -66,17 +66,15 @@ void static printUciInfo(void){
 Move moveFromUci(Position& pos, std::string& str) {
 
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
-	Movegen mg;
-	mg.generateMoves<Movegen::allMg>(pos);
-	for(unsigned int i=0;i< mg.getGeneratedMoveNumber();i++){
-		if(str==pos.displayUci(mg.getGeneratedMove(i))){
-			return mg.getGeneratedMove(i);
+	Movegen mg(pos);
+	Move m;
+	while( (m=mg.getNextMove()).packed){
+		if(str==pos.displayUci(m)){
+			return m;
 		}
 	}
 	// move not found
-	Move m;
-	m.packed=0;
-	return m;
+	return m; // m è gia una NOMOVE
 }
 
 

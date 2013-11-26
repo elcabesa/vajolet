@@ -19,6 +19,10 @@
 #define VAJOLET_H_
 
 
+// disable assert define
+#define NDEBUG
+#include <cassert>
+
 //---------------------------------------------
 //	include
 //---------------------------------------------
@@ -29,13 +33,16 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet"
-#define VERSION			"0.04"
+#define VERSION			"0.07"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
 
 //---------------------------------------------
 //	define
 //---------------------------------------------
+//#define DEBUG1
+
+
 #define MAX_MOVE_PER_POSITION (512)
 #define ONE_PLY		(16)
 
@@ -44,6 +51,7 @@
 //---------------------------------------------
 
 #define SCORE_INFINITE	(2000000000)
+#define SCORE_MATE		(2000000000)
 
 //---------------------------------------------
 //

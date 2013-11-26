@@ -46,6 +46,7 @@ private:
 	template<nodeType type>Score alphaBeta(Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
 	template<nodeType type>Score qsearch(Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
 	unsigned long long visitedNodes;
+	unsigned int selDepth;
 };
 
 #endif /* SEARCH_H_ */

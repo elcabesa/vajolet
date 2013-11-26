@@ -19,8 +19,8 @@
 #define MOVEGEN_H_
 
 #include <stack>
+#include <list>
 #include <utility>
-#include <cassert>
 #include "vajolet.h"
 #include "move.h"
 #include "position.h"
@@ -28,6 +28,7 @@
 #define KING_SIDE_CASTLE (0)
 #define QUEEN_SIDE_CASTLE (1)
 class Movegen{
+	static Move NOMOVE;
 public:
 	enum genType{
 		captureMg,			// generate capture moves
@@ -38,32 +39,55 @@ public:
 		allMg				// general generate all move
 
 	};
+
+	enum eStagedGeneratorState{
+		generateCaptureMoves,
+		iterateCaptureMoves,
+		generateQuietMoves,
+		iterateQuietMoves,
+		finishedNormalStage,
+
+		generateEvasionMoves,
+		iterateEvasionMoves,
+		finishedEvasionStage,
+
+		generateQuiescentMoves,
+		iterateQuiescentMoves,
+		finishedQuescentStage
+
+	}stagedGeneratorState;
 private:
-
 	Move moveList[MAX_MOVE_PER_POSITION];
-	unsigned int moveListIndex;
+	unsigned int moveListSize;
+	unsigned int moveListPosition;
 
-	/*Move *moveList;//[MAX_MOVE_PER_POSITION];
-	static Move moveListPool[1024][MAX_MOVE_PER_POSITION];
-	static unsigned int moveListAllocated;
+	Position & pos;
+
 
 public:
-	Movegen(){
-		moveList=moveListPool[moveListAllocated++];
+	Movegen(Position & p): pos(p)
+	{
+		Position::state &s =pos.getActualState();
+		if(s.checkers){
+			stagedGeneratorState=generateEvasionMoves;
+		}
+		else{
+			stagedGeneratorState=generateCaptureMoves;
+		}
+		moveListPosition=0;
+		moveListSize=0;
 	}
-	~Movegen(){
-		moveListAllocated--;
-	}*/
-public:
-	Movegen(){
-		moveListIndex=0;
+	void setupQuiescentSearch(){
+		stagedGeneratorState=generateQuiescentMoves;
 	}
 
 	static void initMovegenConstant(void);
 	template<Movegen::genType type>	void generateMoves(Position &p);
 	bool isMoveLegal(Position&p, Move m);
-	inline unsigned int getGeneratedMoveNumber(void){ return moveListIndex;}
-	inline Move  & getGeneratedMove(unsigned int x){ return moveList[x];}
+	inline unsigned int getGeneratedMoveNumber(void){ return moveListSize;}
+
+	Move & getNextMove(void);
+
 
 	inline static bitMap attackFrom(Position::bitboardIndex piece,tSquare from,bitMap & occupancy){
 		switch(piece){
@@ -160,6 +184,13 @@ private:
 	static bitMap ROOK_PSEUDO_ATTACK[squareNumber];
 	static bitMap BISHOP_PSEUDO_ATTACK[squareNumber];
 	static bitMap castlePath[2][2];
+
+	/*inline void swapMoves(Move * list, unsigned int index1, unsigned int index2){
+		Move temp;
+		temp.packed=list[index1].packed;
+		moveList[index1].packed=moveList[index2].packed;
+		moveList[index2].packed=temp.packed;
+	}*/
 
 };
 

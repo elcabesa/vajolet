@@ -75,6 +75,8 @@ public:
 
 	};
 
+
+
 	enum eNextMove{					// color turn. ( it's also used as offset to access bitmaps by index)
 		whiteTurn,
 		blackTurn=blackKing-whiteKing
@@ -135,6 +137,7 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
+public:
 	static simdScore pieceValue[lastBitboard];
 	static simdScore pstValue[lastBitboard][squareNumber];
 	static simdScore nonPawnValue[lastBitboard][squareNumber];
@@ -153,6 +156,8 @@ public:
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 	bool moveGivesCheck(Move& m)const ;
+	Score see(Move m) const;
+	Score seeSign(Move m) const;
 
 	/*! \brief constructor
 		\author Marco Belli
@@ -322,11 +327,11 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline bitMap getAttackersTo(tSquare to){
+	inline bitMap getAttackersTo(tSquare to) const {
 		return getAttackersTo(to, bitBoard[occupiedSquares]);
 	}
 
-	bitMap getAttackersTo(tSquare to, bitMap occupancy);
+	bitMap getAttackersTo(tSquare to, bitMap occupancy) const;
 
 
 	/*! \brief return the mvvlva score

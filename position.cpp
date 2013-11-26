@@ -183,7 +183,7 @@ void Position::initScoreValues(void){
 	pieceValue[whiteBishops]=32500;
 	pieceValue[whiteRooks]=50000;
 	pieceValue[whiteQueens]=90000;
-	pieceValue[whiteKing]=300000;
+	pieceValue[whiteKing]=3000000;
 
 	pieceValue[blackPawns]=-pieceValue[whitePawns];
 	pieceValue[blackKnights]=-pieceValue[whiteKnights];
@@ -503,6 +503,11 @@ void Position::doNullMove(void){
 	x.Us=&bitBoard[x.nextMove];
 	x.Them=&bitBoard[(blackTurn-x.nextMove)];
 	x.ply++;
+	x.capturedPiece=emptyBitmap;
+
+	calcCheckingSquares();
+	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
+	x.pinnedPieces=getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
 
 
 }
@@ -923,24 +928,21 @@ unsigned long long Position::perft(unsigned int depth){
 		return 1;
 	}
 #endif
-	Movegen mg;
-	mg.generateMoves<Movegen::allMg>(*this);
+
 	unsigned long long tot = 0;
+	Movegen mg(*this);
 #ifdef FAST_PERFT
 	if(depth==1){
+		mg.generateMoves<Movegen::allMg>(*this);
 		return mg.getGeneratedMoveNumber();
 	}
 #endif
 
-	unsigned int mn=0;
-	while (mn <mg.getGeneratedMoveNumber()) {
-		/*if(!mg.isMoveLegal(*this,mg.getGeneratedMove(mn))){
-			sync_cout<<"errore"<<sync_endl;
-		}*/
-		doMove(mg.getGeneratedMove(mn));
+	Move m;
+	while ((m=mg.getNextMove()).packed) {
+		doMove(m);
 		tot += perft(depth - 1);
-		undoMove(mg.getGeneratedMove(mn));
-		mn++;
+		undoMove(m);
 	}
 	return tot;
 
@@ -953,19 +955,18 @@ unsigned long long Position::perft(unsigned int depth){
 */
 unsigned long long Position::divide(unsigned int depth){
 
-	Movegen mg;
+	Movegen mg(*this);
 	unsigned long long tot = 0;
 	unsigned int mn=0;
-	mg.generateMoves<Movegen::allMg>(*this);
-	while (mn <mg.getGeneratedMoveNumber()) {
-
-		doMove(mg.getGeneratedMove(mn));
-		unsigned long long n= perft(depth - 1);
-
-		tot+=n;
-		undoMove(mg.getGeneratedMove(mn));
-		sync_cout<<mn+1<<") "<<displayMove(mg.getGeneratedMove(mn))<<": "<<n<<sync_endl;
+	Move m;
+	while ((m=mg.getNextMove()).packed) {
 		mn++;
+		doMove(m);
+		unsigned long long n= perft(depth - 1);
+		tot+=n;
+		undoMove(m);
+		sync_cout<<mn<<") "<<displayMove(m)<<": "<<n<<sync_endl;
+
 	}
 	return tot;
 
@@ -1028,12 +1029,12 @@ bitMap Position::getHiddenCheckers(tSquare kingSquare,eNextMove next){
 
 }
 
-/*! \brief get all the attackers/defender of a given square with a ginven occupancy
+/*! \brief get all the attackers/defender of a given square with a given occupancy
 	\author Marco Belli
 	\version 1.0
 	\date 08/11/2013
 */
-bitMap Position::getAttackersTo(tSquare to, bitMap occupancy){
+bitMap Position::getAttackersTo(tSquare to, bitMap occupancy) const {
 	bitMap res=(Movegen::attackFromPawn(to,1) & bitBoard[whitePawns])
 			|(Movegen::attackFromPawn(to,0) & bitBoard[blackPawns])
 			|(Movegen::attackFromKnight(to) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))

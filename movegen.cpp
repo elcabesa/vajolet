@@ -23,6 +23,7 @@
 #include "bitops.h"
 
 
+Move Movegen::NOMOVE;
 bitMap Movegen::MG_RANKMASK[squareNumber];
 bitMap Movegen::MG_FILEMASK[squareNumber];
 bitMap Movegen::MG_DIAGA8H1MASK[squareNumber];
@@ -547,8 +548,8 @@ void Movegen::generateMoves(Position& p){
 			if(!(p.getAttackersTo((tSquare)m.to,p.bitBoard[Position::occupiedSquares] & ~s.Us[Position::King]) & s.Them[Position::Pieces]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 			}
 			moves &= moves-1;
@@ -578,8 +579,8 @@ void Movegen::generateMoves(Position& p){
 					squaresAligned(from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 			}
 			moves &= moves-1;
@@ -603,8 +604,8 @@ void Movegen::generateMoves(Position& p){
 					squaresAligned(from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 			}
 
@@ -629,8 +630,8 @@ void Movegen::generateMoves(Position& p){
 				squaresAligned(from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 			}
 			moves &= moves-1;
@@ -651,8 +652,8 @@ void Movegen::generateMoves(Position& p){
 			while (moves){
 				m.to=firstOne(moves);
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 				moves &= moves-1;
 
@@ -680,8 +681,8 @@ void Movegen::generateMoves(Position& p){
 				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 			}
 			moves &= moves-1;
@@ -695,8 +696,8 @@ void Movegen::generateMoves(Position& p){
 				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 			}
 			moves &= moves-1;
@@ -714,8 +715,8 @@ void Movegen::generateMoves(Position& p){
 			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
 				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
-				moveList[moveListIndex].packed=m.packed;
-				moveListIndex++;
+				//moveList.push_back(m);
+				moveList[moveListSize++].packed=m.packed;
 			}
 			moves &= moves-1;
 		}
@@ -729,8 +730,8 @@ void Movegen::generateMoves(Position& p){
 			if(!(s.pinnedPieces & bitSet((tSquare)m.from)) ||
 				squaresAligned((tSquare)m.from,(tSquare)m.to,p.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
-				moveList[moveListIndex].packed=m.packed;
-				moveListIndex++;
+				//moveList.push_back(m);
+				moveList[moveListSize++].packed=m.packed;
 			}
 			moves &= moves-1;
 		}
@@ -751,8 +752,8 @@ void Movegen::generateMoves(Position& p){
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
 					if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-						moveList[moveListIndex].packed=m.packed;
-						moveListIndex++;
+						//moveList.push_back(m);
+						moveList[moveListSize++].packed=m.packed;
 					}
 				}
 			}
@@ -774,8 +775,8 @@ void Movegen::generateMoves(Position& p){
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 			}
 			moves &= moves-1;
@@ -793,8 +794,8 @@ void Movegen::generateMoves(Position& p){
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 			}
 			moves &= moves-1;
@@ -818,8 +819,8 @@ void Movegen::generateMoves(Position& p){
 					m.to=s.epSquare;
 					m.from=from;
 					m.flags=Move::fenpassant;
-					moveList[moveListIndex].packed=m.packed;
-					moveListIndex++;
+					//moveList.push_back(m);
+					moveList[moveListSize++].packed=m.packed;
 				}
 				epAttacker &=epAttacker-1;
 			}
@@ -848,8 +849,8 @@ void Movegen::generateMoves(Position& p){
 					m.from=kingSquare;
 					m.to=kingSquare+2;
 					if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-						moveList[moveListIndex].packed=m.packed;
-						moveListIndex++;
+						//moveList.push_back(m);
+						moveList[moveListSize++].packed=m.packed;
 					}
 				}
 
@@ -869,15 +870,14 @@ void Movegen::generateMoves(Position& p){
 					m.from=kingSquare;
 					m.to=kingSquare-2;
 					if(type !=Movegen::quietChecksMg || p.moveGivesCheck(m)){
-						moveList[moveListIndex].packed=m.packed;
-						moveListIndex++;
+						//moveList.push_back(m);
+						moveList[moveListSize++].packed=m.packed;
 					}
 				}
 			}
 		}
 	}
-
-	assert(moveListIndex<=MAX_MOVE_PER_POSITION);
+	assert(moveListSize<=MAX_MOVE_PER_POSITION);
 
 
 
@@ -1204,3 +1204,71 @@ bool Movegen::isMoveLegal(Position&p, Move m){
 
 
 
+Move & Movegen::getNextMove(){
+
+	bool found=false;
+
+	while(!found){
+		switch(stagedGeneratorState){
+		case generateCaptureMoves:
+			generateMoves<Movegen::genType::captureMg>(pos);
+			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			break;
+		case generateQuietMoves:
+			generateMoves<Movegen::genType::quietMg>(pos);
+			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			break;
+		case generateEvasionMoves:
+			generateMoves<Movegen::allEvasionMg>(pos);
+			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			break;
+		case generateQuiescentMoves:
+			generateMoves<Movegen::captureMg>(pos);
+			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			break;
+
+		case iterateEvasionMoves:
+		case iterateQuietMoves:
+			if(moveListPosition<moveListSize){
+				return moveList[moveListPosition++];
+			}
+			else{
+				return NOMOVE;
+			}
+			break;
+		case iterateCaptureMoves:
+		case iterateQuiescentMoves:
+		{
+			if(moveListPosition<moveListSize){
+				Score bestScore=-SCORE_INFINITE;
+				unsigned int bestIndex=moveListPosition;
+				for(unsigned int i=moveListPosition;i<moveListSize;i++){ // itera sulle mosse rimanenti
+					Score res=pos.getMvvLvaScore(moveList[i]);
+					if(res>bestScore){
+						bestScore=res;
+						bestIndex=i;
+					}
+				}
+
+				if(bestIndex!=moveListPosition){
+					std::swap(moveList[moveListPosition].packed,moveList[bestIndex].packed);
+				}
+				return moveList[moveListPosition++];
+			}
+			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+
+		}
+			break;
+		default:
+			return NOMOVE;
+
+			break;
+
+
+		}
+	}
+
+	return NOMOVE;
+
+
+}
