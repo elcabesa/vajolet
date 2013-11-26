@@ -33,7 +33,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet"
-#define VERSION			"0.07"
+#define VERSION			"0.09"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
 
@@ -51,7 +51,7 @@
 //---------------------------------------------
 
 #define SCORE_INFINITE	(2000000000)
-#define SCORE_MATE		(2000000000)
+#define SCORE_MATE		(1999999990)
 
 //---------------------------------------------
 //

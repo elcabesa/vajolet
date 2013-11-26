@@ -61,11 +61,11 @@ private:
 	unsigned int moveListSize;
 	unsigned int moveListPosition;
 
-	Position & pos;
+	const Position & pos;
 
 
 public:
-	Movegen(Position & p): pos(p)
+	Movegen(const Position & p): pos(p)
 	{
 		Position::state &s =pos.getActualState();
 		if(s.checkers){
@@ -82,7 +82,7 @@ public:
 	}
 
 	static void initMovegenConstant(void);
-	template<Movegen::genType type>	void generateMoves(Position &p);
+	template<Movegen::genType type>	void generateMoves();
 	bool isMoveLegal(Position&p, Move m);
 	inline unsigned int getGeneratedMoveNumber(void){ return moveListSize;}
 
@@ -123,13 +123,13 @@ public:
 		}
 	}
 
-	inline static bitMap attackFromRook(tSquare from,bitMap & occupancy){
+	inline static bitMap attackFromRook(tSquare from,const bitMap & occupancy){
 		assert(from <=squareNumber);
 		bitMap res = MG_RANK_ATTACK[from][((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from])];
 		res |= MG_FILE_ATTACK[from][((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
 		return res;
 	}
-	inline static bitMap attackFromBishop(tSquare from,bitMap & occupancy){
+	inline static bitMap attackFromBishop(tSquare from,const bitMap & occupancy){
 		assert(from <=squareNumber);
 		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
 		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];

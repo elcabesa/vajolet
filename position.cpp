@@ -933,7 +933,7 @@ unsigned long long Position::perft(unsigned int depth){
 	Movegen mg(*this);
 #ifdef FAST_PERFT
 	if(depth==1){
-		mg.generateMoves<Movegen::allMg>(*this);
+		mg.generateMoves<Movegen::allMg>();
 		return mg.getGeneratedMoveNumber();
 	}
 #endif
@@ -1113,4 +1113,46 @@ bool Position::moveGivesCheck(Move& m)const {
 		return false;
 	}
 	return false;
+}
+
+
+bool Position::isDraw() const {
+
+	// Draw by material?
+	if (   !board[whitePawns] && !board[blackPawns] && ((getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2])<= pieceValue[whiteBishops][0]))
+		return true;
+
+	// Draw by the 50 moves rule?
+	if (getActualState().fiftyMoveCnt>  99){
+		if(!getActualState().checkers){
+			return true;
+		}
+		Movegen mg(*this);
+		mg.generateMoves<Movegen::genType::allMg>();
+		if(mg.getGeneratedMoveNumber()){
+			return true;
+		}
+	}
+
+  // Draw by repetition?
+  int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);
+
+  if (i <= e)
+  {
+	  unsigned int stateIndexPointer=stateIndex-1-2;
+      const state* stp=&stateInfo[stateIndexPointer];
+
+      do {
+    	  stateIndexPointer-=2;
+    	  stp=&stateInfo[stateIndexPointer];
+
+          if (stp->key == getActualState().key)
+              return true;
+
+          i += 2;
+
+      } while (i <= e);
+  }
+
+  return false;
 }

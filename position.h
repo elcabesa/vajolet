@@ -158,6 +158,7 @@ public:
 	bool moveGivesCheck(Move& m)const ;
 	Score see(Move m) const;
 	Score seeSign(Move m) const;
+	bool isDraw() const;
 
 	/*! \brief constructor
 		\author Marco Belli
@@ -339,7 +340,7 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline Score getMvvLvaScore(Move & m){
+	inline Score getMvvLvaScore(Move & m) const {
 		Score s=Position::pieceValue[board[m.to]%emptyBitmap][0]-(board[m.from]%emptyBitmap);
 		if (m.flags == Move::fpromotion){
 			s += (Position::pieceValue[whiteQueens +m.promotion] - Position::pieceValue[whitePawns])[0];
@@ -384,6 +385,7 @@ private:
 	void clear();
 	inline void calcCheckingSquares(void);
 	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next);
+
 
 
 	/*! \brief list of the past states, this is the history of the position

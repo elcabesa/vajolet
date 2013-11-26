@@ -58,13 +58,21 @@ void search::startThinking(Position & p){
 	unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 
 	std::vector<Move> PV;
-	for(int depth=ONE_PLY;depth<4*ONE_PLY;depth+=ONE_PLY){
+	for(int depth=ONE_PLY;depth<20*ONE_PLY;depth+=ONE_PLY){
 
 		PV.clear();
 		selDepth=0;
-		Score res=alphaBeta<search::nodeType::ROOT_NODE>(p,depth,-SCORE_INFINITE,SCORE_INFINITE,PV);
+		Score res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,depth,-SCORE_INFINITE,SCORE_INFINITE,PV);
 		unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-		sync_cout<<"info depth "<<depth/ONE_PLY<<" seldepth "<< selDepth-selDepthBase<<" score cp "<<(int)((float)res/100.0)<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(endTime-startTime))<<" time "<<(endTime-startTime);
+		sync_cout<<"info depth "<<depth/ONE_PLY<<" seldepth "<< selDepth-selDepthBase<<" score ";
+		if(abs(res) >SCORE_MATE-200){
+			std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
+		}
+		else{
+			std::cout<< "cp "<<(int)((float)res/100.0);
+		}
+		std::cout<<(res >= SCORE_INFINITE ? " lowerbound" : res <= -SCORE_INFINITE ? " upperbound" : "");
+		std::cout<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(endTime-startTime))<<" time "<<(endTime-startTime);
 		std::cout<<" pv ";
 		for (auto & m :PV){
 			std::cout<<p.displayUci(m)<<" ";
@@ -83,7 +91,7 @@ void search::startThinking(Position & p){
 
 }
 
-template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
+template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
 
 	visitedNodes++;
 #ifdef DEBUG1
@@ -95,12 +103,23 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 					search::nodeType::CUT_NODE:
 					type==search::nodeType::CUT_NODE?search::nodeType::ALL_NODE:
 							search::nodeType::PV_NODE;
+	if(type !=search::nodeType::ROOT_NODE){
+		if(pos.isDraw()){
+			return 0;
+		}
 
+		alpha = std::max(matedIn(ply), alpha);
+		beta = std::min(mateIn(ply+1), beta);
+		if (alpha >= beta)
+			return alpha;
+
+	}
 
 
 	if(depth<ONE_PLY){
-		return qsearch<type>(pos,depth,alpha,beta,PV);
+		return qsearch<type>(ply,pos,depth,alpha,beta,PV);
 	}
+
 
 	if(!pos.getActualState().checkers){
 
@@ -113,7 +132,7 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 		){
 			pos.doNullMove();
 			std::vector<Move> childPV;
-			Score val = -alphaBeta<childNodesType>(pos, depth - 3*ONE_PLY, -beta, -beta+1, childPV);
+			Score val = -alphaBeta<childNodesType>(ply+1,pos, depth - 3*ONE_PLY, -beta, -beta+1, childPV);
 			pos.undoNullMove();
 			if (val >= beta){return val;}
 		}
@@ -142,7 +161,7 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 					sync_cout<<"FIRST alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<sync_endl;
 				}
 #endif
-				val=-alphaBeta<search::nodeType::PV_NODE>(pos,depth-ONE_PLY,-beta,-alpha,childPV);
+				val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
 
 			}
 			else{
@@ -151,7 +170,7 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 					sync_cout<<"OTHER alpha "<<(alpha)/10000.0<<" beta "<<(alpha+1)/10000.0<<sync_endl;
 				}
 #endif
-				val=-alphaBeta<search::nodeType::CUT_NODE>(pos,depth-ONE_PLY,-alpha-1,-alpha,childPV);
+				val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,depth-ONE_PLY,-alpha-1,-alpha,childPV);
 
 				if(val>alpha && val < beta ){
 #ifdef DEBUG1
@@ -166,14 +185,14 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 						sync_cout<<"RESEARCH alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<sync_endl;
 					}
 #endif
-					val=-alphaBeta<search::nodeType::PV_NODE>(pos,depth-ONE_PLY,-beta,-alpha,childPV);
+					val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
 
 				}
 
 			}
 		}
 		else{
-			val=-alphaBeta<childNodesType>(pos,depth-ONE_PLY,-alpha-1,-alpha,childPV);
+			val=-alphaBeta<childNodesType>(ply+1,pos,depth-ONE_PLY,-alpha-1,-alpha,childPV);
 		}
 
 
@@ -208,7 +227,7 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 			bestScore=0;
 		}
 		else{
-			bestScore=-SCORE_MATE;
+			bestScore=-SCORE_MATE+ply;
 		}
 	}
 	return bestScore;
@@ -216,11 +235,16 @@ template<search::nodeType type> Score search::alphaBeta(Position & pos,int depth
 }
 
 
-template<search::nodeType type> Score search::qsearch(Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
+template<search::nodeType type> Score search::qsearch(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
+
 
 	// if in check do evasion
 	if(pos.getActualState().checkers){
-		return alphaBeta<type>(pos,ONE_PLY,alpha,beta,PV);
+		return alphaBeta<type>(ply,pos,ONE_PLY,alpha,beta,PV);
+	}
+
+	if(pos.isDraw()){
+		return 0;
 	}
 
 	if(pos.getActualState().ply>selDepth){
@@ -298,7 +322,7 @@ template<search::nodeType type> Score search::qsearch(Position & pos,int depth,S
 		pos.doMove(m);
 		Score val;
 		std::vector<Move> childPV;
-		val=-qsearch<childNodesType>(pos,depth-ONE_PLY,-beta,-alpha,childPV);
+		val=-qsearch<childNodesType>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
 		pos.undoMove(m);
 
 		if(val>=bestScore){

@@ -32,6 +32,14 @@ public:
 
 };
 
+inline Score mateIn(int ply) {
+  return SCORE_MATE - ply;
+}
+
+inline Score matedIn(int ply) {
+  return -SCORE_MATE + ply;
+}
+
 
 class search{
 public:
@@ -43,8 +51,8 @@ public:
 	} nodeType;
 	void startThinking(Position & p);
 private:
-	template<nodeType type>Score alphaBeta(Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
-	template<nodeType type>Score qsearch(Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
+	template<nodeType type>Score alphaBeta(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
+	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
 	unsigned long long visitedNodes;
 	unsigned int selDepth;
 };
