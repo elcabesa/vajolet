@@ -241,7 +241,7 @@ void Position::initScoreValues(void){
 */
 void Position::clear() {
 	for (tSquare i = square0; i < squareNumber; i++) {
-		board[i] = empty;
+		squares[i] = empty;
 		index[i] = 0;
 	};
 	for (int i = 0; i < lastBitboard; i++) {
@@ -273,7 +273,7 @@ void Position::display()const {
 			std::cout << rank+1 <<  " |";
 			for (file = 0; file <= 7; file++)
 			{
-				std::cout << " " << PIECE_NAMES_FEN[board[BOARDINDEX[file][rank]]] << " |";
+				std::cout << " " << PIECE_NAMES_FEN[squares[BOARDINDEX[file][rank]]] << " |";
 			}
 			std::cout << std::endl;
 		}
@@ -325,12 +325,12 @@ void Position::displayFen() const {
 		emptyFiles=0;
 		for (file = 0; file <= 7; file++)
 		{
-			if(board[BOARDINDEX[file][rank]]!=0){
+			if(squares[BOARDINDEX[file][rank]]!=0){
 				if(emptyFiles!=0){
 					std::cout<<emptyFiles;
 				}
 				emptyFiles=0;
-				std::cout << PIECE_NAMES_FEN[board[BOARDINDEX[file][rank]]];
+				std::cout << PIECE_NAMES_FEN[squares[BOARDINDEX[file][rank]]];
 			}else{
 				emptyFiles++;
 			}
@@ -389,8 +389,8 @@ U64 Position::calcKey(void) const {
 
 	for (int i = 0; i < squareNumber; i++)
 	{
-		if(board[i]!=empty){
-			hash ^=HashKeys::keys[i][board[i]];
+		if(squares[i]!=empty){
+			hash ^=HashKeys::keys[i][squares[i]];
 		}
 	}
 
@@ -416,8 +416,8 @@ U64 Position::calcPawnKey(void) const {
 	U64 hash=0;
 	for (int i = 0; i < squareNumber; i++)
 	{
-		if(board[i]==whitePawns || board[i]==blackPawns){
-			hash ^=HashKeys::keys[i][board[i]];
+		if(squares[i]==whitePawns || squares[i]==blackPawns){
+			hash ^=HashKeys::keys[i][squares[i]];
 		}
 	}
 
@@ -449,7 +449,7 @@ U64 Position::calcMaterialKey(void) const {
 simdScore Position::calcMaterialValue(void) const{
 	simdScore score=0;
 	for (tSquare s=(tSquare)0;s<squareNumber;s++){
-		bitboardIndex val=board[s];
+		bitboardIndex val=squares[s];
 		score+=pstValue[val][s];
 
 
@@ -469,7 +469,7 @@ void Position::calcNonPawnMaterialValue(Score* s){
 	t[1]=0;
 
 	for (tSquare s=(tSquare)0;s<squareNumber;s++){
-		bitboardIndex val=board[s];
+		bitboardIndex val=squares[s];
 		if(!isPawn(val)){
 			if(val>emptyBitmap){
 				t[1]-=pstValue[val][s];
@@ -528,8 +528,8 @@ void Position::doMove(Move & m){
 	tSquare from =(tSquare)m.from;
 	tSquare to =(tSquare)m.to;
 	tSquare captureSquare =(tSquare)m.to;
-	bitboardIndex piece= board[from];
-	bitboardIndex capture = (m.flags ==Move::fenpassant ? (x.nextMove?whitePawns:blackPawns) :board[to]);
+	bitboardIndex piece= squares[from];
+	bitboardIndex capture = (m.flags ==Move::fenpassant ? (x.nextMove?whitePawns:blackPawns) :squares[to]);
 	simdScore mv;
 	mv.load_partial(2,x.material);
 	simdScore npm;
@@ -553,7 +553,7 @@ void Position::doMove(Move & m){
 	if(m.flags==Move::fcastle){
 		bool kingSide=to > from;
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
-		bitboardIndex rook = board[rFrom];
+		bitboardIndex rook = squares[rFrom];
 		tSquare rTo = kingSide? to+ovest: to+est;
 		movePiece(rook,rFrom,rTo);
 		mv+=pstValue[rook][rTo]-pstValue[rook][rFrom];
@@ -691,7 +691,7 @@ void Position::undoMove(Move & m){
 
 	tSquare to = (tSquare)m.to;
 	tSquare from = (tSquare)m.from;
-	bitboardIndex piece= board[to];
+	bitboardIndex piece= squares[to];
 
 	if(m.flags == Move::fpromotion){
 		removePiece(piece,to);
@@ -703,7 +703,7 @@ void Position::undoMove(Move & m){
 		bool kingSide=to > from;
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		tSquare rTo = kingSide? to+ovest: to+est;
-		bitboardIndex rook = board[rTo];
+		bitboardIndex rook = squares[rTo];
 
 		movePiece(rook,rTo,rFrom);
 		movePiece(piece,to,from);
@@ -776,7 +776,7 @@ bool Position::checkPosConsistency(int nn){
 		return false;
 	}
 	for(tSquare i=square0;i<squareNumber;i++){
-		bitboardIndex id=board[i];
+		bitboardIndex id=squares[i];
 
 		if(id != empty && (bitBoard[id] & bitSet(i))==0){
 			sync_cout<<"board inconsistency"<<sync_endl;
@@ -1059,7 +1059,7 @@ bitMap Position::getAttackersTo(tSquare to, bitMap occupancy) const {
 bool Position::moveGivesCheck(Move& m)const {
 	tSquare from = (tSquare)m.from;
 	tSquare to = (tSquare)m.to;
-	bitboardIndex piece = board[from];
+	bitboardIndex piece = squares[from];
 	state s=getActualState();
 
 	// Direct check ?
@@ -1119,7 +1119,8 @@ bool Position::moveGivesCheck(Move& m)const {
 bool Position::isDraw() const {
 
 	// Draw by material?
-	if (   !board[whitePawns] && !board[blackPawns] && ((getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2])<= pieceValue[whiteBishops][0]))
+
+	if (   !bitBoard[whitePawns] && !bitBoard[blackPawns] && ((getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2])<= pieceValue[whiteBishops][0]))
 		return true;
 
 	// Draw by the 50 moves rule?

@@ -32,6 +32,8 @@ public:
 
 };
 
+
+
 inline Score mateIn(int ply) {
   return SCORE_MATE - ply;
 }
@@ -42,7 +44,11 @@ inline Score matedIn(int ply) {
 
 
 class search{
+
 public:
+	struct sSignal{
+		bool stop=false;
+	}signals;
 	typedef enum eNodeType{
 		ROOT_NODE,
 		PV_NODE,
@@ -55,6 +61,7 @@ private:
 	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
 	unsigned long long visitedNodes;
 	unsigned int selDepth;
+	bool stop;
 };
 
 #endif /* SEARCH_H_ */

@@ -912,7 +912,7 @@ void Movegen::generateMoves<Movegen::allMg>(){
 
 bool Movegen::isMoveLegal(Position&p, Move m){
 	Position::state &s =p.getActualState();
-	Position::bitboardIndex piece=p.board[m.from];
+	Position::bitboardIndex piece=p.squares[m.from];
 	// pezzo inesistente
 	if(piece==Position::empty){
 		p.display();

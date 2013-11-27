@@ -294,10 +294,10 @@ public:
 		state st=getActualState();
 
 		bool capture = (bitSet((tSquare)m.to) & st.Them[Pieces]);
-		if(!isPawn(board[m.from])){
-			s+=PIECE_NAMES_FEN[board[m.from]%Position::emptyBitmap];
+		if(!isPawn(squares[m.from])){
+			s+=PIECE_NAMES_FEN[squares[m.from]%Position::emptyBitmap];
 		}
-		if(capture && isPawn(board[m.from])){
+		if(capture && isPawn(squares[m.from])){
 			s+=char('a'+FILES[m.from]);
 		}
 		if(capture){
@@ -341,7 +341,7 @@ public:
 		\date 08/11/2013
 	*/
 	inline Score getMvvLvaScore(Move & m) const {
-		Score s=Position::pieceValue[board[m.to]%emptyBitmap][0]-(board[m.from]%emptyBitmap);
+		Score s=Position::pieceValue[squares[m.to]%emptyBitmap][0]-(squares[m.from]%emptyBitmap);
 		if (m.flags == Move::fpromotion){
 			s += (Position::pieceValue[whiteQueens +m.promotion] - Position::pieceValue[whitePawns])[0];
 		}else if(m.flags == Move::fenpassant){
@@ -403,7 +403,7 @@ private:
 	*/
 	inline void putPiece(bitboardIndex piece,tSquare s) {
 		bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
-		board[s] = piece;
+		squares[s] = piece;
 		bitBoard[piece] |= bitSet(s);
 		bitBoard[occupiedSquares] |= bitSet(s);
 		bitBoard[color]|= bitSet(s);
@@ -425,8 +425,8 @@ private:
 		bitBoard[occupiedSquares] ^= fromTo;
 		bitBoard[piece] ^= fromTo;
 		bitBoard[color] ^= fromTo;
-		board[from] = empty;
-		board[to] = piece;
+		squares[from] = empty;
+		squares[to] = piece;
 		index[to] = index[from];
 		pieceList[piece][index[to]] = to;
 
@@ -447,7 +447,7 @@ private:
 		bitBoard[occupiedSquares]^= bitSet(s);
 		bitBoard[piece] ^= bitSet(s);
 		bitBoard[color] ^= bitSet(s);
-		board[s] = empty;
+		squares[s] = empty;
 		tSquare lastSquare = pieceList[piece][--pieceCount[piece]];
 		index[lastSquare] = index[s];
 		pieceList[piece][index[lastSquare]] = lastSquare;
@@ -463,7 +463,7 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	bitboardIndex board[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
+	bitboardIndex squares[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
 	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
 	unsigned int pieceCount[lastBitboard];	// number of pieces indexed by bitboardIndex enum
 	tSquare pieceList[lastBitboard][64];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 64 pezzi di ogni tipo)

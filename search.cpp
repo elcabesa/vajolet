@@ -31,6 +31,7 @@ std::uniform_int_distribution<uint64_t> uint_dist;
 
 
 void search::startThinking(Position & p){
+	signals.stop=false;
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
@@ -57,28 +58,36 @@ void search::startThinking(Position & p){
 	visitedNodes=0;
 	unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 
-	std::vector<Move> PV;
-	for(int depth=ONE_PLY;depth<20*ONE_PLY;depth+=ONE_PLY){
+	std::vector<Move> newPV, PV;
+	int depth=ONE_PLY;
+	do{
 
-		PV.clear();
-		selDepth=0;
-		Score res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,depth,-SCORE_INFINITE,SCORE_INFINITE,PV);
-		unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-		sync_cout<<"info depth "<<depth/ONE_PLY<<" seldepth "<< selDepth-selDepthBase<<" score ";
-		if(abs(res) >SCORE_MATE-200){
-			std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
+		newPV.clear();
+		selDepth=selDepthBase;
+		Score res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,depth,-SCORE_INFINITE,SCORE_INFINITE,newPV);
+
+		if(depth==ONE_PLY || !signals.stop){
+			unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+			sync_cout<<"info depth "<<depth/ONE_PLY<<" seldepth "<< selDepth-selDepthBase<<" score ";
+			if(abs(res) >SCORE_MATE-200){
+				std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
+			}
+			else{
+				std::cout<< "cp "<<(int)((float)res/100.0);
+			}
+
+			std::cout<<(res >= SCORE_INFINITE ? " lowerbound" : res <= -SCORE_INFINITE ? " upperbound" : "");
+			std::cout<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(endTime-startTime))<<" time "<<(endTime-startTime);
+			std::cout<<" pv ";
+			for (auto & m :newPV){
+				std::cout<<p.displayUci(m)<<" ";
+			}
+			std::cout<<sync_endl;
+
+			PV=newPV;
+			depth+=ONE_PLY;
 		}
-		else{
-			std::cout<< "cp "<<(int)((float)res/100.0);
-		}
-		std::cout<<(res >= SCORE_INFINITE ? " lowerbound" : res <= -SCORE_INFINITE ? " upperbound" : "");
-		std::cout<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(endTime-startTime))<<" time "<<(endTime-startTime);
-		std::cout<<" pv ";
-		for (auto & m :PV){
-			std::cout<<p.displayUci(m)<<" ";
-		}
-		std::cout<<sync_endl;
-	}
+	}while(depth<200*ONE_PLY && signals.stop==false);
 	sync_cout<<"bestmove "<<p.displayUci(PV[0]);
 	if(PV.size()>1)
 	{
@@ -104,7 +113,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 					type==search::nodeType::CUT_NODE?search::nodeType::ALL_NODE:
 							search::nodeType::PV_NODE;
 	if(type !=search::nodeType::ROOT_NODE){
-		if(pos.isDraw()){
+		if(pos.isDraw() || signals.stop){
 			return 0;
 		}
 
@@ -210,9 +219,11 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			bestScore=val;
 			if(val>alpha){
 				alpha =val;
-				PV.clear();
-				PV.push_back(m);
-				std::copy (childPV.begin(),childPV.end(),back_inserter(PV));
+				if(type ==search::nodeType::ROOT_NODE|| !signals.stop){
+					PV.clear();
+					PV.push_back(m);
+					std::copy (childPV.begin(),childPV.end(),back_inserter(PV));
+				}
 			}
 		}
 
@@ -243,7 +254,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		return alphaBeta<type>(ply,pos,ONE_PLY,alpha,beta,PV);
 	}
 
-	if(pos.isDraw()){
+	if(pos.isDraw() || signals.stop){
 		return 0;
 	}
 
@@ -292,7 +303,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 				m.flags != Move::fpromotion
 		){
 			Score futilityValue=futilityBase
-                    + Position::pieceValue[pos.board[m.to]%Position::emptyBitmap][1]
+                    + Position::pieceValue[pos.squares[m.to]%Position::emptyBitmap][1]
                     + (m.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
 
 			if (futilityValue < beta)
@@ -329,9 +340,11 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 			bestScore=val;
 			if(val>alpha){
 				alpha =val;
-				PV.clear();
-				PV.push_back(m);
-				std::copy (childPV.begin(),childPV.end(),back_inserter(PV));
+				if(!signals.stop){
+					PV.clear();
+					PV.push_back(m);
+					std::copy (childPV.begin(),childPV.end(),back_inserter(PV));
+				}
 			}
 		}
 		moveNumber++;

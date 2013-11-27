@@ -31,6 +31,8 @@
 #include "movegen.h"
 #include "move.h"
 #include "search.h"
+#include "thread.h"
+#include "transposition.h"
 
 
 
@@ -54,6 +56,7 @@ const static char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQk
 void static printUciInfo(void){
 	sync_cout<< "id name "<<PROGRAM_NAME<<" "<<VERSION<<std::endl;
 	std::cout<<"id author Belli Marco"<<std::endl;
+	std::cout<<"option name Hash type spin default 1 min 1 max 128"<<sync_endl;
 	std::cout<<"uciok"<<sync_endl;
 }
 
@@ -121,7 +124,7 @@ void static doPerft(unsigned int n, Position & pos){
 }
 
 
-void static go(std::istringstream& is, Position & pos) {
+void static go(std::istringstream& is, Position & pos, my_thread & thr) {
 
 	searcLimits limits;
 	std::string token;
@@ -146,10 +149,34 @@ void static go(std::istringstream& is, Position & pos) {
         else if (token == "ponder")    limits.ponder = true;
     }
 
-    search src;
-    src.startThinking(pos);
-  }
+    thr.startTinking(&pos,limits);
+}
 
+
+
+
+void setoption(std::istringstream& is) {
+	std::string token, name, value;
+
+	is >> token; // Consume "name" token
+
+	// Read option name (can contain spaces)
+	while (is >> token && token != "value"){
+		name += std::string(" ", !name.empty()) + token;
+	}
+
+	// Read option value (can contain spaces)
+	while (is >> token){
+		value += std::string(" ", !value.empty()) + token;
+	}
+
+	/*if (Options.count(name)){
+		Options[name] = value;
+	}
+	else{
+		sync_cout << "No such option: " << name << sync_endl;
+	}*/
+}
 
 
 /*	\brief manage the uci loop
@@ -158,6 +185,9 @@ void static go(std::istringstream& is, Position & pos) {
 	\date 21/10/2013
 */
 void uciLoop(){
+	my_thread thr;
+	transpositionTable tt;
+	tt.setSize(128);
 	Position pos;
 	pos.setupFromFen(StartFEN);
 	std::string token, cmd;
@@ -174,6 +204,7 @@ void uciLoop(){
 			printUciInfo();
 		}
 		else if (token =="quit" || token =="stop" || token =="ponderhit"){
+			thr.stopThinking();
 		}
 		else if (token =="ucinewgame"){
 		}
@@ -182,6 +213,9 @@ void uciLoop(){
 		}
 		else if (token =="position"){
 			position(is,pos);
+		}
+		else if(token=="setoption"){
+			setoption(is);
 		}
 		else if (token =="eval"){
 			sync_cout<<"Eval:" <<pos.eval()/10000.0<<sync_endl;
@@ -199,7 +233,8 @@ void uciLoop(){
 			sync_cout<<"divide Res="<<res<<sync_endl;
 		}
 		else if (token =="go"){
-			go(is,pos);
+			go(is,pos,thr);
+
 		}
 		else{
 			sync_cout<<"unknown command"<<sync_endl;

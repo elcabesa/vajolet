@@ -16,3 +16,69 @@
 */
 
 #include "transposition.h"
+#include "io.h"
+
+
+void transpositionTable::setSize(size_t mbSize){
+	unsigned int size =  (mbSize << 20) / sizeof(ttCluster);
+	elements=size;
+	if(table){
+		free(table);
+	}
+	table =(ttCluster*)calloc(elements,sizeof(ttCluster));
+	if (!table)
+	{
+		std::cerr << "Failed to allocate " << mbSize<< "MB for transposition table." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+void transpositionTable::clear(){
+	std::memset(table, 0, elements * sizeof(ttCluster));
+}
+
+ttEntry* transpositionTable::probe(const U64 key) const {
+
+	ttCluster * ttc=findCluster(key);
+	unsigned int keyH = key >> 32;
+
+	for (unsigned i = 0; i < 4; i++){
+		if ((*ttc).data[i].getKey() == keyH)
+			return &(*ttc).data[i];
+	}
+
+	return nullptr;
+}
+
+void transpositionTable::store(const U64 key, Score v, unsigned char b, signed short int d, unsigned short m, Score statV) {
+	int c1, c2, c3;
+	ttEntry *tte, *replace;
+	unsigned int key32 = key >> 32; // Use the high 32 bits as key inside the cluster
+
+	tte = replace = &(*findCluster(key)).data[0];
+
+	for (unsigned i = 0; i < 4; i++, tte++)
+	{
+		if(!tte->getKey() || tte->getKey() == key32) // Empty or overwrite old
+		{
+			if (!m){
+				m = tte->getPackedMove(); // Preserve any existing ttMove
+			}
+
+			replace = tte;
+			break;
+		}
+
+		// Implement replace strategy
+		c1 = (replace->getGeneration() == generation ?  2 : 0);
+		c2 = (tte->getGeneration() == generation || tte->getType() == typeExact ? -2 : 0);
+		c3 = (tte->getDepth() < replace->getDepth() ?  1 : 0);
+
+		if (c1 + c2 + c3 > 0){
+			replace = tte;
+		}
+	}
+	replace->save(key32, v, b, d, m, statV);
+	replace->setGeneration(generation);
+
+}

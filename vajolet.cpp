@@ -24,6 +24,8 @@
 #include "position.h"
 #include "movegen.h"
 
+
+
 /*!	\brief	print the startup information
 	\author Marco Belli
 	\version 1.0
@@ -50,9 +52,18 @@ int main()
 	Movegen::initMovegenConstant();
 
 
+
+
+
 	//----------------------------------
 	//	main loop
 	//----------------------------------
 	printStartInfo();
+
 	uciLoop();
+
+
+
+
+
 }
