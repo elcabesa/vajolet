@@ -23,6 +23,9 @@
 #include "hashKeys.h"
 #include "position.h"
 #include "movegen.h"
+#include "transposition.h"
+#include "statistics.h"
+
 
 
 
@@ -51,6 +54,9 @@ int main()
 	Position::initCastlaRightsMask();
 	Movegen::initMovegenConstant();
 
+
+
+	TT.setSize(256);
 
 
 

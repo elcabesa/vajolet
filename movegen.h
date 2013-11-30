@@ -41,6 +41,7 @@ public:
 	};
 
 	enum eStagedGeneratorState{
+		getTT,
 		generateCaptureMoves,
 		iterateCaptureMoves,
 		generateQuietMoves,
@@ -51,6 +52,7 @@ public:
 		iterateEvasionMoves,
 		finishedEvasionStage,
 
+		getQsearchTT,
 		generateQuiescentMoves,
 		iterateQuiescentMoves,
 		finishedQuescentStage
@@ -62,28 +64,34 @@ private:
 	unsigned int moveListPosition;
 
 	const Position & pos;
+	Move ttMove;
 
 
 public:
-	Movegen(const Position & p): pos(p)
+	Movegen(const Position & p, Move & m): pos(p)
 	{
+		ttMove.packed=m.packed;
 		Position::state &s =pos.getActualState();
 		if(s.checkers){
 			stagedGeneratorState=generateEvasionMoves;
+			ttMove.packed=0;
 		}
 		else{
-			stagedGeneratorState=generateCaptureMoves;
+			stagedGeneratorState=getTT;
 		}
 		moveListPosition=0;
 		moveListSize=0;
 	}
 	void setupQuiescentSearch(){
-		stagedGeneratorState=generateQuiescentMoves;
+		stagedGeneratorState=getQsearchTT;
+		if(!pos.isCaptureMove(ttMove)){
+			ttMove.packed=0;
+		}
 	}
 
 	static void initMovegenConstant(void);
 	template<Movegen::genType type>	void generateMoves();
-	bool isMoveLegal(Position&p, Move m);
+	bool isMoveLegal(const Position&p, Move &m) const;
 	inline unsigned int getGeneratedMoveNumber(void){ return moveListSize;}
 
 	Move & getNextMove(void);

@@ -366,6 +366,11 @@ public:
 		return (570000-tot)*(65535.0/(570000-120000));
 
 	}
+	inline bool isCaptureMove(Move & m) const {
+
+		return squares[m.to]!=emptyBitmap || m.flags==Move::fenpassant;
+
+	}
 
 
 

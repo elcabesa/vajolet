@@ -23,22 +23,25 @@
 #include "search.h"
 #include "position.h"
 #include "movegen.h"
+#include "transposition.h"
+#include "statistics.h"
 
-
-std::mt19937_64 rnd;
-std::uniform_int_distribution<uint64_t> uint_dist;
 
 
 
 void search::startThinking(Position & p){
 	signals.stop=false;
+	TT.newSearch();
+	//Statistics::instance().initNodeTypeStat();
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
-	Movegen mg(p);
 	Move m;
+	m.packed=0;
+	Movegen mg(p,m);
+
 	Move lastLegalMove;
 	unsigned int legalMoves=0;
 	while((m=mg.getNextMove()).packed){
@@ -54,46 +57,95 @@ void search::startThinking(Position & p){
 	}
 
 
+
 	unsigned int selDepthBase=p.getActualState().ply;
 	visitedNodes=0;
 	unsigned long startTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-
 	std::vector<Move> newPV, PV;
 	int depth=ONE_PLY;
+
+	Score alpha, beta;
+	Score delta;
+	Score res=0;
+
 	do{
+		if(depth<=2*ONE_PLY){
+			alpha= -SCORE_INFINITE;
+			beta = SCORE_INFINITE;
+		}
+		else{
+			delta= 1600;
+			alpha= res - delta;
+			beta= res + delta;
+		}
 
-		newPV.clear();
-		selDepth=selDepthBase;
-		Score res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,depth,-SCORE_INFINITE,SCORE_INFINITE,newPV);
+		do{
+			newPV.clear();
+			selDepth=selDepthBase;
 
-		if(depth==ONE_PLY || !signals.stop){
-			unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-			sync_cout<<"info depth "<<depth/ONE_PLY<<" seldepth "<< selDepth-selDepthBase<<" score ";
-			if(abs(res) >SCORE_MATE-200){
-				std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
+
+			res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,depth,alpha,beta,newPV);
+
+			if(depth==ONE_PLY || !signals.stop){
+
+				// print info
+				unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+				sync_cout<<"info depth "<<depth/ONE_PLY<<" seldepth "<< selDepth-selDepthBase<<" score ";
+				if(abs(res) >SCORE_MATE_IN_MAX_PLY){
+					std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
+				}
+				else{
+					std::cout<< "cp "<<(int)((float)res/100.0);
+				}
+
+				std::cout<<(res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
+				ttType nodeType=res>=beta? typeScoreHigherThanBeta: res<=alpha? typeScoreLowerThanAlpha:typeExact;
+
+
+				std::cout<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(endTime-startTime))<<" time "<<(endTime-startTime);
+				std::cout<<" pv ";
+				int i=0;
+				for (auto it= newPV.begin(); it != newPV.end(); ++it){
+					std::cout<<p.displayUci(*it)<<" ";
+
+					if(nodeType==typeExact){
+						TT.store(p.getActualState().key, transpositionTable::scoreToTT((i%2)?-res:res, i),nodeType,depth-i*ONE_PLY, (*it).packed, p.eval());
+					}
+					p.doMove(*it);
+					i++;
+				}
+				std::cout<<sync_endl;
+
+
+				for (int i=newPV.size()-1;i>=0;i--){
+					p.undoMove(newPV[i]);
+				}
+				PV=newPV;
+
+
+			}
+
+			if(res>=beta || res<=alpha){
+				alpha= -SCORE_INFINITE;
+				beta= +SCORE_INFINITE;
+
 			}
 			else{
-				std::cout<< "cp "<<(int)((float)res/100.0);
+				break;
 			}
 
-			std::cout<<(res >= SCORE_INFINITE ? " lowerbound" : res <= -SCORE_INFINITE ? " upperbound" : "");
-			std::cout<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(endTime-startTime))<<" time "<<(endTime-startTime);
-			std::cout<<" pv ";
-			for (auto & m :newPV){
-				std::cout<<p.displayUci(m)<<" ";
-			}
-			std::cout<<sync_endl;
+		}while(1);
 
-			PV=newPV;
-			depth+=ONE_PLY;
-		}
-	}while(depth<200*ONE_PLY && signals.stop==false);
+		depth+=ONE_PLY;
+	}while(depth<200*ONE_PLY && !signals.stop);
 	sync_cout<<"bestmove "<<p.displayUci(PV[0]);
 	if(PV.size()>1)
 	{
 		std::cout<<" ponder "<<p.displayUci(PV[1]);
 	}
 	std::cout<<sync_endl;
+
+	//Statistics::instance().printNodeTypeStat();
 
 	//sync_cout<<"bestmove "<<p.displayUci(mg.getGeneratedMove(uint_dist(rnd)%mg.getGeneratedMoveNumber()))<<sync_endl;
 
@@ -103,15 +155,16 @@ void search::startThinking(Position & p){
 template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
 
 	visitedNodes++;
-#ifdef DEBUG1
-	unsigned long long tempVisitedNodes=visitedNodes;
-#endif
+	const bool PVnode=(type==search::nodeType::PV_NODE || type==search::nodeType::ROOT_NODE);
+
 
 	const search::nodeType childNodesType=
 			type==search::nodeType::ALL_NODE?
 					search::nodeType::CUT_NODE:
 					type==search::nodeType::CUT_NODE?search::nodeType::ALL_NODE:
 							search::nodeType::PV_NODE;
+
+
 	if(type !=search::nodeType::ROOT_NODE){
 		if(pos.isDraw() || signals.stop){
 			return 0;
@@ -124,10 +177,33 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 	}
 
-
 	if(depth<ONE_PLY){
 		return qsearch<type>(ply,pos,depth,alpha,beta,PV);
 	}
+
+
+	U64 posKey=pos.getActualState().key;
+	ttEntry* tte = TT.probe(posKey);
+	Move ttMove;
+	ttMove.packed=tte ? tte->getPackedMove() : 0;
+	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
+
+	if (type!=search::nodeType::ROOT_NODE &&
+			tte
+			&& tte->getDepth() >= depth
+		    && ttValue != SCORE_NONE // Only in case of TT access race
+		    && (	PVnode ?  tte->getType() == typeExact
+		            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta)
+		                              : (tte->getType() ==  typeScoreLowerThanAlpha)))
+		{
+
+			TT.refresh(tte);
+			PV.clear();
+			PV.push_back(ttMove);
+			return ttValue;
+		}
+
+
 
 
 	if(!pos.getActualState().checkers){
@@ -141,9 +217,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		){
 			pos.doNullMove();
 			std::vector<Move> childPV;
-			Score val = -alphaBeta<childNodesType>(ply+1,pos, depth - 3*ONE_PLY, -beta, -beta+1, childPV);
+			Score val = -alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos, depth - 3*ONE_PLY, -beta, -beta+1, childPV);
 			pos.undoNullMove();
-			if (val >= beta){return val;}
+			if (val >= beta){
+				//Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
+				return val;
+			}
 		}
 
 	}
@@ -153,9 +232,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	Score bestScore=-SCORE_INFINITE;
 	bool searchFirstMove=true;
 
-	Movegen mg(pos);
-	unsigned int moveNumber=0;
+	Move bestMove;
+	bestMove.packed=0;
 	Move m;
+	Movegen mg(pos,ttMove);
+	unsigned int moveNumber=0;
+
 	while (bestScore <beta  && (m=mg.getNextMove()).packed) {
 		pos.doMove(m);
 
@@ -171,7 +253,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				}
 #endif
 				val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
-
+#ifdef PRINT_PV_CHANGES
+				sync_cout<<"FIRST ply "<<ply<<" alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<" res "<<val/10000.0<<" "<<pos.displayUci(m)<<sync_endl;
+#endif
 			}
 			else{
 #ifdef DEBUG1
@@ -184,8 +268,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				if(val>alpha && val < beta ){
 #ifdef DEBUG1
 					if(type==ROOT_NODE){
-						sync_cout<<"info currmove "<<pos.displayUci(m)<<" val "<<val/10000.0<<" nodes "<<visitedNodes<<" deltaNodes "<<visitedNodes-tempVisitedNodes<< sync_endl;
-						tempVisitedNodes=visitedNodes;
+						sync_cout<<"info currmove "<<pos.displayUci(m)<<" val "<<val/10000.0<<" nodes "<<visitedNodes<< sync_endl;
 							}
 #endif
 					childPV.clear();
@@ -195,7 +278,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 					}
 #endif
 					val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
-
+#ifdef PRINT_PV_CHANGES
+					sync_cout<<"OTHER ply "<<ply<<" alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<" res "<<val/10000.0<<" "<<pos.displayUci(m)<<sync_endl;
+#endif
 				}
 
 			}
@@ -208,20 +293,22 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 		pos.undoMove(m);
 
-#ifdef DEBUG1
-		if(type==ROOT_NODE){
-			sync_cout<<"info currmove "<<pos.displayUci(m)<<" val "<<val/10000.0<<" nodes "<<visitedNodes<<" deltaNodes "<<visitedNodes-tempVisitedNodes<< sync_endl;
-			tempVisitedNodes=visitedNodes;
-		}
-#endif
 
-		if(val>=bestScore){
+		if(type==ROOT_NODE && depth>10*ONE_PLY && !signals.stop){
+			sync_cout<<"info currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<< sync_endl;
+		}
+
+
+		if(val>bestScore){
 			bestScore=val;
+
 			if(val>alpha){
+				bestMove.packed=m.packed;
 				alpha =val;
 				if(type ==search::nodeType::ROOT_NODE|| !signals.stop){
 					PV.clear();
-					PV.push_back(m);
+					PV.push_back(bestMove);
+
 					std::copy (childPV.begin(),childPV.end(),back_inserter(PV));
 				}
 			}
@@ -238,9 +325,19 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			bestScore=0;
 		}
 		else{
-			bestScore=-SCORE_MATE+ply;
+			bestScore=matedIn(ply);
 		}
 	}
+
+	if (bestScore == -SCORE_INFINITE)
+		bestScore = alpha;
+
+
+	//Statistics::instance().gatherNodeTypeStat(type,bestScore >= beta?CUT_NODE:PVnode && bestMove.packed? PV_NODE:ALL_NODE );
+	TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+			bestScore >= beta  ? typeScoreHigherThanBeta :
+					PVnode && bestMove.packed ? typeExact : typeScoreLowerThanAlpha,
+							depth, bestMove.packed, pos.eval());
 	return bestScore;
 
 }
@@ -248,7 +345,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 template<search::nodeType type> Score search::qsearch(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
 
-
+	const bool PVnode=(type==search::nodeType::PV_NODE);
 	// if in check do evasion
 	if(pos.getActualState().checkers){
 		return alphaBeta<type>(ply,pos,ONE_PLY,alpha,beta,PV);
@@ -274,33 +371,60 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 	visitedNodes++;
 
+	U64 posKey=pos.getActualState().key;
+	ttEntry* tte = TT.probe(posKey);
+	Move ttMove;
+	ttMove.packed=tte ? tte->getPackedMove() : 0;
+	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
+
+	if (tte
+		&& tte->getDepth() >= 0
+	    && ttValue != SCORE_NONE // Only in case of TT access race
+	    && (	PVnode ?  tte->getType() == typeExact
+	            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta)
+	                              : (tte->getType() ==  typeScoreLowerThanAlpha)))
+	{
+		PV.clear();
+		PV.push_back(ttMove);
+		return ttValue;
+	}
+
+	ttType TTtype=typeScoreLowerThanAlpha;
+
 	//----------------------------
 	//	stand pat score
 	//----------------------------
-	Score bestScore=pos.eval();
+
+	Score staticEval=pos.eval();
+	Score bestScore=staticEval;
 	if(bestScore>alpha){
+
 		alpha=bestScore;
+		// TODO testare se la riga TTtype=typeExact; ha senso
+		TTtype=typeExact;
 	}
 	Score futilityBase=bestScore+20000;
 
 	//----------------------------
 	//	try the captures
 	//----------------------------
-	Movegen mg(pos);
+	Movegen mg(pos,ttMove);
 	mg.setupQuiescentSearch();
 	unsigned int moveNumber=0;
 	Move m;
+	Move bestMove;
+	bestMove.packed=0;
 	while (bestScore <beta  &&  (m=mg.getNextMove()).packed) {
 
 		//----------------------------
 		//	futility pruning (delta pruning)
 		//----------------------------
-		// TODO aggiungere mossa != ttmove
 		// TODO testare se aggiungere o no !movegivesCheck() &&
 		// TODO aggiungere mossa non è passed pawn push
 
-		if(type != search::nodeType::PV_NODE &&
-				m.flags != Move::fpromotion
+		if(!PVnode &&
+			m.packed != ttMove.packed &&
+			m.flags != Move::fpromotion
 		){
 			Score futilityValue=futilityBase
                     + Position::pieceValue[pos.squares[m.to]%Position::emptyBitmap][1]
@@ -321,11 +445,10 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		//----------------------------
 
 		// TODO controllare se conviene fare o non fare la condizione type != search::nodeType::PV_NODE
-		// TODO aggiungere mossa != ttmove
 		// TODO testare se aggiungere o no !movegivesCheck() &&
 		if(type != search::nodeType::PV_NODE &&
 				m.flags != Move::fpromotion &&
-				/*m.packed != TTMOVE:packed  &&*/
+				m.packed != ttMove.packed &&
 				pos.seeSign(m)<0){
 			moveNumber++;
 			continue;
@@ -336,9 +459,11 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		val=-qsearch<childNodesType>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
 		pos.undoMove(m);
 
-		if(val>=bestScore){
+		if(val>bestScore){
+			bestMove.packed=m.packed;
 			bestScore=val;
 			if(val>alpha){
+				TTtype=typeExact;
 				alpha =val;
 				if(!signals.stop){
 					PV.clear();
@@ -349,6 +474,10 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		}
 		moveNumber++;
 	}
+
+	TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+	             bestScore >= beta ? typeScoreHigherThanBeta : TTtype,
+	             0, bestMove.packed, staticEval);
 	return bestScore;
 
 }

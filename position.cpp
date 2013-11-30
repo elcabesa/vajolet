@@ -192,6 +192,7 @@ void Position::initScoreValues(void){
 	pieceValue[blackQueens]=-pieceValue[whiteQueens];
 	pieceValue[blackKing]=-pieceValue[whiteKing];
 
+
 	for(int piece=0;piece<lastBitboard;piece++){
 		for(tSquare s=(tSquare)0;s<squareNumber;s++){
 			nonPawnValue[piece][s]=0;
@@ -200,12 +201,17 @@ void Position::initScoreValues(void){
 			int file=FILES[s];
 			if(piece >occupiedSquares && piece <whitePieces ){
 				pstValue[piece][s]=-10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
+				if(isPawn((bitboardIndex)piece)){
+					pstValue[piece][s].insert(1,100*(rank-3.5));
+				}
+
 				if(!isKing((bitboardIndex)piece)){
 					pstValue[piece][s]+=pieceValue[piece];
 				}
 				else{
 					pstValue[piece][s].insert(0,-pstValue[piece][s][0]);
 				}
+
 				if(!isPawn((bitboardIndex)piece)){
 					nonPawnValue[piece][s].insert(0,pstValue[piece][s][0]);
 					nonPawnValue[piece][s].insert(1,pstValue[piece][s][1]);
@@ -214,6 +220,10 @@ void Position::initScoreValues(void){
 			}
 			else if(piece >emptyBitmap && piece <blackPieces ){
 				pstValue[piece][s]=10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
+				if(isPawn((bitboardIndex)piece)){
+					pstValue[piece][s].insert(1,-100*(rank-3.5));
+				}
+
 				if(!isKing((bitboardIndex)piece)){
 					pstValue[piece][s]+=pieceValue[piece];
 				}
@@ -930,7 +940,9 @@ unsigned long long Position::perft(unsigned int depth){
 #endif
 
 	unsigned long long tot = 0;
-	Movegen mg(*this);
+	Move m;
+	m.packed=0;
+	Movegen mg(*this,m);
 #ifdef FAST_PERFT
 	if(depth==1){
 		mg.generateMoves<Movegen::allMg>();
@@ -938,7 +950,6 @@ unsigned long long Position::perft(unsigned int depth){
 	}
 #endif
 
-	Move m;
 	while ((m=mg.getNextMove()).packed) {
 		doMove(m);
 		tot += perft(depth - 1);
@@ -955,10 +966,11 @@ unsigned long long Position::perft(unsigned int depth){
 */
 unsigned long long Position::divide(unsigned int depth){
 
-	Movegen mg(*this);
+	Move m;
+	m.packed=0;
+	Movegen mg(*this,m);
 	unsigned long long tot = 0;
 	unsigned int mn=0;
-	Move m;
 	while ((m=mg.getNextMove()).packed) {
 		mn++;
 		doMove(m);
@@ -1128,7 +1140,9 @@ bool Position::isDraw() const {
 		if(!getActualState().checkers){
 			return true;
 		}
-		Movegen mg(*this);
+		Move m;
+		m.packed=0;
+		Movegen mg(*this,m);
 		mg.generateMoves<Movegen::genType::allMg>();
 		if(mg.getGeneratedMoveNumber()){
 			return true;

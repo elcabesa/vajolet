@@ -33,7 +33,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet"
-#define VERSION			"0.11"
+#define VERSION			"0.19"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
 
@@ -41,6 +41,7 @@
 //	define
 //---------------------------------------------
 //#define DEBUG1
+//#define PRINT_PV_CHANGES
 
 
 #define MAX_MOVE_PER_POSITION (512)
@@ -50,8 +51,12 @@
 //SCORE DEFINITION
 //---------------------------------------------
 
-#define SCORE_INFINITE	(2000000000)
-#define SCORE_MATE		(1999999990)
+#define SCORE_NONE				(2000000001)
+#define SCORE_INFINITE			(2000000000)
+#define SCORE_MATE				(1999999990)
+#define SCORE_MATED				(-SCORE_MATE)
+#define SCORE_MATE_IN_MAX_PLY	(1999999000)
+#define SCORE_MATED_IN_MAX_PLY	(-SCORE_MATE_IN_MAX_PLY)
 
 //---------------------------------------------
 //

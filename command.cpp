@@ -56,7 +56,7 @@ const static char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQk
 void static printUciInfo(void){
 	sync_cout<< "id name "<<PROGRAM_NAME<<" "<<VERSION<<std::endl;
 	std::cout<<"id author Belli Marco"<<std::endl;
-	std::cout<<"option name Hash type spin default 1 min 1 max 128"<<sync_endl;
+	std::cout<<"option name Hash type spin default 1 min 1 max 4096"<<sync_endl;
 	std::cout<<"uciok"<<sync_endl;
 }
 
@@ -69,8 +69,10 @@ void static printUciInfo(void){
 Move moveFromUci(Position& pos, std::string& str) {
 
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
-	Movegen mg(pos);
 	Move m;
+	m.packed=0;
+	Movegen mg(pos,m);
+
 	while( (m=mg.getNextMove()).packed){
 		if(str==pos.displayUci(m)){
 			return m;
@@ -164,18 +166,18 @@ void setoption(std::istringstream& is) {
 	while (is >> token && token != "value"){
 		name += std::string(" ", !name.empty()) + token;
 	}
-
 	// Read option value (can contain spaces)
 	while (is >> token){
 		value += std::string(" ", !value.empty()) + token;
 	}
 
-	/*if (Options.count(name)){
-		Options[name] = value;
+	if(name =="Hash"){
+		TT.setSize(stoi(value));
 	}
 	else{
 		sync_cout << "No such option: " << name << sync_endl;
-	}*/
+	}
+
 }
 
 
@@ -186,8 +188,6 @@ void setoption(std::istringstream& is) {
 */
 void uciLoop(){
 	my_thread thr;
-	transpositionTable tt;
-	tt.setSize(128);
 	Position pos;
 	pos.setupFromFen(StartFEN);
 	std::string token, cmd;

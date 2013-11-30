@@ -35,15 +35,22 @@ bool my_thread::quit=false;
 bool my_thread::startThink=false;
 Position *my_thread::pos;
 search my_thread::src;
-unsigned int my_thread::searchTimeout;
-unsigned int my_thread::searchTimer;
+unsigned long my_thread::searchTimeout;
 searcLimits my_thread::limits;
 
 std::mutex my_thread::searchMutex;
 std::condition_variable my_thread::searchCond;
 
+unsigned long my_thread::startTime;
+
+
 
 void my_thread::timerThread() {
+	// TODO change time based on PV changing during the search.
+	/*
+	 * provare, usando la statistica e la define PRINT_PV_CHANGES a capire quante volte cambia la PV durante la ricerca,
+	 * dargli uun peso in base al depth^2 e decidere in base a soglie o rapporti con i nodi etc se la posizione è calma o problematica
+	*/
 	std::mutex mutex;
 	while (!quit)
 	{
@@ -51,8 +58,9 @@ void my_thread::timerThread() {
 
 		if (!quit){
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
-			searchTimer+=5;
-			if(searchTimer>searchTimeout){
+
+
+			if(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime>searchTimeout && !limits.infinite){
 				src.signals.stop=true;
 			}
 		}
@@ -67,7 +75,7 @@ void my_thread::searchThread() {
 		searchCond.wait(lk,[&]{return startThink||quit;});
 		if(!quit){
 			searchTimeout=timeManagerInit(*pos, limits);
-			searchTimer=0;
+			startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 			src.startThinking(*pos);
 			startThink=false;
 

@@ -20,6 +20,7 @@
 
 #include <thread>
 #include <mutex>
+#include <chrono>
 #include <condition_variable>
 #include "position.h"
 #include "search.h"
@@ -40,9 +41,10 @@ class my_thread{
 	static std::condition_variable searchCond;
 	static Position *pos;
 	static search src;
-	static unsigned int searchTimeout;
-	static unsigned int searchTimer;
+	static unsigned long searchTimeout;
 	static searcLimits limits;
+
+	static unsigned long startTime;
 
 	void initThreads();
 	void quitThreads();

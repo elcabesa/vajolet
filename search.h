@@ -39,7 +39,7 @@ inline Score mateIn(int ply) {
 }
 
 inline Score matedIn(int ply) {
-  return -SCORE_MATE + ply;
+  return SCORE_MATED + ply;
 }
 
 
@@ -49,6 +49,7 @@ public:
 	struct sSignal{
 		bool stop=false;
 	}signals;
+
 	typedef enum eNodeType{
 		ROOT_NODE,
 		PV_NODE,

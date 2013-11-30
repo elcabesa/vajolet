@@ -22,10 +22,14 @@
 #include <stdlib.h>
 #include <cstring>
 
+
+
+
+
 enum ttType{
 	typeExact,
-	typeAlpha,
-	typeBeta
+	typeScoreLowerThanAlpha,
+	typeScoreHigherThanBeta
 };
 
 struct ttEntry{
@@ -73,6 +77,10 @@ class transpositionTable{
 	unsigned int elements;
 	unsigned char generation;
 public:
+	transpositionTable(){
+		generation=0;
+		elements=1;
+	}
 	~transpositionTable(){
 		if(table){
 			free(table);
@@ -83,7 +91,7 @@ public:
 	void clear();
 
 	inline ttCluster* findCluster(U64 key) const {
-		return table + (key % elements);
+		return table + (((unsigned int)key) % elements);
 	}
 
 	inline void refresh(const ttEntry* tte) const {
@@ -92,7 +100,30 @@ public:
 
 	ttEntry* probe(const U64 key) const;
 	void store(const U64 key, Score v, unsigned char b, signed short int d, unsigned short m, Score statV);
+
+	// value_to_tt() adjusts a mate score from "plies to mate from the root" to
+	// "plies to mate from the current position". Non-mate scores are unchanged.
+	// The function is called before storing a value to the transposition table.
+
+	static Score scoreToTT(Score v, int ply){
+		return  v >= SCORE_MATE_IN_MAX_PLY  ? v + ply
+				: v <= SCORE_MATED_IN_MAX_PLY ? v - ply : v;
+	}
+
+
+	// value_from_tt() is the inverse of value_to_tt(): It adjusts a mate score
+	// from the transposition table (where refers to the plies to mate/be mated
+	// from current position) to "plies to mate/be mated from the root".
+
+	static Score scoreFromTT(Score v, int ply){
+
+		return  v == SCORE_NONE ? SCORE_NONE
+				: v >= SCORE_MATE_IN_MAX_PLY  ? v - ply
+				: v <= SCORE_MATED_IN_MAX_PLY ? v + ply : v;
+	  }
 };
+
+extern transpositionTable TT;
 
 
 
