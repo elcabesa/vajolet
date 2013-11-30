@@ -306,9 +306,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				bestMove.packed=m.packed;
 				alpha =val;
 				if(type ==search::nodeType::ROOT_NODE|| !signals.stop){
+
 					PV.clear();
 					PV.push_back(bestMove);
-
 					std::copy (childPV.begin(),childPV.end(),back_inserter(PV));
 				}
 			}
@@ -347,9 +347,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 	const bool PVnode=(type==search::nodeType::PV_NODE);
 	// if in check do evasion
-	if(pos.getActualState().checkers){
+	/*if(pos.getActualState().checkers){
 		return alphaBeta<type>(ply,pos,ONE_PLY,alpha,beta,PV);
-	}
+	}*/
 
 	if(pos.isDraw() || signals.stop){
 		return 0;
@@ -409,7 +409,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	//	try the captures
 	//----------------------------
 	Movegen mg(pos,ttMove);
-	mg.setupQuiescentSearch();
+	mg.setupQuiescentSearch(pos.getActualState().checkers);
 	unsigned int moveNumber=0;
 	Move m;
 	Move bestMove;

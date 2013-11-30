@@ -82,10 +82,14 @@ public:
 		moveListPosition=0;
 		moveListSize=0;
 	}
-	void setupQuiescentSearch(){
-		stagedGeneratorState=getQsearchTT;
-		if(!pos.isCaptureMove(ttMove)){
-			ttMove.packed=0;
+	void setupQuiescentSearch(bool checkers){
+		if(checkers){
+			stagedGeneratorState=generateEvasionMoves;
+		}else{
+			stagedGeneratorState=getQsearchTT;
+			if(!pos.isCaptureMove(ttMove)){
+				ttMove.packed=0;
+			}
 		}
 	}
 
