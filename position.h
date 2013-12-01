@@ -49,7 +49,7 @@ public:
 		whitePawns=6,					//6		00000110
 		whitePieces=7,					//7		00000111
 
-		emptyBitmap=8,
+		separationBitmap=8,
 		blackKing=9,					//9		00001001
 		blackQueens=10,					//10	00001010
 		blackRooks=11,					//11	00001011
@@ -113,6 +113,7 @@ public:
 		bitMap pinnedPieces;	/*!< pinned pieces*/
 		bitMap checkers;	/*!< checking pieces*/
 		bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
+		Move killers[2];	/*!< killer move at ply x*/
 
 	};
 
@@ -241,7 +242,14 @@ public:
 			stateInfo.push_back(s);
 		}
 		else{
+			Move killer0;
+			Move killer1;
+			killer0.packed=stateInfo[stateIndex].killers[0].packed;
+			killer1.packed=stateInfo[stateIndex].killers[1].packed;
 			stateInfo[stateIndex]=s;
+			stateInfo[stateIndex].killers[0].packed=killer0.packed;
+			stateInfo[stateIndex].killers[1].packed=killer1.packed;
+
 		}
 
 		stateIndex++;
@@ -295,7 +303,7 @@ public:
 
 		bool capture = (bitSet((tSquare)m.to) & st.Them[Pieces]);
 		if(!isPawn(squares[m.from])){
-			s+=PIECE_NAMES_FEN[squares[m.from]%Position::emptyBitmap];
+			s+=PIECE_NAMES_FEN[squares[m.from]%Position::separationBitmap];
 		}
 		if(capture && isPawn(squares[m.from])){
 			s+=char('a'+FILES[m.from]);
@@ -341,7 +349,7 @@ public:
 		\date 08/11/2013
 	*/
 	inline Score getMvvLvaScore(Move & m) const {
-		Score s=Position::pieceValue[squares[m.to]%emptyBitmap][0]-(squares[m.from]%emptyBitmap);
+		Score s=Position::pieceValue[squares[m.to]%separationBitmap][0]-(squares[m.from]%separationBitmap);
 		if (m.flags == Move::fpromotion){
 			s += (Position::pieceValue[whiteQueens +m.promotion] - Position::pieceValue[whitePawns])[0];
 		}else if(m.flags == Move::fenpassant){
@@ -366,10 +374,12 @@ public:
 		return (570000-tot)*(65535.0/(570000-120000));
 
 	}
+
 	inline bool isCaptureMove(Move & m) const {
-
-		return squares[m.to]!=emptyBitmap || m.flags==Move::fenpassant;
-
+		return squares[m.to]!=empty || m.flags==Move::fenpassant;
+	}
+	inline bool isCaptureMoveOrPromotion(Move & m) const {
+		return squares[m.to]!=empty || m.flags==Move::fenpassant || m.flags == Move::fpromotion;
 	}
 
 
@@ -407,7 +417,7 @@ private:
 		\date 27/10/2013
 	*/
 	inline void putPiece(bitboardIndex piece,tSquare s) {
-		bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
+		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
 		squares[s] = piece;
 		bitBoard[piece] |= bitSet(s);
 		bitBoard[occupiedSquares] |= bitSet(s);
@@ -426,7 +436,7 @@ private:
 		// index[from] is not updated and becomes stale. This works as long
 		// as index[] is accessed just by known occupied squares.
 		bitMap fromTo = bitSet(from) ^ bitSet(to);
-		bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
+		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
 		bitBoard[occupiedSquares] ^= fromTo;
 		bitBoard[piece] ^= fromTo;
 		bitBoard[color] ^= fromTo;
@@ -448,7 +458,7 @@ private:
 		// do_move() and then replace it in undo_move() we will put it at the end of
 		// the list and not in its original place, it means index[] and pieceList[]
 		// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
-		bitboardIndex color=piece>emptyBitmap? blackPieces:whitePieces;
+		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
 		bitBoard[occupiedSquares]^= bitSet(s);
 		bitBoard[piece] ^= bitSet(s);
 		bitBoard[color] ^= bitSet(s);

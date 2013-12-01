@@ -24,7 +24,7 @@
 
 
 Score Position::seeSign(Move m) const {
-	if (pieceValue[squares[m.from]%emptyBitmap][0] <= pieceValue[squares[m.to]%emptyBitmap][0])
+	if (pieceValue[squares[m.from]%separationBitmap][0] <= pieceValue[squares[m.to]%separationBitmap][0])
 	{
 		return 1;
 	}
@@ -44,14 +44,14 @@ Score Position::see(Move m) const {
 	tSquare from=(tSquare)m.from, to=(tSquare)m.to;
 	bitMap occupied=bitBoard[occupiedSquares]^bitSet(from);
 //	displayBitMap(occupied);
-	eNextMove color=squares[from]>emptyBitmap?blackTurn:whiteTurn;
+	eNextMove color=squares[from]>separationBitmap?blackTurn:whiteTurn;
 
 	Score swapList[64];
 	unsigned int slIndex = 1;
 	bitMap attackers,colorAttackers;
 	bitboardIndex captured;
 
-	swapList[0] = pieceValue[squares[to]%emptyBitmap][0];
+	swapList[0] = pieceValue[squares[to]%separationBitmap][0];
 
 	if(m.flags== Move::fenpassant){
 		occupied ^= to- pawnPush(color);
@@ -83,7 +83,7 @@ Score Position::see(Move m) const {
 	// destination square, where the sides alternately capture, and always
 	// capture with the least valuable piece. After each capture, we look for
 	// new X-ray attacks from behind the capturing piece.
-	captured = bitboardIndex(squares[from]%emptyBitmap);
+	captured = bitboardIndex(squares[from]%separationBitmap);
 
 	do {
 		assert(slIndex < 64);

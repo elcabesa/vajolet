@@ -44,6 +44,7 @@ public:
 		getTT,
 		generateCaptureMoves,
 		iterateGoodCaptureMoves,
+		getKillers,
 		generateQuietMoves,
 		iterateQuietMoves,
 		iterateBadCaptureMoves,
@@ -75,6 +76,7 @@ private:
 
 	unsigned int badCaptureSize;
 	unsigned int badCapturePosition;
+	unsigned int killerPos;
 
 
 	const Position & pos;
@@ -96,6 +98,7 @@ public:
 		moveListSize=0;
 		badCaptureSize=0;
 		badCapturePosition=0;
+		killerPos=0;
 	}
 	int setupQuiescentSearch(bool checkers,int depth){
 		if(checkers){

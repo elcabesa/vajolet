@@ -218,7 +218,7 @@ void Position::initScoreValues(void){
 				}
 
 			}
-			else if(piece >emptyBitmap && piece <blackPieces ){
+			else if(piece >separationBitmap && piece <blackPieces ){
 				pstValue[piece][s]=10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
 				if(isPawn((bitboardIndex)piece)){
 					pstValue[piece][s].insert(1,-100*(rank-3.5));
@@ -481,7 +481,7 @@ void Position::calcNonPawnMaterialValue(Score* s){
 	for (tSquare s=(tSquare)0;s<squareNumber;s++){
 		bitboardIndex val=squares[s];
 		if(!isPawn(val)){
-			if(val>emptyBitmap){
+			if(val>separationBitmap){
 				t[1]-=pstValue[val][s];
 			}
 			else{
@@ -513,7 +513,7 @@ void Position::doNullMove(void){
 	x.Us=&bitBoard[x.nextMove];
 	x.Them=&bitBoard[(blackTurn-x.nextMove)];
 	x.ply++;
-	x.capturedPiece=emptyBitmap;
+	x.capturedPiece=empty;
 
 	calcCheckingSquares();
 	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
@@ -705,7 +705,7 @@ void Position::undoMove(Move & m){
 
 	if(m.flags == Move::fpromotion){
 		removePiece(piece,to);
-		piece = (bitboardIndex)(piece>emptyBitmap?blackPawns:whitePawns);
+		piece = (bitboardIndex)(piece>separationBitmap?blackPawns:whitePawns);
 		putPiece(piece,to);
 	}
 
@@ -798,7 +798,7 @@ bool Position::checkPosConsistency(int nn){
 
 	for (int i = whiteKing; i <= blackPawns; i++){
 		for (int j = whiteKing; j <= blackPawns; j++){
-			if(i!=j && i!= whitePieces && i!= emptyBitmap && j!= whitePieces && j!= emptyBitmap && (bitBoard[i] & bitBoard[j])){
+			if(i!=j && i!= whitePieces && i!= separationBitmap && j!= whitePieces && j!= separationBitmap && (bitBoard[i] & bitBoard[j])){
 				sync_cout<<"bitboard intersection"<<sync_endl;
 				sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
 				while(1){}
@@ -807,7 +807,7 @@ bool Position::checkPosConsistency(int nn){
 		}
 	}
 	for (int i = whiteKing; i <= blackPawns; i++){
-		if(i!= whitePieces && i!= emptyBitmap){
+		if(i!= whitePieces && i!= separationBitmap){
 			if(pieceCount[i]!= bitCnt(bitBoard[i])){
 				sync_cout<<"pieceCount Error"<<sync_endl;
 				sync_cout<<(nn?"DO error":"undoError") <<sync_endl;

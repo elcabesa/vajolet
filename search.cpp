@@ -156,6 +156,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 	visitedNodes++;
 	const bool PVnode=(type==search::nodeType::PV_NODE || type==search::nodeType::ROOT_NODE);
+	const bool inCheck = pos.getActualState().checkers;
 
 
 	const search::nodeType childNodesType=
@@ -206,7 +207,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 
 
-	if(!pos.getActualState().checkers){
+	if(!inCheck){
 
 		// null move pruning
 		if(
@@ -321,7 +322,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 	// draw
 	if(!moveNumber){
-		if(!pos.getActualState().checkers){
+		if(!inCheck){
 			bestScore=0;
 		}
 		else{
@@ -338,6 +339,19 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			bestScore >= beta  ? typeScoreHigherThanBeta :
 					PVnode && bestMove.packed ? typeExact : typeScoreLowerThanAlpha,
 							depth, bestMove.packed, pos.eval());
+
+	// save killer move
+	if (bestScore >= beta &&
+			// TODO provare a fare solamente pos.isCaptureMove
+		!pos.isCaptureMoveOrPromotion(bestMove) &&
+		!inCheck)
+	{
+		if(pos.getActualState().killers[0].packed != bestMove.packed)
+		{
+			pos.getActualState().killers[1].packed = pos.getActualState().killers[0].packed;
+			pos.getActualState().killers[0].packed = bestMove.packed;
+		}
+	}
 	return bestScore;
 
 }
@@ -433,7 +447,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 			m.flags != Move::fpromotion
 		){
 			Score futilityValue=futilityBase
-                    + Position::pieceValue[pos.squares[m.to]%Position::emptyBitmap][1]
+                    + Position::pieceValue[pos.squares[m.to]%Position::separationBitmap][1]
                     + (m.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
 
 			if (futilityValue < beta)

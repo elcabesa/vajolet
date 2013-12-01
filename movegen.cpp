@@ -1234,8 +1234,23 @@ Move & Movegen::getNextMove(){
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 
-		case iterateEvasionMoves:
 		case iterateQuietMoves:
+			if(moveListPosition<moveListSize){
+				if(moveList[moveListPosition].packed!=ttMove.packed &&
+					moveList[moveListPosition].packed!=pos.getActualState().killers[0].packed &&
+					moveList[moveListPosition].packed!=pos.getActualState().killers[1].packed
+				)
+				{
+					return moveList[moveListPosition++];
+				}
+				moveListPosition++;
+
+			}
+			else{
+				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			}
+			break;
+		case iterateEvasionMoves:
 		case iterateQuietcChecks:
 			if(moveListPosition<moveListSize){
 				if(moveList[moveListPosition].packed!=ttMove.packed){
@@ -1319,6 +1334,22 @@ Move & Movegen::getNextMove(){
 					moveListPosition++;
 				}
 
+			}
+			else{
+				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			}
+			break;
+		case getKillers:
+			if(killerPos<2){
+				Move& t= pos.getActualState().killers[killerPos];
+				killerPos++;
+				//pos.display();
+				//sync_cout<<pos.displayUci(t)<<sync_endl;
+
+				if(isMoveLegal(pos,t)){
+					//sync_cout<<"eccomi"<<sync_endl;
+					return t;
+				}
 			}
 			else{
 				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
