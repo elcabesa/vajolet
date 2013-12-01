@@ -46,9 +46,10 @@ ttEntry* transpositionTable::probe(const U64 key) const {
 	unsigned int keyH = key >> 32;
 
 
-	for (unsigned i = 0; i < 4; i++){
-		if ((*ttc).data[i].getKey() == keyH)
-			return &(*ttc).data[i];
+	ttEntry *tte=(ttEntry*)ttc;
+	for (unsigned i = 0; i < 4; i++,tte++){
+		if (tte->getKey() == keyH)
+			return tte;
 	}
 
 	return nullptr;

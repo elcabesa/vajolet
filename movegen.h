@@ -43,9 +43,10 @@ public:
 	enum eStagedGeneratorState{
 		getTT,
 		generateCaptureMoves,
-		iterateCaptureMoves,
+		iterateGoodCaptureMoves,
 		generateQuietMoves,
 		iterateQuietMoves,
+		iterateBadCaptureMoves,
 		finishedNormalStage,
 
 		getTTevasion,
@@ -68,8 +69,13 @@ public:
 	}stagedGeneratorState;
 private:
 	Move moveList[MAX_MOVE_PER_POSITION];
+	Move badCaptureList[MAX_MOVE_PER_POSITION];
 	unsigned int moveListSize;
 	unsigned int moveListPosition;
+
+	unsigned int badCaptureSize;
+	unsigned int badCapturePosition;
+
 
 	const Position & pos;
 	Move ttMove;
@@ -88,6 +94,8 @@ public:
 		}
 		moveListPosition=0;
 		moveListSize=0;
+		badCaptureSize=0;
+		badCapturePosition=0;
 	}
 	int setupQuiescentSearch(bool checkers,int depth){
 		if(checkers){

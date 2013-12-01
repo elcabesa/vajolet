@@ -55,7 +55,7 @@ public:
 		searchId=gen;
 	}
 
-	unsigned int getKey() const{return key;}
+	inline unsigned int getKey() const{return key;}
 	Score getValue()const {return value;}
 	Score getStaticValue()const {return staticValue;}
 	unsigned short getPackedMove()const {return packedMove;}

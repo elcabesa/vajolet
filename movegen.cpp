@@ -1238,56 +1238,91 @@ Move & Movegen::getNextMove(){
 		case iterateQuietMoves:
 		case iterateQuietcChecks:
 			if(moveListPosition<moveListSize){
-				unsigned int bestIndex=moveListPosition;
-				for(unsigned int i=moveListPosition;i<moveListSize;i++){ // itera sulle mosse rimanenti
-					if(moveList[i].packed !=ttMove.packed){
-						found =true;
-						bestIndex=i;
-
-					}
-				}
-
-				if(found ==true){
-					if(moveListPosition!=bestIndex){
-						std::swap(moveList[moveListPosition].packed,moveList[bestIndex].packed);
-					}
+				if(moveList[moveListPosition].packed!=ttMove.packed){
 					return moveList[moveListPosition++];
 				}
+				moveListPosition++;
 
 			}
-			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			else{
+				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			}
 
 
 			break;
-		case iterateCaptureMoves:
-		case iterateQuiescentMoves:
-		case iterateQuiescentCaptures:
-		{
+		case iterateGoodCaptureMoves:
 			if(moveListPosition<moveListSize){
 				Score bestScore=-SCORE_INFINITE;
 				unsigned int bestIndex=moveListPosition;
 				for(unsigned int i=moveListPosition;i<moveListSize;i++){ // itera sulle mosse rimanenti
-					if(moveList[i].packed !=ttMove.packed){
-						Score res=pos.getMvvLvaScore(moveList[i]);
-						if(res>bestScore){
-							found =true;
-							bestScore=res;
-							bestIndex=i;
-						}
+					Score res=pos.getMvvLvaScore(moveList[i]);
+					if(res>bestScore){
+						bestScore=res;
+						bestIndex=i;
 					}
 				}
-
-				if(found ==true){
-					if(moveListPosition!=bestIndex){
-						std::swap(moveList[moveListPosition].packed,moveList[bestIndex].packed);
+				if(bestIndex!=moveListPosition){
+					std::swap(moveList[moveListPosition].packed,moveList[bestIndex].packed);
+				}
+				if(moveList[moveListPosition].packed!=ttMove.packed){
+					if(pos.seeSign(moveList[moveListPosition])>=0){
+						return moveList[moveListPosition++];
 					}
-					return moveList[moveListPosition++];
+					else{
+						badCaptureList[badCaptureSize++].packed=moveList[moveListPosition++].packed;
+					}
+				}
+				else{
+					moveListPosition++;
 				}
 
 			}
-			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			else{
+				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			}
+			break;
+		case iterateBadCaptureMoves:
+			if(badCapturePosition<badCaptureSize){
+				//if(badCaptureList[badCapturePosition].packed!=ttMove.packed){
+					return badCaptureList[badCapturePosition++];
+				//}
+				//else{
+				//	sync_cout<<" mi pare impossibile"<<sync_endl;
+				//}
+				//badCapturePosition++;
 
-		}
+			}
+			else{
+				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			}
+			break;
+
+		case iterateQuiescentMoves:
+		case iterateQuiescentCaptures:
+			if(moveListPosition<moveListSize){
+				Score bestScore=-SCORE_INFINITE;
+				unsigned int bestIndex=moveListPosition;
+				for(unsigned int i=moveListPosition;i<moveListSize;i++){ // itera sulle mosse rimanenti
+					Score res=pos.getMvvLvaScore(moveList[i]);
+					if(res>bestScore){
+						bestScore=res;
+						bestIndex=i;
+					}
+				}
+				if(bestIndex!=moveListPosition){
+					std::swap(moveList[moveListPosition].packed,moveList[bestIndex].packed);
+				}
+				if(moveList[moveListPosition].packed!=ttMove.packed){
+					return moveList[moveListPosition++];
+				}
+				else{
+					moveListPosition++;
+				}
+
+			}
+			else{
+				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			}
 			break;
 		case getTT:
 		case getTTevasion:
