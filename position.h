@@ -240,6 +240,8 @@ public:
 	inline void insertState(state & s){
 		if(stateIndex>=stateInfo.size()){
 			stateInfo.push_back(s);
+			stateInfo[stateIndex].killers[0].packed=0;
+			stateInfo[stateIndex].killers[1].packed=0;
 		}
 		else{
 			Move killer0;
