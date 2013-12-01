@@ -884,6 +884,8 @@ void Movegen::generateMoves(){
 }
 template void Movegen::generateMoves<Movegen::captureMg>();
 template void Movegen::generateMoves<Movegen::quietMg>();
+template void Movegen::generateMoves<Movegen::quietChecksMg>();
+
 
 
 template<>
@@ -1223,12 +1225,18 @@ Move & Movegen::getNextMove(){
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 		case generateQuiescentMoves:
+		case generateQuiescentCaptures:
 			generateMoves<Movegen::captureMg>();
+			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			break;
+		case generateQuietCheks:
+			generateMoves<Movegen::quietChecksMg>();
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 
 		case iterateEvasionMoves:
 		case iterateQuietMoves:
+		case iterateQuietcChecks:
 			if(moveListPosition<moveListSize){
 				unsigned int bestIndex=moveListPosition;
 				for(unsigned int i=moveListPosition;i<moveListSize;i++){ // itera sulle mosse rimanenti
@@ -1253,6 +1261,7 @@ Move & Movegen::getNextMove(){
 			break;
 		case iterateCaptureMoves:
 		case iterateQuiescentMoves:
+		case iterateQuiescentCaptures:
 		{
 			if(moveListPosition<moveListSize){
 				Score bestScore=-SCORE_INFINITE;
@@ -1281,7 +1290,9 @@ Move & Movegen::getNextMove(){
 		}
 			break;
 		case getTT:
+		case getTTevasion:
 		case getQsearchTT:
+		case getQsearchTTquiet:
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			if(ttMove.packed && isMoveLegal(pos,ttMove)){
 				return ttMove;

@@ -48,6 +48,7 @@ public:
 		iterateQuietMoves,
 		finishedNormalStage,
 
+		getTTevasion,
 		generateEvasionMoves,
 		iterateEvasionMoves,
 		finishedEvasionStage,
@@ -55,7 +56,14 @@ public:
 		getQsearchTT,
 		generateQuiescentMoves,
 		iterateQuiescentMoves,
-		finishedQuescentStage
+		finishedQuiescentStage,
+
+		getQsearchTTquiet,
+		generateQuiescentCaptures,
+		iterateQuiescentCaptures,
+		generateQuietCheks,
+		iterateQuietcChecks,
+		finishedQuiescentQuietStage,
 
 	}stagedGeneratorState;
 private:
@@ -73,8 +81,7 @@ public:
 		ttMove.packed=m.packed;
 		Position::state &s =pos.getActualState();
 		if(s.checkers){
-			stagedGeneratorState=generateEvasionMoves;
-			ttMove.packed=0;
+			stagedGeneratorState=getTTevasion;
 		}
 		else{
 			stagedGeneratorState=getTT;
@@ -82,14 +89,22 @@ public:
 		moveListPosition=0;
 		moveListSize=0;
 	}
-	void setupQuiescentSearch(bool checkers){
+	int setupQuiescentSearch(bool checkers,int depth){
 		if(checkers){
-			stagedGeneratorState=generateEvasionMoves;
+			stagedGeneratorState=getTTevasion;
+			return -1*ONE_PLY;
 		}else{
-			stagedGeneratorState=getQsearchTT;
-			if(!pos.isCaptureMove(ttMove)){
-				ttMove.packed=0;
+			if(depth>-1*ONE_PLY){
+				stagedGeneratorState=getQsearchTTquiet;
+				return -1*ONE_PLY;
+			}else{
+				stagedGeneratorState=getQsearchTT;
+				if(!pos.isCaptureMove(ttMove)){
+					ttMove.packed=0;
+				}
+				return -2*ONE_PLY;
 			}
+
 		}
 	}
 

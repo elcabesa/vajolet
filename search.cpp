@@ -346,10 +346,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 template<search::nodeType type> Score search::qsearch(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
 
 	const bool PVnode=(type==search::nodeType::PV_NODE);
-	// if in check do evasion
-	/*if(pos.getActualState().checkers){
-		return alphaBeta<type>(ply,pos,ONE_PLY,alpha,beta,PV);
-	}*/
+	bool inCheck=pos.getActualState().checkers;
+
 
 	if(pos.isDraw() || signals.stop){
 		return 0;
@@ -375,10 +373,12 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	ttEntry* tte = TT.probe(posKey);
 	Move ttMove;
 	ttMove.packed=tte ? tte->getPackedMove() : 0;
+	Movegen mg(pos,ttMove);
+	int TTdepth=mg.setupQuiescentSearch(pos.getActualState().checkers,depth);
 	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
 
 	if (tte
-		&& tte->getDepth() >= 0
+		&& tte->getDepth() >= TTdepth
 	    && ttValue != SCORE_NONE // Only in case of TT access race
 	    && (	PVnode ?  tte->getType() == typeExact
 	            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta)
@@ -394,9 +394,16 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	//----------------------------
 	//	stand pat score
 	//----------------------------
-
 	Score staticEval=pos.eval();
-	Score bestScore=staticEval;
+	Score bestScore;
+	if(inCheck){
+		bestScore=-SCORE_INFINITE;
+	}
+	else{
+		bestScore=staticEval;
+	}
+
+
 	if(bestScore>alpha){
 
 		alpha=bestScore;
@@ -408,21 +415,20 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	//----------------------------
 	//	try the captures
 	//----------------------------
-	Movegen mg(pos,ttMove);
-	mg.setupQuiescentSearch(pos.getActualState().checkers);
 	unsigned int moveNumber=0;
 	Move m;
 	Move bestMove;
 	bestMove.packed=0;
 	while (bestScore <beta  &&  (m=mg.getNextMove()).packed) {
+		moveNumber++;
 
 		//----------------------------
 		//	futility pruning (delta pruning)
 		//----------------------------
-		// TODO testare se aggiungere o no !movegivesCheck() &&
 		// TODO aggiungere mossa non è passed pawn push
-
 		if(!PVnode &&
+			!inCheck &&
+			!pos.moveGivesCheck(m) &&
 			m.packed != ttMove.packed &&
 			m.flags != Move::fpromotion
 		){
@@ -433,7 +439,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 			if (futilityValue < beta)
 			{
 				bestScore = std::max(bestScore, futilityValue);
-				moveNumber++;
 				continue;
 			}
 
@@ -447,12 +452,13 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		// TODO controllare se conviene fare o non fare la condizione type != search::nodeType::PV_NODE
 		// TODO testare se aggiungere o no !movegivesCheck() &&
 		if(type != search::nodeType::PV_NODE &&
+				!inCheck &&
 				m.flags != Move::fpromotion &&
 				m.packed != ttMove.packed &&
 				pos.seeSign(m)<0){
-			moveNumber++;
 			continue;
 		}
+
 		pos.doMove(m);
 		Score val;
 		std::vector<Move> childPV;
@@ -472,12 +478,20 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 				}
 			}
 		}
-		moveNumber++;
+
 	}
 
+	// draw
+	if(!moveNumber && inCheck){
+		bestScore=matedIn(ply);
+	}
+
+	if (bestScore == -SCORE_INFINITE)
+		bestScore = alpha;
+
 	TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
-	             bestScore >= beta ? typeScoreHigherThanBeta : TTtype,
-	             0, bestMove.packed, staticEval);
+			bestScore >= beta ? typeScoreHigherThanBeta : TTtype,
+			TTdepth, bestMove.packed, staticEval);
 	return bestScore;
 
 }
