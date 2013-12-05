@@ -79,6 +79,7 @@ Move moveFromUci(Position& pos, std::string& str) {
 		}
 	}
 	// move not found
+	m.packed=0;
 	return m; // m è gia una NOMOVE
 }
 

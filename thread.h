@@ -33,8 +33,8 @@
 
 class my_thread{
 
-	static bool quit;
-	static bool startThink;
+	volatile static bool quit;
+	volatile static bool startThink;
 	std::thread timer;
 	std::thread searcher;
 	static std::mutex searchMutex;
@@ -59,9 +59,14 @@ public :
 	}
 	void startTinking(Position * p,searcLimits& l){
 
-		while(startThink){
+		src.signals.stop=true;
 
+		//sync_cout<<"STOOOOOOPPPPE"<<sync_endl;
+		while(startThink){
+			//sync_cout<<"attesa"<<sync_endl;
 		}
+		//sync_cout<<"fine attesa"<<sync_endl;
+
 		if(!startThink){
 			std::lock_guard<std::mutex> lk(searchMutex);
 			limits=l;
@@ -69,6 +74,7 @@ public :
 			startThink=true;
 			searchCond.notify_one();
 		}
+
 	}
 
 	void stopThinking(){

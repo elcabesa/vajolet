@@ -114,6 +114,7 @@ public:
 		bitMap checkers;	/*!< checking pieces*/
 		bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 		Move killers[2];	/*!< killer move at ply x*/
+		bool skipNullMove;
 
 	};
 
@@ -220,6 +221,7 @@ public:
 	*/
 	inline void undoNullMove(void){
 		removeState();
+		//checkPosConsistency(0);
 	}
 	/*! \brief return a reference to the actual state
 		\author Marco Belli
@@ -228,6 +230,7 @@ public:
 		\date 21/11/2013
 	*/
 	inline state& getActualState(void)const {
+		assert(stateIndex>=1);
 		return (state&) stateInfo[stateIndex-1];
 	}
 
@@ -238,12 +241,15 @@ public:
 		\date 21/11/2013
 	*/
 	inline void insertState(state & s){
+		assert(stateIndex>=0);
 		if(stateIndex>=stateInfo.size()){
 			stateInfo.push_back(s);
+			assert(stateIndex<stateInfo.size());
 			stateInfo[stateIndex].killers[0].packed=0;
 			stateInfo[stateIndex].killers[1].packed=0;
 		}
 		else{
+			assert(stateIndex<stateInfo.size());
 			Move killer0;
 			Move killer1;
 			killer0.packed=stateInfo[stateIndex].killers[0].packed;
@@ -264,6 +270,7 @@ public:
 		\date 21/11/2013
 	*/
 	inline void removeState(){
+		assert(stateIndex>=1);
 		stateIndex--;
 	}
 

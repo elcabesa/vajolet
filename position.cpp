@@ -25,6 +25,7 @@
 #include "hashKeys.h"
 #include "move.h"
 #include "movegen.h"
+#include "transposition.h"
 
 
 
@@ -148,6 +149,7 @@ void Position::setupFromFen(const std::string& fenStr){
 	}
 
 	x.pliesFromNull=0;
+	x.skipNullMove=true;
 	x.capturedPiece=empty;
 
 
@@ -165,7 +167,7 @@ void Position::setupFromFen(const std::string& fenStr){
 	x.pinnedPieces=getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
 	x.checkers= getAttackersTo(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0]) & bitBoard[blackPieces-x.nextMove];
 
-	checkPosConsistency(1);
+	//checkPosConsistency(1);
 }
 
 
@@ -507,8 +509,12 @@ void Position::doNullMove(void){
 		x.epSquare=squareNone;
 	}
 	x.key^=HashKeys::side;
+
+
+	__builtin_prefetch (TT.findCluster(x.key));
 	x.fiftyMoveCnt++;
 	x.pliesFromNull = 0;
+	x.skipNullMove=true;
 	x.nextMove= (eNextMove)(blackTurn-x.nextMove);
 	x.Us=&bitBoard[x.nextMove];
 	x.Them=&bitBoard[(blackTurn-x.nextMove)];
@@ -518,6 +524,9 @@ void Position::doNullMove(void){
 	calcCheckingSquares();
 	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
 	x.pinnedPieces=getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
+
+
+	//checkPosConsistency(1);
 
 
 }
@@ -552,6 +561,7 @@ void Position::doMove(Move & m){
 	// update counter
 	x.fiftyMoveCnt++;
 	x.pliesFromNull++;
+	x.skipNullMove=false;
 
 	// reset ep square
 	if(x.epSquare!=squareNone){
@@ -648,6 +658,8 @@ void Position::doMove(Move & m){
 		x.pawnKey ^= HashKeys::keys[from][piece] ^ HashKeys::keys[to][piece];
 		x.fiftyMoveCnt=0;
 	}
+
+	__builtin_prefetch (TT.findCluster(x.key));
 
 
 	mv.store_partial(2,x.material);

@@ -20,6 +20,7 @@
 #include "search.h"
 
 
+
 unsigned int timeManagerInit(Position& pos, searcLimits& lim){
 	if(pos.getActualState().nextMove){
 		return lim.btime/40.0;
@@ -31,8 +32,8 @@ unsigned int timeManagerInit(Position& pos, searcLimits& lim){
 }
 
 
-bool my_thread::quit=false;
-bool my_thread::startThink=false;
+volatile bool my_thread::quit=false;
+volatile bool my_thread::startThink=false;
 Position *my_thread::pos;
 search my_thread::src;
 unsigned long my_thread::searchTimeout;
@@ -59,7 +60,6 @@ void my_thread::timerThread() {
 		if (!quit){
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
-
 			if(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime>searchTimeout && !limits.infinite){
 				src.signals.stop=true;
 			}
@@ -69,19 +69,25 @@ void my_thread::timerThread() {
 }
 
 void my_thread::searchThread() {
+
 	while (!quit)
 	{
-		std::unique_lock<std::mutex> lk(searchMutex);
+		std::mutex mutex;
+		std::unique_lock<std::mutex> lk(mutex);
 		searchCond.wait(lk,[&]{return startThink||quit;});
 		if(!quit){
 			searchTimeout=timeManagerInit(*pos, limits);
 			startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 			src.startThinking(*pos);
+			//sync_cout<<"startThink=false"<<sync_endl;
 			startThink=false;
+			//sync_cout<<startThink<<sync_endl;
 
 		}
 		lk.unlock();
-  }
+	}
+
+
 }
 
 
@@ -89,6 +95,7 @@ void my_thread::searchThread() {
 void my_thread::initThreads(){
 	timer=std::thread(timerThread);
 	searcher=std::thread(searchThread);
+	src.signals.stop=true;
 }
 
 void my_thread::quitThreads(){

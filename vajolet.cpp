@@ -56,7 +56,7 @@ int main()
 
 
 
-	TT.setSize(256);
+	TT.setSize(1);
 
 
 
