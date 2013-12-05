@@ -46,6 +46,7 @@ inline Score matedIn(int ply) {
 class search{
 
 	static Score futility[5];
+	static Score futilityMargin[7];
 public:
 	struct sSignal{
 		bool stop=false;

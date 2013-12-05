@@ -30,6 +30,7 @@
 
 
 Score search::futility[5]={0,6000,20000,30000,40000};
+Score search::futilityMargin[7]={0,10000,20000,30000,40000,50000,60000};
 
 void search::startThinking(Position & p){
 	signals.stop=false;
@@ -93,7 +94,7 @@ void search::startThinking(Position & p){
 
 				// print info
 				unsigned long endTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-				sync_cout<<"info depth "<<depth/ONE_PLY<<" seldepth "<< selDepth-selDepthBase<<" score ";
+				sync_cout<<"info depth "<<(depth>>ONE_PLY_SHIFT)<<" seldepth "<< selDepth-selDepthBase<<" score ";
 				if(abs(res) >SCORE_MATE_IN_MAX_PLY){
 					std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
 				}
@@ -290,13 +291,13 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		&& !inCheck
 		&& !pos.getActualState().skipNullMove
 		&&  depth < 4 * ONE_PLY
-		&&  eval - futility[depth/ONE_PLY] >= beta
+		&&  eval - futility[depth>>ONE_PLY_SHIFT] >= beta
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		//&&  abs(eval) < VALUE_KNOWN_WIN
 		&&  ((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]> 30000) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]> 30000)))
 	{
 		//Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-		return eval - futility[depth/ONE_PLY];
+		return eval - futility[depth>>ONE_PLY_SHIFT];
 	}
 
 
@@ -423,7 +424,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 
 	Score bestScore=-SCORE_INFINITE;
-	bool searchFirstMove=true;
 
 	Move bestMove;
 	bestMove.packed=0;
@@ -434,17 +434,46 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	Move quietMoveList[64];
 
 	while (bestScore <beta  && (m=mg.getNextMove()).packed) {
-		if(!pos.isCaptureMoveOrPromotion(m) && quietMoveCount < 64){
+		bool captureOrPromotion =pos.isCaptureMoveOrPromotion(m);
+		if(!captureOrPromotion && quietMoveCount < 64){
 			quietMoveList[quietMoveCount++].packed=m.packed;
 		}
+
+		// todo aggiungere passed pawn push alle mosse dangeous
+		bool isDangerous=pos.moveGivesCheck(m) || pos.isCastleMove(m);
+
+
+
+		//---------------------------------------
+		//	FUTILITY PRUNING
+		//---------------------------------------
+		if(!PVnode
+			&& !captureOrPromotion
+			&& !inCheck
+			&& m.packed != ttMove.packed
+			&& !isDangerous
+			&& bestScore>SCORE_MATED_IN_MAX_PLY
+		){
+			if(depth<7*ONE_PLY){
+				Score localEval= eval + futilityMargin[depth>>ONE_PLY_SHIFT];
+				if(localEval<beta){
+					bestScore = std::max(bestScore, localEval);
+				}
+
+				moveNumber++;
+				continue;
+			}
+
+
+		}
+
 		pos.doMove(m);
 
 		Score val;
 		std::vector<Move> childPV;
 		if(type==search::nodeType::PV_NODE ||
 			type==search::nodeType::ROOT_NODE ){
-			if(searchFirstMove){
-				searchFirstMove=false;
+			if(moveNumber==0){
 #ifdef DEBUG1
 				if(type==search::nodeType::ROOT_NODE){
 					sync_cout<<"FIRST alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<sync_endl;
@@ -530,9 +559,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				}
 			}
 		}
-
-
-		searchFirstMove=false;
 	}
 
 

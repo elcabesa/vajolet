@@ -57,6 +57,11 @@ struct Move
 
 };
 
+struct extMove{
+	Move m;
+	Score score;
+};
+
 /*!	\brief return the offset of a pawn push
     \author Marco Belli
 	\version 1.0

@@ -33,7 +33,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet"
-#define VERSION			"0.33"
+#define VERSION			"0.34"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
 
@@ -46,6 +46,7 @@
 
 #define MAX_MOVE_PER_POSITION (512)
 #define ONE_PLY		(16)
+#define ONE_PLY_SHIFT (4)
 
 //---------------------------------------------
 //SCORE DEFINITION

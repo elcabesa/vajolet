@@ -387,6 +387,9 @@ public:
 	inline bool isCaptureMove(Move & m) const {
 		return squares[m.to]!=empty || m.flags==Move::fenpassant;
 	}
+	inline bool isCastleMove(Move & m) const {
+		return  m.flags==Move::fcastle;
+	}
 	inline bool isCaptureMoveOrPromotion(Move & m) const {
 		return squares[m.to]!=empty || m.flags==Move::fenpassant || m.flags == Move::fpromotion;
 	}
