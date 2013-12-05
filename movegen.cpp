@@ -1226,6 +1226,7 @@ Move & Movegen::getNextMove(){
 			break;
 		case generateQuiescentMoves:
 		case generateQuiescentCaptures:
+		case generateProbCutCaptures:
 			generateMoves<Movegen::captureMg>();
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
@@ -1332,6 +1333,35 @@ Move & Movegen::getNextMove(){
 				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
+		case iterateProbCutCaptures:
+			if(moveListPosition<moveListSize){
+				Score bestScore=-SCORE_INFINITE;
+				unsigned int bestIndex=moveListPosition;
+				for(unsigned int i=moveListPosition;i<moveListSize;i++){ // itera sulle mosse rimanenti
+					Score res=pos.getMvvLvaScore(moveList[i]);
+					if(res>bestScore){
+						bestScore=res;
+						bestIndex=i;
+					}
+				}
+				if(bestIndex!=moveListPosition){
+					std::swap(moveList[moveListPosition].packed,moveList[bestIndex].packed);
+				}
+				if(moveList[moveListPosition].packed!=ttMove.packed){
+					if(pos.see(moveList[moveListPosition])>=captureThreshold){
+						return moveList[moveListPosition++];
+					}
+					moveListPosition++;
+				}
+				else{
+					moveListPosition++;
+				}
+
+			}
+			else{
+				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+			}
+			break;
 		case iterateBadCaptureMoves:
 			if(badCapturePosition<badCaptureSize){
 				return badCaptureList[badCapturePosition++];
@@ -1340,6 +1370,7 @@ Move & Movegen::getNextMove(){
 				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
+
 
 		case iterateQuiescentMoves:
 		case iterateQuiescentCaptures:
@@ -1388,6 +1419,7 @@ Move & Movegen::getNextMove(){
 		case getTTevasion:
 		case getQsearchTT:
 		case getQsearchTTquiet:
+		case getProbCutTT:
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			if(ttMove.packed && isMoveLegal(pos,ttMove)){
 				return ttMove;

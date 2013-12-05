@@ -60,6 +60,11 @@ public:
 		iterateQuiescentMoves,
 		finishedQuiescentStage,
 
+		getProbCutTT,
+		generateProbCutCaptures,
+		iterateProbCutCaptures,
+		finishedProbCutStage,
+
 		getQsearchTTquiet,
 		generateQuiescentCaptures,
 		iterateQuiescentCaptures,
@@ -77,6 +82,7 @@ private:
 	unsigned int badCaptureSize;
 	unsigned int badCapturePosition;
 	unsigned int killerPos;
+	Score captureThreshold;
 
 
 	const Position & pos;
@@ -99,6 +105,7 @@ public:
 		badCaptureSize=0;
 		badCapturePosition=0;
 		killerPos=0;
+		captureThreshold=0;
 	}
 	int setupQuiescentSearch(bool checkers,int depth){
 		if(checkers){
@@ -116,6 +123,14 @@ public:
 				return -2*ONE_PLY;
 			}
 
+		}
+	}
+
+	void setupProbCutSearch(Position::bitboardIndex capturePiece){
+		stagedGeneratorState=getProbCutTT;
+		captureThreshold=Position::pieceValue[capturePiece%Position::separationBitmap][0];
+		if(!pos.isCaptureMove(ttMove) || !pos.see(ttMove)<captureThreshold){
+			ttMove.packed=0;
 		}
 	}
 
