@@ -25,6 +25,7 @@
 #include "movegen.h"
 #include "transposition.h"
 #include "statistics.h"
+#include "search.h"
 
 
 
@@ -53,9 +54,7 @@ int main()
 	Position::initScoreValues();
 	Position::initCastlaRightsMask();
 	Movegen::initMovegenConstant();
-
-
-
+	search::initLMRreduction();
 	TT.setSize(1);
 
 

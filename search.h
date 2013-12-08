@@ -22,13 +22,27 @@
 #include "move.h"
 #include <vector>
 #include <list>
+#include <cmath>
 
-class searcLimits{
+class searchLimits{
 public:
 	bool ponder,infinite;
 	unsigned int wtime,btime,winc,binc,movesToGo,depth,nodes,mate,moveTime;
 
 	std::list<Move> searchMoves;
+	searchLimits(){
+		ponder=false;
+		infinite =false;
+		wtime=0;
+		btime=0;
+		winc=0;
+		binc=0;
+		movesToGo=0;
+		depth=0;
+		nodes=0;
+		mate=0;
+		moveTime=0;
+	}
 
 };
 
@@ -47,7 +61,20 @@ class search{
 
 	static Score futility[5];
 	static Score futilityMargin[7];
+	static Score FutilityMoveCounts[11];
+	static Score PVreduction[32*ONE_PLY][64];
+	static Score nonPVreduction[32*ONE_PLY][64];
 public:
+	static void initLMRreduction(void){
+		for (int d = 1; d < 32*ONE_PLY; d++)
+			for (int mc = 1; mc < 64; mc++)
+			{
+				double    PVRed = 0.08*log(double(d)) * log(double(mc));
+				double nonPVRed = 0.33 + 0.213*log(double(d)) * log(double(mc));
+				PVreduction[d][mc]=(Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
+				nonPVreduction[d][mc]=(Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
+			}
+	};
 	struct sSignal{
 		bool stop=false;
 	}signals;
@@ -58,7 +85,10 @@ public:
 		ALL_NODE,
 		CUT_NODE
 	} nodeType;
-	void startThinking(Position & p);
+	void startThinking(Position & p,searchLimits & limits);
+	unsigned long long getVisitedNodes(){
+		return visitedNodes;
+	}
 private:
 	template<nodeType type>Score alphaBeta(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
 	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);

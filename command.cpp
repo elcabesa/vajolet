@@ -129,7 +129,7 @@ void static doPerft(unsigned int n, Position & pos){
 
 void static go(std::istringstream& is, Position & pos, my_thread & thr) {
 
-	searcLimits limits;
+	searchLimits limits;
 	std::string token;
 
 
@@ -137,7 +137,12 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr) {
     {
         if (token == "searchmoves")
             while (is >> token){
-                limits.searchMoves.push_back(moveFromUci(pos,token));
+            	Move m;
+            	m.packed=moveFromUci(pos,token).packed;
+            	if(m.packed){
+            		limits.searchMoves.push_back(moveFromUci(pos,token));
+            		sync_cout<<pos.displayUci(m)<<sync_endl;
+            	}
             }
         else if (token == "wtime")     is >> limits.wtime;
         else if (token == "btime")     is >> limits.btime;

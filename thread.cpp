@@ -21,7 +21,13 @@
 
 
 
-unsigned int timeManagerInit(Position& pos, searcLimits& lim){
+unsigned int timeManagerInit(Position& pos, searchLimits& lim){
+	if(lim.depth
+		||lim.moveTime
+		||lim.nodes)
+	{
+		lim.infinite=true;
+	}
 	if(pos.getActualState().nextMove){
 		return lim.btime/40.0;
 	}
@@ -37,7 +43,7 @@ volatile bool my_thread::startThink=false;
 Position *my_thread::pos;
 search my_thread::src;
 unsigned long my_thread::searchTimeout;
-searcLimits my_thread::limits;
+searchLimits my_thread::limits;
 
 std::mutex my_thread::searchMutex;
 std::condition_variable my_thread::searchCond;
@@ -60,7 +66,14 @@ void my_thread::timerThread() {
 		if (!quit){
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
-			if(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime>searchTimeout && !limits.infinite){
+			unsigned long time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
+			if(time>=searchTimeout && !limits.infinite){
+				src.signals.stop=true;
+			}
+			if(limits.nodes && src.getVisitedNodes()>limits.nodes){
+				src.signals.stop=true;
+			}
+			if(limits.moveTime && time>=limits.moveTime){
 				src.signals.stop=true;
 			}
 		}
@@ -78,7 +91,7 @@ void my_thread::searchThread() {
 		if(!quit){
 			searchTimeout=timeManagerInit(*pos, limits);
 			startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-			src.startThinking(*pos);
+			src.startThinking(*pos,limits);
 			//sync_cout<<"startThink=false"<<sync_endl;
 			startThink=false;
 			//sync_cout<<startThink<<sync_endl;

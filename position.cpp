@@ -150,6 +150,7 @@ void Position::setupFromFen(const std::string& fenStr){
 
 	x.pliesFromNull=0;
 	x.skipNullMove=true;
+	x.excludedMove.packed=0;
 	x.capturedPiece=empty;
 
 
@@ -166,6 +167,8 @@ void Position::setupFromFen(const std::string& fenStr){
 	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
 	x.pinnedPieces=getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
 	x.checkers= getAttackersTo(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0]) & bitBoard[blackPieces-x.nextMove];
+
+
 
 	//checkPosConsistency(1);
 }
@@ -520,6 +523,7 @@ void Position::doNullMove(void){
 	x.Them=&bitBoard[(blackTurn-x.nextMove)];
 	x.ply++;
 	x.capturedPiece=empty;
+	x.excludedMove.packed=0;
 
 	calcCheckingSquares();
 	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
@@ -562,6 +566,7 @@ void Position::doMove(Move & m){
 	x.fiftyMoveCnt++;
 	x.pliesFromNull++;
 	x.skipNullMove=false;
+	x.excludedMove.packed=0;
 
 	// reset ep square
 	if(x.epSquare!=squareNone){
@@ -1161,25 +1166,13 @@ bool Position::isDraw() const {
 		}
 	}
 
-  // Draw by repetition?
-  int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);
-
-  if (i <= e)
-  {
-	  unsigned int stateIndexPointer=stateIndex-1-2;
-      const state* stp=&stateInfo[stateIndexPointer];
-
-      do {
-    	  stateIndexPointer-=2;
-    	  stp=&stateInfo[stateIndexPointer];
-
-          if (stp->key == getActualState().key)
-              return true;
-
-          i += 2;
-
-      } while (i <= e);
-  }
-
-  return false;
+	// Draw by repetition?
+	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2){
+		unsigned int stateIndexPointer=stateIndex-1-i;
+		const state* stp=&stateInfo[stateIndexPointer];
+		if(stp->key==getActualState().key){
+			return true;
+		}
+	}
+	return false;
 }

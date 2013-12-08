@@ -42,7 +42,7 @@ class my_thread{
 	static Position *pos;
 	static search src;
 	static unsigned long searchTimeout;
-	static searcLimits limits;
+	static searchLimits limits;
 
 	static unsigned long startTime;
 
@@ -57,7 +57,7 @@ public :
 	~my_thread(){
 		quitThreads();
 	}
-	void startTinking(Position * p,searcLimits& l){
+	void startTinking(Position * p,searchLimits& l){
 
 		src.signals.stop=true;
 

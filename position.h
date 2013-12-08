@@ -115,6 +115,7 @@ public:
 		bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 		Move killers[2];	/*!< killer move at ply x*/
 		bool skipNullMove;
+		Move excludedMove;
 
 	};
 
@@ -127,6 +128,7 @@ public:
 private:
 
 	unsigned int stateIndex;
+	state * actualState;
 	/*! \brief array of char to create the fen string
 		\author Marco Belli
 		\version 1.0
@@ -213,6 +215,13 @@ public:
 	}
 
 
+	U64 getKey(void){
+		return getActualState().key;
+	}
+
+	U64 getExclusionKey(void){
+		return getActualState().key^HashKeys::exclusion;
+	}
 
 	/*! \brief undo a null move
 		\author Marco Belli
@@ -231,7 +240,8 @@ public:
 	*/
 	inline state& getActualState(void)const {
 		assert(stateIndex>=1);
-		return (state&) stateInfo[stateIndex-1];
+		//return (state&) stateInfo[stateIndex-1];
+		return (state&) *actualState;
 	}
 
 	/*! \brief insert a new state in memory
@@ -261,6 +271,7 @@ public:
 		}
 
 		stateIndex++;
+		actualState= &stateInfo[stateIndex-1];
 	}
 
 	/*! \brief  remove the last state
@@ -272,6 +283,7 @@ public:
 	inline void removeState(){
 		assert(stateIndex>=1);
 		stateIndex--;
+		actualState= &stateInfo[stateIndex-1];
 	}
 
 
