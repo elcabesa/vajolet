@@ -150,7 +150,7 @@ void Position::setupFromFen(const std::string& fenStr){
 
 	x.pliesFromNull=0;
 	x.skipNullMove=true;
-	x.excludedMove.packed=0;
+	x.excludedMove=0;
 	x.capturedPiece=empty;
 
 
@@ -523,7 +523,7 @@ void Position::doNullMove(void){
 	x.Them=&bitBoard[(blackTurn-x.nextMove)];
 	x.ply++;
 	x.capturedPiece=empty;
-	x.excludedMove.packed=0;
+	x.excludedMove=0;
 
 	calcCheckingSquares();
 	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
@@ -566,7 +566,7 @@ void Position::doMove(Move & m){
 	x.fiftyMoveCnt++;
 	x.pliesFromNull++;
 	x.skipNullMove=false;
-	x.excludedMove.packed=0;
+	x.excludedMove=0;
 
 	// reset ep square
 	if(x.epSquare!=squareNone){
@@ -958,7 +958,7 @@ unsigned long long Position::perft(unsigned int depth){
 
 	unsigned long long tot = 0;
 	Move m;
-	m.packed=0;
+	m=0;
 	Movegen mg(*this,m);
 #ifdef FAST_PERFT
 	if(depth==1){
@@ -984,7 +984,7 @@ unsigned long long Position::perft(unsigned int depth){
 unsigned long long Position::divide(unsigned int depth){
 
 	Move m;
-	m.packed=0;
+	m=0;
 	Movegen mg(*this,m);
 	unsigned long long tot = 0;
 	unsigned int mn=0;
@@ -1158,7 +1158,7 @@ bool Position::isDraw() const {
 			return true;
 		}
 		Move m;
-		m.packed=0;
+		m=0;
 		Movegen mg(*this,m);
 		mg.generateMoves<Movegen::genType::allMg>();
 		if(mg.getGeneratedMoveNumber()){

@@ -262,11 +262,11 @@ public:
 			assert(stateIndex<stateInfo.size());
 			Move killer0;
 			Move killer1;
-			killer0.packed=stateInfo[stateIndex].killers[0].packed;
-			killer1.packed=stateInfo[stateIndex].killers[1].packed;
+			killer0=stateInfo[stateIndex].killers[0];
+			killer1=stateInfo[stateIndex].killers[1];
 			stateInfo[stateIndex]=s;
-			stateInfo[stateIndex].killers[0].packed=killer0.packed;
-			stateInfo[stateIndex].killers[1].packed=killer1.packed;
+			stateInfo[stateIndex].killers[0]=killer0;
+			stateInfo[stateIndex].killers[1]=killer1;
 
 		}
 

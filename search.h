@@ -64,6 +64,9 @@ class search{
 	static Score FutilityMoveCounts[11];
 	static Score PVreduction[32*ONE_PLY][64];
 	static Score nonPVreduction[32*ONE_PLY][64];
+
+	searchLimits limits;
+
 public:
 	static void initLMRreduction(void){
 		for (int d = 1; d < 32*ONE_PLY; d++)

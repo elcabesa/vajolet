@@ -550,7 +550,7 @@ void Movegen::generateMoves(){
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 			}
 			moves &= moves-1;
@@ -581,7 +581,7 @@ void Movegen::generateMoves(){
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 			}
 			moves &= moves-1;
@@ -606,7 +606,7 @@ void Movegen::generateMoves(){
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 			}
 
@@ -632,7 +632,7 @@ void Movegen::generateMoves(){
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 			}
 			moves &= moves-1;
@@ -654,7 +654,7 @@ void Movegen::generateMoves(){
 				m.to=firstOne(moves);
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 				moves &= moves-1;
 
@@ -683,7 +683,7 @@ void Movegen::generateMoves(){
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 			}
 			moves &= moves-1;
@@ -698,7 +698,7 @@ void Movegen::generateMoves(){
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 			}
 			moves &= moves-1;
@@ -717,7 +717,7 @@ void Movegen::generateMoves(){
 				squaresAligned((tSquare)m.from,(tSquare)m.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				//moveList.push_back(m);
-				moveList[moveListSize++].m.packed=m.packed;
+				moveList[moveListSize++].m=m;
 			}
 			moves &= moves-1;
 		}
@@ -732,7 +732,7 @@ void Movegen::generateMoves(){
 				squaresAligned((tSquare)m.from,(tSquare)m.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				//moveList.push_back(m);
-				moveList[moveListSize++].m.packed=m.packed;
+				moveList[moveListSize++].m=m;
 			}
 			moves &= moves-1;
 		}
@@ -754,7 +754,7 @@ void Movegen::generateMoves(){
 					m.promotion=prom;
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 						//moveList.push_back(m);
-						moveList[moveListSize++].m.packed=m.packed;
+						moveList[moveListSize++].m=m;
 					}
 				}
 			}
@@ -777,7 +777,7 @@ void Movegen::generateMoves(){
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 			}
 			moves &= moves-1;
@@ -796,7 +796,7 @@ void Movegen::generateMoves(){
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 			}
 			moves &= moves-1;
@@ -821,7 +821,7 @@ void Movegen::generateMoves(){
 					m.from=from;
 					m.flags=Move::fenpassant;
 					//moveList.push_back(m);
-					moveList[moveListSize++].m.packed=m.packed;
+					moveList[moveListSize++].m=m;
 				}
 				epAttacker &=epAttacker-1;
 			}
@@ -851,7 +851,7 @@ void Movegen::generateMoves(){
 					m.to=kingSquare+2;
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 						//moveList.push_back(m);
-						moveList[moveListSize++].m.packed=m.packed;
+						moveList[moveListSize++].m=m;
 					}
 				}
 
@@ -872,7 +872,7 @@ void Movegen::generateMoves(){
 					m.to=kingSquare-2;
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
 						//moveList.push_back(m);
-						moveList[moveListSize++].m.packed=m.packed;
+						moveList[moveListSize++].m=m;
 					}
 				}
 			}
@@ -1259,9 +1259,9 @@ Move & Movegen::getNextMove(){
 				if(bestIndex!=moveListPosition){
 					std::swap(moveList[moveListPosition],moveList[bestIndex]);
 				}
-				if(moveList[moveListPosition].m.packed!=ttMove.packed &&
-					moveList[moveListPosition].m.packed!=pos.getActualState().killers[0].packed &&
-					moveList[moveListPosition].m.packed!=pos.getActualState().killers[1].packed )
+				if(moveList[moveListPosition].m!=ttMove &&
+					moveList[moveListPosition].m!=pos.getActualState().killers[0] &&
+					moveList[moveListPosition].m!=pos.getActualState().killers[1] )
 				{
 					return moveList[moveListPosition++].m;
 				}
@@ -1275,7 +1275,7 @@ Move & Movegen::getNextMove(){
 			break;
 		case iterateEvasionMoves:
 			if(moveListPosition<moveListSize){
-				if(moveList[moveListPosition].m.packed!=ttMove.packed){
+				if(moveList[moveListPosition].m!=ttMove){
 					return moveList[moveListPosition++].m;
 				}
 				moveListPosition++;
@@ -1298,7 +1298,7 @@ Move & Movegen::getNextMove(){
 				if(bestIndex!=moveListPosition){
 					std::swap(moveList[moveListPosition],moveList[bestIndex]);
 				}
-				if(moveList[moveListPosition].m.packed!=ttMove.packed)
+				if(moveList[moveListPosition].m!=ttMove)
 				{
 					return moveList[moveListPosition++].m;
 				}
@@ -1327,12 +1327,12 @@ Move & Movegen::getNextMove(){
 				if(bestIndex!=moveListPosition){
 					std::swap(moveList[moveListPosition],moveList[bestIndex]);
 				}
-				if(moveList[moveListPosition].m.packed!=ttMove.packed){
+				if(moveList[moveListPosition].m!=ttMove){
 					if(pos.seeSign(moveList[moveListPosition].m)>=0){
 						return moveList[moveListPosition++].m;
 					}
 					else{
-						badCaptureList[badCaptureSize++].m.packed=moveList[moveListPosition++].m.packed;
+						badCaptureList[badCaptureSize++].m=moveList[moveListPosition++].m;
 					}
 				}
 				else{
@@ -1358,7 +1358,7 @@ Move & Movegen::getNextMove(){
 				if(bestIndex!=moveListPosition){
 					std::swap(moveList[moveListPosition],moveList[bestIndex]);
 				}
-				if(moveList[moveListPosition].m.packed!=ttMove.packed){
+				if(moveList[moveListPosition].m!=ttMove){
 					if(pos.see(moveList[moveListPosition].m)>=captureThreshold){
 						return moveList[moveListPosition++].m;
 					}
@@ -1398,7 +1398,7 @@ Move & Movegen::getNextMove(){
 				if(bestIndex!=moveListPosition){
 					std::swap(moveList[moveListPosition],moveList[bestIndex]);
 				}
-				if(moveList[moveListPosition].m.packed!=ttMove.packed){
+				if(moveList[moveListPosition].m!=ttMove){
 					return moveList[moveListPosition++].m;
 				}
 				else{
@@ -1414,7 +1414,7 @@ Move & Movegen::getNextMove(){
 				Move& t= pos.getActualState().killers[killerPos];
 				killerPos++;
 
-				if((t.packed != ttMove.packed) && isMoveLegal(pos,t)){
+				if((t != ttMove) && isMoveLegal(pos,t)){
 					return t;
 				}
 			}

@@ -35,18 +35,31 @@ Score search::FutilityMoveCounts[11]={5,10,17,26,37,50,66,85,105,130,151};
 Score search::PVreduction[32*ONE_PLY][64];
 Score search::nonPVreduction[32*ONE_PLY][64];
 
-void search::startThinking(Position & p,searchLimits & limits){
+void search::startThinking(Position & p,searchLimits & l){
 	signals.stop=false;
 	TT.newSearch();
 	History::instance().clear();
 	//Statistics::instance().initNodeTypeStat();
+
+	limits=l;
+	//--------------------------------
+	//	generate the list of root moves to be searched
+	//--------------------------------
+	if(limits.searchMoves.size()==0){
+		Move m;
+		m=0;
+		Movegen mg(p,m);
+		while ((m=mg.getNextMove()).packed){
+			limits.searchMoves.push_back(m);
+		}
+	}
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
 	Move m;
-	m.packed=0;
+	m=0;
 	Movegen mg(p,m);
 
 	Move lastLegalMove;
@@ -174,7 +187,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	const bool PVnode=(type==search::nodeType::PV_NODE || type==search::nodeType::ROOT_NODE);
 	const bool inCheck = pos.getActualState().checkers;
 	Move threatMove;
-	threatMove.packed=0;
+	threatMove=0;
 
 
 	const search::nodeType childNodesType=
@@ -208,7 +221,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	U64 posKey=excludedMove.packed?pos.getExclusionKey() :pos.getKey();
 	ttEntry* tte = TT.probe(posKey);
 	Move ttMove;
-	ttMove.packed=tte ? tte->getPackedMove() : 0;
+	ttMove=tte ? tte->getPackedMove() : 0;
 	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
 
 	if (type!=search::nodeType::ROOT_NODE &&
@@ -227,10 +240,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			!pos.isCaptureMoveOrPromotion(ttMove) &&
 			!inCheck)
 		{
-			if(pos.getActualState().killers[0].packed != ttMove.packed)
+			if(pos.getActualState().killers[0] != ttMove)
 			{
-				pos.getActualState().killers[1].packed = pos.getActualState().killers[0].packed;
-				pos.getActualState().killers[0].packed = ttMove.packed;
+				pos.getActualState().killers[1] = pos.getActualState().killers[0];
+				pos.getActualState().killers[0] = ttMove;
 			}
 		}
 
@@ -369,7 +382,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		else
 		{
 			ttEntry * tte=TT.probe(nullKey);
-			threatMove.packed=tte? tte->getPackedMove(): 0;
+			threatMove=tte? tte->getPackedMove(): 0;
 		}
 
 	}
@@ -424,7 +437,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		pos.getActualState().skipNullMove=skipBackup;
 
 		tte = TT.probe(posKey);
-		ttMove.packed=tte ? tte->getPackedMove():0;
+		ttMove=tte ? tte->getPackedMove():0;
 	}
 
 
@@ -433,7 +446,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	Score bestScore=-SCORE_INFINITE;
 
 	Move bestMove;
-	bestMove.packed=0;
+	bestMove=0;
 	Move m;
 	Movegen mg(pos,ttMove);
 	unsigned int moveNumber=0;
@@ -444,21 +457,35 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		type!=search::nodeType::ROOT_NODE
 		&& depth >= (PVnode ? 6 * ONE_PLY : 8 * ONE_PLY)
 		&& ttMove.packed != 0
-		&& excludedMove.packed==0 // Recursive singular search is not allowed
+		&& !excludedMove.packed // Recursive singular search is not allowed
 		&& tte
 		&& (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
 		&&  tte->getDepth()>= depth - 3 * ONE_PLY;
 
 	while (bestScore <beta  && (m=mg.getNextMove()).packed) {
 
-		if(m.packed == excludedMove.packed){
+		if(m== excludedMove){
 			continue;
+		}
+
+		// search only the moves in the search list
+		if(type==search::nodeType::ROOT_NODE){
+
+			std::list<Move>::iterator findIter=
+			std::find(
+					limits.searchMoves.begin(),
+					limits.searchMoves.end(),
+					m);
+			if((*findIter)!=m){
+				continue;
+			}
+
 		}
 		moveNumber++;
 
 		bool captureOrPromotion =pos.isCaptureMoveOrPromotion(m);
 		if(!captureOrPromotion && quietMoveCount < 64){
-			quietMoveList[quietMoveCount++].packed=m.packed;
+			quietMoveList[quietMoveCount++]=m;
 		}
 
 		// todo aggiungere passed pawn push alle mosse dangeous
@@ -477,13 +504,13 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		//------------------------------
 		if(singularExtensionNode
 			&& !ext
-			&&  m.packed == ttMove.packed
+			&&  m == ttMove
 			&&  abs(ttValue) < SCORE_KNOWN_WIN
 		)
 		{
 
 			Score rBeta = ttValue - int(depth*10);
-			pos.getActualState().excludedMove.packed=m.packed;
+			pos.getActualState().excludedMove=m;
 			bool backup=pos.getActualState().skipNullMove;
 			pos.getActualState().skipNullMove=true;
 			std::vector<Move> locChildPV;
@@ -505,7 +532,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		if(!PVnode
 			&& !captureOrPromotion
 			&& !inCheck
-			&& m.packed != ttMove.packed
+			&& m != ttMove
 			&& !isDangerous
 			&& bestScore>SCORE_MATED_IN_MAX_PLY
 		){
@@ -567,9 +594,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				if(depth>3*ONE_PLY
 					&& !captureOrPromotion
 					&& !isDangerous
-					&&  m.packed != ttMove.packed
-					&&  m.packed != pos.getActualState().killers[0].packed
-					&&  m.packed != pos.getActualState().killers[1].packed
+					&&  m != ttMove
+					&&  m != pos.getActualState().killers[0]
+					&&  m != pos.getActualState().killers[1]
 				)
 				{
 					int reduction = PVreduction[std::min(depth,32*ONE_PLY-1)][std::min(moveNumber,(unsigned int)63)];
@@ -632,9 +659,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			if(depth>3*ONE_PLY
 				&& !captureOrPromotion
 				&& !isDangerous
-				&&  m.packed != ttMove.packed
-				&&  m.packed != pos.getActualState().killers[0].packed
-				&&  m.packed != pos.getActualState().killers[1].packed
+				&&  m != ttMove
+				&&  m != pos.getActualState().killers[0]
+				&&  m != pos.getActualState().killers[1]
 			)
 			{
 				int reduction = nonPVreduction[std::min(depth,32*ONE_PLY-1)][std::min(moveNumber,(unsigned int)63)];
@@ -672,7 +699,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			bestScore=val;
 
 			if(val>alpha){
-				bestMove.packed=m.packed;
+				bestMove=m;
 				alpha =val;
 				if(type ==search::nodeType::ROOT_NODE|| !signals.stop){
 
@@ -716,10 +743,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		!pos.isCaptureMoveOrPromotion(bestMove) &&
 		!inCheck)
 	{
-		if(pos.getActualState().killers[0].packed != bestMove.packed)
+		if(pos.getActualState().killers[0] != bestMove)
 		{
-			pos.getActualState().killers[1].packed = pos.getActualState().killers[0].packed;
-			pos.getActualState().killers[0].packed = bestMove.packed;
+			pos.getActualState().killers[1] = pos.getActualState().killers[0];
+			pos.getActualState().killers[0] = bestMove;
 		}
 
 
@@ -731,7 +758,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		if(quietMoveCount>1){
 			for (int i = 0; i < quietMoveCount - 1; i++){
 				Move m;
-				m.packed= quietMoveList[i].packed;
+				m= quietMoveList[i];
 				History::instance().update(pos.squares[m.from],(tSquare) m.to, -bonus);
 			}
 		}
@@ -770,7 +797,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	U64 posKey=pos.getActualState().key;
 	ttEntry* tte = TT.probe(posKey);
 	Move ttMove;
-	ttMove.packed=tte ? tte->getPackedMove() : 0;
+	ttMove=tte ? tte->getPackedMove() : 0;
 	Movegen mg(pos,ttMove);
 	int TTdepth=mg.setupQuiescentSearch(pos.getActualState().checkers,depth);
 	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
@@ -830,7 +857,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	unsigned int moveNumber=0;
 	Move m;
 	Move bestMove;
-	bestMove.packed=0;
+	bestMove=0;
 	while (bestScore <beta  &&  (m=mg.getNextMove()).packed) {
 		moveNumber++;
 
@@ -841,7 +868,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		if(!PVnode &&
 			!inCheck &&
 			!pos.moveGivesCheck(m) &&
-			m.packed != ttMove.packed &&
+			m != ttMove &&
 			m.flags != Move::fpromotion
 		){
 			Score futilityValue=futilityBase
@@ -866,7 +893,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		if(PVnode &&
 				!inCheck &&
 				m.flags != Move::fpromotion &&
-				m.packed != ttMove.packed &&
+				m != ttMove &&
 				pos.seeSign(m)<0){
 			continue;
 		}
@@ -879,7 +906,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 
 		if(val>bestScore){
-			bestMove.packed=m.packed;
+			bestMove=m;
 			bestScore=val;
 			if(val>alpha){
 				TTtype=typeExact;

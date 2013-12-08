@@ -24,6 +24,7 @@
 #include "vajolet.h"
 #include "move.h"
 #include "position.h"
+#include "history.h"
 
 #define KING_SIDE_CASTLE (0)
 #define QUEEN_SIDE_CASTLE (1)
@@ -92,7 +93,7 @@ private:
 public:
 	Movegen(const Position & p, Move & m): pos(p)
 	{
-		ttMove.packed=m.packed;
+		ttMove=m;
 		Position::state &s =pos.getActualState();
 		if(s.checkers){
 			stagedGeneratorState=getTTevasion;
@@ -118,7 +119,7 @@ public:
 			}else{
 				stagedGeneratorState=getQsearchTT;
 				if(!pos.isCaptureMove(ttMove)){
-					ttMove.packed=0;
+					ttMove=0;
 				}
 				return -2*ONE_PLY;
 			}
@@ -130,7 +131,7 @@ public:
 		stagedGeneratorState=getProbCutTT;
 		captureThreshold=Position::pieceValue[capturePiece%Position::separationBitmap][0];
 		if(!pos.isCaptureMove(ttMove) || !pos.see(ttMove)<captureThreshold){
-			ttMove.packed=0;
+			ttMove=0;
 		}
 	}
 

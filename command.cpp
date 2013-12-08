@@ -70,7 +70,7 @@ Move moveFromUci(Position& pos, std::string& str) {
 
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
 	Move m;
-	m.packed=0;
+	m=0;
 	Movegen mg(pos,m);
 
 	while( (m=mg.getNextMove()).packed){
@@ -79,7 +79,7 @@ Move moveFromUci(Position& pos, std::string& str) {
 		}
 	}
 	// move not found
-	m.packed=0;
+	m=0;
 	return m; // m è gia una NOMOVE
 }
 
@@ -138,10 +138,9 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr) {
         if (token == "searchmoves")
             while (is >> token){
             	Move m;
-            	m.packed=moveFromUci(pos,token).packed;
+            	m=moveFromUci(pos,token);
             	if(m.packed){
             		limits.searchMoves.push_back(moveFromUci(pos,token));
-            		sync_cout<<pos.displayUci(m)<<sync_endl;
             	}
             }
         else if (token == "wtime")     is >> limits.wtime;
