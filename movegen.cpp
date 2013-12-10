@@ -569,6 +569,7 @@ void Movegen::generateMoves(){
 	//------------------------------------------------------
 	for(unsigned int i=0;i<pos.pieceCount[piece];i++){
 		tSquare from=pos.pieceList[piece][i];
+		assert(from<squareNumber);
 		m.from=from;
 		moves= attackFromRook(from,occupiedSquares);
 		moves |= attackFromBishop(from,occupiedSquares);
@@ -597,6 +598,7 @@ void Movegen::generateMoves(){
 	for(unsigned int i=0;i<pos.pieceCount[piece];i++){
 		tSquare from=pos.pieceList[piece][i];
 		m.from=from;
+		assert(from<squareNumber);
 		moves= attackFromRook(from,occupiedSquares);
 		moves &=target;
 		while (moves){
@@ -814,6 +816,7 @@ void Movegen::generateMoves(){
 				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[from];
 				bitMap occ= occupiedSquares^bitSet(from)^bitSet(s.epSquare)^captureSquare;
 
+				assert(kingSquare<squareNumber);
 				if(	!((attackFromRook(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Rooks]))|
 						(Movegen::attackFromBishop(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Bishops])))
 				){
@@ -1067,6 +1070,7 @@ bool Movegen::isMoveLegal(const Position&p, Move &m){
 
 		case Position::whiteRooks:
 		case Position::blackRooks:
+			assert(m.from<squareNumber);
 			if(!(getRookPseudoAttack((tSquare)m.from) & bitSet((tSquare)m.to)) || !(attackFromRook((tSquare)m.from,p.bitBoard[Position::occupiedSquares])& bitSet((tSquare)m.to))){
 /*				p.display();
 				sync_cout<<p.displayUci(m)<<": rook problem"<<sync_endl;
@@ -1077,6 +1081,7 @@ bool Movegen::isMoveLegal(const Position&p, Move &m){
 
 		case Position::whiteQueens:
 		case Position::blackQueens:
+			assert(m.from<squareNumber);
 			if(
 				!(
 					(getBishopPseudoAttack((tSquare)m.from) | getRookPseudoAttack((tSquare)m.from))
@@ -1085,6 +1090,7 @@ bool Movegen::isMoveLegal(const Position&p, Move &m){
 				||
 				!(
 					(
+
 						attackFromBishop((tSquare)m.from,p.bitBoard[Position::occupiedSquares])
 						|attackFromRook((tSquare)m.from,p.bitBoard[Position::occupiedSquares])
 					)
@@ -1142,9 +1148,11 @@ bool Movegen::isMoveLegal(const Position&p, Move &m){
 
 			}
 			if(m.flags== Move::fenpassant){
+
 				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[m.from];
 				bitMap occ= p.bitBoard[Position::occupiedSquares]^bitSet((tSquare)m.from)^bitSet(s.epSquare)^captureSquare;
 				tSquare kingSquare=p.pieceList[Position::whiteKing+s.nextMove][0];
+				assert(kingSquare<squareNumber);
 				if((attackFromRook(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Rooks]))|
 							(attackFromBishop(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Bishops]))){
 /*				p.display();
@@ -1181,6 +1189,7 @@ bool Movegen::isMoveLegal(const Position&p, Move &m){
 				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[m.from];
 				bitMap occ= p.bitBoard[Position::occupiedSquares]^bitSet((tSquare)m.from)^bitSet(s.epSquare)^captureSquare;
 				tSquare kingSquare=p.pieceList[Position::whiteKing+s.nextMove][0];
+				assert(kingSquare<squareNumber);
 				if((attackFromRook(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Rooks]))|
 							(attackFromBishop(kingSquare, occ) & (s.Them[Position::Queens] |s.Them[Position::Bishops]))){
 /*				p.display();

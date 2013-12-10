@@ -56,6 +56,7 @@ int main()
 	Movegen::initMovegenConstant();
 	search::initLMRreduction();
 	TT.setSize(1);
+	History::instance().clear();
 
 
 

@@ -689,6 +689,7 @@ void Position::doMove(Move & m){
 			}
 			if(n.hiddenCheckersCandidate && (n.hiddenCheckersCandidate & bitSet(from))){
 				if(!isRook(piece)){
+					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
 					x.checkers|=Movegen::attackFromRook(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (x.Them[Queens] |x.Them[Rooks]);
 				}
 				if(!isBishop(piece)){
@@ -1014,9 +1015,11 @@ inline void Position::calcCheckingSquares(void){
 
 
 	tSquare kingSquare=pieceList[opponentKing][0];
+
 	bitMap occupancy=bitBoard[occupiedSquares];
 
 	s.checkingSquares[whiteKing+attackingPieces]=0;
+	assert(kingSquare<squareNumber);
 	s.checkingSquares[whiteRooks+attackingPieces]=Movegen::attackFromRook(kingSquare,occupancy);
 	s.checkingSquares[whiteBishops+attackingPieces]=Movegen::attackFromBishop(kingSquare,occupancy);
 	s.checkingSquares[whiteQueens+attackingPieces]=s.checkingSquares[whiteRooks+attackingPieces]|s.checkingSquares[whiteBishops+attackingPieces];
@@ -1074,6 +1077,7 @@ bitMap Position::getAttackersTo(tSquare to, bitMap occupancy) const {
 	}
 	mask= (bitBoard[blackRooks]|bitBoard[whiteRooks]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
 	if(Movegen::getRookPseudoAttack(to) &mask){
+		assert(to<squareNumber);
 		res |=Movegen::attackFromRook(to,occupancy) & mask;
 	}
 	return	res;
@@ -1124,6 +1128,7 @@ bool Position::moveGivesCheck(Move& m)const {
 		tSquare rTo=to>from?to+ovest:to+est;
 
 		bitMap occ = (bitBoard[occupiedSquares] ^ bitSet(kFrom) ^ bitSet(rFrom)) | bitSet(rTo) | bitSet(kTo);
+		assert(rTo<squareNumber);
 		return   (Movegen::getRookPseudoAttack(rTo) & bitSet(kingSquare))
 			     && (Movegen::attackFromRook(rTo,occ) & bitSet(kingSquare));
 	}
@@ -1132,6 +1137,7 @@ bool Position::moveGivesCheck(Move& m)const {
 	{
 		bitMap captureSquare= FILEMASK[m.to] & RANKMASK[m.from];
 		bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.from)^bitSet((tSquare)m.to)^captureSquare;
+		assert(kingSquare<squareNumber);
 		return
 				(Movegen::attackFromRook(kingSquare, occ) & (s.Us[Queens] |s.Us[Rooks]))
 			   | (Movegen::attackFromBishop(kingSquare, occ) & (s.Us[Queens] |s.Us[Bishops]));
@@ -1169,6 +1175,7 @@ bool Position::isDraw() const {
 	// Draw by repetition?
 	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2){
 		unsigned int stateIndexPointer=stateIndex-1-i;
+		assert(stateIndex>=i+1);
 		const state* stp=&stateInfo[stateIndexPointer];
 		if(stp->key==getActualState().key){
 			return true;

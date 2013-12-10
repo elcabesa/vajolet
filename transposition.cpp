@@ -40,6 +40,8 @@ void transpositionTable::clear(){
 }
 
 ttEntry* transpositionTable::probe(const U64 key) const {
+
+
 	ttCluster * ttc=findCluster(key);
 	assert(ttc!=nullptr);
 	unsigned int keyH = key >> 32;
@@ -54,6 +56,7 @@ ttEntry* transpositionTable::probe(const U64 key) const {
 }
 
 void transpositionTable::store(const U64 key, Score v, unsigned char b, signed short int d, unsigned short m, Score statV) {
+
 	int c1, c2, c3;
 	ttEntry *tte, *replace;
 	unsigned int key32 = key >> 32; // Use the high 32 bits as key inside the cluster

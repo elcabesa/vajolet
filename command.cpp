@@ -57,6 +57,7 @@ void static printUciInfo(void){
 	sync_cout<< "id name "<<PROGRAM_NAME<<" "<<VERSION<<std::endl;
 	std::cout<<"id author Belli Marco"<<std::endl;
 	std::cout<<"option name Hash type spin default 1 min 1 max 4096"<<sync_endl;
+	std::cout<<"option name MultiPV type spin default 1 min 1 max 500"<<sync_endl;
 	std::cout<<"uciok"<<sync_endl;
 }
 
@@ -178,6 +179,10 @@ void setoption(std::istringstream& is) {
 
 	if(name =="Hash"){
 		TT.setSize(stoi(value));
+	}
+	else if(name =="MultiPV"){
+		int i=stoi(value);
+		search::multiPVLines=i<500?(i>0?i:1):500;
 	}
 	else{
 		sync_cout << "No such option: " << name << sync_endl;

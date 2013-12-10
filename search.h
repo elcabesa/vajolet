@@ -46,6 +46,15 @@ public:
 
 };
 
+class rootMove{
+public:
+	Score score;
+	Score previousScore;
+	std::vector<Move> PV;
+	Move firstMove;
+	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
+	bool operator==(const Move& m) const { return firstMove.packed == m.packed; }
+};
 
 
 inline Score mateIn(int ply) {
@@ -65,9 +74,15 @@ class search{
 	static Score PVreduction[32*ONE_PLY][64];
 	static Score nonPVreduction[32*ONE_PLY][64];
 
+
 	searchLimits limits;
 
+	unsigned int PVIdx;
+	void printAllPV(unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count);
+	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::vector<Move>& PV);
 public:
+	std::vector<rootMove> rootMoves;
+	static unsigned int multiPVLines;
 	static void initLMRreduction(void){
 		for (int d = 1; d < 32*ONE_PLY; d++)
 			for (int mc = 1; mc < 64; mc++)

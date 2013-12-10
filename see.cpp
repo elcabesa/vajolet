@@ -113,6 +113,7 @@ Score Position::see(Move m) const {
 				}
 
 				if (nextAttacker == Rooks || nextAttacker == Queens){
+					assert(to<squareNumber);
 					attackers |= Movegen::attackFromRook(to,occupied)& (bitBoard[whiteRooks] |bitBoard[blackRooks] |bitBoard[whiteQueens] |bitBoard[blackQueens]);
 				}
 				attackers &= occupied;

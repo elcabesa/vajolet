@@ -151,10 +151,12 @@ public:
 			break;
 		case Position::whiteQueens:
 		case Position::blackQueens:
+			assert(from<squareNumber);
 			return attackFromRook(from,occupancy) | attackFromBishop(from,occupancy);
 			break;
 		case Position::whiteRooks:
 		case Position::blackRooks:
+			assert(from<squareNumber);
 			return attackFromRook(from,occupancy);
 			break;
 		case Position::whiteBishops:
@@ -178,29 +180,29 @@ public:
 	}
 
 	inline static bitMap attackFromRook(tSquare from,const bitMap & occupancy){
-		assert(from <=squareNumber);
+		assert(from <squareNumber);
 		bitMap res = MG_RANK_ATTACK[from][((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from])];
 		res |= MG_FILE_ATTACK[from][((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
 		return res;
 	}
 	inline static bitMap attackFromBishop(tSquare from,const bitMap & occupancy){
-		assert(from <=squareNumber);
+		assert(from <squareNumber);
 		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
 		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
 		return res;
 	}
 
 	inline static bitMap attackFromKnight(tSquare from){
-		assert(from <=squareNumber);
+		assert(from <squareNumber);
 		return KNIGHT_MOVE[from];
 	}
 	inline static bitMap attackFromKing(tSquare from){
-		assert(from <=squareNumber);
+		assert(from <squareNumber);
 		return KING_MOVE[from];
 	}
 	inline static bitMap attackFromPawn(tSquare from,unsigned int color ){
 		assert(color <=1);
-		assert(from <=squareNumber);
+		assert(from <squareNumber);
 		return PAWN_ATTACK[color][from];
 	}
 

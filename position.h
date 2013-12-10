@@ -251,7 +251,7 @@ public:
 		\date 21/11/2013
 	*/
 	inline void insertState(state & s){
-		assert(stateIndex>=0);
+		assert(stateIndex<=60000);
 		if(stateIndex>=stateInfo.size()){
 			stateInfo.push_back(s);
 			assert(stateIndex<stateInfo.size());
@@ -405,6 +405,14 @@ public:
 	inline bool isCaptureMoveOrPromotion(Move & m) const {
 		return squares[m.to]!=empty || m.flags==Move::fenpassant || m.flags == Move::fpromotion;
 	}
+	void cleanKillers(){
+		for( auto& s:stateInfo){
+			s.killers[0].packed=0;
+			s.killers[1].packed=0;
+			s.skipNullMove=true;
+			s.excludedMove.packed=0;
+		}
+	}
 
 
 
@@ -434,6 +442,7 @@ private:
 		\date 27/10/2013
 	*/
 	std::vector<state> stateInfo;
+
 
 	/*! \brief put a piece on the board
 		\author STOCKFISH
@@ -477,6 +486,8 @@ private:
 		\date 27/10/2013
 	*/
 	inline void removePiece( bitboardIndex piece, tSquare s) {
+
+		assert(!isKing(piece));
 
 		// WARNING: This is not a reversible operation. If we remove a piece in
 		// do_move() and then replace it in undo_move() we will put it at the end of
