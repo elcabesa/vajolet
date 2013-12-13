@@ -27,9 +27,6 @@
 #include "statistics.h"
 #include "search.h"
 
-
-
-
 /*!	\brief	print the startup information
 	\author Marco Belli
 	\version 1.0
@@ -52,12 +49,11 @@ int main()
 	initData();
 	HashKeys::init();
 	Position::initScoreValues();
-	Position::initCastlaRightsMask();
+	Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();
 	search::initLMRreduction();
 	TT.setSize(1);
 	History::instance().clear();
-
 
 
 

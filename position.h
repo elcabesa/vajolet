@@ -27,6 +27,8 @@
 
 
 
+
+
 //---------------------------------------------------
 //	class
 //---------------------------------------------------
@@ -108,6 +110,7 @@ public:
 			ply;			/*!<  ply from the start*/
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
 		Score material[2];	/*!<  two values for opening/endgame score*/
+
 		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
@@ -154,7 +157,7 @@ public:
 	void doNullMove(void);
 	void doMove(Move &m);
 	void undoMove(Move &m);
-	static void initCastlaRightsMask(void);
+	static void initCastleRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
 	Score eval(void) const;
 	unsigned long long perft(unsigned int depth);
@@ -230,7 +233,9 @@ public:
 	*/
 	inline void undoNullMove(void){
 		removeState();
-		//checkPosConsistency(0);
+#ifdef ENABLE_CHECK_CONSISTENCY
+		checkPosConsistency(0);
+#endif
 	}
 	/*! \brief return a reference to the actual state
 		\author Marco Belli
@@ -240,8 +245,10 @@ public:
 	*/
 	inline state& getActualState(void)const {
 		assert(stateIndex>=1);
-		//return (state&) stateInfo[stateIndex-1];
-		return (state&) *actualState;
+		assert(actualState);
+		assert(stateIndex-1<stateInfo.size());
+		return (state&) stateInfo[stateIndex-1];
+		//return (state&) *actualState;
 	}
 
 	/*! \brief insert a new state in memory
@@ -252,6 +259,7 @@ public:
 	*/
 	inline void insertState(state & s){
 		assert(stateIndex<=60000);
+		assert(stateInfo.size()<1000);
 		if(stateIndex>=stateInfo.size()){
 			stateInfo.push_back(s);
 			assert(stateIndex<stateInfo.size());
@@ -370,11 +378,11 @@ public:
 		\date 08/11/2013
 	*/
 	inline Score getMvvLvaScore(Move & m) const {
-		Score s=Position::pieceValue[squares[m.to]%separationBitmap][0]-(squares[m.from]%separationBitmap);
+		Score s=pieceValue[squares[m.to]%separationBitmap][0]-(squares[m.from]%separationBitmap);
 		if (m.flags == Move::fpromotion){
-			s += (Position::pieceValue[whiteQueens +m.promotion] - Position::pieceValue[whitePawns])[0];
+			s += (pieceValue[whiteQueens +m.promotion] - pieceValue[whitePawns])[0];
 		}else if(m.flags == Move::fenpassant){
-			s +=Position::pieceValue[whitePawns][0];
+			s +=pieceValue[whitePawns][0];
 		}
 		return s;
 	}
@@ -388,13 +396,16 @@ public:
 		Score tot=getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
 		if(tot>570000){ //opening
 			return 0;
+
 		}
 		if(tot<120000){	//endgame
-			return 65535;
-		}
-		return (570000-tot)*(65535.0/(570000-120000));
+			return 65536;
 
+		}
+		return (570000-tot)*(65536/(570000-120000));
 	}
+
+
 
 	inline bool isCaptureMove(Move & m) const {
 		return squares[m.to]!=empty || m.flags==Move::fenpassant;
@@ -405,10 +416,10 @@ public:
 	inline bool isCaptureMoveOrPromotion(Move & m) const {
 		return squares[m.to]!=empty || m.flags==Move::fenpassant || m.flags == Move::fpromotion;
 	}
-	void cleanKillers(){
+	void cleanStateInfo(){
 		for( auto& s:stateInfo){
-			s.killers[0].packed=0;
-			s.killers[1].packed=0;
+			//s.killers[0].packed=0;
+			//s.killers[1].packed=0;
 			s.skipNullMove=true;
 			s.excludedMove.packed=0;
 		}
@@ -441,7 +452,7 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::vector<state> stateInfo;
+	std::vector< state> stateInfo;
 
 
 	/*! \brief put a piece on the board
@@ -450,11 +461,16 @@ private:
 		\date 27/10/2013
 	*/
 	inline void putPiece(bitboardIndex piece,tSquare s) {
+		assert(s<squareNumber);
+		assert(piece<lastBitboard);
 		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
+		bitMap b=bitSet(s);
+
+		assert(squares[s]==empty);
 		squares[s] = piece;
-		bitBoard[piece] |= bitSet(s);
-		bitBoard[occupiedSquares] |= bitSet(s);
-		bitBoard[color]|= bitSet(s);
+		bitBoard[piece] |= b;
+		bitBoard[occupiedSquares] |= b;
+		bitBoard[color]|= b;
 		index[s] = pieceCount[piece]++;
 		pieceList[piece][index[s]] = s;
 	}
@@ -465,9 +481,13 @@ private:
 		\date 27/10/2013
 	*/
 	inline void movePiece(bitboardIndex piece, tSquare from, tSquare to) {
-
+		assert(from<squareNumber);
+		assert(to<squareNumber);
+		assert(piece<lastBitboard);
 		// index[from] is not updated and becomes stale. This works as long
 		// as index[] is accessed just by known occupied squares.
+		assert(squares[from]!=empty);
+		assert(squares[to]==empty);
 		bitMap fromTo = bitSet(from) ^ bitSet(to);
 		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
 		bitBoard[occupiedSquares] ^= fromTo;
@@ -488,15 +508,19 @@ private:
 	inline void removePiece( bitboardIndex piece, tSquare s) {
 
 		assert(!isKing(piece));
+		assert(s<squareNumber);
+		assert(piece<lastBitboard);
+		assert(squares[s]!=empty);
 
 		// WARNING: This is not a reversible operation. If we remove a piece in
 		// do_move() and then replace it in undo_move() we will put it at the end of
 		// the list and not in its original place, it means index[] and pieceList[]
 		// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
 		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
-		bitBoard[occupiedSquares]^= bitSet(s);
-		bitBoard[piece] ^= bitSet(s);
-		bitBoard[color] ^= bitSet(s);
+		bitMap b=bitSet(s);
+		bitBoard[occupiedSquares]^= b;
+		bitBoard[piece] ^= b;
+		bitBoard[color] ^= b;
 		squares[s] = empty;
 		tSquare lastSquare = pieceList[piece][--pieceCount[piece]];
 		index[lastSquare] = index[s];

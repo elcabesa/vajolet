@@ -99,6 +99,7 @@ public:
 	}
 
 	inline void refresh(const ttEntry* tte) const {
+		assert(tte!=nullptr);
 		const_cast<ttEntry*>(tte)->setGeneration(generation);
 	}
 

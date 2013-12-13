@@ -33,7 +33,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet"
-#define VERSION			"0.46"
+#define VERSION			"0.53"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
 
@@ -42,6 +42,9 @@
 //---------------------------------------------
 //#define DEBUG1
 //#define PRINT_PV_CHANGES
+
+#define DISABLE_PREFETCH
+//#define ENABLE_CHECK_CONSISTENCY
 
 
 #define MAX_MOVE_PER_POSITION (512)

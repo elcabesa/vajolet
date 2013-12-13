@@ -29,10 +29,20 @@ unsigned int timeManagerInit(Position& pos, searchLimits& lim){
 		lim.infinite=true;
 	}
 	if(pos.getActualState().nextMove){
-		return lim.btime/40.0;
+		//return lim.btime/40.0;
+		if(lim.movesToGo>0){
+			return ((float)(lim.btime)*0.9)/lim.movesToGo;
+		}else{
+			return (float)(lim.btime)/40.0;
+		}
 	}
 	else{
-		return lim.wtime/40.0;
+		//return lim.wtime/40.0;
+		if(lim.movesToGo>0){
+			return ((float)(lim.wtime)*0.9)/lim.movesToGo;
+		}else{
+			return (float)(lim.wtime)/40.0;
+		}
 	}
 
 }

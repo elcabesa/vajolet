@@ -107,7 +107,7 @@ void static position(std::istringstream& is, Position & pos){
 
 	Move m;
 	// Parse move list (if any)
-	while (is >> token && (m = moveFromUci(pos, token)).packed != 0)
+	while (is >> token && ((m = moveFromUci(pos, token)).packed != 0))
 	{
 		pos.doMove(m);
 	}
@@ -229,7 +229,7 @@ void uciLoop(){
 		}
 		else if (token =="eval"){
 			sync_cout<<"Eval:" <<pos.eval()/10000.0<<sync_endl;
-			sync_cout<<"gamePhase:" <<pos.getGamePhase()/65535.0*100<<"%"<<sync_endl;
+			sync_cout<<"gamePhase:" <<pos.getGamePhase()/65536.0*100<<"%"<<sync_endl;
 		}
 		else if (token =="isready"){
 			sync_cout<<"readyok"<<sync_endl;

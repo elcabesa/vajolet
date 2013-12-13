@@ -24,6 +24,7 @@
 
 
 Score Position::seeSign(Move m) const {
+	assert(m.packed);
 	if (pieceValue[squares[m.from]%separationBitmap][0] <= pieceValue[squares[m.to]%separationBitmap][0])
 	{
 		return 1;
@@ -38,6 +39,10 @@ Score Position::seeSign(Move m) const {
 
 Score Position::see(Move m) const {
 
+	if(!m.packed){
+		sync_cout<<"eccolo"<<sync_endl;
+	}
+	assert(m.packed);
 //	display();
 //	sync_cout<<displayUci(m)<<sync_endl;
 
@@ -68,6 +73,7 @@ Score Position::see(Move m) const {
 
 	// If the opponent has no attackers we are finished
 	color = (eNextMove)(blackTurn-color);
+	assert(Pieces+color<lastBitboard);
 	colorAttackers = attackers & bitBoard[Pieces+color];
 
 //	displayBitMap(colorAttackers);
@@ -84,7 +90,8 @@ Score Position::see(Move m) const {
 	// capture with the least valuable piece. After each capture, we look for
 	// new X-ray attacks from behind the capturing piece.
 	captured = bitboardIndex(squares[from]%separationBitmap);
-
+	assert(captured<lastBitboard);
+	assert(squares[from]!=empty);
 	do {
 		assert(slIndex < 64);
 
@@ -118,6 +125,7 @@ Score Position::see(Move m) const {
 				}
 				attackers &= occupied;
 //				displayBitMap(attackers);
+				captured=nextAttacker;
 
 				break;
 			}

@@ -91,9 +91,9 @@ private:
 
 
 public:
-	Movegen(const Position & p, Move & m): pos(p)
+	Movegen(const Position & p, Move & ttm): pos(p)
 	{
-		ttMove=m;
+		ttMove=ttm;
 		Position::state &s =pos.getActualState();
 		if(s.checkers){
 			stagedGeneratorState=getTTevasion;
@@ -108,6 +108,7 @@ public:
 		killerPos=0;
 		captureThreshold=0;
 	}
+
 	int setupQuiescentSearch(bool checkers,int depth){
 		if(checkers){
 			stagedGeneratorState=getTTevasion;
@@ -118,7 +119,7 @@ public:
 				return -1*ONE_PLY;
 			}else{
 				stagedGeneratorState=getQsearchTT;
-				if(!pos.isCaptureMove(ttMove)){
+				if(ttMove.packed && !pos.isCaptureMove(ttMove)){
 					ttMove=0;
 				}
 				return -2*ONE_PLY;
@@ -128,9 +129,15 @@ public:
 	}
 
 	void setupProbCutSearch(Position::bitboardIndex capturePiece){
-		stagedGeneratorState=getProbCutTT;
+		Position::state &s =pos.getActualState();
+		if(s.checkers){
+			stagedGeneratorState=getTTevasion;
+		}
+		else{
+			stagedGeneratorState=getProbCutTT;
+		}
 		captureThreshold=Position::pieceValue[capturePiece%Position::separationBitmap][0];
-		if(!pos.isCaptureMove(ttMove) || !pos.see(ttMove)<captureThreshold){
+		if(ttMove.packed && (!pos.isCaptureMove(ttMove) || !pos.see(ttMove)<captureThreshold)){
 			ttMove=0;
 		}
 	}
@@ -140,10 +147,17 @@ public:
 	static bool isMoveLegal(const Position&p, Move &m);
 	inline unsigned int getGeneratedMoveNumber(void){ return moveListSize;}
 
-	Move & getNextMove(void);
+	Move  getNextMove(void);
 
 
 	inline static bitMap attackFrom(Position::bitboardIndex piece,tSquare from,bitMap & occupancy){
+		assert(piece<Position::lastBitboard);
+		assert(piece!=Position::occupiedSquares);
+		assert(piece!=Position::whitePieces);
+		assert(piece!=Position::blackPieces);
+		assert(piece!=Position::blackPieces);
+		assert(piece!=Position::separationBitmap);
+		assert(from<squareNumber);
 		switch(piece){
 		case Position::whiteKing:
 		case Position::blackKing:
@@ -181,12 +195,16 @@ public:
 
 	inline static bitMap attackFromRook(tSquare from,const bitMap & occupancy){
 		assert(from <squareNumber);
+		assert((((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from]))<64);
+		assert((((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57)<64);
 		bitMap res = MG_RANK_ATTACK[from][((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from])];
 		res |= MG_FILE_ATTACK[from][((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
 		return res;
 	}
 	inline static bitMap attackFromBishop(tSquare from,const bitMap & occupancy){
 		assert(from <squareNumber);
+		assert((((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57)<64);
+		assert((((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >>57)<64);
 		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
 		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
 		return res;
@@ -207,10 +225,12 @@ public:
 	}
 
 	inline static bitMap getRookPseudoAttack(tSquare from){
+		assert(from<squareNumber);
 		return ROOK_PSEUDO_ATTACK[from];
 	}
 
 	inline static bitMap getBishopPseudoAttack(tSquare from){
+		assert(from<squareNumber);
 		return BISHOP_PSEUDO_ATTACK[from];
 	}
 

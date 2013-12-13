@@ -67,6 +67,7 @@ static inline tSquare firstOne(bitMap bitmap)
 #if __x86_64__
 	return __builtin_ctzll(bitmap);
 #else
+	assert(bitmap);
 
 	return ((unsigned long)bitmap)?((tSquare)__builtin_ctzl((unsigned long) bitmap)):((tSquare)__builtin_ctzl(bitmap>>32))+(tSquare)32;
 #endif

@@ -34,8 +34,12 @@ public :
 	}
 
 	void clear() { std::memset(table, 0, sizeof(table)); }
+
+
 	inline void update(Position::bitboardIndex p, tSquare to, Score v){
 
+		assert(p<Position::lastBitboard);
+		assert(to<squareNumber);
 		/*if(p >=Position::lastBitboard || to>=squareNumber){
 			sync_cout<<"errore"<<sync_endl;
 		}*/
@@ -48,6 +52,8 @@ public :
 		}*/
 	}
 	inline Score getValue(Position::bitboardIndex p, tSquare to){
+		assert(p<Position::lastBitboard);
+		assert(to<squareNumber);
 		return table[p][to];
 	}
 
