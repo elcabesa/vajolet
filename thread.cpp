@@ -77,7 +77,7 @@ void my_thread::timerThread() {
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
 			unsigned long time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
-			if(time>=searchTimeout && !limits.infinite){
+			if(time>=searchTimeout && !(limits.infinite || limits.ponder)){
 				src.signals.stop=true;
 			}
 			if(limits.nodes && src.getVisitedNodes()>limits.nodes){

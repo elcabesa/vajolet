@@ -81,6 +81,11 @@ public :
 		src.signals.stop=true;
 	}
 
+	void ponderHit(){
+		startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+		limits.ponder=false;
+	}
+
 
 };
 

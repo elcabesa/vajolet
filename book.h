@@ -14,36 +14,31 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#include "bitops.h"
-#include "data.h"
-#include "io.h"
 
 
-/*! \brief display a bitmap on stdout
-	\author Marco Belli
-	\version 1.0
-	\date 21/10/2013
-*/
-void displayBitmap(bitMap b){
-	char boardc[squareNumber];
+#ifndef BOOK_H_
+#define BOOK_H_
 
-	for ( int i = 0 ; i < squareNumber ; i++)
-	{
-		if (b & bitSet((enSquare)i)) boardc[i] = '1';
-		else boardc[i] = '.';
-	}
-	sync_cout;
-	for (int rank = 7 ; rank >= 0; rank--)
-	{
-		std::cout <<rank +1<< " ";
-		for (int file = 0 ; file <= 7; file++)
-		{
-			std::cout << boardc[BOARDINDEX[file][rank]];
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl << "  abcdefgh" << sync_endl;
-	return;
-}
+#include <fstream>
+#include <string>
+#include <iostream>
+
+U64 polyglotKey(const Position& pos);
+
+class PolyglotBook : private std::ifstream {
+public:
+	PolyglotBook();
+	~PolyglotBook();
+	Move probe(const Position& pos, const std::string& fName, bool pickBest);
+private:
+	template<typename T> PolyglotBook& operator>>(T& n);
+
+	bool open(const std::string& fName);
+	size_t find_first(U64 key);
+
+	std::string fileName;
+
+};
 
 
+#endif /* BOOK_H_ */

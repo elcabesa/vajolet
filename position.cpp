@@ -208,9 +208,9 @@ void Position::initScoreValues(void){
 			int file=FILES[s];
 			if(piece >occupiedSquares && piece <whitePieces ){
 				pstValue[piece][s]=-10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
-				if(isPawn((bitboardIndex)piece)){
+				/*if(isPawn((bitboardIndex)piece)){
 					pstValue[piece][s].insert(1,100*(rank-3.5));
-				}
+				}*/
 
 				if(!isKing((bitboardIndex)piece)){
 					pstValue[piece][s]+=pieceValue[piece];
@@ -227,9 +227,9 @@ void Position::initScoreValues(void){
 			}
 			else if(piece >separationBitmap && piece <blackPieces ){
 				pstValue[piece][s]=10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
-				if(isPawn((bitboardIndex)piece)){
+				/*if(isPawn((bitboardIndex)piece)){
 					pstValue[piece][s].insert(1,-100*(rank-3.5));
-				}
+				}*/
 
 				if(!isKing((bitboardIndex)piece)){
 					pstValue[piece][s]+=pieceValue[piece];
@@ -843,9 +843,9 @@ bool Position::checkPosConsistency(int nn){
 	}
 	if((bitBoard[whitePieces] | bitBoard[blackPieces]) !=bitBoard[occupiedSquares]){
 		display();
-		displayBitMap(bitBoard[whitePieces]);
-		displayBitMap(bitBoard[blackPieces]);
-		displayBitMap(bitBoard[occupiedSquares]);
+		displayBitmap(bitBoard[whitePieces]);
+		displayBitmap(bitBoard[blackPieces]);
+		displayBitmap(bitBoard[occupiedSquares]);
 
 		sync_cout<<"all piece problem"<<sync_endl;
 		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
@@ -974,35 +974,6 @@ bool Position::checkPosConsistency(int nn){
 	return true;
 }
 
-
-/*! \brief do a pretty simple evalutation
-	\author Marco Belli
-	\version 1.0
-	\date 27/10/2013
-*/
-Score Position::eval(void) const {
-	state &st =getActualState();
-	signed int gamePhase=getGamePhase();
-	/*sync_cout<<"--game phase:"<<gamePhase<<sync_endl;
-	sync_cout<<"mat0:"<<st.material[0]<<sync_endl;
-	sync_cout<<"mat1:"<<st.material[1]<<sync_endl;
-
-	simdScore result;
-	result.load(st.material);
-	result.cutoff(2);*/
-	signed long long r=((signed long long)st.material[0])*(65536-gamePhase)+((signed long long)st.material[1])*gamePhase;
-	Score score =(r)/65536;
-	/*sync_cout<<"result:"<<score<<sync_endl;
-*/
-	if(st.nextMove)
-	{
-		return -score;
-	}
-	else{
-		return score;
-	}
-
-}
 
 /*! \brief calculate the perft result
 	\author Marco Belli

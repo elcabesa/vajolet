@@ -27,18 +27,19 @@
 #include "transposition.h"
 #include "statistics.h"
 #include "history.h"
+#include "book.h"
 
 
-void search::printAllPV(unsigned int depth, Position & p, unsigned long time, unsigned int count){
+void search::printAllPV(unsigned int depth, Position & p, unsigned int count){
 
 
 	for (unsigned int i=0; i<=count; i++){
 		Score res=rootMoves[i].score;
-		printPV(res,depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,time,i,rootMoves[i].PV);
+		printPV(res,depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,rootMoves[i].time,i,rootMoves[i].PV,rootMoves[i].nodes);
 	}
 }
 
-void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::vector<Move>& PV){
+void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::vector<Move>& PV,unsigned long long nodes){
 	sync_cout<<"info multipv "<< count+1<< " depth "<<(depth)<<" seldepth "<<seldepth <<" score ";
 	if(abs(res) >SCORE_MATE_IN_MAX_PLY){
 		std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
@@ -49,7 +50,7 @@ void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score al
 	std::cout<<(res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
 
 
-	std::cout<<" nodes "<<visitedNodes<<" nps "<<(unsigned int)((double)visitedNodes*1000/(time))<<" time "<<(time);
+	std::cout<<" nodes "<<nodes<<" nps "<<(unsigned int)((double)nodes*1000/(time))<<" time "<<(time);
 	std::cout<<" pv ";
 	for (auto it= PV.begin(); it != PV.end(); ++it){
 		std::cout<<p.displayUci(*it)<<" ";
@@ -64,6 +65,8 @@ Score search::FutilityMoveCounts[11]={5,10,17,26,37,50,66,85,105,130,151};
 Score search::PVreduction[32*ONE_PLY][64];
 Score search::nonPVreduction[32*ONE_PLY][64];
 unsigned int search::multiPVLines=1;
+bool search::useOwnBook=true;
+bool search::bestMoveBook=false;
 
 void search::startThinking(Position & p,searchLimits & l){
 	signals.stop=false;
@@ -118,11 +121,28 @@ void search::startThinking(Position & p,searchLimits & l){
 		lastLegalMove=m;
 	}
 	if(legalMoves==0){
+		while((limits.infinite && !signals.stop) || limits.ponder){}
 		sync_cout<<"bestmove 0000"<<sync_endl;
 		return;
 	}else if(legalMoves==1){
+		while((limits.infinite && !signals.stop) || limits.ponder){}
 		sync_cout<<"bestmove "<<p.displayUci(lastLegalMove)<<sync_endl;
 		return;
+	}
+
+	//----------------------------------------------
+	//	book probing
+	//----------------------------------------------
+
+	PolyglotBook pol;
+	//std::cout<<"polyglot testing"<<std::endl;
+	if(useOwnBook && !limits.infinite ){
+		Move bookM=pol.probe(p,"book.bin",bestMoveBook);
+		if(bookM.packed){
+			while((limits.infinite && !signals.stop) || limits.ponder){}
+			sync_cout<<"bestmove "<<p.displayUci(bookM)<<sync_endl;
+			return;
+		}
 	}
 
 
@@ -153,7 +173,7 @@ void search::startThinking(Position & p,searchLimits & l){
 
 			if (depth >= 5)
 			{
-				delta = 1600;
+				delta = 800;
 				alpha = std::max((signed long long int)(rootMoves[PVIdx].previousScore) - delta,(signed long long int)-SCORE_INFINITE);
 				beta  = std::min((signed long long int)(rootMoves[PVIdx].previousScore) + delta,(signed long long int) SCORE_INFINITE);
 			}
@@ -204,12 +224,15 @@ void search::startThinking(Position & p,searchLimits & l){
 					//sync_cout<<"iterative deepening Stop"<<sync_endl;
 					break;
 				}
+				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 				if(newPV.size()!=0){
 					std::vector<rootMove>::iterator it=std::find(rootMoves.begin(),rootMoves.end(),newPV[0]);
 					if(it->firstMove==newPV[0]){
 						it->PV=newPV;
 						it->score=res;
 						it->selDepth=selDepth-selDepthBase;
+						it->nodes=visitedNodes;
+						it->time= now-startTime;
 					}
 					std::stable_sort(rootMoves.begin() + PVIdx, rootMoves.end());
 					//sync_cout<<"stableSort OK "<<sync_endl;
@@ -219,14 +242,13 @@ void search::startThinking(Position & p,searchLimits & l){
 				if (res <= alpha)
 				{
 					//sync_cout<<"res<=alpha "<<sync_endl;
-					unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV);
+
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
 					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 				}
 				else if (res >= beta){
 					//sync_cout<<"res>=alpha "<<sync_endl;
-					unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV);
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
 					beta = std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 				}else{
 					break;
@@ -244,7 +266,7 @@ void search::startThinking(Position & p,searchLimits & l){
 				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 				if (PVIdx + 1 == PVSize || now - startTime > 3000){
 					//sync_cout<<"print pv "<<sync_endl;
-					printAllPV(depth,p, now-startTime, PVIdx);
+					printAllPV(depth,p, PVIdx);
 				}
 			}
 		}
@@ -253,6 +275,9 @@ void search::startThinking(Position & p,searchLimits & l){
 
 	//sync_cout<<"print final bestMove "<<sync_endl;
 
+	while(limits.ponder){
+
+	}
 	sync_cout<<"bestmove "<<p.displayUci(rootMoves[0].PV[0]);
 	if(rootMoves[0].PV.size()>1)
 	{
@@ -410,7 +435,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		&&  depth < 4 * ONE_PLY
 		&&  eval - futility[depth>>ONE_PLY_SHIFT] >= beta
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
-		&&  abs(eval) < SCORE_KNOWN_WIN
+		//&&  abs(eval) < SCORE_KNOWN_WIN
 		&&  ((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]> 30000) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]> 30000)))
 	{
 		//Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
@@ -584,9 +609,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			quietMoveList[quietMoveCount++]=m;
 		}
 
-		// todo aggiungere passed pawn push alle mosse dangeous
 		bool moveGivesCheck=pos.moveGivesCheck(m);
-		bool isDangerous=moveGivesCheck || pos.isCastleMove(m);
+		bool isDangerous=moveGivesCheck || pos.isCastleMove(m) || pos.isPassedPawnMove(m);
 
 		int ext=0;
 		if(PVnode && isDangerous){
@@ -953,7 +977,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		TTtype=typeExact;
 	}
 	// todo trovare un valore buono per il futility
-	Score futilityBase=bestScore+20000;
+	Score futilityBase=bestScore+5000;
 
 	//----------------------------
 	//	try the captures
@@ -973,12 +997,12 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		//----------------------------
 		//	futility pruning (delta pruning)
 		//----------------------------
-		// TODO aggiungere mossa non è passed pawn push
 		if(!PVnode &&
 			!inCheck &&
 			!pos.moveGivesCheck(m) &&
 			m != ttMove &&
-			m.flags != Move::fpromotion
+			m.flags != Move::fpromotion &&
+			!pos.isPassedPawnMove(m)
 		){
 			Score futilityValue=futilityBase
                     + Position::pieceValue[pos.squares[m.to]%Position::separationBitmap][1]

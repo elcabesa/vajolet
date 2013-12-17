@@ -86,7 +86,7 @@ inline bool moreThanOneBit(bitMap b) {
 //-----------------------------------------------------------------------------
 //	function prototype
 //-----------------------------------------------------------------------------
-void displayBitMap(bitMap b);
+void displayBitmap(bitMap b);
 
 
 #endif /* BITOPS_H_ */

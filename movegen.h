@@ -150,7 +150,7 @@ public:
 	Move  getNextMove(void);
 
 
-	inline static bitMap attackFrom(Position::bitboardIndex piece,tSquare from,bitMap & occupancy){
+	inline static bitMap attackFrom(const Position::bitboardIndex piece,const tSquare from,const bitMap & occupancy){
 		assert(piece<Position::lastBitboard);
 		assert(piece!=Position::occupiedSquares);
 		assert(piece!=Position::whitePieces);

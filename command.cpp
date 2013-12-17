@@ -58,6 +58,9 @@ void static printUciInfo(void){
 	std::cout<<"id author Belli Marco"<<std::endl;
 	std::cout<<"option name Hash type spin default 1 min 1 max 4096"<<sync_endl;
 	std::cout<<"option name MultiPV type spin default 1 min 1 max 500"<<sync_endl;
+	std::cout<<"option name Ponder type check default true"<<sync_endl;
+	std::cout<<"option name OwnBook type check default true"<<std::endl;
+	std::cout<<"option name BestMoveBook type check default false"<<std::endl;
 	std::cout<<"uciok"<<sync_endl;
 }
 
@@ -184,6 +187,22 @@ void setoption(std::istringstream& is) {
 		int i=stoi(value);
 		search::multiPVLines=i<500?(i>0?i:1):500;
 	}
+	else if(name =="OwnBook"){
+		if(value=="true"){
+			search::useOwnBook=true;
+		}
+		else{
+			search::useOwnBook=false;
+		}
+	}
+	else if(name =="BestMoveBook"){
+		if(value=="true"){
+			search::bestMoveBook=true;
+		}
+		else{
+			search::bestMoveBook=false;
+		}
+	}
 	else{
 		sync_cout << "No such option: " << name << sync_endl;
 	}
@@ -213,7 +232,7 @@ void uciLoop(){
 		if(token== "uci"){
 			printUciInfo();
 		}
-		else if (token =="quit" || token =="stop" || token =="ponderhit"){
+		else if (token =="quit" || token =="stop"){
 			thr.stopThinking();
 		}
 		else if (token =="ucinewgame"){
@@ -244,7 +263,9 @@ void uciLoop(){
 		}
 		else if (token =="go"){
 			go(is,pos,thr);
-
+		}
+		else if (token == "ponderhit"){
+			thr.ponderHit();
 		}
 		else{
 			sync_cout<<"unknown command"<<sync_endl;

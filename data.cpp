@@ -55,6 +55,10 @@ bitMap DIAGA8H1MASK[squareNumber];		//!< bitmask of a diagonal given a square on
 bitMap SQUARES_BETWEEN[squareNumber][squareNumber];		//bitmask with the squares btween 2 alinged squares, 0 otherwise
 bitMap LINES[squareNumber][squareNumber];
 
+bitMap ISOLATED_PAWN[squareNumber];
+bitMap PASSED_PAWN[2][squareNumber];
+bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
+
 //--------------------------------------------------------------
 //	function bodies
 //--------------------------------------------------------------
@@ -228,6 +232,54 @@ void initData(void){
 						temp2++;
 					}
 				}
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////
+	//
+	//	PAWN STRUCTURE DATA
+	//
+	//////////////////////////////////////////////////
+	for(int square=0;square<squareNumber;square++){
+		ISOLATED_PAWN[square]=0;
+		int file= FILES[square];
+
+		if(file>0){
+			ISOLATED_PAWN[square]|= FILEMASK[BOARDINDEX[file-1][0]];
+		}
+		if(file<7){
+			ISOLATED_PAWN[square]|= FILEMASK[BOARDINDEX[file+1][0]];
+		}
+	}
+
+	for(int square=0;square<squareNumber;square++){
+		PASSED_PAWN[0][square]=0;
+		PASSED_PAWN[1][square]=0;
+		SQUARES_IN_FRONT_OF[0][square]=0;
+		SQUARES_IN_FRONT_OF[1][square]=0;
+		int file= FILES[square];
+		int rank= RANKS[square];
+
+		for(int i=rank+1;i<8;i++){
+			if(file>0){
+				PASSED_PAWN[0][square] |= BITSET[BOARDINDEX[file-1][i]];
+			}
+			PASSED_PAWN[0][square] |= BITSET[BOARDINDEX[file][i]];
+			SQUARES_IN_FRONT_OF[0][square] |= BITSET[BOARDINDEX[file][i]];
+			if(file<7){
+				PASSED_PAWN[0][square] |= BITSET[BOARDINDEX[file+1][i]];
+			}
+		}
+
+		for(int i=rank-1;i>=0;i--){
+			if(file>0){
+				PASSED_PAWN[1][square] |= BITSET[BOARDINDEX[file-1][i]];
+			}
+			PASSED_PAWN[1][square] |= BITSET[BOARDINDEX[file][i]];
+			SQUARES_IN_FRONT_OF[1][square] |= BITSET[BOARDINDEX[file][i]];
+			if(file<7){
+				PASSED_PAWN[1][square] |= BITSET[BOARDINDEX[file+1][i]];
 			}
 		}
 	}

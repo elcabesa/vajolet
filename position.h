@@ -416,6 +416,14 @@ public:
 	inline bool isCaptureMoveOrPromotion(Move & m) const {
 		return squares[m.to]!=empty || m.flags==Move::fenpassant || m.flags == Move::fpromotion;
 	}
+	inline bool isPassedPawnMove(Move & m) const {
+		if(isPawn(squares[m.to])){
+			bool color=squares[m.to]>=separationBitmap;
+			bitMap theirPawns=color? bitBoard[whitePawns]:bitBoard[blackPawns];
+			return !(theirPawns & PASSED_PAWN[color][m.from]);
+		}
+		return false;
+	}
 	void cleanStateInfo(){
 		for( auto& s:stateInfo){
 			//s.killers[0].packed=0;

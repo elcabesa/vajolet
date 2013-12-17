@@ -26,7 +26,7 @@
 
 class searchLimits{
 public:
-	bool ponder,infinite;
+	volatile bool ponder,infinite;
 	unsigned int wtime,btime,winc,binc,movesToGo,depth,nodes,mate,moveTime;
 
 	std::list<Move> searchMoves;
@@ -53,6 +53,8 @@ public:
 	std::vector<Move> PV;
 	Move firstMove;
 	unsigned int selDepth;
+	unsigned long long nodes;
+	unsigned long time;
 	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
 	bool operator==(const Move& m) const { return firstMove.packed == m.packed; }
 };
@@ -79,11 +81,13 @@ class search{
 	searchLimits limits;
 
 	unsigned int PVIdx;
-	void printAllPV(unsigned int depth, Position & p, unsigned long time,unsigned int count);
-	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::vector<Move>& PV);
+	void printAllPV(unsigned int depth, Position & p,unsigned int count);
+	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::vector<Move>& PV,unsigned long long nods);
 public:
 	std::vector<rootMove> rootMoves;
 	static unsigned int multiPVLines;
+	static bool useOwnBook;
+	static bool bestMoveBook;
 	static void initLMRreduction(void){
 		for (int d = 1; d < 32*ONE_PLY; d++)
 			for (int mc = 1; mc < 64; mc++)
@@ -95,7 +99,7 @@ public:
 			}
 	};
 	struct sSignal{
-		bool stop=false;
+		volatile bool stop=false;
 	}signals;
 
 	typedef enum eNodeType{
