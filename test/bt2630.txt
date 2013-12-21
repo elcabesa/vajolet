@@ -1,0 +1,118 @@
+Analysis of C:\Users\belli\workspace\vajolet2\test\bt2630.epd   
+21/12/2013 14:53:13 Level: 900 Seconds
+Analyzing engine: Vajolet2
+
+ 1 Nxg7; id "test 1";   
+    Searching move: Nf5xg7
+    Best move (Vajolet2): Nf5xg7
+    Identical moves! Found in: 00:00
+     2/10	00:00	       1'338	191'142	+0.56	Nf5-e3 Qb8-c7
+     3/12	00:00	       2'997	199'800	+0.28	Nf5-e3 Qb8-b7 Ne3-c4
+     4/14	00:00	       5'674	210'148	+0.56	Nf5-e3 Qb8-b7 Ne3-c4 Be5-d4
+     5/16-	00:00	      14'075	299'468	+0.39	
+     5/15	00:00	      23'957	342'242	+0.30	Nf5-e3 Qb8-b7 Ne3-c4 Be5-d4 Nc4-d6
+     6/16+	00:00	      36'946	377'000	+0.38	Rf1-f2
+     6/16	00:00	      58'307	419'474	+0.45	Rf1-f2 Qb8-c7 Rh1-f1 Ra8-c8 Nf5-e3 Re8-e7
+     7/17+	00:00	      77'848	444'845	+0.54	Nf5xg7
+     7/12+	00:00	      78'006	445'748	+0.62	Nf5xg7
+     7/13+	00:00	      79'631	449'892	+1.68	Nf5xg7
+     7/16	00:00	      92'209	461'045	+1.75	Nf5xg7 Re8-f8 Ng7-f5 Qb8-b7 Nf5-h6+ Kg8-g7 Qf3-e2 Ra8-d8 Nh6-f5+ Kg7-g8
+     8/18+	00:00	      96'965	466'177	+1.84	Nf5xg7
+     8/22+	00:00	     117'917	487'260	+1.92	Nf5xg7
+     8/20	00:00	     129'015	500'058	+2.00	Nf5xg7 Re8-f8 Ng7-f5 Qb8-b7 Nf5-h6+ Kg8-g7 Qf3-e2 Ra8-d8 h4-h5 Kg7-h8
+     9/18	00:00	     134'825	503'078	+2.00	Nf5xg7 Re8-f8 Ng7-f5 Qb8-b7 Nf5-h6+ Kg8-g7 Qf3-e2 Ra8-d8 h4-h5 Kg7-h8
+    10/25+	00:00	     201'388	544'291	+2.08	Nf5xg7
+    10/25+	00:00	     293'272	573'917	+2.16	Nf5xg7
+    10/26	00:00	     462'754	602'544	+2.26	Nf5xg7 Re8-f8 Ng7-f5 Qb8-c7 Rf1-f2 Qc7-c4 h4-h5 Ra8-e8 b2-b3 Qc4-c3 Rh1-d1
+   21/12/2013 14:53:18, Time for this analysis: 00:00:01, Rated time: 00:00
+
+ 2 Bxb6; id "test 2";   
+    Searching move: Bd4xb6
+    Best move (Vajolet2): Bd4xb6
+    Identical moves! Found in: 00:27
+     2/4	00:00	         111	111'000	+1.89	Bd4-e3 f7-f6
+     3/5	00:00	         267	267'000	+2.15	Bd4-e3 f7-f6 b4-b5
+     4/9	00:00	         742	371'000	+2.25	Bd4-e3 f7-f5 b4-b5 f5-f4
+     5/9-	00:00	       1'187	593'500	+2.03	
+     5/11	00:00	       2'438	609'500	+2.17	Bd4-c3 f7-f6 b4-b5 a6-a5 Kh1-g2
+     6/13-	00:00	       2'857	714'250	+2.08	
+     6/13	00:00	       4'518	753'000	+2.11	Bd4-e3 f7-f5 Be3-g5 b6-b5 a4xb5 a6xb5 Kh1-g2 Bc7-b6
+     7/15+	00:00	       8'345	758'636	+2.19	Bd4-f2
+     7/15+	00:00	       9'625	802'083	+2.28	Bd4-f2
+     7/15	00:00	      13'069	816'812	+2.30	Bd4-f2 f7-f5 b4-b5 a6-a5 Kh1-g2 f5-f4 h2-h4
+     8/14	00:00	      15'212	845'111	+2.28	Bd4-f2 f7-f5 b4-b5 a6-a5 Kh1-g2 f5-f4 h2-h3 f4xg3 Kg2xg3
+     9/13-	00:00	      16'513	825'650	+2.20	
+     9/16	00:00	      20'336	847'333	+2.30	Bd4-f2 f7-f5 b4-b5 a6-a5 Kh1-g2 f5-f4 g3xf4 e5xf4 Bf2-d4 h7-h6 h2-h3
+    10/18	00:00	      32'105	802'625	+2.30	Bd4-f2 f7-f5 b4-b5 a6-a5 Kh1-g2 f5-f4 g3xf4 e5xf4 Bf2-d4 h7-h6 h2-h3
+    11/17	00:00	      42'689	820'942	+2.26	Bd4-f2 f7-f5 b4-b5 a6-a5 Bf2-e3 f5-f4 g3xf4 e5xf4 Be3-d4 h7-h6 Kh1-g2 Kg8-h7
+    12/21	00:00	      80'893	785'368	+2.26	Bd4-e3 f7-f5 b4-b5 f5-f4 g3xf4 e5xf4 Be3-d4 a6-a5 Kh1-g2 h7-h6 h2-h3 Kg8-h7 h3-h4 Kh7-g8 Kg2-h3 Kg8-h7
+    13/20-	00:00	     117'229	814'090	+2.18	
+    13/22	00:00	     133'894	826'506	+2.15	Bd4-e3 b6-b5 a4xb5 a6xb5 Be3-c5 h7-h6 Kh1-g2 f7-f5 h2-h3 f5-f4 g3-g4 Kg8-g7 h3-h4 Kg7-f6 Kg2-h3
+    14/24+	00:00	     173'736	827'314	+2.23	Bd4-e3
+    14/21+	00:00	     193'133	828'896	+2.31	Bd4-e3
+    14/24	00:00	     260'983	810'506	+2.26	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 f5-f4 g3xf4 e5xf4 Be3-d4 h7-h6 h2-h3 Kg8-h7 h3-h4 Kh7-g8 Kg2-h3 Kg8-h7
+    15/18	00:00	     283'922	811'205	+2.26	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 f5-f4 g3xf4 e5xf4 Be3-d4 h7-h6 h2-h3 Kg8-h7 h3-h4 Kh7-g8 Kg2-h3 Kg8-h7
+    16/21	00:00	     311'925	820'855	+2.28	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 f5-f4 g3xf4 e5xf4 Be3-d4 h7-h6 h2-h3 Kg8-h7 h3-h4 Kh7-g8 Kg2-h3 Kg8-h7 Kh3-g4
+    17/25	00:00	     375'052	829'761	+2.33	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 f5-f4 g3xf4 e5xf4 Be3-d4 h7-h6 h2-h4 Kg8-h7 Kg2-h3 h6-h5 Kh3-g2 Kh7-h6 Kg2-f2 g6-g5 h4xg5+ Kh6xg5
+    18/27	00:00	     506'106	849'171	+2.30	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 f5-f4 g3xf4 e5xf4 Be3-d4 h7-h6 h2-h4 Kg8-h7 Kg2-h3 h6-h5 Kh3-g2 Kh7-h6 Kg2-f2 g6-g5 h4xg5+ Kh6xg5 Kf2-e2
+    19/27-	00:00	     621'858	854'200	+2.22	
+    19/33	00:01	   1'265'360	877'503	+2.24	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 f5-f4 Be3-c1 Bc7-d6 Bc1-a3 Bd6-c7 Kg2-h3 h7-h6 Kh3-g2 Kg8-g7 g3xf4 e5xf4 Ba3-b2+ Kg7-g8 Bb2-d4 g6-g5 h2-h4 g5xh4
+    20/30-	00:01	   1'673'006	886'595	+2.16	
+    20/29	00:02	   1'890'693	889'319	+2.14	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 Kg8-f7 Be3-g5 Kf7-g7 Bg5-d2 Kg7-f6 h2-h4 f5-f4 g3xf4 e5xf4 Bd2-c3+ Kf6-e6 Kg2-h3 Ke6-f5 Bc3-d4 h7-h6 Kh3-g2 Bc7-d8 Kg2-f1 Bd8-c7
+    21/28	00:02	   2'254'617	898'970	+2.14	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 Kg8-f7 Be3-g5 Kf7-g7 Bg5-d2 Kg7-f6 h2-h4 f5-f4 g3xf4 e5xf4 Bd2-c3+ Kf6-e6 Kg2-h3 Ke6-f5 Bc3-d4 h7-h6 Kh3-g2 Bc7-d8 Kg2-f1 Bd8-c7
+    22/29+	00:02	   2'569'878	896'677	+2.22	Bd4-e3
+    22/33	00:04	   3'798'435	909'586	+2.16	Bd4-e3 f7-f6 b4-b5 a6-a5 Kh1-g2 Kg8-g7 h2-h4 f6-f5 Kg2-h3 Kg7-f6 Be3-h6 Kf6-e6 Bh6-g5 f5-f4 Kh3-g2 Ke6-f7 g3-g4 Kf7-e6 Kg2-h3 h7-h5 g4xh5 g6xh5 Kh3-g2
+    23/37-	00:08	   7'960'448	908'830	+2.00	
+    23/36	00:10	   9'340'431	915'369	+1.99	Bd4-e3 a6-a5 b4-b5 f7-f5 Be3-h6 Kg8-f7 Bh6-g5 Kf7-g7 Kh1-g2 h7-h6 Bg5-e3 g6-g5 h2-h3 f5-f4 Be3-f2 Kg7-g6 h3-h4 h6-h5 h4xg5 Kg6xg5 g3xf4+ e5xf4 Kg2-h3 Kg5-g6 Bf2-d4 Kg6-g5 Bd4-c3 Bc7-d6
+    24/34	00:12	  11'352'735	920'069	+1.99	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 f5-f4 Be3-c1 g6-g5 g3xf4 e5xf4 h2-h4 g5xh4 Kg2-h3 Kg8-f7 Kh3xh4 Kf7-g6 Bc1-b2 h7-h5 Kh4-h3 Kg6-g5 Bb2-d4 Kg5-g6 Bd4-f2 Bc7-d8 Bf2-h4 Bd8xh4 Kh3xh4
+    25/35	00:14	  13'035'082	924'736	+1.99	Bd4-e3 a6-a5 b4-b5 f7-f5 Kh1-g2 f5-f4 Be3-c1 g6-g5 g3xf4 e5xf4 h2-h4 g5xh4 Kg2-h3 Kg8-f7 Kh3xh4 Kf7-g6 Bc1-b2 h7-h5 Kh4-h3 Kg6-g5 Bb2-d4 Kg5-g6 Bd4-f2 Bc7-d8 Bf2-h4 Bd8xh4 Kh3xh4
+    26/40+	00:27	  25'047'319	914'636	+2.07	Bd4xb6
+    26/38+	00:27	  25'551'210	917'886	+2.15	Bd4xb6
+    26/46+	00:32	  30'887'747	937'583	+3.73	Bd4xb6
+    26/50	00:41	  39'303'345	936'083	+4.29	Bd4xb6 Bc7xb6 a4-a5 Bb6-c7 b4-b5 a6xb5 a5-a6 Bc7-b6 a6-a7 Bb6xa7 c6-c7 Kg8-g7 c7-c8Q b5-b4 Qc8-c4 Ba7-d4 Qc4xb4 Bd4-a1 Qb4-d6 Ba1-c3 Kh1-g2 h7-h6 h2-h3 Bc3-b2 Qd6-e7 Bb2-d4 Qe7-d7 g6-g5 Qd7-c8 f7-f6 Qc8-d8 Kg7-f7 Qd8-d7+
+    27/42	00:42	  39'804'933	935'574	+4.29	Bd4xb6 Bc7xb6 a4-a5 Bb6-c7 b4-b5 a6xb5 a5-a6 Bc7-b6 a6-a7 Bb6xa7 c6-c7 Kg8-g7 c7-c8Q b5-b4 Qc8-c4 Ba7-d4 Qc4xb4 Bd4-a1 Qb4-d6 Ba1-c3 Kh1-g2 h7-h6 Qd6-d7 Bc3-d4 Qd7-c7 g6-g5 Qc7-e7 Kg7-g6 Qe7-d6+ Kg6-g7 h2-h3 h6-h5
+    28/42	00:44	  41'720'262	931'775	+4.31	Bd4xb6 Bc7xb6 a4-a5 Bb6-c7 b4-b5 a6xb5 a5-a6 Bc7-b6 a6-a7 Bb6xa7 c6-c7 Kg8-g7 c7-c8Q b5-b4 Qc8-c4 Ba7-d4 Qc4xb4 Bd4-a1 Qb4-d6 h7-h6 Qd6-d7 g6-g5 Kh1-g2 Ba1-d4 h2-h3 Kg7-g6 Qd7-e8 Kg6-g7 Qe8-c6 f7-f5 Qc6-d6 f5-f4 Qd6-e7+
+    29/44	00:47	  44'657'862	932'587	+4.36	Bd4xb6 Bc7xb6 a4-a5 Bb6-c7 b4-b5 a6xb5 a5-a6 Bc7-b6 a6-a7 Bb6xa7 c6-c7 Kg8-g7 c7-c8Q b5-b4 Qc8-c4 Ba7-d4 Qc4xb4 Bd4-a1 Qb4-d6 h7-h6 Qd6-d7 Ba1-c3 Kh1-g2 Bc3-b2 h2-h3 Bb2-d4 Qd7-d6 g6-g5 Qd6-e7 Kg7-g6 Qe7-e8 Kg6-g7 Qe8-d7 Kg7-g6
+   21/12/2013 14:54:07, Time for this analysis: 00:00:49, Rated time: 00:27
+
+ 3 Re6; id "test 3";    
+    Searching move: Re5-e6
+    Best move (Vajolet2): Re5-e6
+    Identical moves! Found in: 00:14
+     2/13	00:00	       1'957	391'400	-0.74	g2-g3 Qc7-d6
+     3/14	00:00	       9'148	508'222	-1.14	f3-f4 Qc7-d7 Ng5-f3
+     4/15	00:00	      26'900	548'979	-0.99	Ng5-h3 Rf8-d8 Nh3-f4 Qc7-d6
+     5/15-	00:00	      39'274	569'188	-1.15	
+     5/15	00:00	      45'308	573'518	-1.18	Ng5-h3 Kh8-g8 Qh5-f5 g7-g6 Qf5-f6
+     6/14+	00:00	      47'532	579'658	-1.10	Ng5-h3
+     6/16	00:00	      55'539	584'621	-1.05	Ng5-h3 Kh8-g8 Qh5-f5 g7-g6 Qf5-f4 Rf8-c8
+     7/17	00:00	      82'639	554'624	-1.02	Ng5-h3 Qc7-d7 Nh3-f4 Rf8-d8 g2-g3 a7-a6 Bd3xa6 Qd7-d1+ Kh1-g2 Qd1xc2+ Ba6-e2
+     8/19	00:00	     109'616	567'958	-1.04	Ng5-h3 Qc7-d7 Nh3-f4 Rf8-d8 g2-g3 Na5-b7 Kh1-g2 Nb7-d6
+     9/20+	00:00	     136'656	581'514	-0.96	Ng5-h3
+     9/19	00:00	     167'329	591'268	-1.11	Ng5-h3 Qc7-d7 Qh5-g4 Qd7xg4 f3xg4 Bc6-d7 Nh3-f2 Na5-c6 Re5-e1 a7-a5 Kh1-h2
+    10/19	00:00	     201'143	607'682	-1.05	Ng5-h3 Qc7-d7 Qh5-g4 Qd7xg4 f3xg4 Bc6-d7 Nh3-f2 Na5-c6 Re5-e1 Rf8-d8 Kh1-h2
+    11/25+	00:00	     304'763	597'574	-0.97	Ng5-h3
+    11/24	00:00	     425'602	586'228	-0.91	Ng5-h3 Qc7-d7 Nh3-f4 Rf8-e8 Re5xe8+ Qd7xe8 Kh1-h2 Qe8-d7 c2-c4 a7-a6 Qh5-e5 Qd7-d8
+    12/23-	00:00	     512'209	594'900	-0.99	
+    12/25	00:01	     729'824	606'166	-1.05	Ng5-h3 Qc7-d7 Nh3-f4 Rf8-e8 Nf4-d5 Qd7-d8 Re5xe8+ Qd8xe8 Kh1-h2 Qe8-d7 Nd5-c3 Na5-b7 Qh5-f5 Qd7xf5 Bd3xf5
+    13/24	00:01	     874'297	602'132	-1.05	Ng5-h3 Qc7-d7 Nh3-f4 Rf8-e8 Nf4-d5 Qd7-d8 Re5xe8+ Qd8xe8 Kh1-h2 Qe8-d7 Nd5-c3 Na5-b7 Qh5-f5 Qd7xf5 Bd3xf5
+    14/25+	00:01	   1'177'760	606'467	-0.97	Ng5-h3
+    14/30+	00:04	   2'513'681	621'890	-0.89	Re5-e6
+    14/24+	00:05	   3'425'150	629'970	+1.60	Re5-e6
+    14/34	00:06	   3'983'257	643'498	+1.86	Re5-e6 f7-f5 Re6xh6+ g7xh6 Qh5xh6+ Kh8-g8 Qh6xf8+ Kg8xf8 Ng5-e6+ Kf8-e7 Ne6xc7 Bc6-d7 g2-g3 Na5-c6 Nc7-d5+ Ke7-f7 Kh1-g2 Nc6-e5 Bd3-e2 b6-b5 f3-f4 Ne5-g4
+    15/25+	00:06	   4'101'638	643'495	+1.94	Re5-e6
+    15/31+	00:06	   4'372'274	646'786	+2.02	Re5-e6
+    15/38+	00:12	   8'074'895	642'189	+15.62	Re5-e6
+    15/38	00:14	   9'202'888	640'646	+20.95	Re5-e6 Kh8-g8 Bd3-h7+ Kg8-h8 Re6xh6 g7-g6 Bh7xg6+ Kh8-g7 Ng5-e6+ Kg7-f6 Ne6xc7 Kf6-e7 Qh5-e5+ Ke7-d8 Qe5-d6+ Kd8-c8 Bg6-f5+ Kc8-b7 Qd6xf8 b6-b5 Qf8xf7 Kb7-b6 Nc7-a8+ Kb6-c5 Qf7xa7+ Kc5-c4 Qa7xa5
+    16/28-	00:14	   9'241'005	640'979	+20.87	
+    16/36+	00:14	   9'292'844	641'372	+21.03	Re5-e6
+    16/23+	00:14	   9'577'639	644'048	+M500	Re5-e6
+    16/29	00:14	   9'580'541	644'069	+21.40	Re5-e6 Kh8-g8 Bd3-h7+ Kg8-h8 Re6xh6 g7-g6 Bh7xg6+ Kh8-g7 Ng5-e6+ Kg7-f6 Ne6xc7 Kf6-e7 Qh5-e5+ Ke7-d8 Qe5-d6+ Kd8-c8 Bg6-f5+ Kc8-b7 Qd6xf8 b6-b5 Nc7-d5 Bc6-e8 Qf8-e7+ Be8-d7 Qe7xd7+ Kb7-a8 Qd7xb5
+    17/34	00:15	   9'869'674	645'752	+21.40	Re5-e6 Kh8-g8 Bd3-h7+ Kg8-h8 Re6xh6 g7-g6 Bh7xg6+ Kh8-g7 Ng5-e6+ Kg7-f6 Ne6xc7 Kf6-e7 Qh5-e5+ Ke7-d8 Qe5-d6+ Kd8-c8 Bg6-f5+ Kc8-b7 Qd6xf8 b6-b5 Nc7-d5 Bc6-e8 Qf8-e7+ Be8-d7 Qe7xd7+ Kb7-a8 Qd7xb5
+    18/30+	00:15	  10'036'383	644'721	+21.48	Re5-e6
+    18/38+	00:15	  10'124'996	644'575	+21.56	Re5-e6
+    18/27+	00:16	  10'409'044	644'922	+M500	Re5-e6
+    18/38	01:40	  61'873'853	618'707	+M10	Re5-e6 Kh8-g8 Bd3-h7+ Kg8-h8 Re6xh6 g7-g6 Bh7xg6+ Kh8-g7 Bg6xf7 Qc7xf7 Ng5xf7 Rf8-h8 Qh5-g6+ Kg7-f8 Nf7-e5 Rh8-h7 Rh6xh7 Bc6-d5 Ne5-d7+
+    19/32	03:21	 123'886'542	614'358	+M10	Re5-e6 Kh8-g8 Bd3-h7+ Kg8-h8 Re6xh6 g7-g6 Bh7xg6+ Kh8-g7 Bg6xf7 Qc7xf7 Ng5xf7 Rf8-h8 Qh5-g6+ Kg7-f8 Nf7-e5 Rh8-h7 Rh6xh7 Bc6-d5 Ne5-d7+
+   21/12/2013 14:57:31, Time for this analysis: 00:03:22, Rated time: 00:41
+

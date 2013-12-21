@@ -1,0 +1,2152 @@
+Analysis of C:\Users\belli\workspace\vajolet2\test\wac.epd   
+20/12/2013 23:25:29 Level: 10 Seconds
+Analyzing engine: Vajolet2
+
+ 1 Qg6; id "WAC.001";   
+    Searching move: Qg3-g6
+    Best move (Vajolet2): Qg3-g6
+    Identical moves! Found in: 00:00
+     2/11	00:00	       2'053	157'923	+M2	Qg3-g6 f7xg6 Ne5xg6+
+     3/3	00:00	       2'239	172'230	+M2	Qg3-g6 f7xg6 Ne5xg6+
+      4	00:00	       2'391	170'785	+M2	Qg3-g6 f7xg6 Ne5xg6+
+      5	00:00	       2'562	183'000	+M2	Qg3-g6 f7xg6 Ne5xg6+
+      6	00:00	       2'743	195'928	+M2	Qg3-g6 f7xg6 Ne5xg6+
+      7	00:00	       2'927	195'133	+M2	Qg3-g6 f7xg6 Ne5xg6+
+      8	00:00	       3'112	207'466	+M2	Qg3-g6 f7xg6 Ne5xg6+
+      9	00:00	       3'298	219'866	+M2	Qg3-g6 f7xg6 Ne5xg6+
+   20/12/2013 23:25:33, Time for this analysis: 00:00:01, Rated time: 00:00
+
+ 2 Rxb2; id "WAC.002";  
+    Searching move: Rb3xb2
+    Best move (Vajolet2): Rb3-b6
+    Not found in: 00:10
+     2/5	00:00	         174	174'000	+2.21	Rb3-b7 Rd2-g2
+     3/10	00:00	         613	204'333	+2.36	c4-c3 Rd2xd3 c3xb2 Rd3xb3 a4xb3
+     4/11	00:00	       1'746	249'428	+2.09	c4-c3 Rd2xd3 c3xb2 Rd3xb3 a4xb3 a3-a4
+     5/12	00:00	       3'144	285'818	+2.10	Rb3-b7 Rd2-g2 Rb7-e7 h2-h4 h7-h6
+     6/14	00:00	       5'780	304'210	+2.08	Rb3-b8 Rd2-g2 Rb8-e8 h2-h3 h7-h5 Rg2-g1
+     7/12+	00:00	       6'278	313'900	+2.22	Rb3-b8
+     7/12	00:00	       7'438	338'090	+2.23	Rb3-b8 Rd2-g2 Rb8-e8 h2-h4 h7-h5 Rg2-g5 Re8-b8
+     8/10+	00:00	       7'704	350'181	+2.33	Rb3-b8
+     8/15+	00:00	       9'504	380'160	+2.42	Rb3-b8
+     8/18+	00:00	      10'552	390'814	+2.54	Rb3-b8
+     8/16	00:00	      13'026	407'062	+2.57	Rb3-b8 Rd2-g2 Rb8-d8 Rg2-g1 d3-d2 Kf3-e2 h7-h6 h2-h4 Rd8-d7
+     9/23-	00:00	     101'485	607'694	+2.11	
+     9/25	00:00	     132'224	641'864	+2.16	Rb3-b8 e3-e4 f5xe4+ Kf3xe4 Rb8-d8 h2-h3 Rd8-e8+ Ke4-d4 Re8-e2 Kd4-c3 Re2-e4 Rd2-f2 h7-h5
+    10/18+	00:00	     139'133	647'130	+2.25	Rb3-b6
+    10/20+	00:00	     143'605	652'750	+2.33	Rb3-b6
+    10/19+	00:00	     147'655	656'244	+2.45	Rb3-b6
+    10/23	00:00	     168'232	672'928	+2.40	Rb3-b6 Rd2-g2 Rb6-d6 Rg2-g1 Rd6-d8 Rg1-d1 Rd8-d7 e3-e4 f5xe4+ Kf3xe4 d3-d2 f4-f5 Rd7-e7+ Ke4-f3 Re7-d7
+    11/24-	00:00	     350'820	797'318	+1.94	
+    11/28	00:00	     409'963	810'203	+2.43	Rb3-b6 e3-e4 f5xe4+ Kf3xe4 Rb6-e6+ Ke4-f3 Kf6-f5 Rd2-g2 Re6-g6 Rg2xg6 h7xg6 h2-h3 Kf5-e6 Kf3-e3 Ke6-d5 h3-h4 Kd5-c5 Ke3-e4
+    12/24-	00:00	     446'859	829'051	+2.27	
+    12/23	00:00	     492'127	844'128	+2.15	Rb3-b6 h2-h3 Rb6-e6 Rd2-d1 Re6-e8 Rd1-c1 Re8-c8 h3-h4 d3-d2 Rc1-d1 Rc8-d8 Kf3-e2 c4-c3 b2xc3
+    13/25	00:00	     551'010	865'007	+2.15	Rb3-b6 h2-h3 Rb6-e6 Rd2-d1 Re6-e8 Rd1-c1 Re8-c8 h3-h4 d3-d2 Rc1-d1 Rc8-d8 Kf3-e2 c4-c3 b2xc3
+    14/26+	00:00	     624'392	870'839	+2.23	Rb3-b6
+    14/26+	00:00	     661'103	876'794	+2.31	Rb3-b6
+    14/25	00:00	     773'276	893'960	+2.41	Rb3-b6 h2-h3 Rb6-e6 Rd2-d1 Re6-e8 Rd1-d2 Re8-d8 e3-e4 f5xe4+ Kf3xe4 h7-h6 h3-h4 Rd8-d7 Rd2-g2 d3-d2 Rg2-g8 Rd7-d3
+    15/30-	00:01	   1'213'560	930'644	+2.13	
+    15/29	00:01	   1'767'153	937'481	+2.27	Rb3-b6 Rd2-g2 Rb6-d6 Rg2-g1 Rd6-d8 Rg1-d1 Rd8-b8 Rd1-d2 Rb8-e8 Rd2-d1 Re8-g8 e3-e4 f5xe4+ Kf3xe4 Rg8-g2 Rd1-c1 Rg2-e2+ Ke4-f3
+    16/26+	00:01	   1'804'854	938'561	+2.35	Rb3-b6
+    16/30+	00:01	   1'871'235	941'265	+2.43	Rb3-b6
+    16/27	00:02	   1'980'568	945'829	+2.39	Rb3-b6 Rd2-g2 Rb6-d6 Rg2-g1 h7-h5 Rg1-d1 Rd6-b6 Rd1-d2 Rb6-e6 Rd2-d1 Re6-e8 Rd1-c1 Re8-d8 Kf3-f2 Rd8-c8 Rc1-d1 Rc8-e8 Kf2-f3
+    17/25-	00:02	   2'093'328	948'924	+2.31	
+    17/24	00:02	   2'138'287	951'195	+2.39	Rb3-b6 Rd2-g2 Rb6-d6 Rg2-g1 h7-h5 Rg1-d1 Rd6-b6 Rd1-d2 Rb6-e6 Rd2-d1 Re6-e8 Rd1-c1 Re8-d8 Kf3-f2 Rd8-c8 Rc1-d1 Rc8-e8 Kf2-f3
+    18/26	00:02	   2'312'529	955'590	+2.39	Rb3-b6 Rd2-g2 Rb6-d6 Rg2-g1 h7-h5 Rg1-d1 Rd6-b6 Rd1-d2 Rb6-e6 Rd2-d1 Re6-e8 Rd1-c1 Re8-d8 Rc1-d1 Rd8-b8 Rd1-d2 Rb8-g8 Rd2-d1
+    19/35-	00:04	   4'494'766	974'580	+2.23	
+    19/34	00:05	   5'009'671	980'750	+2.28	Rb3-b6 h2-h4 Rb6-e6 Rd2-g2 Re6-d6 Rg2-d2 h7-h6 Rd2-d1 Rd6-b6 Rd1-d2 Rb6-e6 h4-h5 Kf6-f7 Rd2-d1 Re6-b6 Rd1-d2 Kf7-e6 Rd2-h2 Rb6-b7 e3-e4
+    20/32	00:05	   5'536'048	983'836	+2.28	Rb3-b6 h2-h4 Rb6-e6 Rd2-g2 Re6-d6 Rg2-d2 h7-h6 Rd2-d1 Rd6-b6 Rd1-d2 Rb6-e6 h4-h5 Kf6-f7 Rd2-d1 Re6-b6 Rd1-d2 Kf7-e6 Rd2-h2 Rb6-b7 e3-e4
+    21/35	00:07	   7'906'631	997'430	+2.33	Rb3-b6 h2-h4 Rb6-e6 Rd2-g2 Re6-d6 Rg2-d2 h7-h6 Rd2-d1 Rd6-b6 Rd1-d2 h6-h5 Rd2-g2 Rb6-b8 e3-e4 f5xe4+ Kf3xe4 Rb8-e8+ Ke4-f3 Re8-e1 Rg2-h2 Re1-g1 Kf3-e4 Rg1-g8 Ke4-d4 Rg8-c8
+   20/12/2013 23:25:44, Time for this analysis: 00:00:10, Rated time: 00:10
+
+ 3 Rg3; id "WAC.003";   
+    Searching move: Re3-g3
+    Best move (Vajolet2): Re3-g3
+    Identical moves! Found in: 00:00
+     2/13	00:00	       3'005	231'153	+1.22	Re3-g3 Qg5xg3 Nh1xg3 f4xg3 Rf1xf8+ Bd6xf8
+     3/14	00:00	       3'388	242'000	+1.22	Re3-g3 Qg5xg3 Nh1xg3 f4xg3 Rf1xf8+ Bd6xf8
+     4/10	00:00	       3'802	253'466	+1.22	Re3-g3 Qg5xg3 Nh1xg3 f4xg3 Rf1xf8+ Bd6xf8
+     5/16	00:00	       4'479	279'937	+1.22	Re3-g3 Qg5xg3 Nh1xg3 f4xg3 Rf1xf8+ Bd6xf8
+     6/17	00:00	       7'424	296'960	+1.15	Re3-g3 Qg5xg3 Nh1xg3 f4xg3 Qe2-c4+ Kg8-h8 Rf1xf8+ Bd6xf8
+     7/13+	00:00	       8'233	294'035	+1.25	Re3-g3
+     7/17+	00:00	       8'735	301'206	+1.33	Re3-g3
+     7/19+	00:00	      10'823	327'969	+2.48	Re3-g3
+     7/18	00:00	      15'794	376'047	+2.08	Re3-g3 Qg5xg3 Nh1xg3 f4xg3 Rf1xf8+ Kg8xf8 Bd2-g5 Rh4-f4 Bg5xf4 Bd6xf4
+     8/17	00:00	      20'352	424'000	+2.08	Re3-g3 Qg5xg3 Nh1xg3 f4xg3 Rf1xf8+ Kg8xf8 Bd2-g5 Rh4-f4 Bg5xf4 Bd6xf4
+     9/21+	00:00	      25'617	449'421	+2.18	Re3-g3
+     9/17+	00:00	      28'359	464'901	+2.26	Re3-g3
+     9/24+	00:00	      62'020	553'750	+2.83	Re3-g3
+     9/22	00:00	      74'055	569'653	+2.79	Re3-g3 Qg5xg3 Nh1xg3 f4xg3 Rf1xf8+ Kg8xf8 Qe2-f3+ Kf8-g8 Bd2-g5 Rh4xh3 g2xh3 Bd7xh3 Qf3-f6
+   20/12/2013 23:25:46, Time for this analysis: 00:00:01, Rated time: 00:10
+
+ 4 Qxh7+; id "WAC.004"; 
+    Searching move: Qh6xh7
+    Best move (Vajolet2): Qh6xh7
+    Identical moves! Found in: 00:00
+     2/3	00:00	         417	208'500	+M2	Qh6xh7+ Kh8xh7 h5xg6+
+      3	00:00	         505	252'500	+M2	Qh6xh7+ Kh8xh7 h5xg6+
+      4	00:00	         573	286'500	+M2	Qh6xh7+ Kh8xh7 h5xg6+
+      5	00:00	         658	329'000	+M2	Qh6xh7+ Kh8xh7 h5xg6+
+      6	00:00	         745	248'333	+M2	Qh6xh7+ Kh8xh7 h5xg6+
+      7	00:00	         833	277'666	+M2	Qh6xh7+ Kh8xh7 h5xg6+
+      8	00:00	         922	307'333	+M2	Qh6xh7+ Kh8xh7 h5xg6+
+      9	00:00	       1'011	337'000	+M2	Qh6xh7+ Kh8xh7 h5xg6+
+   20/12/2013 23:25:48, Time for this analysis: 00:00:01, Rated time: 00:10
+
+ 5 Qc4+; id "WAC.005";  
+    Searching move: Qc6-c4
+    Best move (Vajolet2): Qc6-c4
+    Identical moves! Found in: 00:00
+     2/10	00:00	         382	382'000	+M2	Qc6-c4+ Nd6xc4 b5xc4+
+     3/1	00:00	         446	446'000	+M2	Qc6-c4+ Nd6xc4 b5xc4+
+     4/1	00:00	         500	500'000	+M2	Qc6-c4+ Nd6xc4 b5xc4+
+     5/1	00:00	         561	280'500	+M2	Qc6-c4+ Nd6xc4 b5xc4+
+     6/1	00:00	         625	312'500	+M2	Qc6-c4+ Nd6xc4 b5xc4+
+     7/1	00:00	         689	344'500	+M2	Qc6-c4+ Nd6xc4 b5xc4+
+     8/1	00:00	         754	377'000	+M2	Qc6-c4+ Nd6xc4 b5xc4+
+     9/1	00:00	         819	409'500	+M2	Qc6-c4+ Nd6xc4 b5xc4+
+   20/12/2013 23:25:50, Time for this analysis: 00:00:01, Rated time: 00:10
+
+ 6 Rb7; id "WAC.006";   
+    Searching move: Rb6-b7
+    Best move (Vajolet2): Rb6-b7
+    Identical moves! Found in: 00:00
+     2/6	00:00	         164	164'000	+5.88	Rb6-b7 a7-a5 Kh6xg5
+     3/6	00:00	         237	237'000	+5.88	Rb6-b7 a7-a5 Kh6xg5
+     4/8	00:00	         385	192'500	+6.51	Rb6-b7 a7-a5 Kh6xg5 a5-a4 Kg5xg4
+     5/9	00:00	         559	279'500	+6.51	Rb6-b7 a7-a5 Kh6xg5 a5-a4 Kg5xg4
+     6/11+	00:00	         730	365'000	+6.60	Rb6-b7
+     6/9+	00:00	         794	397'000	+6.69	Rb6-b7
+     6/7+	00:00	         823	411'500	+6.83	Rb6-b7
+     6/12	00:00	       1'130	376'666	+6.72	Rb6-b7 a7-a5 Kh6xg5 Kh8-g8 Rb7-a7 a5-a4 Ra7xa4
+     7/10+	00:00	       1'294	431'333	+6.80	Rb6-b7
+     7/11+	00:00	       1'413	353'250	+6.88	Rb6-b7
+     7/14	00:00	       2'436	406'000	+6.91	Rb6-b7 Rg5-b5 Rb7xb5 Kh8-g8 Kh6-g5 a7-a6 Rb5-b8+ Kg8-f7 Rb8-b7+ Kf7-e6 Kg5xg4
+     8/13+	00:00	       2'712	387'428	+7.00	Rb6-b7
+     8/14+	00:00	       3'177	397'125	+7.11	Rb6-b7
+     8/16+	00:00	       4'943	411'916	+7.42	Rb6-b7
+     8/15	00:00	       6'791	452'733	+7.66	Rb6-b7 Rg5-b5 Rb7xb5 Kh8-g8 Rb5-g5+ Kg8-f7 Rg5xg4 Kf7-f6 Rg4-a4 Kf6-e5 Ra4xa7
+     9/13	00:00	       7'769	485'562	+7.66	Rb6-b7 Rg5-b5 Rb7xb5 Kh8-g8 Rb5-g5+ Kg8-f7 Rg5xg4 Kf7-f6 Rg4-a4 Kf6-e5 Ra4xa7
+   20/12/2013 23:25:52, Time for this analysis: 00:00:01, Rated time: 00:10
+
+ 7 Ne3; id "WAC.007";   
+    Searching move: Ng4-e3
+    Best move (Vajolet2): Ng4-e3
+    Identical moves! Found in: 00:00
+     2/8	00:00	         319	319'000	+4.49	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1
+     3/9	00:00	         500	500'000	+4.49	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1
+     4/5	00:00	         779	389'500	+4.49	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1
+     5/11+	00:00	       1'117	372'333	+4.60	Ng4-e3
+     5/13+	00:00	       1'533	306'600	+4.68	Ng4-e3
+     5/14	00:00	       2'267	323'857	+4.78	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 Nb8-c6
+     6/13-	00:00	       2'630	328'750	+4.68	
+     6/9	00:00	       2'998	333'111	+4.62	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 Nb8-c6 Nd2-e4
+     7/16+	00:00	       4'247	326'692	+4.71	Ng4-e3
+     7/12	00:00	       5'193	346'200	+4.71	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 Nb8-c6 Nd2-b3 Bf8-b4
+     8/20-	00:00	       6'631	390'058	+4.63	
+     8/21+	00:00	      31'860	513'870	+4.79	Ng4-e3
+     8/20	00:00	      33'053	516'453	+4.74	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 d7-d6 e2-e3 Nb8-c6 Bf1-b5 Bc8-f5 Bb5xc6+
+     9/17	00:00	      36'737	510'236	+4.74	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 d7-d6 e2-e3 Nb8-c6 Bf1-b5 Bc8-f5 Bb5xc6+ b7xc6
+    10/20+	00:00	      52'409	518'900	+4.82	Ng4-e3
+    10/24+	00:00	      87'252	545'325	+4.90	Ng4-e3
+    10/26	00:00	     171'431	577'208	+4.97	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 d7-d6 e2-e3 Nb8-c6 Bf1-b5 Bc8-d7 e5xd6 Bf8xd6 Nd2-e4 O-O Ne4xd6 c7xd6
+    11/20-	00:00	     174'719	578'539	+4.89	
+    11/24	00:00	     225'893	589'798	+5.05	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 d7-d6 e5xd6 Bf8xd6 Nd2-c4 Bd6-c5+ Kd1-e1 O-O Bc1-e3 Bc5xe3 Nc4xe3 Nb8-c6
+    12/24-	00:00	     237'572	589'508	+4.97	
+    12/26	00:00	     319'632	596'328	+5.00	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 d7-d6 e5xd6 Bf8xd6 Nd2-c4 Bd6-c5+ Kd1-e1 O-O Bc1-e3 Bc5xe3 Nc4xe3 Bc8-d7 Ra1-d1 Nb8-c6
+    13/26	00:00	     400'674	598'020	+5.00	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 d7-d6 e5xd6 Bf8xd6 Nd2-c4 Bd6-c5+ Kd1-e1 O-O Bc1-e3 Bc5xe3 Nc4xe3 Bc8-d7 Ra1-d1 Nb8-c6
+    14/27	00:00	     574'681	601'130	+5.00	Ng4-e3 Ng1-f3 Ne3xd1 Ke1xd1 d7-d6 e5xd6 Bf8xd6 Nd2-c4 Bd6-c5+ Kd1-e1 O-O Bc1-e3 Bc5xe3 Nc4xe3 Bc8-d7 Ra1-d1 Nb8-c6
+    15/28+	00:01	     904'283	602'453	+5.08	Ng4-e3
+    15/32+	00:02	   1'575'790	608'178	+5.16	Ng4-e3
+   20/12/2013 23:25:55, Time for this analysis: 00:00:02, Rated time: 00:10
+
+ 8 Rf7; id "WAC.008";   
+    Searching move: Re7-f7
+    Best move (Vajolet2): Re7-f7
+    Identical moves! Found in: 00:00
+     2/10	00:00	         382	382'000	+3.87	Nh6-f7+ Kh8-g8 Re7xd7 Rg7xf7
+     3/12	00:00	       1'701	283'500	+6.67	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Nh6xf5
+     4/9	00:00	       1'927	321'166	+6.67	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Nh6xf5
+     5/14	00:00	       2'914	323'777	+6.67	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Nh6xf5
+     6/12+	00:00	       3'018	301'800	+6.79	Re7-f7
+     6/9+	00:00	       3'075	307'500	+6.90	Re7-f7
+     6/16	00:00	       4'424	340'307	+6.91	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Nh6xf5 Bd7xf5 Qf6xf5
+     7/17+	00:00	       4'915	327'666	+7.01	Re7-f7
+     7/17+	00:00	       5'047	336'466	+7.25	Re7-f7
+     7/18+	00:00	       5'728	336'941	+9.07	Re7-f7
+     7/16	00:00	       6'792	357'473	+9.65	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Ra1-d1 Bd7-e6 Qf6xe6
+     8/18+	00:00	       7'003	368'578	+9.78	Re7-f7
+     8/14+	00:00	       7'139	375'736	+9.88	Re7-f7
+     8/15+	00:00	       7'691	384'550	+10.46	Re7-f7
+     8/18-	00:00	       9'866	428'956	+9.51	
+     8/23-	00:00	      18'055	475'131	+7.99	
+     8/26	00:00	      50'518	574'068	+7.42	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Ra1-d1 Ra8-e8 Nh6xf5 Bd7xf5 Qf6xf5 Re8-g8 Qf5-e4 c6-c5
+     9/26-	00:00	      64'129	582'990	+7.26	
+     9/25	00:00	      68'479	590'336	+7.43	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Ra1-d1 Ra8-e8 Nh6xf5 Bd7xf5 Qf6xf5 Re8-g8 Qf5-e4 c6-c5 Rd1-d5 Rg7-b7
+    10/20	00:00	      72'541	599'512	+7.41	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Ra1-d1 Ra8-e8 Nh6xf5 Bd7xf5 Qf6xf5 Re8-g8
+    11/23-	00:00	      80'993	608'969	+7.33	
+    11/23+	00:00	      84'292	615'270	+7.50	Re7-f7
+    11/18+	00:00	      84'847	614'833	+7.62	Re7-f7
+    11/24-	00:00	      91'176	624'493	+7.25	
+    11/30+	00:00	     124'247	664'422	+7.81	Re7-f7
+    11/24+	00:00	     128'289	668'171	+9.78	Re7-f7
+    11/24	00:00	     132'699	666'829	+10.42	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Ra1-d1 Ra8-e8 f2-f3 Bd7-e6 Rd1-e1 c6-c5 Re1xe6 Re8-b8 Nh6xf5
+    12/24	00:00	     145'433	676'432	+10.42	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Ra1-d1 Ra8-e8 f2-f3 Bd7-e6 Rd1-e1 c6-c5 Re1xe6 Re8-b8 Nh6xf5
+    13/26	00:00	     167'046	684'614	+10.42	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Ra1-d1 Ra8-e8 f2-f3 Bd7-e6 Rd1-e1 c6-c5 Re1xe6 Re8-b8 Nh6xf5
+    14/27+	00:00	     172'632	685'047	+10.50	Re7-f7
+    14/27+	00:00	     180'709	687'106	+10.58	Re7-f7
+    14/16+	00:00	     478'195	740'239	+M500	Re7-f7
+    14/28	00:00	     508'794	738'452	+13.39	Re7-f7 Qf8xf7 Nh6xf7+ Kh8-g8 Nf7-h6+ Kg8-h8 Ra1-d1 Ra8-e8 f2-f3 Bd7-e6 Rd1-e1 c6-c5 Re1xe6 Re8-c8 Nh6xf5 Rc8-g8 Nf5xg7
+   20/12/2013 23:25:58, Time for this analysis: 00:00:01, Rated time: 00:10
+
+ 9 Bh2+; id "WAC.009";  
+    Searching move: Bd6-h2
+    Best move (Vajolet2): Bd6-h2
+    Identical moves! Found in: 00:00
+     2/6	00:00	         188	94'000	 0.00	Bd6-h2+ Kg1-h1 Bh2-d6+ Kh1-g1
+     3/6	00:00	         295	98'333	 0.00	Bd6-h2+ Kg1-h1 Bh2-d6+ Kh1-g1
+     4/14	00:00	         489	163'000	 0.00	Bd6-h2+ Kg1-h1 Bh2-d6+ Kh1-g1
+     5/7	00:00	         728	182'000	 0.00	Bd6-h2+ Kg1-h1 Bh2-d6+ Kh1-g1
+     6/12+	00:00	       1'247	207'833	+M5	Bd6-h2+
+     6/16	00:00	       5'400	225'000	+M5	Bd6-h2+ Kg1-h1 Bh2-g3+ Kh1-g1 Rh4-h1+ Kg1xh1 Qd8-h4+ Kh1-g1 Qh4-h2+
+     7/16	00:00	       9'293	290'406	+M5	Bd6-h2+ Kg1-h1 Bh2-g3+ Kh1-g1 Rh4-h1+ Kg1xh1 Qd8-h4+ Kh1-g1 Qh4-h2+
+     8/18	00:00	      15'128	343'818	+M5	Bd6-h2+ Kg1-h1 Bh2-g3+ Kh1-g1 Rh4-h1+ Kg1xh1 Qd8-h4+ Kh1-g1 Qh4-h2+
+     9/16	00:00	      27'512	404'588	+M5	Bd6-h2+ Kg1-h1 Bh2-g3+ Kh1-g1 Rh4-h1+ Kg1xh1 Qd8-h4+ Kh1-g1 Qh4-h2+
+   20/12/2013 23:26:00, Time for this analysis: 00:00:01, Rated time: 00:10
+
+ 10 Rxh7; id "WAC.010"; 
+    Searching move: Rh4xh7
+    Best move (Vajolet2): Rh4xh7
+    Identical moves! Found in: 00:00
+     2/12	00:00	         832	277'333	+2.30	Rh4xh7 f6xe5 b2-b3
+     3/13	00:00	       2'924	292'400	+2.05	Rh4xh7 Bc8-b7 Qg6xg7+ Qc7xg7 Rh7xg7+ Kg8xg7 e5xf6+ Kg7xf6
+     4/13	00:00	       5'013	334'200	+2.05	Rh4xh7 Bc8-b7 Qg6xg7+ Qc7xg7 Rh7xg7+ Kg8xg7 e5xf6+ Kg7xf6
+     5/13+	00:00	       5'379	358'600	+2.14	Rh4xh7
+     5/15+	00:00	       6'212	365'411	+2.23	Rh4xh7
+     5/14+	00:00	       7'486	394'000	+2.81	Rh4xh7
+     5/15	00:00	       9'086	413'000	+2.92	Rh4xh7 Rg7xg6 Rh7xc7 Bc8-d7 e5xf6 Rg6xf6
+     6/13+	00:00	       9'543	414'913	+3.03	Rh4xh7
+     6/15	00:00	      11'550	427'777	+3.10	Rh4xh7 Rg7xg6 Rh7xc7 Bc8-d7 b2-b3 f6xe5 Rc7xc5
+     7/16+	00:00	      13'082	451'103	+3.22	Rh4xh7
+     7/17+	00:00	      13'647	454'900	+3.30	Rh4xh7
+     7/21+	00:00	      19'908	485'560	+3.88	Rh4xh7
+     7/19	00:00	      27'659	521'867	+3.98	Rh4xh7 f6xe5 Qg6xg7+ Qc7xg7 Rh7xg7+ Kg8xg7 Nd6-f5+ e6xf5 Rd1xd8 Bc8-e6 Rd8-d6 Be6-c4 h2-h4
+     8/22	00:00	      38'297	555'028	+3.98	Rh4xh7 f6xe5 Qg6xg7+ Qc7xg7 Rh7xg7+ Kg8xg7 Nd6-f5+ e6xf5 Rd1xd8 Bc8-e6 Rd8-d6 Be6-c4 h2-h4
+     9/22	00:00	      57'004	593'791	+3.98	Rh4xh7 f6xe5 Qg6xg7+ Qc7xg7 Rh7xg7+ Kg8xg7 Nd6-f5+ e6xf5 Rd1xd8 Bc8-e6 Rd8-d6 Be6-c4 h2-h4
+   20/12/2013 23:26:02, Time for this analysis: 00:00:01, Rated time: 00:10
+
+ 11 Bxc6; id "WAC.011"; 
+    Searching move: Bf3xc6
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/10	00:00	         770	256'666	+0.64	Na4-c5 Bf8xc5+ Bb6xc5
+     3/12	00:00	       1'600	266'666	+0.71	Na4-c5 Bf8xc5+ Bb6xc5 a6-a5
+     4/14	00:00	       2'454	306'750	+0.61	Na4-c5 Bf8xc5+ Bb6xc5 a6-a5 Rf1-e1
+     5/16+	00:00	       4'845	302'812	+0.69	Bf3xc6
+     5/14+	00:00	       5'260	309'411	+0.80	Bf3xc6
+     5/9+	00:00	       7'393	321'434	+4.83	Bf3xc6
+     5/18	00:00	       9'411	313'700	+5.34	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 Rf1-e1 Nd5xf4
+     6/13-	00:00	      12'348	343'000	+4.13	
+     6/15	00:00	      13'169	355'918	+3.68	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Bd7xa4 f5xe6 Nd5xb6 e6xf7+ Ke8-e7
+     7/16	00:00	      14'700	376'923	+3.68	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Bd7xa4 f5xe6 Nd5xb6 e6xf7+ Ke8-e7
+     8/18	00:00	      20'958	427'714	+3.68	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Bd7xa4 f5xe6 Nd5xb6 e6xf7+ Ke8-e7
+     9/24-	00:00	      81'588	586'964	+3.21	
+     9/26	00:00	     148'127	617'195	+3.17	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 Bb6-f2 Bd7xa4 f4-f5 Ba4-d7 f5xe6 Bd7xe6 Qd1-d4 Ra8-d8 Ra1-d1 a6-a5
+    10/28+	00:00	     159'127	619'171	+3.25	Bf3xc6
+    10/28+	00:00	     161'195	619'980	+3.34	Bf3xc6
+    10/28+	00:00	     167'566	625'246	+3.64	Bf3xc6
+    10/28	00:00	     182'296	632'972	+3.71	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Bd7xa4 f5xe6 f7xe6 Bb6-d4 Ba4-b5 Qd1-g4 Nd5-c7 Qg4-h5+ g7-g6
+    11/18	00:00	     190'427	634'756	+3.71	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Bd7xa4 f5xe6 f7xe6 Bb6-d4 Ba4-b5 Qd1-g4 Nd5-c7 Qg4-h5+ g7-g6
+    12/25-	00:00	     223'084	641'045	+3.63	
+    12/29+	00:00	     340'930	654'376	+3.79	Bf3xc6
+    12/26	00:00	     349'119	655'007	+3.80	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Nd5xb6 f5xe6 Bd7xe6 Na4xb6 Bf8-c5+ Kg1-h1 Bc5xb6 Qd1-d6 Bb6-a7 Qd6-c6+ Ke8-e7 Qc6-b7+ Ke7-d6 Ra1-d1+
+    13/21	00:00	     368'375	656'639	+3.80	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Nd5xb6 f5xe6 Bd7xe6 Na4xb6 Bf8-c5+ Kg1-h1 Bc5xb6 Qd1-d6 Bb6-a7 Qd6-c6+ Ke8-e7 Qc6-b7+ Ke7-d6 Ra1-d1+ Kd6-e5
+    14/26	00:00	     401'877	659'896	+3.80	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Nd5xb6 f5xe6 Bd7xe6 Na4xb6 Bf8-c5+ Kg1-h1 Bc5xb6 Qd1-d6 Bb6-a7 Qd6-c6+ Ke8-e7 Qc6-b7+ Ke7-d6 Ra1-d1+ Kd6-e5 Qb7xa6
+    15/30+	00:00	     433'075	658'168	+3.88	Bf3xc6
+    15/34+	00:00	     488'286	659'845	+3.96	Bf3xc6
+    15/36+	00:01	     678'683	660'197	+4.27	Bf3xc6
+    15/34	00:01	     851'549	665'272	+4.40	Bf3xc6 Nf6-d5 Bc6xd7+ Bc8xd7 f4-f5 Nd5xb6 f5xe6 Bd7xe6 Na4xb6 Bf8-c5+ Kg1-h1 Ra8-d8 Qd1-f3 O-O Nb6-a4 Bc5-d4 c2-c3 b4xc3 Na4xc3 Be6-c4 Rf1-e1 Rf8-e8 Ra1-d1
+    17/28-	00:01	   1'022'939	673'429	+4.33	
+   20/12/2013 23:26:05, Time for this analysis: 00:00:01, Rated time: 00:20
+
+ 12 Qxf3+; id "WAC.012" 
+    Searching move: Qg4xf3
+    Best move (Vajolet2): Qg4xf3
+    Identical moves! Found in: 00:00
+     2/12	00:00	         361	180'500	+M2	Qg4xf3+ Qc2-g2 Qf3xg2+
+     3/1	00:00	         417	208'500	+M2	Qg4xf3+ Qc2-g2 Qf3xg2+
+     4/1	00:00	         469	234'500	+M2	Qg4xf3+ Qc2-g2 Qf3xg2+
+     5/1	00:00	         522	261'000	+M2	Qg4xf3+ Qc2-g2 Qf3xg2+
+     6/1	00:00	         577	288'500	+M2	Qg4xf3+ Qc2-g2 Qf3xg2+
+     7/1	00:00	         633	316'500	+M2	Qg4xf3+ Qc2-g2 Qf3xg2+
+     8/1	00:00	         690	345'000	+M2	Qg4xf3+ Qc2-g2 Qf3xg2+
+     9/1	00:00	         747	373'500	+M2	Qg4xf3+ Qc2-g2 Qf3xg2+
+   20/12/2013 23:26:07, Time for this analysis: 00:00:01, Rated time: 00:20
+
+ 13 Qxf8+; id "WAC.013" 
+    Searching move: Qf1xf8
+    Best move (Vajolet2): Qf1xf8
+    Identical moves! Found in: 00:00
+     2/12	00:00	         484	242'000	+1.53	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-f7 Nd7xe5+ Nc6xe5
+     3/11	00:00	         718	359'000	+1.56	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5
+     4/8	00:00	       1'008	336'000	+1.56	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5
+     5/8+	00:00	       1'068	356'000	+1.89	Qf1xf8+
+     5/9+	00:00	       1'114	371'333	+2.01	Qf1xf8+
+     5/11	00:00	       1'640	410'000	+2.03	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 Ra1-f1
+     6/13	00:00	       2'686	383'714	+2.01	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 Ra1-b1 b7-b6
+     7/12+	00:00	       3'174	352'666	+2.10	Qf1xf8+
+     7/14	00:00	       4'060	406'000	+2.10	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 Ra1-b1 b7-b6 Rb1-f1
+     8/14-	00:00	       6'513	465'214	+1.93	
+     8/15	00:00	       8'682	482'333	+1.95	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 a2-a4 g7-g6 Ra1-b1 b7-b6
+     9/18	00:00	      12'630	505'200	+2.02	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 a2-a4 b7-b6 Ra1-c1 a7-a6 Rc1-f1
+    10/20-	00:00	      18'318	508'833	+1.94	
+    10/25	00:00	     122'094	744'475	+2.00	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 h2-h3 b7-b5 a2-a3 c4-c3 Ra1-b1 a7-a6 Rb1-c1 d5-d4 Rc1-f1
+    11/20	00:00	     129'236	755'766	+1.94	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 a2-a4 Ne5-d7 Ra1-b1 b7-b6 Rb1-c1 g7-g6 e2-e4 Ke7-d6
+    12/22	00:00	     145'490	765'736	+2.00	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 h2-h3 b7-b5 a2-a3 c4-c3 Ra1-b1 a7-a6 Rb1-c1 d5-d4 Rc1-f1
+    13/23	00:00	     172'174	782'609	+2.00	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 h2-h3 b7-b5 a2-a3 c4-c3 Ra1-b1 a7-a6 Rb1-c1 d5-d4 Rc1-f1
+    15/26-	00:00	     345'843	819'533	+1.92	
+    15/30	00:00	     807'967	826'987	+1.90	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 Ra1-b1 b7-b6 h2-h3 Ke7-d6 Kh1-h2 Kd6-c5 Rb1-c1 a7-a6 a2-a3 g7-g6 e2-e3 Kc5-d6 Rc1-d1
+    16/30	00:01	     874'418	824'922	+1.91	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 Ra1-b1 b7-b6 h2-h3 Ke7-d6 Kh1-h2 Kd6-c5 Rb1-c1 g7-g6 Rc1-f1 c4-c3 Rf1-f6 Kc5-d6
+    17/31	00:01	     990'238	824'511	+1.90	Qf1xf8+ Kg8xf8 Nc5-d7+ Kf8-e7 Nd7xe5 Nc6xe5 Ra1-b1 b7-b6 h2-h3 Ke7-d6 Kh1-h2 Kd6-c5 Rb1-c1 g7-g6 a2-a3 a7-a6 e2-e3 Kc5-d6 Rc1-d1
+   20/12/2013 23:26:09, Time for this analysis: 00:00:01, Rated time: 00:20
+
+ 14 Qxh7+; id "WAC.014" 
+    Searching move: Qh3xh7
+    Best move (Vajolet2): Qh3xh7
+    Identical moves! Found in: 00:00
+     2/12	00:00	       1'650	275'000	+0.45	b3-b4 Bc5-e7
+     3/14	00:00	       3'784	252'266	+2.65	Qh3xh7+ Kg8-f8 Qh7-g7+ Kf8-e7 Bb2-f6+ Ke7-d6 Bf6xd8 Ra8xd8
+     4/18	00:00	       9'383	284'333	+M4	Qh3xh7+ Kg8-f8 Bb2-f6 Bc5xe3+ Rf3xe3 Ra8-c8 Qh7-g7+
+     5/14	00:00	      11'687	307'552	+M4	Qh3xh7+ Kg8-f8 Bb2-f6 Bc5xe3+ Rf3xe3 Ra8-c8 Qh7-g7+
+     6/18	00:00	      16'069	349'326	+M4	Qh3xh7+ Kg8-f8 Bb2-f6 Bc5xe3+ Rf3xe3 Ra8-c8 Qh7-g7+
+     7/16	00:00	      19'608	369'962	+M4	Qh3xh7+ Kg8-f8 Bb2-f6 Bc5xe3+ Rf3xe3 Ra8-c8 Qh7-g7+
+     8/16	00:00	      23'896	391'737	+M4	Qh3xh7+ Kg8-f8 Bb2-f6 Bc5xe3+ Rf3xe3 Ra8-c8 Qh7-g7+
+     9/18	00:00	      41'161	437'882	+M4	Qh3xh7+ Kg8-f8 Bb2-f6 Bc5xe3+ Rf3xe3 Ra8-c8 Qh7-g7+
+   20/12/2013 23:26:11, Time for this analysis: 00:00:01, Rated time: 00:20
+
+ 15 Rxb7; id "WAC.015"; 
+    Searching move: Rb8xb7
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/10	00:00	         831	277'000	+2.88	Rb8-g8 Kd7-c6
+     3/11	00:00	       1'441	288'200	+6.18	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7
+     4/8	00:00	       1'626	325'200	+6.24	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 b2-b3
+     5/11	00:00	       2'026	337'666	+6.19	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 b2-b3 g7-g6
+     6/10	00:00	       2'464	352'000	+6.22	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 b2-b3 g7-g6 Kg1-f2
+     7/17+	00:00	       3'572	357'200	+6.30	Rb8xb7
+     7/11+	00:00	       3'675	367'500	+6.39	Rb8xb7
+     7/13+	00:00	       4'192	381'090	+7.53	Rb8xb7
+     7/16	00:00	       5'104	392'615	+7.64	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 Rc1-d1 h6-h5 Rd1-d6 h5-h4 g3xh4
+     8/17+	00:00	       5'586	399'000	+7.73	Rb8xb7
+     8/16	00:00	       7'131	419'470	+7.72	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 Rc1-d1 h6-h5 Rd1-d7+ Kb7-c8 Rd7-e7 h5-h4 g3xh4
+     9/18+	00:00	       7'789	409'947	+7.81	Rb8xb7
+     9/17+	00:00	       8'354	439'684	+7.89	Rb8xb7
+     9/18+	00:00	       9'131	434'809	+8.01	Rb8xb7
+     9/18	00:00	      12'428	428'551	+8.04	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 Rc1-d1 h6-h5 Rd1-d6 g7-g6 b2-b3 g6-g5 Rd6xe6
+    14/23-	00:00	     119'160	816'164	+9.23	
+    14/25	00:00	     125'605	826'348	+9.17	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 Rc1-d1 Kb7-b6 Rd1-d6+ Kb6-c5 Rd6xe6 h6-h5 Re6-a6 Kc5-b4 e5-e6 Kb4xa4 e6-e7 Ka4-b5 e7-e8Q+ Kb5xa6 Qe8xh5
+    15/25+	00:00	     138'794	836'108	+9.25	Rb8xb7
+    15/28+	00:00	     161'857	856'386	+9.33	Rb8xb7
+    15/31	00:00	     210'994	875'493	+9.39	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 Rc1-d1 Kb7-b6 Rd1-d6+ Kb6-c5 Rd6xe6 Kc5-d5 Re6-e8 g7-g6 e5-e6 Kd5-e5 b2-b3 Ke5-f6 Kg1-f1 Kf6-g5 e6-e7
+    16/24	00:00	     235'967	887'093	+9.39	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 Rc1-d1 Kb7-b6 Rd1-d6+ Kb6-c5 Rd6xe6 Kc5-d5 Re6-e8 g7-g6 e5-e6 Kd5-e5 b2-b3 Ke5-f6 Kg1-f1 Kf6-g5 e6-e7
+    17/27	00:00	     312'608	911'393	+9.39	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 Rc1-d1 Kb7-b6 Rd1-d6+ Kb6-c5 Rd6xe6 Kc5-d5 Re6-e8 g7-g6 e5-e6 Kd5-e5 b2-b3 Ke5-f6 Kg1-f1 Kf6-g5 e6-e7
+    18/30-	00:00	     769'164	925'588	+9.19	
+    18/33	00:00	     929'509	938'897	+9.36	Rb8xb7 Rc7xb7 c5-c6+ Kd7-c7 c6xb7+ Kc7xb7 Rc1-d1 Kb7-b6 Rd1-d6+ Kb6-c5 Rd6xe6 Kc5-d5 Re6-e8 h6-h5 e5-e6 g7-g5 b2-b3 Kd5-e5 Kg1-f2 Ke5-f6 Kf2-f1 Kf6-g6 e6-e7
+    19/30-	00:01	   1'024'109	947'371	+9.28	
+   20/12/2013 23:26:13, Time for this analysis: 00:00:01, Rated time: 00:30
+
+ 16 Nc3; id "WAC.016";  
+    Searching move: Ne2-c3
+    Best move (Vajolet2): Ne2-c3
+    Identical moves! Found in: 00:01
+     2/5	00:00	         265	265'000	+0.38	Ne2-c3 Qd5-d6 Be3xc5 Qd6xc5
+     3/8	00:00	         620	310'000	+0.38	Ne2-c3 Qd5-d6 Be3xc5 Qd6xc5
+     4/8	00:00	       1'268	317'000	+3.92	Ne2-c3 Qd5-d6 Nc3-e4 Qd6-e7 Be3xc5
+     5/8	00:00	       1'683	336'600	+3.92	Ne2-c3 Qd5-d6 Nc3-e4 Qd6-e7 Be3xc5
+     6/11+	00:00	       2'482	354'571	+4.00	Ne2-c3
+     6/13+	00:00	       2'961	329'000	+4.08	Ne2-c3
+     6/12	00:00	       4'190	349'166	+4.14	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Rf1-e1 Ra8-d8
+     7/18-	00:00	       6'998	333'238	+3.96	
+     7/15	00:00	       9'445	337'321	+3.92	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Rf1-e1 b7-b6 Bc5-e3 Ra8-d8
+     8/14	00:00	      11'338	343'575	+3.92	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Rf1-e1 b7-b6 Bc5-e3 Ra8-d8
+     9/22-	00:00	      28'044	467'400	+3.76	
+     9/24	00:00	      62'067	530'487	+3.72	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Rf1-e1 Ra8-d8 Bc5-e3 f7-f6 Qd1-f3 b7-b6 Be3-d2 a7-a5
+    10/18	00:00	      65'831	539'598	+3.75	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Rf1-e1 Ra8-d8 f2-f3 b7-b6 Bc5-e3 f7-f6
+    11/20	00:00	      82'434	564'616	+3.68	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Qd1-f3 b7-b6 Bc5-e3 f7-f6 Be3-d2 Ra8-d8 Ra1-e1
+    12/21	00:00	     102'239	571'167	+3.73	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Qd1-f3 b7-b6 Bc5-e3 Nc6-d4 Qf3-d1 Ra8-d8 Be3-g5 f7-f6
+    13/24-	00:00	     206'027	613'175	+3.65	
+    13/30	00:01	     767'105	621'641	+3.59	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Kg1-h1 Ra8-d8 f2-f3 b7-b6 Bc5-f2 f7-f6 Qd1-d2 a7-a6 Rf1-e1 Kg8-h8 Ra1-d1
+    14/23	00:01	     793'158	623'551	+3.64	Ne2-c3 Qd5-d7 Be3xc5 Rf8-e8 Kg1-h1 Ra8-d8 f2-f3 b7-b6 Bc5-f2 f7-f6 Qd1-d2 a7-a6 Rf1-e1 Nc6-d4 Ra1-d1
+   20/12/2013 23:26:15, Time for this analysis: 00:00:01, Rated time: 00:31
+
+ 17 Ne5; id "WAC.017";  
+    Searching move: Nc4-e5
+    Best move (Vajolet2): Nc4-e5
+    Identical moves! Found in: 00:00
+     2/10	00:00	         855	213'750	+0.16	Bc1-f4 Rh8-d8
+     3/13	00:00	       5'781	275'285	+0.38	Nc4-e5 Rg6-f6 Ne5xd7+ Qe6xd7
+     4/12	00:00	       6'896	299'826	+0.58	Nc4-e5 Rg6-f6 Ne5xd7+ Qe6xd7 Bc1-f4
+     5/14+	00:00	       9'025	300'833	+0.66	Nc4-e5
+     5/11+	00:00	       9'180	306'000	+0.75	Nc4-e5
+     5/14+	00:00	      11'128	317'942	+1.33	Nc4-e5
+     5/14	00:00	      12'950	340'789	+1.50	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-e8 Bg5xf6 Qe6xf6
+     6/13	00:00	      15'726	374'428	+1.50	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-e8 Bg5xf6 Qe6xf6
+     7/16+	00:00	      22'323	413'388	+1.58	Nc4-e5
+     7/15+	00:00	      24'633	432'157	+1.66	Nc4-e5
+     7/16	00:00	      30'995	462'611	+1.72	Nc4-e5 Rh8-c8 Ne5xg6 Ne7xg6 Ra1-b1 Qe6xb3 Rb1xb3
+     8/17+	00:00	      37'064	475'179	+1.80	Nc4-e5
+     8/18	00:00	      54'112	510'490	+1.79	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-c8 Bg5xf6 Qe6xf6 c3-c4 Rh8-d8
+     9/18-	00:00	      57'922	517'160	+1.71	
+     9/20	00:00	      72'861	539'711	+1.67	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-c8 Bg5xf6 Qe6xf6 c3-c4 Rh8-d8 Ra1-d1 Bc8-e6
+    10/21	00:00	      94'497	569'259	+1.67	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-c8 Bg5xf6 Qe6xf6 c3-c4 Rh8-d8 Ra1-d1 Bc8-e6
+    11/24-	00:00	     287'384	657'629	+0.94	
+    11/26	00:00	     419'859	660'155	+1.14	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-e8 f2-f3 Ne7-g6 f3xe4 Ng6xe5 d4xe5 Qe6xe5 Bg5xf6 Qe5xf6 a2-a4 Be8-f7
+    12/21	00:00	     443'297	661'637	+1.14	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-e8 f2-f3 Ne7-g6 f3xe4 Ng6xe5 d4xe5 Qe6xe5 Bg5xf6 Qe5xf6 a2-a4 Be8-f7
+    13/22	00:00	     524'635	664'936	+1.14	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-e8 f2-f3 Ne7-g6 f3xe4 Ng6xe5 d4xe5 Qe6xe5 Bg5xf6 Qe5xf6 a2-a4 Be8-f7
+    14/25+	00:00	     617'300	665'911	+1.22	Nc4-e5
+    14/29	00:01	     884'141	675'432	+1.27	Nc4-e5 Rg6-f6 Bc1-g5 Bd7-e8 f2-f3 Ne7-g6 f3xe4 Ng6xe5 d4xe5 Qe6xe5 Bg5xf6 Qe5xf6 e4xf5 Qf6xf5 c3-c4 Rh8-f8 Ra1-d1 Be8-h5 Rd1-d2 Qf5-c5+ Kg1-h1
+   20/12/2013 23:26:18, Time for this analysis: 00:00:02, Rated time: 00:31
+
+ 18 Rh8; id "WAC.018";  
+    Searching move: Ra8-h8
+    Best move (Vajolet2): Ra8-h8
+    Identical moves! Found in: 00:00
+     2/8	00:00	         167	167'000	+2.56	Kg1-f1 Ra2-d2
+     3/8	00:00	         421	421'000	+2.58	Kg1-f1 Kf7-e7 Kf1-e1
+     4/10	00:00	       1'066	533'000	+2.59	Kg1-f1 Kf7-e7 Kf1-e1 Ra2-c2
+     5/10	00:00	       1'833	458'250	+2.58	Kg1-f1 Kf7-e7 Kf1-e1 Ke7-d7 Ke1-d1
+     6/12	00:00	       3'228	538'000	+2.59	Kg1-f1 Kf7-e7 Kf1-e1 Ke7-d7 Ke1-d1 Ra2-f2
+     7/14	00:00	       4'842	538'000	+2.55	Kg1-f1 Kf7-e7 Kf1-e1 Ke7-d7 Ke1-d1 Kd7-e7 Kd1-c1
+     8/14	00:00	       6'757	563'083	+2.56	Kg1-f1 Kf7-e7 Kf1-e1 Ke7-d7 Ke1-d1 Kd7-e7 Kd1-c1 Ra2-f2
+     9/17+	00:00	      15'054	579'000	+2.67	Ra8-h8
+     9/17+	00:00	      16'048	573'142	+2.76	Ra8-h8
+     9/15+	00:00	      65'384	817'300	+5.39	Ra8-h8
+     9/20	00:00	     104'588	917'438	+6.53	Ra8-h8 Ra2-a1+ Kg1-f2 Ra1-a2+ Kf2-e3 Ra2-a3+ Ke3-d4 Ra3-a4+ Kd4-c5 Ra4-a5+ Kc5-b4 Ra5-a2 a7-a8Q Ra2xa8 Rh8xa8
+    10/15	00:00	     109'817	922'831	+6.53	Ra8-h8 Ra2-a1+ Kg1-f2 Ra1-a2+ Kf2-e3 Ra2-a3+ Ke3-d4 Ra3-a4+ Kd4-c5 Ra4-a5+ Kc5-b4 Ra5-a2 a7-a8Q Ra2xa8 Rh8xa8
+    11/19+	00:00	     120'957	937'651	+6.61	Ra8-h8
+    11/22+	00:00	     141'052	966'109	+6.70	Ra8-h8
+    11/26	00:00	     205'150	1'010'591	+6.74	Ra8-h8 Kf7-e7 a7-a8Q Ra2xa8 Rh8xa8 Ke7-d6 Ra8-a5 Kd6-c6 Kg1-f2 Kc6-b6 Ra5-e5 Kb6-c6
+    12/24	00:00	     220'985	1'009'063	+6.74	Ra8-h8 Kf7-e7 a7-a8Q Ra2xa8 Rh8xa8 Ke7-d6 Ra8-a5 Kd6-c6 Kg1-f2 Kc6-b6 Ra5-e5 Kb6-c6
+   20/12/2013 23:26:21, Time for this analysis: 00:00:01, Rated time: 00:31
+
+ 19 c6; id "WAC.019";   
+    Searching move: c5-c6
+    Best move (Vajolet2): c5-c6
+    Identical moves! Found in: 00:00
+     2/11	00:00	       1'237	412'333	-0.26	c5-c6 Qh5xb5 Na3xb5
+     3/9	00:00	       1'674	334'800	-0.26	c5-c6 Qh5xb5 Na3xb5
+     4/13	00:00	       3'160	351'111	+0.16	c5-c6 Qh5-d5 Qb5xd5 e6xd5 c6xd7 Bc8xd7
+     5/13	00:00	       5'390	336'875	+0.16	c5-c6 Qh5-d5 Qb5xd5 e6xd5 c6xd7 Bc8xd7
+     6/14+	00:00	       6'954	316'090	+0.24	c5-c6
+     6/15+	00:00	       7'237	328'954	+0.35	c5-c6
+     6/13	00:00	       8'663	360'958	+0.42	c5-c6 Qh5-d5 Qb5xd5 e6xd5 c6xd7 Bc8xd7 Na3-c2
+     7/15+	00:00	       9'739	374'576	+0.56	c5-c6
+     7/12+	00:00	      10'136	389'846	+0.64	c5-c6
+     7/13+	00:00	      10'538	405'307	+0.76	c5-c6
+     7/15	00:00	      12'454	429'448	+0.90	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6xd7 Bc8xd7 Nb5-d6 Bd7-c6
+     8/17+	00:00	      15'313	464'030	+0.98	c5-c6
+     8/17	00:00	      19'009	500'236	+1.04	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6-c7 Nd7-f6 Bc1-a3 Rf8-e8 Ba3-d6
+     9/17	00:00	      24'956	519'916	+1.04	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6-c7 Nd7-f6 Bc1-a3 Rf8-e8 Ba3-d6
+    10/21-	00:00	      34'106	559'114	+0.88	
+    10/21	00:00	      43'820	592'162	+0.85	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6-c7 Nd7-f6 Bc1-a3 Rf8-e8 Nf3-e5 Bb6-a5 Ba3-d6 b7-b6
+    11/19	00:00	      55'398	608'769	+0.84	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6-c7 Nd7-f6 Bc1-a3 Rf8-e8 Nf3-e5 Bb6-a5 Ba3-c5 b7-b6
+    12/23	00:00	      76'684	633'752	+0.85	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6-c7 Nd7-f6 Bc1-a3 Rf8-e8 Nf3-e5 Bb6-a5 Ba3-d6 b7-b6
+    13/22	00:00	     119'678	653'978	+0.84	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6-c7 Nd7-f6 Bc1-a3 Rf8-e8 Nf3-e5 Bb6-a5 Ne5xf7 Kg8xf7 Nb5-d6+ Kf7-g8 Nd6xe8 Nf6xe8
+    14/27-	00:00	     353'352	679'523	+0.68	
+    14/29	00:00	     568'374	700'831	+0.62	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6xd7 Bc8xd7 Ra1-b1 Bd7-c6 Bc1-a3 Rf8-d8 Rf1-c1 Bc6-e4 Rb1-b3 Ra8-c8 Rc1-c3 Rc8xc3 Rb3xc3
+    15/28	00:00	     636'654	702'708	+0.62	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6xd7 Bc8xd7 Ra1-b1 Bd7-c6 Bc1-a3 Rf8-d8 Rf1-c1 Bc6-e4 Rb1-b3 Ra8-c8 Rc1-c3 Rc8xc3 Rb3xc3
+    16/24	00:01	     751'414	706'216	+0.62	c5-c6 Qh5xb5 Na3xb5 Bc7-b6 c6xd7 Bc8xd7 Ra1-b1 Bd7-c6 Bc1-a3 Rf8-d8 Rf1-c1 Bc6-e4 Rb1-b3 Ra8-c8 Rc1-c3 Rc8xc3 Rb3xc3
+    17/27+	00:01	     857'721	712'392	+0.70	c5-c6
+   20/12/2013 23:26:23, Time for this analysis: 00:00:01, Rated time: 00:31
+
+ 20 Bb5; id "WAC.020";  
+    Searching move: Bd7-b5
+    Best move (Vajolet2): Bd7-b5
+    Identical moves! Found in: 00:00
+     2/11	00:00	       1'134	283'500	+7.69	Bd7-b5 Qc4xb5+ a6xb5
+     3/12	00:00	       1'454	290'800	+8.42	Bd7-b5 Qc4xb5+ a6xb5 Bc1-e3 b5xa4
+     4/15	00:00	       2'913	291'300	+8.82	Bd7-b5 Qc4xb5+ a6xb5 Kf1-e2 b5xa4
+     5/13	00:00	       3'493	317'545	+8.77	Bd7-b5 Qc4xb5+ a6xb5 Kf1-e2 Ra8xa4 Ra1xa4 b5xa4
+     6/16-	00:00	       5'573	293'315	+8.58	
+     6/16	00:00	       6'368	303'238	+8.52	Bd7-b5 Qc4xb5+ a6xb5 Kf1-e2 Qd8-h4 Bc1-e3 Qh4xe4
+     7/18	00:00	      10'106	374'296	+8.60	Bd7-b5 Qc4xb5+ a6xb5 Kf1-e2 Qd8-h4 f2-f3 Ra8xa4 Ra1xa4 b5xa4
+     8/19	00:00	      17'035	448'289	+8.57	Bd7-b5 Qc4xb5+ a6xb5 Kf1-e2 Qd8-h4 f2-f3 Ra8xa4 Ra1xa4 b5xa4 Ng1-h3
+     9/18+	00:00	      20'136	468'279	+8.65	Bd7-b5
+     9/22+	00:00	      26'114	502'192	+8.74	Bd7-b5
+     9/22	00:00	      38'573	543'281	+8.63	Bd7-b5 Qc4xb5+ a6xb5 Kf1-e2 Qd8-h4 f2-f3 Ra8xa4 Ra1xa4 b5xa4 Ng1-h3 Bf8-e7 Rh1-d1 a4-a3
+   20/12/2013 23:26:25, Time for this analysis: 00:00:01, Rated time: 00:31
+
+ 21 Qh6; id "WAC.021";  
+    Searching move: Qd2-h6
+    Best move (Vajolet2): Qd2-h6
+    Identical moves! Found in: 00:00
+     2/9	00:00	       1'082	360'666	+1.17	Qd2xc3 Nd5xc3
+     3/12	00:00	       2'220	370'000	+1.34	Qd2xc3 Nd5xc3 Re1-e7 Bb7xf3 Bd3xa6
+     4/14	00:00	       4'670	359'230	+1.16	Qd2xc3 Nd5xc3 Re1-c1 Nc3-b5
+     5/14-	00:00	       7'564	360'190	+1.08	
+     5/15	00:00	       8'746	364'416	+1.15	Qd2xc3 Nd5xc3 Re1-e7 Bb7xf3 Bd3xa6 Bf3-e4 Nf5-d6
+     6/16	00:00	      13'834	384'277	+1.15	Qd2xc3 Nd5xc3 Re1-e7 Bb7xf3 Bd3xa6 b6-b5 Ba6-b7 Bf3xb7 Re7xb7
+     7/18	00:00	      18'614	443'190	+1.15	Qd2xc3 Nd5xc3 Re1-e7 Bb7xf3 Bd3xa6 b6-b5 Ba6-b7 Bf3xb7 Re7xb7
+     8/18	00:00	      32'946	531'387	+1.09	Qd2xc3 Nd5xc3 Re1-e7 Bb7xf3 Bd3xa6 b6-b5 Ba6-b7 Bf3xb7 Re7xb7 Rf8-d8
+     9/20+	00:00	      57'605	593'865	+1.17	Qd2xc3
+     9/22+	00:00	      80'195	616'884	+1.25	Qd2xc3
+     9/22+	00:00	     106'148	635'616	+1.55	Qd2xc3
+     9/23	00:00	     146'648	643'192	+1.43	Qd2xc3 Nd5xc3 Kg1-f2 Rf8-d8 Re1-e7 Bb7-d5 Bd3xa6 b6-b5 h2-h4 Bd5-e6 g3-g4 Be6xf5 g4xf5
+    10/20+	00:00	     164'763	648'673	+1.52	Qd2-h6
+    10/15+	00:00	     166'068	651'247	+1.61	Qd2-h6
+    10/23+	00:00	     194'971	665'430	+4.11	Qd2-h6
+    10/25	00:00	     231'925	678'143	+5.23	Qd2-h6 Qc3xe1+ Bd3-f1 Qe1xf1+ Kg1xf1 Nd5-e3+ Qh6xe3 Bb7-c8 Nf5-e7+ Kg8-g7 Ne7xc8 Rf8xc8 Qe3xb6 Rc8-c3 Qb6xa6 Rc3xf3+ Kf1-g2 Rf3-c3 a3-a4 Rc3-c2+ Kg2-h3
+    11/20	00:00	     242'327	682'611	+5.25	Qd2-h6 Qc3xe1+ Bd3-f1 Qe1xf1+ Kg1xf1 Nd5-e3+ Qh6xe3 Bb7-c8 Nf5-e7+ Kg8-g7 Ne7xc8 Rf8xc8 Qe3xb6 Rc8-c3 Qb6xa6 Rc3xf3+ Kf1-g2
+    12/21	00:00	     260'118	688'142	+5.25	Qd2-h6 Qc3xe1+ Bd3-f1 Qe1xf1+ Kg1xf1 Nd5-e3+ Qh6xe3 Bb7-c8 Nf5-e7+ Kg8-g7 Ne7xc8 Rf8xc8 Qe3xb6 Rc8-c3 Qb6xa6 Rc3xf3+ Kf1-g2 Rf3-e3 a3-a4
+    13/25	00:00	     294'458	697'767	+5.23	Qd2-h6 Qc3xe1+ Bd3-f1 Qe1xf1+ Kg1xf1 Nd5-e3+ Qh6xe3 Bb7-c8 Nf5-e7+ Kg8-g7 Ne7xc8 Rf8xc8 Qe3xb6 Rc8-c3 Qb6xa6 Rc3xf3+ Kf1-g2 Rf3-c3 a3-a4 Rc3-c2+ Kg2-h3
+   20/12/2013 23:26:27, Time for this analysis: 00:00:01, Rated time: 00:31
+
+ 22 Ba2 Nxf7; id "WAC.0 
+    Searching move: Bc4-a2, Ng5xf7
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/11	00:00	         794	264'666	-0.28	Qd1-h5 Rh8-f8
+     3/14	00:00	       3'789	252'600	+0.77	Ng5xf7 Ke8xf7 Qd1-h5+ Kf7-f6 Qh5xa5
+     4/16	00:00	       5'759	274'238	+0.81	Ng5xf7 Ke8xf7 Qd1-h5+ Ne7-g6 Qh5-f5+ Qd8-f6 Qf5xa5
+     5/15-	00:00	      11'314	305'783	+0.34	
+     5/11	00:00	      11'729	317'000	+0.33	Ng5xf7 Ke8xf7 Qd1-h5+ g7-g6 Qh5xa5 Bc8-d7
+     6/11+	00:00	      12'038	316'789	+0.41	Ng5xf7
+     6/13+	00:00	      12'243	322'184	+0.49	Ng5xf7
+     6/18	00:00	      15'673	356'204	+0.59	Ng5xf7 Ke8xf7 Qd1-h5+ g7-g6 Qh5xa5 Bc8-d7 O-O h7-h6
+     7/18+	00:00	      16'570	360'217	+0.68	Ng5xf7
+     7/18+	00:00	      16'975	369'021	+0.76	Ng5xf7
+     7/20	00:00	      26'932	414'338	+0.79	Ng5xf7 Ke8xf7 Qd1-h5+ g7-g6 Qh5xa5 Bc8-d7 O-O h7-h6 Bc1-f4
+     8/17+	00:00	      28'371	423'447	+0.87	Ng5xf7
+     8/18+	00:00	      29'582	428'724	+0.95	Ng5xf7
+     8/18+	00:00	      32'470	438'783	+1.07	Ng5xf7
+     8/20	00:00	      42'893	466'228	+1.11	Ng5xf7 Ke8xf7 Qd1-h5+ g7-g6 Qh5xa5 Bc8-d7 O-O a7-a6 Qa5-e5 b7-b5
+     9/22	00:00	      58'871	503'170	+1.08	Ng5xf7 Ke8xf7 Qd1-h5+ g7-g6 Qh5xa5 Bc8-d7 O-O a7-a6 Qa5-e5 b7-b5 Qe5-f4+ Ne7-f5
+    10/26-	00:00	     236'862	607'338	+0.62	
+    10/28	00:00	     344'256	606'084	+0.80	Ng5xf7 Ke8xf7 Qd1-h5+ g7-g6 Qh5xa5 Ne7-d5 O-O b7-b6 Qa5-b5 a7-a6 Qb5-b3 b6-b5 Bc4-e2 Bc8-d7 c3-c4 b5xc4 Be2xc4 Ra8-b8
+    11/22-	00:00	     363'583	605'971	+0.72	
+    11/30	00:00	     531'999	607'998	+0.80	Ng5xf7 Ke8xf7 Qd1-h5+ g7-g6 Qh5xa5 Ne7-d5 O-O b7-b6 Qa5-b5 a7-a6 Qb5-b3 b6-b5 Bc4-e2 Bc8-d7 c3-c4 b5xc4 Be2xc4 Ra8-b8
+    12/26	00:00	     572'597	607'207	+0.87	Ng5xf7 Ke8xf7 Qd1-h5+ g7-g6 Qh5xa5 Ne7-d5 O-O b7-b6 Qa5-a4 a7-a6 Bc1-d2 Bc8-d7 Qa4-b3 Bd7-c6
+    13/26-	00:01	     664'496	608'512	+0.79	
+   20/12/2013 23:26:29, Time for this analysis: 00:00:01, Rated time: 00:41
+
+ 23 g4; id "WAC.023";   
+    Searching move: g2-g4
+    Best move (Vajolet2): g2-g4
+    Identical moves! Found in: 00:00
+     2/11	00:00	         811	270'333	+1.73	Nc5xe6 f7xe6
+     3/12	00:00	       2'389	265'444	+1.45	Nc5xe6 f7xe6 Rd4-d3
+     4/13	00:00	       6'477	281'608	+1.37	Qe3-e2 Be6-c8 f2-f3 Ne8-g7
+     5/16+	00:00	      15'662	340'478	+1.64	Rd4-f4
+     5/14	00:00	      21'902	391'107	+1.45	Rd4-f4 Qf5xc2 Re1-e2 d5-d4 Re2xc2 d4xe3 Nc5xe6 f7xe6 f2xe3
+     6/12+	00:00	      22'230	390'000	+1.54	Rd4-f4
+     6/7+	00:00	      22'343	391'982	+1.62	Rd4-f4
+     6/15+	00:00	      22'680	397'894	+1.95	Rd4-f4
+     6/14	00:00	      24'183	409'881	+2.18	Rd4-f4 Qf5xc2 Re1-e2 d5-d4 Rf4xd4 Qc2-f5 Nc5xe6 f7xe6
+     7/16	00:00	      25'878	417'387	+2.18	Rd4-f4 Qf5xc2 Re1-e2 d5-d4 Rf4xd4 Qc2-f5 Nc5xe6 f7xe6
+     8/16	00:00	      28'341	436'015	+2.18	Rd4-f4 Qf5xc2 Re1-e2 d5-d4 Rf4xd4 Qc2-f5 Nc5xe6 f7xe6
+     9/17+	00:00	      30'104	442'705	+2.26	Rd4-f4
+     9/19+	00:00	      32'172	453'126	+2.35	Rd4-f4
+     9/19+	00:00	      43'742	486'022	+2.65	Rd4-f4
+     9/25+	00:00	      73'210	522'928	+2.93	g2-g4
+     9/20	00:00	      92'062	541'541	+3.31	g2-g4 Qf5xg4+ Rd4xg4 Be6xg4 Qe3-f4 Bg4-f5 Qf4-a4 Ra8-b8 b2-b4 Rb8-b6 Nc5xa6
+    10/16	00:00	      95'384	548'183	+3.31	g2-g4 Qf5xg4+ Rd4xg4 Be6xg4 Qe3-f4 Bg4-f5 Qf4-a4 Ra8-b8 b2-b4 Rb8-b6 Nc5xa6
+    11/20+	00:00	     100'513	549'251	+3.39	g2-g4
+    11/26	00:00	     130'766	573'535	+3.36	g2-g4 Qf5xg4+ Rd4xg4 Be6xg4 Qe3-f4 Bg4-f5 Qf4-a4 Ra8-b8 b2-b4 Rb8-b6 Nc5xa6 h7-h6 Kg1-g2 d5-d4 Nc3-e4
+    12/22	00:00	     145'650	589'676	+3.35	g2-g4 Qf5xg4+ Rd4xg4 Be6xg4 Qe3-f4 Bg4-f5 Qf4-a4 Ra8-b8 b2-b4 Rb8-b6 Nc5xa6 h7-h6 f2-f3 Bf5xc2
+   20/12/2013 23:26:32, Time for this analysis: 00:00:01, Rated time: 00:41
+
+ 24 Bd4; id "WAC.024";  
+    Searching move: Bg7-d4
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/11	00:00	       1'150	287'500	+6.14	Bg7-d4 Be1-d2 Bd4xe3+ Nc4xe3
+     3/6	00:00	       1'318	329'500	+6.14	Bg7-d4 Be1-d2 Bd4xe3+ Nc4xe3
+     4/13	00:00	       1'836	306'000	+5.94	Bg7-d4 Be1-d2 Bd4xe3+ Nc4xe3 Nd7-f6 f5xg6 h7xg6
+     5/13	00:00	       2'730	341'250	+5.90	Bg7-d4 Be1-d2 Bd4xe3+ Nc4xe3 Nd7-e5 Bb1-c2
+     6/17-	00:00	       4'007	364'272	+5.81	
+     6/16	00:00	       6'116	339'777	+5.87	Bg7-d4 Be1-d2 Bd4xe3+ Nc4xe3 Qe7-g5 f5xg6 f7xg6 Bb1-d3 Bb7xg2 Bd3xa6
+     7/18+	00:00	       7'094	354'700	+5.95	Bg7-d4
+     7/14+	00:00	       7'556	359'809	+6.04	Bg7-d4
+     7/17	00:00	      12'415	443'392	+6.12	Bg7-d4 Be1-d2 Bd4xe3+ Nc4xe3 Qe7-g5 f5xg6 f7xg6 g2-g3 Nd7-e5
+     8/19+	00:00	      15'238	476'187	+6.21	Bg7-d4
+     8/18+	00:00	      15'970	483'939	+6.29	Bg7-d4
+     8/18+	00:00	      17'424	497'828	+6.41	Bg7-d4
+     8/18	00:00	      24'306	552'409	+6.50	Bg7-d4 Be1-d2 Bd4xe3+ Nc4xe3 Qe7-g5 g2-g3 Nd7-e5 Kg1-f1 Bb7-f3 f5xg6 h7xg6
+     9/20+	00:00	      33'096	591'000	+6.58	Bg7-d4
+     9/19+	00:00	      39'049	610'140	+6.66	Bg7-d4
+     9/19+	00:00	      44'092	621'014	+6.78	Bg7-d4
+     9/21	00:00	      63'139	650'917	+6.94	Bg7-d4 Be1-d2 Bd4xe3+ Nc4xe3 Qe7-g5 f5xg6 h7xg6 Bb1-d3 Bb7xg2 h2-h4 Qg5-g3 Ne3xg2 Qg3xd3
+    11/20-	00:00	      97'930	699'500	+6.78	
+    11/34+	00:00	     224'580	761'288	+7.02	Bg7-d4
+    11/28+	00:00	     273'780	769'044	+7.20	Bg7-d4
+    11/24	00:00	     319'986	772'913	+7.22	Bg7-d4 Be1-f2 Bd4xe3 Nc4xe3 Qe7xb4 Bb1-c2 Qb4-a3 f5xg6 h7xg6 Bc2-b3 Nd7-c5 Bb3-c4 Qa3-c1+ Bc4-f1
+    12/23+	00:00	     349'579	771'697	+7.30	Bg7-d4
+    12/25+	00:00	     452'256	770'453	+7.38	Bg7-d4
+    12/30+	00:00	     551'336	774'348	+7.50	Bg7-d4
+    12/27	00:00	     660'431	775'153	+7.50	Bg7-d4 Be1-f2 Bd4xe3 Nc4xe3 Qe7xb4 Bb1-c2 Qb4-a3 h2-h3 Qa3xa2 Bf2-g3 Qa2-a1+ Kg1-h2 b6-b5 f5xg6 h7xg6 Bc2-d1 a6-a5
+    13/25-	00:01	     880'742	786'376	+7.22	
+   20/12/2013 23:26:34, Time for this analysis: 00:00:01, Rated time: 00:51
+
+ 25 Qh4+; id "WAC.025"; 
+    Searching move: Qg4-h4
+    Best move (Vajolet2): Qg4-h4
+    Identical moves! Found in: 00:00
+     2/10	00:00	         385	385'000	+8.50	Qg4-h4+ Kf2-g1 Qh4xf6
+     3/10	00:00	         773	386'500	+9.06	Qg4-h4+ Kf2-g2 Qh4xf6 Rd8xf8+ Kg8xf8
+     4/14	00:00	       1'510	377'500	+8.89	Qg4-h4+ Kf2-g2 Qh4xf6 Rd8xf8+ Kg8xf8 b2-b3
+     5/12+	00:00	       1'723	430'750	+8.97	Qg4-h4+
+     5/13	00:00	       2'319	386'500	+9.05	Qg4-h4+ Kf2-g2 Qh4xf6 Rd8xf8+ Kg8xf8 b2-b3 h6-h5
+     6/14+	00:00	       2'676	446'000	+9.13	Qg4-h4+
+     6/11+	00:00	       2'809	401'285	+9.22	Qg4-h4+
+     6/12+	00:00	       3'270	408'750	+9.53	Qg4-h4+
+     6/14	00:00	       4'989	453'545	+9.71	Qg4-h4+ Kf2-g2 Qh4xf6 Rd8xf8+ Kg8xf8 b2-b4 Qf6-b2 Kg2-f2 Qb2xa3 b4xc5 Qa3xc5
+     7/18	00:00	       6'958	434'875	+9.71	Qg4-h4+ Kf2-g2 Qh4xf6 Rd8xf8+ Kg8xf8 b2-b4 Qf6-b2 Kg2-f2 Qb2xa3 b4xc5 Qa3xc5
+     8/14+	00:00	       7'822	434'555	+9.79	Qg4-h4+
+     8/18+	00:00	       9'448	449'904	+9.88	Qg4-h4+
+     8/19+	00:00	      17'508	603'724	+10.86	Qg4-h4+
+     8/24	00:00	      39'138	724'777	+10.66	Qg4-h4+ Kf2-g1 Qh4xf6 Rd8xf8+ Kg8xf8 b2-b4 Qf6-c3 b4xc5 Qc3-e1+ Kg1-h2 Qe1xe2+ Kh2-h1 Qe2xe3
+     9/19+	00:00	      40'104	729'163	+10.75	Qg4-h4+
+     9/20+	00:00	      42'192	740'210	+10.83	Qg4-h4+
+     9/23+	00:00	      48'996	765'562	+11.45	Qg4-h4+
+     9/26	00:00	      78'533	818'052	+11.48	Qg4-h4+ Kf2-g2 Qh4xf6 Rd8xf8+ Kg8xf8 b2-b4 Qf6-b2 b4xc5 Qb2xe2+ Kg2-h1 Qe2xc4 c5-c6 Qc4xc6
+   20/12/2013 23:26:36, Time for this analysis: 00:00:01, Rated time: 00:51
+
+ 26 Bf5; id "WAC.026";  
+    Searching move: Bd7-f5
+    Best move (Vajolet2): Bd7-f5
+    Identical moves! Found in: 00:00
+     2/10	00:00	         538	538'000	+1.03	Qb6xb2 Re4-e7 Qb2-a1+ Kg1-h2 Qa1xa2
+     3/12	00:00	       1'796	359'200	+1.15	Bd7-f5 b2-b3 Bf5xe4 Qd3xe4
+     4/12	00:00	       2'659	379'857	+1.15	Bd7-f5 b2-b3 Bf5xe4 Qd3xe4
+     5/14+	00:00	       3'592	359'200	+1.24	Bd7-f5
+     5/14	00:00	       4'886	349'000	+1.26	Bd7-f5 b2-b3 Qb6-a5 b3-b4 Bf5xe4 Qd3xe4
+     6/15	00:00	       8'337	397'000	+1.26	Bd7-f5 b2-b3 Qb6-a5 b3-b4 Bf5xe4 Qd3xe4
+     7/17+	00:00	       9'165	416'590	+1.35	Bd7-f5
+     7/15+	00:00	       9'556	434'363	+1.43	Bd7-f5
+     7/17+	00:00	      10'505	456'739	+1.73	Bd7-f5
+     7/17	00:00	      12'322	473'923	+1.71	Bd7-f5 b2-b3 Qb6-a5 Re4-e8+ Rd8xe8 Nd4xf5 Qa5xa2 Nf5-e7+ Kg8-h8
+     8/18	00:00	      19'903	537'918	+1.66	Bd7-f5 b2-b4 Qb6-c7 f2-f3 Bf5xe4 f3xe4 b7-b5 g2-g3
+     9/19-	00:00	      28'922	578'440	+1.58	
+     9/22+	00:00	      65'400	654'000	+1.74	Bd7-f5
+     9/20+	00:00	      72'063	661'128	+1.86	Bd7-f5
+     9/21	00:00	      85'962	682'238	+2.02	Bd7-f5 b2-b4 Qb6-c7 f2-f3 Bf5xe4 f3xe4 Qc7-e5 a2-a4 Rd8-e8 c3-c4 Qe5xe4
+    10/22	00:00	      95'318	690'710	+2.02	Bd7-f5 b2-b4 Qb6-c7 f2-f3 Bf5xe4 f3xe4 Qc7-e5 a2-a4 Rd8-e8 c3-c4 Qe5xe4
+    11/26	00:00	     112'792	709'383	+2.02	Bd7-f5 b2-b4 Qb6-c7 f2-f3 Bf5xe4 f3xe4 Qc7-e5 a2-a4 Rd8-e8 c3-c4 Qe5xe4
+    12/26+	00:00	     141'752	730'680	+2.11	Bd7-f5
+    12/28+	00:00	     227'411	745'609	+2.19	Bd7-f5
+    12/33	00:00	     460'935	756'871	+2.22	Bd7-f5 b2-b4 Qb6-c7 a2-a4 Bf5xe4 Qd3xe4 Qc7xc3 Nd4-f5 b7-b6 Kg1-h2 Qc3-c7+ g2-g3 Kg8-h8 Kh2-g2 Qc7-d7 Qe4-g4
+   20/12/2013 23:26:38, Time for this analysis: 00:00:01, Rated time: 00:51
+
+ 27 Qf8+; id "WAC.027"; 
+    Searching move: Qa3-f8
+    Best move (Vajolet2): Qa3-f8
+    Identical moves! Found in: 00:00
+     2/10	00:00	         331	165'500	+M2	Qa3-f8+ Rf2xf8 Rf1xf8+
+      3	00:00	         421	210'500	+M2	Qa3-f8+ Rf2xf8 Rf1xf8+
+      4	00:00	         492	246'000	+M2	Qa3-f8+ Rf2xf8 Rf1xf8+
+      5	00:00	         579	289'500	+M2	Qa3-f8+ Rf2xf8 Rf1xf8+
+      6	00:00	         668	334'000	+M2	Qa3-f8+ Rf2xf8 Rf1xf8+
+      7	00:00	         758	252'666	+M2	Qa3-f8+ Rf2xf8 Rf1xf8+
+      8	00:00	         849	283'000	+M2	Qa3-f8+ Rf2xf8 Rf1xf8+
+      9	00:00	         940	313'333	+M2	Qa3-f8+ Rf2xf8 Rf1xf8+
+   20/12/2013 23:26:40, Time for this analysis: 00:00:01, Rated time: 00:51
+
+ 28 Qe1+; id "WAC.028"; 
+    Searching move: Qb4-e1
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/12	00:00	       1'787	297'833	+0.40	Qb4-e1+ Bc4-f1 Rb8-b5
+     3/13	00:00	       2'849	316'555	+2.05	Qb4-e1+ Bc4-f1 Be6-b3 Qc2xc6 Bb3xa4 Qc6xa4 Rb8xb2
+     4/16	00:00	       3'720	338'181	+2.05	Qb4-e1+ Bc4-f1 Be6-b3 Qc2xc6 Bb3xa4 Qc6xa4 Rb8xb2
+     5/16+	00:00	       4'196	349'666	+2.16	Qb4-e1+
+     5/16+	00:00	       4'393	366'083	+2.26	Qb4-e1+
+     5/16+	00:00	       5'051	360'785	+3.26	Qb4-e1+
+     5/17	00:00	       6'196	364'470	+3.42	Qb4-e1+ Bc4-f1 Be6-b3 Qc2-c3 Qe1xc3 b2xc3 Bb3xa4 Re5xe7
+     6/17	00:00	       7'416	370'800	+3.42	Qb4-e1+ Bc4-f1 Be6-b3 Qc2-c3 Qe1xc3 b2xc3 Bb3xa4 Re5xe7
+     7/14	00:00	       8'500	369'565	+3.42	Qb4-e1+ Bc4-f1 Be6-b3 Qc2-c3 Qe1xc3 b2xc3 Bb3xa4 Re5xe7
+     8/18+	00:00	       9'118	337'703	+3.51	Qb4-e1+
+     8/18+	00:00	      11'540	372'258	+3.59	Qb4-e1+
+     8/18	00:00	      15'466	418'000	+3.70	Qb4-e1+ Bc4-f1 Be6-b3 Qc2-c3 Qe1xc3 b2xc3 Bb3xa4 Re5xe7 Kg8-g7 Re7-a7 Rd8-d5
+     9/20-	00:00	      60'199	578'836	+3.42	
+     9/23	00:00	      71'078	602'355	+3.42	Qb4-e1+ Bc4-f1 Be6-b3 Qc2xc6 Bb3xa4 Qc6-c3 Qe1xc3 b2xc3 Rb8-b2 Re5xe7 Kg8-g7 Re7-e5 Rd8-a8 Bf1-c4
+    10/22+	00:00	      72'330	602'750	+3.50	Qb4-e1+
+    10/23	00:00	      99'947	636'605	+3.34	Qb4-e1+ Bc4-f1 Be6-b3 Qc2xc6 Bb3xa4 Qc6-c3 Qe1xc3 b2xc3 Rb8-b2 Re5xe7 Rd8-d7 Re7-e8+ Kg8-g7 Re8-e5 Rd7-a7 Bf1-c4 h7-h6
+    11/21	00:00	     104'938	639'865	+3.34	Qb4-e1+ Bc4-f1 Be6-b3 Qc2xc6 Bb3xa4 Qc6-c3 Qe1xc3 b2xc3 Rb8-b2 Re5xe7 Rd8-d7 Re7-e5 Rd7-a7
+    12/24	00:00	     133'889	656'318	+3.37	Qb4-e1+ Bc4-f1 Be6-b3 Qc2xc6 Bb3xa4 Qc6-c3 Qe1xc3 b2xc3 Rb8-b2 Re5xe7 Rd8-d7 Re7-e8+ Kg8-g7 Re8-e5 Rd7-a7
+    14/29-	00:00	     378'846	698'977	+3.65	
+    14/29+	00:00	     432'582	701'105	+3.81	Qb4-e1+
+    14/31+	00:00	     567'079	703'571	+3.93	Qb4-e1+
+    14/30	00:00	     676'644	707'786	+4.07	Qb4-e1+ Bc4-f1 Be6-b3 Qc2-c3 Qe1xc3 b2xc3 Bb3xa4 Re5xe7 Kg8-g7 c3-c4 Ba4-c2 Re7-c7 Rd8-c8 Rc7-a7 a5-a4 e3-e4 Bc2xe4 Ra7xa4
+    15/23	00:01	     705'669	709'215	+4.07	Qb4-e1+ Bc4-f1 Be6-b3 Qc2-c3 Qe1xc3 b2xc3 Bb3xa4 Re5xe7 Kg8-g7 c3-c4 Ba4-c2 Re7-c7 Rd8-c8 Rc7-a7 a5-a4 e3-e4 Bc2xe4 Ra7xa4
+    16/24-	00:01	     776'479	713'020	+3.99	
+   20/12/2013 23:26:42, Time for this analysis: 00:00:01, Rated time: 01:01
+
+ 29 c6; id "WAC.029";   
+    Searching move: c5-c6
+    Best move (Vajolet2): c5-c6
+    Identical moves! Found in: 00:00
+     2/11	00:00	         621	310'500	+0.90	Rf1-d1 Rd7xd1+ Rb1xd1
+     3/11	00:00	       2'016	288'000	+0.77	Rf1-d1 Nf6-d5 Bf4-e5
+     4/13	00:00	       4'675	311'666	+0.68	Rf1-d1 Nf6-d5 Bf4-e5 Be7-g5
+     5/14+	00:00	       7'260	315'652	+0.78	c5-c6
+     5/13+	00:00	       7'427	322'913	+0.88	c5-c6
+     5/15+	00:00	       8'027	334'458	+1.26	c5-c6
+     5/16	00:00	      10'240	365'714	+1.46	c5-c6 b7xc6 Bg2xc6 Nf6-d5 Bf4-d2 Ra8-c8 Bc6xd7 Qd8xd7
+     6/14+	00:00	      12'059	401'966	+1.55	c5-c6
+     6/11+	00:00	      12'326	397'612	+1.63	c5-c6
+     6/17	00:00	      13'727	428'968	+1.59	c5-c6 b7xc6 Bg2xc6 Nf6-d5 Bc6xd7 Qd8xd7 Qe2-e4 Ra8-c8
+     7/18	00:00	      19'889	473'547	+1.57	c5-c6 b7xc6 Bg2xc6 Nf6-d5 Bc6xd7 Qd8xd7 Bf4-d2 Ra8-c8 a2-a3
+     8/22-	00:00	      42'284	579'232	+1.29	
+     8/21	00:00	      58'849	619'463	+1.56	c5-c6 b7xc6 Bg2xc6 Nf6-d5 Bf4-d2 Ra8-c8 Bc6xd7 Qd8xd7 Qe2-d3 Nd5-f6 Qd3xd7 Nf6xd7
+     9/19	00:00	      64'179	623'097	+1.56	c5-c6 b7xc6 Bg2xc6 Nf6-d5 Bf4-d2 Ra8-c8 Bc6xd7 Qd8xd7 Qe2-d3 Nd5-f6 Qd3xd7 Nf6xd7
+    10/20	00:00	      78'132	640'426	+1.56	c5-c6 b7xc6 Bg2xc6 Nf6-d5 Bf4-d2 Ra8-c8 Bc6xd7 Qd8xd7 Qe2-d3 Nd5-f6 Qd3xd7 Nf6xd7
+    11/26-	00:00	     144'654	688'828	+1.39	
+    11/27	00:00	     262'979	695'711	+1.54	c5-c6 b7xc6 Bg2xc6 Ra8-c8 Bc6xd7 Qd8xd7 Rf1-c1 Rc8xc1+ Bf4xc1 Nf6-d5 Bc1-d2 Qd7-a4 Qe2-c4 Nd5-b6 Qc4-b3 Qa4xb3 Rb1xb3
+    12/24	00:00	     300'397	696'976	+1.54	c5-c6 b7xc6 Bg2xc6 Ra8-c8 Bc6xd7 Qd8xd7 Rf1-c1 Rc8xc1+ Bf4xc1 Nf6-d5 Bc1-d2 Qd7-a4 Qe2-c4 Nd5-b6 Qc4-b3 Qa4xb3 Rb1xb3
+    13/25	00:00	     383'294	700'720	+1.54	c5-c6 b7xc6 Bg2xc6 Ra8-c8 Bc6xd7 Qd8xd7 Rf1-c1 Rc8xc1+ Bf4xc1 Nf6-d5 Bc1-d2 Qd7-a4 Qe2-c4 Nd5-b6 Qc4-b3 Qa4xb3 Rb1xb3
+    14/26+	00:00	     474'620	700'029	+1.63	c5-c6
+    14/28	00:00	     705'351	717'549	+1.54	c5-c6 b7xc6 Bg2xc6 Ra8-c8 Bc6xd7 Qd8xd7 Rf1-c1 Nf6-d5 Qe2-d3 Rc8-d8 Bf4-d2 Be7-f6 a2-a3 Nd5-c7 Qd3xd7 Rd8xd7 Bd2-f4
+   20/12/2013 23:26:45, Time for this analysis: 00:00:01, Rated time: 01:01
+
+ 30 Nxd6; id "WAC.030"; 
+    Searching move: Ne4xd6
+    Best move (Vajolet2): Ne4xd6
+    Identical moves! Found in: 00:00
+     2/14	00:00	       8'236	374'363	-0.15	Ne4-c3 Qe7-d7
+     3/15	00:00	      13'846	419'575	-0.21	Ne4-c3 d6-d5 a2-a3
+     4/16	00:00	      23'289	465'780	-0.10	Ne4-c3 Nc4-e5 Nc3xa4 Rb8xb4 Bg2xc6 Ne5xc6 Qc1xc6 Ba6xe2 Rd1xd6
+     5/18+	00:00	      50'583	543'903	-0.01	Qc1-c3+
+     5/10+	00:00	      50'999	542'542	+0.06	Qc1-c3+
+     5/15+	00:00	      56'119	555'633	+0.64	Qc1-c3+
+     5/16+	00:00	      63'428	561'309	+1.05	Ne4xd6
+     5/17	00:00	      68'273	568'941	+1.20	Ne4xd6 Nc4xd6 Qc1xc6 Nd6-e4 Qc6xa6 Rb8xb4 Bg2xe4 Qe7xe4
+     6/17+	00:00	      71'795	569'801	+1.28	Ne4xd6
+     6/17	00:00	      75'341	579'546	+1.29	Ne4xd6 Nc4xd6 Qc1xc6 Ba6-c4 Qc6xd6 Qe7xd6 Rd1xd6 Rb8xb4
+     7/18	00:00	      88'704	591'360	+1.32	Ne4xd6 Nc4xd6 Qc1xc6 Ba6-b7 Qc6xd6 Qe7xd6 Rd1xd6 Bb7xg2 Kg1xg2 Rb8xb4
+     8/20	00:00	     109'053	602'502	+1.32	Ne4xd6 Nc4xd6 Qc1xc6 Ba6-b7 Qc6xd6 Qe7xd6 Rd1xd6 Bb7xg2 Kg1xg2 Rb8xb4
+     9/21+	00:00	     139'025	607'096	+1.40	Ne4xd6
+     9/23	00:00	     250'505	640'677	+1.48	Ne4xd6 Qe7-e6 Qc1-f4 Rb8-d8 Nd6xc4 Rd8xd1 Re1xd1 Ba6xc4 Qf4-c7+ Kg7-h8 Bg2xc6 Qe6xe2
+   20/12/2013 23:26:47, Time for this analysis: 00:00:01, Rated time: 01:01
+
+ 31 Qxa8 d6 dxe6 g3; id 
+    Searching move: Qb7xa8, d5-d6, d5xe6, g2-g3
+    Best move (Vajolet2): d5xe6
+    Identical moves! Found in: 00:02
+     2/13	00:00	       2'447	305'875	+3.72	d5-d6 Bb8xd6 Rd1xd6
+     3/9	00:00	       2'740	342'500	+3.64	d5-d6 Bb8xd6 Rd1xd6 Ra8-c8
+     4/14	00:00	       3'839	349'000	+3.26	d5-d6 Bb8xd6 Rd1xd6 Ra8-c8 Rd6-d1
+     5/12-	00:00	       6'000	375'000	+2.75	
+     5/16	00:00	       6'857	380'944	+2.71	d5-d6 Bb8xd6 Rd1xd6 Ra8-b8 Qb7-c7 Rb8xb3 Rd6-d8
+     6/10+	00:00	       7'055	391'944	+2.81	d5-d6
+     6/11+	00:00	       7'236	402'000	+2.91	d5-d6
+     6/11+	00:00	       7'501	394'789	+3.04	d5-d6
+     6/14	00:00	       9'034	392'782	+3.15	d5-d6 Bb8xd6 Rd1xd6 Ra8-b8 Qb7-c7 Rb8-c8 Qc7-d7 Rc8-c1+ Rd6-d1
+     7/16-	00:00	      11'464	395'310	+2.95	
+     7/14	00:00	      12'296	396'645	+2.95	d5-d6 Bb8xd6 Rd1xd6 Ra8-b8 Qb7-c7 Rb8-c8 Qc7-d7 Rc8-c2
+     8/21-	00:00	      19'412	431'377	+2.86	
+     8/19+	00:00	      21'241	451'936	+3.03	d5-d6
+     8/19	00:00	      24'452	470'230	+3.05	d5-d6 Bb8xd6 Rd1xd6 Ra8-b8 Qb7-c7 Rb8-c8 Qc7-d7 Rc8-c2 Rd6-d2 Rc2-c1+ Rd2-d1 Rc1-c2 Qd7xa7 Rc2xb2
+     9/20	00:00	      35'894	527'852	+3.05	d5-d6 Bb8xd6 Rd1xd6 Ra8-b8 Qb7-c7 Rb8-c8 Qc7-d7 Rc8-c2 Rd6-d2 Rc2-c1+ Rd2-d1 Rc1-c2 Qd7xa7 Rc2xb2
+    10/22	00:00	      53'151	590'566	+3.05	d5-d6 Bb8xd6 Rd1xd6 Ra8-b8 Qb7-c7 Rb8-c8 Qc7-d7 Rc8-c2 Rd6-d2 Rc2-c1+ Rd2-d1 Rc1-c2 Qd7xa7 Rc2xb2
+    11/24-	00:00	     105'105	669'458	+2.97	
+    11/28+	00:00	     185'439	713'226	+3.13	d5xe6
+    11/26+	00:00	     286'880	741'291	+3.70	d5xe6
+    11/28	00:00	     664'726	741'881	+4.08	d5xe6 f7xe6 Nf3-g5 Bb8xh2+ Kg1xh2 Qf8-f4+ Kh2-g1 Ra8-f8 Ng5-f3 a7-a5 Qb7-c6 Qf4-f6 Rd1-d7 Qf6-g6 Nf3-e5 Qg6-f5 Ne5-d3
+    12/25+	00:00	     712'397	745'185	+4.16	d5xe6
+    12/33+	00:01	     965'959	752'890	+4.24	d5xe6
+    12/36	00:01	   1'244'769	754'405	+4.09	d5xe6 f7xe6 Nf3-g5 Bb8xh2+ Kg1xh2 Qf8-f4+ Kh2-g1 Ra8-f8 Ng5-f3 a7-a5 Qb7-c6 Qf4-f6 Rd1-d7 h7-h6 Rd7-a7 Qf6xb2 Qc6xe6+ Kg8-h8 Ra7xa5 Rf8-b8 Ra5-a7 Qb2xb3 Qe6-d7 Qb3-c3 Qd7-d1
+    13/26	00:01	   1'335'527	756'244	+4.15	d5xe6 f7xe6 Nf3-g5 Bb8xh2+ Kg1xh2 Qf8-f4+ Kh2-g1 Ra8-f8 Ng5-f3 a7-a5 Qb7-c6 Qf4-f6 Rd1-d7 h7-h6 Qc6-e4 Kg8-h8 Qe4-e3
+    14/33-	00:02	   1'714'957	766'975	+4.07	
+    14/30	00:02	   1'915'435	768'942	+4.07	d5xe6 f7xe6 Nf3-g5 Bb8xh2+ Kg1xh2 Qf8-f4+ Kh2-g1 Ra8-f8 Ng5-f3 a7-a5 Qb7-c6 Qf4-f6 Rd1-d7 h7-h6 Qc6-e4 Kg8-h8 Qe4-e1 Qf6xb2 Qe1xe6 Qb2-b1+ Kg1-h2 Kh8-h7
+    15/29	00:02	   2'176'239	773'086	+4.07	d5xe6 f7xe6 Nf3-g5 Bb8xh2+ Kg1xh2 Qf8-f4+ Kh2-g1 Ra8-f8 Ng5-f3 a7-a5 Qb7-c6 Qf4-f6 Rd1-d7 h7-h6 Qc6-e4 Kg8-h8 Qe4-e1 Qf6xb2 Qe1xe6 Qb2-b1+ Kg1-h2 Kh8-h7
+   20/12/2013 23:26:51, Time for this analysis: 00:00:03, Rated time: 01:03
+
+ 32 Qd8+; id "WAC.032"; 
+    Searching move: Qd1-d8
+    Best move (Vajolet2): Qd1-d8
+    Identical moves! Found in: 00:00
+     2/12	00:00	         380	190'000	+1.71	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5
+     3/12	00:00	         979	326'333	+1.71	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5
+     4/13	00:00	       1'890	378'000	+1.71	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5
+     5/10	00:00	       2'282	380'333	+1.71	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5
+     6/16	00:00	       3'566	396'222	+1.63	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5 Kg1-f1
+     7/14	00:00	       6'013	375'812	+1.56	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5 Kg1-f1 h7-h6
+     8/20	00:00	      10'482	388'222	+1.54	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5 f2-f3 h7-h6 Kg1-f2
+     9/20	00:00	      21'615	502'674	+1.51	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5 f2-f3 h7-h6 Kg1-f2 f7-f6
+    10/20-	00:00	      37'124	589'269	+1.43	
+    10/22	00:00	      78'407	712'790	+1.46	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5 f2-f3 a7-a6 Kg1-f2 f7-f6 g2-g4 a6-a5 h2-h4 h7-h6 Kf2-g3
+    11/24	00:00	      88'533	725'680	+1.46	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5 f2-f3 a7-a6 Kg1-f2 f7-f6 Kf2-g3 h7-h6
+    12/24	00:00	     117'387	757'335	+1.46	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5 e3-e4 f7-f6 f2-f4 c5-c4 Kg1-f2 a7-a5 Kf2-f3 h7-h6
+    13/26	00:00	     175'544	797'927	+1.47	Qd1-d8+ Kg8-g7 Qd8xf6+ Kg7xf6 Ng3xe4+ Kf6-g7 Ne4xc5 b6xc5 f2-f3 h7-h5 Kg1-f2 a7-a5 g2-g3 f7-f6 h2-h3 c5-c4 h3-h4
+   20/12/2013 23:26:53, Time for this analysis: 00:00:01, Rated time: 01:03
+
+ 33 Qe5+ Qf4; id "WAC.0 
+    Searching move: Qe4-e5, Qe4-f4
+    Best move (Vajolet2): Qe4-e5
+    Identical moves! Found in: 00:00
+     2/11	00:00	       1'603	320'600	+1.56	Kg1-g2 Rd6-d2
+     3/11	00:00	       3'109	345'444	+1.44	Kg1-g2 h7-h6 Qe4-e5+ f7-f6
+     4/13	00:00	       6'665	370'277	+1.56	Kg1-g2 h7-h6 h2-h3 Rd6-d2
+     5/14-	00:00	      13'252	414'125	+1.47	
+     5/15	00:00	      18'777	481'461	+1.41	Qe4-e5+ f7-f6 Qe5-c3 h7-h6 h2-h3 Rd6-d8
+     6/15+	00:00	      23'101	513'355	+1.49	Qe4-e5+
+     6/17+	00:00	      34'933	572'672	+1.57	Qe4-e5+
+     6/16	00:00	      53'386	628'070	+1.53	h2-h3 f7-f6 Kg1-g2 h7-h6 Qe4-f4 a7-a5
+     7/19	00:00	      96'645	685'425	+1.61	Qe4-e5+ Kg7-g8 Qe5-f4 f7-f6 h2-h3 Kg8-g7 Kg1-g2 h7-h6
+     8/19+	00:00	     136'284	709'812	+1.69	Qe4-e5+
+     8/19+	00:00	     142'891	714'455	+1.77	Qe4-e5+
+     8/19+	00:00	     159'282	717'486	+1.89	Qe4-e5+
+     8/20	00:00	     192'589	724'018	+1.95	Qe4-e5+ Kg7-h6 Qe5-b5 a7-a5 Qb5-b7 Qc7-d8 Qb7xf7 Rd6-d1+ Rc1xd1 Qd8xd1+ Kg1-g2 Qd1xa4
+     9/20+	00:00	     202'689	723'889	+2.03	Qe4-e5+
+     9/26	00:00	     246'346	737'562	+2.11	Qe4-e5+ f7-f6 Qe5-b5 Rd6-d7 c6xd7 Qc7xc1+ Kg1-g2 Qc1-c7 Qb5-d5 Qc7-d8 h2-h3
+    10/22+	00:00	     277'315	745'470	+2.19	Qe4-e5+
+    10/24+	00:00	     318'219	755'864	+2.27	Qe4-e5+
+    10/26+	00:00	     372'213	764'297	+2.39	Qe4-e5+
+    10/26	00:00	     404'063	772'586	+2.36	Qe4-e5+ f7-f6 Qe5-b5 Rd6-d7 c6xd7 Qc7xc1+ Kg1-g2 Qc1-c7 Qb5-d5 Qc7-d8 h2-h3 h7-h6 f2-f3 a7-a6 Qd5-e6 a6-a5
+    11/16-	00:00	     409'785	774'640	+2.27	
+    11/22	00:00	     438'745	779'298	+2.33	Qe4-e5+ f7-f6 Qe5-b5 Rd6-d7 c6xd7 Qc7xc1+ Kg1-g2 Qc1-c7 Qb5-d5 Qc7-d8 h2-h3 h7-h6 f2-f3 a7-a6
+    12/24	00:00	     464'576	788'753	+2.33	Qe4-e5+ f7-f6 Qe5-b5 Rd6-d7 c6xd7 Qc7xc1+ Kg1-g2 Qc1-c7 Qb5-d5 Qc7-d8 h2-h3 h7-h6 f2-f3 a7-a6 Qd5-e6
+    13/26+	00:00	     553'033	800'337	+2.41	Qe4-e5+
+    13/30+	00:00	     709'042	815'928	+2.49	Qe4-e5+
+    13/26+	00:00	     758'685	826'454	+5.01	Qe4-e5+
+   20/12/2013 23:26:56, Time for this analysis: 00:00:01, Rated time: 01:03
+
+ 34 Bg1; id "WAC.034";  
+    Searching move: Bd4-g1
+    Best move (Vajolet2): Bd4-g1
+    Identical moves! Found in: 00:00
+     2/11	00:00	         780	260'000	+1.26	Bd4-g1 Kh1xg1 Rd7xd3 Bb1xd3 Bb7xe4 Bd3xe4 Qe5xe4
+     3/11	00:00	       1'150	230'000	+1.26	Bd4-g1 Kh1xg1 Rd7xd3 Bb1xd3 Bb7xe4 Bd3xe4 Qe5xe4
+     4/9	00:00	       1'418	283'600	+1.26	Bd4-g1 Kh1xg1 Rd7xd3 Bb1xd3 Bb7xe4 Bd3xe4 Qe5xe4
+     5/11	00:00	       2'140	305'714	+1.26	Bd4-g1 Kh1xg1 Rd7xd3 Bb1xd3 Bb7xe4 Bd3xe4 Qe5xe4
+     6/15+	00:00	       3'645	331'363	+1.41	Bd4-g1
+     6/11+	00:00	       3'792	344'727	+1.50	Bd4-g1
+     6/14	00:00	       4'915	378'076	+1.57	Bd4-g1 Rd1xg1 Rd7xd3 Bb1xd3 Bb7xe4 Bd3xe4 Qe5xe4
+     7/12	00:00	       6'358	423'866	+1.55	Bd4-g1 Rd1xg1 Rd7xd3 Bb1xd3 Bb7xe4 Bd3xe4 Qe5xe4 Rg1-f1
+     8/14	00:00	       8'146	479'176	+1.59	Bd4-g1 Rd1xg1 Rd7xd3 Bb1xd3 Bb7xe4 Bd3xe4 Qe5xe4 Rg1-f1 a6-a5
+     9/17+	00:00	       9'849	492'450	+1.67	Bd4-g1
+     9/15+	00:00	      11'251	511'409	+1.75	Bd4-g1
+     9/15+	00:00	      12'150	528'260	+1.87	Bd4-g1
+     9/15	00:00	      15'065	579'423	+2.03	Bd4-g1 Rd1xg1 Rd7xd3 Bb1xd3 Bb7xe4 Bd3xe4 Qe5xe4 Nf5-g3 Qe4-a4 Rg1-a1 a6-a5
+    11/23-	00:00	      55'943	708'139	+1.95	
+    11/24	00:00	      97'813	758'240	+2.12	Bd4-g1 Kh1xg1 Qe5xe4 Nf5-e3 Rd7xd3 Rd1xd3 Qe4-e8 Bb1-c2 a6-a5 Bc2-d1 Bb7-e4 Rd3-c3 Qe8-e6 Rc3-c7 Qe6xa2
+    12/21	00:00	     107'099	770'496	+2.07	Bd4-g1 Kh1xg1 Qe5xe4 Nf5-e3 Rd7xd3 Rd1xd3 Qe4-e8 Bb1-c2 a6-a5 Bc2-d1 g7-g6 Bd1-g4 Bb7-c6 Kg1-h1
+    13/20	00:00	     132'144	791'281	+2.12	Bd4-g1 Kh1xg1 Qe5xe4 Nf5-e3 Rd7xd3 Rd1xd3 Qe4-e8 Bb1-c2 a6-a5 Bc2-d1 Bb7-e4 Rd3-c3 Qe8-e6 Rc3-c7 Qe6xa2
+    14/22-	00:00	     159'623	810'269	+2.04	
+    14/26	00:00	     285'947	821'686	+1.99	Bd4-g1 Kh1xg1 Qe5xe4 Nf5-e3 Rd7xd3 Rd1xd3 Qe4-e8 Ne3-f1 a6-a5 Rd3-d2 Qe8-e7 Bb1-d3 Bb7-c6 Kg1-h1 Qe7-f6 Nf1-e3 Qf6-a1+ Ne3-d1
+    15/25	00:00	     362'454	825'635	+2.05	Bd4-g1 Kh1xg1 Qe5xe4 Nf5-e3 Rd7xd3 Rd1xd3 Qe4-e8 Ne3-f1 a6-a5 Rd3-d2 a5-a4 a2-a3 Qe8-e7 Bb1-g6 Bb7-c6 Rd2-d3
+    16/25	00:00	     474'219	831'963	+1.99	Bd4-g1 Kh1xg1 Qe5xe4 Nf5-e3 Rd7xd3 Rd1xd3 Qe4-e8 Ne3-f1 a6-a5 Rd3-d2 Qe8-e7 Bb1-d3 Bb7-c6 Kg1-h1 Qe7-f6 Nf1-e3 Qf6-a1+ Ne3-d1
+    17/27+	00:00	     545'294	829'975	+2.07	Bd4-g1
+    17/33+	00:00	     770'967	842'586	+2.15	Bd4-g1
+    17/34+	00:01	     845'373	849'621	+2.27	Bd4-g1
+   20/12/2013 23:26:58, Time for this analysis: 00:00:01, Rated time: 01:03
+
+ 35 Rxh7+; id "WAC.035" 
+    Searching move: Rh4xh7
+    Best move (Vajolet2): Rh4xh7
+    Identical moves! Found in: 00:00
+     2/11	00:00	         616	308'000	+1.45	Qd1-c1 Re8-e2 Rc7-c8+ Re2-e8
+     3/12	00:00	       1'591	318'200	+M4	Rh4xh7+ Kh8xh7 Qd1-h5+ Kh7-g8 Qh5-f7+ Kg8-h7 Qf7xg7+
+     4/14	00:00	       2'797	399'571	+M4	Rh4xh7+ Kh8xh7 Qd1-h5+ Kh7-g8 Qh5-f7+ Kg8-h7 Qf7xg7+
+     5/14	00:00	       4'109	456'555	+M4	Rh4xh7+ Kh8xh7 Qd1-h5+ Kh7-g8 Qh5-f7+ Kg8-h7 Qf7xg7+
+     6/14	00:00	       5'384	448'666	+M4	Rh4xh7+ Kh8xh7 Qd1-h5+ Kh7-g8 Qh5-f7+ Kg8-h7 Qf7xg7+
+     7/10	00:00	       6'447	460'500	+M4	Rh4xh7+ Kh8xh7 Qd1-h5+ Kh7-g8 Qh5-f7+ Kg8-h7 Qf7xg7+
+     8/14	00:00	       7'550	471'875	+M4	Rh4xh7+ Kh8xh7 Qd1-h5+ Kh7-g8 Qh5-f7+ Kg8-h7 Qf7xg7+
+     9/14	00:00	      11'919	476'760	+M4	Rh4xh7+ Kh8xh7 Qd1-h5+ Kh7-g8 Qh5-f7+ Kg8-h7 Qf7xg7+
+   20/12/2013 23:27:00, Time for this analysis: 00:00:01, Rated time: 01:03
+
+ 36 Re1+; id "WAC.036"; 
+    Searching move: Re7-e1
+    Best move (Vajolet2): Re7-e1
+    Identical moves! Found in: 00:00
+     2/10	00:00	         348	348'000	+2.60	Re7-e1+ Kg1-f2 Qd6xc6 Rc1xc6 Re1xa1 Rc6xc7+ Kf7-e6
+     3/12	00:00	         683	683'000	+2.60	Re7-e1+ Kg1-f2 Qd6xc6 Rc1xc6 Re1xa1 Rc6xc7+ Kf7-e6
+     4/16	00:00	       2'308	384'666	+2.49	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-d7
+     5/9+	00:00	       2'493	415'500	+2.60	Re7-e1+
+     5/16	00:00	       4'516	410'545	+2.60	Re7-e1+ Kg1-f2 Qd6xc6 Rc1xc6 Re1xa1 Rc6xc7+ Kf7-e6
+     6/17-	00:00	       6'365	397'812	+2.51	
+     6/16+	00:00	       8'022	401'100	+2.68	Re7-e1+
+     6/16	00:00	       8'503	404'904	+2.49	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-d6 d4-d5 Kf7-g7
+     7/14+	00:00	       8'811	400'500	+2.58	Re7-e1+
+     7/16+	00:00	      16'486	433'842	+2.66	Re7-e1+
+     7/18	00:00	      19'982	454'136	+2.63	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-b7 Rc1-d1 Qb7-a7 Re1-e3 c7-c6
+     8/19	00:00	      22'238	453'836	+2.63	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-b7 Rc1-d1 Qb7-a7 Re1-e3 c7-c6
+     9/21+	00:00	      25'783	468'781	+2.71	Re7-e1+
+     9/21+	00:00	      34'110	501'617	+2.79	Re7-e1+
+     9/24+	00:00	      54'512	556'244	+2.91	Re7-e1+
+     9/22	00:00	     111'904	625'162	+2.99	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-b7 Rc1-d1 c7-c6 h2-h3 Qb7-a6 Re1-e3 Qa6-c4 Re3-e4 Qc4-c2
+    12/25-	00:00	     168'472	652'992	+2.92	
+    12/27+	00:00	     249'382	681'371	+3.08	Re7-e1+
+    12/26+	00:00	     370'502	708'416	+3.20	Re7-e1+
+    12/30	00:00	     467'489	721'433	+3.17	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-b7 Re1-d1 c7-c6 Rd1-d3 Qb7-e7 Kg1-h1 Rd8-e8 h2-h3 Qe7-d7 Rd3-c3 Re8-e6 g2-g3
+    13/25	00:00	     556'251	732'873	+3.23	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-b7 Re1-d1 c7-c6 h2-h3 Qb7-a8 Rd1-d3 Qa8-a6 Rd3-e3 Qa6-a4 Re3-e4 Qa4xa3 Rc1xc6 Qa3xb4
+    14/28-	00:00	     606'007	737'234	+3.15	
+    14/30	00:00	     741'986	750'997	+3.20	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-b7 Re1-d1 c7-c6 Rd1-d3 Qb7-e7 Kg1-h1 Rd8-e8 h2-h3 Qe7-d7 Rd3-c3 Re8-e6 Rc3-c4 Kf7-g7
+    15/26	00:01	     898'573	758'929	+3.26	Re7-e1+ Rc1xe1 Qd6xc6 Ra1-c1 Qc6-b7 Re1-d1 c7-c6 Rd1-d3 Qb7-e7 Kg1-h1 Rd8-e8 h2-h3 Qe7-d7 Rd3-c3 Re8-e6 Kh1-h2 Qd7-d6+
+   20/12/2013 23:27:02, Time for this analysis: 00:00:01, Rated time: 01:03
+
+ 37 Nxd4+; id "WAC.037" 
+    Searching move: Nc6xd4
+    Best move (Vajolet2): Nc6xd4
+    Identical moves! Found in: 00:00
+     2/14	00:00	       2'035	339'166	+1.10	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Ke2-f3
+     3/14	00:00	       3'909	325'750	+1.10	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Ke2-f3
+     4/14	00:00	       5'035	335'666	+1.01	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Ke2-f3 Bf6xb2 Be3xb6
+     5/15	00:00	       9'357	346'555	+1.01	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Ke2-f3 Bf6xb2 Be3xb6
+     6/15-	00:00	      13'568	411'151	+0.93	
+     6/21+	00:00	      19'448	452'279	+1.10	Nc6xd4+
+     6/16	00:00	      20'781	472'295	+0.91	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Ke2-f3 Bf6xb2 Be3xb6 Na2-b4 Bb6xa5
+     7/13+	00:00	      21'057	467'933	+1.04	Nc6xd4+
+     7/14+	00:00	      21'561	479'133	+1.12	Nc6xd4+
+     7/16+	00:00	      24'683	493'660	+1.43	Nc6xd4+
+     7/18	00:00	      30'287	504'783	+1.50	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Rd1-d2 Na2-c1+ Ke2-d1 Rc2xd2+ Kd1xd2 Nc1-b3+ Kd2-e1 d5-d4
+     8/23	00:00	      70'952	586'380	+1.58	Nc6xd4+ Nb5xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Rd1-d2 Rc2-c6 f2-f3 Na2-b4 Nb3-d4 Rc6-c4 Nd4-b5 Rc4-c6
+     9/22-	00:00	      92'510	604'640	+1.42	
+     9/27+	00:00	     198'680	638'842	+1.66	Nc6xd4+
+     9/22	00:00	     212'400	643'636	+1.68	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Rd1-d2 Na2-c1+ Ke2-e1 Rc2xd2 Ke1xd2 Nc1-b3+ Kd2-c2 Nb3-c5 b2-b3 e6-e5
+    10/17	00:00	     219'697	644'272	+1.68	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Rd1-d2 Na2-c1+ Ke2-e1 Rc2xd2 Ke1xd2 Nc1-b3+ Kd2-c2 Nb3-c5 b2-b3 e6-e5
+    11/25-	00:00	     273'280	663'300	+1.60	
+    11/23	00:00	     277'165	666'262	+1.59	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Rd1-d2 Na2-c1+ Ke2-e1 Rc2xd2 Ke1xd2 Nc1-b3+ Kd2-c2 Nb3-c5 b2-b3 e6-e5 f2-f3 d5-d4
+    12/25	00:00	     317'965	677'963	+1.59	Nc6xd4+ Nb3xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Rd1-d2 Na2-c1+ Ke2-e1 Rc2xd2 Ke1xd2 Nc1-b3+ Kd2-c2 Nb3-c5 b2-b3 e6-e5 f2-f3 d5-d4
+    13/25+	00:00	     341'484	682'968	+1.67	Nc6xd4+
+    13/28+	00:00	     355'393	687'413	+1.75	Nc6xd4+
+    13/29+	00:00	     524'022	716'856	+2.05	Nc6xd4+
+    13/32	00:00	     718'665	737'092	+2.14	Nc6xd4+ Nb5xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Rd1-d2 Rc2xd2+ Ke2xd2 Kd7-c7 Nb3-d4 e6-e5 Nd4-e6+ Kc7-d6 Ne6xg7 Bf6xg7 Be3xb6 e5-e4 Bb6xa5 Bg7xb2 Kd2-e3 Bb2-f6
+    14/30	00:01	     772'562	737'881	+2.14	Nc6xd4+ Nb5xd4 Rc7xc2+ Nd4xc2 Rc8xc2+ Rd1-d2 Rc2xd2+ Ke2xd2 Kd7-c7 Nb3-d4 e6-e5 Nd4-e6+ Kc7-d6 Ne6xg7 Bf6xg7 Be3xb6 e5-e4 Bb6xa5 Bg7xb2 Kd2-e3 Bb2-f6
+   20/12/2013 23:27:05, Time for this analysis: 00:00:02, Rated time: 01:03
+
+ 38 Rd8+ Qd3; id "WAC.0 
+    Searching move: Rd2-d8, Qc3-d3
+    Best move (Vajolet2): Rd2-d8
+    Identical moves! Found in: 00:00
+     2/11	00:00	         286	286'000	+0.37	Rd2-d8+ Ke8xd8 Qc3xe1
+     3/8	00:00	         628	628'000	+0.41	Rd2-d8+ Ke8xd8 Qc3xe1 a7-a6
+     4/14	00:00	       1'532	383'000	+0.33	Rd2-d8+ Ke8xd8 Qc3xe1 a7-a6 h2-h3
+     5/10+	00:00	       1'811	362'200	+0.41	Rd2-d8+
+     5/13+	00:00	       3'509	501'285	+0.49	Rd2-d8+
+     5/16	00:00	      10'183	599'000	+0.54	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 Qe1-e6 Bc5-d4
+     6/17	00:00	      18'097	624'034	+0.46	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 Qe1-e6 Bc5-d4 Qe6-d6+ Rg7-d7
+     7/18	00:00	      34'875	683'823	+0.52	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 h2-h3 a7-a6 Qe1-e2 a6-a5
+     8/18-	00:00	      57'797	731'607	+0.44	
+     8/21	00:00	      96'006	774'241	+0.51	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 Qe1-c3 Kd8-e7 h2-h3 a7-a5 Qc3-f3 Bc5-d4 Qf3-e4+ Bd4-e5
+     9/18	00:00	     104'402	773'348	+0.51	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 Qe1-c3 Kd8-e7 h2-h3 a7-a5 Qc3-f3 Bc5-d4 Qf3-e4+ Bd4-e5
+    10/22-	00:00	     177'271	791'388	+0.43	
+    10/23	00:00	     313'821	813'007	+0.56	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 Qe1-c3 Kd8-e7 h2-h3 a7-a5 a2-a4 Ke7-e6 Qc3-f3 f6-f5 Qf3-c6+ Ke6-f7 Qc6-d7+ Kf7-g6 Qd7-e6+ Kg6-g5
+    11/24	00:00	     380'045	810'330	+0.54	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 Qe1-c3 Kd8-e7 h2-h3 a7-a5 f2-f3 Ke7-f7 Qc3-d3 h7-h5 f3-f4
+    12/26	00:00	     532'747	820'873	+0.54	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 Qe1-c3 Kd8-e7 h2-h3 a7-a5 f2-f3 Ke7-f7 Qc3-d3 h7-h5 f3-f4 Kf7-f8
+    13/29	00:00	     800'196	835'277	+0.54	Rd2-d8+ Ke8xd8 Qc3xe1 f7-f6 Qe1-c3 Kd8-e7 h2-h3 a7-a5 f2-f3 Ke7-f7 Qc3-d3 h7-h5 f3-f4 Kf7-f8 Qd3-d8+
+   20/12/2013 23:27:08, Time for this analysis: 00:00:02, Rated time: 01:03
+
+ 39 Na4; id "WAC.039";  
+    Searching move: Nc3-a4
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/10	00:00	         638	319'000	+2.75	Nc3-a4 Qb2xa1 Qd1xa1
+     3/3	00:00	         771	257'000	+2.75	Nc3-a4 Qb2xa1 Qd1xa1
+     4/9	00:00	       1'022	340'666	+2.59	Nc3-a4 Qb2xa1 Qd1xa1 Bc8-d7
+     5/10+	00:00	       1'283	320'750	+2.67	Nc3-a4
+     5/9+	00:00	       1'387	346'750	+2.76	Nc3-a4
+     5/9	00:00	       1'819	363'800	+2.78	Nc3-a4 Qb2xa1 Qd1xa1 e6-e5 Bf4-d2
+     6/12-	00:00	       2'483	413'833	+2.59	
+     6/10	00:00	       2'971	424'428	+2.57	Nc3-a4 Qb2xa1 Qd1xa1 e6-e5 Bf4-d2 Bc8-e6
+     7/13+	00:00	       3'641	404'555	+2.66	Nc3-a4
+     7/16	00:00	       5'030	386'923	+2.70	Nc3-a4 Qb2xa1 Qd1xa1 Nf6-h5 Bf4-d2 Bc8-d7 Na4-c3
+     8/14+	00:00	       6'997	349'850	+2.78	Nc3-a4
+     8/16	00:00	      11'974	362'848	+2.73	Nc3-a4 Qb2xa1 Qd1xa1 e6-e5 Bf4-e3 Bc8-e6 Na4-c3 Ra8-c8 Qa1-d1
+     9/11	00:00	      13'455	384'428	+2.73	Nc3-a4 Qb2xa1 Qd1xa1 e6-e5 Bf4-e3 Bc8-e6 Na4-c3 Ra8-c8 Qa1-d1
+    15/25-	00:00	     393'121	621'044	+2.80	
+   20/12/2013 23:27:10, Time for this analysis: 00:00:01, Rated time: 01:13
+
+ 40 Rc8; id "WAC.040";  
+    Searching move: Rd8-c8
+    Best move (Vajolet2): Rd8-c8
+    Identical moves! Found in: 00:00
+     2/9	00:00	         584	292'000	+3.06	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7
+     3/6	00:00	         762	381'000	+3.06	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7
+     4/8	00:00	       1'260	420'000	+3.06	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7
+     5/10-	00:00	       1'572	393'000	+2.93	
+     5/9	00:00	       1'881	470'250	+2.93	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 Rf8-e8
+     6/11+	00:00	       2'269	453'800	+3.02	Rd8-c8
+     6/9+	00:00	       2'464	492'800	+3.13	Rd8-c8
+     6/9+	00:00	       2'662	443'666	+3.26	Rd8-c8
+     6/14	00:00	       3'251	464'428	+3.27	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 Rf8-e8 Rd4-d2
+     7/16-	00:00	       9'280	421'818	+2.80	
+     7/17	00:00	      12'758	472'518	+2.77	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 b7-b6 Rd4-d7 Rf8-e8 e2-e3
+     8/15	00:00	      14'280	492'413	+2.77	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 b7-b6 Rd4-d7 Rf8-e8 e2-e3
+     9/21-	00:00	      27'934	581'958	+2.60	
+     9/20	00:00	      46'641	621'880	+2.49	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 b7-b6 Rd4-d7 Rf8-e8 e2-e3 Qh3-g4 a2-a3 b6-b5 Kg1-g2
+    10/19-	00:00	      56'710	637'191	+2.41	
+    10/23+	00:00	      65'576	649'267	+2.65	Rd8-c8
+    10/22	00:00	      77'524	656'983	+2.68	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 b7-b6 Rd4-d7 Rf8-e8 e2-e3 Qh3-g4 a2-a4 Re8-g8 Rd7-d4 Qg4-e2
+    11/19-	00:00	      83'860	660'314	+2.60	
+    11/22	00:00	     108'044	675'275	+2.68	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 b7-b6 Rd4-d7 Rf8-e8 e2-e3 Qh3-g4 a2-a4 Re8-g8 Rd7-d4 Qg4-e2
+    12/19+	00:00	     118'272	672'000	+2.76	Rd8-c8
+    12/20	00:00	     131'281	683'755	+2.68	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 b7-b6 Rd4-d7 Rf8-e8 e2-e3 Qh3-g4 a2-a4 Re8-g8 Rd7-d4 Qg4-e2
+    13/20	00:00	     148'658	675'718	+2.68	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 b7-b6 Rd4-d7 Rf8-e8 e2-e3 Qh3-g4 a2-a4 Re8-g8 Rd7-d4 Qg4-e2
+    14/24+	00:00	     186'951	684'802	+2.76	Rd8-c8
+    14/30+	00:00	     261'241	706'056	+2.84	Rd8-c8
+    14/26	00:00	     391'281	738'266	+2.85	Rd8-c8 Qc4-c7 Rc8xc7 Rc1xc7 b7-b6 Rd4-d7 Rf8-e8 a2-a4 Qh3-g4 a4-a5 Qg4xb4 Rd7xg7 Qb4-b1+ Kg1-g2 Qb1-e4+ Kg2-g1 b6xa5 e2-e3 a5-a4
+   20/12/2013 23:27:13, Time for this analysis: 00:00:01, Rated time: 01:13
+
+ 41 Ka5 Kc5 b7; id "WAC 
+    Searching move: Kb5-a5, Kb5-c5, b6-b7
+    Best move (Vajolet2): b6-b7
+    Identical moves! Found in: 00:00
+     2/8	00:00	         244	0	+9.46	Rf7-f8+ Kb8-b7 g7-g8Q Rg4xg8 Rf8xg8
+     3/6	00:00	         337	337'000	+9.46	Rf7-f8+ Kb8-b7 g7-g8Q Rg4xg8 Rf8xg8
+     4/8	00:00	         619	619'000	+9.46	Rf7-f8+ Kb8-b7 g7-g8Q Rg4xg8 Rf8xg8
+     5/9-	00:00	       1'821	364'200	+7.58	
+     5/12	00:00	       3'661	406'777	+7.48	b6-b7 Kb8-a7 Kb5-c6 Rg4-g3 Rf7-d7 Rg3-c3+ Kc6-b5
+     6/12	00:00	       6'645	415'312	+7.48	b6-b7 Kb8-a7 Kb5-c5 Rg4-g5+ Kc5-c6 Rg5-g4 Rf7-d7 Rg4-c4+ Kc6-b5
+     7/13	00:00	       8'412	442'736	+7.48	b6-b7 Kb8-a7 Kb5-c5 Rg4-g5+ Kc5-c6 Rg5-g4 Rf7-d7 Rg4-c4+ Kc6-b5
+     8/16	00:00	      16'217	491'424	+7.48	b6-b7 Kb8-a7 Kb5-c5 Rg4-g5+ Kc5-c6 Rg5-g2 Rf7-d7 Rg2-g4 Kc6-c5
+     9/16	00:00	      26'445	587'666	+7.45	b6-b7 Kb8-a7 Kb5-c5 Rg4-g5+ Kc5-c6 Rg5-g2 Rf7-e7 Rg2-c2+ Kc6-d5 Rc2-d2+ Kd5-c4 Rd2-c2+ Kc4-d4
+   20/12/2013 23:27:15, Time for this analysis: 00:00:01, Rated time: 01:13
+
+ 42 Ba5; id "WAC.042";  
+    Searching move: Bb4-a5
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/8	00:00	         766	255'333	+1.36	Bb4-a5 Bg7-f8 Ba5xb6 Bf8xa3
+     3/8	00:00	       1'134	283'500	+1.36	Bb4-a5 Bg7-f8 Ba5xb6 Bf8xa3
+     4/12	00:00	       1'896	316'000	+4.88	Bb4-a5 Bg7-f8 Qa3-c3 Re8xe3 f2xe3
+     5/9+	00:00	       2'262	323'142	+4.97	Bb4-a5
+     5/11+	00:00	       2'503	312'875	+5.05	Bb4-a5
+     5/8	00:00	       2'849	356'125	+5.09	Bb4-a5 Bg7-f8 Qa3-c3 Bf8-b4 Ba5xb4
+     6/12-	00:00	       5'193	346'200	+4.91	
+     6/13	00:00	       5'906	347'411	+4.81	Bb4-a5 Bg7xd4 Ba5xb6 Bd4xb6 Ra1-c1 Nd7-f6 Rf1-d1
+     7/18-	00:00	      11'782	346'529	+4.73	
+     7/13	00:00	      12'491	356'885	+4.92	Bb4-a5 Bg7xd4 Ba5xb6 Bd4xb6 Ra1-c1 Nd7-f6 Qa3-c3 Kg8-g7
+     8/19-	00:00	      25'272	414'295	+4.62	
+     8/19	00:00	      39'570	460'116	+4.53	Bb4-a5 Bg7-f8 Qa3-c3 Bf8-b4 Qc3xb4 Qb6xb4 Ba5xb4 Nd7-f6
+     9/13-	00:00	      40'651	467'252	+4.45	
+     9/23	00:00	      82'183	526'814	+4.47	Bb4-a5 Bg7xd4 Ba5xb6 Bd4xb6 Rf1-d1 Nd7-f6 Ra1-c1 Bc8-f5 Be2-d3 Bf5-d7 h2-h3
+    10/21-	00:00	      92'059	532'132	+4.38	
+    10/20	00:00	      94'971	533'544	+4.34	Bb4-a5 Bg7-f8 Qa3-c3 Bf8-b4 Ba5xb4 a7-a5 Bb4-d6 Nd7-f6 Bd6-e5 Kg8-g7 Ra1-b1
+    11/18	00:00	      98'894	537'467	+4.34	Bb4-a5 Bg7-f8 Qa3-c3 Bf8-b4 Ba5xb4 a7-a5 Bb4-d6 Nd7-f6 Bd6-e5 Kg8-g7 Ra1-b1
+    12/26-	00:00	     127'654	543'208	+4.18	
+    12/27	00:00	     174'204	542'691	+4.20	Bb4-a5 Bg7-f8 Qa3-c3 Bf8-b4 Ba5xb4 a7-a5 Bb4-d6 Nd7-f6 Bd6-e5 Kg8-g7 Rf1-d1 h7-h6 Ra1-c1 Bc8-e6 h2-h3 Be6-f5
+    13/16	00:00	     182'566	548'246	+4.22	Bb4-a5 Bg7-f8 Qa3-c3 Bf8-b4 Ba5xb4 a7-a5 Bb4-d6 Nd7-f6 Bd6-e5 Kg8-g7 Rf1-d1 Bc8-d7 Ra1-c1 h7-h6
+    14/22	00:00	     202'388	563'754	+4.22	Bb4-a5 Bg7-f8 Qa3-c3 Bf8-b4 Ba5xb4 a7-a5 Bb4-d6 Nd7-f6 Bd6-e5 Kg8-g7 Rf1-d1 Bc8-d7 Ra1-c1 h7-h6 Be2-d3
+    15/26	00:00	     263'330	586'481	+4.18	Bb4-a5 Bg7-f8 Qa3-c3 Bf8-b4 Ba5xb4 a7-a5 Bb4-d6 Nd7-f6 Bd6-e5 Kg8-g7 Rf1-d1 h7-h6 Ra1-c1 Bc8-e6 h2-h3
+    17/28-	00:00	     496'677	624'750	+4.12	
+   20/12/2013 23:27:17, Time for this analysis: 00:00:01, Rated time: 01:23
+
+ 43 Be7 Qxa8; id "WAC.0 
+    Searching move: Ba3-e7, Qd5xa8
+    Best move (Vajolet2): Qd5xa8
+    Identical moves! Found in: 00:00
+     2/12	00:00	       1'805	361'000	+2.94	Ba3-e7 Qd8xe7 Qd5xa8+ Rg5-g8
+     3/12	00:00	       2'200	366'666	+2.94	Ba3-e7 Qd8xe7 Qd5xa8+ Rg5-g8
+     4/14	00:00	       3'130	391'250	+2.65	Ba3-e7 Qd8xe7 Qd5xa8+ Rg5-g8 Qa8xa7 f6xe5
+     5/15+	00:00	       3'510	390'000	+2.74	Ba3-e7
+     5/13+	00:00	       3'666	366'600	+2.94	Ba3-e7
+     5/12+	00:00	       4'049	368'090	+3.31	Ba3-e7
+     5/14+	00:00	       5'043	387'923	+3.64	Qd5xa8
+     5/8+	00:00	       5'307	379'071	+4.71	Qd5xa8
+     5/10	00:00	       5'702	407'285	+5.06	Qd5xa8 Qd8xa8 Rc1-c8+ Rg5-g8 Rc8xa8 Rg8xa8 e5xf6
+     6/10-	00:00	       5'971	398'066	+4.90	
+     6/10	00:00	       6'315	421'000	+4.90	Qd5xa8 Qd8xa8 Rc1-c8+ Rg5-g8 Rc8xa8 Rg8xa8 e5-e6
+     7/12-	00:00	       6'995	411'470	+4.81	
+     7/14+	00:00	       7'340	407'777	+4.98	Qd5xa8
+     7/13	00:00	       8'067	424'578	+5.08	Qd5xa8 Qd8xa8 Rc1-c8+ Rg5-g8 Rc8xa8 Rg8xa8 e5-e6 Kh8-g8
+     8/10+	00:00	       8'300	415'000	+5.18	Qd5xa8
+     8/11+	00:00	       8'501	425'050	+5.26	Qd5xa8
+     8/11+	00:00	       8'799	419'000	+5.63	Qd5xa8
+     8/16	00:00	       9'818	426'869	+5.78	Qd5xa8 Qd8xa8 Rc1-c8+ Rg5-g8 Rc8xa8 Rg8xa8 e5-e6 Ra8-g8 e6-e7
+     9/12-	00:00	      10'853	434'120	+5.70	
+     9/18+	00:00	      12'432	428'689	+5.86	Qd5xa8
+     9/17+	00:00	      18'441	512'250	+8.40	Qd5xa8
+     9/17	00:00	      20'258	533'105	+8.82	Qd5xa8 Qd8xa8 Rc1-c8+ Rg5-g8 Rc8xa8 Rg8xa8 e5-e6 Ra8-g8 e6-e7 a7-a5 e7-e8Q
+    10/15	00:00	      22'207	555'175	+8.82	Qd5xa8 Qd8xa8 Rc1-c8+ Rg5-g8 Rc8xa8 Rg8xa8 e5-e6 Ra8-g8 e6-e7 a7-a5 e7-e8Q
+    11/17+	00:00	      24'134	574'619	+8.91	Qd5xa8
+    11/18+	00:00	      26'583	590'733	+9.00	Qd5xa8
+    11/26+	00:00	      95'784	731'175	+11.50	Qd5xa8
+    11/28	00:00	     124'626	741'821	+12.76	Qd5xa8 Qd8xa8 Rc1-c8+ Rg5-g8 Rc8xa8 Rg8xa8 e5-e6 Ra8-g8 e6-e7 b6-b5 d7-d8Q a7-a6 e7-e8Q Rg8xe8 Qd8xe8+ Kh8-g7
+    12/23	00:00	     130'821	743'301	+12.76	Qd5xa8 Qd8xa8 Rc1-c8+ Rg5-g8 Rc8xa8 Rg8xa8 e5-e6 Ra8-g8 e6-e7 b6-b5 d7-d8Q a7-a6 e7-e8Q Rg8xe8 Qd8xe8+ Kh8-g7
+   20/12/2013 23:27:19, Time for this analysis: 00:00:01, Rated time: 01:23
+
+ 44 dxc4; id "WAC.044"; 
+    Searching move: d5xc4
+    Best move (Vajolet2): d5xc4
+    Identical moves! Found in: 00:00
+     2/9	00:00	         275	275'000	+1.24	d5xc4 Rd1xd8 Ne6xd8
+     3/12	00:00	         728	364'000	+1.24	d5xc4 Rd1xd8 Ne6xd8
+     4/11	00:00	       1'607	321'400	+1.25	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7
+     5/15	00:00	       2'989	332'111	+1.25	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7
+     6/13-	00:00	       5'214	347'600	+1.01	
+     6/12	00:00	       6'617	367'611	+0.94	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-e4
+     7/16	00:00	      10'606	378'785	+0.91	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-e4 Nb7-c5
+     8/15+	00:00	      11'892	396'400	+0.99	d5xc4
+     8/17	00:00	      15'921	454'885	+1.04	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-e4 Nb7-c5 Be4-d5 Be8-b5
+     9/16	00:00	      22'433	521'697	+1.04	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-e4 Nb7-c5 Be4-d5 Be8-b5
+    12/19-	00:00	     109'896	709'006	+2.06	
+    12/22+	00:00	     141'642	722'663	+2.22	d5xc4
+    12/27	00:00	     181'359	743'274	+2.26	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-c2 Nb7-c5 Bg3-d6 Nc5-d3 Bd6-a3 Bg7-e5 Bc2-d1 Be8-c6 Bd1-f3 Bc6xf3 g2xf3
+    13/17-	00:00	     197'397	739'314	+2.18	
+    13/22	00:00	     211'240	746'431	+2.26	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-c2 Nb7-c5 Bg3-d6 Nc5-d3 Bd6-a3 Bg7-e5 Bc2-d1 Be8-c6 Bd1-f3 Bc6xf3 g2xf3
+    14/26	00:00	     240'772	752'412	+2.26	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-c2 Nb7-c5 Bg3-d6 Nc5-d3 Bd6-a3 Bg7-e5 Bc2-d1 Be8-c6 Bd1-f3 Bc6xf3 g2xf3
+    15/27	00:00	     364'184	737'214	+2.26	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-c2 Nb7-c5 Bg3-d6 Nc5-d3 Bd6-a3 Bg7-e5 Bc2-d1 Be8-c6 Bd1-f3 Bc6xf3 g2xf3
+    16/30	00:00	     509'397	744'732	+2.26	d5xc4 Rd1xd8 Ne6xd8 Qf3xb7 Nd8xb7 Bb1-c2 Nb7-c5 Bg3-d6 Nc5-d3 Bd6-a3 Bg7-e5 Bc2-d1 Be8-c6 Bd1-f3 Bc6xf3 g2xf3
+   20/12/2013 23:27:21, Time for this analysis: 00:00:01, Rated time: 01:23
+
+ 45 Qxa1; id "WAC.045"; 
+    Searching move: Qf1xa1
+    Best move (Vajolet2): Qf1xa1
+    Identical moves! Found in: 00:00
+     2/9	00:00	         377	188'500	+4.24	Qf1xa1 b2-b3 Qa1-a8+ Qg3-g2 Qa8xg2+ Kh1xg2
+     3/8	00:00	         745	248'333	+4.24	Qf1xa1 b2-b3 Qa1-a8+ Qg3-g2 Qa8xg2+ Kh1xg2
+     4/14	00:00	       4'332	333'230	+4.37	Qf1xa1 h2-h3 Qa1-f1 e5-e6
+     5/14	00:00	       7'994	363'363	+4.33	Qf1xa1 Qg3-g2 c7-c5 Qg2-b7 Rf4-f1 Qb7-b8+ Be7-f8
+     6/13+	00:00	       8'832	384'000	+4.42	Qf1xa1
+     6/16+	00:00	      11'604	429'777	+4.50	Qf1xa1
+     6/15+	00:00	      12'743	439'413	+4.62	Qf1xa1
+     6/16	00:00	      16'633	489'205	+4.77	Qf1xa1 h2-h3 Qa1-f1 Qg3-g2 c7-c5 b4xc5 Be7xc5
+     7/15+	00:00	      18'495	499'864	+4.85	Qf1xa1
+     7/14	00:00	      21'166	516'243	+4.92	Qf1xa1 h2-h3 Qa1-f1 Qg3-g2 c7-c5 b4xc5 Be7xc5 Qg2-a8+ Rf4-f8
+     8/18+	00:00	      26'026	542'208	+5.00	Qf1xa1
+     8/17+	00:00	      32'700	573'684	+5.09	Qf1xa1
+     8/17+	00:00	      46'592	621'226	+5.39	Qf1xa1
+     8/22	00:00	      81'728	675'438	+5.46	Qf1xa1 Qg3-g2 c7-c5 e5-e6 c5xb4 Qg2-g3 Qa1-f1 Qg3-g2 b4xc3 Qg2xf1 Rf4xf1 b2xc3
+     9/19-	00:00	      94'641	690'810	+5.37	
+     9/20+	00:00	      99'712	697'286	+5.54	Qf1xa1
+     9/22	00:00	     119'027	708'494	+5.59	Qf1xa1 h2-h3 Rf4-e4 b2-b3 Re4-e2 Qg3-f3 Re2xe5 Qf3-c6 Qa1-f1 Qc6-e8+ Qf1-f8
+    10/18-	00:00	     123'740	711'149	+5.51	
+    10/18	00:00	     130'475	716'895	+5.44	Qf1xa1 h2-h3 Rf4-e4 b2-b3 Re4-e2 Qg3-f3 Re2xe5 Qf3-b7 Be7-d8 Qb7-f3 Bd8-f6
+    11/20+	00:00	     143'098	719'085	+5.52	Qf1xa1
+    11/22+	00:00	     163'161	725'160	+5.60	Qf1xa1
+    11/23+	00:00	     301'884	760'413	+5.90	Qf1xa1
+    11/24	00:00	     348'596	764'464	+5.96	Qf1xa1 Qg3-g2 c7-c5 h2-h3 c5xb4 c3xb4 Qa1-e1 Qg2-a8+ Rf4-f8 Qa8-d5 Qe1xb4 Qd5-g2 Qb4-e1 Qg2-d5
+    12/24+	00:00	     401'548	767'778	+6.04	Qf1xa1
+    12/26+	00:00	     454'028	770'845	+6.12	Qf1xa1
+    12/31	00:00	     519'261	772'709	+6.20	Qf1xa1 Qg3-g2 c7-c5 e5-e6 c5xb4 c3xb4 Be7xb4 h2-h3 Rf4-f8 Qg2-c6 Qa1xb2 Qc6xb5 Qb2-c3 Bg1-h2 Bb4-c5 Qb5-c6 Rf8-f1+ Kh1-g2
+    13/21	00:00	     537'167	775'132	+6.20	Qf1xa1 Qg3-g2 c7-c5 e5-e6 c5xb4 c3xb4 Be7xb4 h2-h3 Rf4-f8 Qg2-c6 Qa1xb2 Qc6xb5 Qb2-c3 Bg1-h2 Bb4-c5 Qb5-c6 Rf8-f1+ Kh1-g2
+   20/12/2013 23:27:24, Time for this analysis: 00:00:01, Rated time: 01:23
+
+ 46 Nb5; id "WAC.046";  
+    Searching move: Nc3-b5
+    Best move (Vajolet2): Nc3-b5
+    Identical moves! Found in: 00:00
+     2/12	00:00	       1'394	278'800	+1.09	Bf1-b5 Kg8-h8
+     3/14	00:00	       5'472	273'600	+0.74	Bf1-e2 Nd7-b6 Ke1-f1
+     4/14	00:00	      10'396	371'285	+0.72	Bf1-b5 a7-a6 Qc2-a4 Nd7-b6
+     5/16-	00:00	      25'159	474'698	+0.63	
+     5/15	00:00	      29'342	489'033	+0.60	Nc3-b5 Qd8-b6 Rd1-c1 a7-a6 Qc2-a4
+     6/16+	00:00	      36'349	504'847	+0.68	Nc3-b5
+     6/14+	00:00	      37'252	510'301	+0.77	Nc3-b5
+     6/16+	00:00	      50'272	534'808	+1.34	Nc3-b5
+     6/17	00:00	      55'004	539'254	+1.69	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8
+     7/16	00:00	      60'670	541'696	+1.64	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8 Rd1-c1
+     8/17	00:00	      69'198	549'190	+1.70	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8 Rd1-c1 Qa8-c8
+     9/21-	00:00	      85'479	566'086	+1.54	
+     9/21	00:00	     109'554	579'650	+1.51	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8 Bf1-e2 Re8-c8 Qc2-d3 Nb6-c4 Qd3-b3 Qa8-b8
+    10/20	00:00	     141'408	591'665	+1.48	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8 Bf1-e2 Re8-c8 Qc2-d3 Rc8-c4
+    11/22-	00:00	     153'119	602'830	+1.40	
+    11/27+	00:00	     252'762	619'514	+1.56	Nc3-b5
+    11/26	00:00	     322'447	626'110	+1.57	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8 Bf1-e2 Re8-c8 Qc2-b1 Nb6-c4 Rd1-c1 Bd7-b5 Nf3-e5 Qa8-b8 Ne5xc4 d5xc4
+    12/21	00:00	     379'731	628'693	+1.57	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8 Bf1-e2 Re8-c8 Qc2-b1 Nb6-c4 O-O g7-g6 Rd1-c1 Kg8-g7
+    13/26	00:00	     491'684	635'250	+1.57	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8 Bf1-e2 Re8-c8 Qc2-b1 Nb6-c4 O-O g7-g6 Rd1-c1 Kg8-g7 Qb1-a2
+    14/24	00:01	     639'357	644'513	+1.57	Nc3-b5 Nd7-b6 Nb5-c7 Bc8-d7 Nc7xa8 Qd8xa8 Bf1-e2 Re8-c8 Qc2-b1 Nb6-c4 Rd1-c1 Bd7-b5 Nf3-e5 Qa8-b8 Ne5xc4 d5xc4
+   20/12/2013 23:27:27, Time for this analysis: 00:00:02, Rated time: 01:23
+
+ 47 Nxd4; id "WAC.047"; 
+    Searching move: Nc6xd4
+    Best move (Vajolet2): Nc6xd4
+    Identical moves! Found in: 00:00
+     2/9	00:00	         462	231'000	+0.42	Nc6xd4 Nf3xd4 Qa5xg5
+     3/11	00:00	       1'229	245'800	+0.42	Nc6xd4 Nf3xd4 Qa5xg5
+     4/8	00:00	       1'574	262'333	+0.42	Nc6xd4 Nf3xd4 Qa5xg5 Rf1-d1
+     5/13-	00:00	       3'436	286'333	+0.26	
+     5/14	00:00	       4'225	301'785	+0.26	Nc6xd4 Nf3xd4 Qa5xg5 Nd4-f3 Qg5-c5
+     6/15	00:00	       7'505	300'200	+0.20	Nc6xd4 Nf3xd4 Qa5xg5 Nd4-f3 Qg5-c5 Rf1-d1
+     7/16+	00:00	       8'168	302'518	+0.29	Nc6xd4
+     7/18+	00:00	       9'069	323'892	+0.38	Nc6xd4
+     7/16+	00:00	      10'221	340'700	+0.50	Nc6xd4
+     7/16	00:00	      16'678	406'780	+0.61	Nc6xd4 Nf3xd4 Qa5xg5 Bc4-b5 Rf8-d8 Nd4-f3 Qg5-c5
+     8/17	00:00	      24'412	460'603	+0.63	Nc6xd4 Nf3xd4 Qa5xg5 Bc4-b5 a7-a6 Nd4-f3 Qg5-f5 Bb5-d3
+     9/18-	00:00	      29'816	488'786	+0.55	
+     9/23	00:00	      81'562	566'402	+0.64	Nc6xd4 Nf3xd4 Qa5xg5 Nd4-f3 Qg5-a5 Nf3-e5 Rf8-d8 Rf1-d1 a7-a6 Rd1xd8+ Qa5xd8 Bc4-d3
+    10/20	00:00	      88'499	574'668	+0.60	Nc6xd4 Nf3xd4 Qa5xg5 Nd4-f3 Qg5-a5 Nf3-e5 Rf8-d8 Rf1-d1 a7-a6 Rd1xd8+ Qa5xd8
+    11/21+	00:00	     111'646	584'534	+0.68	Nc6xd4
+    11/23+	00:00	     142'766	592'390	+0.76	Nc6xd4
+    11/22	00:00	     183'250	608'803	+0.82	Nc6xd4 Nf3xd4 Qa5xg5 Nd4-f3 Qg5-f4 g2-g3 Qf4-g4 Nf3-e5 Qg4xe2 Bc4xe2 Rf8-d8 Rf1-d1
+    12/23	00:00	     201'653	616'675	+0.82	Nc6xd4 Nf3xd4 Qa5xg5 Nd4-f3 Qg5-f4 g2-g3 Qf4-g4 Nf3-e5 Qg4xe2 Bc4xe2 Rf8-d8 Rf1-d1
+   20/12/2013 23:27:30, Time for this analysis: 00:00:01, Rated time: 01:23
+
+ 48 Rb4; id "WAC.048";  
+    Searching move: Rb8-b4
+    Best move (Vajolet2): Rb8-b4
+    Identical moves! Found in: 00:00
+     2/12	00:00	         838	279'333	-0.36	Bc8-f5 Qa4xc6 Qd8xd4 Qc6xc7
+     3/13	00:00	       3'514	292'833	-0.39	Rb8-b4 Qa4xc6 Qd8xd4 Qc6xc7 Rb4xc4 Qc7xe7
+     4/14	00:00	       5'272	292'888	-0.39	Rb8-b4 Qa4xc6 Qd8xd4 Qc6xc7 Rb4xc4 Qc7xe7
+     5/17+	00:00	       7'826	301'000	-0.29	Rb8-b4
+     5/11+	00:00	       8'177	302'851	-0.19	Rb8-b4
+     5/11+	00:00	       9'464	338'000	+2.49	Rb8-b4
+     5/15	00:00	      10'724	357'466	+2.63	Rb8-b4 Qa4xa7 Rb4xc4 Bc1-e3 Bc8-f5
+     6/14-	00:00	      15'583	399'564	+2.45	
+     6/16	00:00	      17'981	418'162	+2.34	Rb8-b4 Bc4xf7+ Rf8xf7 Qa4xa7 Rb4xd4 Bc1-e3 Rd4-b4
+     7/18+	00:00	      23'141	445'019	+2.43	Rb8-b4
+     7/17	00:00	      26'069	465'517	+2.47	Rb8-b4 Bc4xf7+ Rf8xf7 Qa4xa7 Bc8-f5 Nc3-e2 Be7-d6 Rf1-e1
+     8/18-	00:00	      30'866	489'936	+2.39	
+     8/20	00:00	      45'950	528'160	+2.48	Rb8-b4 Bc4xf7+ Rf8xf7 Qa4xa7 Rb4xd4 Bc1-e3 Rd4-b4 Ra1-d1 Be7-d6 b2-b3
+     9/18	00:00	      50'096	538'666	+2.48	Rb8-b4 Bc4xf7+ Rf8xf7 Qa4xa7 Rb4xd4 Bc1-e3 Rd4-b4 Ra1-d1 Be7-d6 b2-b3
+    10/21-	00:00	      65'818	562'547	+2.40	
+    10/24	00:00	     109'417	604'513	+2.35	Rb8-b4 Bc4xf7+ Rf8xf7 Qa4xa7 Rb4xd4 Bc1-e3 Rd4-b4 Rf1-d1 Be7-d6 Qa7-a3 Qd8-e7 Ra1-c1 Bc8-f5
+    11/21	00:00	     129'604	611'339	+2.41	Rb8-b4 Bc4xf7+ Rf8xf7 Qa4xa7 Rb4xd4 Bc1-e3 Rd4-b4 Rf1-d1 Be7-d6 Qa7-a3 Qd8-e7 Ra1-c1
+    12/24	00:00	     190'380	634'600	+2.35	Rb8-b4 Bc4xf7+ Rf8xf7 Qa4xa7 Rb4xd4 Bc1-e3 Rd4-b4 Rf1-d1 Be7-d6 Qa7-a3 Qd8-e7 Ra1-c1 Bc8-f5
+    13/25+	00:00	     217'075	636'583	+2.43	Rb8-b4
+    13/27+	00:00	     269'742	634'687	+2.51	Rb8-b4
+    13/30+	00:00	     475'454	626'421	+2.63	Rb8-b4
+   20/12/2013 23:27:32, Time for this analysis: 00:00:01, Rated time: 01:23
+
+ 49 Qxh7+; id "WAC.049" 
+    Searching move: Qh5xh7
+    Best move (Vajolet2): Qh5xh7
+    Identical moves! Found in: 00:00
+     2/13	00:00	       2'452	272'444	-2.35	Nh4-f5 Bc8xf5 Rg5xf5 Qb2xb3 Rf5xf7 Re7xf7
+     3/11	00:00	       2'925	265'909	-2.35	Nh4-f5 Bc8xf5 Rg5xf5 Qb2xb3 Rf5xf7 Re7xf7
+     4/16	00:00	      11'853	348'617	-1.58	Qh5-h6 g7-g6 Rg5-g2 Qb2-c3
+     5/17+	00:00	      14'142	362'615	-1.50	Qh5-h6
+     5/15	00:00	      17'625	383'152	-1.43	Qh5-h6 g7-g6 Rg5-g2 Qb2-g7 Qh6xg7+ Rf7xg7
+     6/20+	00:00	      24'287	426'087	-1.35	Qh5-h6
+     6/16+	00:00	      25'821	437'644	-1.27	Qh5-h6
+     6/16+	00:00	      28'009	437'640	-1.15	Qh5-h6
+     6/19	00:00	      43'520	478'241	-1.09	Qh5-h6 Qb2xb3 Qh6xd6 Re7-e8 Qd6-c6 Re8-d8 Qc6xc5 Bc8xh3
+     7/17	00:00	      47'732	487'061	-1.09	Qh5-h6 Qb2xb3 Qh6xd6 Re7-e8 Qd6-c6 Re8-d8 Qc6xc5 Bc8xh3
+     8/20-	00:00	      55'754	506'854	-1.25	
+     8/23	00:00	      87'502	553'810	-1.21	Qh5-h6 Qb2xb3 Qh6xd6 Re7-e8 Qd6-c6 Re8-f8 d5-d6 Bc8xh3 Rg5xc5 Qb3-e3 Rc5-g5
+     9/22+	00:00	     101'247	565'625	-1.09	Qh5xh7+
+     9/14+	00:00	     102'213	567'850	-1.01	Qh5xh7+
+     9/18+	00:00	     127'319	586'723	+M500	Qh5xh7+
+     9/19	00:00	     166'140	580'909	+M6	Qh5xh7+ Kg8xh7 Rg5-h5+ Kh7-g8 Nh4-g6 Qb2-g2+ Rg1xg2 Rf7-f8 Rh5-h8+ Kg8-f7 Rh8xf8+
+    10/20	00:00	     212'176	596'000	+M6	Qh5xh7+ Kg8xh7 Rg5-h5+ Kh7-g8 Nh4-g6 Qb2-g2+ Rg1xg2 Rf7-f8 Rh5-h8+ Kg8-f7 Rh8xf8+
+    11/22	00:00	     302'581	613'754	+M6	Qh5xh7+ Kg8xh7 Rg5-h5+ Kh7-g8 Nh4-g6 Qb2-g2+ Rg1xg2 Rf7-f8 Rh5-h8+ Kg8-f7 Rh8xf8+
+    12/20	00:00	     405'728	629'035	+M6	Qh5xh7+ Kg8xh7 Rg5-h5+ Kh7-g8 Nh4-g6 Qb2-g2+ Rg1xg2 Rf7-f8 Rh5-h8+ Kg8-f7 Rh8xf8+
+   20/12/2013 23:27:35, Time for this analysis: 00:00:01, Rated time: 01:23
+
+ 50 Rxb6+; id "WAC.050" 
+    Searching move: Rb7xb6
+    Best move (Vajolet2): Rb7xb6
+    Identical moves! Found in: 00:00
+     2/11	00:00	       1'594	318'800	+M3	Rb7xb6+ Qc2xc6 Re2xa2+ Qc6-a4 Ra2xa4+
+     3/12	00:00	       2'464	352'000	+M3	Rb7xb6+ Qc2xc6 Re2xa2+ Qc6-a4 Ra2xa4+
+     4/12	00:00	       3'590	359'000	+M3	Rb7xb6+ Qc2xc6 Re2xa2+ Qc6-a4 Ra2xa4+
+     5/7	00:00	       4'080	340'000	+M3	Rb7xb6+ Qc2xc6 Re2xa2+ Qc6-a4 Ra2xa4+
+     6/12	00:00	       4'745	365'000	+M3	Rb7xb6+ Qc2xc6 Re2xa2+ Qc6-a4 Ra2xa4+
+      7	00:00	       5'258	375'571	+M3	Rb7xb6+ Qc2xc6 Re2xa2+ Qc6-a4 Ra2xa4+
+      8	00:00	       6'126	382'875	+M3	Rb7xb6+ Qc2xc6 Re2xa2+ Qc6-a4 Ra2xa4+
+      9	00:00	       7'223	401'277	+M3	Rb7xb6+ Qc2xc6 Re2xa2+ Qc6-a4 Ra2xa4+
+   20/12/2013 23:27:37, Time for this analysis: 00:00:01, Rated time: 01:23
+
+ 51 Rg4+; id "WAC.051"; 
+    Searching move: Rf4-g4
+    Best move (Vajolet2): Rf4-g4
+    Identical moves! Found in: 00:01
+     2/12	00:00	       6'210	326'842	+3.06	Rf4-g4+ Qd8-g5 h4xg5 f5xg4 g5xh6+ Kg7-h8 Qh5xg4
+     3/14	00:00	       6'790	323'333	+3.54	Rf4-g4+ Qd8-g5 h4xg5 f5xg4 Qh5-g6+ Kg7-h8 Qg6xh6+ Kh8-g8 Nd4xe6
+     4/15	00:00	       8'865	328'333	+6.63	Rf4-g4+ Qd8-g5 h4xg5 Bc8-d7 g5xh6+ Kg7-h8
+     5/14+	00:00	       8'999	321'392	+6.75	Rf4-g4+
+     5/14+	00:00	       9'170	327'500	+6.91	Rf4-g4+
+     5/16+	00:00	      11'247	321'342	+7.31	Rf4-g4+
+     5/16	00:00	      16'567	376'522	+7.30	Rf4-g4+ Qd8-g5 h4xg5 Rf8-f7 g5xh6+ Kg7-f8 Rg4-g6
+     6/13+	00:00	      16'740	380'454	+7.39	Rf4-g4+
+     6/15+	00:00	      16'833	382'568	+7.51	Rf4-g4+
+     6/18	00:00	      22'296	420'679	+7.62	Rf4-g4+ Qd8-g5 h4xg5 Rf8-f7 g5xh6+ Kg7-f8 Rg4-g6 Rf7-e7 Rg6-f6+ Kf8-g8
+     7/17+	00:00	      22'781	421'870	+7.70	Rf4-g4+
+     7/20+	00:00	      27'717	447'048	+7.79	Rf4-g4+
+     7/18+	00:00	      42'402	517'097	+8.82	Rf4-g4+
+     7/22	00:00	      53'505	540'454	+9.00	Rf4-g4+ Qd8-g5 h4xg5 Rf8-f7 g5xh6+ Kg7-f8 Rg4-g6 Ra8-b8 Nd4xe6+ Bc8xe6 Rg6xe6
+     8/20	00:00	      67'811	560'421	+9.00	Rf4-g4+ Qd8-g5 h4xg5 Rf8-f7 g5xh6+ Kg7-f8 Rg4-g6 Ra8-b8 Nd4xe6+ Bc8xe6 Rg6xe6
+     9/22+	00:00	      71'252	561'039	+9.08	Rf4-g4+
+     9/20+	00:00	      75'648	568'781	+9.16	Rf4-g4+
+     9/24+	00:00	     156'911	632'705	+15.08	Rf4-g4+
+     9/25	00:00	     192'159	640'530	+14.96	Rf4-g4+ Qd8-g5 h4xg5 Rf8-f7 g5xh6+ Kg7-f8 Rg4-g6 Bc8-d7 h6-h7 Kf8-e7 Qh5-h4+ Ke7-e8 h7-h8Q+ Rf7-f8 Rg6-g7
+    13/30-	00:01	     877'221	706'866	+26.80	
+    13/28+	00:01	     900'214	704'944	+27.36	Rf4-g4+
+    13/30+	00:01	     908'746	707'195	+28.49	Rf4-g4+
+   20/12/2013 23:27:39, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 52 Re7 c4; id "WAC.052 
+    Searching move: Re1-e7, c2-c4
+    Best move (Vajolet2): Re1-e7
+    Identical moves! Found in: 00:00
+     2/11	00:00	       1'437	359'250	+2.12	Nd5-c3 Ra8-a6
+     3/13	00:00	       2'782	309'111	+1.76	Nd5-c3 Ra8-a6 Qb6-d4
+     4/13	00:00	       4'053	311'769	+2.07	Nd5-c3 Ra8-a6 Qb6-d4 Bd6-e7
+     5/15-	00:00	       5'794	321'888	+1.98	
+     5/16+	00:00	      23'236	474'204	+2.15	a2-a3
+     5/14+	00:00	      25'814	487'056	+2.27	a2-a3
+     5/16+	00:00	      31'572	509'225	+2.46	Re1-e7
+     5/14	00:00	      34'499	522'712	+2.66	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 a2-a3 Be7-f6
+     6/15-	00:00	      43'729	546'612	+2.50	
+     6/16	00:00	      44'907	547'646	+2.54	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 Qb6-e3 Kc8-d7 Qe3-d4+ Be7-d6 Qd4-g7+ Bd6-e7
+     7/17+	00:00	      46'144	549'333	+2.63	Re1-e7
+     7/16	00:00	      51'366	558'326	+2.64	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 a2-a3 Be7-d8 Qb6-c5 Ra8-a5
+     8/19-	00:00	      58'595	574'460	+2.56	
+     8/20	00:00	      79'599	603'022	+2.66	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 a2-a3 Be7-d8 Qb6-e3 Ra8-a5 Kd2-c1 Ra5-d5 Kc1-b1 Rd5-d7
+     9/20	00:00	     108'372	630'069	+2.70	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 Qb6-e3 Kc8-d7 a2-a3 Ra8-f8 Kd2-c1 Rf8-e8
+    10/22	00:00	     134'904	651'710	+2.62	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 a2-a3 Be7-d8 Qb6-c5 Ra8-a5 Qc5-f8 Ra5-d5 Kd2-c3 Kc8-b8
+    11/22+	00:00	     146'366	659'306	+2.70	Re1-e7
+    11/23	00:00	     240'486	683'198	+2.73	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 Qb6-b3 Ra8-a5 Qb3-e6+ Kc8-d8 c2-c3 Ra5-a6 Qe6-g8+ Kd8-d7 Kd2-c2 Kd7-c7
+    13/26-	00:00	     422'609	731'157	+3.23	
+    13/28	00:00	     477'994	739'928	+3.32	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 Qb6-b3 Ra8-a5 Qb3-e6+ Kc8-d8 c2-c3 Be7-f8 b2-b4 Ra5-a6 Kd2-c2 Bf8-e7 Kc2-b2 c6-c5 Qe6-d5+ Kd8-c7 b4xc5
+    14/27	00:00	     568'116	744'581	+3.32	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 Qb6-b3 Ra8-a5 Qb3-e6+ Kc8-d8 c2-c3 Be7-f8 b2-b4 Ra5-a6 Kd2-c2 Bf8-e7 Kc2-b2 c6-c5 Qe6-d5+ Kd8-c7 b4xc5
+    15/29	00:00	     726'526	752'097	+3.32	Re1-e7 Qf7xe7 Nd5xe7+ Bd6xe7 Qb6-b3 Ra8-a5 Qb3-e6+ Kc8-d8 c2-c3 Be7-f8 b2-b4 Ra5-a6 Kd2-c2 Bf8-e7 Kc2-b2 c6-c5 Qe6-d5+ Kd8-c7 b4xc5
+   20/12/2013 23:27:41, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 53 Re1; id "WAC.053";  
+    Searching move: Re3-e1
+    Best move (Vajolet2): Re3-e1
+    Identical moves! Found in: 00:00
+     2/12	00:00	         471	471'000	-1.29	Ne5xf3+ Rf2xf3 Re3xf3 Qf1xf3
+     3/12	00:00	       2'123	303'285	+1.98	Re3-e1 Bf3-h5 Re1xf1+ Rf2xf1
+     4/10	00:00	       2'467	308'375	+1.87	Re3-e1 Bf3-h5 Re1xf1+ Rf2xf1 Qg3-e3+ Kg1-h1
+     5/12+	00:00	       4'037	336'416	+1.96	Re3-e1
+     5/12+	00:00	       4'980	355'714	+2.05	Re3-e1
+     5/15	00:00	       6'962	366'421	+2.09	Re3-e1 Bf3-d1 Re1xf1+ Rf2xf1 Qg3-d3 Bd1-b3
+     6/16	00:00	       8'937	372'375	+2.03	Re3-e1 Bf3-h5 Re1xf1+ Rf2xf1 g7-g6 Bh5-d1 Qg3-e3+ Kg1-h1
+     7/16	00:00	      18'833	428'022	+2.05	Re3-e1 Bf3-h5 Re1xf1+ Rf2xf1 g7-g6 Bh5-d1 Qg3-d3 Bd1-b3
+     8/19-	00:00	      32'315	529'754	+1.97	
+     8/20+	00:00	      42'484	581'972	+2.21	Re3-e1
+     8/16	00:00	      44'019	586'920	+1.95	Re3-e1 Bf3-e2 Re1xf1+ Be2xf1 f4-f3 d5-d6 Qg3-g6 d6-d7 Ne5xd7 Bf1-c4+ Kg8-h8 Rf2xf3
+     9/14+	00:00	      45'836	587'641	+2.03	Re3-e1
+     9/15+	00:00	      46'732	591'544	+2.12	Re3-e1
+     9/20+	00:00	      51'788	609'270	+2.24	Re3-e1
+     9/20	00:00	      64'957	649'570	+2.24	Re3-e1 Bf3-h5 Re1xf1+ Rf2xf1 g7-g6 Bh5-e2 Qg3-e3+ Rf1-f2 Ne5-d3 Be2xd3 Qe3xd3 Rf2xf4 Qd3xd5
+    10/17+	00:00	      68'505	652'428	+2.32	Re3-e1
+    10/18+	00:00	      70'062	660'962	+2.40	Re3-e1
+    10/24+	00:00	      98'278	712'159	+2.52	Re3-e1
+    10/24	00:00	     137'882	757'593	+2.55	Re3-e1 Bf3-e2 Re1xf1+ Rf2xf1 Qg3-e3+ Rf1-f2 Ne5-d3 Be2xd3 Qe3xd3 Rf2xf4 Qd3xd5 Rf4-f2 Qd5-d6 Kg1-h1 Qd6-g3 Rf2-e2
+    11/19	00:00	     149'336	769'773	+2.54	Re3-e1 Bf3-e2 Re1xf1+ Rf2xf1 Qg3-e3+ Rf1-f2 Ne5-d3 Be2xd3 Qe3xd3 Rf2xf4 Qd3xd5 Rf4-f2 Qd5-d6 Rf2-f1 Qd6-d4+ Kg1-h1
+    13/32-	00:00	     446'876	861'032	+2.53	
+    13/26	00:00	     493'851	869'455	+2.50	Re3-e1 Bf3-h5 Re1xf1+ Rf2xf1 Qg3-g5 Bh5-e2 f4-f3 Be2xf3 Ne5xf3+ Rf1xf3 Qg5xd5 a2-a3 Qd5-e4 Kg1-h2 a6-a5 Rf3-b3 Kg8-h7 Rb3-b5
+    14/28+	00:00	     560'622	873'242	+2.58	Re3-e1
+    14/26+	00:00	     595'196	874'002	+2.66	Re3-e1
+    14/26+	00:00	     630'514	875'713	+2.78	Re3-e1
+   20/12/2013 23:27:43, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 54 Qh1+; id "WAC.054"; 
+    Searching move: Qh5-h1
+    Best move (Vajolet2): Qh5-h1
+    Identical moves! Found in: 00:00
+     2/10	00:00	         952	476'000	+M2	Qh5-h1+ Kg1xh1 Rf8-f1+
+     3/1	00:00	       1'050	525'000	+M2	Qh5-h1+ Kg1xh1 Rf8-f1+
+     4/1	00:00	       1'122	561'000	+M2	Qh5-h1+ Kg1xh1 Rf8-f1+
+     5/1	00:00	       1'217	608'500	+M2	Qh5-h1+ Kg1xh1 Rf8-f1+
+     6/1	00:00	       1'314	657'000	+M2	Qh5-h1+ Kg1xh1 Rf8-f1+
+     7/1	00:00	       1'412	706'000	+M2	Qh5-h1+ Kg1xh1 Rf8-f1+
+     8/1	00:00	       1'511	755'500	+M2	Qh5-h1+ Kg1xh1 Rf8-f1+
+     9/1	00:00	       1'610	805'000	+M2	Qh5-h1+ Kg1xh1 Rf8-f1+
+   20/12/2013 23:27:45, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 55 Qxg7+; id "WAC.055" 
+    Searching move: Qd4xg7
+    Best move (Vajolet2): Qd4xg7
+    Identical moves! Found in: 00:00
+     2/10	00:00	       1'103	275'750	-0.62	Rf4-f3 Ra8-c8
+     3/14	00:00	       3'495	291'250	-0.76	Rf4-f2 f7-f6 Bg5-f4
+     4/14	00:00	      10'251	301'500	-0.89	Rf4-f2 Be6-f5 Re1-e5 Re8xe5 Qd4xe5
+     5/14	00:00	      16'196	359'911	-0.89	Rf4-f2 Be6-f5 Re1-e5 Re8xe5 Qd4xe5
+     6/18-	00:00	      27'822	421'545	-0.97	
+     6/16	00:00	      37'228	465'350	-1.01	Rf4-f2 Be6-f5 Bg5-e3 Ra8-c8 Qd4xa7 Bf5xc2
+     7/18	00:00	      65'053	520'424	-1.07	Rf4-f1 Ra8-c8 c2-c3 Qd7-b5 Rf1-f2 f7-f6 Bg5-f4
+     8/18	00:00	      96'738	555'965	-1.03	Rf4-f1 Be6-f5 Qd4-d2 Qd7-c7 c2-c3 Qc7-c5+ Bg5-e3 Qc5-c4 a2-a3
+     9/20+	00:00	     164'691	601'062	+0.83	Qd4xg7+
+     9/16+	00:00	     165'223	600'810	+M500	Qd4xg7+
+     9/8+	00:00	     165'704	602'560	+M500	Qd4xg7+
+     9/16	00:00	     173'285	595'481	+M4	Qd4xg7+ Kg8xg7 Bg5-f6+ Kg7-f8 Rf4-h4 g6-g5 Rh4-h8+
+    10/14	00:00	     186'762	596'683	+M4	Qd4xg7+ Kg8xg7 Bg5-f6+ Kg7-f8 Rf4-h4 g6-g5 Rh4-h8+
+    11/14	00:00	     222'638	601'724	+M4	Qd4xg7+ Kg8xg7 Bg5-f6+ Kg7-f8 Rf4-h4 g6-g5 Rh4-h8+
+    12/14	00:00	     258'222	628'277	+M4	Qd4xg7+ Kg8xg7 Bg5-f6+ Kg7-f8 Rf4-h4 g6-g5 Rh4-h8+
+   20/12/2013 23:27:48, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 56 Bxf2+; id "WAC.056" 
+    Searching move: Bc5xf2
+    Best move (Vajolet2): Bc5xf2
+    Identical moves! Found in: 00:00
+     2/9	00:00	         571	285'500	+4.86	Bc5xf2+ Ke1xf2 Nf6xe4+ Kf2-f1 Ne4xg3+ h2xg3
+     3/16	00:00	         987	246'750	+4.86	Bc5xf2+ Ke1xf2 Nf6xe4+ Kf2-f1 Ne4xg3+ h2xg3
+     4/14	00:00	       1'739	289'833	+4.88	Bc5xf2+ Qg3xf2 Ne5-d3+ Ke1-f1 Nd3xf2 Kf1xf2 Nf6xe4+ Kf2-f1
+     5/13	00:00	       3'067	306'700	+4.88	Bc5xf2+ Qg3xf2 Ne5-d3+ Ke1-f1 Nd3xf2 Kf1xf2 Nf6xe4+ Kf2-f1
+     6/19+	00:00	       3'449	287'416	+5.00	Bc5xf2+
+     6/18	00:00	       4'656	291'000	+5.07	Bc5xf2+ Qg3xf2 Ne5-d3+ Ke1-f1 Nd3xf2 Kf1xf2 Nf6xe4+ Kf2-f1 d7-d5
+     7/19-	00:00	      10'120	361'428	+4.90	
+     7/22	00:00	      38'562	514'160	+5.03	Bc5xf2+ Qg3xf2 Ne5-d3+ Ke1-f1 Nd3xf2 Kf1xf2 Nf6xe4+ Kf2-f1 d7-d5 Ng1-f3 O-O Bc1-e3
+     8/15	00:00	      39'970	519'090	+5.03	Bc5xf2+ Qg3xf2 Ne5-d3+ Ke1-f1 Nd3xf2 Kf1xf2 Nf6xe4+ Kf2-f1 d7-d5 Ng1-f3 O-O Bc1-e3
+     9/24+	00:00	      56'069	549'696	+5.11	Bc5xf2+
+     9/24+	00:00	      63'230	559'557	+5.19	Bc5xf2+
+     9/24	00:00	      90'236	578'435	+5.17	Bc5xf2+ Qg3xf2 Ne5-d3+ Ke1-f1 Nd3xf2 Kf1xf2 Nf6xe4+ Kf2-e2 b7-b6 Ng1-f3 Bc8-a6+ c3-c4 O-O Rh1-d1 Rf8-e8
+    10/23	00:00	      98'583	583'331	+5.17	Bc5xf2+ Qg3xf2 Ne5-d3+ Ke1-f1 Nd3xf2 Kf1xf2 Nf6xe4+ Kf2-e2 b7-b6 Ng1-f3 Bc8-a6+ c3-c4 O-O Rh1-d1 Rf8-e8
+   20/12/2013 23:27:50, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 57 Rf8+; id "WAC.057"; 
+    Searching move: Rf3-f8
+    Best move (Vajolet2): Rf3-f8
+    Identical moves! Found in: 00:00
+     2/12	00:00	         466	233'000	+M3	Rf3-f8+ Qe8xf8 Rf1xf8+ Ra8xf8 Qh6xg6+
+     3/8	00:00	         854	284'666	+M3	Rf3-f8+ Qe8xf8 Rf1xf8+ Ra8xf8 Qh6xg6+
+     4/10	00:00	       1'279	255'800	+M3	Rf3-f8+ Qe8xf8 Rf1xf8+ Ra8xf8 Qh6xg6+
+     5/3	00:00	       1'572	262'000	+M3	Rf3-f8+ Qe8xf8 Rf1xf8+ Ra8xf8 Qh6xg6+
+     6/10	00:00	       2'128	304'000	+M3	Rf3-f8+ Qe8xf8 Rf1xf8+ Ra8xf8 Qh6xg6+
+      7	00:00	       2'501	312'625	+M3	Rf3-f8+ Qe8xf8 Rf1xf8+ Ra8xf8 Qh6xg6+
+      8	00:00	       3'141	314'100	+M3	Rf3-f8+ Qe8xf8 Rf1xf8+ Ra8xf8 Qh6xg6+
+      9	00:00	       4'196	349'666	+M3	Rf3-f8+ Qe8xf8 Rf1xf8+ Ra8xf8 Qh6xg6+
+   20/12/2013 23:27:52, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 58 Qd1+; id "WAC.058"; 
+    Searching move: Qd3-d1
+    Best move (Vajolet2): Qd3-d1
+    Identical moves! Found in: 00:00
+     2/11	00:00	       1'954	390'800	+1.98	Rc6-c5 Qe5-e6 Qd3xb5
+     3/12	00:00	       3'307	367'444	+1.97	Rc6-c5 Qe5-e6 Rc5xb5
+     4/15	00:00	       8'070	384'285	+1.94	Qd3-f3+ Kh5-g5 Rc6-c5 Qe5-e6 Rc5xb5
+     5/14+	00:00	      10'025	385'576	+2.03	Rc6-c5
+     5/14+	00:00	      12'224	394'322	+2.11	Rc6-c5
+     5/14+	00:00	      13'260	401'818	+2.23	Rc6-c5
+     5/15	00:00	      16'671	427'461	+2.33	Rc6-c5 Qe5-e6 Qd3xb5 Kh5-g5 Rc5-d5 Kg5-g4
+     6/16+	00:00	      21'459	476'866	+2.43	Qd3-d1+
+     6/16+	00:00	      21'802	473'956	+2.63	Qd3-d1+
+     6/20+	00:00	      23'380	487'083	+5.66	Qd3-d1+
+     6/20	00:00	      24'415	498'265	+5.84	Qd3-d1+ Kh5-g5 Qd1-d2+ f5-f4 Qd2-d8+ Kg5-f5 Qd8-c8+ Qe5-e6 Qc8-f8+ Kf5-g4 Qf8-g7+ Kg4-h3 Rc6xe6 Re4xe6 g3xf4
+     7/22	00:00	      27'359	516'207	+5.84	Qd3-d1+ Kh5-g5 Qd1-d2+ f5-f4 Qd2-d8+ Kg5-f5 Qd8-c8+ Qe5-e6 Qc8-f8+ Kf5-g4 Qf8-g7+ Kg4-h3 Rc6xe6 Re4xe6 g3xf4
+     8/23+	00:00	      29'570	537'636	+5.93	Qd3-d1+
+     8/18+	00:00	      29'674	539'527	+6.03	Qd3-d1+
+     8/17+	00:00	      31'648	545'655	+7.10	Qd3-d1+
+     8/21	00:00	      40'658	580'828	+7.67	Qd3-d1+ Kh5-g5 Qd1-d2+ Re4-f4+ Qd2xf4+ Qe5xf4+ g3xf4+ Kg5xf4 Rc6-b6 Kf4-e4 Rb6xb5 f5-f4 Rb5-g5 Ke4-d3 Rg5-f5
+     9/20+	00:00	      41'545	585'140	+7.75	Qd3-d1+
+     9/21+	00:00	      43'174	591'424	+7.83	Qd3-d1+
+     9/22+	00:00	      48'266	588'609	+8.42	Qd3-d1+
+     9/24	00:00	      68'253	650'028	+8.75	Qd3-d1+ Kh5-g5 Qd1-d2+ Re4-f4+ Qd2xf4+ Qe5xf4+ g3xf4+ Kg5xf4 Rc6-b6 Kf4-e4 Rb6xb5 Ke4-f4 Rb5-c5 Kf4-g4 b4-b5 f5-f4 b5-b6 Kg4-h4
+   20/12/2013 23:27:54, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 59 Nd5; id "WAC.059";  
+    Searching move: Nc3-d5
+    Best move (Vajolet2): Nc3-d5
+    Identical moves! Found in: 00:00
+     2/9	00:00	         443	221'500	+1.58	Qd4xg7+ Kg8xg7 Nc3-d5+ Qe7-e5 Nf3xe5 Nf7xe5 Nd5xc7
+     3/12	00:00	       1'032	258'000	+5.37	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Bb2xd4+ Kg7-h6 Ne7xc8 Ra8xc8 e4xf5 g6xf5
+     4/14	00:00	       1'507	301'400	+5.37	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Bb2xd4+ Kg7-h6 Ne7xc8 Ra8xc8 e4xf5 g6xf5
+     5/17	00:00	       2'095	299'285	+5.37	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Bb2xd4+ Kg7-h6 Ne7xc8 Ra8xc8 e4xf5 g6xf5
+     6/15+	00:00	       3'011	334'555	+5.46	Nc3-d5
+     6/18	00:00	       4'326	393'272	+5.46	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Bb2xd4+ Kg7-h6 e4xf5 Bc8xf5 Ne7xf5+ g6xf5
+     7/19	00:00	       8'906	424'095	+5.50	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Bb2xd4+ Kg7-h6 e4xf5 Bc8xf5 Ne7xf5+ g6xf5 Rf1-e1
+     8/20+	00:00	      19'533	465'071	+5.58	Nc3-d5
+     8/18+	00:00	      20'532	466'636	+5.66	Nc3-d5
+     8/18+	00:00	      21'775	483'888	+5.78	Nc3-d5
+     8/20	00:00	      26'955	499'166	+5.80	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Rd1xd4 Nf7-e5 Rd4-d1 Kg7-f7 Nf3xe5+ d6xe5 Ne7xc8 Ra8xc8 e4xf5
+     9/22-	00:00	      43'107	538'837	+5.72	
+     9/24+	00:00	      90'595	580'737	+5.88	Nc3-d5
+     9/24	00:00	     104'654	591'265	+5.93	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Nf3xd4 Kg7-h6 Bb2-c1+ Kh6-g7 Ne7xc8 Rf8xc8 e4xf5 g6xf5 Nd4xc6
+    10/24	00:00	     113'301	596'321	+5.93	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Nf3xd4 Kg7-h6 Bb2-c1+ Kh6-g7 Ne7xc8 Rf8xc8 e4xf5 g6xf5 Nd4xc6
+    11/24	00:00	     141'248	606'214	+5.99	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Nf3xd4 Kg7-h6 Bb2-c1+ Kh6-g7 Ne7xc8 Rf8xc8 e4xf5 c6-c5 Nd4-e6+ Kg7-f6 f5xg6 h7xg6
+    12/25+	00:00	     215'800	618'338	+6.07	Nc3-d5
+    12/26+	00:00	     248'311	619'229	+6.15	Nc3-d5
+    12/30	00:00	     334'008	626'656	+6.10	Nc3-d5 Bg7xd4 Nd5xe7+ Kg8-g7 Nf3xd4 Kg7-h6 Bb2-c1+ Kh6-g7 Ne7xc8 Rf8xc8 e4xf5 c6-c5 Nd4-e6+ Kg7-f6 f5xg6 Kf6xe6 g6xf7 Ke6xf7
+   20/12/2013 23:27:57, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 60 Qh8+; id "WAC.060"; 
+    Searching move: Qh3-h8
+    Best move (Vajolet2): Qh3-h8
+    Identical moves! Found in: 00:00
+     2/10	00:00	         276	276'000	+M2	Qh3-h8+ Bd4xh8 Rh1xh8+
+      3	00:00	         352	176'000	+M2	Qh3-h8+ Bd4xh8 Rh1xh8+
+      4	00:00	         411	205'500	+M2	Qh3-h8+ Bd4xh8 Rh1xh8+
+      5	00:00	         485	242'500	+M2	Qh3-h8+ Bd4xh8 Rh1xh8+
+      6	00:00	         560	280'000	+M2	Qh3-h8+ Bd4xh8 Rh1xh8+
+      7	00:00	         636	318'000	+M2	Qh3-h8+ Bd4xh8 Rh1xh8+
+      8	00:00	         713	356'500	+M2	Qh3-h8+ Bd4xh8 Rh1xh8+
+      9	00:00	         790	263'333	+M2	Qh3-h8+ Bd4xh8 Rh1xh8+
+   20/12/2013 23:27:59, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 61 Qf7+; id "WAC.061"; 
+    Searching move: Qf3-f7
+    Best move (Vajolet2): Qf3-f7
+    Identical moves! Found in: 00:00
+     2/12	00:00	       1'789	298'166	+M2	Qf3-f7+ Re7xf7 e6xf7+
+      3	00:00	       1'877	268'142	+M2	Qf3-f7+ Re7xf7 e6xf7+
+      4	00:00	       1'944	277'714	+M2	Qf3-f7+ Re7xf7 e6xf7+
+      5	00:00	       2'029	289'857	+M2	Qf3-f7+ Re7xf7 e6xf7+
+      6	00:00	       2'117	302'428	+M2	Qf3-f7+ Re7xf7 e6xf7+
+      7	00:00	       2'205	315'000	+M2	Qf3-f7+ Re7xf7 e6xf7+
+      8	00:00	       2'294	327'714	+M2	Qf3-f7+ Re7xf7 e6xf7+
+      9	00:00	       2'383	297'875	+M2	Qf3-f7+ Re7xf7 e6xf7+
+   20/12/2013 23:28:01, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 62 Rxg3+; id "WAC.062" 
+    Searching move: Rg6xg3
+    Best move (Vajolet2): Rg6xg3
+    Identical moves! Found in: 00:00
+     2/9	00:00	         884	294'666	-2.75	Rg8-b8 Kg1-h1
+     3/12	00:00	       1'908	272'571	-3.02	Rg8-b8 Kg1-h1 Qg7-f6
+     4/14	00:00	       9'433	349'370	-2.89	Rg8-b8 a2-a3 Qg7-f6 Rf1-f3
+     5/15+	00:00	      21'127	406'288	-2.79	Rg6xg3+
+     5/7+	00:00	      21'215	407'980	-2.68	Rg6xg3+
+     5/15+	00:00	      22'382	406'945	-1.58	Rg6xg3+
+     5/15	00:00	      29'262	424'086	-1.05	Rg6xg3+ Kg1-h1 Rg3-d3 b3-b4 f5-f4 a2-a4
+     6/16	00:00	      31'994	426'586	-1.05	Rg6xg3+ Kg1-h1 Rg3-d3 b3-b4 f5-f4 a2-a4 f4-f3
+     7/16+	00:00	      36'409	444'012	-0.97	Rg6xg3+
+     7/18+	00:00	      46'476	479'134	-0.89	Rg6xg3+
+     7/19	00:00	      60'874	511'546	-1.09	Rg6xg3+ Kg1-h1 Rg3-d3 Qc5-f2 Qg7-g4 Re2-e1 f5-f4 Rf1-g1 Qg4-f5 Rg1xg8 Kh7xg8
+     8/17	00:00	      78'399	544'437	-1.09	Rg6xg3+ Kg1-h1 Rg3-d3 Qc5-f2 Qg7-g4 Re2-e1 f5-f4 Rf1-g1 Qg4-f5 Rg1xg8 Kh7xg8
+     9/19+	00:00	      84'040	552'894	-1.01	Rg6xg3+
+     9/22+	00:00	     121'744	596'784	-0.93	Rg6xg3+
+     9/23+	00:00	     155'001	625'004	-0.81	Rg6xg3+
+     9/21	00:00	     188'214	644'568	-0.91	Rg6xg3+ Kg1-h1 Rg3-d3 Qc5-f2 Qg7-g4 Re2-e1 Qg4-g5 Re1-d1 Rd3xd1 Rf1xd1 Qg5-g4 Rd1-e1
+   20/12/2013 23:28:03, Time for this analysis: 00:00:01, Rated time: 01:24
+
+ 63 Nxf7; id "WAC.063"; 
+    Searching move: Ne5xf7
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/13	00:00	       5'110	340'666	+2.96	Ne5xf7 Rd8-d5
+     3/14	00:00	       8'040	365'454	+3.19	Ne5xf7 Rd8-d5 Nf7-e5
+     4/13	00:00	      10'089	388'038	+3.07	Ne5xf7 Rd8-d5 Nf7-e5 Ne8-f6
+     5/14-	00:00	      12'474	402'387	+2.91	
+     5/14	00:00	      13'656	413'818	+2.89	Ne5xf7 Rd8-d5 Nf7-e5 Ne8-f6 a3-a4
+     6/16+	00:00	      16'464	422'153	+2.97	Ne5xf7
+     6/16+	00:00	      17'326	422'585	+3.05	Ne5xf7
+     6/18	00:00	      23'958	452'037	+2.99	Ne5xf7 Rd8-d5 Nf7-e5 Ne8-f6 Bd2-f4 Bf8-e7
+     7/19	00:00	      46'649	501'602	+3.05	Ne5xf7 Rd8-d5 Nf7-e5 Rd5-a5 c3-c4 Ra5xa3 Ra1xa3 Bf8xa3
+     8/19+	00:00	      58'641	514'394	+3.13	Ne5xf7
+     8/21	00:00	     129'821	547'767	+3.06	Ne5xf7 Rd8-d5 a3-a4 Ne8-d6 Nf7-e5 Bc8-d7 Ne5xd7 Qc7xd7
+     9/22-	00:00	     154'546	557'927	+2.98	
+     9/26	00:00	     295'636	590'091	+2.93	Ne5xf7 Rd8-d5 a3-a4 Ne8-d6 Nf7-e5 Bc8-d7 Qf3-h5 Ra8-e8 Qh5-g6 Nd6-f5 Ne5xd7 Qc7xd7 Bd3xf5 Rd5xf5 Bd2xh6
+    10/21	00:00	     311'670	592'528	+2.93	Ne5xf7 Rd8-d5 a3-a4 Ne8-d6 Nf7-e5 Bc8-d7 Qf3-h5 Ra8-e8 Qh5-g6 Nd6-f5 Ne5xd7 Qc7xd7 Bd3xf5 Rd5xf5 Bd2xh6
+    11/23+	00:00	     362'654	590'641	+3.01	Ne5xf7
+    11/24+	00:00	     517'926	591'239	+3.09	Ne5xf7
+    11/26	00:01	     778'814	594'061	+3.20	Ne5xf7 Rd8-d5 a3-a4 Ne8-d6 Nf7-e5 g7-g5 h2-h4 Nd6-f7 Ne5-g4 Rd5-d8 h4xg5 Nf7xg5 Ng4-f6+ Kg8-h8
+    12/30	00:02	   1'365'865	602'233	+3.20	Ne5xf7 Rd8-d5 a3-a4 Ne8-d6 Nf7-e5 g7-g5 h2-h4 Nd6-f7 Ne5-g4 Rd5-d8 h4xg5 Nf7xg5 Ng4-f6+ Kg8-h8
+    13/28-	00:03	   1'915'608	608'515	+3.12	
+   20/12/2013 23:28:07, Time for this analysis: 00:00:03, Rated time: 01:34
+
+ 64 g4+; id "WAC.064";  
+    Searching move: g2-g4
+    Best move (Vajolet2): g2-g4
+    Identical moves! Found in: 00:00
+     2/10	00:00	       1'052	350'666	+1.64	Qe3-c5 Qd6-e6
+     3/14	00:00	       2'524	360'571	+M3	g2-g4+ Kf5-g6 Qe3-e8+ Kg6-g5 Qe8-h5+
+     4/12	00:00	       3'115	346'111	+M3	g2-g4+ Kf5-g6 Qe3-e8+ Kg6-g5 Qe8-h5+
+     5/6	00:00	       3'411	341'100	+M3	g2-g4+ Kf5-g6 Qe3-e8+ Kg6-g5 Qe8-h5+
+     6/8	00:00	       3'797	379'700	+M3	g2-g4+ Kf5-g6 Qe3-e8+ Kg6-g5 Qe8-h5+
+     7/4	00:00	       4'116	374'181	+M3	g2-g4+ Kf5-g6 Qe3-e8+ Kg6-g5 Qe8-h5+
+      8	00:00	       4'581	381'750	+M3	g2-g4+ Kf5-g6 Qe3-e8+ Kg6-g5 Qe8-h5+
+      9	00:00	       5'367	412'846	+M3	g2-g4+ Kf5-g6 Qe3-e8+ Kg6-g5 Qe8-h5+
+   20/12/2013 23:28:09, Time for this analysis: 00:00:01, Rated time: 01:34
+
+ 65 Ne7+; id "WAC.065"; 
+    Searching move: Nd5-e7
+    Best move (Vajolet2): Nd5-e7
+    Identical moves! Found in: 00:01
+     2/14	00:00	       1'212	303'000	+5.53	Nd5-e7+ Qf8xe7 d6xe7
+     3/12	00:00	       1'785	297'500	+7.10	Nd5-e7+ Qf8xe7 d6xe7 e5xf4 e7xd8Q+ Rb8xd8
+     4/16	00:00	       3'080	308'000	+7.98	Nd5-e7+ Qf8xe7 d6xe7 e5xf4 Bh3xe6
+     5/16+	00:00	       3'586	326'000	+8.06	Nd5-e7+
+     5/14+	00:00	       3'685	307'083	+8.19	Nd5-e7+
+     5/17+	00:00	       4'216	324'307	+8.57	Nd5-e7+
+     5/17	00:00	       7'795	311'800	+8.80	Nd5-e7+ Qf8xe7 d6xe7 e5-e4 e7xd8Q+ Rb8xd8 Bh3xe6 f7xe6 Nh4xg6 h7xg6 Qh6xg6+ Kg8-h8 Qg6xe4
+     6/17	00:00	      10'906	340'812	+8.80	Nd5-e7+ Qf8xe7 d6xe7 e5-e4 e7xd8Q+ Rb8xd8 Bh3xe6 f7xe6 Nh4xg6 h7xg6 Qh6xg6+ Kg8-h8 Qg6xe4
+     7/20	00:00	      23'404	450'076	+8.87	Nd5-e7+ Qf8xe7 d6xe7 e5xf4 Bh3xe6 f7xe6 e7xd8Q+ Rb8xd8 Qh6xf4
+     8/18+	00:00	      24'705	457'500	+8.95	Nd5-e7+
+     8/24+	00:00	      72'359	578'872	+9.03	Nd5-e7+
+     8/25	00:00	     119'949	621'497	+8.86	Nd5-e7+ Qf8xe7 d6xe7 Ne6-d4 e7xd8Q+ Rb8xd8 Qh6-g5 f7-f6 Qg5-g2 Kg8-h8 Bh3xd7 Rd8xd7 Qg2-a8+ Kh8-g7 f4xe5
+     9/23+	00:00	     128'787	622'159	+8.94	Nd5-e7+
+     9/22+	00:00	     140'528	624'568	+9.02	Nd5-e7+
+     9/23+	00:00	     223'403	643'812	+10.00	Nd5-e7+
+     9/24	00:00	     291'085	649'743	+9.77	Nd5-e7+ Qf8xe7 d6xe7 Nd7-f8 e7xd8Q Rb8xd8 Rd1xd8 Ne6xd8 f4xe5 Ba6-b7 Nh4-f5 g6xf5 Qh6-g5+ Kg8-h8 Qg5xd8
+    13/26-	00:00	     639'405	676'619	+10.00	
+    13/30+	00:01	     769'865	675'913	+10.16	Nd5-e7+
+    13/28+	00:01	     826'575	676'965	+10.28	Nd5-e7+
+    13/30	00:01	     945'521	682'686	+10.30	Nd5-e7+ Qf8xe7 d6xe7 Nd7-f8 e7xd8R Rb8xd8 Rd1xd8 Ne6xd8 f4xe5 Nd8-e6 Bh3-g2 Ba6-c8 Bg2-d5 a7-a6 Nh4-f3 b6-b5 Nf3-d2
+   20/12/2013 23:28:11, Time for this analysis: 00:00:01, Rated time: 01:35
+
+ 66 Qxe5; id "WAC.066"; 
+    Searching move: Qc7xe5
+    Best move (Vajolet2): Qc7xe5
+    Identical moves! Found in: 00:00
+     2/8	00:00	         362	362'000	+2.19	Rd8-e8 Qe5xc7+ Bb6xc7
+     3/12	00:00	       1'202	300'500	+2.04	Rd8-e8 Qe5xc7+ Bb6xc7 Ra1-e1
+     4/9	00:00	       1'967	327'833	+2.44	Qc7xe5 Nf3xe5 Rg8-g5 Ne5-f3 Rg5-h5+ Nf3-h2
+     5/13	00:00	       2'406	343'714	+2.44	Qc7xe5 Nf3xe5 Rg8-g5 Ne5-f3 Rg5-h5+ Nf3-h2
+     6/12	00:00	       3'225	358'333	+2.44	Qc7xe5 Nf3xe5 Rg8-g5 Ne5-f3 Rg5-h5+ Nf3-h2 Rh5-e5
+     7/12+	00:00	       3'537	353'700	+2.57	Qc7xe5
+     7/10+	00:00	       3'688	368'800	+2.71	Qc7xe5
+     7/10+	00:00	       4'035	366'818	+3.03	Qc7xe5
+     7/12	00:00	       4'784	398'666	+3.24	Qc7xe5 Nf3xe5 Rg8-g5 Ne5-f3 Rg5-h5+ Nf3-h2 Bb6-c7 g2-g3 Bc7xg3
+     8/14+	00:00	       5'199	371'357	+3.33	Qc7xe5
+     8/14+	00:00	       5'773	412'357	+3.41	Qc7xe5
+     8/15+	00:00	       7'792	458'352	+4.41	Qc7xe5
+     8/17	00:00	      10'324	516'200	+4.66	Qc7xe5 Nf3xe5 Rg8-g5 Ne5xc6+ b7xc6 Rf1-f3 Rd8-g8 Ra1-f1 Rg5xg2 Rf3-f8+ Kb8-b7 Rf1-f7+ Bb6-c7 Rf8xg8 Rg2xg8
+     9/15	00:00	      11'146	530'761	+4.66	Qc7xe5 Nf3xe5 Rg8-g5 Ne5xc6+ b7xc6 Rf1-f3 Rd8-g8 Ra1-f1 Rg5xg2 Rf3-f8+ Kb8-b7 Rf1-f7+ Bb6-c7 Rf8xg8 Rg2xg8
+    15/25-	00:00	     613'235	790'251	+5.10	
+    15/28	00:00	     644'522	791'796	+5.27	Qc7xe5 Nf3xe5 Rg8-g5 Ne5xc6+ b7xc6 Rf1-f3 Rd8-g8 Ra1-f1 Kb8-b7 a2-a4 Rg5xg2 b2-b4 Rg2-c2 Rf3-f6 h6-h5 Rf6-h6 Rg8-g5 Rf1-f7+ Bb6-c7
+    16/22	00:00	     655'596	793'699	+5.21	Qc7xe5 Nf3xe5 Rg8-g5 Ne5xc6+ b7xc6 Rf1-f3 Rd8-g8 Ra1-f1 Kb8-b7 a2-a4 Rg5xg2 b2-b4 Rg2-c2 Rf3-f6 h6-h5 Rf6-h6 Rg8-g5
+    17/29	00:00	     732'370	797'788	+5.27	Qc7xe5 Nf3xe5 Rg8-g5 Ne5xc6+ b7xc6 Rf1-f3 Rd8-g8 Ra1-f1 Kb8-b7 a2-a4 Rg5xg2 b2-b4 Rg2-c2 Rf3-f6 h6-h5 Rf6-h6 Rg8-g5 Rf1-f7+ Bb6-c7
+    18/31+	00:01	     890'793	792'520	+5.35	Qc7xe5
+   20/12/2013 23:28:13, Time for this analysis: 00:00:01, Rated time: 01:35
+
+ 67 Rxd5; id "WAC.067"; 
+    Searching move: Re5xd5
+    Best move (Vajolet2): Re5xd5
+    Identical moves! Found in: 00:00
+     2/10	00:00	       1'059	353'000	-0.88	Re5xd5 Qd7xd5
+     3/10	00:00	       1'322	440'666	+2.57	Re5xd5 Qd7xd5 Re2-e8+ Rd8xe8 Qd1xd5+ Kg8-g7
+     4/10	00:00	       1'774	443'500	+2.72	Re5xd5 Qd7xd5 Re2-e8+ Rd8xe8 Qd1xd5+ Kg8-h8
+     5/12+	00:00	       2'107	421'400	+2.81	Re5xd5
+     5/16	00:00	       2'747	392'428	+2.82	Re5xd5 Qd7xd5 Re2-e8+ Rd8xe8 Qd1xd5+ Kg8-h8 Qd5-d4+ Kh8-g8
+     6/14+	00:00	       3'171	453'000	+2.91	Re5xd5
+     6/14	00:00	       3'961	440'111	+2.97	Re5xd5 Qd7xd5 Re2-e8+ Rd8xe8 Qd1xd5+ Kg8-f8 Qd5-d7 Re8-e7
+     7/18-	00:00	       5'268	439'000	+2.88	
+     7/19	00:00	      12'389	458'851	+2.99	Re5xd5 Qd7xd5 Re2-e8+ Rd8xe8 Qd1xd5+ Kg8-f8 a2-a4 Re8-e7 a4-a5 b6xa5 Qd5xa5 Re7-d7 Qa5-c5+ Kf8-g7 Qc5-e5+ Kg7-h6
+     8/18	00:00	      13'949	481'000	+2.91	Re5xd5 Qd7xd5 Re2-e8+ Rd8xe8 Qd1xd5+ Kg8-f8 a2-a4 Re8-e7 a4-a5 b6xa5 Qd5xa5
+     9/12+	00:00	      14'303	493'206	+2.99	Re5xd5
+     9/18	00:00	      16'611	519'093	+3.00	Re5xd5 Qd7xd5 Re2-e8+ Rd8xe8 Qd1xd5+ Kg8-f8 a2-a4 Re8-e7 a4-a5 b6xa5 Qd5xa5 Kf8-f7 Qa5-d5+
+    10/19	00:00	      20'134	559'277	+2.99	Re5xd5 Qd7xd5 Re2-e8+ Rd8xe8 Qd1xd5+ Kg8-f8 a2-a4 Re8-e7 a4-a5 b6xa5 Qd5xa5 Re7-d7 Qa5-c5+ Kf8-g7 Qc5-e5+ Kg7-h6
+   20/12/2013 23:28:15, Time for this analysis: 00:00:01, Rated time: 01:35
+
+ 68 Qxe3; id "WAC.068"; 
+    Searching move: Qe2xe3
+    Best move (Vajolet2): Qe2xe3
+    Identical moves! Found in: 00:00
+     2/9	00:00	         618	618'000	+5.29	Qe2xe3 Qb6xb2 Rc3xc5 Qb2-b1+ Kh1-g2 Qb1-b2+ Qe3-f2
+     3/11	00:00	       1'294	647'000	+5.37	Qe2xe3 Qb6xb2 Rc3xc5 Qb2-b8 Qe3-e7
+     4/15	00:00	       4'489	448'900	+5.77	Qe2xe3 Qb6xb2 Qe3xc5 g7-g6 h2-h3 Qb2-b1+ Kh1-g2 Qb1-b2+ Rc3-c2
+     5/14-	00:00	       5'838	449'076	+5.69	
+     5/9	00:00	       6'727	448'466	+5.68	Qe2xe3 Qb6xb2 Qe3xc5 g7-g6 h2-h3 h7-h6 Qc5-c8+ Kg8-g7
+     6/13+	00:00	       8'041	446'722	+5.76	Qe2xe3
+     6/18+	00:00	      16'394	546'466	+5.84	Qe2xe3
+     6/15	00:00	      18'572	562'787	+5.92	Qe2xe3 Qb6xb2 Qe3xc5 g7-g6 Rc3-c2 Qb2-b1+ Kh1-g2 h7-h6 h2-h3 Qb1-b3
+     7/13	00:00	      20'280	596'470	+5.92	Qe2xe3 Qb6xb2 Qe3xc5 g7-g6 Rc3-c2 Qb2-b1+ Kh1-g2 h7-h6 h2-h3 Qb1-b3
+     8/19-	00:00	      26'915	625'930	+5.84	
+     8/22	00:00	      30'685	652'872	+5.84	Qe2xe3 Qb6xb2 Qe3xc5 g7-g6 Rc3-c2 Qb2-b1+ Kh1-g2 h7-h6 Qc5-c8+ Kg8-g7 h2-h3 Qb1-b5
+     9/20+	00:00	      37'978	678'178	+5.93	Qe2xe3
+     9/22+	00:00	      87'396	746'974	+6.01	Qe2xe3
+     9/22+	00:00	     132'581	784'502	+6.58	Qe2xe3
+     9/26	00:00	     228'515	819'050	+6.74	Qe2xe3 Qb6-d8 Qe3xc5 Qd8-d1+ Kh1-g2 g7-g6 Rc3-c2 h7-h6 b2-b4 Qd1-d8 b4-b5
+    10/21-	00:00	     231'763	818'950	+6.66	
+    10/24	00:00	     255'815	825'209	+6.77	Qe2xe3 Qb6-d8 Qe3xc5 Qd8-d1+ Kh1-g2 Qd1-d2+ Qc5-f2 Qd2-d8 h2-h3 h7-h5 b2-b4 Qd8-b8 Qf2-d4
+    11/22	00:00	     305'011	837'942	+6.78	Qe2xe3 h7-h6 Qe3xc5 Qb6-g6 Qc5-c8+ Kg8-h7 b2-b4 Qg6-f6 b4-b5 Qf6-e5 b5-b6 Qe5-b5 Qc8-c5 Qb5-f1+ Qc5-g1
+    12/24	00:00	     352'688	837'738	+6.74	Qe2xe3 h7-h6 Qe3xc5 Qb6-g6 Qc5-c8+ Kg8-h7 b2-b4 Qg6-h5 Qc8-e8 Qh5-h3 Rc3-c1 Qh3-h5 Kh1-g2 Qh5-f5
+    13/24+	00:00	     393'870	843'404	+6.82	Qe2xe3
+    13/31	00:00	     580'509	838'885	+6.89	Qe2xe3 Qb6-d8 Qe3xc5 Qd8-d1+ Kh1-g2 g7-g6 Qc5-e3 Qd1-d7 b2-b4 h7-h5 Qe3-d3 Qd7-e6 Rc3-c7 Kg8-h7 b4-b5
+   20/12/2013 23:28:18, Time for this analysis: 00:00:01, Rated time: 01:35
+
+ 69 f3 h3; id "WAC.069" 
+    Searching move: f2-f3, h2-h3
+    Best move (Vajolet2): f2-f3
+    Identical moves! Found in: 00:00
+     2/10	00:00	         283	283'000	+2.28	Re6-e8+ Rd7-d8 Re8xd8+ Kc8xd8 Qe5-d5+ Kd8-c8 Qd5xc4
+     3/12	00:00	       1'394	348'500	+2.28	Re6-e8+ Rd7-d8 Re8xd8+ Kc8xd8 Qe5-d5+ Kd8-c8 Qd5xc4
+     4/14	00:00	       7'372	433'647	+2.02	f2-f3 Qg4-h4 Re6-e8+ Rd7-d8 Qe5-e6+ Kc8-b8 Re8xd8+ Qh4xd8 Qe6xc4
+     5/14	00:00	       9'835	468'333	+2.02	f2-f3 Qg4-h4 Re6-e8+ Rd7-d8 Qe5-e6+ Kc8-b8 Re8xd8+ Qh4xd8 Qe6xc4
+     6/15+	00:00	      10'335	492'142	+2.14	f2-f3
+     6/11+	00:00	      10'564	480'181	+2.43	f2-f3
+     6/13+	00:00	      10'948	497'636	+3.10	f2-f3
+     6/16	00:00	      12'275	511'458	+3.16	f2-f3 Qg4-h4 Re6-e8+ Rd7-d8 g2-g3 Qh4-h7 Re8xd8+ Kc8xd8 Qe5xd4+ Kd8-c8 Qd4xc4
+     7/17	00:00	      14'400	553'846	+3.16	f2-f3 Qg4-h4 Re6-e8+ Rd7-d8 g2-g3 Qh4-h7 Re8xd8+ Kc8xd8 Qe5xd4+ Kd8-c8 Qd4xc4
+     8/20	00:00	      21'299	608'542	+3.16	f2-f3 Qg4-h4 Re6-e8+ Rd7-d8 g2-g3 Qh4-h3 Re8xd8+ Kc8xd8 Qe5xd4+ Kd8-c8 Qd4xa7
+     9/15+	00:00	      21'998	611'055	+3.25	f2-f3
+     9/20+	00:00	      23'783	625'868	+3.33	f2-f3
+     9/23	00:00	      36'557	689'754	+3.39	f2-f3 Qg4-h4 Re6-e8+ Rd7-d8 g2-g3 Qh4-h3 Re8xd8+ Kc8xd8 Qe5xd4+ Qh3-d7 Qd4xd7+ Kd8xd7 h2-h4 Kd7-c6
+   20/12/2013 23:28:20, Time for this analysis: 00:00:01, Rated time: 01:35
+
+ 70 Na2+; id "WAC.070"; 
+    Searching move: Nb4-a2
+    Best move (Vajolet2): Nb4-a2
+    Identical moves! Found in: 00:00
+     2/6	00:00	         592	296'000	+5.78	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5
+     3/13	00:00	         808	269'333	+5.78	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5
+     4/14	00:00	       1'377	275'400	+5.78	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5
+     5/15+	00:00	       2'174	271'750	+5.87	Nb4-a2+
+     5/15+	00:00	       2'584	287'111	+5.95	Nb4-a2+
+     5/17	00:00	       3'662	281'692	+5.94	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 b3-b4
+     6/16-	00:00	       9'090	395'217	+5.65	
+     6/19	00:00	      11'727	434'333	+5.52	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 Nf3-g5 Rh8-f8 Na2-c3
+     7/12	00:00	      12'748	439'586	+5.52	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 Nf3-g5 Rh8-f8 Na2-c3
+     8/18-	00:00	      16'993	472'027	+5.43	
+     8/20	00:00	      23'243	494'531	+5.37	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 Nf3-g5 Ba5-b6 Be3xb6 a7xb6 Ng5xf7
+     9/15	00:00	      24'929	498'580	+5.37	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 Nf3-g5 Ba5-b6 Be3xb6 a7xb6 Ng5xf7
+    10/21-	00:00	      32'277	529'131	+5.29	
+    10/28+	00:00	      64'419	575'169	+5.45	Nb4-a2+
+    10/28+	00:00	     113'807	598'984	+5.75	Nb4-a2+
+    10/30	00:00	     150'121	617'781	+5.86	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 Nf3-g5 Rd8xd1+ Rh1xd1 Rh8-d8 Rd1xd8+ Kc8xd8 b3-b4 Qb5-f1+ Kc1-d2 h7-h6 Ng5xf7+ Kd8-c8 Be3xa7 Nf6xe4+ Kd2-e3
+    11/20-	00:00	     154'366	619'943	+5.78	
+    11/30+	00:00	     200'178	629'490	+5.94	Nb4-a2+
+    11/30	00:00	     346'573	628'989	+5.72	Nb4-a2+ Nc3xa2 Qd7xb5 Nf3-g5 e5xd4 Rd1xd4 Rh8-f8 Na2-c3 Ba5xc3 b2xc3 h7-h6 Ng5-f3 Rf8-e8 Rd4-b4 Qb5-a5
+    12/20+	00:00	     348'383	628'850	+5.81	Nb4-a2+
+    12/30+	00:00	     399'324	625'899	+5.89	Nb4-a2+
+    12/32+	00:00	     606'185	632'101	+6.01	Nb4-a2+
+    12/28	00:01	     663'904	636'533	+5.86	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 Nf3-g5 Rd8xd1+ Rh1xd1 Rh8-d8 Rd1xd8+ Kc8xd8 b3-b4 Qb5-f1+ Kc1-d2 h7-h6 Ng5xf7+ Kd8-c8 Be3xa7 Nf6xe4+ Kd2-e3
+    13/24	00:01	     674'637	636'450	+5.86	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 Nf3-g5 Rd8xd1+ Rh1xd1 Rh8-d8 Rd1xd8+ Kc8xd8 b3-b4 Qb5-f1+ Kc1-d2 h7-h6 Ng5xf7+ Kd8-c8 Be3xa7 Nf6xe4+ Kd2-e3
+    14/26	00:01	     760'578	637'533	+5.86	Nb4-a2+ Nc3xa2 Qd7xb5 d4xe5 d6xe5 Nf3-g5 Rd8xd1+ Rh1xd1 Rh8-d8 Rd1xd8+ Kc8xd8 b3-b4 Qb5-f1+ Kc1-d2 h7-h6 Ng5xf7+ Kd8-c8 Be3xa7 Nf6xe4+ Kd2-e3
+   20/12/2013 23:28:23, Time for this analysis: 00:00:02, Rated time: 01:35
+
+ 71 Nxa7+; id "WAC.071" 
+    Searching move: Nb5xa7
+    Best move (Vajolet2): Nb5xa7
+    Identical moves! Found in: 00:02
+     2/11	00:00	       2'066	258'250	-0.91	Qh3xd7+ Rd8xd7 Rf1-e1
+     3/13	00:00	       3'847	274'785	-0.89	Qh3xd7+ Rd8xd7 Rf1-e1 d4-d3
+     4/15	00:00	      20'526	402'470	-0.95	Qh3-g3 Rh8-g8 Qg3-g5 Qd7-e7 Qg5-f5+ Rd8-d7
+     5/16	00:00	      29'720	450'303	-0.94	Qh3xd7+ Rd8xd7 Rf1-e1 d4-d3 Re1-e5 b7-b6
+     6/16	00:00	      45'673	501'901	-0.90	Qh3-g3 Rh8-g8 Qg3-g5 b7-b6 Rf1-e1 d4-d3
+     7/21	00:00	     139'298	561'685	-0.88	Qh3-b3 d4-d3 Nb5-d6+ Bc5xd6 Bf4xd6 d3-d2 Rf1-d1 Nf6-e4
+     8/20-	00:00	     161'751	573'585	-0.96	
+     8/21	00:00	     219'818	600'595	-0.99	Qh3-g3 Rh8-g8 Qg3-g5 b7-b6 Qg5-e5 Kc8-b7 Rf1-e1 Rg8-e8
+     9/20	00:00	     283'590	616'500	-1.05	Qh3xd7+ Rd8xd7 Rf1-e1 Rh8-e8 Re1xe8+ Nf6xe8 Rb1-e1 Ne8-f6 Re1-e5 Bc5-b6 Re5-e1
+    10/22+	00:00	     407'856	626'506	-0.97	Qh3-g3
+    10/22+	00:00	     467'350	624'799	-0.89	Qh3-g3
+    10/22+	00:00	     594'194	624'809	-0.77	Qh3-g3
+    10/24	00:01	     786'125	634'995	-0.96	Qh3-g3 Qd7-g4 Nb5-d6+ Bc5xd6 Bf4xd6 Qg4xg3 Bd6xg3 Rh8-e8 f2-f3 d4-d3 Rb1-b5 Nf6-d7 Rf1-b1
+    11/23+	00:01	     809'762	636'105	-0.88	Qh3-g3
+    11/24+	00:01	     843'284	638'367	-0.80	Qh3-g3
+    11/24	00:01	     924'933	642'314	-0.77	Qh3-g3 Qd7-g4 Nb5-d6+ Bc5xd6 Bf4xd6 Qg4xg3 Bd6xg3 d4-d3 Rb1-b5 Nf6-e4 Rb5-a5 a7-a6 Bg3-e5 f7-f6
+    12/26+	00:01	   1'032'592	647'393	-0.65	Nb5xa7+
+    12/16+	00:01	   1'034'605	647'842	-0.45	Nb5xa7+
+    12/26+	00:01	   1'102'634	651'290	+2.20	Nb5xa7+
+    12/30	00:02	   1'486'879	664'378	+2.73	Nb5xa7+ Bc5xa7 Qh3-a3 Nf6-h5 Qa3xa7 Nh5xf4 Qa7-a8+ Kc8-c7 Rb1xb7+ Kc7-d6 Rb7xd7+ Kd6xd7 Qa8-f3 g7-g5 Rf1-e1 Rd8-b8 Re1-d1 d4-d3 Qf3-g4+ Kd7-c7 Qg4xg5
+    13/28-	00:02	   1'519'965	665'775	+2.65	
+    13/32+	00:02	   1'612'293	667'892	+2.81	Nb5xa7+
+    13/32	00:02	   1'831'576	675'110	+2.76	Nb5xa7+ Bc5xa7 Qh3-a3 Nf6-h5 Qa3xa7 Nh5xf4 Qa7-a8+ Kc8-c7 Rb1xb7+ Kc7-d6 Rb7xd7+ Kd6xd7 Qa8-f3 g7-g5 Rf1-e1 Rd8-b8 Re1-d1 d4-d3 Qf3-g4+ Kd7-c7 Qg4xg5
+    14/29	00:02	   1'871'246	675'784	+2.74	Nb5xa7+ Bc5xa7 Qh3-a3 Nf6-h5 Qa3xa7 Nh5xf4 Qa7-a8+ Kc8-c7 Rb1xb7+ Kc7-d6 Rb7xd7+ Kd6xd7 Qa8-f3 g7-g5 Rf1-e1 Rd8-b8 Re1-d1 d4-d3 Qf3-g4+ Kd7-c6 Qg4xg5
+    15/30	00:02	   1'982'744	678'093	+2.74	Nb5xa7+ Bc5xa7 Qh3-a3 Nf6-h5 Qa3xa7 Nh5xf4 Qa7-a8+ Kc8-c7 Rb1xb7+ Kc7-d6 Rb7xd7+ Kd6xd7 Qa8-f3 g7-g5 Rf1-e1 Rd8-b8 Re1-d1 d4-d3 Qf3-g4+ Kd7-c6 Qg4xg5
+    16/30+	00:03	   2'051'486	679'525	+2.82	Nb5xa7+
+    16/32+	00:03	   2'220'198	681'251	+2.90	Nb5xa7+
+    16/28+	00:03	   2'550'652	688'620	+3.20	Nb5xa7+
+   20/12/2013 23:28:28, Time for this analysis: 00:00:04, Rated time: 01:37
+
+ 72 e6; id "WAC.072";   
+    Searching move: e5-e6
+    Best move (Vajolet2): e5-e6
+    Identical moves! Found in: 00:00
+     2/9	00:00	         434	217'000	+0.24	Ba3-d6 Ra8-d8
+     3/10	00:00	       1'678	335'600	+2.49	e5-e6 Re8-d8 e6xf7+ Kg8-h8
+     4/10	00:00	       2'207	315'285	+2.38	e5-e6 Re8-d8 Rd1xd7 Rd8xd7 e6xd7 Bf5xd7
+     5/15+	00:00	       2'822	352'750	+2.46	e5-e6
+     5/14	00:00	       4'136	344'666	+2.53	e5-e6 Nd7-e5 f4xe5 Bf5xe6 Bc4xe6 Re8xe6
+     6/12-	00:00	       5'557	370'466	+2.34	
+     6/11	00:00	       6'923	364'368	+2.33	e5-e6 Bf5xe6 Bc4xe6 Nd7-f6 Be6-c4 Ra8-d8
+     7/14	00:00	       8'339	379'045	+2.33	e5-e6 Bf5xe6 Bc4xe6 Nd7-f6 Be6-c4 Ra8-d8 Rd1xd8 Re8xd8
+     8/15+	00:00	      10'386	370'928	+2.41	e5-e6
+     8/18	00:00	      16'051	411'564	+2.28	e5-e6 Bf5xe6 Bc4xe6 Nd7-b6 Be6-f5 Nb6-d5 Rd1-b1 b7-b6 Bf5-d7
+     9/18	00:00	      19'648	446'545	+2.28	e5-e6 Bf5xe6 Bc4xe6 Nd7-b6 Be6-f5 Nb6-d5 Rd1-b1 b7-b6 Bf5-d7
+    13/24-	00:00	     152'657	672'497	+2.42	
+    13/25	00:00	     452'500	699'381	+2.50	e5-e6 Bf5xe6 Bc4xe6 Nd7-f6 Be6-b3 b7-b6 Rd1-e1 c6-c5 Ra1-d1 a7-a5 Re1xe8+ Ra8xe8 Bb3-a4 Re8-c8 Ba3-c1
+    14/28	00:00	     521'412	702'711	+2.50	e5-e6 Bf5xe6 Bc4xe6 Nd7-f6 Be6-b3 b7-b6 Rd1-e1 c6-c5 Ra1-d1 a7-a5 Re1xe8+ Ra8xe8 Bb3-a4 Re8-c8 Ba3-c1
+   20/12/2013 23:28:30, Time for this analysis: 00:00:01, Rated time: 01:37
+
+ 73 Qd2; id "WAC.073";  
+    Searching move: Qe2-d2
+    Best move (Vajolet2): Qe2-d2
+    Identical moves! Found in: 00:00
+     2/10	00:00	         721	240'333	+0.22	Qe2-d2 Bd7xe6 f5xe6
+     3/14	00:00	       1'377	275'400	+3.12	Qe2-d2 Kh8-h7 Qd2xd7 Qc8xd7 Rd1xd7
+     4/8	00:00	       1'773	295'500	+3.12	Qe2-d2 Kh8-h7 Qd2xd7 Qc8xd7 Rd1xd7
+     5/15	00:00	       3'853	321'083	+3.12	Qe2-d2 Kh8-h7 Qd2xd7 Qc8xd7 Rd1xd7
+     6/16+	00:00	       8'068	322'720	+3.20	Qe2-d2
+     6/17+	00:00	      10'231	319'718	+3.28	Qe2-d2
+     6/15+	00:00	      12'374	334'432	+3.40	Qe2-d2
+     6/17	00:00	      17'328	385'066	+3.52	Qe2-d2 Kh8-h7 Qd2xd7 Be7-d6 Qd7-f7 Qc8-e8
+     7/16-	00:00	      19'898	406'081	+3.42	
+     7/18	00:00	      33'814	469'638	+3.42	Qe2-d2 Kh8-h7 Qd2xd7 Be7-d6 Qd7-b5 b7-b6 Rh3-d3 Qc8-e8
+     8/20	00:00	      37'808	478'582	+3.42	Qe2-d2 Kh8-h7 Qd2xd7 Be7-d6 Qd7-b5 b7-b6 Rh3-d3 Qc8-e8
+     9/20+	00:00	      46'169	501'836	+3.51	Qe2-d2
+     9/22+	00:00	      53'502	514'442	+3.59	Qe2-d2
+     9/20+	00:00	      77'858	548'295	+3.89	Qe2-d2
+     9/24	00:00	      97'987	569'691	+3.93	Qe2-d2 Kh8-h7 Qd2xd7 Be7-d6 Qd7xc8 Ra8xc8 Nc3-b5 g7-g6 Nb5xd6 c7xd6 f5xg6+ Kh7xg6 Rh3-g3+ Kg6-h7
+    10/24	00:00	     113'174	580'379	+3.95	Qe2-d2 Kh8-h7 Qd2xd7 Be7-d6 Qd7xc8 Ra8xc8 Nc3-b5 g7-g6 Nb5xd6 c7xd6 f5xg6+ Rg8xg6
+    13/24-	00:00	     547'328	650'806	+4.32	
+    13/26	00:00	     641'461	652'554	+4.38	Qe2-d2 Be7-f8 Qd2xd7 c7-c6 Qd7-f7 Qc8-e8 Rd1-d7 Qe8xf7 Rd7xf7 b7-b6 Rh3-g3 Kh8-h7 Ne6xf8+ Ra8xf8 Rg3xg7+ Rg8xg7 Rf7xf8
+    14/26	00:01	     792'303	657'512	+4.38	Qe2-d2 Be7-f8 Qd2xd7 c7-c6 Qd7-f7 Qc8-e8 Rd1-d7 Qe8xf7 Rd7xf7 b7-b6 Rh3-g3 Kh8-h7 Ne6xf8+ Ra8xf8 Rg3xg7+ Rg8xg7 Rf7xf8
+   20/12/2013 23:28:33, Time for this analysis: 00:00:01, Rated time: 01:37
+
+ 74 Qf1+; id "WAC.074"; 
+    Searching move: Qf4-f1
+    Best move (Vajolet2): Qf4-f1
+    Identical moves! Found in: 00:00
+     2/12	00:00	         257	257'000	+6.84	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-g1 Rf2xa2+ Kg1-f1
+     3/12	00:00	         422	211'000	+6.84	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-g1 Rf2xa2+ Kg1-f1
+     4/12	00:00	         701	350'500	+7.01	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2
+     5/13	00:00	       1'205	401'666	+7.01	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2
+     6/13+	00:00	       1'263	421'000	+7.13	Qf4-f1+
+     6/11+	00:00	       1'294	323'500	+7.22	Qf4-f1+
+     6/14	00:00	       2'225	370'833	+7.22	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 b3-b4
+     7/17+	00:00	       2'442	348'857	+7.32	Qf4-f1+
+     7/16	00:00	       3'735	373'500	+7.32	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 e5-e6 Rg2xa2
+     8/22-	00:00	      15'419	440'542	+7.04	
+     8/24	00:00	      30'186	548'836	+7.12	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 e5-e6 Rg2xa2 b3-b4 Bc5-e7 h2-h3 Ra2-h2 e4-e5 Rh2xh3
+     9/18-	00:00	      31'815	558'157	+7.04	
+     9/25	00:00	      47'715	611'730	+7.12	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 e5-e6 Rg2xa2 b3-b4 Bc5-e7 h2-h3 Ra2-h2 e4-e5 Rh2xh3
+    10/19-	00:00	      51'345	626'158	+7.04	
+    10/26	00:00	      85'052	675'015	+7.10	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 a2-a4 Rg2-g4 Ke1-d2 Rg4xe4 Kd2-d3 Re4-h4 e5-e6 Rh4xh2 Kd3-c4
+    11/18	00:00	      87'426	677'720	+7.11	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 a2-a4 Rg2-g4 Ke1-d2 Rg4xe4 Kd2-d3 Re4-e3+ Kd3-c4
+    12/20	00:00	      90'547	680'804	+7.18	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 a2-a4 Rg2-g4 Ke1-d2 Rg4xe4 Kd2-d3 Re4-h4 e5-e6 Rh4xh2
+    13/28	00:00	     121'050	703'779	+7.10	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 a2-a4 Rg2-g4 Ke1-d2 Rg4xe4 Kd2-d3 Re4-h4 e5-e6 Rh4xh2 Kd3-c4
+    15/31-	00:00	     268'135	753'188	+7.02	
+    15/30+	00:00	     375'009	762'213	+7.18	Qf4-f1+
+    15/28+	00:00	     437'131	773'683	+7.48	Qf4-f1+
+    15/30	00:00	     489'645	777'214	+7.31	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1Q+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 b3-b4 Bc5-e7 a2-a3 Rg2xh2 Ke1-d1 Rh2-h4 Kd1-c2 Rh4xe4 Kc2-d3 Re4-f4 e5-e6 Rf4-f3+ Kd3-c2
+    16/30+	00:00	     529'841	784'949	+7.39	Qf4-f1+
+    16/28+	00:00	     542'126	787'973	+7.47	Qf4-f1+
+    16/36+	00:00	     633'254	788'610	+7.59	Qf4-f1+
+    16/34	00:00	     783'771	791'687	+7.58	Qf4-f1+ Qe2xf1 e3-e2+ Nd1-f2 e2xf1R+ Kg1xf1 Rf8xf2+ Kf1-e1 Rf2xg2 e5-e6 Rg2xa2 Bc3-d2 Ra2-b2 Bd2-g5 Rb2xb3 e6-e7 Bc5xe7 Bg5xe7 Rb3-e3+ Ke1-d2 Re3xe4 Be7-c5 a7-a5 h2-h3
+    17/33+	00:01	     886'680	800'252	+7.66	Qf4-f1+
+    17/31+	00:01	     917'948	804'511	+7.74	Qf4-f1+
+    17/35+	00:01	   1'067'720	811'954	+7.86	Qf4-f1+
+   20/12/2013 23:28:35, Time for this analysis: 00:00:01, Rated time: 01:37
+
+ 75 Qd6; id "WAC.075";  
+    Searching move: Qd7-d6
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/10	00:00	         699	233'000	-2.77	Re8xe1+ Qb4xe1 Ra8-e8
+     3/12	00:00	       1'121	280'250	-2.46	Re8xe1+ Qb4xe1 Ra8-e8 Qe1-d2
+     4/14	00:00	       3'430	285'833	+3.44	Qd7-d6 Re1xe8+ Ra8xe8 h3xg4 Qd6xb4
+     5/9+	00:00	       3'726	286'615	+3.55	Qd7-d6
+     5/7+	00:00	       3'862	297'076	+3.63	Qd7-d6
+     5/12+	00:00	       4'337	309'785	+3.94	Qd7-d6
+     5/10	00:00	       4'782	318'800	+4.05	Qd7-d6 Re1xe8+ Ra8xe8 h3xg4 Qd6xb4 Nb1-c3 Re8-e1+ Kg1-h2 Qb4xg4
+     6/12	00:00	       5'505	344'062	+4.05	Qd7-d6 Re1xe8+ Ra8xe8 h3xg4 Qd6xb4 Nb1-c3 Re8-e1+ Kg1-h2 Qb4xg4
+     7/16	00:00	       6'417	377'470	+4.05	Qd7-d6 Re1xe8+ Ra8xe8 h3xg4 Qd6xb4 Nb1-c3 Re8-e1+ Kg1-h2 Qb4xg4
+     8/16+	00:00	       7'975	419'736	+4.14	Qd7-d6
+     8/18+	00:00	       9'999	454'500	+4.22	Qd7-d6
+     8/20+	00:00	      13'669	506'259	+4.34	Qd7-d6
+     8/20	00:00	      18'552	545'647	+4.46	Qd7-d6 h3xg4 Qd6xb4 Re1-f1 Re8-e2 Nb1-c3 Re2xc2 g4-g5
+     9/20-	00:00	      21'824	545'600	+4.37	
+     9/22	00:00	      27'813	567'612	+4.48	Qd7-d6 h3xg4 Qd6xb4 Re1-f1 Re8-e2 c2-c4 Qb4xc4 Nb1-c3 Re2-c2 g4-g5
+    10/18	00:00	      31'989	581'618	+4.48	Qd7-d6 h3xg4 Qd6xb4 Re1-f1 Re8-e2 c2-c4 Qb4xc4 Nb1-c3 Re2-c2 g4-g5
+    11/24-	00:00	      50'472	600'857	+4.40	
+    11/20	00:00	      65'178	614'886	+4.35	Qd7-d6 h3xg4 Qd6xb4 Re1-f1 Re8-e2 Nb1-a3 a7-a6 f2-f4 Qb4-e7 Rf1-d1 Ra8-e8
+    12/22+	00:00	      80'561	629'382	+4.43	Qd7-d6
+    12/25	00:00	     163'549	656'823	+4.32	Qd7-d6 h3xg4 Qd6xb4 Re1-f1 Re8-e2 Nb1-a3 a7-a6 c2-c4 Ra8-d8 Kg1-h2 Rd8-d3 f2-f3 Qb4-e7 Kh2-h3
+    13/28	00:00	     193'392	666'868	+4.33	Qd7-d6 h3xg4 Qd6xb4 Re1-f1 Re8-e2 Nb1-a3 a7-a6 c2-c4 Ra8-d8 Ra1-b1 Rd8-d4 Bc1-e3 Rd4xg4
+    14/28	00:00	     256'424	678'370	+4.36	Qd7-d6 h3xg4 Qd6xb4 Re1-f1 Re8-e2 Nb1-a3 a7-a6 c2-c4 Ra8-d8 Kg1-h2 Qb4-c5 Kh2-g3 Rd8-d3+ f2-f3 Qc5-e5+ Kg3-h3
+    17/28-	00:01	     869'941	696'510	+4.57	
+   20/12/2013 23:28:37, Time for this analysis: 00:00:01, Rated time: 01:47
+
+ 76 Bxf6; id "WAC.076"; 
+    Searching move: Bg5xf6
+    Best move (Vajolet2): Bg5xf6
+    Identical moves! Found in: 00:00
+     2/11	00:00	         701	233'666	+0.75	Bg5xf6 g7xf6 Qe2-g4+ Kg8-h8
+     3/15	00:00	       8'750	265'151	+0.75	Bg5xf6 g7xf6 Qe2-g4+ Kg8-h8
+     4/16	00:00	      13'759	305'755	+0.99	Bg5xf6 g7xf6 Bb3-d5 Ra8-a7 Qe2-g4+ Kg8-h8
+     5/17	00:00	      24'986	362'115	+0.99	Bg5xf6 g7xf6 Bb3-d5 Ra8-a7 Qe2-g4+ Kg8-h8
+     6/18+	00:00	      37'315	414'611	+1.07	Bg5xf6
+     6/14+	00:00	      37'806	415'450	+1.15	Bg5xf6
+     6/18+	00:00	      64'219	458'707	+2.75	Bg5xf6
+     6/18	00:00	     103'195	491'404	+2.81	Bg5xf6 Ne6xd4 Nf5xd4 g7xf6 Bb3-d5 Ra8-a7
+     7/18-	00:00	     119'835	503'508	+2.53	
+     7/17	00:00	     124'983	508'060	+2.47	Bg5xf6 Ne6xd4 Nf5xd4 g7xf6 Bb3-d5 Ra8-a7 Bd5-c6
+     8/20+	00:00	     141'339	512'097	+2.55	Bg5xf6
+     8/19+	00:00	     145'551	516'138	+2.63	Bg5xf6
+     8/19+	00:00	     151'687	517'703	+2.75	Bg5xf6
+     8/23	00:00	     167'513	528'432	+2.91	Bg5xf6 Ne6xd4 Nf5xd4 g7xf6 Bb3-d5 Ra8-a7 Nd4-c6 Ra7-b7 Nb1-d2
+     9/22	00:00	     193'924	538'677	+2.91	Bg5xf6 Ne6xd4 Nf5xd4 g7xf6 Bb3-d5 Ra8-a7 Nd4-c6 Ra7-b7 Nb1-d2
+    10/24	00:00	     268'013	560'696	+2.96	Bg5xf6 Ne6xd4 Nf5xd4 g7xf6 Bb3-d5 Ra8-a7 Nd4-c6 Ra7-b7 Nb1-d2 f6-f5
+   20/12/2013 23:28:40, Time for this analysis: 00:00:01, Rated time: 01:47
+
+ 77 Ng3; id "WAC.077";  
+    Searching move: Nf5-g3
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/11	00:00	       1'674	279'000	+9.02	Nf5-g3 f2xg3 Qg6xe4
+     3/8	00:00	       1'956	279'428	+9.02	Nf5-g3 f2xg3 Qg6xe4
+     4/12	00:00	       2'998	299'800	+9.02	Nf5-g3 Qe4xd4 Ng3-e2+ Kg1-h1 Ne2xd4
+     5/14+	00:00	       4'190	322'307	+9.10	Nf5-g3
+     5/12+	00:00	       4'553	325'214	+9.18	Nf5-g3
+     5/14	00:00	       5'579	328'176	+9.23	Nf5-g3 f2xg3 Qg6xe4 Bf4-g5 f7-f6
+     6/16	00:00	       7'082	337'238	+9.20	Nf5-g3 f2xg3 Qg6xe4 Nb1xc3 Ba5xc3 Bf4xc7 Qe4-e3+ Kg1-h1
+     7/17	00:00	      13'091	385'029	+9.22	Nf5-g3 f2xg3 Qg6xe4 Kg1-h1 Rd8-e8 Nb1-a3 c3-c2
+     8/18	00:00	      20'550	456'666	+9.23	Nf5-g3 f2xg3 Qg6xe4 Kg1-h1 Nd4-e2 Nb1-a3 c3-c2 Bf4-g5
+     9/20+	00:00	      34'477	522'378	+9.31	Nf5-g3
+     9/20+	00:00	      40'446	539'280	+9.39	Nf5-g3
+     9/20-	00:00	      49'050	563'793	+9.15	
+     9/24+	00:00	      71'770	593'140	+9.52	Nf5-g3
+     9/20	00:00	      79'573	602'825	+9.35	Nf5-g3 f2xg3 Qg6xe4 Kg1-h1 Qe4-d3 Nb1-a3 c3-c2 Bf4-g5 f7-f6
+    10/20+	00:00	      89'847	615'390	+9.43	Nf5-g3
+    10/20+	00:00	      95'990	619'290	+9.51	Nf5-g3
+    10/22+	00:00	     106'864	628'611	+9.63	Nf5-g3
+    10/22	00:00	     159'574	646'048	+9.69	Nf5-g3 Qe4xd4 Ng3-e2+ Kg1-h1 Rd8xd4 Bf4-e3 Rd4-g4 Rf1-d1 c7-c6 Nb1-a3 Rg4xg2 Be3xa7 Ba5-c7
+    11/22	00:00	     174'892	650'156	+9.69	Nf5-g3 Qe4xd4 Ng3-e2+ Kg1-h1 Rd8xd4 Bf4-e3 Rd4-g4 Rf1-d1 c7-c6 Nb1-a3 Rg4xg2 Be3xa7 Ba5-c7
+    12/23	00:00	     204'531	661'912	+9.69	Nf5-g3 Qe4xd4 Ng3-e2+ Kg1-h1 Rd8xd4 Bf4-e3 Rd4-g4 Rf1-d1 c7-c6 Nb1-a3 Rg4xg2 Be3xa7 Ba5-c7
+    13/26-	00:00	     398'651	670'001	+9.61	
+    13/32+	00:00	     529'281	669'975	+9.97	Nf5-g3
+    13/31	00:01	     697'954	669'179	+10.11	Nf5-g3 Bf4xg3 Qg6xe4 Nb1-a3 c3-c2 Kg1-h1 Qe4-d3 Na3xc2 Nd4xc2 Ra1-b1 f7-f6 Rf1-c1 Nc2-a3 Rb1-a1 Na3-c4 Ra1-b1 Ba5-d2
+    14/26-	00:01	     855'804	677'596	+10.03	
+   20/12/2013 23:28:42, Time for this analysis: 00:00:01, Rated time: 01:57
+
+ 78 Ng5+; id "WAC.078"; 
+    Searching move: Ne4-g5
+    Best move (Vajolet2): Ne4-g5
+    Identical moves! Found in: 00:00
+     2/14	00:00	       1'759	251'285	+2.24	Ne4-g5+ Ne6xg5 Rd1-d7+ Qd8xd7 Qf5xd7+ Kf7-g8 Qd7xc7
+     3/14	00:00	       7'824	411'789	+2.34	Ne4-g5+ Ne6xg5 Rd1-d7+ Qd8xd7 Qf5xd7+ Kf7-f8 Qd7xc7
+     4/16	00:00	      17'343	525'545	+2.17	Qf5xe6+ Kf7xe6 Ne4-d6+ Ke6-d7 Nd6xb7+ Kd7-c8 Nb7xd8 Rh8xd8
+     5/17	00:00	      24'473	569'139	+2.17	Qf5xe6+ Kf7xe6 Ne4-d6+ Ke6-d7 Nd6xb7+ Kd7-c8 Nb7xd8 Rh8xd8
+     6/18	00:00	      34'812	590'033	+2.13	Qf5xe6+ Kf7xe6 Ne4-d6+ Ke6-d7 Nd6xb7+ Kd7-c8 Nb7xd8 Rh8xd8 Rd1xd8+ Kc8xd8
+     7/20	00:00	      53'297	612'609	+2.12	Qf5xe6+ Kf7xe6 Ne4-d6+ Ke6-d7 Nd6xb7+ Kd7-c8 Nb7xd8 Rh8xd8 Rd1xd8+ Kc8xd8 Re1-d1+ Kd8-e7
+     8/25-	00:00	     167'837	648'019	+1.96	
+     8/24	00:00	     215'324	672'887	+1.88	Ne4-g5+ Ne6xg5 Rd1-d7+ Qd8xd7 Qf5xd7+ Kf7-f8 Bf4xg5 Bf6xg5 Qd7-b5 Bg5-f4 Qb5xb7
+     9/19+	00:00	     216'058	673'077	+1.97	Ne4-g5+
+     9/22+	00:00	     217'242	674'664	+2.05	Ne4-g5+
+     9/22+	00:00	     220'742	675'051	+3.06	Ne4-g5+
+     9/26	00:00	     309'958	685'747	+3.12	Ne4-g5+ Ne6xg5 Rd1-d7+ Qd8xd7 Qf5xd7+ Kf7-f8 Bf4xg5 Bf6xg5 Qd7xc7 Bg5-f6 Re1-e6 Bf6-g5 Qc7xb7
+    10/26	00:00	     416'214	686'821	+3.12	Ne4-g5+ Ne6xg5 Rd1-d7+ Qd8xd7 Qf5xd7+ Kf7-f8 Bf4xg5 Bf6xg5 Qd7xc7 Bg5-f6 Re1-e6 Bf6-g5 Qc7xb7
+    11/28	00:00	     648'673	695'255	+3.19	Ne4-g5+ Ne6xg5 Rd1-d7+ Qd8xd7 Qf5xd7+ Kf7-f8 Bf4xg5 Bf6xg5 Qd7xc7 Kf8-g8 Re1-e6 Rh8-h6 Qc7xb7 Ra8-d8 Qb7xa7
+   20/12/2013 23:28:45, Time for this analysis: 00:00:02, Rated time: 01:57
+
+ 79 Qxh2+; id "WAC.079" 
+    Searching move: Qh3xh2
+    Best move (Vajolet2): Qh3xh2
+    Identical moves! Found in: 00:00
+     2/15	00:00	       5'705	271'666	-0.38	h4xg3 Qe2xb5+ c7-c6
+     3/15	00:00	      15'864	406'769	-0.05	h4xg3 f2xg3 Ke8-f8 d2-d3
+     4/18	00:00	      31'845	482'500	-0.03	h4xg3 f2xg3 Ke8-f8 Rf1-f5 a7-a6
+     5/18+	00:00	      61'708	527'418	+0.04	O-O-O
+     5/16+	00:00	      67'601	532'291	+0.12	O-O-O
+     5/16+	00:00	      69'680	531'908	+0.24	O-O-O
+     5/21+	00:00	     146'277	554'079	+M3	Qh3xh2+
+     5/16	00:00	     148'743	552'947	+M3	Qh3xh2+ Kg1xh2 h4xg3+ Kh2-g1 Rh8-h1+
+     6/16	00:00	     150'249	554'424	+M3	Qh3xh2+ Kg1xh2 h4xg3+ Kh2-g1 Rh8-h1+
+     7/12	00:00	     151'242	556'036	+M3	Qh3xh2+ Kg1xh2 h4xg3+ Kh2-g1 Rh8-h1+
+     8/12	00:00	     152'488	556'525	+M3	Qh3xh2+ Kg1xh2 h4xg3+ Kh2-g1 Rh8-h1+
+     9/12	00:00	     153'971	559'894	+M3	Qh3xh2+ Kg1xh2 h4xg3+ Kh2-g1 Rh8-h1+
+   20/12/2013 23:28:47, Time for this analysis: 00:00:01, Rated time: 01:57
+
+ 80 Ra1; id "WAC.080";  
+    Searching move: Rd1-a1
+    Best move (Vajolet2): Rd1-a1
+    Identical moves! Found in: 00:01
+     2/10	00:00	         555	277'500	+1.08	Rf1-e1 Ra8-c8
+     3/11	00:00	       1'738	289'666	+0.99	Rd1-a1 Qa2-b3 Rf1-e1
+     4/12	00:00	       3'955	263'666	+1.07	Rd1-a1 Qa2-b3 Bd3-c2 Qb3-b4
+     5/14	00:00	       7'742	286'740	+1.11	d4-d5 Nf6-e8 Bc7-g3 Be7-f6 d5xe6 Qa2xb2 Qe2xb2 Bf6xb2
+     6/15+	00:00	      11'994	333'166	+1.19	d4-d5
+     6/15+	00:00	      13'017	351'810	+1.28	d4-d5
+     6/14+	00:00	      15'231	371'487	+1.40	d4-d5
+     6/16	00:00	      17'269	383'755	+1.41	d4-d5 Nf6-e8 Bc7-g3 Ne8-d6 d5xe6 Ra8-d8 e6xf7+ Rf8xf7
+     7/18+	00:00	      28'902	437'909	+1.86	Rd1-a1
+     7/9+	00:00	      29'120	441'212	+2.11	Rd1-a1
+     7/11+	00:00	      30'224	451'104	+4.28	Rd1-a1
+     7/13	00:00	      33'706	461'726	+4.45	Rd1-a1 Qa2xa1 Rf1xa1 Rf8-c8 Bc7-g3 a7-a6 Ra1-e1
+     8/16+	00:00	      35'161	468'813	+4.53	Rd1-a1
+     8/18	00:00	      39'371	480'134	+4.49	Rd1-a1 Qa2xa1 Rf1xa1 Rf8-c8 Bc7-g3 a7-a6 d4-d5 Nf6-d7 d5xe6
+     9/14-	00:00	      42'411	493'151	+4.41	
+     9/18	00:00	      44'351	498'325	+4.35	Rd1-a1 Qa2-b3 Bd3-c2 Qb3-b4 Ra1-a4 Ra8-c8 Ra4xb4 Be7xb4 Qe2-e5 a7-a6
+    10/24-	00:00	      63'700	568'750	+3.60	
+    10/28	00:00	      98'927	599'557	+3.82	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-b3 Rc4-b4 Qb3-c3 a7-a5 d4-d5 Nh7-g5 Be5xg7 Ng5xf3+ Qc3xf3 Kg8xg7 d5xe6
+    11/14-	00:00	     101'277	602'839	+3.73	
+    11/25	00:00	     110'062	614'871	+3.82	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-b3 Rc4-b4 Qb3-c3 a7-a5 d4-d5 Nh7-g5 Be5xg7 Ng5xf3+ Qc3xf3 Kg8xg7 d5xe6
+    12/20-	00:00	     114'369	621'570	+3.73	
+    12/25	00:00	     127'347	636'735	+3.82	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-b3 Rc4-b4 Qb3-c3 a7-a5 d4-d5 Nh7-g5 Be5xg7 Ng5xf3+ Qc3xf3 Kg8xg7 d5xe6
+    13/28-	00:00	     159'076	665'589	+3.65	
+    13/30+	00:00	     212'273	676'028	+3.90	Rd1-a1
+    13/32+	00:00	     260'608	682'219	+4.08	Rd1-a1
+    13/34	00:00	     295'615	685'881	+4.13	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-e2 Rc4-c8 d4-d5 e6xd5 Be5xg7 Kg8xg7 Qe2xe7 Rc8-c2 Ra1xa7 Ra8xa7 Qe7xa7
+    14/19-	00:00	     303'027	690'266	+4.04	
+    14/26	00:00	     324'761	692'454	+4.13	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-e2 Rc4-c8 d4-d5 e6xd5 Be5xg7 Kg8xg7 Qe2xe7 Rc8-c2 Ra1xa7 Ra8xa7 Qe7xa7
+    15/23-	00:00	     337'244	696'785	+4.04	
+    15/28	00:00	     395'136	698'120	+4.13	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-e2 Rc4-c8 d4-d5 e6xd5 Be5xg7 Kg8xg7 Qe2xe7 Rc8-c2 Ra1xa7 Ra8xa7 Qe7xa7
+    16/21	00:00	     430'021	701'502	+4.13	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-e2 Rc4-c8 d4-d5 e6xd5 Be5xg7 Kg8xg7 Qe2xe7 Rc8-c2 Ra1xa7 Ra8xa7 Qe7xa7
+    17/29	00:00	     514'657	704'045	+4.13	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-e2 Rc4-c8 d4-d5 e6xd5 Be5xg7 Kg8xg7 Qe2xe7 Rc8-c2 Ra1xa7 Ra8xa7 Qe7xa7
+    18/28	00:01	     711'408	703'667	+4.13	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-e2 Rc4-c8 d4-d5 e6xd5 Be5xg7 Kg8xg7 Qe2xe7 Rc8-c2 Ra1xa7 Ra8xa7 Qe7xa7
+    19/31-	00:01	     913'448	711'408	+4.05	
+    19/32	00:01	   1'265'145	715'175	+4.11	Rd1-a1 Qa2-b3 Bd3-c2 Qb3xb2 Bc2-h7+ Nf6xh7 Qe2xb2 Rf8-c8 Bc7-e5 Rc8xc4 Qb2-e2 Rc4-c8 d4-d5 e6xd5 Be5xg7 Rc8-e8 Bg7-e5 Nh7-f6 Qe2-b5 Kg8-h7 Qb5-d3+ Kh7-g8 Rf1-c1
+   20/12/2013 23:28:50, Time for this analysis: 00:00:02, Rated time: 01:58
+
+ 81 Bd6; id "WAC.081";  
+    Searching move: Be7-d6
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/10	00:00	         901	450'500	-0.99	Ra8xa3 Rc7xe7 Ra3-a2 Be2xb5
+     3/11	00:00	       1'634	408'500	-1.15	Ra8xa3 Rc7xe7 Ra3-a2 Be2xb5 Bb7-e4
+     4/13	00:00	       4'176	348'000	-0.73	Bb7xg2 Kg1xg2 Be7-d8 Rc7-c3 Nf6-e4
+     5/16	00:00	       7'903	395'150	-0.71	Bb7xg2 Kg1xg2 Be7-d8 Rc7-b7 Nf6-d5 Rd1-d3
+     6/19-	00:00	      16'034	471'588	-0.87	
+     6/18	00:00	      19'356	496'307	-0.97	Bb7xg2 Kg1xg2 Be7-d8 Rc7-b7 Nf6-d5 Ne5-d7 Nd5-c3 Nd7xf8 Nc3xd1 Nf8xh7 Kg8xh7 Be2xd1
+     7/14	00:00	      22'641	514'568	-0.97	Bb7xg2 Kg1xg2 Be7-d8 Rc7-b7 Nf6-d5 Ne5-d7 Nd5-c3 Nd7xf8 Nc3xd1 Nf8xh7 Kg8xh7 Be2xd1
+     8/19	00:00	      37'092	570'646	-0.97	Bb7xg2 Kg1xg2 Be7-d8 Rc7-b7 Nf6-d5 Ne5-d7 Nd5-c3 Nd7xf8 Nc3xd1 Nf8xh7 Kg8xh7 Be2xd1
+     9/23+	00:00	      72'377	629'365	-0.89	Ra8xa3
+     9/21+	00:00	      78'418	648'082	-0.81	Ra8xa3
+     9/25+	00:00	     153'689	674'074	-0.51	Ra8xa3
+     9/31	00:00	     225'670	698'668	-0.43	Ra8xa3 Rc7xb7 Be7xb4 Be2xb5 Bb4-c3 Ne5-d7 Rf8-d8 Nd7xf6+ Bc3xf6 Rd1xd8+ Bf6xd8 Rb7-d7 Bd8-f6 Bb5-c4 Ra3-a1+ Bc4-f1
+    10/23	00:00	     307'020	717'336	-0.44	Bb7-e4 Rc7xe7 Nf6-d5 Re7-d7 Ra8xa3 Be2-h5 Nd5-c3 Rd1-c1 f7-f6 Ne5-d3 Be4xd3 Rd7xd3
+    11/23+	00:00	     325'757	722'299	-0.36	Bb7-e4
+    11/24+	00:00	     367'038	728'250	-0.28	Bb7-e4
+    11/23	00:00	     415'314	732'476	-0.24	Bb7-e4 Rc7xe7 Nf6-d5 Re7-d7 Ra8xa3 Be2-h5 g7-g6 Bh5-f3 Be4-c2 Rd1-c1 Ra3-a2 Bf3xd5 e6xd5 Rd7xd5
+    12/21+	00:00	     469'317	740'247	-0.16	Be7-d6
+    12/23+	00:00	     480'832	743'171	-0.08	Be7-d6
+    12/27+	00:00	     645'530	748'006	+0.49	Be7-d6
+    12/28	00:01	     776'937	749'216	+0.42	Be7-d6 Rd1xd6 Nf6-e8 Rd6-b6 Ne8xc7 Rb6xb7 Nc7-d5 Be2xb5 Ra8xa3 Ne5-c6 Nd5-c3 Bb5-f1 Ra3-a1 f2-f3 Ra1-a2 Rb7-d7
+    13/22	00:01	     799'057	748'881	+0.42	Be7-d6 Rd1xd6 Nf6-e8 Rd6-b6 Ne8xc7 Rb6xb7 Nc7-d5 Be2xb5 Ra8xa3 Ne5-c6 Ra3-a1+ Bb5-f1 Nd5-c3 f2-f3 Ra1-a2 Rb7-d7
+    14/25	00:01	     832'124	751'014	+0.38	Be7-d6 Rd1xd6 Nf6-e8 Rd6-b6 Ne8xc7 Rb6xb7 Nc7-d5 Be2xb5 Ra8xa3 Ne5-c6 Nd5-c3 Bb5-f1 Ra3-a2 Rb7-d7 Nc3-e4 f2-f3
+    15/30	00:01	     942'350	754'483	+0.36	Be7-d6 Rd1xd6 Nf6-e8 Rd6-b6 Ne8xc7 Rb6xb7 Nc7-d5 Be2xb5 Ra8xa3 Bb5-c4 Ra3-a1+ Bc4-f1 Nd5-c3 f2-f3 Ra1-a2 Bf1-c4 Ra2-b2 b4-b5 Nc3-d5 Bc4xd5 e6xd5
+    16/29-	00:01	   1'081'369	754'618	+0.28	
+    16/32	00:01	   1'350'300	759'021	+0.36	Be7-d6 Rd1xd6 Nf6-e8 Rd6-b6 Ne8xc7 Rb6xb7 Nc7-d5 Be2xb5 Ra8xa3 Bb5-f1 Ra3-a2 b4-b5 Nd5-c3 b5-b6 Nc3-e2+ Bf1xe2 Ra2xe2 Kg1-f1 Re2-b2 Ne5-c4 Rb2-a2
+    17/28	00:02	   1'552'789	763'791	+0.42	Be7-d6 Rd1xd6 Nf6-e8 Rd6-b6 Ne8xc7 Rb6xb7 Nc7-d5 Be2xb5 Ra8xa3 Bb5-f1 Ra3-a2 b4-b5 Nd5-c3 b5-b6 Nc3-e2+ Bf1xe2 Ra2xe2 Kg1-f1 Re2-b2 Ne5-d3 Rb2-c2
+    18/28-	00:02	   1'755'269	766'493	+0.34	
+   20/12/2013 23:28:54, Time for this analysis: 00:00:02, Rated time: 02:08
+
+ 82 Bh7+; id "WAC.082"; 
+    Searching move: Be4-h7
+    Best move (Vajolet2): Be4-h7
+    Identical moves! Found in: 00:01
+     2/13	00:00	       1'982	330'333	-0.47	Be4-h7+ Kg8-f8 Qg3-a3+ Re8-e7
+     3/15	00:00	       5'965	313'947	-0.56	Qg3-f4 Rd8-d1 Be4-h7+ Kg8-f8
+     4/14	00:00	      12'851	367'171	-0.01	Rf1-f2 Qe2-e1+ Kh1-h2 Qe1-c1 Rh4-h7
+     5/14+	00:00	      13'982	388'388	+0.06	Rf1-f2
+     5/12+	00:00	      14'300	386'486	+0.14	Rf1-f2
+     5/14+	00:00	      14'793	389'289	+0.27	Rf1-f2
+     5/16-	00:00	      19'027	422'822	-0.09	
+     5/14	00:00	      19'448	422'782	-0.11	Rf1-f2 Qe2-d1+ Kh1-h2 Qd1-d7 Rh4-h7 Be6-g4
+     6/19+	00:00	      23'418	441'849	-0.01	Rf1-f2
+     6/17	00:00	      27'573	459'550	 0.00	Rf1-f2 Qe2-d1+ Kh1-h2 Qd1-d7 Rf2-b2 b7-b6 Rh4-h7
+     7/19	00:00	      46'105	518'033	-0.06	Rf1-f2 Qe2-d1+ Kh1-h2 Qd1-d7 Rf2-b2 b7-b6 Rh4-h7 Be6-g4
+     8/22	00:00	      92'803	580'018	-0.04	Rf1-f2 Qe2-d1+ Kh1-h2 Qd1-d7 Rf2-b2 b7-b6 Be4-h7+ Kg8-f8 Bh7-e4 f7-f6 Rh4-h8+ Be6-g8
+     9/26	00:00	     340'538	638'908	 0.00	Be4-h7+ Kg8-f8 Rf1-b1 Be6-c8 Qg3-a3+ Qe2-e7 Qa3xe7+ Re8xe7 Bh7-d3 Kf8-g8 Bd3-h7+ Kg8-f8
+    10/26+	00:00	     427'613	642'061	+0.09	Be4-h7+
+    10/18+	00:00	     428'192	641'967	+0.20	Be4-h7+
+    10/20+	00:00	     449'976	642'822	+6.16	Be4-h7+
+    10/29	00:00	     613'298	662'308	+8.72	Be4-h7+ Kg8-f8 Qg3-a3+ Re8-e7 Bh7-d3 Qe2xf1+ Bd3xf1 f7-f6 Rh4-h8+ Be6-g8 Rh8xg8+ Kf8xg8 Qa3xe7 Rd8-b8 Bf1-d3 a7-a5 Qe7-d6 Rb8-e8 Qd6-d5+ Kg8-h8 Qd5xb7
+    11/26-	00:01	     678'732	668'701	+8.64	
+    11/27	00:01	     724'337	672'550	+8.79	Be4-h7+ Kg8-f8 Qg3-a3+ Re8-e7 Bh7-d3 Qe2xf1+ Bd3xf1 f7-f6 Rh4-h8+ Be6-g8 Rh8xg8+ Kf8xg8 Qa3xe7 Rd8-b8 Bf1-d3 a7-a6 Qe7-d6 Rb8-e8 Qd6-d5+ Kg8-f8 Qd5xb7 Re8-e1+ Kh1-h2
+    12/30	00:01	     921'126	683'327	+8.74	Be4-h7+ Kg8-f8 Qg3-a3+ Re8-e7 Bh7-d3 Qe2xf1+ Bd3xf1 f7-f6 Rh4-h8+ Be6-g8 Rh8xg8+ Kf8xg8 Qa3xe7 Rd8-b8 Bf1-d3 a7-a6 Qe7-c7 Rb8-e8
+    13/30	00:02	   1'402'595	702'702	+8.74	Be4-h7+ Kg8-f8 Qg3-a3+ Re8-e7 Bh7-d3 Qe2xf1+ Bd3xf1 f7-f6 Rh4-h8+ Be6-g8 Rh8xg8+ Kf8xg8 Qa3xe7 Rd8-b8 Bf1-d3 a7-a6 Qe7-c7 Rb8-e8 Qc7xb7
+    14/31+	00:02	   1'446'253	703'430	+8.82	Be4-h7+
+    14/33+	00:02	   1'550'367	705'995	+8.90	Be4-h7+
+    14/34+	00:02	   1'970'547	708'065	+9.20	Be4-h7+
+   20/12/2013 23:28:58, Time for this analysis: 00:00:03, Rated time: 02:09
+
+ 83 Qxd7; id "WAC.083"; 
+    Searching move: Qd4xd7
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+     2/12	00:00	         838	419'000	+5.33	Qd4xd7 Qc7-b8
+     3/12	00:00	       1'559	389'750	+4.42	Qd4xd7 Qc7-b8 Re7xe8+ Rd8xe8
+     4/15	00:00	       4'418	368'166	+4.15	Qd4xd7 Qc7-b8 Rd1-e1 Re8xe7 Qd7xe7
+     5/15+	00:00	       4'795	368'846	+4.26	Qd4xd7
+     5/15+	00:00	       6'049	403'266	+4.38	Qd4xd7
+     5/16	00:00	      11'066	442'640	+4.41	Qd4xd7 Qc7-b8 Re7xe8+ Rd8xe8 Ng3-f5 Nf4-d5
+     6/15-	00:00	      21'424	510'095	+4.24	
+     6/16	00:00	      25'132	523'583	+4.17	Qd4xd7 Qc7-b8 Re7xe8+ Rd8xe8 Bc2-b3 Nf4-e6 Bb3-c2
+     7/14+	00:00	      26'067	531'979	+4.25	Qd4xd7
+     7/20	00:00	      39'030	557'571	+4.28	Qd4xd7 Qc7-b8 Re7xe8+ Rd8xe8 Bc2-b3 Nf4-e6 Ng3-f5 Re8-d8
+     8/23-	00:00	      69'387	583'084	+4.20	
+     8/23+	00:00	     189'161	608'234	+4.37	Qd4xd7
+     8/19+	00:00	     193'515	610'457	+4.49	Qd4xd7
+     8/19	00:00	     203'604	615'117	+4.49	Qd4xd7 Qc7-b8 Re7xe8+ Rd8xe8 Ng3-e4 Nf4-g6 Ne4-g5 Re8-f8 Ng5-f3
+     9/20+	00:00	     210'081	617'885	+4.57	Qd4xd7
+     9/24	00:00	     262'784	630'177	+4.43	Qd4xd7 Qc7-b8 Re7xe8+ Rd8xe8 Ng3-e4 Nf4-g6 Ne4-g5 Re8-f8 Bc2-f5 Qb8-e5 Ng5-f3
+    10/21+	00:00	     279'160	634'454	+4.52	Qd4xd7
+    10/22+	00:00	     281'878	634'860	+4.60	Qd4xd7
+    10/22+	00:00	     301'775	643'443	+4.90	Qd4xd7
+    10/25	00:00	     411'961	646'720	+4.70	Qd4xd7 Qc7-b8 Qd7xb7 Qb8xb7 Re7xb7 Rd8xd1+ Bc2xd1 Re8-e1+ Ng3-f1 g7-g6 Rb7-d7 Nf4-e2+ Bd1xe2 Re1xe2 Rd7-d2 Re2xd2 Nf1xd2
+    11/15+	00:00	     415'371	646'995	+4.78	Qd4xd7
+    11/28	00:00	     611'799	648'779	+4.67	Qd4xd7 Qc7-b8 Qd7xb7 Qb8xb7 Re7xb7 Rd8xd1+ Bc2xd1 Re8-e1+ Ng3-f1 g7-g6 Rb7-d7 Nf4-e2+ Bd1xe2 Re1xe2 Rd7-d2 Re2xd2 Nf1xd2 h7-h6
+    12/29-	00:01	   1'193'094	651'252	+4.59	
+   20/12/2013 23:29:00, Time for this analysis: 00:00:01, Rated time: 02:19
+
+ 84 Qg8+; id "WAC.084"; 
+    Searching move: Qd5-g8
+    Best move (Vajolet2): Qd5-g8
+    Identical moves! Found in: 00:01
+     2/6	00:01	         317	317'000	+M2	Qd5-g8+ Rf8xg8 Ng5-f7+
+      3	00:01	         423	423'000	+M2	Qd5-g8+ Rf8xg8 Ng5-f7+
+      4	00:01	         501	501'000	+M2	Qd5-g8+ Rf8xg8 Ng5-f7+
+      5	00:01	         604	604'000	+M2	Qd5-g8+ Rf8xg8 Ng5-f7+
+      6	00:01	         709	709'000	+M2	Qd5-g8+ Rf8xg8 Ng5-f7+
+      7	00:01	         815	815'000	+M2	Qd5-g8+ Rf8xg8 Ng5-f7+
+      8	00:01	         922	922'000	+M2	Qd5-g8+ Rf8xg8 Ng5-f7+
+      9	00:01	       1'029	1'029'000	+M2	Qd5-g8+ Rf8xg8 Ng5-f7+
+   20/12/2013 23:29:09, Time for this analysis: 00:00:05, Rated time: 02:20
+
+ 85 Na6; id "WAC.085";  
+    Searching move: Nc5-a6
+    Best move (Vajolet2): Nc5-a6
+    Identical moves! Found in: 00:00
+     2/10	00:00	         759	253'000	+1.49	Re8xb8+ Qd6xb8 Bf1-c4
+     3/12	00:00	       1'564	312'800	+4.52	Nc5-a6 Rb8xe8 Qa3xd6
+     4/11	00:00	       2'154	359'000	+4.85	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8
+     5/10	00:00	       2'715	387'857	+4.86	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8 Bf1-c4
+     6/9+	00:00	       2'894	361'750	+4.95	Nc5-a6
+     6/14	00:00	       3'671	458'875	+4.96	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8 Bf1-c4 Rf7-b7
+     7/16	00:00	       5'675	515'909	+4.96	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8 Qa3-c5 Rf7-f6 Bf1-c4
+     8/10+	00:00	       6'118	509'833	+5.04	Nc5-a6
+     8/17+	00:00	       7'882	563'000	+5.12	Nc5-a6
+     8/17+	00:00	      11'624	581'200	+5.43	Nc5-a6
+     8/18	00:00	      16'762	620'814	+5.46	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8 Qa3-c5 Rf7-f6 Bf1-d3 f5-f4 g3xf4
+     9/16	00:00	      19'294	643'133	+5.46	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8 Qa3-c5 Rf7-f6 Bf1-d3 f5-f4 g3xf4
+    11/18-	00:00	     103'425	738'750	+6.56	
+    11/20	00:00	     107'607	742'117	+6.72	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8 Qa3-c5 Rd8-c8 Bf1-d3 f5-f4 Qc5xh5 Rc8-f8 Bd3-e4 Rf7-b7 Qh5xg4 f4xg3 h2xg3
+    12/21	00:00	     115'892	747'690	+6.72	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8 Qa3-c5 Rd8-c8 Bf1-d3 f5-f4 Qc5xh5 Rc8-f8 Bd3-e4 Rf7-b7 Qh5xg4 f4xg3 h2xg3
+    13/22	00:00	     135'632	753'511	+6.72	Nc5-a6 Qd6-d8 Re8xd8 Rb8xd8 Qa3-c5 Rd8-c8 Bf1-d3 f5-f4 Qc5xh5 Rc8-f8 Bd3-e4 Rf7-b7 Qh5xg4 f4xg3 h2xg3
+    14/23+	00:00	     146'649	755'922	+6.81	Nc5-a6
+    14/27+	00:00	     165'301	761'755	+6.89	Nc5-a6
+    14/32+	00:00	     553'984	797'099	+10.76	Nc5-a6
+    14/34	00:01	   1'027'168	836'456	+11.80	Nc5-a6 Qd6-f8 Re8xb8+ Qf8xb8 Na6xb8 Ka8xb8 Qa3-d6+ Kb8-b7 Bf1-a6+ Kb7xa6 Qd6xc6+ Ka6-a5 Qc6-d5+ Ka5-b4 Qd5xf7 a7-a5 Qf7xf5 a5-a4 Qf5xh5 a4-a3 Qh5xg4
+   20/12/2013 23:29:11, Time for this analysis: 00:00:01, Rated time: 02:20
+
+ 86 Ng4+; id "WAC.086"; 
+    Searching move: Nf6-g4
+    Best move (Vajolet2): Nf6-g4
+    Identical moves! Found in: 00:01
+     2/10	00:01	         419	419'000	+0.45	a7-a5 Ke3-d3
+     3/11	00:01	       1'333	666'500	+0.43	a7-a5 Ke3-d3 Kd6-c7
+     4/13	00:01	       3'878	646'333	+0.48	a7-a5 Ke3-d3 h5-h4 Nf2-d1 h4xg3 h2xg3
+     5/14	00:01	       7'917	719'727	+0.48	a7-a5 Ke3-d3 h5-h4 Nf2-d1 h4xg3 h2xg3
+     6/15+	00:01	      10'475	748'214	+0.56	a7-a5
+     6/17	00:01	      18'825	753'000	+0.63	a7-a5 Ke3-d3 f5-f4 Nf2-e4+ Nf6xe4 Kd3xe4 f4xg3 h2xg3
+     7/17+	00:01	      42'188	781'259	+0.71	Nf6-g4+
+     7/14+	00:01	      42'754	777'345	+0.81	Nf6-g4+
+     7/17+	00:01	      44'383	792'553	+1.11	Nf6-g4+
+     7/18	00:01	      51'110	786'307	+1.37	Nf6-g4+ Nf2xg4 h5xg4 c4-c5+ b6xc5 a4-a5 c5xd4+ c3xd4 Kd6-e7 Ke3-f2 Ke7-f6 Kf2-g2
+     8/16	00:01	      56'280	792'676	+1.37	Nf6-g4+ Nf2xg4 h5xg4 c4-c5+ b6xc5 a4-a5 c5xd4+ c3xd4 Kd6-e7 Ke3-f2 Ke7-f6 Kf2-g2
+     9/17	00:01	      66'421	800'253	+1.33	Nf6-g4+ Nf2xg4 h5xg4 c4-c5+ b6xc5 a4-a5 c5xd4+ c3xd4 Kd6-e7 Ke3-f2 Ke7-f6 Kf2-g2 a7-a6
+    10/20+	00:01	      76'623	806'557	+1.42	Nf6-g4+
+    10/20+	00:01	      85'926	810'622	+1.50	Nf6-g4+
+    10/20+	00:01	     110'990	828'283	+1.80	Nf6-g4+
+    10/27	00:01	     178'733	859'293	+1.99	Nf6-g4+ Ke3-f3 Ng4xh2+ Kf3-g2 Nh2-g4 Nf2-h3 Ng4-e3+ Kg2-f2 Ne3-d1+ Kf2-g2 g5-g4 Nh3-f4 Nd1xc3 Nf4xh5 Nc3xa4
+    13/23-	00:01	     349'380	891'275	+1.95	
+    13/29	00:01	     408'297	895'388	+2.04	Nf6-g4+ Ke3-f3 Ng4xh2+ Kf3-g2 Nh2-g4 Nf2-h3 Ng4-e3+ Kg2-f2 Ne3-d1+ Kf2-e1 g5-g4 Nh3-f4 Nd1xc3 Nf4xh5 Nc3-e4 Ke1-e2 Ne4xg3+ Nh5xg3 f5-f4 Ng3-e4+ Kd6-c7 Ke2-d3
+    14/21-	00:01	     620'623	898'151	+1.87	
+    14/31+	00:01	     721'261	891'546	+2.12	Nf6-g4+
+    14/28	00:02	     869'809	900'423	+2.08	Nf6-g4+ Ke3-f3 Ng4xh2+ Kf3-g2 Nh2-g4 Nf2-h3 Ng4-e3+ Kg2-f2 Ne3-d1+ Kf2-e1 g5-g4 Nh3-f4 Nd1xc3 Nf4xh5 Nc3-e4 Ke1-e2 Ne4xg3+ Nh5xg3 f5-f4 Ng3-e4+ Kd6-c7 Ne4-g5
+   20/12/2013 23:29:21, Time for this analysis: 00:00:05, Rated time: 02:21
+
+ 87 Rxe5; id "WAC.087"; 
+    Searching move: Re6xe5
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+   20/12/2013 23:29:31, Time for this analysis: 00:00:10, Rated time: 02:31
+
+ 88 Rxg2+; id "WAC.088" 
+    Searching move: Rg6xg2
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+   20/12/2013 23:29:45, Time for this analysis: 00:00:10, Rated time: 02:41
+
+ 89 g5; id "WAC.089";   
+    Searching move: g7-g5
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+   20/12/2013 23:29:59, Time for this analysis: 00:00:10, Rated time: 02:51
+
+ 89 g5; id "WAC.089";   
+    Searching move: g7-g5
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+   20/12/2013 23:30:02, Time for this analysis: 00:00:13, Rated time: 03:01
+
+ 89 g5; id "WAC.089";   
+    Searching move: g7-g5
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+   20/12/2013 23:30:03, Time for this analysis: 00:00:14, Rated time: 03:11
+
+ 89 g5; id "WAC.089";   
+    Searching move: g7-g5
+    Best move (Vajolet2): ...
+    Not found in: 00:10
+   20/12/2013 23:30:06, Time for this analysis: 00:00:16, Rated time: 03:21
+

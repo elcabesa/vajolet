@@ -78,6 +78,7 @@ public :
 	}
 
 	void stopThinking(){
+		//sync_cout<<"received stop"<<sync_endl;
 		src.signals.stop=true;
 	}
 

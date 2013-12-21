@@ -76,7 +76,7 @@ class search{
 	static Score FutilityMoveCounts[11];
 	static Score PVreduction[32*ONE_PLY][64];
 	static Score nonPVreduction[32*ONE_PLY][64];
-
+	unsigned long startTime;
 
 	searchLimits limits;
 

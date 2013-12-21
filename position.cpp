@@ -151,6 +151,7 @@ void Position::setupFromFen(const std::string& fenStr){
 	x.pliesFromNull=0;
 	x.skipNullMove=true;
 	x.excludedMove=0;
+	x.currentMove=0;
 	x.capturedPiece=empty;
 
 
@@ -508,6 +509,7 @@ void Position::doNullMove(void){
 	state n=getActualState();
 	insertState(n);
 	state &x=getActualState();
+	x.currentMove=0;
 	if(x.epSquare!=squareNone){
 		assert(x.epSquare<squareNumber);
 		x.key^=HashKeys::ep[x.epSquare];
@@ -527,6 +529,7 @@ void Position::doNullMove(void){
 	x.ply++;
 	x.capturedPiece=empty;
 	x.excludedMove=0;
+
 
 	calcCheckingSquares();
 	assert(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0]!=squareNone);
@@ -551,6 +554,7 @@ void Position::doMove(Move & m){
 	bool moveIsCheck=moveGivesCheck(m);
 	insertState(n);
 	state &x=getActualState();
+	x.currentMove=m;
 
 
 

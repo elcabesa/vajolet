@@ -225,6 +225,7 @@ void uciLoop(){
 		if (!std::getline(std::cin, cmd)) // Block here waiting for input
 			cmd = "quit";
 		std::istringstream is(cmd);
+		//sync_cout<<"ricevuto comando:"<<cmd<<sync_endl;
 
 		is >> std::skipws >> token;
 

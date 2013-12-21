@@ -34,6 +34,10 @@
 */
 static void printStartInfo(void){
 	sync_cout<<PROGRAM_NAME<<" "<<VERSION<<" by Marco Belli"<<sync_endl;
+	bool hwpopcnt=__builtin_cpu_supports("popcnt");
+	if(hwpopcnt){
+		sync_cout<<"hw popcnt"<<sync_endl;
+	}
 }
 
 /*!	\brief	main function
@@ -43,6 +47,11 @@ static void printStartInfo(void){
 */
 int main()
 {
+	// todo test for cpu type and capability con le nuove funzioni di gcc
+	//
+	//__builtin_cpu_supports("ssse3");
+	//TODO__builtin_cpu_supports("popcnt")
+	//TODO gcc Function Multiversioning per fare popcnt hw solo se c'è, si può usare con gcc 4.8.2
 	//----------------------------------
 	//	init global data
 	//----------------------------------

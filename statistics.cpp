@@ -26,7 +26,11 @@ void Statistics::printNodeTypeStat(){
 
 	sync_cout<<"result nodetype PV: "<<resultNodeTypePv<<sync_endl;
 	sync_cout<<"result nodetype Cut: "<<resultNodeTypeCut<<sync_endl;
-	sync_cout<<"result nodetype All: "<<resultNodeTypeAll<<sync_endl;
+	sync_cout<<"result nodetype All: "<<resultNodeTypeAll<<std::endl<<sync_endl;
+
+	sync_cout<<"PV type %error : "<<(signed long long)(testedNodeTypePv-resultNodeTypePv)/float(resultNodeTypePv)*100.0<<sync_endl;
+	sync_cout<<"Cut type %error : "<<(signed long long)(testedNodeTypeCut-resultNodeTypeCut)/float(resultNodeTypeCut)*100.0<<sync_endl;
+	sync_cout<<"All type %error : "<<(signed long long)(testedNodeTypeAll-resultNodeTypeAll)/float(resultNodeTypeAll)*100.0<<sync_endl;
 }
 
 void Statistics::gatherNodeTypeStat(search::nodeType expectedNodeType,search::nodeType resultNodeType){

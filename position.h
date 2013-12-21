@@ -119,6 +119,7 @@ public:
 		Move killers[2];	/*!< killer move at ply x*/
 		bool skipNullMove;
 		Move excludedMove;
+		Move currentMove;
 
 	};
 
@@ -429,7 +430,8 @@ public:
 			//s.killers[0].packed=0;
 			//s.killers[1].packed=0;
 			s.skipNullMove=true;
-			s.excludedMove.packed=0;
+			s.excludedMove=0;
+			s.currentMove=0;
 		}
 	}
 
