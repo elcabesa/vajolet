@@ -20,6 +20,7 @@
 #include "vajolet.h"
 #include "position.h"
 #include "move.h"
+#include "eval.h"
 #include <vector>
 #include <list>
 #include <cmath>
@@ -77,6 +78,7 @@ class search{
 	static Score PVreduction[32*ONE_PLY][64];
 	static Score nonPVreduction[32*ONE_PLY][64];
 	unsigned long startTime;
+	pawnTable pawnHashTable;
 
 	searchLimits limits;
 

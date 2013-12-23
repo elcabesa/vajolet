@@ -17,6 +17,7 @@
 #ifndef POSITION_H_
 #define POSITION_H_
 
+#include <exception>
 #include <vector>
 #include <string>
 #include "data.h"
@@ -24,6 +25,7 @@
 #include "hashKeys.h"
 #include "move.h"
 #include "io.h"
+#include "eval.h"
 
 
 
@@ -160,7 +162,7 @@ public:
 	void undoMove(Move &m);
 	static void initCastleRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
-	Score eval(void) const;
+	Score eval(pawnTable& pawnHashTable) const;
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 	bool moveGivesCheck(Move& m)const ;
@@ -173,7 +175,8 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	Position(){
+	Position()
+	{
 		stateIndex=0;
 	}
 

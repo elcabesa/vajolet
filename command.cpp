@@ -248,7 +248,8 @@ void uciLoop(){
 			setoption(is);
 		}
 		else if (token =="eval"){
-			sync_cout<<"Eval:" <<pos.eval()/10000.0<<sync_endl;
+			pawnTable pawnHashTable;
+			sync_cout<<"Eval:" <<pos.eval(pawnHashTable)/10000.0<<sync_endl;
 			sync_cout<<"gamePhase:" <<pos.getGamePhase()/65536.0*100<<"%"<<sync_endl;
 		}
 		else if (token =="isready"){

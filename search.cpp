@@ -196,7 +196,7 @@ void search::startThinking(Position & p,searchLimits & l){
 								break;
 							}*/
 
-							TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].previousScore:rootMoves[i].previousScore, n),typeExact,depth-n*ONE_PLY, (*it).packed, p.eval());
+							TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].previousScore:rootMoves[i].previousScore, n),typeExact,depth-n*ONE_PLY, (*it).packed, p.eval(pawnHashTable));
 
 							//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
 							p.doMove(*it);
@@ -395,7 +395,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	Score staticEval;
 	Score eval;
 	if(inCheck){
-		staticEval=pos.eval();
+		staticEval=pos.eval(pawnHashTable);
 		eval=staticEval;
 	}
 	else{
@@ -418,7 +418,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		}
 		else
 		{
-			staticEval=pos.eval();
+			staticEval=pos.eval(pawnHashTable);
 			eval=staticEval;
 		}
 
@@ -1017,7 +1017,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	Score staticEval;
 	Score bestScore;
 	if(inCheck){
-		staticEval=pos.eval();
+		staticEval=pos.eval(pawnHashTable);
 		bestScore=-SCORE_INFINITE;
 	}
 	else{
@@ -1027,7 +1027,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		}
 		else
 		{
-			staticEval=pos.eval();
+			staticEval=pos.eval(pawnHashTable);
 		}
 		bestScore=staticEval;
 

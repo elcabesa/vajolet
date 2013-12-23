@@ -20,6 +20,7 @@
 #include "move.h"
 #include "bitops.h"
 #include "movegen.h"
+#include "eval.h"
 
 
 enum color{
@@ -348,7 +349,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	\version 1.0
 	\date 27/10/2013
 */
-Score Position::eval(void) const {
+Score Position::eval(pawnTable& pawnHashTable) const {
 
 	bitMap attackedSquares[lastBitboard]={0};
 	bitMap weakSquares[2]={0};
@@ -380,6 +381,7 @@ Score Position::eval(void) const {
 	state &st =getActualState();
 	simdScore res=simdScore(st.material[0],st.material[1],0,0);
 
+
 	//---------------------------------------------
 	//	tempo
 	//---------------------------------------------
@@ -404,80 +406,95 @@ Score Position::eval(void) const {
 	//todo passed pawn post evalutation
 	//todo king near passed pawn
 	//todo supporting / counter passed pawn
-	bitMap pawns= bitBoard[whitePawns];
+	simdScore pawnResult;
+	pawnEntry* probePawn= pawnHashTable.probe(getActualState().pawnKey);
+	if(probePawn!=nullptr){
+		pawnResult=probePawn->res;
+		weakPawns=probePawn->weakPawns;
+		passedPawns=probePawn->passedPawns;
+		attackedSquares[whitePawns]=probePawn->pawnAttacks[0];
+		attackedSquares[blackPawns]=probePawn->pawnAttacks[1];
+		weakSquares[white]=probePawn->weakSquares[0];
+		weakSquares[black]=probePawn->weakSquares[1];
+		holes[white]=probePawn->holes[0];
+		holes[black]=probePawn->holes[1];
 
-	while(pawns){
-		tSquare sq=firstOne(pawns);
-		res+=evalPawn<white>(*this,sq, weakPawns, passedPawns);
-		pawns &= pawns-1;
+
+	}
+	else{
+		pawnResult=0;
+		bitMap pawns= bitBoard[whitePawns];
+
+		while(pawns){
+			tSquare sq=firstOne(pawns);
+			pawnResult+=evalPawn<white>(*this,sq, weakPawns, passedPawns);
+			pawns &= pawns-1;
+		}
+
+		pawns= bitBoard[blackPawns];
+
+		while(pawns){
+			tSquare sq=firstOne(pawns);
+			pawnResult-=evalPawn<black>(*this,sq, weakPawns, passedPawns);
+			pawns &= pawns-1;
+		}
+
+
+		bitMap temp=bitBoard[whitePawns];
+		bitMap pawnAttack=(temp & ~(FILEMASK[H1]))<<9;
+		pawnAttack|=(temp & ~(FILEMASK[A1]))<<7;
+
+		attackedSquares[whitePawns]=pawnAttack;
+		pawnAttack|=pawnAttack<<8;
+		pawnAttack|=pawnAttack<<8;
+		pawnAttack|=pawnAttack<<8;
+		pawnAttack|=pawnAttack<<8;
+		pawnAttack|=pawnAttack<<8;
+
+		weakSquares[white]=~pawnAttack;
+
+		temp=bitBoard[blackPawns];
+		pawnAttack=(temp & ~(FILEMASK[H1]))>>7;
+		pawnAttack|=(temp & ~(FILEMASK[A1]))>>9;
+
+		attackedSquares[blackPawns]=pawnAttack;
+
+		pawnAttack|=pawnAttack>>8;
+		pawnAttack|=pawnAttack>>8;
+		pawnAttack|=pawnAttack>>8;
+		pawnAttack|=pawnAttack>>8;
+		pawnAttack|=pawnAttack>>8;
+
+		weakSquares[black]=~pawnAttack;
+
+		temp=bitBoard[whitePawns]<<8;
+		temp|=temp<<8;
+		temp|=temp<<8;
+		temp|=temp<<8;
+		temp|=temp<<8;
+		temp|=temp<<8;
+
+		holes[white]= weakSquares[white]&temp;
+
+
+		temp=bitBoard[blackPawns]>>8;
+		temp|=temp>>8;
+		temp|=temp>>8;
+		temp|=temp>>8;
+		temp|=temp>>8;
+		temp|=temp>>8;
+
+		holes[black]= weakSquares[black]&temp;
+
+
+
+		pawnHashTable.insert(getActualState().pawnKey,pawnResult, weakPawns, passedPawns,attackedSquares[whitePawns],attackedSquares[blackPawns],weakSquares[white],weakSquares[black],holes[white],holes[black]);
+
+
+
 	}
 
-	pawns= bitBoard[blackPawns];
-
-	while(pawns){
-		tSquare sq=firstOne(pawns);
-		res-=evalPawn<black>(*this,sq, weakPawns, passedPawns);
-		pawns &= pawns-1;
-	}
-
-	//------------------------------------------
-	//	weak squares
-	//------------------------------------------
-
-
-
-	bitMap temp=bitBoard[whitePawns];
-
-	bitMap pawnAttack=(temp & ~(FILEMASK[H1]))<<9;
-	pawnAttack|=(temp & ~(FILEMASK[A1]))<<7;
-
-	attackedSquares[whitePawns]=pawnAttack;
-
-	pawnAttack|=pawnAttack<<8;
-	pawnAttack|=pawnAttack<<8;
-	pawnAttack|=pawnAttack<<8;
-	pawnAttack|=pawnAttack<<8;
-	pawnAttack|=pawnAttack<<8;
-
-	weakSquares[white]=~pawnAttack;
-
-
-	temp=bitBoard[whitePawns]<<8;
-	temp|=temp<<8;
-	temp|=temp<<8;
-	temp|=temp<<8;
-	temp|=temp<<8;
-	temp|=temp<<8;
-
-	holes[white]= weakSquares[white]&temp;
-
-	temp=bitBoard[blackPawns];
-
-	pawnAttack=(temp & ~(FILEMASK[H1]))>>7;
-	pawnAttack|=(temp & ~(FILEMASK[A1]))>>9;
-
-	attackedSquares[blackPawns]=pawnAttack;
-
-
-	pawnAttack|=pawnAttack>>8;
-	pawnAttack|=pawnAttack>>8;
-	pawnAttack|=pawnAttack>>8;
-	pawnAttack|=pawnAttack>>8;
-	pawnAttack|=pawnAttack>>8;
-
-	weakSquares[black]=~pawnAttack;
-
-	temp=bitBoard[blackPawns]>>8;
-	temp|=temp>>8;
-	temp|=temp>>8;
-	temp|=temp>>8;
-	temp|=temp>>8;
-	temp|=temp>>8;
-
-	holes[black]= weakSquares[black]&temp;
-
-
-
+	res+=pawnResult;
 
 
 	// todo supported squares

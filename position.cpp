@@ -98,6 +98,7 @@ void Position::setupFromFen(const std::string& fenStr){
 		}
 	}
 	state s;
+
 	insertState(s);
 	state &x= getActualState();
 
@@ -944,7 +945,7 @@ bool Position::checkPosConsistency(int nn){
 	}
 
 	simdScore sc=calcMaterialValue();
-	if(sc[0]!=x.material[0] || sc[1]!=x.material[1]){
+	if((sc[0]!=x.material[0]) || (sc[1]!=x.material[1])){
 		display();
 		sync_cout<<sc[0]<<":"<<x.material[0]<<sync_endl;
 		sync_cout<<sc[1]<<":"<<x.material[1]<<sync_endl;
