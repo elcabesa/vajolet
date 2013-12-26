@@ -27,11 +27,21 @@
 
 
 
-
+typedef struct timeManagement{
+	unsigned long allocatedTime;
+	unsigned long minSearchTime;
+	unsigned long maxSearchTime;
+	unsigned int depth;
+	bool idLoopIterationFinished;
+	unsigned int singularRootMoveCount;
+	bool idLoopRequestToExtend;
+} timeManagementStruct;
 
 
 
 class my_thread{
+
+
 
 	volatile static bool quit;
 	volatile static bool startThink;
@@ -41,7 +51,6 @@ class my_thread{
 	static std::condition_variable searchCond;
 	static Position *pos;
 	static search src;
-	static unsigned long searchTimeout;
 	static searchLimits limits;
 
 	static unsigned long startTime;
@@ -51,6 +60,7 @@ class my_thread{
 	static void timerThread();
 	static void searchThread();
 public :
+	static timeManagementStruct timeMan;
 	my_thread(){
 		initThreads();
 	};

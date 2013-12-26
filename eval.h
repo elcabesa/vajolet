@@ -22,6 +22,8 @@
 #include <vector>
 #include "vajolet.h"
 
+void initMaterialKeys();
+
 
 template<class Entry, int Size>
 struct HashTable

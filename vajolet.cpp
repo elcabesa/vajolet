@@ -26,6 +26,7 @@
 #include "transposition.h"
 #include "statistics.h"
 #include "search.h"
+#include "eval.h"
 
 /*!	\brief	print the startup information
 	\author Marco Belli
@@ -63,6 +64,7 @@ int main()
 	search::initLMRreduction();
 	TT.setSize(1);
 	History::instance().clear();
+	initMaterialKeys();
 
 
 

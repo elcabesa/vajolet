@@ -28,6 +28,7 @@
 #include "statistics.h"
 #include "history.h"
 #include "book.h"
+#include "thread.h"
 
 inline unsigned int razorMargin(unsigned int depth){
 	return 20000+depth*78;
@@ -114,8 +115,9 @@ void search::startThinking(Position & p,searchLimits & l){
 	 *	if there is only 1 moves do it
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
-	Move m;
+	Move m,oldBestMove;
 	m=0;
+	oldBestMove=0;
 	Movegen mg(p,m);
 
 	Move lastLegalMove;
@@ -247,11 +249,15 @@ void search::startThinking(Position & p,searchLimits & l){
 				{
 					//sync_cout<<"res<=alpha "<<sync_endl;
 
+					//my_thread::timeMan.idLoopRequestToExtend=true;
 					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
 					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 					//sync_cout<<"new alpha "<<alpha<<sync_endl;
 				}
 				else if (res >= beta){
+					if(oldBestMove!=newPV[0]){
+					my_thread::timeMan.idLoopRequestToExtend=true;
+					}
 					//sync_cout<<"res>=beta "<<sync_endl;
 					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
 					beta = std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
@@ -276,7 +282,40 @@ void search::startThinking(Position & p,searchLimits & l){
 				}
 			}
 		}
+		//-----------------------
+		//	single good move at root
+		//-----------------------
+		if (depth >= 12
+			&& !signals.stop
+			&&  PVSize == 1
+			&&  res > SCORE_MATED_IN_MAX_PLY)
+		{
+
+			Score rBeta = res - 20000;
+			p.getActualState().excludedMove=newPV[0];
+			p.getActualState().skipNullMove=true;
+			std::vector<Move> locChildPV;
+			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0,p,depth-3,rBeta-1,rBeta,locChildPV);
+			p.getActualState().skipNullMove=false;
+			p.getActualState().excludedMove.packed=0;
+
+			if(temp < rBeta){
+				my_thread::timeMan.singularRootMoveCount++;
+			}
+		}
+
+		if(oldBestMove!=newPV[0]){
+			my_thread::timeMan.idLoopRequestToExtend=true;
+		}
+		oldBestMove=newPV[0];
+
+		my_thread::timeMan.depth=depth;
+		my_thread::timeMan.idLoopIterationFinished=true;
+
+
+
 		depth+=1;
+
 	}while(depth<=(limits.depth? limits.depth:100) && !signals.stop);
 
 	//sync_cout<<"print final bestMove "<<sync_endl;
@@ -716,6 +755,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 		}
 
+		if(type==ROOT_NODE && std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime>3000 && !signals.stop){
+			sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<< sync_endl;
+		}
+
 		pos.doMove(m);
 
 		Score val;
@@ -849,9 +892,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 		pos.undoMove(m);
 
-		if(type==ROOT_NODE && std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime>3000 && !signals.stop){
-			sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<< sync_endl;
-		}
+
 
 
 		if(val>bestScore){

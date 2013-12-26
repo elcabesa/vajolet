@@ -15,7 +15,9 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-
+#include <utility>
+#include <unordered_map>
+#include <map>
 #include "position.h"
 #include "move.h"
 #include "bitops.h"
@@ -27,6 +29,102 @@ enum color{
 	white=0,
 	black=1
 };
+
+//---------------------------------------------
+//	MATERIAL KEYS
+//---------------------------------------------
+U64 kVsKkey;
+U64	kbVsKkey;
+U64	knVsKkey;
+U64	kVsKBkey;
+U64	kVsKNkey;
+
+U64	kbVsKBkey;
+U64	kbVsKNkey;
+U64	knVsKBkey;
+U64	knVsKNkey;
+
+std::unordered_map<U64, bool> materialKeyMap;
+
+
+void initMaterialKeys(void){
+	Position p;
+	//------------------------------------------
+	//	k vs K
+	//------------------------------------------
+	p.setupFromFen("k7/8/8/8/8/8/8/7K w - -");
+	kVsKkey=p.getActualState().materialKey;
+	materialKeyMap.insert({kVsKkey,true});
+	//------------------------------------------
+	//	kb vs K
+	//------------------------------------------
+	p.setupFromFen("kb6/8/8/8/8/8/8/7K w - -");
+	kbVsKkey=p.getActualState().materialKey;
+	materialKeyMap.insert({kbVsKkey,true});
+	//------------------------------------------
+	//	kn vs K
+	//------------------------------------------
+	p.setupFromFen("kn6/8/8/8/8/8/8/7K w - -");
+	knVsKkey=p.getActualState().materialKey;
+	materialKeyMap.insert({knVsKkey,true});
+	//------------------------------------------
+	//	k vs KB
+	//------------------------------------------
+	p.setupFromFen("k7/8/8/8/8/8/8/6BK w - -");
+	kVsKBkey=p.getActualState().materialKey;
+	materialKeyMap.insert({kVsKBkey,true});
+	//------------------------------------------
+	//	k vs KN
+	//------------------------------------------
+	p.setupFromFen("k7/8/8/8/8/8/8/6NK w - -");
+	kVsKNkey=p.getActualState().materialKey;
+	materialKeyMap.insert({kVsKNkey,true});
+
+
+	//------------------------------------------
+	//	kn vs KB
+	//------------------------------------------
+	p.setupFromFen("kn6/8/8/8/8/8/8/6BK w - -");
+	knVsKBkey=p.getActualState().materialKey;
+	materialKeyMap.insert({knVsKBkey,true});
+	//------------------------------------------
+	//	kn vs KN
+	//------------------------------------------
+	p.setupFromFen("kn6/8/8/8/8/8/8/6NK w - -");
+	knVsKNkey=p.getActualState().materialKey;
+	materialKeyMap.insert({knVsKNkey,true});
+
+	//------------------------------------------
+	//	kb vs KB
+	//------------------------------------------
+	p.setupFromFen("kb6/8/8/8/8/8/8/6BK w - -");
+	kbVsKBkey=p.getActualState().materialKey;
+	materialKeyMap.insert({kbVsKBkey,true});
+	//------------------------------------------
+	//	kb vs KN
+	//------------------------------------------
+	p.setupFromFen("kb6/8/8/8/8/8/8/6NK w - -");
+	kbVsKNkey=p.getActualState().materialKey;
+	materialKeyMap.insert({kbVsKNkey,true});
+
+}
+//---------------------------------------------
+bool materialEval(const Position& p){
+	U64 key=p.getActualState().materialKey;
+
+	std::unordered_map<U64,bool>::const_iterator got= materialKeyMap.find(key);
+	if(got == materialKeyMap.end())
+	{
+		// not found
+	}
+	else
+	{
+		 return got->second;
+	}
+
+	return false;
+
+}
 
 const simdScore mobilityBonus[][32] = {
 		{}, {},
@@ -381,6 +479,10 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	state &st =getActualState();
 	simdScore res=simdScore(st.material[0],st.material[1],0,0);
 
+	if(materialEval(*this))
+	{
+		return 0;
+	}
 
 	//---------------------------------------------
 	//	tempo
@@ -401,7 +503,6 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	//----------------------------------------------
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
-	//todo creare pawn attack bitmaps
 	//todo king shield
 	//todo passed pawn post evalutation
 	//todo king near passed pawn
@@ -446,12 +547,11 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 		attackedSquares[whitePawns]=pawnAttack;
 		pawnAttack|=pawnAttack<<8;
-		pawnAttack|=pawnAttack<<8;
-		pawnAttack|=pawnAttack<<8;
-		pawnAttack|=pawnAttack<<8;
-		pawnAttack|=pawnAttack<<8;
+		pawnAttack|=pawnAttack<<16;
+		pawnAttack|=pawnAttack<<32;
 
 		weakSquares[white]=~pawnAttack;
+
 
 		temp=bitBoard[blackPawns];
 		pawnAttack=(temp & ~(FILEMASK[H1]))>>7;
@@ -460,31 +560,26 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		attackedSquares[blackPawns]=pawnAttack;
 
 		pawnAttack|=pawnAttack>>8;
-		pawnAttack|=pawnAttack>>8;
-		pawnAttack|=pawnAttack>>8;
-		pawnAttack|=pawnAttack>>8;
-		pawnAttack|=pawnAttack>>8;
+		pawnAttack|=pawnAttack>>16;
+		pawnAttack|=pawnAttack>>32;
 
 		weakSquares[black]=~pawnAttack;
 
 		temp=bitBoard[whitePawns]<<8;
 		temp|=temp<<8;
-		temp|=temp<<8;
-		temp|=temp<<8;
-		temp|=temp<<8;
-		temp|=temp<<8;
+		temp|=temp<<16;
+		temp|=temp<<32;
 
 		holes[white]= weakSquares[white]&temp;
 
 
 		temp=bitBoard[blackPawns]>>8;
 		temp|=temp>>8;
-		temp|=temp>>8;
-		temp|=temp>>8;
-		temp|=temp>>8;
-		temp|=temp>>8;
+		temp|=temp>>16;
+		temp|=temp>>32;
 
 		holes[black]= weakSquares[black]&temp;
+
 
 
 
