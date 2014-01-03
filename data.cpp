@@ -47,6 +47,17 @@ const int RANKS[squareNumber] = {		//!< precalculated rank from square number
 	7, 7, 7, 7, 7, 7, 7, 7,
 };
 
+const int SQUARE_COLOR[squareNumber]={
+	0,1,0,1,0,1,0,1,
+	1,0,1,0,1,0,1,0,
+	0,1,0,1,0,1,0,1,
+	1,0,1,0,1,0,1,0,
+	0,1,0,1,0,1,0,1,
+	1,0,1,0,1,0,1,0,
+	0,1,0,1,0,1,0,1,
+	1,0,1,0,1,0,1,0
+};
+
 bitMap RANKMASK[squareNumber];			//!< bitmask of a rank given a square on the rank
 bitMap FILEMASK[squareNumber];			//!< bitmask of a file given a square on the rank
 

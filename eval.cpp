@@ -33,96 +33,313 @@ enum color{
 //---------------------------------------------
 //	MATERIAL KEYS
 //---------------------------------------------
-U64 kVsKkey;
-U64	kbVsKkey;
-U64	knVsKkey;
-U64	kVsKBkey;
-U64	kVsKNkey;
 
-U64	kbVsKBkey;
-U64	kbVsKNkey;
-U64	knVsKBkey;
-U64	knVsKNkey;
 
-std::unordered_map<U64, bool> materialKeyMap;
+typedef struct{
+	enum {
+		exact,
+		additiveFunction,
+		exactFunction
+	}type ;
+	bool (*pointer)(const Position & ,Score &);
+	Score val;
+
+}materialStruct;
+
+std::unordered_map<U64, materialStruct> materialKeyMap;
+
+bool evalKBPvsK(const Position& p, Score& res){
+	color Pcolor=p.bitBoard[Position::whitePawns]?white:black;
+	tSquare pawnSquare;
+	tSquare bishopSquare;
+	if(Pcolor==white){
+		pawnSquare = p.pieceList[Position::whitePawns][0];
+		int pawnFile=FILES[pawnSquare];
+		if(pawnFile==0 || pawnFile==7){
+			bishopSquare=p.pieceList[Position::whiteBishops][0];
+			if( SQUARE_COLOR[BOARDINDEX[pawnFile][7]]!=SQUARE_COLOR[bishopSquare]){
+				tSquare kingSquare=  p.pieceList[Position::blackKing][0];
+				if(RANKS[kingSquare]>=6  && abs(pawnFile-FILES[kingSquare])<=1){
+					res=0;
+					return true;
+
+				}
+			}
+		}
+	}
+	else{
+		pawnSquare = p.pieceList[Position::blackPawns][0];
+		int pawnFile=FILES[pawnSquare];
+		if(pawnFile==0 || pawnFile==7){
+			bishopSquare=p.pieceList[Position::blackBishops][0];
+			if( SQUARE_COLOR[BOARDINDEX[pawnFile][0]]!=SQUARE_COLOR[bishopSquare]){
+				tSquare kingSquare=  p.pieceList[Position::whiteKing][0];
+				if(RANKS[kingSquare]<=1  && abs(pawnFile-FILES[kingSquare])<=1){
+					res=0;
+					return true;
+
+				}
+			}
+		}
+	}
+	return false;
+
+}
+
 
 
 void initMaterialKeys(void){
+	/*---------------------------------------------
+	 *
+	 * K vs K		->	draw
+	 * km vs k		->	draw
+	 * km vs km		->	draw
+	 * kmm vs km	->	draw
+	 *
+	 * kbp vs k		->	probable draw on the rook file
+	 *
+	 ----------------------------------------------*/
+
+
 	Position p;
+	U64 key;
 	//------------------------------------------
 	//	k vs K
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/7K w - -");
-	kVsKkey=p.getActualState().materialKey;
-	materialKeyMap.insert({kVsKkey,true});
+	key=p.getActualState().materialKey;
+	materialStruct t;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 	//------------------------------------------
 	//	kb vs K
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/7K w - -");
-	kbVsKkey=p.getActualState().materialKey;
-	materialKeyMap.insert({kbVsKkey,true});
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 	//------------------------------------------
 	//	kn vs K
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/7K w - -");
-	knVsKkey=p.getActualState().materialKey;
-	materialKeyMap.insert({knVsKkey,true});
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 	//------------------------------------------
 	//	k vs KB
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/6BK w - -");
-	kVsKBkey=p.getActualState().materialKey;
-	materialKeyMap.insert({kVsKBkey,true});
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 	//------------------------------------------
 	//	k vs KN
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/6NK w - -");
-	kVsKNkey=p.getActualState().materialKey;
-	materialKeyMap.insert({kVsKNkey,true});
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 
 
 	//------------------------------------------
 	//	kn vs KB
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/6BK w - -");
-	knVsKBkey=p.getActualState().materialKey;
-	materialKeyMap.insert({knVsKBkey,true});
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 	//------------------------------------------
 	//	kn vs KN
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/6NK w - -");
-	knVsKNkey=p.getActualState().materialKey;
-	materialKeyMap.insert({knVsKNkey,true});
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 
 	//------------------------------------------
 	//	kb vs KB
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/6BK w - -");
-	kbVsKBkey=p.getActualState().materialKey;
-	materialKeyMap.insert({kbVsKBkey,true});
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 	//------------------------------------------
 	//	kb vs KN
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/6NK w - -");
-	kbVsKNkey=p.getActualState().materialKey;
-	materialKeyMap.insert({kbVsKNkey,true});
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kbb vs KN
+	//------------------------------------------
+	p.setupFromFen("kbb5/8/8/8/8/8/8/6NK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kbb vs KB
+	//------------------------------------------
+	p.setupFromFen("kbb5/8/8/8/8/8/8/6BK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kbn vs KN
+	//------------------------------------------
+	p.setupFromFen("kbn5/8/8/8/8/8/8/6NK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kbn vs KB
+	//------------------------------------------
+	p.setupFromFen("kbn5/8/8/8/8/8/8/6BK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	knn vs KN
+	//------------------------------------------
+	p.setupFromFen("knn5/8/8/8/8/8/8/6NK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	knn vs KB
+	//------------------------------------------
+	p.setupFromFen("knn5/8/8/8/8/8/8/6BK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	kb vs KBB
+	//------------------------------------------
+	p.setupFromFen("kb6/8/8/8/8/8/8/5BBK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kn vs KBB
+	//------------------------------------------
+	p.setupFromFen("kn6/8/8/8/8/8/8/5BBK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kb vs KBN
+	//------------------------------------------
+	p.setupFromFen("kb6/8/8/8/8/8/8/5BNK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kn vs KBN
+	//------------------------------------------
+	p.setupFromFen("kn6/8/8/8/8/8/8/5BNK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kb vs KNN
+	//------------------------------------------
+	p.setupFromFen("kb6/8/8/8/8/8/8/5NNK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kn vs KNN
+	//------------------------------------------
+	p.setupFromFen("kn6/8/8/8/8/8/8/5NNK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exact;
+	t.pointer=nullptr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+
+
+
+
+
+	//------------------------------------------
+	//	k vs KBP
+	//------------------------------------------
+	p.setupFromFen("k7/8/8/8/8/8/8/5BPK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKBPvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kbp vs K
+	//------------------------------------------
+	p.setupFromFen("kbp5/8/8/8/8/8/8/7K w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKBPvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+
 
 }
+
+
 //---------------------------------------------
-bool materialEval(const Position& p){
+const materialStruct* getMaterialData(const Position& p){
 	U64 key=p.getActualState().materialKey;
 
-	std::unordered_map<U64,bool>::const_iterator got= materialKeyMap.find(key);
+	std::unordered_map<U64,materialStruct>::const_iterator got= materialKeyMap.find(key);
 	if(got == materialKeyMap.end())
 	{
-		// not found
+		return nullptr;
 	}
 	else
 	{
-		 return got->second;
+		 return &(got->second);
 	}
-
-	return false;
 
 }
 
@@ -134,14 +351,14 @@ const simdScore mobilityBonus[][32] = {
 				simdScore( 2820, 5507,0,0), simdScore( 2820, 5507,0,0), simdScore(2820, 5507,0,0), simdScore(2820, 5507,0,0), simdScore(2820, 5507,0,0), simdScore(2820, 5507,0,0),
 				simdScore( 2820, 5507,0,0), simdScore( 2820, 5507,0,0), simdScore(2820, 5507,0,0), simdScore(2820, 5507,0,0), simdScore(2820, 5507,0,0), simdScore(2820, 5507,0,0),
 				simdScore( 2820, 5507,0,0), simdScore( 2820, 5507,0,0) },
-		{ simdScore(-1918,-4434,0,0), simdScore(-1239,-2150,0,0), simdScore(-563,  0,0,0), simdScore( 112, 2150,0,0), simdScore( 788, 4300,0,0), simdScore(1465, 6450,0,0), // Rooks
-				simdScore( 2031, 8600,0,0), simdScore(2482, 10750,0,0), simdScore(2933, 12900,0,0), simdScore(3271,14644,0,0), simdScore(3496,15452,0,0), simdScore(3725,15989,0,0),
-				simdScore( 3835,16391,0,0), simdScore( 4063,16529,0,0), simdScore(4176,16659,0,0), simdScore(4288,16659,0,0) },
+		{ simdScore(-1918,-2217,0,0), simdScore(-1239,-1075,0,0), simdScore(-563,  0,0,0), simdScore( 112, 1075,0,0), simdScore( 788, 2150,0,0), simdScore(1465, 3225,0,0), // Rooks
+				simdScore( 2031, 4300,0,0), simdScore(2482, 5375,0,0), simdScore(2933, 6450,0,0), simdScore(3271,7322,0,0), simdScore(3496,7726,0,0), simdScore(3725,7994,0,0),
+				simdScore( 3835,8195,0,0), simdScore( 4063,8329,0,0), simdScore(4176,8329,0,0), simdScore(4288,8329,0,0) },
 		{ simdScore(-2483,-3628,0,0), simdScore( -903,-1746,0,0), simdScore( 677,  134,0,0), simdScore(2257, 2015,0,0), simdScore(3838, 3896,0,0), simdScore(5418, 5778,0,0), // Bishops
 				simdScore( 6773, 7390,0,0), simdScore( 7676, 8465,0,0), simdScore(8353, 9137,0,0), simdScore(8692,9675,0,0), simdScore(9031, 10078,0,0), simdScore(9257, 10346,0,0),
 				simdScore( 9482, 10615,0,0), simdScore( 9708, 10884,0,0), simdScore(9821, 11018,0,0), simdScore(9821, 11018,0,0) },
-		{ simdScore(-3951,-30,0,0), simdScore(-2843,-20,0,0), simdScore(-1016,-10,0,0), simdScore( 338,  0,0,0), simdScore(1693, 10,0,0), simdScore(3048, 20,0,0), // Knights
-				simdScore( 4176, 28,0,0), simdScore( 4741, 31,0,0), simdScore(4967, 33,0,0) }
+		{ simdScore(-3951,-300,0,0), simdScore(-2843,-200,0,0), simdScore(-1016,-100,0,0), simdScore( 338,  0,0,0), simdScore(1693, 100,0,0), simdScore(3048, 200,0,0), // Knights
+				simdScore( 4176, 280,0,0), simdScore( 4741, 310,0,0), simdScore(4967, 330,0,0) }
 };
 
 const int KingExposed[] = {
@@ -348,7 +565,6 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 
 		unsigned int mobility= bitCnt(attack&~threatenSquares);
 		res+=mobilityBonus[piece%Position::separationBitmap][mobility];
-
 		//todo alfiere buono cattivo
 		//todo controllo centro
 		//todo trapped pieces
@@ -479,9 +695,26 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	state &st =getActualState();
 	simdScore res=simdScore(st.material[0],st.material[1],0,0);
 
-	if(materialEval(*this))
+	//-----------------------------------------------------
+	//	material evalutation
+	//-----------------------------------------------------
+	const materialStruct* materialData=getMaterialData(*this);
+	if(materialData)
 	{
-		return 0;
+		switch(materialData->type){
+		case materialStruct::exact:
+			return materialData->val;
+			break;
+		case materialStruct::additiveFunction:
+			break;
+		case materialStruct::exactFunction:
+			Score res;
+
+			if(materialData->pointer(*this,res)){
+				return res;
+			}
+			break;
+		}
 	}
 
 	//---------------------------------------------
@@ -494,6 +727,29 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	else{
 		res+=tempo;
 	}
+
+	//---------------------------------------------
+	//	imbalancies
+	//---------------------------------------------
+	//	bishop pair
+
+	if(pieceCount[whiteBishops]>=2 ){
+		if(pieceCount[whiteBishops]==2 && SQUARE_COLOR[pieceList[whiteBishops][0]]==SQUARE_COLOR[pieceList[whiteBishops][1]]){
+		}
+		else{
+			res+=simdScore(5000,5000,0,0);
+		}
+	}
+
+	if(pieceCount[blackBishops]>=2 ){
+		if(pieceCount[blackBishops]==2 && SQUARE_COLOR[pieceList[blackBishops][0]]==SQUARE_COLOR[pieceList[blackBishops][1]]){
+		}
+		else{
+			res-=simdScore(5000,5000,0,0);
+		}
+	}
+
+
 
 	//todo specialized endgame & scaling function
 	//todo material imbalance
@@ -592,6 +848,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	res+=pawnResult;
 
 
+
 	// todo supported squares
 
 
@@ -617,7 +874,38 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 	//todo attacked squares
 
-	//todo space
+	//---------------------------------------
+	//	space
+	//---------------------------------------
+	// white pawns
+	bitMap spacew =bitBoard[whitePawns];
+	spacew|=spacew>>8;
+	spacew|=spacew>>16;
+	spacew|=spacew>>32;
+	spacew &=~attackedSquares[blackPawns];
+	spacew &=~attackedSquares[blackKnights];
+	spacew &=~attackedSquares[blackBishops];
+	spacew &=~attackedSquares[blackRooks];
+	spacew &=~attackedSquares[blackQueens];
+	//displayBitmap(spacew);
+
+
+
+	// black pawns
+	bitMap spaceb =bitBoard[blackPawns];
+	spaceb|=spaceb<<8;
+	spaceb|=spaceb<<16;
+	spaceb|=spaceb<<32;
+	spaceb &=~attackedSquares[whitePawns];
+	spaceb &=~attackedSquares[whiteKnights];
+	spaceb &=~attackedSquares[whiteBishops];
+	spaceb &=~attackedSquares[whiteRooks];
+	spaceb &=~attackedSquares[whiteQueens];
+	//displayBitmap(spaceb);
+	res+=(bitCnt(spacew)-bitCnt(spaceb))*simdScore(100,0,0,0);
+
+
+
 
 	//todo counterattack??
 
@@ -708,6 +996,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 
 	}
+
 
 	//--------------------------------------
 	//	finalizing
