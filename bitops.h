@@ -65,7 +65,7 @@ static inline unsigned int bitCnt(bitMap bitmap)
 static inline tSquare firstOne(bitMap bitmap)
 {
 #if __x86_64__
-	return __builtin_ctzll(bitmap);
+	return (tSquare)__builtin_ctzll(bitmap);
 #else
 	assert(bitmap);
 

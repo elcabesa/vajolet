@@ -30,7 +30,7 @@ struct HashTable
 {
 public:
 	HashTable() : e(Size, Entry()) {}
-	Entry* operator[](U64 k) { return &e[(unsigned int)k % (Size)]; }
+	Entry* operator[](U64 k) {return &e[(unsigned int)k % (Size)]; }
 
 private:
   std::vector<Entry> e;
@@ -46,7 +46,7 @@ public:
 	bitMap pawnAttacks[2];
 	bitMap weakSquares[2];
 	bitMap holes[2];
-	simdScore res;
+	Score res[2];
 };
 
 class pawnTable
@@ -55,9 +55,12 @@ public:
 	void insert(U64 key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
 		pawnEntry* x=pawnTable[key];
 		x->key=key;
-		x->res=res;
+		x->res[0]=res[0];
+		x->res[1]=res[1];
+
 		x->weakPawns=weak;
 		x->passedPawns=passed;
+
 		x->pawnAttacks[0]=whiteAttack;
 		x->pawnAttacks[1]=blackAttack;
 		x->weakSquares[0]=weakSquareWhite;

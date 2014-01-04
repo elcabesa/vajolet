@@ -665,6 +665,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 */
 Score Position::eval(pawnTable& pawnHashTable) const {
 
+
 	bitMap attackedSquares[lastBitboard]={0};
 	bitMap weakSquares[2]={0};
 	bitMap holes[2]={0};
@@ -694,6 +695,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	// material + pst
 	state &st =getActualState();
 	simdScore res=simdScore(st.material[0],st.material[1],0,0);
+
 
 	//-----------------------------------------------------
 	//	material evalutation
@@ -728,6 +730,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		res+=tempo;
 	}
 
+
 	//---------------------------------------------
 	//	imbalancies
 	//---------------------------------------------
@@ -756,6 +759,8 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	bitMap weakPawns=0;
 	bitMap passedPawns=0;
 
+
+
 	//----------------------------------------------
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
@@ -766,7 +771,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	simdScore pawnResult;
 	pawnEntry* probePawn= pawnHashTable.probe(getActualState().pawnKey);
 	if(probePawn!=nullptr){
-		pawnResult=probePawn->res;
+		pawnResult=simdScore(probePawn->res[0],probePawn->res[1],0,0);
 		weakPawns=probePawn->weakPawns;
 		passedPawns=probePawn->passedPawns;
 		attackedSquares[whitePawns]=probePawn->pawnAttacks[0];
@@ -779,6 +784,8 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 	}
 	else{
+
+
 		pawnResult=0;
 		bitMap pawns= bitBoard[whitePawns];
 
@@ -795,6 +802,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 			pawnResult-=evalPawn<black>(*this,sq, weakPawns, passedPawns);
 			pawns &= pawns-1;
 		}
+
 
 
 		bitMap temp=bitBoard[whitePawns];
@@ -829,15 +837,13 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		holes[white]= weakSquares[white]&temp;
 
 
+
 		temp=bitBoard[blackPawns]>>8;
 		temp|=temp>>8;
 		temp|=temp>>16;
 		temp|=temp>>32;
 
 		holes[black]= weakSquares[black]&temp;
-
-
-
 
 		pawnHashTable.insert(getActualState().pawnKey,pawnResult, weakPawns, passedPawns,attackedSquares[whitePawns],attackedSquares[blackPawns],weakSquares[white],weakSquares[black],holes[white],holes[black]);
 

@@ -54,7 +54,10 @@ void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score al
 	std::cout<<(res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
 
 
-	std::cout<<" nodes "<<nodes<<" nps "<<(unsigned int)((double)nodes*1000/(time))<<" time "<<(time);
+	std::cout<<" nodes "<<nodes;
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+	std::cout<<" nps "<<(unsigned int)((double)nodes*1000/(time))<<" time "<<(time);
+#endif
 	std::cout<<" pv ";
 	for (auto it= PV.begin(); it != PV.end(); ++it){
 		std::cout<<p.displayUci(*it)<<" ";
@@ -109,7 +112,7 @@ void search::startThinking(Position & p,searchLimits & l){
 
 	}
 
-	unsigned int PVSize = std::min(search::multiPVLines, rootMoves.size());
+	unsigned int PVSize = std::min(search::multiPVLines, (unsigned int)rootMoves.size());
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
@@ -295,7 +298,7 @@ void search::startThinking(Position & p,searchLimits & l){
 			p.getActualState().excludedMove=newPV[0];
 			p.getActualState().skipNullMove=true;
 			std::vector<Move> locChildPV;
-			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0,p,depth-3,rBeta-1,rBeta,locChildPV);
+			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0,p,(depth-3)*ONE_PLY,rBeta-1,rBeta,locChildPV);
 			p.getActualState().skipNullMove=false;
 			p.getActualState().excludedMove.packed=0;
 
