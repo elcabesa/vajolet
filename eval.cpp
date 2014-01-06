@@ -754,6 +754,8 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 
 
+
+
 	//todo specialized endgame & scaling function
 	//todo material imbalance
 	bitMap weakPawns=0;
@@ -783,7 +785,8 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 
 	}
-	else{
+	else
+	{
 
 
 		pawnResult=0;
@@ -854,7 +857,6 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	res+=pawnResult;
 
 
-
 	// todo supported squares
 
 
@@ -912,7 +914,6 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 
 
-
 	//todo counterattack??
 
 	//todo weakpawn
@@ -937,6 +938,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	if(pawnFarShield){
 		res+=bitCnt(pawnFarShield)*kingFarShieldBonus;
 	}
+
 	pawnShield=kingShield[black]&bitBoard[blackPawns];
 	pawnFarShield=kingFarShield[black]&bitBoard[blackPawns];
 	if(pawnShield){
@@ -945,6 +947,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	if(pawnFarShield){
 		res-=bitCnt(pawnFarShield)*kingFarShieldBonus;
 	}
+
 
 
 	if(kingAttackersCount[white]>=2 && kingAdjacentZoneAttacksCount[white])
@@ -966,7 +969,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 		unsigned int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[white] * kingAttackersWeight[white]) / 2)
 		                     + 3 * (kingAdjacentZoneAttacksCount[white] + bitCnt(undefendedSquares))
-		                     + KingExposed[64-pieceList[blackKing][0]];
+		                     + KingExposed[63-pieceList[blackKing][0]];
 		                     //- mg_value(score) / 32;
 		attackUnits = std::min((unsigned int)99, std::max((unsigned int)0, attackUnits));
 		attackUnits*=attackUnits;
