@@ -279,7 +279,11 @@ void search::startThinking(Position & p,searchLimits & l){
 				std::stable_sort(rootMoves.begin(), rootMoves.begin() + PVIdx + 1);
 				//sync_cout<<"stable sort ok "<<sync_endl;
 				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-				if (PVIdx + 1 == PVSize || now - startTime > 3000){
+				if (PVIdx + 1 == PVSize
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+					|| now - startTime > 3000
+#endif
+				){
 					//sync_cout<<"print pv "<<sync_endl;
 					printAllPV(depth,p, PVIdx);
 				}
@@ -758,7 +762,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 		}
 
-		if(type==ROOT_NODE && std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime>3000 && !signals.stop){
+		if(type==ROOT_NODE
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+				&& std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime>3000
+#endif
+				&& !signals.stop
+				){
 			sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<< sync_endl;
 		}
 
@@ -1149,6 +1158,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		Score val;
 		std::vector<Move> childPV;
 		val=-qsearch<childNodesType>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
+
 		pos.undoMove(m);
 
 
