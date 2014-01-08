@@ -73,6 +73,10 @@ int main()
 	//----------------------------------
 	printStartInfo();
 
+#ifdef PRINT_STATISTICS
+	Statistics::instance().initNodeTypeStat();
+#endif
+
 	uciLoop();
 
 

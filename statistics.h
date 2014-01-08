@@ -31,6 +31,14 @@ public :
 	  return instance;
 	}
 
+	bool testedAll;
+	unsigned long long testedAllPruning;
+	unsigned long long correctAllPruning;
+
+	bool testedCut;
+	unsigned long long testedCutPruning;
+	unsigned long long correctCutPruning;
+
 	unsigned long long testedNodeTypeCut;
 	unsigned long long testedNodeTypeAll;
 	unsigned long long testedNodeTypePv;

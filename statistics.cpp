@@ -31,6 +31,14 @@ void Statistics::printNodeTypeStat(){
 	sync_cout<<"PV type %error : "<<(signed long long)(testedNodeTypePv-resultNodeTypePv)/float(resultNodeTypePv)*100.0<<sync_endl;
 	sync_cout<<"Cut type %error : "<<(signed long long)(testedNodeTypeCut-resultNodeTypeCut)/float(resultNodeTypeCut)*100.0<<sync_endl;
 	sync_cout<<"All type %error : "<<(signed long long)(testedNodeTypeAll-resultNodeTypeAll)/float(resultNodeTypeAll)*100.0<<sync_endl;
+
+	sync_cout<<"tested All razoring: "<<testedAllPruning<<sync_endl;
+	sync_cout<<"correct All razoring: "<<correctAllPruning<<sync_endl;
+	sync_cout<<"% correct All pruning: "<<(signed long long)(correctAllPruning)/float(testedAllPruning)*100.0<<std::endl<<sync_endl;
+
+	sync_cout<<"tested Cut razoring: "<<testedCutPruning<<sync_endl;
+	sync_cout<<"correct Cut razoring: "<<correctCutPruning<<sync_endl;
+	sync_cout<<"% correct Cut pruning: "<<(signed long long)(correctCutPruning)/float(testedCutPruning)*100.0<<std::endl<<sync_endl;
 }
 
 void Statistics::gatherNodeTypeStat(search::nodeType expectedNodeType,search::nodeType resultNodeType){
@@ -75,6 +83,14 @@ void Statistics::initNodeTypeStat(){
 	resultNodeTypeCut=0;
 	resultNodeTypeAll=0;
 	resultNodeTypePv=0;
+
+	testedAll=0;
+	testedAllPruning=0;
+	correctAllPruning=0;
+
+	testedCut=0;
+	testedCutPruning=0;
+	correctCutPruning=0;
 }
 
 

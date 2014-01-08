@@ -22,34 +22,41 @@
 
 
 void timeManagerInit(Position& pos, searchLimits& lim, timeManagementStruct& timeMan){
-	if(lim.depth
-		||lim.moveTime
-		||lim.nodes)
-	{
+	if((!lim.btime || !lim.wtime) && !lim.moveTime){
 		lim.infinite=true;
 	}
-	if(pos.getActualState().nextMove){
-		if(lim.movesToGo>0){
-			timeMan.allocatedTime=std::min((lim.btime*4.0)/lim.movesToGo,lim.btime*0.8);
-			timeMan.maxSearchTime=timeMan.allocatedTime;
-		}else{
-			timeMan.allocatedTime=(float)(lim.btime)/10.0;
-			timeMan.maxSearchTime=timeMan.allocatedTime;
-		}
+	if(lim.moveTime){
+		timeMan.allocatedTime=lim.moveTime;
+		timeMan.maxSearchTime=lim.moveTime;
+		timeMan.minSearchTime=lim.moveTime;
+		timeMan.resolution=std::min((unsigned long int)100,timeMan.allocatedTime/100);
 	}
 	else{
-		if(lim.movesToGo>0){
-			timeMan.allocatedTime=std::min((lim.wtime*4.0)/lim.movesToGo,lim.wtime*0.8);
-			timeMan.maxSearchTime=timeMan.allocatedTime;
-		}else{
-			timeMan.allocatedTime=(float)(lim.wtime)/10.0;
-			timeMan.maxSearchTime=timeMan.allocatedTime;
+		if(pos.getActualState().nextMove){
+			if(lim.movesToGo>0){
+				timeMan.allocatedTime=std::min((lim.btime*4.0)/lim.movesToGo,lim.btime*0.8);
+				timeMan.maxSearchTime=timeMan.allocatedTime;
+			}else{
+				timeMan.allocatedTime=(float)(lim.btime)/10.0;
+				timeMan.maxSearchTime=timeMan.allocatedTime;
+			}
 		}
-	}
+		else{
+			if(lim.movesToGo>0){
+				timeMan.allocatedTime=std::min((lim.wtime*4.0)/lim.movesToGo,lim.wtime*0.8);
+				timeMan.maxSearchTime=timeMan.allocatedTime;
+			}else{
+				timeMan.allocatedTime=(float)(lim.wtime)/10.0;
+				timeMan.maxSearchTime=timeMan.allocatedTime;
+			}
+		}
 
-	timeMan.minSearchTime=timeMan.allocatedTime*0.1;
+		timeMan.minSearchTime=timeMan.allocatedTime*0.1;
+		timeMan.resolution=std::min((unsigned long int)100,timeMan.allocatedTime/100);
+	}
 	timeMan.singularRootMoveCount=0;
 	timeMan.idLoopRequestToExtend=false;
+
 
 
 }
@@ -61,6 +68,7 @@ Position *my_thread::pos;
 search my_thread::src;
 timeManagementStruct my_thread::timeMan;
 searchLimits my_thread::limits;
+
 
 std::mutex my_thread::searchMutex;
 std::condition_variable my_thread::searchCond;
@@ -81,7 +89,7 @@ void my_thread::timerThread() {
 		std::unique_lock<std::mutex> lk(mutex);
 
 		if (!quit){
-			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
 			unsigned long time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
 			if(time>=timeMan.allocatedTime && !(limits.infinite || limits.ponder)){
 				src.signals.stop=true;

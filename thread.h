@@ -35,6 +35,7 @@ typedef struct timeManagement{
 	bool idLoopIterationFinished;
 	unsigned int singularRootMoveCount;
 	bool idLoopRequestToExtend;
+	unsigned int resolution;
 } timeManagementStruct;
 
 

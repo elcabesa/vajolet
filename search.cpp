@@ -80,9 +80,7 @@ void search::startThinking(Position & p,searchLimits & l){
 	TT.newSearch();
 	History::instance().clear();
 
-#ifdef PRINT_STATISTICS
-	Statistics::instance().initNodeTypeStat();
-#endif
+
 
 	limits=l;
 	rootMoves.clear();
@@ -469,16 +467,18 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		}
 
 	}
-
+#ifdef PRINT_STATISTICS
+	Statistics::instance().testedAll=false;
+	Statistics::instance().testedCut=false;
+#endif
 	//------------------------
 	// razoring
 	//------------------------
-	// TODO trovare un valore buono da mettere al posto di +30000 ( sara' una funzione di depth??)
 	if (!PVnode
 		&& !inCheck
 		&&  depth < 4 * ONE_PLY
 		&&  eval + razorMargin(depth) < beta
-		&&  !ttMove.packed
+		&&  ((type==CUT_NODE &&!ttMove.packed ) || type==ALL_NODE)
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&& !((pos.getActualState().nextMove && (pos.bitBoard[Position::blackPawns] & RANKMASK[A2])) || (!pos.getActualState().nextMove && (pos.bitBoard[Position::whitePawns] & RANKMASK[A7]) ) )
 	)
@@ -489,6 +489,14 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		if (v < rbeta)
 		{
 #ifdef PRINT_STATISTICS
+			if(type==ALL_NODE){
+				Statistics::instance().testedAll=true;
+				Statistics::instance().testedAllPruning++;
+			}
+			else{
+				Statistics::instance().testedCut=true;
+				Statistics::instance().testedCutPruning++;
+			}
 			Statistics::instance().gatherNodeTypeStat(type,ALL_NODE);
 #endif
 			return v;
@@ -890,13 +898,27 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			}
 
 
+
+
 			if(doFullDepthSearch){
 				childPV.clear();
-				if(newDepth<ONE_PLY){
-					val=-qsearch<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
-				}else{
-					val=-alphaBeta<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
+
+				if(moveNumber<5){
+					if(newDepth<ONE_PLY){
+						val=-qsearch<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
+					}else{
+						val=-alphaBeta<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
+					}
 				}
+				else{
+					if(newDepth<ONE_PLY){
+						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
+					}else{
+						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
+					}
+
+				}
+
 			}
 		}
 
@@ -985,6 +1007,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	}else if(PVnode && bestMove.packed){
 		Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
 	}else{
+		if(Statistics::instance().testedAll==true){
+			Statistics::instance().correctAllPruning++;
+		}
+		if(Statistics::instance().testedCut==true){
+			Statistics::instance().correctCutPruning++;
+		}
 		Statistics::instance().gatherNodeTypeStat(type,ALL_NODE);
 	}
 #endif
