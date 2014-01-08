@@ -55,7 +55,6 @@ void timeManagerInit(Position& pos, searchLimits& lim, timeManagementStruct& tim
 		timeMan.resolution=std::min((unsigned long int)100,timeMan.allocatedTime/100);
 	}
 	timeMan.singularRootMoveCount=0;
-	timeMan.idLoopRequestToExtend=false;
 
 
 
@@ -81,7 +80,7 @@ void my_thread::timerThread() {
 	// TODO change time based on PV changing during the search.
 	/*
 	 * provare, usando la statistica e la define PRINT_PV_CHANGES a capire quante volte cambia la PV durante la ricerca,
-	 * dargli uun peso in base al depth^2 e decidere in base a soglie o rapporti con i nodi etc se la posizione è calma o problematica
+	 * dargli uun peso in base al depth^2 e decidere in base a soglie o rapporti con i nodi etc se la posizione ï¿½ calma o problematica
 	*/
 	std::mutex mutex;
 	while (!quit)
@@ -92,6 +91,9 @@ void my_thread::timerThread() {
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
 			unsigned long time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
 			if(time>=timeMan.allocatedTime && !(limits.infinite || limits.ponder)){
+				/*if(startThink){
+					sync_cout<<"STOPPPPE"<<sync_endl;
+				}*/
 				src.signals.stop=true;
 			}
 			if(timeMan.idLoopIterationFinished && time>=timeMan.allocatedTime*0.6 && !(limits.infinite || limits.ponder)){
@@ -111,15 +113,8 @@ void my_thread::timerThread() {
 			if(limits.moveTime && time>=limits.moveTime){
 				src.signals.stop=true;
 			}
-
-			if(timeMan.idLoopRequestToExtend){
-				timeMan.idLoopRequestToExtend=false;
-				timeMan.allocatedTime=timeMan.maxSearchTime;
-			}
-			if(timeMan.idLoopIterationFinished){
-				timeMan.allocatedTime=std::max(timeMan.minSearchTime,(unsigned long int)(timeMan.allocatedTime*0.87));
-			}
 			timeMan.idLoopIterationFinished=false;
+
 
 
 		}

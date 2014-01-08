@@ -256,8 +256,9 @@ void search::startThinking(Position & p,searchLimits & l){
 					//sync_cout<<"new alpha "<<alpha<<sync_endl;
 				}
 				else if (res >= beta){
-					if(oldBestMove!=newPV[0]){
-					my_thread::timeMan.idLoopRequestToExtend=true;
+					if(oldBestMove.packed && oldBestMove!=newPV[0]){
+						my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
+						sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 					}
 					//sync_cout<<"res>=beta "<<sync_endl;
 					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
@@ -309,14 +310,18 @@ void search::startThinking(Position & p,searchLimits & l){
 			}
 		}
 
-		if(oldBestMove!=newPV[0]){
-			my_thread::timeMan.idLoopRequestToExtend=true;
+		if(oldBestMove.packed && oldBestMove!=newPV[0]){
+			my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
+			//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 		}
 		oldBestMove=newPV[0];
 
 		my_thread::timeMan.depth=depth;
-		my_thread::timeMan.idLoopIterationFinished=true;
+		unsigned long time=my_thread::timeMan.minSearchTime;
+		my_thread::timeMan.allocatedTime=std::max(time,(unsigned long int)(my_thread::timeMan.allocatedTime*0.87));
+		//sync_cout<<"nuovo tempo allocato="<<my_thread::timeMan.allocatedTime<<sync_endl;
 
+		my_thread::timeMan.idLoopIterationFinished=true;
 
 
 		depth+=1;

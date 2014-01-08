@@ -100,7 +100,7 @@ public:
 				nonPVreduction[d][mc]=(Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
 			}
 	};
-	struct sSignal{
+	volatile struct sSignal{
 		volatile bool stop=false;
 	}signals;
 

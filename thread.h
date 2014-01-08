@@ -28,14 +28,13 @@
 
 
 typedef struct timeManagement{
-	unsigned long allocatedTime;
-	unsigned long minSearchTime;
-	unsigned long maxSearchTime;
-	unsigned int depth;
-	bool idLoopIterationFinished;
-	unsigned int singularRootMoveCount;
-	bool idLoopRequestToExtend;
-	unsigned int resolution;
+	volatile unsigned long allocatedTime;
+	volatile unsigned long minSearchTime;
+	volatile unsigned long maxSearchTime;
+	volatile unsigned int depth;
+	volatile unsigned int singularRootMoveCount;
+	volatile unsigned int resolution;
+	volatile bool idLoopIterationFinished;
 } timeManagementStruct;
 
 
