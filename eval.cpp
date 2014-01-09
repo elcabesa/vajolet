@@ -1011,9 +1011,13 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	//	finalizing
 	//--------------------------------------
 	float gamePhase=getGamePhase();
+	Vec2d gp= Vec2d(1-gamePhase,gamePhase);
+	Vec2d dRes= reinterpret_d(res);
+	double total=horizontal_add(gp*dRes);
+	Vec2d dtot= total;
 
-	float r=res[0]*(1-gamePhase)+(res[1])*gamePhase;
-	Score score =(r);
+	simdScore sc=reinterpret_i(dtot);
+	Score score =sc[0];
 
 
 	if(st.nextMove)
