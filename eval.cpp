@@ -1017,15 +1017,12 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	Vec2d dtot= total;
 
 	simdScore sc=reinterpret_i(dtot);
-	Score score =sc[0];
-
-
 	if(st.nextMove)
 	{
-		return -score;
+		return -sc[0];
 	}
 	else{
-		return score;
+		return sc[0];
 	}
 
 }
