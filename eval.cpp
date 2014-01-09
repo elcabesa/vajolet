@@ -1010,10 +1010,10 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	//--------------------------------------
 	//	finalizing
 	//--------------------------------------
-	signed int gamePhase=getGamePhase();
+	float gamePhase=getGamePhase();
 
-	signed long long r=((signed long long)res[0])*(65536-gamePhase)+((signed long long)res[1])*gamePhase;
-	Score score =(r)/65536;
+	float r=res[0]*(1-gamePhase)+(res[1])*gamePhase;
+	Score score =(r);
 
 
 	if(st.nextMove)

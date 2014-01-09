@@ -49,6 +49,7 @@ class my_thread{
 	std::thread searcher;
 	static std::mutex searchMutex;
 	static std::condition_variable searchCond;
+	static std::condition_variable timerCond;
 	static Position *pos;
 	static search src;
 	static searchLimits limits;
@@ -83,6 +84,7 @@ public :
 			pos=p;
 			startThink=true;
 			searchCond.notify_one();
+
 		}
 
 	}

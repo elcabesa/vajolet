@@ -396,17 +396,17 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline unsigned int getGamePhase() const{
+	inline float getGamePhase() const{
 		Score tot=getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
 		if(tot>570000){ //opening
-			return 0;
+			return 0.0;
 
 		}
 		if(tot<120000){	//endgame
-			return 65536;
+			return 1.0;
 
 		}
-		return (570000-tot)*(65536/(570000-120000));
+		return (570000-tot)*(1.0/(570000-120000));
 	}
 
 

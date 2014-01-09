@@ -22,7 +22,7 @@
 
 
 void timeManagerInit(Position& pos, searchLimits& lim, timeManagementStruct& timeMan){
-	if((!lim.btime || !lim.wtime) && !lim.moveTime){
+	if((!lim.btime && !lim.wtime) && !lim.moveTime){
 		lim.infinite=true;
 	}
 	if(lim.moveTime){
@@ -55,6 +55,7 @@ void timeManagerInit(Position& pos, searchLimits& lim, timeManagementStruct& tim
 		timeMan.resolution=std::min((unsigned long int)100,timeMan.allocatedTime/100);
 	}
 	timeMan.singularRootMoveCount=0;
+	timeMan.idLoopIterationFinished=false;
 
 
 
@@ -71,6 +72,7 @@ searchLimits my_thread::limits;
 
 std::mutex my_thread::searchMutex;
 std::condition_variable my_thread::searchCond;
+std::condition_variable my_thread::timerCond;
 
 unsigned long my_thread::startTime;
 
@@ -87,6 +89,7 @@ void my_thread::timerThread() {
 	{
 		std::unique_lock<std::mutex> lk(mutex);
 
+		timerCond.wait(lk,[&]{return startThink||quit;});
 		if (!quit){
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
 			unsigned long time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
@@ -132,11 +135,11 @@ void my_thread::searchThread() {
 		if(!quit){
 			timeManagerInit(*pos, limits,timeMan);
 			startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+			timerCond.notify_one();
 			src.startThinking(*pos,limits);
 			//sync_cout<<"startThink=false"<<sync_endl;
 			startThink=false;
 			//sync_cout<<startThink<<sync_endl;
-
 		}
 		lk.unlock();
 	}

@@ -258,7 +258,7 @@ void search::startThinking(Position & p,searchLimits & l){
 				else if (res >= beta){
 					if(oldBestMove.packed && oldBestMove!=newPV[0]){
 						my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
-						sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
+						//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 					}
 					//sync_cout<<"res>=beta "<<sync_endl;
 					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
