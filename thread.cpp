@@ -158,6 +158,7 @@ void my_thread::initThreads(){
 void my_thread::quitThreads(){
 	quit=true;
 	searchCond.notify_one();
+	timerCond.notify_one();
 	timer.join();
 	searcher.join();
 

@@ -217,7 +217,7 @@ void search::startThinking(Position & p,searchLimits & l){
 			do{
 
 				//sync_cout<<"SEARCH"<<sync_endl;
-				selDepth=0;
+				selDepth=selDepthBase;
 				newPV.clear();
 				p.cleanStateInfo();
 				res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,depth*ONE_PLY,alpha,beta,newPV);
