@@ -134,7 +134,6 @@ void static doPerft(unsigned int n, Position & pos){
 
 
 void static go(std::istringstream& is, Position & pos, my_thread & thr) {
-
 	searchLimits limits;
 	std::string token;
 
