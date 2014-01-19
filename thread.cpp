@@ -75,6 +75,7 @@ std::condition_variable my_thread::searchCond;
 std::condition_variable my_thread::timerCond;
 
 unsigned long my_thread::startTime;
+unsigned long my_thread::lastHasfullMessage;
 
 
 
@@ -98,6 +99,11 @@ void my_thread::timerThread() {
 					sync_cout<<"STOPPPPE"<<sync_endl;
 				}*/
 				src.signals.stop=true;
+			}
+
+			if(time - lastHasfullMessage>1000){
+				lastHasfullMessage=time;
+				sync_cout<<"info hashfull "<<TT.getFullness()<<sync_endl;
 			}
 			if(timeMan.idLoopIterationFinished && time>=timeMan.allocatedTime*0.6 && !(limits.infinite || limits.ponder)){
 				src.signals.stop=true;

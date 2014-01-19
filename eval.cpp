@@ -39,7 +39,9 @@ typedef struct{
 	enum {
 		exact,
 		additiveFunction,
-		exactFunction
+		exactFunction,
+		saturationH,
+		saturationL
 	}type ;
 	bool (*pointer)(const Position & ,Score &);
 	Score val;
@@ -97,6 +99,9 @@ void initMaterialKeys(void){
 	 * kmm vs km	->	draw
 	 *
 	 * kbp vs k		->	probable draw on the rook file
+	 *
+	 * kb vs kpawns	-> bishop cannot win
+	 * kn vs kpawns	-> bishop cannot win
 	 *
 	 ----------------------------------------------*/
 
@@ -298,6 +303,126 @@ void initMaterialKeys(void){
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
+	//------------------------------------------
+	//	kb vs Kpawns
+	//------------------------------------------
+	t.type=materialStruct::saturationL;
+	t.pointer=nullptr;
+	t.val=0;
+	p.setupFromFen("kb6/8/8/8/8/8/7P/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kb6/8/8/8/8/8/6PP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kb6/8/8/8/8/8/5PPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kb6/8/8/8/8/8/4PPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kb6/8/8/8/8/8/3PPPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kb6/8/8/8/8/8/2PPPPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kb6/8/8/8/8/8/1PPPPPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kb6/8/8/8/8/8/PPPPPPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+
+	t.type=materialStruct::saturationH;
+	t.pointer=nullptr;
+	t.val=0;
+	p.setupFromFen("k7/8/8/8/8/8/7p/6BK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/6pp/6BK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/5ppp/6BK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/4pppp/6BK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/3ppppp/6BK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/2pppppp/6BK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/1ppppppp/6BK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/ppppppp/6BK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+
+
+	//------------------------------------------
+	//	kn vs Kpawns
+	//------------------------------------------
+	t.type=materialStruct::saturationL;
+	t.pointer=nullptr;
+	t.val=0;
+	p.setupFromFen("kn6/8/8/8/8/8/7P/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kn6/8/8/8/8/8/6PP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kn6/8/8/8/8/8/5PPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kn6/8/8/8/8/8/4PPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kn6/8/8/8/8/8/3PPPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kn6/8/8/8/8/8/2PPPPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kn6/8/8/8/8/8/1PPPPPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("kn6/8/8/8/8/8/PPPPPPPP/7K w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+
+	t.type=materialStruct::saturationH;
+	t.pointer=nullptr;
+	t.val=0;
+	p.setupFromFen("k7/8/8/8/8/8/7p/6NK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/6pp/6NK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/5ppp/6NK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/4pppp/6NK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/3ppppp/6NK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/2pppppp/6NK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/1ppppppp/6NK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+	p.setupFromFen("k7/8/8/8/8/8/ppppppp/6NK w - -");
+	key=p.getActualState().materialKey;
+	materialKeyMap.insert({key,t});
+
+
 
 
 
@@ -402,6 +527,29 @@ simdScore bishopOnOutpostSupported= simdScore(1900,170,0,0);
 simdScore bishopOnHole= simdScore(290,370,0,0);
 
 simdScore tempo= simdScore(1540,421,0,0);
+
+simdScore attackedByPawnPenalty[Position::separationBitmap]=
+{	simdScore(0,0,0,0),
+	simdScore(0,0,0,0),//king
+	simdScore(2500,3200,0,0),//queen
+	simdScore(1325,1527,0,0),//rook
+	simdScore(1300,1450,0,0),//bishop
+	simdScore(1200,1350,0,0),//knight
+	simdScore(0,0,0,0),//pawn
+	simdScore(0,0,0,0),
+};
+
+simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitmap]=
+{	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(0,0,0,0),			simdScore(0,0,0,0),		simdScore(0,0,0,0),		simdScore(0,0,0,0),	simdScore(0,0,0,0),	simdScore(0,0,0,0)},
+	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(0,0,0,0),			simdScore(0,0,0,0),		simdScore(0,0,0,0),		simdScore(0,0,0,0),	simdScore(0,0,0,0),	simdScore(0,0,0,0)},//king
+	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(600,400,0,0),		simdScore(802,420,0,0),	simdScore(1200,1000,0,0),simdScore(1200,1000,0,0),simdScore(3200,2000,0,0),	simdScore(0,0,0,0)},//queen
+	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(400,200,0,0),		simdScore(420,320,0,0),	simdScore(800,600,0,0),	simdScore(700,400,0,0),	simdScore(2400,2000,0,0),	simdScore(0,0,0,0)},//rook
+	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(200,100,0,0),		simdScore(220,150,0,0),	simdScore(400,200,0,0),	simdScore(500,300,0,0),	simdScore(1000,890,0,0),	simdScore(0,0,0,0)},//bishop
+	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(200,100,0,0),	simdScore(221,147,0,0),	simdScore(423,217,0,0),	simdScore(423,417,0,0),	simdScore(890,954,0,0),	simdScore(0,0,0,0)},//knight
+	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(50,40,0,0),	simdScore(60,50,0,0),	simdScore(100,80,0,0),	simdScore(150,90,0,0),	simdScore(200,170,0,0),	simdScore(0,0,0,0)},//pawn
+	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(0,0,0,0),			simdScore(0,0,0,0),		simdScore(0,0,0,0),	simdScore(0,0,0,0),	simdScore(0,0,0,0),	simdScore(0,0,0,0)}
+//						king				queen						rook					bishop				knight				pawn
+};
 //------------------------------------------------
 //king safety
 //------------------------------------------------
@@ -419,7 +567,7 @@ simdScore evalPawn(const Position & p,tSquare sq, bitMap & weakPawns, bitMap & p
 	const bitMap theirPawns =c?p.bitBoard[Position::whitePawns]:p.bitBoard[Position::blackPawns];
 	bitMap b;
 	const int relativeRank =c?7-RANKS[sq] :RANKS[sq];
-	const int file =FILES[sq];
+	//const int file =FILES[sq];
 
 	// Our rank plus previous one. Used for chain detection
     b = RANKMASK[sq] | RANKMASK[sq-pawnPush(c)];
@@ -475,19 +623,19 @@ simdScore evalPawn(const Position & p,tSquare sq, bitMap & weakPawns, bitMap & p
 
 	//passed pawn
 	if(passed &&!doubled){
-		int r=relativeRank-1;
+		/*int r=relativeRank-1;
 		int rr= r*(r-1);
 
-		res+=simdScore(600*rr,1100*(rr+r+1),0,0);
+		res+=simdScore(600*rr,1100*(rr+r+1),0,0);*/
 
 		passedPawns|=BITSET[sq];
 
-		if(file==0 || file==7){
+		/*if(file==0 || file==7){
 			res -=passedPawnFileAHPenalty;
 		}
 		if(chain){
 			res+=passedPawnSupportedBonus*r;
-		}
+		}*/
 	}
 
 	if ( !passed && !isolated && !doubled && !opposed && bitCnt( PASSED_PAWN[c][sq] & theirPawns ) < bitCnt(PASSED_PAWN[c][sq-pawnPush(c)] & ourPawns ))
@@ -665,6 +813,8 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 */
 Score Position::eval(pawnTable& pawnHashTable) const {
 
+	Score lowSat=-SCORE_INFINITE;
+	Score highSat=SCORE_INFINITE;
 
 	bitMap attackedSquares[lastBitboard]={0};
 	bitMap weakSquares[2]={0};
@@ -716,6 +866,12 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 				return res;
 			}
 			break;
+		case materialStruct::saturationH:
+			highSat=materialData->val;
+			break;
+		case materialStruct::saturationL:
+			lowSat=materialData->val;
+					break;
 		}
 	}
 
@@ -730,6 +886,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		res+=tempo;
 	}
 
+	//sync_cout<<"material:"<<res[0]<<":"<<res[1]<<sync_endl;
 
 	//---------------------------------------------
 	//	imbalancies
@@ -753,6 +910,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	}
 
 
+	//sync_cout<<"imbalance:"<<res[0]<<":"<<res[1]<<sync_endl;
 
 
 
@@ -766,10 +924,6 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	//----------------------------------------------
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
-	//todo king shield
-	//todo passed pawn post evalutation
-	//todo king near passed pawn
-	//todo supporting / counter passed pawn
 	simdScore pawnResult;
 	pawnEntry* probePawn= pawnHashTable.probe(getActualState().pawnKey);
 	if(probePawn!=nullptr){
@@ -857,6 +1011,9 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	res+=pawnResult;
 
 
+	//sync_cout<<"pawn:"<<res[0]<<":"<<res[1]<<sync_endl;
+
+
 	// todo supported squares
 
 
@@ -876,9 +1033,146 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 	//todo valutazione pezzi
 
+	//sync_cout<<"pieces:"<<res[0]<<":"<<res[1]<<sync_endl;
 	attackedSquares[whiteKing]=Movegen::attackFromKing(pieceList[whiteKing][0]);
 	attackedSquares[blackKing]=Movegen::attackFromKing(pieceList[blackKing][0]);
 
+	attackedSquares[whitePieces]=attackedSquares[whiteKing]
+								| attackedSquares[whiteKnights]
+								| attackedSquares[whiteBishops]
+								| attackedSquares[whiteRooks]
+								| attackedSquares[whiteQueens]
+								| attackedSquares[whitePawns];
+
+	attackedSquares[blackPieces]=attackedSquares[blackKing]
+								| attackedSquares[blackKnights]
+								| attackedSquares[blackBishops]
+								| attackedSquares[blackRooks]
+								| attackedSquares[blackQueens]
+								| attackedSquares[blackPawns];
+
+
+	//-----------------------------------------
+	//	passed pawn evalutation
+	//-----------------------------------------
+	// white passed pawns
+	bitMap pp=passedPawns&bitBoard[whitePawns];
+
+	while(pp){
+		simdScore passedPawnsBonus;
+		tSquare ppSq=firstOne(pp);
+
+		pp &= pp-1;
+
+		unsigned int relativeRank=RANKS[ppSq];
+
+		int r=relativeRank-1;
+		int rr= r*(r-1);
+
+		passedPawnsBonus=simdScore(600*rr,1100*(rr+r+1),0,0);
+
+		if(rr){
+			tSquare blockingSquare=ppSq+pawnPush(white);
+			// bonus for king proximity to blocking square
+			passedPawnsBonus+=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*50*rr,0,0);
+			passedPawnsBonus-=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*20*rr,0,0);
+
+			if(squares[blockingSquare]==empty){
+				bitMap forwardSquares=SQUARES_IN_FRONT_OF[0][ppSq];
+				bitMap defendedSquares = forwardSquares & attackedSquares[whitePieces];
+
+				bitMap unsafeSquares = forwardSquares & (attackedSquares[blackPieces] |bitBoard[blackPieces] );
+
+				if(unsafeSquares){
+					passedPawnsBonus-=simdScore(100*rr,100*rr,0,0);
+					if(unsafeSquares & bitSet(blockingSquare)){
+							passedPawnsBonus-=simdScore(100*rr,100*rr,0,0);
+					}
+				}
+				if(defendedSquares==forwardSquares){
+					passedPawnsBonus+=simdScore(100*rr,100*rr,0,0);
+					if(defendedSquares & bitSet(blockingSquare)){
+						passedPawnsBonus+=simdScore(20*rr,20*rr,0,0);
+					}
+				}
+			}
+		}
+
+		if(FILES[ppSq]==0 || FILES[ppSq]==7){
+			passedPawnsBonus -=passedPawnFileAHPenalty;
+		}
+		bitMap supportingPawns=bitBoard[whitePawns]&ISOLATED_PAWN[ppSq];
+		if(supportingPawns & RANKMASK[ppSq]){
+			passedPawnsBonus+=passedPawnSupportedBonus*r;
+		}
+		if(supportingPawns & RANKMASK[ppSq-pawnPush(0)]){
+			passedPawnsBonus+=passedPawnSupportedBonus*(r/2);
+		}
+
+		res+=passedPawnsBonus;
+
+	}
+
+	// todo unsotppable passed pawn: ( more value to unstoppable passed pawn, less value or 0 for stobbable ones
+	pp=passedPawns&bitBoard[blackPawns];
+
+	while(pp){
+		simdScore passedPawnsBonus;
+		tSquare ppSq=firstOne(pp);
+		pp &= pp-1;
+
+		unsigned int relativeRank=7-RANKS[ppSq];
+
+		int r=relativeRank-1;
+		int rr= r*(r-1);
+
+		passedPawnsBonus=simdScore(600*rr,1100*(rr+r+1),0,0);
+
+		if(rr){
+			tSquare blockingSquare=ppSq+pawnPush(black);
+
+			// bonus for king proximity to blocking square
+			passedPawnsBonus+=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*50*rr,0,0);
+			passedPawnsBonus-=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*20*rr,0,0);
+
+			if(squares[blockingSquare]==empty){
+				bitMap forwardSquares=SQUARES_IN_FRONT_OF[1][ppSq];
+				bitMap defendedSquares = forwardSquares & attackedSquares[blackPieces];
+
+				bitMap unsafeSquares = forwardSquares & (attackedSquares[whitePieces] | bitBoard[whitePieces]);
+
+
+				if(unsafeSquares){
+					passedPawnsBonus-=simdScore(100*rr,100*rr,0,0);
+					if(unsafeSquares & bitSet(blockingSquare)){
+							passedPawnsBonus-=simdScore(100*rr,100*rr,0,0);
+					}
+				}
+				if(defendedSquares==forwardSquares){
+					passedPawnsBonus+=simdScore(100*rr,100*rr,0,0);
+					if(defendedSquares & bitSet(blockingSquare)){
+						passedPawnsBonus+=simdScore(20*rr,20*rr,0,0);
+					}
+				}
+			}
+		}
+
+		if(FILES[ppSq]==0 || FILES[ppSq]==7){
+			passedPawnsBonus -=passedPawnFileAHPenalty;
+		}
+		bitMap supportingPawns=bitBoard[blackPawns]&ISOLATED_PAWN[ppSq];
+		if(supportingPawns & RANKMASK[ppSq]){
+			passedPawnsBonus+=passedPawnSupportedBonus*r;
+		}
+		if(supportingPawns & RANKMASK[ppSq-pawnPush(1)]){
+			passedPawnsBonus+=passedPawnSupportedBonus*(r/2);
+		}
+
+		res-=passedPawnsBonus;
+
+	}
+
+	//sync_cout<<"passedPawns:"<<res[0]<<":"<<res[1]<<sync_endl;
 
 	//todo attacked squares
 
@@ -890,11 +1184,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	spacew|=spacew>>8;
 	spacew|=spacew>>16;
 	spacew|=spacew>>32;
-	spacew &=~attackedSquares[blackPawns];
-	spacew &=~attackedSquares[blackKnights];
-	spacew &=~attackedSquares[blackBishops];
-	spacew &=~attackedSquares[blackRooks];
-	spacew &=~attackedSquares[blackQueens];
+	spacew &=~attackedSquares[blackPieces];
 	//displayBitmap(spacew);
 
 
@@ -904,15 +1194,13 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	spaceb|=spaceb<<8;
 	spaceb|=spaceb<<16;
 	spaceb|=spaceb<<32;
-	spaceb &=~attackedSquares[whitePawns];
-	spaceb &=~attackedSquares[whiteKnights];
-	spaceb &=~attackedSquares[whiteBishops];
-	spaceb &=~attackedSquares[whiteRooks];
-	spaceb &=~attackedSquares[whiteQueens];
+	spaceb &=~attackedSquares[whitePieces];
+
 	//displayBitmap(spaceb);
 	res+=(bitCnt(spacew)-bitCnt(spaceb))*simdScore(100,0,0,0);
 
 
+	//sync_cout<<"space:"<<res[0]<<":"<<res[1]<<sync_endl;
 
 	//todo counterattack??
 
@@ -920,46 +1208,186 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 	//todo unsopported pieces/weak pieces
 	//todo undefended minor
+	//--------------------------------------
+	//	weak pieces
+	//--------------------------------------
+	bitMap pawnAttackedPieces=bitBoard[whitePieces] & attackedSquares[blackPawns];
+	while(pawnAttackedPieces){
+		tSquare attacked=firstOne(pawnAttackedPieces);
+		res-=attackedByPawnPenalty[squares[attacked]&separationBitmap];
+		pawnAttackedPieces &=pawnAttackedPieces-1;
+	}
+	pawnAttackedPieces=bitBoard[blackPieces] & attackedSquares[whitePawns];
+	while(pawnAttackedPieces){
+		tSquare attacked=firstOne(pawnAttackedPieces);
+		res+=attackedByPawnPenalty[squares[attacked]&separationBitmap];
+		pawnAttackedPieces &=pawnAttackedPieces-1;
+	}
 
-	//todo king shield
-	//todo king safety
-	//todo scaling
-	// finalizing
+	// todo fare un weak piece migliore:qualsiasi pezzo attaccato riceve un malus dipendente dal suo più debole attaccante e dal suo valore.
+	// volendo anche da quale pezzo è difeso
+	bitMap weakPieces=bitBoard[whitePieces] & attackedSquares[blackPieces] &~attackedSquares[whitePawns];
+	bitMap undefendedMinors =  (bitBoard[whiteKnights] | bitBoard[whiteBishops])  & ~attackedSquares[whitePieces];
+	if (undefendedMinors){
+		res-=simdScore(956,254,0,0);
+	}
+	while(weakPieces){
+		tSquare p=firstOne(weakPieces);
+
+		bitboardIndex attackedPiece= squares[p];
+		bitboardIndex attackingPiece=blackPawns;
+		for(;attackingPiece>=separationBitmap;attackingPiece=(bitboardIndex)(attackingPiece-1)){
+			if(attackedSquares[attackingPiece] & bitSet(p)){
+				res-=weakPiecePenalty[attackedPiece%separationBitmap][attackingPiece%separationBitmap];
+				break;
+			}
+		}
+		weakPieces&=weakPieces-1;
+	}
+
+	weakPieces=bitBoard[blackPieces] & attackedSquares[whitePieces] &~attackedSquares[blackPawns];
+	undefendedMinors =  (bitBoard[blackKnights] | bitBoard[blackBishops])  & ~attackedSquares[blackPieces];
+	if (undefendedMinors){
+		res+=simdScore(956,254,0,0);
+	}
+	while(weakPieces){
+		tSquare p=firstOne(weakPieces);
+		bitboardIndex attackedPiece= squares[p];
+		bitboardIndex attackingPiece=whitePawns;
+		for(;attackingPiece>=occupiedSquares;attackingPiece=(bitboardIndex)(attackingPiece-1)){
+			if(attackedSquares[attackingPiece] & bitSet(p)){
+				res+=weakPiecePenalty[attackedPiece%separationBitmap][attackingPiece%separationBitmap];
+				break;
+			}
+		}
+		weakPieces&=weakPieces-1;
+	}
+
+
+	//sync_cout<<"weakPieces:"<<res[0]<<":"<<res[1]<<sync_endl;
+
+
+
 
 	//--------------------------------------
 	//	king safety
 	//--------------------------------------
 	// todo tenere conto anche della possibilita di arrocco
+	simdScore kingSafety[2]={0,0};
+
 	bitMap pawnShield=kingShield[white]&bitBoard[whitePawns];
 	bitMap pawnFarShield=kingFarShield[white]&bitBoard[whitePawns];
 	if(pawnShield){
-		res+=bitCnt(pawnShield)*kingShieldBonus;
+		kingSafety[0]+=bitCnt(pawnShield)*kingShieldBonus;
 	}
 	if(pawnFarShield){
-		res+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		kingSafety[0]+=bitCnt(pawnFarShield)*kingFarShieldBonus;
 	}
+
+	if((st.castleRights & wCastleOO)
+		&& !(attackedSquares[blackPieces] & (bitSet(E1)|bitSet(F1)|bitSet(G1) ))
+		&& !(bitBoard[occupiedSquares] & (bitSet(F1)|bitSet(G1)))
+		){
+		simdScore ks=0;
+		bitMap localKingRing=Movegen::attackFromKing(G1);
+		bitMap localKingShield=localKingRing;
+		localKingRing|=Movegen::attackFromKing(G2);
+		bitMap localKingFarShield=localKingRing&~(localKingShield);
+
+		pawnShield=localKingShield&bitBoard[whitePawns];
+		pawnFarShield=localKingFarShield&bitBoard[whitePawns];
+		if(pawnShield){
+			ks=bitCnt(pawnShield)*kingShieldBonus;
+		}
+		if(pawnFarShield){
+			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		}
+		kingSafety[0]=max(ks,kingSafety[0]);
+	}
+
+	if((st.castleRights & wCastleOOO)
+		&& !(attackedSquares[blackPieces] & (bitSet(E1)|bitSet(D1)|bitSet(C1) ))
+		&& !(bitBoard[occupiedSquares] & (bitSet(D1)|bitSet(C1)|bitSet(B1)))
+		){
+		simdScore ks=0;
+		bitMap localKingRing=Movegen::attackFromKing(C1);
+		bitMap localKingShield=localKingRing;
+		localKingRing|=Movegen::attackFromKing(C2);
+		bitMap localKingFarShield=localKingRing&~(localKingShield);
+
+		pawnShield=localKingShield&bitBoard[whitePawns];
+		pawnFarShield=localKingFarShield&bitBoard[whitePawns];
+		if(pawnShield){
+			ks=bitCnt(pawnShield)*kingShieldBonus;
+		}
+		if(pawnFarShield){
+			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		}
+		kingSafety[0]=max(ks,kingSafety[0]);
+	}
+
 
 	pawnShield=kingShield[black]&bitBoard[blackPawns];
 	pawnFarShield=kingFarShield[black]&bitBoard[blackPawns];
 	if(pawnShield){
-		res-=bitCnt(pawnShield)*kingShieldBonus;
+		kingSafety[1]+=bitCnt(pawnShield)*kingShieldBonus;
 	}
 	if(pawnFarShield){
-		res-=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		kingSafety[1]+=bitCnt(pawnFarShield)*kingFarShieldBonus;
 	}
 
+	if((st.castleRights & bCastleOO)
+		&& !(attackedSquares[whitePieces] & (bitSet(E8)|bitSet(F8)|bitSet(G8) ))
+		&& !(bitBoard[occupiedSquares] & (bitSet(F8)|bitSet(G8)))
+		){
+		simdScore ks=0;
+		bitMap localKingRing=Movegen::attackFromKing(G8);
+		bitMap localKingShield=localKingRing;
+		localKingRing|=Movegen::attackFromKing(G8);
+		bitMap localKingFarShield=localKingRing&~(localKingShield);
 
+		pawnShield=localKingShield&bitBoard[blackPawns];
+		pawnFarShield=localKingFarShield&bitBoard[blackPawns];
+		if(pawnShield){
+			ks=bitCnt(pawnShield)*kingShieldBonus;
+		}
+		if(pawnFarShield){
+			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		}
+		kingSafety[1]=max(ks,kingSafety[1]);
+	}
+
+	if((st.castleRights & bCastleOOO)
+		&& !(attackedSquares[whitePieces] & (bitSet(E8)|bitSet(D8)|bitSet(C8) ))
+		&& !(bitBoard[occupiedSquares] & (bitSet(D8)|bitSet(C8)|bitSet(B8)))
+		){
+		simdScore ks=0;
+		bitMap localKingRing=Movegen::attackFromKing(C8);
+		bitMap localKingShield=localKingRing;
+		localKingRing|=Movegen::attackFromKing(C7);
+		bitMap localKingFarShield=localKingRing&~(localKingShield);
+
+		pawnShield=localKingShield&bitBoard[blackPawns];
+		pawnFarShield=localKingFarShield&bitBoard[blackPawns];
+		if(pawnShield){
+			ks=bitCnt(pawnShield)*kingShieldBonus;
+		}
+		if(pawnFarShield){
+			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		}
+		kingSafety[1]=max(ks,kingSafety[1]);
+	}
+
+	res+=kingSafety[0]-kingSafety[1];
+
+
+	// todo pawn storm
 
 	if(kingAttackersCount[white]>=2 && kingAdjacentZoneAttacksCount[white])
 	{
 
 		bitMap undefendedSquares=
-			(attackedSquares[whitePawns]
-			|attackedSquares[whiteKnights]
-			|attackedSquares[whiteBishops]
-			|attackedSquares[whiteRooks]
-			|attackedSquares[whiteQueens]
-			|attackedSquares[whiteKing])& attackedSquares[blackKing];
+			attackedSquares[whitePieces]& attackedSquares[blackKing];
 		undefendedSquares&=
 			~(attackedSquares[blackPawns]
 			|attackedSquares[blackKnights]
@@ -967,13 +1395,54 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 			|attackedSquares[blackRooks]
 			|attackedSquares[blackQueens]);
 
-		unsigned int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[white] * kingAttackersWeight[white]) / 2)
+		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[white] * kingAttackersWeight[white]) / 2)
 		                     + 3 * (kingAdjacentZoneAttacksCount[white] + bitCnt(undefendedSquares))
-		                     + KingExposed[63-pieceList[blackKing][0]];
-		                     //- mg_value(score) / 32;
-		attackUnits = std::min((unsigned int)99, std::max((unsigned int)0, attackUnits));
+		                     + KingExposed[63-pieceList[blackKing][0]]
+		                     - kingSafety[0][0] / 500;
+
+
+		// safe contact queen check
+		bitMap safeContactSquare=undefendedSquares & attackedSquares[whiteQueens];
+		safeContactSquare &= (attackedSquares[whiteRooks]| attackedSquares[whiteBishops] | attackedSquares[whiteKnights]| attackedSquares[whitePawns]);
+
+		if(safeContactSquare){
+			attackUnits+=5*bitCnt(safeContactSquare);
+		}
+
+		// safe contact rook check
+		safeContactSquare=undefendedSquares & attackedSquares[whiteRooks];
+		safeContactSquare &= (attackedSquares[whiteRooks]| attackedSquares[whiteBishops] | attackedSquares[whiteKnights]| attackedSquares[whitePawns]);
+
+		safeContactSquare &=Movegen::getRookPseudoAttack(pieceList[blackKing][0]);
+
+		if(safeContactSquare){
+			attackUnits+=3*bitCnt(safeContactSquare);
+		}
+
+		// long distance check
+		bitMap rMap=Movegen::attackFromRook(pieceList[blackKing][0],bitBoard[occupiedSquares]);
+		bitMap bMap=Movegen::attackFromBishop(pieceList[blackKing][0],bitBoard[occupiedSquares]);
+
+		// vertical check
+		bitMap longDistCheck=rMap & (attackedSquares[whiteRooks]| attackedSquares[whiteQueens]) & ~attackedSquares[blackPieces] & ~bitBoard[whitePieces];
+		if(longDistCheck){
+			attackUnits+=3*bitCnt(longDistCheck);
+		}
+
+		// diagonal check
+		longDistCheck=bMap & (attackedSquares[whiteBishops]| attackedSquares[whiteQueens]) & ~attackedSquares[blackPieces] & ~bitBoard[whitePieces];
+		if(longDistCheck){
+			attackUnits+=2*bitCnt(longDistCheck);
+		}
+
+		///knight check;
+		longDistCheck=Movegen::attackFromKnight(pieceList[blackKing][0]) & (attackedSquares[whiteKnights]) & ~attackedSquares[blackPieces] & ~bitBoard[whitePieces];
+		if(longDistCheck){
+			attackUnits+=bitCnt(longDistCheck);
+		}
+		attackUnits = std::min(99, std::max(0, attackUnits));
 		attackUnits*=attackUnits;
-		res+=simdScore(attackUnits,attackUnits/2,0,0);
+		res+=simdScore(attackUnits*3,attackUnits/5,0,0);
 
 
 	}
@@ -982,12 +1451,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	{
 
 		bitMap undefendedSquares=
-			(attackedSquares[blackPawns]
-			|attackedSquares[blackKnights]
-			|attackedSquares[blackBishops]
-			|attackedSquares[blackRooks]
-			|attackedSquares[blackQueens]
-			|attackedSquares[blackKing])& attackedSquares[whiteKing];
+			attackedSquares[blackPieces] & attackedSquares[whiteKing];
 		undefendedSquares&=
 			~(attackedSquares[whitePawns]
 			|attackedSquares[whiteKnights]
@@ -995,35 +1459,84 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 			|attackedSquares[whiteRooks]
 			|attackedSquares[whiteQueens]);
 
-		unsigned int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[black] * kingAttackersWeight[black]) / 2)
+		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[black] * kingAttackersWeight[black]) / 2)
 							 + 3 * (kingAdjacentZoneAttacksCount[black] + bitCnt(undefendedSquares))
-							 + KingExposed[pieceList[whiteKing][0]];
-							 //- mg_value(score) / 32;
-		attackUnits = std::min((unsigned int)99, std::max((unsigned int)0, attackUnits));
+							 + KingExposed[pieceList[whiteKing][0]]
+							 - kingSafety[1][0] / 500;
+
+		// safe contact queen check
+		bitMap safeContactSquare=undefendedSquares & attackedSquares[blackQueens];
+		safeContactSquare &= (attackedSquares[blackRooks]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
+
+		if(safeContactSquare){
+			attackUnits+=5*bitCnt(safeContactSquare);
+		}
+		// safe contact rook check
+
+		safeContactSquare=undefendedSquares & attackedSquares[blackRooks];
+		safeContactSquare &= (attackedSquares[blackRooks]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
+
+		safeContactSquare &=Movegen::getRookPseudoAttack(pieceList[whiteKing][0]);
+
+		if(safeContactSquare){
+			attackUnits+=3*bitCnt(safeContactSquare);
+		}
+
+		// long distance check
+		bitMap rMap=Movegen::attackFromRook(pieceList[whiteKing][0],bitBoard[occupiedSquares]);
+		bitMap bMap=Movegen::attackFromBishop(pieceList[whiteKing][0],bitBoard[occupiedSquares]);
+
+		// vertical check
+		bitMap longDistCheck=rMap & (attackedSquares[blackRooks]| attackedSquares[blackQueens]) & ~attackedSquares[whitePieces] & ~bitBoard[blackPieces];
+		if(longDistCheck){
+			attackUnits+=3*bitCnt(longDistCheck);
+		}
+
+		// diagonal check
+		longDistCheck=bMap & (attackedSquares[blackBishops]| attackedSquares[blackQueens]) & ~attackedSquares[whitePieces] & ~bitBoard[blackPieces];
+		if(longDistCheck){
+			attackUnits+=2*bitCnt(longDistCheck);
+		}
+
+		///knight check;
+		longDistCheck=Movegen::attackFromKnight(pieceList[whiteKing][0]) & (attackedSquares[blackKnights]) & ~attackedSquares[whitePieces] & ~bitBoard[blackPieces];
+		if(longDistCheck){
+			attackUnits+=bitCnt(longDistCheck);
+		}
+
+
+		attackUnits = std::min(99, std::max(0, attackUnits));
 		attackUnits*=attackUnits;
-		res-=simdScore(attackUnits,attackUnits/2,0,0);
+		res-=simdScore(attackUnits*3,attackUnits/5,0,0);
 
 
 	}
+
+
+	//sync_cout<<"kingSafety:"<<res[0]<<":"<<res[1]<<sync_endl;
+	//todo scaling
 
 
 	//--------------------------------------
 	//	finalizing
 	//--------------------------------------
-	float gamePhase=getGamePhase();
-	Vec4f gp= Vec4f(1-gamePhase,gamePhase,0,0);
-	Vec4f dRes= reinterpret_f(res);
-	Vec4f prod=gp*dRes;
-	float total=horizontal_add(prod);
-	Vec4f dtot= total;
+	signed int gamePhase=getGamePhase();
 
-	simdScore sc=reinterpret_i(dtot);
+	signed long long r=((signed long long)res[0])*(65536-gamePhase)+((signed long long)res[1])*gamePhase;
+	Score score =(r)/65536;
+
+	// final value saturation
+	score=std::min(highSat,score);
+	score=std::max(lowSat,score);
+
+
+
 	if(st.nextMove)
 	{
-		return -sc[0];
+		return -score;
 	}
 	else{
-		return sc[0];
+		return score;
 	}
 
 }

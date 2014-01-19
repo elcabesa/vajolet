@@ -155,6 +155,7 @@ public:
 
 
 	static void initScoreValues(void);
+	static void initPstValues(void);
 	void display(void) const;
 	void displayFen(void) const;
 	void doNullMove(void);
@@ -396,17 +397,17 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline float getGamePhase() const{
+	inline unsigned int getGamePhase() const{
 		Score tot=getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
 		if(tot>570000){ //opening
-			return 0.0;
+			return 0;
 
 		}
 		if(tot<120000){	//endgame
-			return 1.0;
+			return 65536;
 
 		}
-		return (570000-tot)*(1.0/(570000-120000));
+		return (570000-tot)*(65536.0/(570000-120000));
 	}
 
 

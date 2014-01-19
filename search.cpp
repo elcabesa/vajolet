@@ -34,12 +34,12 @@ inline unsigned int razorMargin(unsigned int depth){
 	return 20000+depth*78;
 }
 
-void search::printAllPV(unsigned int depth, Position & p, unsigned int count){
+void search::printAllPV(Position & p, unsigned int count){
 
 
-	for (unsigned int i=0; i<=count; i++){
-		Score res=rootMoves[i].score;
-		printPV(res,depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,rootMoves[i].time,i,rootMoves[i].PV,rootMoves[i].nodes);
+	for (unsigned int i=0; i<count; i++){
+		Score res=rootMoves[i].previousScore;
+		printPV(res,rootMoves[i].depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,rootMoves[i].time,i,rootMoves[i].PV,rootMoves[i].nodes);
 	}
 }
 
@@ -201,6 +201,7 @@ void search::startThinking(Position & p,searchLimits & l){
 
 							TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].previousScore:rootMoves[i].previousScore, n),typeExact,depth-n*ONE_PLY, (*it).packed, p.eval(pawnHashTable));
 
+
 							//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
 							p.doMove(*it);
 							n++;
@@ -232,12 +233,14 @@ void search::startThinking(Position & p,searchLimits & l){
 					break;
 				}
 				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-				if(newPV.size()!=0 && res > alpha && res < beta){
+				if(newPV.size()!=0 && res > alpha /*&& res < beta*/){
 					std::vector<rootMove>::iterator it=std::find(rootMoves.begin(),rootMoves.end(),newPV[0]);
 					if(it->firstMove==newPV[0]){
 						it->PV=newPV;
 						it->score=res;
+						it->previousScore=res;
 						it->selDepth=selDepth-selDepthBase;
+						it->depth=depth;
 						it->nodes=visitedNodes;
 						it->time= now-startTime;
 					}
@@ -253,6 +256,8 @@ void search::startThinking(Position & p,searchLimits & l){
 					//my_thread::timeMan.idLoopRequestToExtend=true;
 					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
 					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
+
+					TT.store(p.getActualState().key, transpositionTable::scoreToTT(rootMoves[PVIdx].previousScore, 0),typeExact,depth*ONE_PLY, (rootMoves[PVIdx].PV[0]).packed, p.eval(pawnHashTable));
 					//sync_cout<<"new alpha "<<alpha<<sync_endl;
 				}
 				else if (res >= beta){
@@ -277,14 +282,15 @@ void search::startThinking(Position & p,searchLimits & l){
 				// Sort the PV lines searched so far and update the GUI
 				std::stable_sort(rootMoves.begin(), rootMoves.begin() + PVIdx + 1);
 				//sync_cout<<"stable sort ok "<<sync_endl;
-				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+/*				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 				if (PVIdx + 1 == PVSize
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 					|| now - startTime > 3000
 #endif
-				){
+				)*/{
 					//sync_cout<<"print pv "<<sync_endl;
-					printAllPV(depth,p, PVIdx);
+					printAllPV(p, PVSize);
+
 				}
 			}
 		}
@@ -339,7 +345,6 @@ void search::startThinking(Position & p,searchLimits & l){
 		std::cout<<" ponder "<<p.displayUci(rootMoves[0].PV[1]);
 	}
 	std::cout<<sync_endl;
-	visitedNodes=0;
 #ifdef PRINT_STATISTICS
 	Statistics::instance().printNodeTypeStat();
 #endif
@@ -479,16 +484,22 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	//------------------------
 	// razoring
 	//------------------------
+	// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
+	//------------------------
 	if (!PVnode
 		&& !inCheck
 		&&  depth < 4 * ONE_PLY
 		&&  eval + razorMargin(depth) < beta
+		&&  beta >= -SCORE_INFINITE+razorMargin(depth)
 		&&  ((type==CUT_NODE &&!ttMove.packed ) || type==ALL_NODE)
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&& !((pos.getActualState().nextMove && (pos.bitBoard[Position::blackPawns] & RANKMASK[A2])) || (!pos.getActualState().nextMove && (pos.bitBoard[Position::whitePawns] & RANKMASK[A7]) ) )
 	)
 	{
+
 		Score rbeta = beta - razorMargin(depth);
+
+		assert(rbeta>-SCORE_INFINITE);
 		std::vector<Move> childPV;
 		Score v = qsearch<childNodesType>(ply,pos,0, rbeta-1, rbeta, childPV);
 		if (v < rbeta)
@@ -511,15 +522,20 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	//---------------------------
 	//	 STATIC NULL MOVE PRUNING
 	//---------------------------
+	//	at very low deep and with an evaluation well above beta, bet that we can found a move with a result above beta
+	//---------------------------
 	if (!PVnode
 		&& !inCheck
 		&& !pos.getActualState().skipNullMove
 		&&  depth < 4 * ONE_PLY
+		&& eval >-SCORE_INFINITE + futility[depth>>ONE_PLY_SHIFT]
 		&&  eval - futility[depth>>ONE_PLY_SHIFT] >= beta
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		//&&  abs(eval) < SCORE_KNOWN_WIN
 		&&  ((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]> 30000) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]> 30000)))
 	{
+		//sync_cout<<"eval:"<<eval<<" futility:"<<futility[depth>>ONE_PLY_SHIFT]<<sync_endl;
+		assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
 #ifdef PRINT_STATISTICS
 		Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
 #endif
@@ -529,6 +545,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 	//---------------------------
 	//	 NULL MOVE PRUNING
+	//---------------------------
+	// if the evaluation is above beta and after passing the move the result of a search is still above beta we bet there will be a beta cutoff
+	// this search let us know about threat move by the opponent.
 	//---------------------------
 
 	if(!PVnode
@@ -543,7 +562,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		int red = 3 * ONE_PLY + depth / 4;
 
 		// Null move dynamic reduction based on value
-		if (eval - 10000 > beta){
+		if (eval > -SCORE_INFINITE+10000 && eval - 10000 > beta){
 			red += ONE_PLY;
 		}
 		pos.doNullMove();
@@ -601,13 +620,15 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	//------------------------
 	//	PROB CUT
 	//------------------------
+	//	at high depth we try the capture moves. if a reduced search of this moves gives us a result above beta we bet we can found with a regular search a move exceeding beta
+	//------------------------
 
 	if(!PVnode &&
 		!inCheck &&
 		depth>=5*ONE_PLY &&
 		!pos.getActualState().skipNullMove &&
-		abs(beta)<SCORE_KNOWN_WIN &&
-		abs(beta)<SCORE_MATE_IN_MAX_PLY
+		abs(beta)<SCORE_KNOWN_WIN
+		//&& abs(beta)<SCORE_MATE_IN_MAX_PLY
 	){
 		Score s;
 		Score rBeta=beta+8000;
@@ -747,6 +768,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			&& !isDangerous
 			&& bestScore>SCORE_MATED_IN_MAX_PLY
 		){
+			assert(moveNumber>1);
 
 			if(depth < 11*ONE_PLY
 				&& moveNumber >= FutilityMoveCounts[depth>>ONE_PLY_SHIFT]
@@ -775,13 +797,16 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 		}
 
-		if(type==ROOT_NODE
+		if(type==ROOT_NODE){
+			unsigned long elapsed=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
+			if(
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-				&& std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime>3000
+				elapsed>3000
 #endif
 				&& !signals.stop
 				){
-			sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<< sync_endl;
+				sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<<" time "<<elapsed << sync_endl;
+			}
 		}
 
 		pos.doMove(m);
@@ -1073,7 +1098,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	if (tte
 		&& tte->getDepth() >= TTdepth
 	    && ttValue != SCORE_NONE // Only in case of TT access race
-	    && (	PVnode ?  tte->getType() == typeExact
+	    && (	PVnode ?  false/*tte->getType() == typeExact*/
 	            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta|| tte->getType() == typeExact)
 	                              : (tte->getType() ==  typeScoreLowerThanAlpha|| tte->getType() == typeExact)))
 	{

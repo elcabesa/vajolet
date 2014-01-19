@@ -16,6 +16,7 @@
 */
 
 #include "data.h"
+#include <algorithm>
 
 //--------------------------------------------------------------
 //	global variables
@@ -69,6 +70,8 @@ bitMap LINES[squareNumber][squareNumber];
 bitMap ISOLATED_PAWN[squareNumber];
 bitMap PASSED_PAWN[2][squareNumber];
 bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
+
+int SQUARE_DISTANCE[squareNumber][squareNumber];
 
 //--------------------------------------------------------------
 //	function bodies
@@ -292,6 +295,13 @@ void initData(void){
 			if(file<7){
 				PASSED_PAWN[1][square] |= BITSET[BOARDINDEX[file+1][i]];
 			}
+		}
+	}
+
+	for(int square=0;square<squareNumber;square++){
+		for(int square2=0;square2<squareNumber;square2++){
+
+			SQUARE_DISTANCE[square][square2]=std::max(std::abs(FILES[square]-FILES[square2]),std::abs(RANKS[square]-RANKS[square2]));
 		}
 	}
 

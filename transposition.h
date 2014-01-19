@@ -79,18 +79,20 @@ struct ttCluster{
 class transpositionTable{
 	ttCluster* table;
 	unsigned int elements;
+	unsigned int usedElements;
 	unsigned char generation;
 public:
 	transpositionTable(){
 		generation=0;
 		elements=1;
+		usedElements=0;
 	}
 	~transpositionTable(){
 		if(table){
 			free(table);
 		}
 	}
-	void newSearch() { generation++; }
+	void newSearch() { generation++; usedElements=0; }
 	void setSize(unsigned int mbSize);
 	void clear();
 
@@ -98,13 +100,21 @@ public:
 		return table + (((unsigned int)key) % elements);
 	}
 
-	inline void refresh(const ttEntry* tte) const {
+	inline void refresh(const ttEntry* tte) {
 		assert(tte!=nullptr);
+		if(const_cast<ttEntry*>(tte)->getSearchId()!=generation){
+			usedElements++;
+		}
 		const_cast<ttEntry*>(tte)->setGeneration(generation);
+
 	}
 
 	ttEntry* probe(const U64 key) const;
 	void store(const U64 key, Score v, unsigned char b, signed short int d, unsigned short m, Score statV);
+
+	unsigned int getFullness(void){
+		return usedElements*250.0/(elements);
+	}
 
 	// value_to_tt() adjusts a mate score from "plies to mate from the root" to
 	// "plies to mate from the current position". Non-mate scores are unchanged.
@@ -135,7 +145,7 @@ public:
 		return  v == SCORE_NONE ? SCORE_NONE
 				: v >= SCORE_MATE_IN_MAX_PLY  ? v - ply
 				: v <= SCORE_MATED_IN_MAX_PLY ? v + ply : v;
-	  }
+	}
 };
 
 extern transpositionTable TT;

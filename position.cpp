@@ -176,30 +176,7 @@ void Position::setupFromFen(const std::string& fenStr){
 }
 
 
-/*! \brief init the score value in the static const
-	\author Marco Belli
-	\version 1.0
-	\date 27/10/2013
-*/
-void Position::initScoreValues(void){
-	for(auto &val :pieceValue){
-		val=0;
-	}
-	pieceValue[whitePawns]=10000;
-	pieceValue[whiteKnights]=30000;
-	pieceValue[whiteBishops]=32500;
-	pieceValue[whiteRooks]=50000;
-	pieceValue[whiteQueens]=90000;
-	pieceValue[whiteKing]=3000000;
-
-	pieceValue[blackPawns]=-pieceValue[whitePawns];
-	pieceValue[blackKnights]=-pieceValue[whiteKnights];
-	pieceValue[blackBishops]=-pieceValue[whiteBishops];
-	pieceValue[blackRooks]=-pieceValue[whiteRooks];
-	pieceValue[blackQueens]=-pieceValue[whiteQueens];
-	pieceValue[blackKing]=-pieceValue[whiteKing];
-
-
+void Position::initPstValues(void){
 	for(int piece=0;piece<lastBitboard;piece++){
 		for(tSquare s=(tSquare)0;s<squareNumber;s++){
 			assert(piece<lastBitboard);
@@ -251,6 +228,35 @@ void Position::initScoreValues(void){
 			}
 		}
 	}
+}
+
+/*! \brief init the score value in the static const
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
+void Position::initScoreValues(void){
+	for(auto &val :pieceValue){
+		val=0;
+	}
+	pieceValue[whitePawns]=10000;
+	pieceValue[whiteKnights]=30000;
+	pieceValue[whiteBishops]=32500;
+	pieceValue[whiteRooks]=59000;
+	pieceValue[whiteQueens]=120000;
+	pieceValue[whiteKing]=3000000;
+
+	pieceValue[blackPawns]=-pieceValue[whitePawns];
+	pieceValue[blackKnights]=-pieceValue[whiteKnights];
+	pieceValue[blackBishops]=-pieceValue[whiteBishops];
+	pieceValue[blackRooks]=-pieceValue[whiteRooks];
+	pieceValue[blackQueens]=-pieceValue[whiteQueens];
+	pieceValue[blackKing]=-pieceValue[whiteKing];
+
+	initPstValues();
+
+
+
 
 }
 /*! \brief clear a position and his history

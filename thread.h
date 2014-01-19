@@ -24,6 +24,7 @@
 #include <condition_variable>
 #include "position.h"
 #include "search.h"
+#include "transposition.h"
 
 
 
@@ -55,12 +56,16 @@ class my_thread{
 	static searchLimits limits;
 
 	static unsigned long startTime;
+	static unsigned long lastHasfullMessage;
 
 	void initThreads();
 	void quitThreads();
 	static void timerThread();
 	static void searchThread();
 public :
+	unsigned long long getVisitedNodes(){
+		return src.getVisitedNodes();
+	}
 	static timeManagementStruct timeMan;
 	my_thread(){
 		initThreads();
@@ -71,6 +76,7 @@ public :
 	void startTinking(Position * p,searchLimits& l){
 
 		src.signals.stop=true;
+		lastHasfullMessage=0;
 
 		//sync_cout<<"STOOOOOOPPPPE"<<sync_endl;
 		while(startThink){

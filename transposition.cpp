@@ -90,6 +90,9 @@ void transpositionTable::store(const U64 key, Score v, unsigned char b, signed s
 		}
 	}
 	assert(replace!=nullptr);
+	if(replace->getSearchId()!=generation){
+		usedElements++;
+	}
 	replace->save(key32, v, b, d, m, statV);
 	replace->setGeneration(generation);
 

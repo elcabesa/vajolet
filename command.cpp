@@ -33,6 +33,7 @@
 #include "search.h"
 #include "thread.h"
 #include "transposition.h"
+#include "benchmark.h"
 
 
 
@@ -61,6 +62,7 @@ void static printUciInfo(void){
 	std::cout<<"option name Ponder type check default true"<<sync_endl;
 	std::cout<<"option name OwnBook type check default true"<<std::endl;
 	std::cout<<"option name BestMoveBook type check default false"<<std::endl;
+	std::cout<<"option name UCI_EngineAbout type string default VajoletII by Marco Belli"<<sync_endl;
 	std::cout<<"uciok"<<sync_endl;
 }
 
@@ -210,6 +212,53 @@ void setoption(std::istringstream& is) {
 }
 
 
+void setvalue(std::istringstream& is) {
+	std::string token, name, value;
+
+	is >> name;
+
+	is >> value;
+
+	if(name =="queenMG"){
+		Position::pieceValue[Position::whiteQueens].insert(0,stoi(value));
+		Position::pieceValue[Position::blackQueens]=-Position::pieceValue[Position::whiteQueens];
+		Position::initPstValues();
+	}else if(name =="queenEG"){
+		Position::pieceValue[Position::whiteQueens].insert(1,stoi(value));
+		Position::pieceValue[Position::blackQueens]=-Position::pieceValue[Position::whiteQueens];
+		Position::initPstValues();
+	}else if(name =="rookMG"){
+		Position::pieceValue[Position::whiteRooks].insert(0,stoi(value));
+		Position::pieceValue[Position::blackRooks]=-Position::pieceValue[Position::whiteRooks];
+		Position::initPstValues();
+	}else if(name =="rookEG"){
+		Position::pieceValue[Position::whiteRooks].insert(1,stoi(value));
+		Position::pieceValue[Position::blackRooks]=-Position::pieceValue[Position::whiteRooks];
+		Position::initPstValues();
+	}else if(name =="bishopMG"){
+		Position::pieceValue[Position::whiteBishops].insert(0,stoi(value));
+		Position::pieceValue[Position::blackBishops]=-Position::pieceValue[Position::whiteBishops];
+		Position::initPstValues();
+	}else if(name =="bishopEG"){
+		Position::pieceValue[Position::whiteBishops].insert(1,stoi(value));
+		Position::pieceValue[Position::blackBishops]=-Position::pieceValue[Position::whiteBishops];
+		Position::initPstValues();
+	}else if(name =="knightMG"){
+		Position::pieceValue[Position::whiteKnights].insert(0,stoi(value));
+		Position::pieceValue[Position::blackKnights]=-Position::pieceValue[Position::whiteKnights];
+		Position::initPstValues();
+	}else if(name =="knightEG"){
+		Position::pieceValue[Position::whiteKnights].insert(1,stoi(value));
+		Position::pieceValue[Position::blackKnights]=-Position::pieceValue[Position::whiteKnights];
+		Position::initPstValues();
+	}else if(name =="pawnsEG"){
+		Position::pieceValue[Position::whitePawns].insert(1,stoi(value));
+		Position::pieceValue[Position::blackPawns]=-Position::pieceValue[Position::whitePawns];
+		Position::initPstValues();
+	}
+}
+
+
 /*	\brief manage the uci loop
 	\author Marco Belli
 	\version 1.0
@@ -247,17 +296,19 @@ void uciLoop(){
 		else if(token=="setoption"){
 			setoption(is);
 		}
+		else if(token=="setvalue"){
+			setvalue(is);
+		}
 		else if (token =="eval"){
 			pawnTable pawnHashTable;
 			sync_cout<<"Eval:" <<pos.eval(pawnHashTable)/10000.0<<sync_endl;
-			sync_cout<<"gamePhase:" <<pos.getGamePhase()*100<<"%"<<sync_endl;
+			sync_cout<<"gamePhase:" <<pos.getGamePhase()/65536.0*100<<"%"<<sync_endl;
 		}
 		else if (token =="isready"){
 			sync_cout<<"readyok"<<sync_endl;
 		}
 		else if (token =="perft" && (is>>token)){
 			doPerft(stoi(token), pos);
-
 		}
 		else if (token =="divide" && (is>>token)){
 			unsigned long res=pos.divide(stoi(token));
@@ -265,6 +316,9 @@ void uciLoop(){
 		}
 		else if (token =="go"){
 			go(is,pos,thr);
+		}
+		else if (token =="bench"){
+			benchmark();
 		}
 		else if (token == "ponderhit"){
 			thr.ponderHit();
