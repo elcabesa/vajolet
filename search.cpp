@@ -30,7 +30,7 @@
 #include "book.h"
 #include "thread.h"
 
-inline unsigned int razorMargin(unsigned int depth){
+inline signed int razorMargin(unsigned int depth){
 	return 20000+depth*78;
 }
 
@@ -486,23 +486,22 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	//------------------------
 	// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
 	//------------------------
-	if (!PVnode
-		&& !inCheck
+	if (/*!PVnode
+		&& */!inCheck
 		&&  depth < 4 * ONE_PLY
-		&&  eval + razorMargin(depth) < beta
-		&&  beta >= -SCORE_INFINITE+razorMargin(depth)
-		&&  ((type==CUT_NODE &&!ttMove.packed ) || type==ALL_NODE)
+		&&  eval + razorMargin(depth) <= alpha
+		&&  alpha >= -SCORE_INFINITE+razorMargin(depth)
+		//&&  abs(alpha) < SCORE_MATE_IN_MAX_PLY // implicito nell riga precedente
+		&&  ((/*type==CUT_NODE &&*/!ttMove.packed ) || type==ALL_NODE)
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&& !((pos.getActualState().nextMove && (pos.bitBoard[Position::blackPawns] & RANKMASK[A2])) || (!pos.getActualState().nextMove && (pos.bitBoard[Position::whitePawns] & RANKMASK[A7]) ) )
 	)
 	{
-
-		Score rbeta = beta - razorMargin(depth);
-
-		assert(rbeta>-SCORE_INFINITE);
+		Score ralpha = alpha - razorMargin(depth);
+		assert(ralpha>=-SCORE_INFINITE);
 		std::vector<Move> childPV;
-		Score v = qsearch<childNodesType>(ply,pos,0, rbeta-1, rbeta, childPV);
-		if (v < rbeta)
+		Score v = qsearch<childNodesType>(ply,pos,0, ralpha, ralpha+1, childPV);
+		if (v <= ralpha)
 		{
 #ifdef PRINT_STATISTICS
 			if(type==ALL_NODE){
@@ -532,9 +531,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		&&  eval - futility[depth>>ONE_PLY_SHIFT] >= beta
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		//&&  abs(eval) < SCORE_KNOWN_WIN
-		&&  ((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]> 30000) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]> 30000)))
+		&&  ((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0])))
 	{
-		//sync_cout<<"eval:"<<eval<<" futility:"<<futility[depth>>ONE_PLY_SHIFT]<<sync_endl;
 		assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
 #ifdef PRINT_STATISTICS
 		Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
@@ -556,7 +554,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		&& eval>=beta
 		&& !pos.getActualState().skipNullMove
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
-		&&((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]> 30000) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]> 30000))
+		&&((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0]))
 	){
 		// Null move dynamic reduction based on depth
 		int red = 3 * ONE_PLY + depth / 4;

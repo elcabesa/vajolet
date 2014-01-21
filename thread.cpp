@@ -54,6 +54,10 @@ void timeManagerInit(Position& pos, searchLimits& lim, timeManagementStruct& tim
 		timeMan.minSearchTime=timeMan.allocatedTime*0.1;
 		timeMan.resolution=std::min((unsigned long int)100,timeMan.allocatedTime/100);
 	}
+
+	if(lim.infinite){
+		timeMan.resolution=100;
+	}
 	timeMan.singularRootMoveCount=0;
 	timeMan.idLoopIterationFinished=false;
 

@@ -150,7 +150,7 @@ private:
 public:
 	static simdScore pieceValue[lastBitboard];
 	static simdScore pstValue[lastBitboard][squareNumber];
-	static simdScore nonPawnValue[lastBitboard][squareNumber];
+	static simdScore nonPawnValue[lastBitboard];
 public:
 
 

@@ -31,7 +31,7 @@
 
 simdScore Position::pieceValue[lastBitboard];
 simdScore Position::pstValue[lastBitboard][squareNumber];
-simdScore Position::nonPawnValue[lastBitboard][squareNumber];
+simdScore Position::nonPawnValue[lastBitboard];
 int Position::castleRightsMask[squareNumber];
 
 /*! \brief setup a position from a fen string
@@ -181,7 +181,7 @@ void Position::initPstValues(void){
 		for(tSquare s=(tSquare)0;s<squareNumber;s++){
 			assert(piece<lastBitboard);
 			assert(s<squareNumber);
-			nonPawnValue[piece][s]=0;
+			nonPawnValue[piece]/*[s]*/=0;
 			pstValue[piece][s]=0;
 			int rank=RANKS[s];
 			int file=FILES[s];
@@ -196,11 +196,12 @@ void Position::initPstValues(void){
 				}
 				else{
 					pstValue[piece][s].insert(0,-pstValue[piece][s][0]);
+					//pstValue[piece][s]*=3;
 				}
 
-				if(!isPawn((bitboardIndex)piece)){
-					nonPawnValue[piece][s].insert(0,pstValue[piece][s][0]);
-					nonPawnValue[piece][s].insert(1,pstValue[piece][s][1]);
+				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
+					nonPawnValue[piece].insert(0,pieceValue[piece][0]);
+					nonPawnValue[piece].insert(1,pieceValue[piece][1]);
 				}
 
 			}
@@ -215,11 +216,12 @@ void Position::initPstValues(void){
 				}
 				else{
 					pstValue[piece][s].insert(0,-pstValue[piece][s][0]);
+					//pstValue[piece][s]*=3;
 				}
-				if(!isPawn((bitboardIndex)piece)){
+				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
 
-					nonPawnValue[piece][s].insert(2,-pstValue[piece][s][0]);
-					nonPawnValue[piece][s].insert(3,-pstValue[piece][s][1]);
+					nonPawnValue[piece].insert(2,-pieceValue[piece][0]);
+					nonPawnValue[piece].insert(3,-pieceValue[piece][1]);
 				}
 
 			}
@@ -494,12 +496,12 @@ void Position::calcNonPawnMaterialValue(Score* s){
 
 	for (tSquare n=(tSquare)0;n<squareNumber;n++){
 		bitboardIndex val=squares[n];
-		if(!isPawn(val)){
+		if(!isPawn(val) && !isKing(val)){
 			if(val>separationBitmap){
-				t[1]-=pstValue[val][n];
+				t[1]-=pieceValue[val];
 			}
 			else{
-				t[0]+=pstValue[val][n];
+				t[0]+=pieceValue[val];
 			}
 		}
 	}
@@ -615,7 +617,7 @@ void Position::doMove(Move & m){
 		movePiece(rook,rFrom,rTo);
 		mv+=pstValue[rook][rTo]-pstValue[rook][rFrom];
 
-		npm+=nonPawnValue[rook][rTo]-nonPawnValue[rook][rFrom];
+		//npm+=nonPawnValue[rook][rTo]-nonPawnValue[rook][rFrom];
 
 		x.key ^=HashKeys::keys[rFrom][rook];
 		x.key ^=HashKeys::keys[rTo][rook];
@@ -633,7 +635,7 @@ void Position::doMove(Move & m){
 			assert(captureSquare<squareNumber);
 			x.pawnKey ^= HashKeys::keys[captureSquare][capture];
 		}
-		npm-=nonPawnValue[capture][captureSquare];
+		npm-=nonPawnValue[capture]/*[captureSquare]*/;
 
 
 		// remove piece
@@ -655,7 +657,7 @@ void Position::doMove(Move & m){
 	movePiece(piece,from,to);
 
 	mv+=pstValue[piece][to]-pstValue[piece][from];
-	npm+=nonPawnValue[piece][to]-nonPawnValue[piece][from];
+	//npm+=nonPawnValue[piece][to]-nonPawnValue[piece][from];
 	// update non pawn material
 
 
@@ -690,7 +692,7 @@ void Position::doMove(Move & m){
 			putPiece(promotedPiece,to);
 
 			mv+=pstValue[promotedPiece][to]-pstValue[piece][to];
-			npm+=nonPawnValue[promotedPiece][to];
+			npm+=nonPawnValue[promotedPiece]/*[to]*/;
 
 
 			x.key ^= HashKeys::keys[to][piece]^ HashKeys::keys[to][promotedPiece];
