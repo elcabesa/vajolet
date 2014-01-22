@@ -163,7 +163,7 @@ public:
 	void undoMove(Move &m);
 	static void initCastleRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
-	Score eval(pawnTable& pawnHashTable) const;
+	template<bool trace>Score eval(pawnTable& pawnHashTable) const;
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 	bool moveGivesCheck(Move& m)const ;

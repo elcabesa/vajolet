@@ -18,6 +18,7 @@
 #include <utility>
 #include <unordered_map>
 #include <map>
+#include <iomanip>
 #include "position.h"
 #include "move.h"
 #include "bitops.h"
@@ -811,7 +812,16 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	\version 1.0
 	\date 27/10/2013
 */
+template<bool trace>
 Score Position::eval(pawnTable& pawnHashTable) const {
+
+	simdScore traceRes=0;
+	if(trace){
+
+		sync_cout <<std::setprecision(3)<< std::setw(21) << "Eval term " << "|     White    |     Black    |      Total     \n"
+			      <<             "                     |    MG    EG  |   MG     EG  |   MG      EG   \n"
+			      <<             "---------------------+--------------+--------------+-----------------"<<sync_endl;
+	}
 
 	Score lowSat=-SCORE_INFINITE;
 	Score highSat=SCORE_INFINITE;
@@ -886,6 +896,13 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		res+=tempo;
 	}
 
+	if(trace){
+		sync_cout << std::setw(20) << "Material, PST, Tempo" << " |   ---    --- |   ---    --- | "
+		          << std::setw(6)  << res[0]/10000.0 << " "
+		          << std::setw(6)  << res[1]/10000.0 << " "<<sync_endl;
+		traceRes=res;
+	}
+
 	//sync_cout<<"material:"<<res[0]<<":"<<res[1]<<sync_endl;
 
 	//---------------------------------------------
@@ -907,6 +924,12 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		else{
 			res-=simdScore(5000,5000,0,0);
 		}
+	}
+	if(trace){
+		sync_cout << std::setw(20) << "imbalancies" << " |   ---    --- |   ---    --- | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
 	}
 
 
@@ -1010,6 +1033,13 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 	res+=pawnResult;
 
+	if(trace){
+		sync_cout << std::setw(20) << "pawns" << " |   ---    --- |   ---    --- | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
+	}
+
 
 	//sync_cout<<"pawn:"<<res[0]<<":"<<res[1]<<sync_endl;
 
@@ -1021,15 +1051,63 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	//	pieces
 	//-----------------------------------------
 
-	res+=evalPieces<Position::whiteQueens>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	res+=evalPieces<Position::whiteRooks>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	res+=evalPieces<Position::whiteBishops>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	res+=evalPieces<Position::whiteKnights>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	simdScore wScore;
+	simdScore bScore;
+	wScore=evalPieces<Position::whiteKnights>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	bScore=evalPieces<Position::blackKnights>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	res+=wScore-bScore;
+	if(trace){
+		sync_cout << std::setw(20) << "knights" << " |"
+				  << std::setw(6)  << (wScore[0])/10000.0 << " "
+				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
+				  << std::setw(6)  << (bScore[0])/10000.0 << " "
+				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
+	}
 
-	res-=evalPieces<Position::blackQueens>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	res-=evalPieces<Position::blackRooks>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	res-=evalPieces<Position::blackBishops>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	res-=evalPieces<Position::blackKnights>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteBishops>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	bScore=evalPieces<Position::blackBishops>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	res+=wScore-bScore;
+	if(trace){
+		sync_cout << std::setw(20) << "bishops" << " |"
+				  << std::setw(6)  << (wScore[0])/10000.0 << " "
+				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
+				  << std::setw(6)  << (bScore[0])/10000.0 << " "
+				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
+	}
+
+	wScore=evalPieces<Position::whiteRooks>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	bScore=evalPieces<Position::blackRooks>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	res+=wScore-bScore;
+	if(trace){
+		sync_cout << std::setw(20) << "rooks" << " |"
+				  << std::setw(6)  << (wScore[0])/10000.0 << " "
+				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
+				  << std::setw(6)  << (bScore[0])/10000.0 << " "
+				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
+	}
+
+	wScore=evalPieces<Position::whiteQueens>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	bScore=evalPieces<Position::blackQueens>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	res+=wScore-bScore;
+	if(trace){
+		sync_cout << std::setw(20) << "queens" << " |"
+				  << std::setw(6)  << (wScore[0])/10000.0 << " "
+				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
+				  << std::setw(6)  << (bScore[0])/10000.0 << " "
+				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
+	}
 
 	//todo valutazione pezzi
 
@@ -1058,6 +1136,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	// white passed pawns
 	bitMap pp=passedPawns&bitBoard[whitePawns];
 
+	wScore=0;
 	while(pp){
 		simdScore passedPawnsBonus;
 		tSquare ppSq=firstOne(pp);
@@ -1109,13 +1188,14 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 			passedPawnsBonus+=passedPawnSupportedBonus*(r/2);
 		}
 
-		res+=passedPawnsBonus;
+		wScore+=passedPawnsBonus;
 
 	}
 
 	// todo unsotppable passed pawn: ( more value to unstoppable passed pawn, less value or 0 for stobbable ones
 	pp=passedPawns&bitBoard[blackPawns];
 
+	bScore=0;
 	while(pp){
 		simdScore passedPawnsBonus;
 		tSquare ppSq=firstOne(pp);
@@ -1168,8 +1248,20 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 			passedPawnsBonus+=passedPawnSupportedBonus*(r/2);
 		}
 
-		res-=passedPawnsBonus;
+		bScore+=passedPawnsBonus;
 
+	}
+	res+=wScore-bScore;
+
+	if(trace){
+		sync_cout << std::setw(20) << "passed pawns" << " |"
+				  << std::setw(6)  << (wScore[0])/10000.0 << " "
+				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
+				  << std::setw(6)  << (bScore[0])/10000.0 << " "
+				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
 	}
 
 	//sync_cout<<"passedPawns:"<<res[0]<<":"<<res[1]<<sync_endl;
@@ -1199,6 +1291,20 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	//displayBitmap(spaceb);
 	res+=(bitCnt(spacew)-bitCnt(spaceb))*simdScore(100,0,0,0);
 
+	if(trace){
+		wScore=bitCnt(spacew)*simdScore(100,0,0,0);
+		bScore=bitCnt(spaceb)*simdScore(100,0,0,0);
+		sync_cout << std::setw(20) << "space" << " |"
+				  << std::setw(6)  << (wScore[0])/10000.0 << " "
+				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
+				  << std::setw(6)  << (bScore[0])/10000.0 << " "
+				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
+	}
+
+
 
 	//sync_cout<<"space:"<<res[0]<<":"<<res[1]<<sync_endl;
 
@@ -1211,25 +1317,22 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	//--------------------------------------
 	//	weak pieces
 	//--------------------------------------
+	wScore=0;
+	bScore=0;
 	bitMap pawnAttackedPieces=bitBoard[whitePieces] & attackedSquares[blackPawns];
 	while(pawnAttackedPieces){
 		tSquare attacked=firstOne(pawnAttackedPieces);
-		res-=attackedByPawnPenalty[squares[attacked]&separationBitmap];
+		wScore-=attackedByPawnPenalty[squares[attacked]&separationBitmap];
 		pawnAttackedPieces &=pawnAttackedPieces-1;
 	}
-	pawnAttackedPieces=bitBoard[blackPieces] & attackedSquares[whitePawns];
-	while(pawnAttackedPieces){
-		tSquare attacked=firstOne(pawnAttackedPieces);
-		res+=attackedByPawnPenalty[squares[attacked]&separationBitmap];
-		pawnAttackedPieces &=pawnAttackedPieces-1;
-	}
+
 
 	// todo fare un weak piece migliore:qualsiasi pezzo attaccato riceve un malus dipendente dal suo più debole attaccante e dal suo valore.
 	// volendo anche da quale pezzo è difeso
 	bitMap weakPieces=bitBoard[whitePieces] & attackedSquares[blackPieces] &~attackedSquares[whitePawns];
 	bitMap undefendedMinors =  (bitBoard[whiteKnights] | bitBoard[whiteBishops])  & ~attackedSquares[whitePieces];
 	if (undefendedMinors){
-		res-=simdScore(956,254,0,0);
+		wScore-=simdScore(956,254,0,0);
 	}
 	while(weakPieces){
 		tSquare p=firstOne(weakPieces);
@@ -1238,17 +1341,27 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		bitboardIndex attackingPiece=blackPawns;
 		for(;attackingPiece>=separationBitmap;attackingPiece=(bitboardIndex)(attackingPiece-1)){
 			if(attackedSquares[attackingPiece] & bitSet(p)){
-				res-=weakPiecePenalty[attackedPiece%separationBitmap][attackingPiece%separationBitmap];
+				wScore-=weakPiecePenalty[attackedPiece%separationBitmap][attackingPiece%separationBitmap];
 				break;
 			}
 		}
 		weakPieces&=weakPieces-1;
 	}
 
+
+
+
+
+	pawnAttackedPieces=bitBoard[blackPieces] & attackedSquares[whitePawns];
+	while(pawnAttackedPieces){
+		tSquare attacked=firstOne(pawnAttackedPieces);
+		bScore-=attackedByPawnPenalty[squares[attacked]&separationBitmap];
+		pawnAttackedPieces &=pawnAttackedPieces-1;
+	}
 	weakPieces=bitBoard[blackPieces] & attackedSquares[whitePieces] &~attackedSquares[blackPawns];
 	undefendedMinors =  (bitBoard[blackKnights] | bitBoard[blackBishops])  & ~attackedSquares[blackPieces];
 	if (undefendedMinors){
-		res+=simdScore(956,254,0,0);
+		bScore-=simdScore(956,254,0,0);
 	}
 	while(weakPieces){
 		tSquare p=firstOne(weakPieces);
@@ -1256,11 +1369,22 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		bitboardIndex attackingPiece=whitePawns;
 		for(;attackingPiece>=occupiedSquares;attackingPiece=(bitboardIndex)(attackingPiece-1)){
 			if(attackedSquares[attackingPiece] & bitSet(p)){
-				res+=weakPiecePenalty[attackedPiece%separationBitmap][attackingPiece%separationBitmap];
+				bScore-=weakPiecePenalty[attackedPiece%separationBitmap][attackingPiece%separationBitmap];
 				break;
 			}
 		}
 		weakPieces&=weakPieces-1;
+	}
+	res+=wScore-bScore;
+	if(trace){
+		sync_cout << std::setw(20) << "threat" << " |"
+				  << std::setw(6)  << (wScore[0])/10000.0 << " "
+				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
+				  << std::setw(6)  << (bScore[0])/10000.0 << " "
+				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
 	}
 
 
@@ -1272,7 +1396,8 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	//--------------------------------------
 	//	king safety
 	//--------------------------------------
-	// todo tenere conto anche della possibilita di arrocco
+	wScore=0;
+	bScore=0;
 	simdScore kingSafety[2]={0,0};
 
 	bitMap pawnShield=kingShield[white]&bitBoard[whitePawns];
@@ -1325,6 +1450,8 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		}
 		kingSafety[0]=max(ks,kingSafety[0]);
 	}
+	wScore=kingSafety[0];
+
 
 
 	pawnShield=kingShield[black]&bitBoard[blackPawns];
@@ -1377,6 +1504,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		}
 		kingSafety[1]=max(ks,kingSafety[1]);
 	}
+	bScore=kingSafety[1];
 
 	res+=kingSafety[0]-kingSafety[1];
 
@@ -1443,9 +1571,12 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		attackUnits = std::min(99, std::max(0, attackUnits));
 		attackUnits*=attackUnits;
 		res+=simdScore(attackUnits*3,attackUnits/5,0,0);
-
+		if(trace){
+			wScore +=simdScore(attackUnits*3,attackUnits/5,0,0);
+		}
 
 	}
+
 
 	if(kingAttackersCount[black]>=2 && kingAdjacentZoneAttacksCount[black])
 	{
@@ -1508,8 +1639,22 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		attackUnits = std::min(99, std::max(0, attackUnits));
 		attackUnits*=attackUnits;
 		res-=simdScore(attackUnits*3,attackUnits/5,0,0);
+		if(trace){
+			bScore +=simdScore(attackUnits*3,attackUnits/5,0,0);
+		}
 
 
+	}
+
+	if(trace){
+		sync_cout << std::setw(20) << "king safety" << " |"
+				  << std::setw(6)  << (wScore[0])/10000.0 << " "
+				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
+				  << std::setw(6)  << (bScore[0])/10000.0 << " "
+				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
+				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		traceRes=res;
 	}
 
 
@@ -1540,3 +1685,6 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	}
 
 }
+
+template Score Position::eval<false>(pawnTable& pawnHashTable) const;
+template Score Position::eval<true>(pawnTable& pawnHashTable) const;
