@@ -1,0 +1,110 @@
+
+--------------------------------------------------------------------------------
+
+Analysis of C:\Users\belli\workspace\vajolet2\test\bt2630.epd   
+Analyzing engine: Vajolet-0.72
+11/01/2014 14:06:30 Level: 900 Seconds
+   Source                    : List of EPD/PGN files
+      C:\Users\belli\workspace\vajolet2\test\bt2630.epd
+   Colours                   : White moves=True, Black moves=True
+   Direction                 : forward
+   Games (PGN)               : From 1 to 999999
+   Moves                     : From 1 to 250
+   Positions (EPD)           : All positions
+   Use Engine(s)             : List
+      Vajolet2
+   Use seconds per move      : 900 Seconds per move
+   Analysis Lines            : Minimum search depth=2
+   Activate abort analysis   : True. Minimal analysis depth 9. Abort, if the correct move is held 4 additional ply
+  1) Nf5xg7             ...      
+0 of 1 matching moves
+11/01/2014 14:07:07, Total time: 00:00:37 Rated time: 15:00 = 900 Seconds
+
+--------------------------------------------------------------------------------
+
+Analysis of C:\Users\belli\workspace\vajolet2\test\bt2630.epd   
+Analyzing engine: Vajolet2
+11/01/2014 14:08:03 Level: 900 Seconds
+   Source                    : Current game
+   Colours                   : White moves=True, Black moves=True
+   Direction                 : forward
+   Moves                     : From 1 to 250
+   Use Engine(s)             : List
+      Vajolet2
+   Use seconds per move      : 900 Seconds per move
+   Analysis Lines            : Minimum search depth=2
+   Activate abort analysis   : True. Minimal analysis depth 9. Abort, if the correct move is held 4 additional ply
+ 1. d2-d4             e2-e4    
+0 of 1 matching moves
+11/01/2014 14:08:26, Total time: 00:00:23 Rated time: 15:00 = 900 Seconds
+
+--------------------------------------------------------------------------------
+
+Analysis of C:\Users\belli\workspace\vajolet2\test\bt2630.epd   
+Analyzing engine: Vajolet2
+11/01/2014 14:08:31 Level: 900 Seconds
+   Source                    : List of EPD/PGN files
+      C:\Users\belli\workspace\vajolet2\test\bt2630.epd
+   Colours                   : White moves=True, Black moves=True
+   Direction                 : forward
+   Games (PGN)               : From 1 to 999999
+   Moves                     : From 1 to 250
+   Positions (EPD)           : All positions
+   Use Engine(s)             : List
+      Vajolet2
+   Use seconds per move      : 900 Seconds per move
+   Analysis Lines            : Minimum search depth=2
+   Activate abort analysis   : True. Minimal analysis depth 9. Abort, if the correct move is held 4 additional ply
+  1) Nf5xg7             Nf5xg7  * 0 Seconds
+1 of 1 matching moves
+11/01/2014 14:08:39, Total time: 00:00:07 Rated time: 00:00 = 0 Seconds
+
+--------------------------------------------------------------------------------
+
+Analysis of C:\Users\belli\workspace\vajolet2\test\bt2630.epd   
+Analyzing engine: Vajolet2
+11/01/2014 14:08:49 Level: 900 Seconds
+   Source                    : List of EPD/PGN files
+      C:\Users\belli\workspace\vajolet2\test\bt2630.epd
+   Colours                   : White moves=True, Black moves=True
+   Direction                 : forward
+   Games (PGN)               : From 1 to 999999
+   Moves                     : From 1 to 250
+   Positions (EPD)           : All positions
+   Use Engine(s)             : List
+      Vajolet2
+   Use seconds per move      : 900 Seconds per move
+   Analysis Lines            : Minimum search depth=2
+   Activate abort analysis   : True. Minimal analysis depth 9. Abort, if the correct move is held 4 additional ply
+  1) Nf5xg7             Nf5xg7  * 0 Seconds
+  2) Bd4xb6             Bd4xb6  * 29 Seconds
+  3) Re5-e6             Re5-e6  * 11 Seconds
+  4) Qa2-f7             Re1-b1   
+  5) Kb5-a6             ...      
+  6) .. e4-e3           e4-e3   * 1 Second
+  7) .. Rc6-d6          Rc6-d6  * 1 Second
+  8) Rd6xc6             Rd6xc6  * 0 Seconds
+  9) .. g6-g5           g6-g5   * 22 Seconds
+ 10) Rg1xg7             Rg1xg7  * 0 Seconds
+ 11) .. Qh3xh2          Qh3xh2  * 0 Seconds
+ 12) .. Qe6-e4          Qe6-e4  * 35 Seconds
+ 13) .. Bc8-e6          Bc8-e6  * 4 Seconds
+ 14) Rh3xh7             Rh3xh7  * 0 Seconds
+ 15) e4-e5              Rf2-f6   
+ 16) .. Nh4xg2          Nh4xg2  * 54 Seconds
+ 17) Qc1xf4             Qc1xf4  * 2 Seconds
+ 18) d5-d6              d5-d6   * 1 Second
+ 19) .. f4-f3           f4-f3   * 1 Second
+ 20) Ra1-a2             Ra1-a2  * 23 Seconds
+ 21) Re4-e1             g6-g7    
+ 22) a2-a3              a2-a3   * 2 Seconds
+ 23) g3-g4              ...      
+ 24) g5-g6              ...      
+ 25) .. Ne5-d3          ...      
+ 26) f4-f5              f4-f5   * 207 Seconds
+ 27) e5-e6              e5-e6   * 8 Seconds
+ 28) e4-e5              Ra1-e1   
+ 29) O-O-O              O-O-O   * 9 Seconds
+ 30) f3-f4              f3-f4   * 3 Seconds
+22 of 30 matching moves
+11/01/2014 16:07:31, Total time: 01:58:41 Rated time: 2:06:53 = 7613 Seconds

@@ -660,6 +660,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	const bitMap & enemyHoles=(piece>Position::separationBitmap)? holes[white]:holes[black];
 	const bitMap & supportedSquares=(piece>Position::separationBitmap)? attackedSquares[Position::blackPawns]:attackedSquares[Position::whitePawns];
 	const bitMap & threatenSquares=(piece>Position::separationBitmap)? attackedSquares[Position::whitePawns]:attackedSquares[Position::blackPawns];
+	const bitMap ourPieces=(piece>Position::separationBitmap)? p.bitBoard[Position::blackPieces]:p.bitBoard[Position::whitePieces];
 	while(tempPieces){
 		tSquare sq=firstOne(tempPieces);
 		tempPieces&= tempPieces-1;
@@ -712,7 +713,12 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		attackedSquares[piece]|=attack;
 
 
-		unsigned int mobility= bitCnt(attack&~threatenSquares);
+		bitMap defendedPieces=attack&ourPieces;
+		// piece coordination
+		res+=bitCnt(defendedPieces)*simdScore(200,180,0,0);
+
+		unsigned int mobility= bitCnt(attack&~(threatenSquares/*|ourPieces*/));
+		//sync_cout<<mobility<<sync_endl;
 		res+=mobilityBonus[piece%Position::separationBitmap][mobility];
 		//todo alfiere buono cattivo
 		//todo controllo centro
@@ -1289,11 +1295,11 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	spaceb &=~attackedSquares[whitePieces];
 
 	//displayBitmap(spaceb);
-	res+=(bitCnt(spacew)-bitCnt(spaceb))*simdScore(100,0,0,0);
+	res+=(bitCnt(spacew)-bitCnt(spaceb))*simdScore(800,0,0,0);
 
 	if(trace){
-		wScore=bitCnt(spacew)*simdScore(100,0,0,0);
-		bScore=bitCnt(spaceb)*simdScore(100,0,0,0);
+		wScore=bitCnt(spacew)*simdScore(800,0,0,0);
+		bScore=bitCnt(spaceb)*simdScore(800,0,0,0);
 		sync_cout << std::setw(20) << "space" << " |"
 				  << std::setw(6)  << (wScore[0])/10000.0 << " "
 				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
