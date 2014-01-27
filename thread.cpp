@@ -108,7 +108,11 @@ void my_thread::timerThread() {
 			if(time - lastHasfullMessage>1000){
 				lastHasfullMessage=time;
 				sync_cout<<"info hashfull "<<TT.getFullness()<<sync_endl;
+				if(src.showCurrentLine){
+					src.showLine=true;
+				}
 			}
+
 			if(timeMan.idLoopIterationFinished && time>=timeMan.allocatedTime*0.6 && !(limits.infinite || limits.ponder)){
 				src.signals.stop=true;
 			}

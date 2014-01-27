@@ -131,6 +131,8 @@ public:
 		\date 27/10/2013
 	*/
 	static int castleRightsMask[squareNumber];
+public:
+	unsigned int getStateIndex(void){ return stateIndex;}
 private:
 
 	unsigned int stateIndex;
@@ -256,6 +258,13 @@ public:
 		//return (state&) *actualState;
 	}
 
+	inline state& getState(unsigned int n)const {
+			assert(stateIndex>=1);
+			assert(n<stateInfo.size());
+			return (state&) stateInfo[n];
+			//return (state&) *actualState;
+		}
+
 	/*! \brief insert a new state in memory
 		\author Marco Belli
 		\version 1.0
@@ -307,7 +316,13 @@ public:
 	*/
 	std::string displayUci(Move & m) const{
 
+
 		std::string s;
+
+		if(m.packed==0){
+			s="0000";
+			return s;
+		}
 
 		//from
 		s+=char('a'+FILES[m.from]);

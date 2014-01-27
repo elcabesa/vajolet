@@ -74,6 +74,7 @@ Score search::nonPVreduction[32*ONE_PLY][64];
 unsigned int search::multiPVLines=1;
 bool search::useOwnBook=true;
 bool search::bestMoveBook=false;
+bool search::showCurrentLine=false;
 
 void search::startThinking(Position & p,searchLimits & l){
 	signals.stop=false;
@@ -366,6 +367,16 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	Move threatMove;
 	threatMove=0;
 
+	if( showLine && depth <=ONE_PLY){
+		showLine=false;
+		sync_cout<<"info currline";
+		for (int i =1; i<= pos.getStateIndex()/2;i++){ // show only half of
+			std::cout<<" "<<pos.displayUci(pos.getState(i).currentMove);
+
+		}
+		std::cout<<sync_endl;
+	}
+
 
 	const search::nodeType childNodesType=
 			type==search::nodeType::ALL_NODE?
@@ -486,8 +497,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	//------------------------
 	// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
 	//------------------------
-	if (/*!PVnode
-		&& */!inCheck
+	if (!PVnode
+		&& !inCheck
 		&&  depth < 4 * ONE_PLY
 		&&  eval + razorMargin(depth) <= alpha
 		&&  alpha >= -SCORE_INFINITE+razorMargin(depth)

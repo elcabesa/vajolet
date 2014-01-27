@@ -91,6 +91,8 @@ public:
 	static unsigned int multiPVLines;
 	static bool useOwnBook;
 	static bool bestMoveBook;
+	static bool showCurrentLine;
+	volatile bool showLine;
 	static void initLMRreduction(void){
 		for (int d = 1; d < 32*ONE_PLY; d++)
 			for (int mc = 1; mc < 64; mc++)

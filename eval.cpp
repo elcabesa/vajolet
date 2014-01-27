@@ -89,6 +89,49 @@ bool evalKBPvsK(const Position& p, Score& res){
 
 }
 
+bool evalKBNvsK(const Position& p, Score& res){
+	color color=p.bitBoard[Position::whiteBishops]?white:black;
+	tSquare bishopSquare;
+	tSquare kingSquare;
+	tSquare enemySquare;
+	tSquare mateSquare1,mateSquare2;
+	int mul=1;
+	if(color==white){
+		mul=1;
+		bishopSquare = p.pieceList[Position::whiteBishops][0];
+		kingSquare = p.pieceList[Position::whiteKing][0];
+		enemySquare = p.pieceList[Position::blackKing][0];
+	}
+	else{
+		mul=-1;
+		bishopSquare = p.pieceList[Position::blackBishops][0];
+		kingSquare = p.pieceList[Position::blackKing][0];
+		enemySquare = p.pieceList[Position::whiteKing][0];
+
+	}
+	int mateColor =SQUARE_COLOR[bishopSquare];
+	if(mateColor== 0){
+		mateSquare1=A1;
+		mateSquare2=H8;
+	}else{
+		mateSquare1=A8;
+		mateSquare2=H1;
+	}
+
+	res= SCORE_KNOWN_WIN+50000;
+	//sync_cout<<"dis1="<<SQUARE_DISTANCE[enemySquare][kingSquare]<<sync_endl;
+	//sync_cout<<"dis2="<<SQUARE_DISTANCE[enemySquare][mateSquare1]<<sync_endl;
+	//sync_cout<<"dis3="<<SQUARE_DISTANCE[enemySquare][mateSquare2]<<sync_endl;
+	res -= 5*SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
+	res -= 10*std::min(SQUARE_DISTANCE[enemySquare][mateSquare1],SQUARE_DISTANCE[enemySquare][mateSquare2]);// devo portare il re avversario nel giusto angolo
+
+
+
+	res *=mul;
+	return true;
+
+}
+
 
 
 void initMaterialKeys(void){
@@ -104,6 +147,7 @@ void initMaterialKeys(void){
 	 * kb vs kpawns	-> bishop cannot win
 	 * kn vs kpawns	-> bishop cannot win
 	 *
+	 * kbn vs k		-> win
 	 ----------------------------------------------*/
 
 
@@ -445,6 +489,25 @@ void initMaterialKeys(void){
 	key=p.getActualState().materialKey;
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKBPvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	k vs KBN
+	//------------------------------------------
+	p.setupFromFen("k7/8/8/8/8/8/8/5BNK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKBNvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kbn vs K
+	//------------------------------------------
+	p.setupFromFen("kbn5/8/8/8/8/8/8/7K w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKBNvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1159,8 +1222,8 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		if(rr){
 			tSquare blockingSquare=ppSq+pawnPush(white);
 			// bonus for king proximity to blocking square
-			passedPawnsBonus+=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*50*rr,0,0);
-			passedPawnsBonus-=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*20*rr,0,0);
+			passedPawnsBonus+=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*150*rr,0,0);
+			passedPawnsBonus-=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*120*rr,0,0);
 
 			if(squares[blockingSquare]==empty){
 				bitMap forwardSquares=SQUARES_IN_FRONT_OF[0][ppSq];
@@ -1218,8 +1281,8 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 			tSquare blockingSquare=ppSq+pawnPush(black);
 
 			// bonus for king proximity to blocking square
-			passedPawnsBonus+=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*50*rr,0,0);
-			passedPawnsBonus-=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*20*rr,0,0);
+			passedPawnsBonus+=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*150*rr,0,0);
+			passedPawnsBonus-=simdScore(0,SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*120*rr,0,0);
 
 			if(squares[blockingSquare]==empty){
 				bitMap forwardSquares=SQUARES_IN_FRONT_OF[1][ppSq];

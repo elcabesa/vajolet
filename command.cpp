@@ -63,6 +63,9 @@ void static printUciInfo(void){
 	std::cout<<"option name OwnBook type check default true"<<std::endl;
 	std::cout<<"option name BestMoveBook type check default false"<<std::endl;
 	std::cout<<"option name UCI_EngineAbout type string default VajoletII by Marco Belli"<<sync_endl;
+	std::cout<<"option name UCI_ShowCurrLine type check default false"<<sync_endl;
+	//std::cout<<"option name UCI_LimitStrength type check default false"<<sync_endl;
+	//std::cout<<"option name UCI_Elo type spin default 1000 min 1000 max 3000"<<sync_endl;
 	std::cout<<"uciok"<<sync_endl;
 }
 
@@ -204,6 +207,16 @@ void setoption(std::istringstream& is) {
 			search::bestMoveBook=false;
 		}
 	}
+	else if(name =="UCI_ShowCurrLine"){
+		if(value=="true"){
+			search::showCurrentLine=true;
+		}
+		else{
+			search::showCurrentLine=false;
+		}
+	}
+
+
 	else{
 		sync_cout << "No such option: " << name << sync_endl;
 	}
