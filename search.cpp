@@ -39,7 +39,10 @@ void search::printAllPV(Position & p, unsigned int count){
 
 	for (unsigned int i=0; i<count; i++){
 		Score res=rootMoves[i].previousScore;
-		printPV(res,rootMoves[i].depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,rootMoves[i].time,i,rootMoves[i].PV,rootMoves[i].nodes);
+		if(rootMoves[i].nodes)
+		{
+			printPV(res,rootMoves[i].depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,rootMoves[i].time,i,rootMoves[i].PV,rootMoves[i].nodes);
+		}
 	}
 }
 
@@ -72,6 +75,8 @@ Score search::FutilityMoveCounts[11]={5,10,17,26,37,50,66,85,105,130,151};
 Score search::PVreduction[32*ONE_PLY][64];
 Score search::nonPVreduction[32*ONE_PLY][64];
 unsigned int search::multiPVLines=1;
+unsigned int search::limitStrength=0;
+unsigned int search::eloStrenght=3000;
 bool search::useOwnBook=true;
 bool search::bestMoveBook=false;
 bool search::showCurrentLine=false;
@@ -80,8 +85,6 @@ void search::startThinking(Position & p,searchLimits & l){
 	signals.stop=false;
 	TT.newSearch();
 	History::instance().clear();
-
-
 
 	limits=l;
 	rootMoves.clear();
@@ -97,6 +100,11 @@ void search::startThinking(Position & p,searchLimits & l){
 			rm.previousScore=-SCORE_INFINITE;
 			rm.score=-SCORE_INFINITE;
 			rm.firstMove=m;
+			rm.selDepth=0;
+			rm.depth=0;
+			rm.nodes=0;
+			rm.time=0;
+
 			rootMoves.push_back(rm);
 		}
 	}
@@ -106,12 +114,24 @@ void search::startThinking(Position & p,searchLimits & l){
 			rm.previousScore=-SCORE_INFINITE;
 			rm.score=-SCORE_INFINITE;
 			rm.firstMove=*it;
+			rm.selDepth=0;
+			rm.depth=0;
+			rm.nodes=0;
+			rm.time=0;
 			rootMoves.push_back(rm);
 		}
-
 	}
 
-	unsigned int PVSize = std::min(search::multiPVLines, (unsigned int)rootMoves.size());
+	//sync_cout<<"legal moves ="<<rootMoves.size()<<sync_endl;
+	unsigned int PVSize = search::multiPVLines;
+
+	if(limitStrength){
+		int lines= (-8.0/2000.0)*(eloStrenght-1000)+10.0;
+		unsigned int linesToBeSearched=std::max(lines,4);
+		PVSize=	std::max(PVSize,linesToBeSearched);
+	}
+	PVSize = std::min(PVSize, (unsigned int)rootMoves.size());
+	//sync_cout<<"PV_SIZE ="<<PVSize<<sync_endl;
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
@@ -222,6 +242,7 @@ void search::startThinking(Position & p,searchLimits & l){
 				selDepth=selDepthBase;
 				newPV.clear();
 				p.cleanStateInfo();
+				//sync_cout<<"search line "<<PVIdx<<sync_endl;
 				res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,depth*ONE_PLY,alpha,beta,newPV);
 
 				/*sync_cout<<"FINISHED SEARCH"<<sync_endl;
@@ -340,10 +361,27 @@ void search::startThinking(Position & p,searchLimits & l){
 	while(limits.ponder){
 
 	}
-	sync_cout<<"bestmove "<<p.displayUci(rootMoves[0].PV[0]);
+
+	unsigned int bestMoveLine=0;
+	if(limitStrength){
+		double lambda=(eloStrenght-1000.0)*(0.8/2000)+0.2;
+
+		std::mt19937_64 rnd;
+		std::exponential_distribution<> uint_dist(lambda);
+		unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+		rnd.seed(now);
+		double res = uint_dist(rnd);
+
+		unsigned int pos=res;
+		bestMoveLine =std::min(pos,PVSize-1);
+	}
+	//sync_cout<<"bestMove index "<<bestMoveLine<<sync_endl;
+
+
+	sync_cout<<"bestmove "<<p.displayUci(rootMoves[bestMoveLine].PV[0]);
 	if(rootMoves[0].PV.size()>1)
 	{
-		std::cout<<" ponder "<<p.displayUci(rootMoves[0].PV[1]);
+		std::cout<<" ponder "<<p.displayUci(rootMoves[bestMoveLine].PV[1]);
 	}
 	std::cout<<sync_endl;
 #ifdef PRINT_STATISTICS
@@ -677,7 +715,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		pos.getActualState().skipNullMove=true;
 
 		std::vector<Move> childPV;
-		const search::nodeType iidType=PVnode? (search::nodeType::PV_NODE) : type;
+		const search::nodeType iidType=/*PVnode? (search::nodeType::PV_NODE) : type;*/type;
 		assert(d>=ONE_PLY);
 		alphaBeta<iidType>(ply,pos, d, alpha, beta, childPV);
 
@@ -719,6 +757,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 		// search only the moves in the search list
 		if(type==search::nodeType::ROOT_NODE && !std::count(rootMoves.begin()+PVIdx,rootMoves.end(),m)){
+			//sync_cout<<"avoid move "<<pos.displayUci(m)<<sync_endl;
 			continue;
 		}
 

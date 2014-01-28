@@ -89,6 +89,8 @@ class search{
 public:
 	std::vector<rootMove> rootMoves;
 	static unsigned int multiPVLines;
+	static unsigned int limitStrength;
+	static unsigned int eloStrenght;
 	static bool useOwnBook;
 	static bool bestMoveBook;
 	static bool showCurrentLine;

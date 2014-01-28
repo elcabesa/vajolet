@@ -1469,7 +1469,7 @@ Move  Movegen::getNextMove(){
 				Move t= pos.getActualState().killers[killerPos];
 				killerPos++;
 
-				if((t != ttMove) && isMoveLegal(pos,t)){
+				if((t != ttMove) && !pos.isCaptureMove(t) && isMoveLegal(pos,t)){
 					return t;
 				}
 			}

@@ -35,10 +35,10 @@
 */
 static void printStartInfo(void){
 	sync_cout<<PROGRAM_NAME<<" "<<VERSION<<" by Marco Belli"<<sync_endl;
-	bool hwpopcnt=__builtin_cpu_supports("popcnt");
+	/*bool hwpopcnt=__builtin_cpu_supports("popcnt");
 	if(hwpopcnt){
 		sync_cout<<"hw popcnt"<<sync_endl;
-	}
+	}*/
 }
 
 /*!	\brief	main function

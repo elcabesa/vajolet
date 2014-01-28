@@ -241,12 +241,12 @@ void Position::initScoreValues(void){
 	for(auto &val :pieceValue){
 		val=0;
 	}
-	pieceValue[whitePawns]=10000;
-	pieceValue[whiteKnights]=30000;
-	pieceValue[whiteBishops]=32500;
-	pieceValue[whiteRooks]=59000;
-	pieceValue[whiteQueens]=120000;
-	pieceValue[whiteKing]=3000000;
+	pieceValue[whitePawns]=simdScore(10000,10000,0,0);
+	pieceValue[whiteKnights]=simdScore(30000,30000,0,0);
+	pieceValue[whiteBishops]=simdScore(32500,32500,0,0);
+	pieceValue[whiteRooks]=simdScore(59000,59000,0,0);
+	pieceValue[whiteQueens]=simdScore(120000,120000,0,0);
+	pieceValue[whiteKing]=simdScore(3000000,3000000,0,0);
 
 	pieceValue[blackPawns]=-pieceValue[whitePawns];
 	pieceValue[blackKnights]=-pieceValue[whiteKnights];

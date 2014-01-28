@@ -39,7 +39,7 @@ enum color{
 typedef struct{
 	enum {
 		exact,
-		additiveFunction,
+		multiplicativeFunction,
 		exactFunction,
 		saturationH,
 		saturationL
@@ -131,6 +131,16 @@ bool evalKBNvsK(const Position& p, Score& res){
 	return true;
 
 }
+
+bool evalOppositeBishopEndgame(const Position& p, Score& res){
+	if(SQUARE_COLOR[p.pieceList[Position::blackBishops][0]] !=SQUARE_COLOR[ p.pieceList[Position::whiteBishops][0]]){
+		res=128;
+		return true;
+	}
+	return false;
+
+}
+
 
 
 
@@ -510,6 +520,35 @@ void initMaterialKeys(void){
 	t.pointer=&evalKBNvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
+
+
+	//------------------------------------------
+	//	opposite bishop endgame
+	//------------------------------------------
+	for(int wp=0;wp<=8;wp++){
+		for(int bp=0;bp<=8;bp++){
+			if(wp!=0 || bp !=0){
+				std::string s="kb6/";
+				for(int i=0;i<bp;i++){
+					s+="p";
+				}
+				if(bp!=8){s+=std::to_string(8-bp);}
+				s+="/8/8/8/8/";
+				for(int i=0;i<wp;i++){
+					s+="P";
+				}
+				if(wp!=8){s+=std::to_string(8-wp);}
+				s+="/6BK w - -";
+				//sync_cout<<s<<sync_endl;
+				p.setupFromFen(s);
+				key=p.getActualState().materialKey;
+				t.type=materialStruct::multiplicativeFunction;
+				t.pointer=&evalOppositeBishopEndgame;
+				t.val=0;
+				materialKeyMap.insert({key,t});
+			}
+		}
+	}
 
 
 
@@ -894,6 +933,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 	Score lowSat=-SCORE_INFINITE;
 	Score highSat=SCORE_INFINITE;
+	Score mulCoeff=256;
 
 	bitMap attackedSquares[lastBitboard]={0};
 	bitMap weakSquares[2]={0};
@@ -920,6 +960,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 
 
+
 	// todo modificare valori material value & pst
 	// material + pst
 	state &st =getActualState();
@@ -936,15 +977,22 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 		case materialStruct::exact:
 			return materialData->val;
 			break;
-		case materialStruct::additiveFunction:
-			break;
-		case materialStruct::exactFunction:
-			Score res;
+		case materialStruct::multiplicativeFunction:{
+			Score r;
+			if(materialData->pointer(*this,r)){
+				mulCoeff=r;
+			}
 
-			if(materialData->pointer(*this,res)){
-				return res;
+			break;
+		}
+		case materialStruct::exactFunction:
+		{	Score r;
+
+			if(materialData->pointer(*this,r)){
+				return r;
 			}
 			break;
+		}
 		case materialStruct::saturationH:
 			highSat=materialData->val;
 			break;
@@ -1381,8 +1429,6 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 	//todo weakpawn
 
-	//todo unsopported pieces/weak pieces
-	//todo undefended minor
 	//--------------------------------------
 	//	weak pieces
 	//--------------------------------------
@@ -1737,7 +1783,12 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	signed int gamePhase=getGamePhase();
 
 	signed long long r=((signed long long)res[0])*(65536-gamePhase)+((signed long long)res[1])*gamePhase;
+
 	Score score =(r)/65536;
+	if(mulCoeff!=256){
+		score*=mulCoeff;
+		score/=256;
+	}
 
 	// final value saturation
 	score=std::min(highSat,score);
