@@ -165,7 +165,7 @@ public:
 	void undoMove(Move &m);
 	static void initCastleRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
-	template<bool trace>Score eval(pawnTable& pawnHashTable) const;
+	template<bool trace>Score eval(pawnTable& pawnHashTable, evalTable& evalTable) const;
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 	bool moveGivesCheck(Move& m)const ;
@@ -198,6 +198,14 @@ public:
 	*/
 	inline static char isKing(bitboardIndex piece){
 		return (piece&7)==1;
+	}
+	/*! \brief tell if the piece is a queen
+		\author Marco Belli
+		\version 1.0
+		\date 04/11/2013
+	*/
+	inline static char isQueen(bitboardIndex piece){
+		return (piece&7)==2;
 	}
 	/*! \brief tell if the piece is a rook
 		\author Marco Belli

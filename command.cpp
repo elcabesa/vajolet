@@ -323,7 +323,8 @@ void uciLoop(){
 		}
 		else if (token =="eval"){
 			pawnTable pawnHashTable;
-			sync_cout<<"Eval:" <<pos.eval<true>(pawnHashTable)/10000.0<<sync_endl;
+			evalTable evalHashTable;
+			sync_cout<<"Eval:" <<pos.eval<true>(pawnHashTable,evalHashTable)/10000.0<<sync_endl;
 			sync_cout<<"gamePhase:" <<pos.getGamePhase()/65536.0*100<<"%"<<sync_endl;
 		}
 		else if (token =="isready"){

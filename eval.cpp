@@ -921,7 +921,19 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	\date 27/10/2013
 */
 template<bool trace>
-Score Position::eval(pawnTable& pawnHashTable) const {
+Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
+
+	state &st =getActualState();
+	evalEntry* probeEval= evalTable.probe(st.key);
+	if(probeEval!=nullptr){
+		if(st.nextMove)
+		{
+			return -probeEval->res;
+		}
+		else{
+			return probeEval->res;
+		}
+	}
 
 	simdScore traceRes=0;
 	if(trace){
@@ -963,7 +975,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 	// todo modificare valori material value & pst
 	// material + pst
-	state &st =getActualState();
+
 	simdScore res=simdScore(st.material[0],st.material[1],0,0);
 
 
@@ -1142,7 +1154,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 		holes[black]= weakSquares[black]&temp;
 
-		pawnHashTable.insert(getActualState().pawnKey,pawnResult, weakPawns, passedPawns,attackedSquares[whitePawns],attackedSquares[blackPawns],weakSquares[white],weakSquares[black],holes[white],holes[black]);
+		pawnHashTable.insert(st.pawnKey,pawnResult, weakPawns, passedPawns,attackedSquares[whitePawns],attackedSquares[blackPawns],weakSquares[white],weakSquares[black],holes[white],holes[black]);
 
 
 
@@ -1794,6 +1806,7 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 	score=std::min(highSat,score);
 	score=std::max(lowSat,score);
 
+	evalTable.insert(st.pawnKey,score);
 
 
 	if(st.nextMove)
@@ -1806,5 +1819,5 @@ Score Position::eval(pawnTable& pawnHashTable) const {
 
 }
 
-template Score Position::eval<false>(pawnTable& pawnHashTable) const;
-template Score Position::eval<true>(pawnTable& pawnHashTable) const;
+template Score Position::eval<false>(pawnTable& pawnHashTable, evalTable& evalTable) const;
+template Score Position::eval<true>(pawnTable& pawnHashTable, evalTable& evalTable) const;

@@ -190,6 +190,12 @@ void Position::initPstValues(void){
 				/*if(isPawn((bitboardIndex)piece)){
 					pstValue[piece][s].insert(1,100*(rank-3.5));
 				}*/
+				if(isRook((bitboardIndex)piece)){
+					pstValue[piece][s]=simdScore(-125*std::abs(file-3.5),0,0,0);
+				}
+				if(isQueen((bitboardIndex)piece)){
+					pstValue[piece][s]*=0.1;
+				}
 
 				if(!isKing((bitboardIndex)piece)){
 					pstValue[piece][s]+=pieceValue[piece];
@@ -211,6 +217,13 @@ void Position::initPstValues(void){
 					pstValue[piece][s].insert(1,-100*(rank-3.5));
 				}*/
 
+				if(isRook((bitboardIndex)piece)){
+					pstValue[piece][s]=simdScore(125*std::abs(file-3.5),0,0,0);
+				}
+				if(isQueen((bitboardIndex)piece)){
+					pstValue[piece][s]*=0.1;
+				}
+
 				if(!isKing((bitboardIndex)piece)){
 					pstValue[piece][s]+=pieceValue[piece];
 				}
@@ -230,6 +243,10 @@ void Position::initPstValues(void){
 			}
 		}
 	}
+
+	/*for(tSquare s=(tSquare)0;s<squareNumber;s++){
+		sync_cout<<pstValue[whiteRooks][s][0]<<sync_endl;
+	}*/
 }
 
 /*! \brief init the score value in the static const

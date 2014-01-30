@@ -80,6 +80,7 @@ class search{
 	static Score nonPVreduction[32*ONE_PLY][64];
 	unsigned long startTime;
 	pawnTable pawnHashTable;
+	evalTable evalHashTable;
 
 	searchLimits limits;
 

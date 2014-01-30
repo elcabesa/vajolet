@@ -78,7 +78,36 @@ public:
 
 	}
 private:
-	HashTable<pawnEntry, 16384> pawnTable;
+	HashTable<pawnEntry, 65536> pawnTable;
+};
+
+
+class evalEntry
+{
+public:
+	U64 key;
+	Score res;
+};
+
+class evalTable
+{
+public:
+	void insert(U64 key,Score res){
+		evalEntry* x=evalTable[key];
+		x->key=key;
+		x->res=res;
+	}
+
+	evalEntry* probe(U64 key){
+		evalEntry* x=evalTable[key];
+		if(x->key==key){
+			return x;
+		}
+		return nullptr;
+
+	}
+private:
+	HashTable<evalEntry, 524288> evalTable;
 };
 
 
