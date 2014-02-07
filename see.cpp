@@ -39,12 +39,12 @@ Score Position::seeSign(Move m) const {
 
 Score Position::see(Move m) const {
 
-	if(!m.packed){
-		sync_cout<<"eccolo"<<sync_endl;
-	}
 	assert(m.packed);
-//	display();
-//	sync_cout<<displayUci(m)<<sync_endl;
+#ifdef DEBUG_SEE
+	sync_cout<<"--------------------------------------------"<<sync_endl;
+	display();
+	sync_cout<<displayUci(m)<<sync_endl;
+#endif
 
 	tSquare from=(tSquare)m.from, to=(tSquare)m.to;
 	bitMap occupied=bitBoard[occupiedSquares]^bitSet(from);
@@ -79,6 +79,9 @@ Score Position::see(Move m) const {
 //	displayBitMap(colorAttackers);
 
 	if (!colorAttackers){
+#ifdef DEBUG_SEE
+	sync_cout<<"SEE:"<<swapList[0]/10000.0<<sync_endl;
+#endif
 		return swapList[0];
 	}
 
@@ -163,6 +166,10 @@ Score Position::see(Move m) const {
 	while (--slIndex){
 		swapList[slIndex-1] = std::min(-swapList[slIndex], swapList[slIndex-1]);
 	}
+
+#ifdef DEBUG_SEE
+	sync_cout<<"SEE:"<<swapList[0]/10000.0<<sync_endl;
+#endif
 
 
 

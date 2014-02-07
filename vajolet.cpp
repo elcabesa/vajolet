@@ -68,6 +68,7 @@ int main()
 	TT.setSize(1);
 	History::instance().clear();
 	initMaterialKeys();
+	initMobilityBonus();
 
 
 

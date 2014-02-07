@@ -46,6 +46,17 @@ public :
 	unsigned long long resultNodeTypeAll;
 	unsigned long long resultNodeTypePv;
 
+	unsigned long long cutNodeOrderingSum;
+	unsigned long long cutNodeOrderingCounter;
+	unsigned int worstCutNodeOrdering;
+	unsigned long long cutNodeOrderingArray[200];
+
+	unsigned long long allNodeOrderingSum;
+	unsigned long long allNodeOrderingCounter;
+
+	unsigned long long pvNodeOrderingCounter;
+	unsigned long long pvNodeOrderingSum;
+
 	void gatherNodeTypeStat(search::nodeType expectedNodeType,search::nodeType resultNodeType);
 	void printNodeTypeStat();
 	void initNodeTypeStat();

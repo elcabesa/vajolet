@@ -39,6 +39,17 @@ void Statistics::printNodeTypeStat(){
 	sync_cout<<"tested Cut razoring: "<<testedCutPruning<<sync_endl;
 	sync_cout<<"correct Cut razoring: "<<correctCutPruning<<sync_endl;
 	sync_cout<<"% correct Cut pruning: "<<(signed long long)(correctCutPruning)/float(testedCutPruning)*100.0<<std::endl<<sync_endl;
+
+	sync_cout<<"Cut node ordering performance: "<<(signed long long)(cutNodeOrderingSum)/float(cutNodeOrderingCounter)<<" "<<cutNodeOrderingCounter<<sync_endl;
+	sync_cout<<"worst move ordering: "<<worstCutNodeOrdering<<std::endl<<sync_endl;
+	sync_cout<<"all node ordering performance: "<<(signed long long)(allNodeOrderingSum)/float(allNodeOrderingCounter)<<std::endl<<sync_endl;
+	sync_cout<<"pv node ordering performance: "<<(signed long long)(pvNodeOrderingSum)/float(pvNodeOrderingCounter)<<std::endl<<sync_endl;
+
+	for(int i=0;i<200;i++){
+		sync_cout<<"["<< i<<"]: "<<cutNodeOrderingArray[i]<<sync_endl;
+	}
+
+
 }
 
 void Statistics::gatherNodeTypeStat(search::nodeType expectedNodeType,search::nodeType resultNodeType){
@@ -91,6 +102,20 @@ void Statistics::initNodeTypeStat(){
 	testedCut=0;
 	testedCutPruning=0;
 	correctCutPruning=0;
+
+	cutNodeOrderingSum=0;
+	cutNodeOrderingCounter=0;
+	worstCutNodeOrdering=0;
+
+	allNodeOrderingSum=0;
+	allNodeOrderingCounter=0;
+
+	pvNodeOrderingSum=0;
+	pvNodeOrderingCounter=0;
+
+	for(int i=0;i<200;i++){
+		cutNodeOrderingArray[i]=0;
+	}
 }
 
 

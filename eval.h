@@ -23,7 +23,7 @@
 #include "vajolet.h"
 
 void initMaterialKeys();
-
+void initMobilityBonus();
 
 template<class Entry, int Size>
 struct HashTable

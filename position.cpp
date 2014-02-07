@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <string>
+#include <cstdlib>
 #include "vajolet.h"
 #include "position.h"
 #include "data.h"
@@ -181,28 +182,57 @@ void Position::initPstValues(void){
 		for(tSquare s=(tSquare)0;s<squareNumber;s++){
 			assert(piece<lastBitboard);
 			assert(s<squareNumber);
-			nonPawnValue[piece]/*[s]*/=0;
+			nonPawnValue[piece]=0;
 			pstValue[piece][s]=0;
 			int rank=RANKS[s];
 			int file=FILES[s];
-			if(piece >occupiedSquares && piece <whitePieces ){
-				pstValue[piece][s]=-10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
-				/*if(isPawn((bitboardIndex)piece)){
-					pstValue[piece][s].insert(1,100*(rank-3.5));
-				}*/
-				if(isRook((bitboardIndex)piece)){
-					pstValue[piece][s]=simdScore(-125*std::abs(file-3.5),0,0,0);
-				}
-				if(isQueen((bitboardIndex)piece)){
-					pstValue[piece][s]*=0.1;
-				}
 
+			if(piece >occupiedSquares && piece <whitePieces ){
+
+				if(piece == Pawns){
+					pstValue[piece][s]=0;
+					if(s== D5 || s==E5 || s== D3 || s==E3){
+						pstValue[piece][s].insert(0,935);
+					}
+					if(s== D4 || s==E4){
+						pstValue[piece][s].insert(0,1750);
+					}
+					pstValue[piece][s].insert(1,10*(rank-2));
+					pstValue[piece][s]-=std::abs(file-3.5);
+				}
+				if(piece== Knights){
+					pstValue[piece][s]=simdScore(
+							-(std::abs(file-3.5)+std::abs(rank-3.5))*95,
+							-(std::abs(file-3.5)+std::abs(rank-3.5))*32,
+							0,0);
+				}
+				if(piece== Bishops){
+					pstValue[piece][s]=simdScore(
+							-(std::abs(file-3.5)+std::abs(rank-3.5))*32,
+							-(std::abs(file-3.5)+std::abs(rank-3.5))*23,
+							0,0);
+				}
+				if(piece==Rooks){
+					pstValue[piece][s]=simdScore(
+						-std::abs(file-3.5)*28,
+						0,
+						0,0);
+				}
+				if(piece== Queens){
+					pstValue[piece][s]=simdScore(
+						0,
+						-(std::abs(file-3.5)+std::abs(rank-3.5))*42,
+						0,0);
+				}
+				if(piece== King){
+					pstValue[piece][s]=simdScore(
+						std::abs(file-3.5)*110+(1-rank)*150,
+						-(std::abs(file-3.5)+std::abs(rank-3.5))*127,
+
+						0,0);
+				}
 				if(!isKing((bitboardIndex)piece)){
 					pstValue[piece][s]+=pieceValue[piece];
-				}
-				else{
-					pstValue[piece][s].insert(0,-pstValue[piece][s][0]);
-					//pstValue[piece][s]*=3;
 				}
 
 				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
@@ -212,31 +242,14 @@ void Position::initPstValues(void){
 
 			}
 			else if(piece >separationBitmap && piece <blackPieces ){
-				pstValue[piece][s]=10*(rank-3.5)*(rank-3.5)*(file-3.5)*(file-3.5);
-				/*if(isPawn((bitboardIndex)piece)){
-					pstValue[piece][s].insert(1,-100*(rank-3.5));
-				}*/
+				int r=7-rank;
+				int f =7-file;
+				pstValue[piece][s]=-pstValue[piece-separationBitmap][BOARDINDEX[f][r]];
 
-				if(isRook((bitboardIndex)piece)){
-					pstValue[piece][s]=simdScore(125*std::abs(file-3.5),0,0,0);
-				}
-				if(isQueen((bitboardIndex)piece)){
-					pstValue[piece][s]*=0.1;
-				}
-
-				if(!isKing((bitboardIndex)piece)){
-					pstValue[piece][s]+=pieceValue[piece];
-				}
-				else{
-					pstValue[piece][s].insert(0,-pstValue[piece][s][0]);
-					//pstValue[piece][s]*=3;
-				}
 				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
-
 					nonPawnValue[piece].insert(2,-pieceValue[piece][0]);
 					nonPawnValue[piece].insert(3,-pieceValue[piece][1]);
 				}
-
 			}
 			else{
 				pstValue[piece][s]=0;
@@ -244,8 +257,9 @@ void Position::initPstValues(void){
 		}
 	}
 
-	/*for(tSquare s=(tSquare)0;s<squareNumber;s++){
-		sync_cout<<pstValue[whiteRooks][s][0]<<sync_endl;
+	/*for(tSquare s=(tSquare)(squareNumber-1);s>=0;s--){
+		std::cout<<pstValue[whiteKing][s][0]/10000.0<<" ";
+		if(s%8==0)std::cout<<std::endl;
 	}*/
 }
 
@@ -258,11 +272,11 @@ void Position::initScoreValues(void){
 	for(auto &val :pieceValue){
 		val=0;
 	}
-	pieceValue[whitePawns]=simdScore(10000,10000,0,0);
-	pieceValue[whiteKnights]=simdScore(30000,30000,0,0);
+	pieceValue[whitePawns]=simdScore(7800,10000,0,0);
+	pieceValue[whiteKnights]=simdScore(32000,32000,0,0);
 	pieceValue[whiteBishops]=simdScore(32500,32500,0,0);
-	pieceValue[whiteRooks]=simdScore(59000,59000,0,0);
-	pieceValue[whiteQueens]=simdScore(120000,120000,0,0);
+	pieceValue[whiteRooks]=simdScore(53000,53000,0,0);
+	pieceValue[whiteQueens]=simdScore(99000,99000,0,0);
 	pieceValue[whiteKing]=simdScore(3000000,3000000,0,0);
 
 	pieceValue[blackPawns]=-pieceValue[whitePawns];
@@ -308,6 +322,7 @@ void Position::clear() {
 */
 void Position::display()const {
 	displayFen();
+
 	int rank, file;
 	state& st =getActualState();
 	sync_cout;
@@ -422,6 +437,77 @@ void Position::displayFen() const {
 	std::cout<<" "<<1 + (st.ply - int(st.nextMove == blackTurn)) / 2<<sync_endl;
 }
 
+
+std::string Position::getSymmetricFen() const {
+
+	std::string s;
+	int file,rank;
+	int emptyFiles=0;
+	state& st =getActualState();
+	for (rank = 0; rank <=7 ; rank++)
+	{
+		emptyFiles=0;
+		for (file = 0; file <=7; file++)
+		{
+			if(squares[BOARDINDEX[file][rank]]!=0){
+				if(emptyFiles!=0){
+					s+=std::to_string(emptyFiles);
+				}
+				emptyFiles=0;
+				bitboardIndex xx=squares[BOARDINDEX[file][rank]];
+				if(xx>separationBitmap){
+					xx=(bitboardIndex)(xx-separationBitmap);
+				}else{
+					xx=(bitboardIndex)(xx+separationBitmap);
+				}
+				s += PIECE_NAMES_FEN[xx];
+			}else{
+				emptyFiles++;
+			}
+		}
+		if(emptyFiles!=0){
+			s+=std::to_string(emptyFiles);
+		}
+		if(rank!=7){
+			s+='/';
+		}
+	}
+	s+=' ';
+	if(st.nextMove){
+		s+='w';
+	}else{
+		s+='b';
+	}
+	s+=' ';
+
+	if(st.castleRights&wCastleOO){
+		s+="k";
+	}
+	if(st.castleRights&wCastleOOO){
+		s+="q";
+	}
+	if(st.castleRights&bCastleOO){
+		s+="K";
+	}
+	if(st.castleRights&bCastleOOO){
+		s+="Q";
+	}
+	if(st.castleRights==0){
+		s+="-";
+	}
+	s+=' ';
+	if(st.epSquare!=squareNone){
+		s+=char('a'+FILES[st.epSquare]);
+		s+=char('1'+RANKS[st.epSquare]);
+	}else{
+		s+='-';
+	}
+	s+=' ';
+	s+=std::to_string(st.fiftyMoveCnt);
+	s+=" "+std::to_string(1 + (st.ply - int(st.nextMove == blackTurn)) / 2);
+
+	return s;
+}
 
 /*! \brief calc the hash key of the position
 	\author Marco Belli
@@ -555,7 +641,6 @@ void Position::doNullMove(void){
 	x.ply++;
 	x.capturedPiece=empty;
 	x.excludedMove=0;
-
 
 	calcCheckingSquares();
 	assert(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0]!=squareNone);
@@ -1231,8 +1316,9 @@ bool Position::isDraw() const {
 
 	// Draw by material?
 
-	if (   !bitBoard[whitePawns] && !bitBoard[blackPawns] && ((getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2])<= pieceValue[whiteBishops][0]))
+	if (   !bitBoard[whitePawns] && !bitBoard[blackPawns] && (getActualState().nonPawnMaterial[0]<= pieceValue[whiteBishops][0]) && (getActualState().nonPawnMaterial[2]<= pieceValue[whiteBishops][0]) ){
 		return true;
+	}
 
 	// Draw by the 50 moves rule?
 	if (getActualState().fiftyMoveCnt>  99){

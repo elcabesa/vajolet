@@ -16,6 +16,7 @@
 */
 
 #include "data.h"
+#include "bitops.h"
 #include <algorithm>
 
 //--------------------------------------------------------------
@@ -73,6 +74,9 @@ bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
 
 int SQUARE_DISTANCE[squareNumber][squareNumber];
 
+bitMap centerBitmap;
+bitMap bigCenterBitmap;
+
 //--------------------------------------------------------------
 //	function bodies
 //--------------------------------------------------------------
@@ -94,6 +98,12 @@ void initData(void){
 		DIAGA1H8MASK[i]=0;
 		DIAGA8H1MASK[i]=0;
 	}
+
+	centerBitmap= bitSet(E4)|bitSet(E5)|bitSet(D4)|bitSet(D5);
+	bigCenterBitmap= bitSet(C6)|bitSet(D6)|bitSet(E6)|bitSet(F6)|
+			bitSet(C5)|bitSet(C4)|bitSet(F5)|bitSet(F4)|
+			bitSet(C3)|bitSet(D3)|bitSet(E3)|bitSet(F3);
+
 
 	for (int file = 0; file < 8; file++)
 	{

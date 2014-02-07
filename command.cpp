@@ -326,6 +326,15 @@ void uciLoop(){
 			evalTable evalHashTable;
 			sync_cout<<"Eval:" <<pos.eval<true>(pawnHashTable,evalHashTable)/10000.0<<sync_endl;
 			sync_cout<<"gamePhase:" <<pos.getGamePhase()/65536.0*100<<"%"<<sync_endl;
+#ifdef DEBUG_EVAL_SIMMETRY
+
+			Position ppp;
+			ppp.setupFromFen(pos.getSymmetricFen());
+			sync_cout<<"Eval:" <<ppp.eval<true>(pawnHashTable,evalHashTable)/10000.0<<sync_endl;
+			sync_cout<<"gamePhase:" <<ppp.getGamePhase()/65536.0*100<<"%"<<sync_endl;
+
+#endif
+
 		}
 		else if (token =="isready"){
 			sync_cout<<"readyok"<<sync_endl;

@@ -50,6 +50,8 @@ extern bitMap PASSED_PAWN[2][squareNumber];
 extern bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
 extern const int SQUARE_COLOR[squareNumber];
 extern int SQUARE_DISTANCE[squareNumber][squareNumber];
+extern bitMap centerBitmap;
+extern bitMap bigCenterBitmap;
 
 
 

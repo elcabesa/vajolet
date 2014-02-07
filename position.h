@@ -160,6 +160,7 @@ public:
 	static void initPstValues(void);
 	void display(void) const;
 	void displayFen(void) const;
+	std::string getSymmetricFen() const;
 	void doNullMove(void);
 	void doMove(Move &m);
 	void undoMove(Move &m);

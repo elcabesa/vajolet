@@ -54,6 +54,7 @@ public:
 		packedMove= m;
 		depth=d;
 		type=t;
+
 	}
 	void setGeneration(unsigned char gen){
 		searchId=gen;
