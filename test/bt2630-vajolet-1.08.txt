@@ -1,0 +1,1220 @@
+Analysis of C:\Users\belli\workspace\vajolet2\test\bt2630.epd   
+10/02/2014 23:49:40 Level: 900 Seconds
+Analyzing engine: Vajolet2
+
+ 1 Nxg7; id "test 1";   
+    Searching move: Nf5xg7
+    Best move (Vajolet2): Nf5xg7
+    Identical moves! Found in: 00:00
+     2/10	00:00	         449	150k	+1.13	Nf5-e3  f7-f6
+     3/12	00:00	          2k	172k	+1.09	Nf5xg7  Kg8xg7  Qf3xf7+  Kg7-h8
+     4/12	00:00	          3k	185k	+1.08	Nf5xg7  Kg8xg7  Qf3xf7+  Kg7-h8  Qf7-h5+  Kh8-g8
+     5/10+	00:00	          3k	198k	+1.18	Nf5xg7
+     5/12	00:00	          4k	212k	+1.24	Nf5xg7  Kg8xg7  Qf3xf7+  Kg7-h8  Qf7-h5+  Kh8-g8  Qh5-g6+  Kg8-h8  Qg6-h6+  Kh8-g8
+     6/16	00:00	          5k	234k	+1.24	Nf5xg7  Kg8xg7  Qf3xf7+  Kg7-h8  Qf7-h5+  Kh8-g8  Qh5-g6+  Kg8-h8  Qg6-h6+  Kh8-g8
+     7/16+	00:00	          6k	248k	+1.33	Nf5xg7
+     7/13+	00:00	          6k	245k	+1.47	Nf5xg7
+     7/13+	00:00	          7k	251k	+1.79	Nf5xg7
+     7/16	00:00	          8k	273k	+1.78	Nf5xg7  Kg8xg7  Qf3xf7+  Kg7-h8  Qf7-h5+  Kh8-g8  Qh5-g6+  Be5-g7  Rf1-f7  Qb8-e5
+     8/16-	00:00	         11k	287k	+1.69	
+     8/16+	00:00	         12k	290k	+1.98	Nf5xg7
+     8/20+	00:00	         17k	306k	+2.86	Nf5xg7
+     8/20	00:00	         32k	319k	+2.89	Nf5xg7  Re8-f8  Ng7-f5  Qb8-a7  Rf1-f2  Be5-d4  Nf5xd4  Qa7xd4
+     9/18+	00:00	         35k	324k	+2.97	Nf5xg7
+     9/24+	00:00	         74k	325k	+3.05	Nf5xg7
+     9/20	00:00	         86k	329k	+3.01	Nf5xg7  Re8-f8  Ng7-f5  Be5xb2  Nf5-h6+  Kg8-g7  Qf3-b3  Qb8-e5  Rf1xf7+  Rf8xf7  Qb3xf7+  Kg7-h8  Qf7-b7
+    10/16	00:00	         89k	328k	+3.01	Nf5xg7  Re8-f8  Ng7-f5  Be5xb2  Nf5-h6+  Kg8-g7  Qf3-b3  Qb8-e5  Rf1xf7+  Rf8xf7  Qb3xf7+  Kg7-h8  Qf7-b7
+    11/24+	00:00	         98k	331k	+3.09	Nf5xg7
+    11/23+	00:00	        116k	335k	+3.17	Nf5xg7
+    11/28	00:00	        296k	367k	+3.21	Nf5xg7  Re8-f8  Ng7-f5  Qb8-a7  Rf1-f2  a6-a5  h4-h5  Kg8-h8  Nf5-h6  f7-f6  g5-g6  Ra8-d8  Nh6-f7+  Rf8xf7  g6xf7  Qa7xf7
+   10/02/2014 23:49:44, Time for this analysis: 00:00:01, Rated time: 00:00
+
+ 2 Bxb6; id "test 2";   
+    Searching move: Bd4xb6
+    Best move (Vajolet2): Bd4xb6
+    Identical moves! Found in: 00:24
+     2/6	00:00	         140	0	+1.62	Bd4-e3  f7-f5
+     3/5	00:00	         254	254k	+1.65	Bd4-e3  f7-f5  b4-b5
+     4/10	00:00	          2k	347k	+1.87	Bd4-f2  f7-f5  b4-b5  a6-a5
+     5/9	00:00	          3k	365k	+1.93	Bd4-f2  f7-f5  b4-b5  a6-a5  Kh1-g2
+     6/13	00:00	          4k	363k	+1.91	Bd4-e3  f7-f5  b4-b5  a6xb5  a4xb5  Kg8-f7  Kh1-g2  Bc7-d8
+     7/11-	00:00	          5k	393k	+1.82	
+     7/14	00:00	          7k	470k	+1.81	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  h2-h4  Kf7-e6
+     8/10	00:00	          8k	486k	+1.81	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  h2-h4  Kf7-e6
+     9/16-	00:00	         18k	570k	+1.65	
+     9/16	00:00	         30k	621k	+1.61	Bd4-g1  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  h2-h3  Kf7-e8  Kg2-h2
+    10/14	00:00	         40k	651k	+1.62	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  h2-h4  Kf7-e8  Kg2-h3  Bc7-d8
+    11/16	00:00	         49k	684k	+1.55	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  h2-h4  Kf7-e8  Kg2-h3  Bc7-d8  Be3-g5  Bd8xg5  h4xg5
+    12/19	00:00	         67k	708k	+1.56	Bd4-e3  f7-f5  b4-b5  a6-a5  Be3-g5  Kg8-f7  Kh1-g1  Kf7-e8  h2-h4  Bc7-d8  Kg1-f2  Bd8xg5  h4xg5
+    13/18	00:00	         90k	742k	+1.56	Bd4-e3  f7-f5  b4-b5  a6-a5  Be3-g5  Kg8-f7  Kh1-g1  Kf7-e8  Kg1-f2  Bc7-d8  h2-h4  Bd8xg5  h4xg5
+    14/21	00:00	        149k	766k	+1.52	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Kg2-f1  f5-f4  Be3-f2  Bc7-d8  Kf1-e2  Kf7-e6  Ke2-d3  Ke6-d6
+    15/21	00:00	        206k	782k	+1.53	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Kg2-f1  f5-f4  Be3-g1  Bc7-d8  Kf1-e2  Kf7-e6  Ke2-d3  Ke6-d6  Kd3-e4
+    16/21	00:00	        258k	798k	+1.54	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Kg2-f1  f5-f4  Be3-g1  Bc7-d8  Kf1-e2  Kf7-e6  Ke2-d3  Ke6-d5  Bg1-f2  Kd5-d6  Kd3-e4
+    17/27	00:00	        343k	810k	+1.53	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Be3-g5  Kf7-e8  Kg2-f2  Bc7-d8  Bg5-h6  Ke8-e7  Kf2-e3  Ke7-d6  Bh6-f8+  Kd6-c7  h2-h4  f5-f4+  g3xf4  e5xf4+  Ke3xf4  Bd8xh4  Kf4-e5
+    18/28	00:00	        458k	800k	+1.60	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Be3-g5  Kf7-e8  Kg2-f2  Bc7-d8  Bg5-h6  Ke8-e7  Kf2-e3  Ke7-d6  h2-h4  Bd8-e7  Ke3-d3  Be7-f6  Bh6-f8+  Kd6-c7
+    19/27-	00:00	        638k	804k	+1.52	
+    19/29	00:01	        901k	809k	+1.52	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Be3-g5  Kf7-e8  Kg2-f2  Bc7-d8  Bg5-h6  Bd8-c7  Kf2-e3  Ke8-d8  Ke3-d3  Bc7-d6  Bh6-g5+  Kd8-c7  Kd3-c4  Bd6-c5
+    20/29	00:01	      1'212k	820k	+1.49	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Be3-g5  Kf7-e8  Kg2-f2  Bc7-d8  Bg5-h6  Bd8-e7  Bh6-e3  Be7-d8  h2-h4  h7-h5  Be3-h6  f5-f4  Bh6-g7  f4xg3+  Kf2xg3  Bd8-c7  Bg7-f6  Bc7-d6
+    21/32	00:02	      1'663k	821k	+1.49	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Be3-h6  Bc7-d8  Kg2-f2  Kf7-e6  h2-h3  Ke6-d6  Kf2-e3  Bd8-e7  Ke3-d3  Kd6-c7  Kd3-c4  Be7-d6  Kc4-d5  e5-e4  f3xe4  f5xe4  Kd5xe4  Bd6xg3
+    22/33	00:02	      2'097k	820k	+1.51	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Kg2-f1  Bc7-d8  Be3-g5  Kf7-e8  h2-h4  Bd8xg5  h4xg5  Ke8-d8  Kf1-e2  Kd8-c7  Ke2-e3  Kc7-c8  Ke3-d2  Kc8-d8  Kd2-d3  Kd8-c7
+    23/33-	00:04	      3'553k	819k	+1.43	
+    23/31	00:05	      4'546k	828k	+1.41	Bd4-e3  f7-f5  b4-b5  a6-a5  Kh1-g2  Kg8-f7  Kg2-f1  h7-h5  Be3-g5  Kf7-e8  Kf1-e2  Bc7-d8  Bg5xd8  Ke8xd8  h2-h4  Kd8-c7  Ke2-e3  Kc7-d6  Ke3-d3  Kd6-c7  Kd3-e2  Kc7-d6  Ke2-e3
+    24/35-	00:08	      7'321k	818k	+1.33	
+    24/38+	00:14	     11'714k	809k	+1.49	Bd4xb6
+    24/47+	00:22	     18'597k	834k	+5.35	Bd4xb6
+    24/46	00:23	     19'935k	836k	+5.42	Bd4xb6  Bc7xb6  a4-a5  Bb6-d8  b4-b5  a6xb5  a5-a6  Bd8-b6  a6-a7  Bb6xa7  c6-c7  Ba7-c5  c7-c8Q+  Bc5-f8  Qc8-e8  b5-b4  Qe8xe5  h7-h6  Kh1-g2  Bf8-g7  Qe5-b8+  Bg7-f8  h2-h4  Kg8-g7  Qb8-c7  Kg7-f6  Kg2-f2  h6-h5  Qc7-c6+  Kf6-g7  Kf2-e3  Kg7-h6  Qc6-d5  Kh6-g7  Ke3-d3  Kg7-f6
+    25/36-	00:23	     19'973k	837k	+5.34	
+    25/40	00:24	     20'314k	838k	+5.38	Bd4xb6  Bc7xb6  a4-a5  Bb6-d8  b4-b5  a6xb5  a5-a6  Bd8-b6  a6-a7  Bb6xa7  c6-c7  Ba7-c5  c7-c8Q+  Bc5-f8  Qc8-e8  b5-b4  Qe8xe5  h7-h6  Kh1-g2  Bf8-g7  Qe5-b8+  Bg7-f8  h2-h4  Kg8-g7  Qb8-c7  Kg7-f6  Kg2-f2  h6-h5  Qc7-c6+  Kf6-g7  Kf2-e3  Kg7-h6  Qc6-c4  f7-f6
+    26/36	00:24	     20'797k	839k	+5.33	Bd4xb6  Bc7xb6  a4-a5  Bb6-d8  b4-b5  a6xb5  a5-a6  Bd8-b6  a6-a7  Bb6xa7  c6-c7  Ba7-c5  c7-c8Q+  Bc5-f8  Qc8-e8  b5-b4  Qe8xe5  h7-h6  Kh1-g2  Bf8-g7  Qe5-b8+  Bg7-f8  h2-h4  Kg8-g7  Qb8-c7  Kg7-f6  Kg2-f2  h6-h5  Kf2-e3  Kf6-e6  Qc7-c4+  Ke6-f6
+    27/38	00:25	     21'254k	842k	+5.36	Bd4xb6  Bc7xb6  a4-a5  Bb6-d8  b4-b5  a6xb5  a5-a6  Bd8-b6  a6-a7  Bb6xa7  c6-c7  Ba7-c5  c7-c8Q+  Bc5-f8  Qc8-e8  b5-b4  Qe8xe5  h7-h6  Kh1-g2  Bf8-g7  Qe5-b8+  Bg7-f8  h2-h4  Kg8-g7  Qb8-c7  Kg7-f6  Kg2-f2  h6-h5  Kf2-e3  Kf6-e6  Qc7-c4+  Ke6-f6  Qc4-c6+  Kf6-e7
+    28/43	00:26	     22'570k	845k	+5.38	Bd4xb6  Bc7xb6  a4-a5  Bb6-d8  b4-b5  a6xb5  a5-a6  Bd8-b6  a6-a7  Bb6xa7  c6-c7  Ba7-c5  c7-c8Q+  Bc5-f8  Qc8-e8  b5-b4  Qe8xe5  h7-h6  Kh1-g2  Bf8-g7  Qe5-b8+  Bg7-f8  h2-h4  Kg8-g7  Qb8-c7  Kg7-f6  Kg2-f2  h6-h5  Qc7-c6+  Kf6-g7  Kf2-e3  Kg7-h6  Qc6-c4  f7-f6
+   10/02/2014 23:50:13, Time for this analysis: 00:00:27, Rated time: 00:24
+
+ 3 Re6; id "test 3";    
+    Searching move: Re5-e6
+    Best move (Vajolet2): Re5-e6
+    Identical moves! Found in: 00:04
+     2/13	00:00	          2k	228k	-1.04	g2-g3  f7-f6
+     3/15	00:00	          5k	257k	-1.02	Kh1-g1  Qc7-d6  g2-g3  Qd6-d4+  Kg1-h2
+     4/16	00:00	          7k	297k	-1.06	Kh1-g1  Qc7-d7  g2-g3  f7-f6
+     5/16-	00:00	          9k	314k	-1.14	
+     5/17	00:00	         11k	336k	-1.19	Kh1-g1  Qc7-d7  g2-g3  Qd7-d4+  Kg1-g2  Na5-c4
+     6/18+	00:00	         12k	346k	-1.11	Kh1-g1
+     6/17+	00:00	         14k	353k	-1.03	Kh1-g1
+     6/17	00:00	         30k	389k	-1.11	Kh1-g1  Na5-b7  g2-g4  Nb7-c5  Kg1-g2  Nc5xd3  c2xd3
+     7/17-	00:00	         37k	401k	-1.19	
+     7/17	00:00	         50k	415k	-1.25	c2-c3  Qc7-d7  Re5-e3  Na5-b7  Bd3-e4  Bc6xe4  Re3xe4  Qd7-d1+  Kh1-h2
+     8/19+	00:00	         72k	430k	-1.17	Ng5-h3
+     8/19+	00:00	         78k	424k	-1.09	Ng5-h3
+     8/19	00:00	         88k	416k	-1.15	Ng5-h3  Qc7-d7  Nh3-f4  Rf8-d8  g2-g3  Na5-b7  Kh1-g2  a7-a5  c2-c4
+     9/16	00:00	         95k	410k	-1.15	Ng5-h3  Qc7-d7  Nh3-f4  Rf8-d8  g2-g3  Na5-b7  Kh1-g2  a7-a5  c2-c4
+    10/24+	00:00	        109k	396k	-1.07	Ng5-h3
+    10/24	00:00	        144k	396k	-1.06	Ng5-h3  Rf8-e8  Re5xe8+  Bc6xe8  Qh5-f5  g7-g6  Qf5-f6+  Kh8-g8  Nh3-f4  Na5-c6  Nf4xg6  f7xg6  Bd3xg6  Qc7-d7  Bg6xe8  Qd7xe8  Qf6xh6
+    11/22	00:00	        210k	410k	-1.08	Ng5-h3  Rf8-e8  Re5xe8+  Bc6xe8  Qh5-f5  g7-g6  Qf5-f6+  Kh8-g8  h4-h5  Qc7-c6  Qf6-e7  Be8-d7  h5xg6  f7xg6
+    12/29-	00:00	        305k	420k	-1.16	
+    12/24	00:00	        363k	426k	-1.10	Ng5-h3  Qc7-d7  Nh3-f4  Kh8-g8  Nf4-d5  Rf8-e8  c2-c4  Na5-b7  Kh1-h2  Nb7-c5  Bd3-c2  Bc6-a4
+    13/27-	00:01	        620k	446k	-1.18	
+    13/26	00:01	        793k	449k	-1.21	Ng5-h3  Qc7-d7  Nh3-f4  Kh8-g8  Nf4-d5  Rf8-e8  c2-c4  Na5-b7  Kh1-h2  Qd7-d6  f3-f4  Re8xe5  f4xe5  Qd6-c5  Qh5-f3
+    14/27+	00:02	      1'167k	456k	-1.13	g2-g3
+    14/32+	00:02	      1'248k	457k	-1.05	g2-g3
+    14/37+	00:03	      1'533k	460k	-0.93	g2-g3
+    14/34+	00:04	      2'225k	460k	-0.75	Re5-e6
+    14/25+	00:05	      2'376k	462k	+1.44	Re5-e6
+    14/35	00:05	      2'680k	474k	+1.48	Re5-e6  f7-f5  Re6xh6+  g7xh6  Qh5xh6+  Kh8-g8  Qh6xf8+  Kg8xf8  Ng5-e6+  Kf8-e7  Ne6xc7  Ke7-f6  Kh1-h2  Na5-b7  g2-g4  Bc6xf3  Bd3xf5  Nb7-d6  Bf5-e6  a7-a5  g4-g5+  Kf6-g6  Kh2-g3  Bf3-e4
+    15/24	00:05	      2'714k	474k	+1.54	Re5-e6  f7-f5  Re6xh6+  g7xh6  Qh5xh6+  Kh8-g8  Qh6xf8+  Kg8xf8  Ng5-e6+  Kf8-e7  Ne6xc7  Ke7-f6  Kh1-h2  Na5-b7  g2-g4  Bc6xf3  Bd3xf5  Nb7-d6  Bf5-e6  a7-a5
+    16/28+	00:05	      2'830k	475k	+1.62	Re5-e6
+    16/28+	00:06	      2'864k	476k	+1.70	Re5-e6
+    16/21+	00:10	      5'282k	496k	+M500	Re5-e6
+    16/29	00:27	     12'896k	465k	+M10	Re5-e6  Kh8-g8  Bd3-h7+  Kg8-h8  Re6xh6  g7-g6  Bh7xg6+  Kh8-g7  Bg6xf7  Qc7xf7  Ng5xf7  Rf8-h8  Qh5-g6+  Kg7-f8  Nf7-e5  Bc6-d5  Rh6xh8+  Kf8-e7  Rh8-e8+
+    17/28	00:40	     19'476k	477k	+M10	Re5-e6  Kh8-g8  Bd3-h7+  Kg8-h8  Re6xh6  g7-g6  Bh7xg6+  Kh8-g7  Bg6xf7  Qc7xf7  Ng5xf7  Rf8-h8  Qh5-g6+  Kg7-f8  Nf7-e5  Bc6-d5  Rh6xh8+  Kf8-e7  Rh8-e8+
+   10/02/2014 23:50:56, Time for this analysis: 00:00:42, Rated time: 00:28
+
+ 4 Qf7; id "test 4";    
+    Searching move: Qa2-f7
+    Best move (Vajolet2): Re1-b1
+    Not found in: 15:00
+     2/11	00:00	          1k	200k	+1.45	Re1-f1  Qd3xd6  Ba1xe5  Qd6xb4
+     3/15	00:00	          5k	278k	+0.50	Re1-f1  Bd2xb4  Ba1xe5  Qd3-e4+  Kg2-h3  Qe4xe5
+     4/13	00:00	          6k	299k	+0.50	Re1-f1  Bd2xb4  Ba1xe5  Qd3-e4+  Kg2-h3  Qe4xe5
+     5/13	00:00	          9k	317k	+0.46	Re1-f1  Rf8-d8  Rf1-f2  Qd3xd6  b7-b8Q  Rd8xb8  Rf2xd2  Qd6xb4
+     6/14-	00:00	         14k	352k	+0.17	
+     6/16	00:00	         18k	369k	+0.16	Re1-f1  Rf8-d8  b4-b5  Qd3xd6  Qa2-c4  Qd6-d7
+     7/17+	00:00	         23k	388k	+0.24	Re1-f1
+     7/17	00:00	         28k	401k	+0.28	Re1-f1  Rf8-d8  b4-b5  Qd3xd6  Rf1-d1  e5-e4  b7-b8Q  Qd6xb8  Rd1xd2  Rd8xd2+  Qa2xd2  Qb8xb5
+     8/15-	00:00	         41k	429k	+0.12	
+     8/20	00:00	         57k	457k	+0.21	Re1-f1  Qd3xd6  Ba1xe5  Qd6xe5  Qa2xd2  Qe5-e4+  Kg2-h3  Qe4xb7  Rf1-d1  Qb7-e4  Qd2-d4  Qe4-f5+  Kh3-g2
+     9/14-	00:00	         62k	463k	+0.13	
+     9/17	00:00	         70k	470k	+0.21	Re1-f1  Qd3xd6  Ba1xe5  Qd6xe5  Qa2xd2  Qe5-e4+  Kg2-h3  Qe4xb7  Rf1-d1  Qb7-e4  Qd2-d4  Qe4-f5+  Kh3-g2
+    10/21	00:00	         90k	454k	+0.21	Re1-f1  Qd3xd6  Ba1xe5  Qd6xe5  Qa2xd2  Qe5-e4+  Kg2-h3  Qe4xb7  Rf1-d1  Qb7-e4  Qd2-d4  Qe4-f5+  Kh3-g2
+    11/22	00:00	        134k	444k	+0.14	Re1-f1  Qd3xd6  Ba1xe5  Qd6xe5  Qa2xd2  Qe5-e4+  Kg2-h3  Qe4xb7  Rf1-d1  Kh8-g8  Qd2-a2+  Kg8-h8  Qa2-c4  Rf8-e8
+    12/21	00:00	        191k	466k	+0.07	Re1-f1  Qd3xd6  Ba1xe5  Qd6xe5  Qa2xd2  Qe5-e4+  Kg2-h3  Qe4xb7  Rf1-d1  Qb7-e4  Qd2-d4  Qe4-f5+  g3-g4  Qf5-f3+  Kh3-h2  Rf8-e8
+    13/28	00:01	        924k	514k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    14/27	00:02	      1'112k	518k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    15/29	00:02	      1'326k	523k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    16/33	00:03	      2'073k	522k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    17/36	00:06	      3'274k	530k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    18/36	00:09	      5'020k	541k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    19/42	00:15	      8'551k	549k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    20/41	00:20	     11'499k	556k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    21/43	00:28	     15'968k	558k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    22/44	01:08	     37'978k	552k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    23/48	01:43	     56'349k	544k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    24/48	02:34	     84'472k	547k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    25/52	04:07	    135'440k	548k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    26/51	06:20	    211'244k	555k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+    27/53	10:15	    345'959k	562k	 0.00	Re1-b1  g7-g5  h4xg5  Qd3-e4+  Kg2-h2  Qe4-e2+  Kh2-h1  Qe2-e4+  Kh1-g1  Qe4-e3+  Kg1-h1  Qe3-e4+
+   11/02/2014 00:05:57, Time for this analysis: 00:15:00, Rated time: 15:28
+
+ 5 Ka6; id "test 5";    
+    Searching move: Kb5-a6
+    Best move (Vajolet2): Kb5-a6
+    Identical moves! Found in: 00:00
+     2/7	00:00	         149	149k	+3.16	Bc6-f3+  Kd1-c2  Kb5-c4
+     3/7	00:00	         708	354k	+2.90	Bd8-f6  Kd1-e2  Kb5-c4
+     4/8	00:00	          2k	328k	+3.11	Kb5-b4  Kd1-e1  Bd8-h4+  Ke1-e2  Bc6-b5+  Ke2-d1  Bb5-a4+  Kd1-c1
+     5/9	00:00	          4k	344k	+3.11	Kb5-b4  Kd1-e1  Bd8-h4+  Ke1-e2  Bc6-b5+  Ke2-d1  Bb5-a4+  Kd1-c1
+     6/12	00:00	          6k	361k	+3.13	Kb5-b4  Kd1-e1  Bd8-h4+  Ke1-e2  Bc6-b5+  Ke2-d1  Bb5-a4+  Kd1-e2  Bh4-f6
+     7/12+	00:00	          7k	355k	+3.22	Kb5-b4
+     7/12	00:00	         10k	399k	+3.25	Kb5-b4  Kd1-e1  Bd8-h4+  Ke1-e2  Bc6-b5+  Ke2-d1  Bh4-f6  Kd1-c1  Bb5-e2
+     8/14+	00:00	         11k	423k	+3.34	Kb5-b4
+     8/14+	00:00	         12k	447k	+3.42	Kb5-b4
+     8/14-	00:00	         18k	520k	+3.16	
+     8/16-	00:00	         65k	710k	+2.31	
+     8/14	00:00	         12k	447k	+3.42	Kb5-b4
+     9/14-	00:00	         76k	749k	+2.50	
+     9/16	00:00	         80k	757k	+2.59	Kb5-a6  Kd1-e2  Bc6-b5+  Ke2-f2  Bd8-b6+  Kf2-e1  Bb6-a5  Ke1-d1  Bb5-a4+  Kd1-e2  Ba4-d7  Ke2-d1  Bd7-g4+  Kd1-e1
+    10/16	00:00	         93k	776k	+2.59	Kb5-a6  Kd1-e2  Bc6-b5+  Ke2-f2  Bd8-b6+  Kf2-e1  Bb6-a5  Ke1-d1  Bb5-a4+  Kd1-e2  Ba4-d7  Ke2-d1  Bd7-g4+  Kd1-e1
+    11/17+	00:00	         96k	780k	+2.67	Kb5-a6
+    11/17+	00:00	         97k	787k	+2.76	Kb5-a6
+    11/17+	00:00	         98k	786k	+2.88	Kb5-a6
+    11/19	00:00	        122k	806k	+2.77	Kb5-a6  Kd1-e1  Bd8-a5  Ke1-e2  Bc6-b5+  Ke2-e1  Ba5-b4  Ke1-d1  Ka6-a5  Kd1-c1  Bb4-a3+  Kc1-d1  Bb5-a4+  Kd1-e2
+    12/16+	00:00	        129k	806k	+2.85	Kb5-a6
+    12/22+	00:00	        138k	814k	+2.94	Kb5-a6
+    12/20	00:00	        158k	826k	+2.87	Kb5-a6  Kd1-e1  Bd8-a5  Ke1-e2  Bc6-b5+  Ke2-d1  Ba5-c7  Kd1-c1  Bc7-f4  Kc1-d1  Bf4-g3  Kd1-c2  Bb5-a4+  Kc2-d3  Ka6-a5  Kd3-e2
+    14/22-	00:00	        243k	771k	+2.93	
+    14/22+	00:00	        248k	767k	+3.09	Kb5-a6
+    14/26	00:00	        287k	773k	+3.21	Kb5-a6  Kd1-e2  Bc6-b5+  Ke2-f2  Bd8-b6+  Kf2-e1  Bb6-a5  Ke1-d1  Ba5-c7  Kd1-e1  Bc7-g3+  Ke1-d1  Ka6-a5  Kd1-c1  Bg3-f4  Kc1-d1  Ka5-b4  Kd1-e1  Bf4-g3+  Ke1-d1  Bb5-a4+  Kd1-e2  Bg3-e5
+    15/22-	00:00	        352k	774k	+3.11	
+    15/22	00:00	        369k	776k	+3.09	Kb5-a6  Kd1-e2  Bc6-b5+  Ke2-f2  Bd8-b6+  Kf2-e1  Bb6-a5  Ke1-d1  Ba5-c7  Kd1-e1  Bc7-g3+  Ke1-d1  Bb5-e8  Kd1-e2  Be8-h5+  Ke2-d3  Bh5-d1  Kd3-e3  Bd1-g4  Ke3-d3
+    16/24+	00:00	        410k	780k	+3.17	Kb5-a6
+    16/26+	00:00	        421k	781k	+3.25	Kb5-a6
+    16/29+	00:00	        504k	775k	+3.83	Kb5-a6
+    16/27	00:00	        587k	784k	+3.80	Kb5-a6  Kd1-e1  Bd8-a5  Ke1-d1  Ba5-b4  Kd1-e2  Bc6-b5+  Ke2-e3  Bb4-c5+  Ke3-f3  Bb5-e8  Kf3-e2  Be8-h5+  Ke2-d3  Bh5-d1  Kd3-e4  Ka6-a5  Ke4-f4  Bd1-e2  Kf4-g3
+    17/22	00:00	        709k	823k	+3.80	Kb5-a6  Kd1-e1  Bd8-a5  Ke1-d1  Ba5-b4  Kd1-e2  Bc6-b5+  Ke2-e3  Bb4-c5+  Ke3-f3  Bb5-e8  Kf3-e2  Be8-h5+  Ke2-d3  Bh5-d1  Kd3-e4  Ka6-a5  Ke4-f4  Bd1-e2  Kf4-g3
+    18/23+	00:00	        728k	828k	+3.89	Kb5-a6
+    18/27+	00:00	        735k	829k	+3.97	Kb5-a6
+    18/27+	00:00	        789k	844k	+6.55	Kb5-a6
+    18/30	00:01	      1'003k	888k	+7.21	Kb5-a6  Kd1-e1  Bd8-a5  Ke1-d1  Ba5-b4  Kd1-e2  Bc6-b5+  Ke2-e3  Bb4-c5+  Ke3-f3  Bb5-e8  Kf3-g4  Be8-a4  Kg4-f3  Ba4-d1+  Kf3-f4  Bc5-b6  Kf4-e4  Ka6-a5  Ke4-f4  Ka5-b4  Kf4-f5  Kb4-c3  Kf5-e5  Kc3xd2
+   11/02/2014 00:05:59, Time for this analysis: 00:00:01, Rated time: 15:28
+
+ 6 e3; id "test 6";     
+    Searching move: e4-e3
+    Best move (Vajolet2): e4-e3
+    Identical moves! Found in: 00:01
+     2/8	00:00	         380	190k	+1.94	h7-h6  h2-h3
+     3/13	00:00	          2k	217k	+1.63	Rd8-d7  a5-a6  Rg4-f4  a6xb7  Kb8xb7
+     4/10	00:00	          2k	247k	+1.63	Rd8-d7  a5-a6  Rg4-f4  a6xb7  Kb8xb7
+     5/12-	00:00	          4k	300k	+1.46	
+     5/13	00:00	          5k	332k	+1.41	h7-h6  a5-a6  Rd8-d6  Bf2-g3  Rd6-g6  a6xb7  Kb8xb7
+     6/15	00:00	          7k	349k	+1.41	h7-h6  a5-a6  Rd8-d6  Bf2-g3  Rd6-g6  a6xb7  Kb8xb7
+     7/17-	00:00	         19k	396k	+1.13	
+     7/17	00:00	         27k	428k	+1.00	Rd8-e8  Rh5xh7  Rg4-g2  Bf2-g3  Rg2-e2+  Ke1-f1  Re2xc2  Bg3xc7+  Kb8-a7  Bc7-b6+  Ka7-a6
+     8/16	00:00	         32k	443k	+1.00	Rd8-e8  Rh5xh7  Rg4-g2  Bf2-g3  Rg2-e2+  Ke1-f1  Re2xc2  Bg3xc7+  Kb8-a7  Bc7-b6+  Ka7-a6
+     9/19+	00:00	         37k	446k	+1.08	Rd8-e8
+     9/19+	00:00	         43k	457k	+1.16	Rd8-e8
+     9/20+	00:00	         54k	466k	+1.47	Rd8-e8
+     9/18	00:00	         76k	483k	+1.16	Rd8-e8  Bf2-g3  Rg4-g7  a5-a6  e4-e3  a6xb7  Kb8xb7  Rh5-f5  f3-f2+  Bg3xf2  e3xf2+  Ke1xf2  h7-h6
+    10/22	00:00	         92k	494k	+1.18	Rd8-e8  Bf2-g3  Rg4-g7  a5-a6  e4-e3  a6xb7  f3-f2+  Bg3xf2  e3xf2+  Ke1xf2  Rg7-f7+  Kf2-g2  Re8-e2+  Kg2-h3  Re2-e3+  Kh3-h4  Kb8xb7
+    11/24-	00:00	        118k	502k	+1.10	
+    11/31	00:00	        148k	504k	+1.14	Rd8-e8  Bf2-g3  Rg4-g7  a5-a6  e4-e3  a6xb7  f3-f2+  Bg3xf2  e3xf2+  Ke1xf2  Rg7-f7+  Kf2-g3  Re8-e3+  Kg3-h4  Kb8xb7  Rh5-b5+  Kb7-a6  Rb5-d5  Nc6-e5  Rc4-a4+  Ka6-b6  Rd5-a5  Ne5-f3+  Kh4-h5  Nf3xh2
+    12/29-	00:00	        279k	517k	+0.94	
+    12/29	00:00	        320k	524k	+0.94	Rd8-e8  Bf2-g3  Rg4-g7  a5-a6  e4-e3  a6xb7  f3-f2+  Bg3xf2  e3xf2+  Ke1xf2  Rg7-f7+  Kf2-g3  Re8-e3+  Kg3-h4  Kb8xb7  Rh5-b5+  Kb7-a6  Rb5-d5  Nc6-e5  Rc4-a4+  Ka6-b7  Rd5-d8  Ne5-g6+  Kh4-h5
+    13/25	00:00	        386k	530k	+1.00	Rd8-e8  Bf2-g3  Rg4-g7  a5-a6  e4-e3  a6xb7  f3-f2+  Bg3xf2  e3xf2+  Ke1xf2  Rg7-f7+  Kf2-g3  Re8-e3+  Kg3-h4  Kb8xb7  Rh5-b5+  Kb7-a6  Rb5-d5  Rf7-f6  Rc4-a4+  Ka6-b7
+    14/27+	00:00	        495k	535k	+1.08	e4-e3
+    14/26+	00:00	        500k	537k	+1.17	e4-e3
+    14/25+	00:01	        583k	545k	+2.75	e4-e3
+    14/32	00:01	        715k	549k	+3.28	e4-e3  Rc4xg4  Rd8-d1+  Ke1xd1  e3xf2  Rg4-e4  f2-f1Q+  Re4-e1  Qf1-g2  Rh5-f5  f3-f2  Re1-e8+  Kb8-a7  Re8-f8  Qg2-g1+  Kd1-e2  Qg1-e1+  Ke2-d3  Nc6-e5+  Rf5xe5  Qe1xe5  Rf8xf2  Qe5xa5
+    15/24	00:01	        740k	552k	+3.28	e4-e3  Rc4xg4  Rd8-d1+  Ke1xd1  e3xf2  Rg4-e4  f2-f1Q+  Re4-e1  Qf1-g2  Rh5-f5  f3-f2  Re1-e8+  Kb8-a7  Re8-f8  Qg2-g1+  Kd1-e2  Qg1-e1+  Ke2-d3  Nc6-e5+  Rf5xe5  Qe1xe5  Rf8xf2  Qe5xa5
+    16/27+	00:01	        781k	555k	+3.36	e4-e3
+    16/36	00:01	        899k	563k	+3.31	e4-e3  Rc4xg4  Rd8-d1+  Ke1xd1  e3xf2  Rg4-e4  f2-f1Q+  Re4-e1  Qf1-g2  Rh5-f5  f3-f2  Re1-e8+  Kb8-a7  Re8-f8  Qg2-g1+  Kd1-e2  Qg1-e1+  Ke2-d3  Nc6-e5+  Kd3-d4  Ne5-d7  Rf8-f7  Qe1-d2+  Kd4-c4  f2-f1Q+  Rf5xf1  Nd7-e5+  Kc4-b4  Ne5xf7  Rf1xf7  Qd2xc2
+    17/32-	00:01	        933k	566k	+3.23	
+    17/34	00:01	      1'020k	570k	+3.31	e4-e3  Rc4xg4  Rd8-d1+  Ke1xd1  e3xf2  Rg4-e4  f2-f1Q+  Re4-e1  Qf1-g2  Rh5-f5  f3-f2  Re1-e8+  Kb8-a7  Re8-f8  Qg2-g1+  Kd1-e2  Qg1-e1+  Ke2-d3  Nc6-e5+  Kd3-d4  Ne5-d7  Rf8-f7  Qe1-d2+  Kd4-c4  f2-f1Q+  Rf5xf1  Nd7-e5+  Kc4-b4  Ne5xf7  Rf1xf7  Qd2xc2
+    18/41	00:02	      1'239k	567k	+3.31	e4-e3  Rc4xg4  Rd8-d1+  Ke1xd1  e3xf2  Rg4-e4  f2-f1Q+  Re4-e1  Qf1-g2  Rh5-f5  f3-f2  Re1-e8+  Kb8-a7  Re8-f8  Qg2-g1+  Kd1-d2  Qg1-e1+  Kd2-d3  Nc6-e5+  Kd3-d4  Ne5-d7  Rf8-f7  Qe1-d2+  Kd4-c4  f2-f1Q+  Rf5xf1  Nd7-e5+  Kc4-b4  Ne5xf7  Rf1xf7  Qd2xc2
+    19/37	00:02	      1'523k	573k	+3.31	e4-e3  Rc4xg4  Rd8-d1+  Ke1xd1  e3xf2  Rg4-e4  f2-f1Q+  Re4-e1  Qf1-g2  Rh5-f5  f3-f2  Re1-e8+  Kb8-a7  Re8-f8  Qg2-g1+  Kd1-d2  Qg1-e1+  Kd2-d3  Nc6-e5+  Kd3-d4  Ne5-d7  Rf8-f7  Qe1-d2+  Kd4-c4  f2-f1Q+  Rf5xf1  Nd7-e5+  Kc4-b4  Ne5xf7  Rf1xf7  Qd2xc2
+    20/35+	00:03	      1'772k	579k	+3.39	e4-e3
+    20/33+	00:03	      1'943k	584k	+3.47	e4-e3
+    20/40+	00:04	      2'428k	595k	+3.77	e4-e3
+   11/02/2014 00:06:04, Time for this analysis: 00:00:04, Rated time: 15:29
+
+ 7 Rd6; id "test 7";    
+    Searching move: Rc6-d6
+    Best move (Vajolet2): Rc6-d6
+    Identical moves! Found in: 00:00
+     2/10	00:00	         483	242k	-2.22	Rc6-c2  Bh6-g5
+     3/12	00:00	          1k	236k	-2.25	Rc6-c2  h2-h3  Qe7-b7  Qd4-d8+  Kg8-f7
+     4/14	00:00	          3k	253k	-2.27	Rc6-c2  h2-h3  Rc2-e2  Bh6-g5
+     5/10-	00:00	          5k	266k	-2.56	
+     5/13	00:00	          5k	267k	-2.57	Rc6-c2  h2-h3  Rc2-e2  Rd1-d2  Re2-e1+  Kg1-h2  Re1-e2+  Rd2xe2  Qe7xe2+  Kh2-g1
+     6/12	00:00	          7k	301k	-2.62	Rc6-c2  h2-h3  Qe7-c7  Rd1-d2  Rc2xd2  Qd4xd2
+     7/15	00:00	         10k	349k	-2.62	Rc6-c2  h2-h3  Rc2-e2  Rd1-d2  Re2xd2  Qd4xd2  Qe7-c5+  Kg1-h2
+     8/15	00:00	         13k	376k	-2.62	Rc6-c2  h2-h3  Rc2-e2  Rd1-d2  Qe7-e3+  Qd4xe3  Re2xe3  Rd2-d8+  Kg8-f7  Rd8-f8+  Kf7-e7
+     9/22-	00:00	         71k	507k	-2.78	
+     9/19	00:00	         82k	509k	-2.77	Rc6-c2  h2-h3  Rc2-e2  Rd1-d2  Re2-e4  Qd4-d8+  Kg8-f7  Qd8xe7+  Re4xe7  Rd2-c2  Re7-e1+  Kg1-f2  Re1-e7
+    10/20	00:00	         96k	505k	-2.77	Rc6-c2  h2-h3  Rc2-e2  Rd1-d2  Re2-e4  Qd4-d8+  Kg8-f7  Qd8xe7+  Re4xe7  Rd2-c2  Re7-e1+  Kg1-f2  Re1-e7
+    11/25	00:00	        153k	490k	-2.76	Rc6-c2  h2-h3  Qe7-c7  Qd4-e3  Kg8-f7  Qe3-b3+  Kf7-f6  Rd1-d6+  Qc7xd6  Qb3xc2  Qd6-d4+  Kg1-h2  Nb6-c4  Bh6-g5+  Kf6-g7
+    12/23+	00:00	        193k	502k	-2.67	Rc6-d6
+    12/19+	00:00	        198k	502k	-2.58	Rc6-d6
+    12/11+	00:00	        199k	501k	-0.38	Rc6-d6
+    12/21	00:00	        205k	494k	 0.00	Rc6-d6  Qd4xd6  Qe7-e3+  Kg1-g2  Qe3-e2+  Kg2-g1  Qe2-e3+
+    13/23	00:00	        214k	492k	 0.00	Rc6-d6  Qd4xd6  Qe7-e3+  Kg1-g2  Qe3-e2+  Kg2-g1  Qe2-e3+
+    14/27	00:00	        227k	500k	 0.00	Rc6-d6  Qd4xd6  Qe7-e3+  Kg1-g2  Qe3-e2+  Kg2-g1  Qe2-e3+
+    15/26	00:00	        248k	510k	 0.00	Rc6-d6  Qd4xd6  Qe7-e3+  Kg1-g2  Qe3-e2+  Kg2-g1  Qe2-e3+
+   11/02/2014 00:06:07, Time for this analysis: 00:00:01, Rated time: 15:29
+
+ 8 Rxc6+; id "test 8";  
+    Searching move: Rd6xc6
+    Best move (Vajolet2): Rd6xc6
+    Identical moves! Found in: 00:00
+     2/8	00:00	         721	180k	+2.23	Bc4xe6+  Kc8-b8  Bg1xc5  Bc6xe4
+     3/10	00:00	          2k	212k	+1.86	Bc4xe6+  Kc8-b8  Bg1xc5  Bc6xe4  Be6-d7
+     4/12	00:00	          3k	254k	+1.64	Bc4xe6+  Kc8-c7  Rd6xd8  Kc7xd8  Be6-d5  Bc6xd5  e4xd5
+     5/10	00:00	          4k	289k	+1.64	Bc4xe6+  Kc8-c7  Rd6xd8  Kc7xd8  Be6-d5  Bc6xd5  e4xd5
+     6/18-	00:00	         11k	385k	+1.16	
+     6/14	00:00	         13k	388k	+1.12	Rd6xc6+  b7xc6  Bc4xa6+  Kc8-b8  Bg1xc5  e6-e5  f4-f5  Nh6-g4  h2-h3
+     7/13+	00:00	         13k	398k	+1.20	Rd6xc6+
+     7/15	00:00	         15k	404k	+1.24	Rd6xc6+  b7xc6  Bc4xa6+  Kc8-b8  Bg1xc5  e6-e5  f4-f5  Nh6-g4  h2-h3  Ng4-h6
+     8/16+	00:00	         17k	418k	+1.32	Rd6xc6+
+     8/17	00:00	         22k	439k	+1.24	Rd6xc6+  b7xc6  Bc4xa6+  Kc8-b8  Bg1xc5  e6-e5  Ra1-a3  Rd8-d7  Ra3-b3+  Kb8-a8  f4-f5  Re8-d8
+     9/19	00:00	         33k	466k	+1.29	Rd6xc6+  b7xc6  Bc4xa6+  Kc8-b8  Bg1xc5  e6-e5  Ra1-a3  Rd8-d7  Ra3-b3+  Kb8-a8  f4-f5  Re8-d8  Rb3-d3  Rd7xd3  Ba6xd3
+    10/23-	00:00	         67k	497k	+1.21	
+    10/22+	00:00	         86k	504k	+1.37	Rd6xc6+
+    10/21	00:00	         90k	506k	+1.31	Rd6xc6+  b7xc6  Bc4xa6+  Kc8-d7  Bg1xc5  e6-e5  f4-f5  g7-g6  f5xg6  h7xg6  a4-a5  Nh6-g4  h2-h3  Rd8-a8  Ba6-c4
+    11/22	00:00	        107k	507k	+1.31	Rd6xc6+  b7xc6  Bc4xa6+  Kc8-d7  Bg1xc5  e6-e5  f4-f5  g7-g6  f5xg6  h7xg6  a4-a5  Nh6-g4  h2-h3  Rd8-a8  Ba6-c4
+    12/27	00:00	        174k	525k	+1.38	Rd6xc6+  b7xc6  Bc4xa6+  Kc8-d7  Bg1xc5  e6-e5  f4-f5  g7-g6  f5xg6  h7xg6  a4-a5  Nh6-f7  Ra1-a3  Nf7-d6  Ra3-d3  Kd7-e6
+    13/24	00:00	        228k	535k	+1.37	Rd6xc6+  b7xc6  Bc4xa6+  Kc8-d7  Bg1xc5  e6-e5  f4-f5  g7-g6  f5xg6  h7xg6  a4-a5  Nh6-f7  Bc5-b6  Rd8-b8  Ra1-a3  Nf7-d6  Ra3-d3
+   11/02/2014 00:06:09, Time for this analysis: 00:00:01, Rated time: 15:29
+
+ 9 g5; id "test 9";     
+    Searching move: g6-g5
+    Best move (Vajolet2): g6-g5
+    Identical moves! Found in: 00:42
+     2/12	00:00	          2k	316k	-1.09	Ra8-f8  Qd3xc4+  Na5xc4
+     3/14	00:00	          3k	377k	-1.04	Ra8-f8  Kf1-e2  b7-b6  Qd3xc4+  Na5xc4
+     4/13	00:00	          5k	380k	-1.04	Ra8-f8  Kf1-e2  b7-b6  Qd3xc4+  Na5xc4
+     5/16-	00:00	         10k	377k	-1.12	
+     5/16	00:00	         11k	373k	-1.05	Ra8-f8  Kf1-e2  b7-b6  Qd3xc4+  Na5xc4  Ra1-f1
+     6/16-	00:00	         13k	381k	-1.13	
+     6/17	00:00	         21k	416k	-1.05	Ra8-f8  Qd3xc4+  Na5xc4  Kf1-e2  c5xd4  c3xd4  Nc4xe3  Ke2xe3
+     7/18-	00:00	         35k	455k	-1.13	
+     7/16	00:00	         44k	469k	-1.15	Bg7-h6  Kf1-e2  Bh6xf4  Be3xf4  Ra8-f8  Qd3xc4+  Na5xc4  Ra1-f1
+     8/14+	00:00	         47k	476k	-1.07	Bg7-h6
+     8/16	00:00	         53k	484k	-1.06	Bg7-h6  Kf1-e2  Bh6xf4  Be3xf4  c5xd4  Qd3xc4+  Na5xc4  c3xd4  Ra8-d8  Ra1-d1
+     9/20	00:00	         82k	504k	-1.06	Ra8-f8  Kf1-g1  c5xd4  c3xd4  Bg7-h6  Qd3-e4  Bh6xf4  Be3xf4  Na5-c6  Bf4-h6
+    10/22	00:00	        278k	514k	-1.07	Ra8-d8  Qd3xc4+  Na5xc4  Be3-f2  Rd8-c8  Kf1-g1  Bg7-h6  Nf4-e6  c5xd4  c3xd4  Kg8-f7  Ne6-c5
+    11/26	00:00	        399k	519k	-1.13	Ra8-d8  Qd3xc4+  Na5xc4  Be3-f2  c5xd4  Nf4-e6  Rd8-c8  c3xd4  Nc4-d2+  Kf1-e2  Nd2-e4  Bf2-h4  Rc8-c2+  Ke2-e3  Rc2xg2  Bh4xe7  Rg2xg4
+    12/25	00:00	        525k	527k	-1.13	Ra8-d8  Qd3xc4+  Na5xc4  Be3-f2  c5xd4  Nf4-e6  Rd8-c8  c3xd4  Nc4-d2+  Kf1-e2  Nd2-e4  Bf2-h4  Rc8-c2+  Ke2-e3  Rc2xg2  Bh4xe7  Rg2xg4
+    13/24	00:01	        793k	531k	-1.13	Ra8-d8  Qd3xc4+  Na5xc4  Be3-f2  c5xd4  Nf4-e6  Rd8-c8  c3xd4  Nc4-d2+  Kf1-e2  Nd2-e4  Bf2-h4  Rc8-c2+  Ke2-e3  Rc2xg2  Bh4xe7  Rg2xg4
+    14/27+	00:01	      1'049k	530k	-1.05	Ra8-d8
+    14/31+	00:05	      2'777k	537k	-0.97	Ra8-c8
+    14/32	00:05	      3'117k	532k	-0.98	Ra8-c8  Kf1-e2  c5xd4  c3xd4  Qc4-a4  Ke2-f3  Rc8-c2  Qd3-e4  Qa4-c4  Qe4-d5+  Qc4xd5+  Nf4xd5  Na5-c6  Ra1-b1  b7-b6  a2-a4  Bg7-f8  Nd5-b4  Nc6xb4  Rb1xb4  e7-e6
+    15/31-	00:09	      4'832k	528k	-1.06	
+    15/31	00:09	      5'080k	531k	-1.07	Ra8-c8  Qd3xc4+  Na5xc4  Kf1-e2  Nc4xe3  Ke2xe3  c5xd4+  c3xd4  Bg7-h6  Ra1-b1  Bh6xf4+  Ke3xf4  b7-b6  Rb1-b2  e7-e6  g4-g5  Kg8-f7  Kf4-g4  Kf7-e7  Rb2-f2
+    16/27	00:10	      5'679k	535k	-1.07	Ra8-c8  Qd3xc4+  Na5xc4  Kf1-e2  Nc4xe3  Ke2xe3  c5xd4+  c3xd4  Bg7-h6  Ra1-b1  Bh6xf4+  Ke3xf4  b7-b6  Rb1-b2  e7-e6  g4-g5  Kg8-f7  Kf4-g4  Kf7-e7  Rb2-f2
+    17/31	00:12	      6'750k	543k	-1.08	Ra8-c8  Qd3xc4+  Na5xc4  Kf1-e2  Nc4xe3  Ke2xe3  c5xd4+  c3xd4  Bg7-h6  Ra1-b1  Bh6xf4+  Ke3xf4  b7-b6  Rb1-b2  e7-e6  g4-g5  Rc8-c1  Rb2-f2  Rc1-c7  Kf4-e4  a7-a6
+    18/31	00:15	      8'604k	549k	-1.06	Ra8-c8  Qd3xc4+  Na5xc4  Kf1-e2  Nc4xe3  Ke2xe3  c5xd4+  c3xd4  Bg7-h6  Ra1-b1  Bh6xf4+  Ke3xf4  b7-b6  Rb1-b2  e7-e6  g4-g5  Rc8-c1  Rb2-d2  Rc1-c4  Kf4-e3  a7-a6  Rd2-f2
+    19/32	00:20	     11'157k	557k	-1.07	Ra8-c8  Qd3xc4+  Na5xc4  Kf1-e2  Nc4xe3  Ke2xe3  c5xd4+  c3xd4  Bg7-h6  Ra1-b1  b7-b6  Rb1-b2  e7-e6  g2-g3  Kg8-f7  Ke3-d3  Rc8-c1  h2-h4  Bh6xf4  g3xf4  Rc1-g1  g4-g5  Rg1-d1+  Kd3-e4
+    20/37+	00:29	     16'456k	558k	-0.99	g6-g5
+    20/30+	00:29	     16'627k	558k	-0.91	g6-g5
+    20/37+	00:31	     17'691k	562k	-0.34	g6-g5
+    20/48	00:37	     21'291k	563k	-0.04	g6-g5  Qd3xc4+  Na5xc4  Nf4-d5  e7-e6  Nd5-e7+  Kg8-f7  Be3xg5  h7-h6  Bg5-h4  Bg7-f8  Ne7-f5  e6xf5  g4xf5  Nc4-e3+  Kf1-e2  Ne3xf5  Bh4-f2  c5xd4  c3xd4  Ra8-d8  Ra1-d1  Kf7-e6  Ke2-d3  Bf8-g7  Rd1-e1  Rd8-d5  Re1-e4  Rd5-a5  Kd3-c4  h6-h5  Kc4-b3  Nf5xd4+  Bf2xd4  Bg7xe5
+    21/35	00:38	     21'800k	564k	-0.02	g6-g5  Qd3xc4+  Na5xc4  Nf4-d5  e7-e6  Nd5-e7+  Kg8-f7  Be3xg5  h7-h6  Bg5-h4  Bg7-f8  Ne7-f5  e6xf5  g4xf5  Nc4-e3+  Kf1-e2  Ne3xf5  Bh4-f2  c5xd4  c3xd4  Ra8-c8  Ke2-f3  Rc8-c2  Ra1-b1  b7-b6  d4-d5  Rc2xa2
+    22/36-	00:39	     22'390k	565k	-0.10	
+    22/43	00:42	     24'055k	568k	-0.04	g6-g5  Qd3xc4+  Na5xc4  Nf4-d5  e7-e6  Nd5-e7+  Kg8-f7  Be3xg5  h7-h6  Bg5-h4  Bg7-f8  Ne7-f5  e6xf5  g4xf5  Nc4-e3+  Kf1-e2  Ne3xf5  Bh4-f2  c5xd4  c3xd4  Ra8-d8  Ra1-d1  Kf7-e6  Ke2-d3  Bf8-g7  Rd1-e1  Rd8-d5  Re1-e4  Rd5-a5  Kd3-c4  h6-h5  Kc4-b3  Nf5xd4+  Bf2xd4  Bg7xe5
+    23/35	00:43	     24'898k	570k	-0.05	g6-g5  Qd3xc4+  Na5xc4  Nf4-d5  e7-e6  Nd5-e7+  Kg8-f7  Be3xg5  h7-h6  Bg5-h4  Bg7-f8  Ne7-f5  e6xf5  g4xf5  Nc4-e3+  Kf1-e2  Ne3xf5  Bh4-f2  c5xd4  c3xd4  Ra8-d8  Ra1-d1  Kf7-e6  Ke2-d3  Bf8-g7  Rd1-e1  Rd8-d5  Re1-e4  Nf5xd4  Bf2xd4  Bg7xe5
+    24/40	00:48	     28'152k	575k	-0.04	g6-g5  Qd3xc4+  Na5xc4  Nf4-d5  e7-e6  Nd5-e7+  Kg8-f7  Be3xg5  h7-h6  Bg5-h4  Bg7-f8  Ne7-f5  e6xf5  g4xf5  Nc4-e3+  Kf1-e2  Ne3xf5  Bh4-f2  c5xd4  c3xd4  Ra8-d8  Ra1-d1  Kf7-e6  Ke2-d3  Bf8-g7  Rd1-e1  Rd8-d5  Re1-e4  Nf5xd4  Bf2xd4  Bg7xe5  Re4xe5+  Rd5xe5  Bd4xe5  Ke6xe5
+    25/39	00:57	     33'340k	579k	-0.04	g6-g5  Qd3xc4+  Na5xc4  Nf4-d5  e7-e6  Nd5-e7+  Kg8-f7  Be3xg5  h7-h6  Bg5-h4  Bg7-f8  Ne7-f5  e6xf5  g4xf5  Nc4-e3+  Kf1-e2  Ne3xf5  Bh4-f2  c5xd4  c3xd4  Ra8-d8  Ra1-d1  Kf7-e6  Ke2-d3  Bf8-g7  Rd1-e1  Rd8-d5  Re1-e4  Nf5xd4  Bf2xd4  Bg7xe5  Re4xe5+  Rd5xe5  Bd4xe5  Ke6xe5
+   11/02/2014 00:07:09, Time for this analysis: 00:00:58, Rated time: 16:11
+
+ 10 Rxg7+; id "test 10" 
+    Searching move: Rg1xg7
+    Best move (Vajolet2): Rg1xg7
+    Identical moves! Found in: 00:01
+     2/10	00:00	         878	220k	-0.22	c3-c4  b5-b4
+     3/12	00:00	          2k	229k	-0.07	c3-c4  Qb7-b6  Qd2-d3  b5xc4  b3xc4
+     4/12	00:00	          3k	195k	-0.53	c3-c4  Qb7-b6  Bc2-d3  e5-e4
+     5/12	00:00	          5k	200k	-0.54	c3-c4  Qb7-b6  Qd2-e2  b5xc4  b3xc4
+     6/14+	00:00	          6k	204k	-0.45	c3-c4
+     6/15	00:00	          9k	234k	-0.59	c3-c4  Qb7-b6  Qd2-c3  b5-b4  Qc3-d2  Be7-f8
+     7/16+	00:00	         10k	248k	-0.51	c3-c4
+     7/14	00:00	         13k	273k	-0.48	c3-c4  Qb7-b6  Qd2-c3  Be7-f8  Be3-d2  b5-b4  Qc3-d3
+     8/17-	00:00	         34k	341k	-0.76	
+     8/21	00:00	         51k	356k	-0.74	c3-c4  Qb7-b6  Qd2-c3  Rc7-b7  Kf1-g2  Be7-d8  f2-f3  b5xc4  b3xc4  Kg8-f8
+     9/20	00:00	         60k	363k	-0.73	c3-c4  Qb7-b6  Be3-h6  Be7-d8  Qd2-g5  Nf6xd5  Qg5-g6  Nd5-f6  Bh6xg7
+    10/20+	00:00	         86k	354k	-0.64	Rg1xg7+
+    10/13+	00:00	         87k	355k	-0.56	Rg1xg7+
+    10/27+	00:00	        181k	379k	+1.03	Rg1xg7+
+    10/21	00:00	        200k	383k	+1.23	Rg1xg7+  Kg8-h8  Be3-h6  Be7-d8  Rh1-g1  Rc7xg7  Bh6xg7+  Qb7xg7  Rg1xg7  Kh8xg7  h3-h4  Kg7-f8
+    11/21+	00:00	        216k	386k	+1.31	Rg1xg7+
+    11/25+	00:00	        240k	392k	+1.39	Rg1xg7+
+    11/24	00:00	        256k	399k	+1.41	Rg1xg7+  Kg8-h8  Be3-h6  Be7-d8  Rh1-g1  Rc7xg7  Bh6xg7+  Qb7xg7  Rg1xg7  Kh8xg7  h3-h4  c5-c4  Qd2-g5+  Kg7-f8  Qg5-g6  Rc8-c7
+    12/22	00:00	        268k	401k	+1.41	Rg1xg7+  Kg8-h8  Be3-h6  Be7-d8  Rh1-g1  Rc7xg7  Bh6xg7+  Qb7xg7  Rg1xg7  Kh8xg7  Qd2-g5+  Kg7-h8  Qg5-h6+  Kh8-g8  Bc2-g6  Rc8-c7
+    13/26+	00:00	        330k	411k	+1.49	Rg1xg7+
+    13/26+	00:00	        342k	414k	+1.57	Rg1xg7+
+    13/26+	00:01	        657k	435k	+15.18	Rg1xg7+
+    13/31	00:01	        719k	437k	+20.13	Rg1xg7+  Kg8-f8  Be3-h6  Kf8-e8  Qd2-g5  Be7-f8  Qg5xf6  Rc7-e7  Bc2-g6+  Ke8-d8  Qf6xf8+  Kd8-c7  Rg7xe7+  Kc7-b6  Re7xb7+  Kb6xb7  Qf8xd6  Rc8-h8  Qd6-d7+  Kb7-a8  Qd7-g7  Rh8-d8  Qg7xe5
+    14/28-	00:01	        726k	438k	+20.05	
+    14/30+	00:01	        737k	438k	+20.21	Rg1xg7+
+    14/11+	00:01	        849k	449k	+M500	Rg1xg7+
+   11/02/2014 00:07:12, Time for this analysis: 00:00:02, Rated time: 16:12
+
+ 11 Qxh2+; id "test 11" 
+    Searching move: Qh3xh2
+    Best move (Vajolet2): Qh3xh2
+    Identical moves! Found in: 00:00
+     2/13	00:00	          3k	218k	+0.21	Qh3-h7  Ne1-d3
+     3/14	00:00	          6k	226k	+0.32	Qh3-h7  Ne1-d3  Rc8-e8
+     4/17	00:00	         13k	268k	+0.69	Qh3-h5  Bg2xe4  Bf5xe4  Ne1-d3
+     5/14	00:00	         15k	273k	+0.72	Qh3-h5  Ne1-d3  Re6-h6  Bg2xe4  Bf5xe4
+     6/11-	00:00	         16k	284k	+0.54	
+     6/11	00:00	         17k	288k	+0.46	Qh3-h5  Bg2xe4  Bf5xe4  Qe2-a6  Rc8-c7  Ne1-d3
+     7/12+	00:00	         18k	293k	+0.54	Qh3-h5
+     7/16+	00:00	         19k	301k	+0.62	Qh3-h5
+     7/17	00:00	         21k	310k	+0.61	Qh3-h5  Ne1-d3  Re6-h6  Bg2xe4  Bf5xe4  Nd3-f4  Qh5-g5
+     8/18+	00:00	         25k	321k	+0.70	Qh3xh2+
+     8/14+	00:00	         25k	323k	+0.79	Qh3xh2+
+     8/23+	00:00	         30k	337k	+2.40	Qh3xh2+
+     8/22	00:00	         39k	354k	+2.67	Qh3xh2+  Kg1xh2  Ne4xg3  Qe2-b5  Re6-h6+  Kh2-g1  c6xb5  Rf1xf5  Rc8xc1  Rf5-g5+  Rh6-g6  Rg5xg6+  f7xg6  Bg2xd5+  Kg8-h7
+     9/17	00:00	         40k	357k	+2.67	Qh3xh2+  Kg1xh2  Ne4xg3  Qe2-b5  Re6-h6+  Kh2-g1  c6xb5  Rf1xf5  Rc8xc1  Rf5-g5+  Rh6-g6  Rg5xg6+  f7xg6  Bg2xd5+  Kg8-h7
+    10/22	00:00	         44k	365k	+2.67	Qh3xh2+  Kg1xh2  Ne4xg3  Qe2-b5  Re6-h6+  Kh2-g1  c6xb5  Rf1xf5  Rc8xc1  Rf5-g5+  Rh6-g6  Rg5xg6+  f7xg6  Bg2xd5+  Kg8-h7
+    11/22+	00:00	         48k	372k	+2.76	Qh3xh2+
+    11/29+	00:00	         61k	394k	+2.84	Qh3xh2+
+    11/24+	00:00	         65k	401k	+2.97	Qh3xh2+
+    11/26	00:00	         77k	412k	+3.04	Qh3xh2+  Kg1xh2  Ne4xg3  Qe2-b5  Re6-h6+  Kh2-g1  c6xb5  Rc1xc8+  Bf5xc8  Rf1-f6  Rh6xf6  Bd4xf6  Ng3-e4  Bf6-d4  f7-f5  Ne1-d3
+    14/32-	00:00	        202k	455k	+2.96	
+    14/32	00:00	        304k	467k	+2.98	Qh3xh2+  Kg1xh2  Ne4xg3  Qe2-b5  Re6-h6+  Kh2-g1  c6xb5  Rc1xc8+  Bf5xc8  Rf1-f6  Rh6xf6  Bd4xf6  Ng3-e4  Bf6-d4  f7-f5  Ne1-d3  a7-a5  Nd3-f4  Bc8-b7  Bg2-f1  Bb8xf4  e3xf4  Bb7-c6
+    15/20+	00:00	        313k	469k	+3.06	Qh3xh2+
+    15/27	00:00	        359k	478k	+3.06	Qh3xh2+  Kg1xh2  Ne4xg3  Qe2-b5  Re6-h6+  Kh2-g1  c6xb5  Rc1xc8+  Bf5xc8  Rf1-f6  Rh6xf6  Bd4xf6  Ng3-e4  Bf6-d4  f7-f5  Ne1-d3  a7-a5  Nd3-f4  Bc8-b7  a2-a3  Kg8-f7  Bg2-f1  Bb8xf4  e3xf4
+    16/23	00:00	        383k	480k	+3.00	Qh3xh2+  Kg1xh2  Ne4xg3  Qe2-b5  Re6-h6+  Kh2-g1  c6xb5  Rc1xc8+  Bf5xc8  Rf1-f6  Rh6xf6  Bd4xf6  Ng3-e4  Bf6-d4  f7-f5  Ne1-d3  Bc8-e6  Nd3-f4  Bb8xf4  Bg2xe4
+    17/35	00:01	        552k	488k	+3.00	Qh3xh2+  Kg1xh2  Ne4xg3  Qe2-b5  Re6-h6+  Kh2-g1  c6xb5  Rc1xc8+  Bf5xc8  Rf1-f6  Rh6xf6  Bd4xf6  Ng3-e4  Bf6-d4  f7-f5  Ne1-d3  Bc8-e6  Nd3-f4  Bb8xf4  Bg2xe4
+   11/02/2014 00:07:14, Time for this analysis: 00:00:01, Rated time: 16:12
+
+ 12 Qe4; id "test 12";  
+    Searching move: Qe6-e4
+    Best move (Vajolet2): Qe6-e4
+    Identical moves! Found in: 11:17
+     2/13	00:00	          2k	302k	-1.23	Qe6-e7  Re2-c2
+     3/15	00:00	          4k	290k	-1.22	Qe6-e7  Re2-c2  Qe7-d7
+     4/13	00:00	          5k	283k	-1.37	Qe6-e7  Rb3-d3  Kf7-g6  Rd3-d6
+     5/13-	00:00	          9k	301k	-2.21	
+     5/15	00:00	         14k	341k	-2.05	Qe6-f5  Rb3xb7+  Kf7-g6  Ke1-f1  Qf5xf4+  Kf1-e1  Qf4-a4
+     6/15+	00:00	         15k	349k	-1.96	Qe6-f5
+     6/16+	00:00	         15k	358k	-1.88	Qe6-f5
+     6/14+	00:00	         16k	368k	-1.48	Qe6-f5
+     6/18	00:00	         23k	403k	-1.29	Qe6-f5  Ke1-f1  Kf7-g6  Re2xe3  Qf5xf4+  Kf1-e2  Rg3-g2+  Ke2-d3  Qf4-f5+  Re3-e4  Qf5-d5+  Re4-d4
+     7/20+	00:00	         23k	404k	-1.20	Qe6-f5
+     7/16+	00:00	         24k	406k	-1.08	Qe6-f5
+     7/16+	00:00	         26k	414k	-0.06	Qe6-f5
+     7/20	00:00	         29k	427k	 0.00	Qe6-f5  Rb3xb7+  Kf7-g6  Re2-h2  Qf5-b1+  Ke1-e2  Qb1-c2+  Ke2-e1  Qc2-b1+
+     8/21	00:00	         34k	447k	+0.05	Qe6-f5  Ke1-f1  Kf7-g6  Re2xe3  Qf5xf4+  Kf1-e2  Rg3-g2+  Ke2-d3  Qf4-f5+  Re3-e4  Qf5-f3+  Re4-e3  Qf3-d5+  Kd3-c3  Qd5xc5+  Kc3-d3
+     9/24+	00:00	         40k	457k	+0.13	Qe6-f5
+     9/26	00:00	         55k	490k	+0.12	Qe6-f5  Ke1-f1  Kf7-g6  Re2xe3  Qf5xf4+  Re3-f3  Qf4-c4+  Kf1-e1  Qc4-c1+  Ke1-f2  Rg3-g2+  Qh1xg2+  h3xg2  Rf3-g3+  Kg6-h5  Kf2xg2  Qc1-c2+  Kg2-f3  Qc2-f5+  Kf3-e2
+    10/24	00:00	         64k	500k	+0.12	Qe6-f5  Ke1-f1  Kf7-g6  Re2xe3  Qf5xf4+  Re3-f3  Qf4-c4+  Kf1-e1  Qc4-c1+  Ke1-f2  Rg3-g2+  Qh1xg2+  h3xg2  Rf3-g3+  Kg6-h5  Kf2xg2  Qc1-c2+  Kg2-f3  Qc2-f5+  Kf3-e2
+    11/28+	00:00	         89k	526k	+0.20	Qe6-f5
+    11/20+	00:00	         93k	529k	+0.28	Qe6-f5
+    11/22+	00:00	        127k	520k	+1.27	Qe6-f5
+    11/30	00:00	        191k	542k	+1.23	Qe6-f5  Ke1-f1  Qf5xf4+  Kf1-e1  b7-b5  Ke1-d1  Qf4-g4  Qh1-h2  f6-f5  Rb3-d3  f5-f4  Rd3-d4  Rg3-g1+  Kd1-c2  Qg4-f5+  Kc2-b3
+    12/24	00:00	        208k	541k	+1.23	Qe6-f5  Ke1-f1  Qf5xf4+  Kf1-e1  b7-b5  Ke1-d1  Qf4-g4  Qh1-h2  f6-f5  Rb3-d3  f5-f4  Rd3-d4  Rg3-g1+  Kd1-c2  Qg4-f5+  Kc2-b3
+    13/26	00:00	        238k	549k	+1.23	Qe6-f5  Ke1-f1  Qf5xf4+  Kf1-e1  b7-b5  Ke1-d1  Qf4-g4  Qh1-h2  f6-f5  Rb3-d3  f5-f4  Rd3-d4  Rg3-g1+  Kd1-c2  Qg4-f5+  Kc2-b3
+    14/29+	00:00	        304k	557k	+1.31	Qe6-f5
+    14/31+	00:00	        359k	563k	+1.39	Qe6-f5
+    14/38+	00:01	        951k	597k	+3.89	Qe6-f5
+    14/34	00:01	      1'141k	600k	+4.70	Qe6-f5  Rb3xb7+  Kf7-g6  Rb7-d7  Qf5xd7  Qh1-e4+  f6-f5  Qe4-h1  Kg6-h5  Qh1-h2  Qd7-d3  Re2-c2  Kh5-g4  b2-b4  Kg4xf4  a2-a4
+    15/35	00:02	      1'301k	604k	+4.73	Qe6-f5  Rb3xb7+  Kf7-g6  Rb7-d7  Qf5xd7  Qh1-e4+  f6-f5  Qe4-h1  Kg6-h5  Qh1-h2  Qd7-d3  Re2-c2  Kh5-g4  b2-b4  Qd3-b5  Rc2-b2  Kg4xf4
+    16/35+	00:02	      1'490k	609k	+4.81	Qe6-f5
+    16/37+	00:02	      1'808k	616k	+4.89	Qe6-f5
+    16/37+	00:04	      2'740k	627k	+6.47	Qe6-f5
+    16/40	00:05	      3'542k	634k	+7.35	Qe6-f5  Rb3xb7+  Kf7-g6  Rb7-d7  Qf5xd7  Qh1-e4+  f6-f5  Qe4-h1  Kg6-h5  Re2-h2  Kh5-g4  Qh1-f1  Qd7-d5  Rh2-c2  Qd5xa2  Ke1-d1  Qa2-b1+  Rc2-c1  Qb1xb2  Qf1-e2+  Qb2xe2+  Kd1xe2  Kg4xf4  Rc1-c4+  Kf4-e5  Rc4-a4  h3-h2  Ra4xa7
+    17/30	00:05	      3'744k	636k	+7.32	Qe6-f5  Rb3xb7+  Kf7-g6  Rb7-d7  Qf5xd7  Qh1-e4+  f6-f5  Qe4-h1  Kg6-h5  Re2-h2  Kh5-g4  Qh1-f1  Qd7-d5  Rh2-c2  Qd5xa2  Ke1-d1  Qa2-b1+  Rc2-c1  Qb1xb2  Qf1-e1  Kg4xf4
+    18/27-	00:05	      3'790k	636k	+7.03	
+    18/30	00:06	      4'137k	642k	+7.35	Qe6-f5  Rb3xb7+  Kf7-g6  Rb7-d7  Qf5xd7  Qh1-e4+  f6-f5  Qe4-h1  Kg6-h5  Re2-h2  Kh5-g4  Qh1-f1  Qd7-d5  Rh2-c2  Qd5xa2  Ke1-d1  Qa2-b1+  Rc2-c1  Qb1xb2  Qf1-e2+  Qb2xe2+  Kd1xe2  Kg4xf4  Rc1-c4+  Kf4-e5  Rc4-a4  h3-h2  Ra4xa7
+    19/30-	00:06	      4'200k	642k	+7.19	
+    19/31	00:07	      4'543k	644k	+7.35	Qe6-f5  Rb3xb7+  Kf7-g6  Rb7-d7  Qf5xd7  Qh1-e4+  f6-f5  Qe4-h1  Kg6-h5  Re2-h2  Kh5-g4  Qh1-f1  Qd7-d5  Rh2-c2  Qd5xa2  Ke1-d1  Qa2-b1+  Rc2-c1  Qb1xb2  Qf1-e2+  Qb2xe2+  Kd1xe2  Kg4xf4  Rc1-c4+  Kf4-e5  Rc4-a4  h3-h2  Ra4xa7
+    20/33	00:08	      5'304k	645k	+7.35	Qe6-f5  Rb3xb7+  Kf7-g6  Rb7-d7  Qf5xd7  Qh1-e4+  f6-f5  Qe4-h1  Kg6-h5  Re2-h2  Kh5-g4  Qh1-f1  Qd7-d5  Rh2-c2  Qd5xa2  Ke1-d1  Qa2-b1+  Rc2-c1  Qb1xb2  Qf1-e2+  Qb2xe2+  Kd1xe2  Kg4xf4  Rc1-c4+  Kf4-e5  Rc4-a4  h3-h2  Ra4xa7
+    21/36+	00:10	      6'538k	653k	+7.43	Qe6-f5
+    21/35+	00:10	      7'081k	659k	+7.51	Qe6-f5
+    21/44+	00:22	     15'063k	678k	+8.48	Qe6-f5
+    21/46	00:25	     17'492k	683k	+8.39	Qe6-f5  Rb3xe3  Rg3xe3  Re2xe3  Qf5-b1+  Ke1-f2  Qb1xh1  Re3-g3  Qh1-h2+  Kf2-f3  Qh2xb2  Rg3xh3  Qb2-a3+  Kf3-g2  Qa3xa2+  Kg2-g3  Qa2-b3+  Kg3-g2  Qb3-d5+  Kg2-h2  Qd5-f5  Kh2-g3  Kf7-g7  Kg3-g2  Qf5xc5  Rh3-g3+  Kg7-f7  Rg3-h3  Qc5-c2+  Kg2-f3  b7-b5  Rh3-h1
+    22/33+	00:26	     18'076k	684k	+8.47	Qe6-f5
+    22/41+	00:27	     18'941k	689k	+8.55	Qe6-f5
+    22/44+	00:32	     22'858k	697k	+9.12	Qe6-f5
+    22/48	00:37	     26'156k	705k	+9.33	Qe6-f5  Rb3xe3  Rg3xe3  Re2xe3  Qf5-b1+  Ke1-f2  Qb1xh1  Re3-g3  Qh1-h2+  Kf2-f3  Qh2xb2  Rg3xh3  Qb2-a3+  Kf3-g2  Qa3xa2+  Kg2-f1  Qa2-c4+  Kf1-g2  Qc4-c2+  Kg2-g3  Qc2-c3+  Kg3-h2  Qc3-d2+  Kh2-h1  Qd2-e1+  Kh1-g2  Qe1-e2+  Kg2-h1  Qe2-e4+  Kh1-h2  Qe4xf4+  Kh2-h1  Qf4-e4+  Kh1-h2  a7-a5  Kh2-g3  Qe4-f5  Rh3-h4  Qf5-g5+  Rh4-g4  Qg5xc5
+    23/44	00:55	     39'115k	700k	+9.27	Qe6-f5  Rb3xe3  Rg3xe3  Re2xe3  Qf5-b1+  Ke1-f2  Qb1xh1  Re3-g3  Qh1-h2+  Kf2-f3  Qh2xb2  Rg3xh3  Qb2-a3+  Kf3-g2  Qa3xa2+  Kg2-f1  Qa2-c4+  Kf1-g2  Qc4-c2+  Kg2-g3  Qc2-c3+  Kg3-h2  Qc3-d2+  Kh2-h1  Qd2-e1+  Kh1-g2  Qe1-e2+  Kg2-h1  Qe2-e4+  Kh1-h2  Qe4xf4+  Kh2-h1  Qf4-e4+  Kh1-h2  Qe4-c2+  Kh2-g3  a7-a5  Rh3-h4  Qc2-c3+  Kg3-g2  Qc3xc5
+    24/45+	01:04	     45'040k	702k	+9.35	Qe6-f5
+    24/44+	01:09	     48'803k	707k	+9.43	Qe6-f5
+    24/48+	01:21	     58'714k	717k	+10.00	Qe6-f5
+    24/51	01:29	     64'476k	723k	+10.18	Qe6-f5  Rb3xe3  Rg3xe3  Re2xe3  Qf5-b1+  Ke1-f2  Qb1xh1  Re3-g3  Qh1-h2+  Kf2-f3  Qh2xb2  Rg3xh3  Qb2-a3+  Kf3-g4  f6-f5+  Kg4-h4  Qa3xc5  Rh3-b3  Qc5-e7+  Kh4-g3  c6-c5  a2-a4  c5-c4  Rb3-b5  Qe7-e3+  Kg3-g2  Qe3-e4+  Kg2-g3  c4-c3  Rb5-e5  Qe4-d3+  Kg3-h4  c3-c2  Re5-c5  Kf7-g6  Rc5-c8  Qd3-d2
+    25/41-	01:38	     72'735k	739k	+9.45	
+    25/50	01:43	     76'839k	739k	+9.38	Qe6-f5  Rb3xe3  Rg3xe3  Re2xe3  Qf5-b1+  Ke1-f2  Qb1xh1  Re3-g3  Qh1-h2+  Kf2-f3  Qh2xb2  Rg3xh3  Qb2-a3+  Kf3-g4  f6-f5+  Kg4-h4  Qa3xa2  Kh4-g3  Qa2-b3+  Kg3-g2  Qb3-c2+  Kg2-g3  Qc2-d3+  Kg3-g2  Qd3-e2+  Kg2-g1  Qe2-g4+  Kg1-h2  Qg4xf4+  Kh2-g2  Qf4-d2+  Kg2-g1  Qd2-c1+  Kg1-g2  Qc1-c2+  Kg2-h1  Kf7-g7  Rh3-g3+  Kg7-f6  Rg3-h3  Qc2-e4+  Kh1-h2  Qe4-e5+  Kh2-h1  Qe5xc5
+    26/47	02:21	    102'285k	725k	+9.35	Qe6-f5  Rb3xe3  Rg3xe3  Re2xe3  Qf5-b1+  Ke1-f2  Qb1xh1  Re3-g3  Qh1-h2+  Kf2-f3  Qh2xb2  Rg3xh3  Qb2-a3+  Kf3-g4  f6-f5+  Kg4-h4  Qa3xa2  Kh4-g3  Qa2-b3+  Kg3-g2  Qb3-c2+  Kg2-g3  Qc2-d3+  Kg3-g2  Qd3-e2+  Kg2-g1  Qe2-g4+  Kg1-h2  Qg4xf4+  Kh2-g2  Qf4-d2+  Kg2-g1  Qd2-c1+  Kg1-g2  Qc1-c2+  Kg2-h1  Kf7-g7  Rh3-g3+  Kg7-f6  Rg3-h3  Qc2-e4+  Kh1-h2  Qe4-e5+  Kh2-g2  Qe5xc5
+    27/49+	02:40	    115'768k	720k	+9.43	Qe6-f5
+    27/46+	02:53	    125'734k	726k	+9.51	Qe6-f5
+    27/54+	05:17	    232'413k	733k	+11.09	Qe6-f5
+    27/59	05:49	    257'507k	738k	+11.14	Qe6-f5  Rb3xe3  Rg3xe3  Re2xe3  Qf5-b1+  Ke1-f2  Qb1xh1  Re3-g3  Qh1-h2+  Kf2-f3  Qh2xb2  Rg3xh3  Qb2-a3+  Kf3-g4  f6-f5+  Kg4-h4  Qa3xc5  Rh3-b3  Qc5-e7+  Kh4-g3  c6-c5  Kg3-f2  c5-c4  Rb3-e3  Qe7-h4+  Kf2-e2  Qh4xf4  Re3-f3  Qf4-e4+  Rf3-e3  Qe4-g2+  Ke2-d1  Qg2xa2  Kd1-c1  f5-f4  Re3-f3  Qa2-h2  Kc1-d1  b7-b5  Rf3-a3  b5-b4  Ra3xa7+  Kf7-e6
+    28/52-	09:21	    415'538k	740k	+10.41	
+    28/52+	11:17	    496'581k	733k	+11.22	Qe6-e4
+    28/48+	13:53	    614'875k	738k	+19.23	Qe6-e4
+   11/02/2014 00:22:15, Time for this analysis: 00:15:00, Rated time: 27:29
+
+ 13 Be6; id "test 13";  
+    Searching move: Bc8-e6
+    Best move (Vajolet2): Bc8-e6
+    Identical moves! Found in: 00:54
+     2/10	00:00	         911	228k	+2.18	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1
+     3/13	00:00	          1k	249k	+2.18	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1
+     4/13	00:00	          2k	234k	+2.08	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-h3
+     5/13-	00:00	          4k	227k	+1.99	
+     5/14	00:00	          5k	231k	+1.96	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-h3  Rd1-f1
+     6/16-	00:00	          7k	252k	+1.88	
+     6/17	00:00	         10k	294k	+1.90	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-h3  Bc4-f1  Rh3-h4  Bf1-e2
+     7/16	00:00	         12k	309k	+1.90	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-h3  Bc4-f1  Rh3-h4  Bf1-e2
+     8/16-	00:00	         18k	351k	+1.82	
+     8/23+	00:00	         22k	372k	+1.98	c3-c2+
+     8/19	00:00	         28k	387k	+1.99	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-h3  g4-g5  Rh3xh5  Qf4-f6+  Qd8xf6  g5xf6  Rh5-h2+  Kb2-c3
+     9/19	00:00	         40k	411k	+2.03	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-h3  Kb2-b1  d6-d5  Rd1-f1  d5xc4  Qf4-f8+  Qd8xf8  Rf1xf8+  Kh8-g7  Rf8xc8
+    10/25-	00:00	        278k	420k	+0.36	
+    10/19	00:00	         46k	421k	+2.11	c3-c2+
+    11/30-	00:01	        639k	482k	+0.36	
+    11/30	00:01	        709k	487k	+0.54	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-a4  Rd1-f1  Bc8-e6  Qf4-h6  Nb4-d3+  Kb2-c2  Ra4xc4+  Kc2xd3  Be6-g8  Rf1-f8  Qd8-e7  Rf8xg8+  Kh8xg8  Kd3xc4  Qe7xe4
+    12/26+	00:01	        788k	491k	+0.62	Bc8-e6
+    12/24+	00:01	        801k	492k	+0.70	Bc8-e6
+    12/27	00:01	        813k	493k	+0.83	Bc8-e6
+    13/28-	00:02	      1'314k	513k	+0.55	
+    13/33	00:02	      1'508k	521k	+0.54	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-a4  Rd1-f1  Bc8-e6  Qf4-h6  Nb4-d3+  Kb2-c3  Ra4xc4+  Kc3xd3  Be6-g8  Rf1-f8  Qd8-e7  Rf8xg8+  Kh8xg8  Kd3xc4  Qe7xe4
+    14/28	00:03	      1'660k	523k	+0.54	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-a4  Rd1-f1  Bc8-e6  Qf4-h6  Nb4-d3+  Kb2-c3  Ra4xc4+  Kc3xd3  Be6-g8  Rf1-f8  Qd8-e7  Rf8xg8+  Kh8xg8  Kd3xc4  Qe7xe4
+    15/30	00:03	      1'933k	525k	+0.49	c3-c2+  Kb1-b2  c2xd1Q  Rg1xd1  Ra3-a4  Rd1-f1  Bc8-e6  Qf4-h6  Nb4-d3+  Kb2-c3  Ra4xc4+  Kc3xd3  Be6-g8  Rf1-f8  Qd8-e7  Rf8xg8+  Kh8xg8  Kd3xc4  Qe7xe4  Qh6-g5+  Kg8-f7  Qg5-f5+  Qe4xf5  g4xf5
+    16/32+	00:04	      2'228k	528k	+0.57	Bc8-e6
+    16/25+	00:04	      2'239k	528k	+0.65	Bc8-e6
+    16/34+	00:05	      2'793k	533k	+3.15	Bc8-e6
+    16/35	00:05	      3'152k	537k	+3.62	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Qc1-a1  c2xd1Q  Qa1xd1  Qd8-a5+  Ka3-b2  Nb4-d3+  Kb2-c2  c5xd4  Qd1-a1  Qa5-e5  Kc2-b1  Qe5xe4  Qa1-a5  Nd3-c5+  Kb1-b2  Qe4-e2+  Kb2-b1
+    17/34-	00:06	      3'319k	539k	+3.54	
+    17/36+	00:06	      3'423k	541k	+3.71	Bc8-e6
+    17/32+	00:07	      4'308k	547k	+5.29	Bc8-e6
+    17/34	00:09	      5'028k	548k	+5.79	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Ka3-b2  Qd8-b6  Kb2-c3  c2xd1Q  Qc1xd1  Nb4-d5+  Kc3xc4  Nd5-e3+  Kc4-d3  Ne3xd1  Rg1xd1  Qb6-b3+  Kd3-d2  c5xd4  Rd1-e1  Qb3-c3+  Kd2-e2  d4-d3+  Ke2-d1
+    18/34-	00:10	      5'674k	543k	+5.71	
+    18/32+	00:10	      5'931k	544k	+5.87	Bc8-e6
+    18/39+	00:12	      6'621k	550k	+6.44	Bc8-e6
+    18/39	00:15	      8'441k	551k	+6.65	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Ka3-b2  Qd8-b6  Kb2-c3  c2xd1Q  Qc1xd1  Nb4-d5+  e4xd5  Qb6-b4+  Kc3-c2  Bc4-b3+  Kc2-c1  Bb3xd1  Rg1xd1  c5xd4  g4-g5  a6-a5  Rd1-d3  Qb4-c4+  Kc1-d2  Qc4xd5  Rd3-g3  Qd5-e4  Rg3-d3  Qe4-g2+  Kd2-e1
+    19/33-	00:15	      8'811k	554k	+6.57	
+    19/36	00:17	      9'532k	557k	+6.62	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Ka3-b2  Qd8-b6  Kb2-c3  c2xd1Q  Qc1xd1  Nb4-d5+  e4xd5  Qb6-b4+  Kc3-c2  Bc4-b3+  Kc2-c1  Bb3xd1  Rg1xd1  c5xd4  g4-g5  a6-a5  Rd1-d3  a5-a4  Kc1-d1  Qb4-b1+  Kd1-e2  Qb1-a2+  Rd3-d2  Qa2xd5
+    20/35-	00:18	     10'238k	558k	+6.54	
+    20/38+	00:19	     11'033k	562k	+6.70	Bc8-e6
+    20/39+	00:21	     11'955k	566k	+7.00	Bc8-e6
+    20/40	00:24	     14'107k	572k	+7.16	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Ka3-b2  Qd8-b6  Kb2-c3  c2xd1Q  Qc1xd1  Nb4-d5+  e4xd5  Qb6-b4+  Kc3-c2  Bc4-b3+  Kc2-c1  Bb3xd1  Rg1xd1  Qb4-c4+  Kc1-b1  Qc4-e2  Rd1-c1  Qe2-d3+  Rc1-c2  Qd3xd4  Rc2-g2  Qd4-e4+  Rg2-c2  Qe4xg4
+    21/38-	00:26	     15'307k	574k	+7.08	
+    21/38+	00:28	     16'532k	574k	+7.24	Bc8-e6
+    21/42-	00:32	     18'855k	584k	+7.00	
+    21/41	00:39	     23'154k	581k	+7.26	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Ka3-b2  Qd8-b6  Kb2-c3  c2xd1Q  Qc1xd1  Nb4-d5+  e4xd5  Qb6-b4+  Kc3-c2  Bc4-b3+  Kc2-c1  Bb3xd1  Rg1xd1  Qb4-c4+  Kc1-b1  Qc4-e2  Kb1-c1  c5-c4  Rd1-d2  Qe2xg4  h5-h6  Qg4-g5  Kc1-c2  Qg5xd5  Rd2-e2  Qd5-f5+  Kc2-b2
+    22/40-	00:46	     27'779k	595k	+6.98	
+    22/44	00:54	     32'983k	604k	+7.21	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Ka3-b2  Qd8-b6  Kb2-c3  c5xd4+  Kc3xc4  Qb6-b5+  Kc4-b3  c2xd1Q+  Rg1xd1  Nb4-d3+  Kb3-a3  Nd3xc1  Rd1xc1  Qb5-d3+  Ka3-a4  Qd3xe4  Rc1-c8+  Kh8-g7  g4-g5  d4-d3+  Ka4-a3  Qe4-e7  h5-h6+  Kg7-g6  Rc8-g8+  Kg6-f5  Rg8-g7
+    23/37	01:00	     36'288k	603k	+7.21	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Ka3-b2  Qd8-b6  Kb2-c3  c5xd4+  Kc3xc4  Qb6-b5+  Kc4-b3  c2xd1Q+  Rg1xd1  Nb4-d3+  Kb3-a3  Nd3xc1  Rd1xc1  Qb5-d3+  Ka3-a4  Qd3xe4  Rc1-c8+  Kh8-g7  g4-g5  d4-d3+  Ka4-a3  Qe4-e7  h5-h6+  Kg7-g6  Rc8-g8+  Kg6-f5  Rg8-g7
+    24/42	01:14	     44'982k	601k	+7.21	Bc8-e6  Qf4-c1  c3-c2+  Kb1-b2  Be6xc4  Kb2xa3  c7-c5  Ka3-b2  Qd8-b6  Kb2-c3  c5xd4+  Kc3xc4  Qb6-b5+  Kc4-b3  c2xd1Q+  Rg1xd1  Nb4-d3+  Kb3-a3  Nd3xc1  Rd1xc1  Qb5-d3+  Ka3-a4  Qd3xe4  Rc1-c8+  Kh8-g7  g4-g5  d4-d3+  Ka4-a3  Qe4-e7  h5-h6+  Kg7-g6  Rc8-g8+  Kg6-f5  Rg8-g7
+    25/43+	01:21	     49'034k	600k	+7.29	Bc8-e6
+   11/02/2014 00:23:39, Time for this analysis: 00:01:22, Rated time: 28:23
+
+ 14 Rxh7; id "test 14"; 
+    Searching move: Rh3xh7
+    Best move (Vajolet2): Rh3xh7
+    Identical moves! Found in: 00:00
+     2/7	00:00	         165	165k	+3.11	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8
+     3/7	00:00	         404	202k	+3.11	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8
+     4/7	00:00	         619	310k	+3.11	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8
+     5/8	00:00	          1k	345k	+3.11	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-g3
+     6/12-	00:00	          2k	423k	+3.03	
+     6/11	00:00	          3k	437k	+3.01	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rh3-h6  Ng7-f5
+     7/12-	00:00	          4k	439k	+2.93	
+     7/14	00:00	          5k	456k	+2.91	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-g3  Ng7-f5  Rg3-d3  h7-h5
+     8/11	00:00	          6k	485k	+2.91	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-g3  Ng7-f5  Rg3-d3  h7-h5
+     9/14-	00:00	         10k	488k	+2.82	
+     9/16	00:00	         16k	525k	+2.80	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-g3  Ng7-f5  Rg3-d3  h7-h5  Kg1-f1  Rd8-a8  Rh3-f3  Kg8-g7
+    10/13	00:00	         21k	543k	+2.80	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-h4  h7-h5  Rh3-d3  Ng7-f5  Rh4-h3  Rd8-a8
+    11/16-	00:00	         31k	564k	+2.72	
+    11/18	00:00	         41k	583k	+2.77	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-h4  h7-h5  Rh3-d3  Ng7-f5  Rh4-h3  Rd8-a8  Rh3-f3  Kg8-g7  Kg1-f1  g6-g5
+    12/16	00:00	         48k	591k	+2.80	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-h4  h7-h5  Rh3-d3  Ng7-f5  Rh4-h3  Rd8-a8  Rh3-f3  Kg8-g7
+    13/19-	00:00	         67k	609k	+2.72	
+    13/22	00:00	        109k	632k	+2.72	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-g3  Ng7-f5  Rg3-d3  h7-h5  Kg1-f2  Rd8-a8  Rd3-d1  Kg8-f8  Rh3-f3  Kf8-e7  Rd1-d3  g6-g5
+    14/19	00:00	        134k	600k	+2.74	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-g3  Ng7-f5  Rg3-d3  h7-h5  Rd3-d1  Rd8-a8  Rh3-c3  Kg8-f8  Rd1-d3  Kf8-e7
+    15/21	00:00	        188k	574k	+2.68	Qd3xb5  a6xb5  Bf6xd8  Rf8xd8  Rg4-g3  Ng7-f5  Rg3-d3  h7-h5  Rd3-d1  Rd8-a8  Kg1-h1  h5-h4  Rh3-f3  g6-g5  Rf3-d3  g5-g4
+    16/24+	00:00	        263k	573k	+2.76	Rh3xh7
+    16/17+	00:00	        264k	573k	+2.84	Rh3xh7
+    16/15+	00:00	        366k	571k	+M500	Rh3xh7
+    16/22	00:01	        915k	523k	+M7	Rh3xh7  Kg8xh7  Rg4-h4+  Kh7-g8  Rh4-h8+  Kg8xh8  Qd3-h3+  Kh8-g8  Qh3-h6  Qb5-f1+  Kg1xf1  Rd8-a8  Qh6xg7+
+    17/22	00:03	      1'700k	550k	+M7	Rh3xh7  Kg8xh7  Rg4-h4+  Kh7-g8  Rh4-h8+  Kg8xh8  Qd3-h3+  Kh8-g8  Qh3-h6  Qb5-f1+  Kg1xf1  Rd8-a8  Qh6xg7+
+    18/22	00:04	      2'758k	583k	+M7	Rh3xh7  Kg8xh7  Rg4-h4+  Kh7-g8  Rh4-h8+  Kg8xh8  Qd3-h3+  Kh8-g8  Qh3-h6  Qb5-f1+  Kg1xf1  Rd8-a8  Qh6xg7+
+    19/20	00:07	      4'365k	612k	+M7	Rh3xh7  Kg8xh7  Rg4-h4+  Kh7-g8  Rh4-h8+  Kg8xh8  Qd3-h3+  Kh8-g8  Qh3-h6  Qb5-f1+  Kg1xf1  Rd8-a8  Qh6xg7+
+   11/02/2014 00:23:48, Time for this analysis: 00:00:08, Rated time: 28:23
+
+ 15 e5; id "test 15";   
+    Searching move: e4-e5
+    Best move (Vajolet2): Rf2-f6
+    Not found in: 15:00
+     2/13	00:00	          1k	272k	+0.57	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8xe4
+     3/16	00:00	          3k	240k	+1.70	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5
+     4/14	00:00	          4k	241k	+1.11	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Qe5-b2+  Kh2-h1
+     5/12	00:00	          5k	245k	+1.11	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Qe5-b2+  Kh2-h1
+     6/16	00:00	          7k	254k	+1.08	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2
+     7/16+	00:00	          8k	272k	+1.17	Rf2-f6+
+     7/18	00:00	         14k	336k	+1.05	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Qf1-f6+  Qe5xf6  Nd5xf6  Na5xc4  Nf6xh5+  Kg7-h7  Nh5-f6+  Kh7-g7
+     8/18	00:00	         19k	367k	+1.05	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Qf1-f6+  Qe5xf6  Nd5xf6  Na5xc4  Nf6xh5+  Kg7-h7  Nh5-f6+  Kh7-g7
+     9/17+	00:00	         20k	377k	+1.13	Rf2-f6+
+     9/17+	00:00	         21k	377k	+1.26	Rf2-f6+
+     9/16+	00:00	         23k	388k	+1.57	Rf2-f6+
+     9/20	00:00	         32k	422k	+1.25	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Qf1-f6+  Qe5xf6  Nd5xf6  Bc8-g4  Nf6xg4  h5xg4  h4-h5  Na5xc4  Rd6-d7+  Kg7-f6  Rd7xa7
+    10/23	00:00	         46k	451k	+1.25	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Qf1-f6+  Qe5xf6  Nd5xf6  Bc8-g4  Nf6xg4  h5xg4  h4-h5  Na5xc4  Rd6-d7+  Kg7-f6  Rd7xa7
+    11/24	00:00	         76k	482k	+1.25	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Qf1-f6+  Qe5xf6  Nd5xf6  Bc8-g4  Nf6xg4  h5xg4  h4-h5  Na5xc4  Rd6-d7+  Kg7-f6  Rd7xa7
+    12/27+	00:00	         91k	468k	+1.34	Rf2-f6+
+    12/24+	00:00	         99k	459k	+1.42	Rf2-f6+
+    12/27+	00:00	        231k	450k	+3.01	Rf2-f6+
+    12/30	00:00	        298k	461k	+3.27	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Be6xd5  c4xd5  Qe5-e7  Qf1-f3  Qe7-b7  Qf3-f8+  Kg7-g6  Qf8-e8+  Kg6-g7  d5-d6
+    13/25	00:00	        330k	472k	+3.27	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Be6xd5  c4xd5  Qe5-e7  Qf1-f3  Qe7-b7  Qf3-f8+  Kg7-g6  Qf8-e8+  Kg6-g7  d5-d6
+    14/27	00:00	        414k	496k	+3.27	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Be6xd5  c4xd5  Qe5-e7  Qf1-f3  Qe7-b7  Qf3-f8+  Kg7-g6  Qf8-e8+  Kg6-g7  d5-d6
+    15/30+	00:00	        473k	501k	+3.35	Rf2-f6+
+    15/32+	00:01	        725k	506k	+3.43	Rf2-f6+
+    15/40-	00:02	      1'228k	519k	+3.19	
+    15/40	00:02	      1'612k	539k	+3.27	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Kh2-h1  Qb2-d4  Ra8xa7+  Kg7-g8  Nd5-f6+  Kg8-f8  Nf6-g4+  Kf8-e8  Ng4xh6  Qd4xe4+  Kh1-h2  Na5xc4  Qf1-d1  Qe4-d5  Qd1xd5  Be6xd5  Nh6-f5  Bd5-f3  Ra7-e7+  Ke8-d8  Kh2-g1
+    16/55-	00:12	      7'501k	578k	+1.61	
+    16/53	00:14	      8'192k	574k	+1.66	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Kh2-h1  Na5xc4  Ra8xa7+  Kg7-g6  Nd5-e7+  Kg6-h7  a4-a5  Nc4xa5  Ne7-f5+  Kh7-g6  Nf5xh6  Qb2-e5  Nh6-f7  Qe5xe4+  Kh1-h2  Qe4-c2+  Kh2-g1  Qc2-c3  Qf1-f2  Qc3-d4  Qf2xd4  c5xd4  Nf7-g5  Be6-g4  Ra7-a6  Na5-c4
+    17/32-	00:15	      8'740k	575k	+1.58	
+    17/41+	00:16	      9'304k	574k	+1.74	Rf2-f6+
+    17/34+	00:16	      9'769k	575k	+2.31	Rf2-f6+
+    17/36	00:17	     10'221k	576k	+2.46	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  Ra7-b7  Nc4-d6  Rb7xb6  Nd6xe4  Nd5-f4  c5-c4  a4-a5  c4-c3  Nf4-e6+  Kg7-g8  Kg2-f3  Ne4-f6  Rb6-b8+  Nf6-e8  a5-a6  Bf7xe6  Rb8xe8+  Kg8-f7
+    18/34-	00:20	     11'560k	576k	+2.38	
+    18/37	00:22	     12'989k	583k	+2.46	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  Ra7-b7  Nc4-d6  Rb7xb6  Nd6xe4  Nd5-f4  c5-c4  a4-a5  c4-c3  Nf4-e6+  Kg7-g8  Kg2-f3  Ne4-f6  Rb6-b8+  Nf6-e8  a5-a6  Bf7xe6  Rb8xe8+  Kg8-f7
+    19/42-	00:32	     19'718k	604k	+2.18	
+    19/37+	00:33	     19'964k	603k	+2.54	Rf2-f6+
+    19/43	00:33	     20'114k	603k	+2.47	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  Ra7-b7  Nc4-d6  Rb7xb6  Nd6xe4  Nd5-f4  c5-c4  a4-a5  c4-c3  a5-a6  Ne4-f6  a6-a7  c3-c2  Rb6-c6  Bh6xf4  a7-a8Q  Bf7-d5+  Kg2-h3  c2-c1Q  Qa8-a7+  Kg7-g6  Rc6xc1  Bf4xc1
+    20/38	00:35	     21'584k	604k	+2.48	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  Ra7-b7  Nc4-d6  Rb7xb6  Nd6xe4  Nd5-f4  c5-c4  a4-a5  c4-c3  a5-a6  Ne4-f6  Kg2-f3
+    21/44-	01:03	     39'515k	619k	+2.32	
+    21/45+	01:06	     40'993k	616k	+2.56	Rf2-f6+
+    21/38	01:07	     41'515k	617k	+2.56	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  a4-a5  Nc4xa5  Nd5xb6  Bh6-d2  Nb6-d7  Na5-c4  Nd7xc5  Bd2-e3  Ra7-c7  Kg7-f6  Rc7-c6+  Kf6-e5  Kg2-f3  Ke5-d4
+    22/41	01:19	     49'260k	620k	+2.60	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  a4-a5  Nc4xa5  Nd5xb6  Bh6-d2  Nb6-d7  Na5-c4  Nd7xc5  Bd2-e3  Ra7-c7  Kg7-f6  Kg2-f3  Be3-d4
+    23/43	01:49	     68'374k	624k	+2.56	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  a4-a5  Nc4xa5  Nd5xb6  Bh6-d2  Nb6-d7  Na5-c4  Nd7xc5  Bd2-e3  Ra7-c7  Kg7-f6  Rc7-c6+  Kf6-e5  Kg2-f3  Ke5-d4
+    24/39+	01:51	     69'598k	623k	+2.64	Rf2-f6+
+    24/43+	01:55	     71'791k	620k	+2.72	Rf2-f6+
+    24/45	02:39	     99'554k	625k	+2.74	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  a4-a5  Nc4xa5  Nd5xb6  c5-c4  Nb6-d5  Bh6-d2  b5-b6  Bd2-e1  Ra7-c7  Kg7-f8  b6-b7  Na5xb7  Rc7xb7  Bf7-g6  Kg2-f3  c4-c3
+    25/45	03:59	    150'342k	628k	+2.74	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Be6-f7  a4-a5  Nc4xa5  Nd5xb6  c5-c4  Nb6-d5  Bh6-d2  b5-b6  Bd2-e1  Ra7-c7  Kg7-f8  b6-b7  Na5xb7  Rc7xb7  Bf7-g6  Kg2-f3  c4-c3
+    26/45+	04:18	    160'592k	622k	+2.82	Rf2-f6+
+    26/46+	04:34	    170'052k	619k	+2.90	Rf2-f6+
+    26/49+	05:11	    190'419k	612k	+3.20	Rf2-f6+
+    26/64	08:45	    321'404k	612k	+3.09	Rf2-f6+  Kg6-g7  Rf6xd6  Qe8-e5  Rd6-d8  Bc8-e6  Rd8-a8  Qe5-b2+  Qf1-g2  Qb2xg2+  Kh2xg2  Na5xc4  Ra8xa7+  Kg7-g6  Nd5xb6  Nc4-e3+  Kg2-f2  Ne3-d1+  Kf2-e2  Be6-g4+  Ke2-f1  Nd1-e3+  Kf1-g1  Bh6-g7  Ra7-a6  Bg7-d4  Nb6-d5+  Kg6-f7  Nd5xe3  Bd4xe3+  Kg1-f1  Be3-d4  b5-b6  Bg4-f3  b6-b7  Bd4-e5  Ra6-b6  Bf3xe4  a4-a5  Be5xg3  a5-a6  Be4-d3+  Kf1-g1  Bg3-b8  Kg1-f2  Bb8-a7  Kf2-e3  c5-c4  b7-b8Q  Ba7xb8  Rb6xb8
+    27/45+	08:51	    324'803k	611k	+3.17	Rf2-f6+
+   11/02/2014 00:38:49, Time for this analysis: 00:15:00, Rated time: 43:23
+
+ 16 Nxg2; id "test 16"; 
+    Searching move: Nh4xg2
+    Best move (Vajolet2): Nh4xg2
+    Identical moves! Found in: 08:59
+     2/14	00:00	          2k	227k	+0.82	Nh4xf3+  Be2xf3  Qd5-c4
+     3/15	00:00	          5k	217k	+0.78	Nh4-f5  c3-c4  Qd5-e4
+     4/16	00:00	          7k	259k	+0.69	Nh4-f5  c3-c4  Qd5-e6  Be2-d3
+     5/14+	00:00	          7k	265k	+0.78	Nh4-f5
+     5/8+	00:00	          8k	262k	+0.86	Nh4-f5
+     5/14	00:00	          9k	282k	+0.84	Nh4-f5  Be2-d3  Bd7-b5  Bd3xb5  Qd5xb5
+     6/16-	00:00	         13k	308k	+0.68	
+     6/16	00:00	         17k	328k	+0.65	Nh4-f5  Be2-d3  h7-h6  c3-c4  Qd5-e6  Rf1-e1
+     7/16-	00:00	         20k	340k	+0.56	
+     7/19	00:00	         46k	374k	+0.62	Nh4-f5  Be2-d3  Kc8-b8  Qd1-b3  Qd5xb3  a2xb3  f7-f6  Bc1-d2
+     8/18	00:00	         55k	382k	+0.62	Nh4-f5  Be2-d3  Kc8-b8  Qd1-b3  Qd5xb3  a2xb3  f7-f6  Bc1-d2
+     9/18	00:00	         68k	387k	+0.63	Nh4-f5  Be2-d3  f7-f6  c3-c4  Qd5-c6  c4-c5  Bd6-g3  Qd1-b3  Nf5-e3  Bc1xe3  Re8xe3
+    10/19	00:00	         90k	379k	+0.64	Nh4-f5  Be2-d3  f7-f6  c3-c4  Qd5-c6  Qd1-b3  Bd6-g3  Kg1-h1  Nf5-e3  Bc1xe3  Re8xe3
+    11/22	00:00	        147k	339k	+0.64	Nh4-f5  Be2-d3  f7-f6  c3-c4  Qd5-c6  Qd1-b3  Bd6-g3  Kg1-h1  Nf5-e3  Bc1xe3  Re8xe3
+    12/30-	00:01	        756k	407k	+0.36	
+    12/28	00:02	        837k	413k	+0.63	Nh4-f5  Be2-d3  f7-f6  Qd1-b3  Qd5-c6  Bc1-d2  Nf5-e3  Rf1-e1  Bd7-e6  Qb3-b5  Qc6xb5  Bd3xb5
+    13/24-	00:02	      1'151k	422k	+0.47	
+    13/29+	00:03	      1'306k	422k	+0.71	Nh4-f5
+    13/22	00:03	      1'327k	423k	+0.63	Nh4-f5  Be2-d3  f7-f6  Qd1-b3  Qd5-c6  Bc1-d2  Bd6-g3  Qb3-f7  Re8-e7  Qf7-c4  Qc6-d6  Bd2-e1  Bg3-f4
+    14/27+	00:03	      1'445k	422k	+0.71	Nh4-f5
+    14/27	00:03	      1'690k	426k	+0.58	Nh4-f5  Be2-d3  f7-f6  Qd1-b3  Qd5-c6  c3-c4  Nf5-g3  Rf1-f2  Ng3-e4  Rf2-e2  Kc8-b8  Bc1-e3  Ne4-g3  Re2-e1  Bd7xh3  Bd3xh7
+    15/29+	00:04	      1'821k	427k	+0.66	Nh4-f5
+    15/28	00:05	      2'256k	433k	+0.57	Nh4-f5  Be2-d3  f7-f6  Qd1-b3  Qd5-c6  Bd3-c4  Nf5-e3  Bc1xe3  Re8xe3  Ra1-e1  Bd6-f4  Bc4-d5  Qc6-b6  Qb3xb6  a7xb6  c3-c4
+    16/31	00:07	      3'203k	441k	+0.57	Nh4-f5  Be2-d3  f7-f6  Qd1-b3  Qd5-c6  Bd3-c4  Nf5-e3  Bc1xe3  Re8xe3  Ra1-e1  Bd6-f4  Bc4-d5  Qc6-b6  Qb3xb6  a7xb6  c3-c4
+    17/32	00:10	      4'761k	447k	+0.62	Nh4-f5  Be2-d3  f7-f6  Qd1-b3  Qd5-c6  Rf1-e1  Re8xe1+  Nf3xe1  Bd6-g3  Ne1-f3  Bd7-e6  Qb3-b5  Qc6xb5  Bd3xb5  g7-g6  Bb5-a4  Kc8-b8  Bc1-d2  h7-h5  Ba4-b3  Be6xb3  a2xb3
+    18/36-	00:29	     13'400k	459k	+0.34	
+    18/36	00:41	     18'947k	452k	+0.45	Nh4-f5  Nf3-g5  f7-f6  Be2-f3  Qd5-c4  Ng5-e4  Bd6-f8  b2-b3  Qc4-e6  Rf1-e1  Nf5-h4  Bf3-h5  g7-g6  Bh5-g4  f6-f5  Bc1-g5  Nh4xg2  Kg1xg2  f5xg4  Qd1xg4  Qe6xg4+  h3xg4
+    19/36	00:48	     21'962k	456k	+0.44	Nh4-f5  Nf3-g5  f7-f6  Be2-f3  Qd5-c4  Ng5-e4  Bd6-f8  b2-b3  Qc4-e6  Rf1-e1  Nf5-h4  Bf3-h5  g7-g6  Bh5-g4  f6-f5  Bc1-g5  Nh4xg2  Kg1xg2  f5xg4  h3xg4
+    20/36-	01:00	     27'834k	462k	+0.36	
+    20/38+	01:04	     29'781k	461k	+0.52	Nh4-f5
+    20/34-	01:19	     36'574k	460k	+0.28	
+    20/36	01:25	     39'553k	460k	+0.43	Nh4-f5  Nf3-g5  f7-f6  Be2-f3  Qd5-c4  Ng5-e4  Bd6-f8  g2-g4  Nf5-h4  Bf3-h1  Bd7-c6  Rf1-e1  Kc8-b8  b2-b3  Qc4-a6  Bc1-f4  f6-f5  Bf4-g3  f5xe4  Bg3xh4  Bf8-e7  Bh4xe7  Re8xe7
+    21/38+	01:47	     49'325k	461k	+0.51	Nh4xg2
+    21/31+	01:48	     49'846k	461k	+0.59	Nh4xg2
+    21/38+	02:13	     61'886k	462k	+1.16	Nh4xg2
+    21/44	02:48	     78'126k	464k	+1.15	Nh4xg2  Kg1xg2  Bd7xh3+  Kg2-f2  Bh3xf1  Qd1xf1  h7-h6  Qf1-h3+  Qd5-e6  Be2-f1  g7-g5  Qh3xe6+  f7xe6  Bf1-h3  Kc8-b8  c3-c4  e6-e5  c4-c5  Bd6-f8  d4xe5  Bf8xc5+  Kf2-g3  Re8-f8  e5-e6  Rd8-d1  Bh3-g4  Bc5-d6+  Kg3-h3  Rd1-h1+  Kh3-g2
+    22/38-	03:26	     96'212k	467k	+1.07	
+    22/44	04:11	    117'923k	470k	+1.18	Nh4xg2  Kg1xg2  Bd7xh3+  Kg2-f2  Bh3xf1  Qd1xf1  h7-h6  Be2-b5  c7-c6  Qf1-h3+  Qd5-e6  Qh3xe6+  Re8xe6  Bb5-d3  Re6-f6  Kf2-g2  Bd6-f4  Bc1xf4  Rf6xf4  Ra1-e1  g7-g5  Re1-e7  h6-h5  Nf3-e5  f7-f6  Ne5-g6  Rf4-g4+  Kg2-f2  Rd8-d7
+    23/40	04:35	    129'664k	471k	+1.18	Nh4xg2  Kg1xg2  Bd7xh3+  Kg2-f2  Bh3xf1  Qd1xf1  h7-h6  Be2-b5  c7-c6  Qf1-h3+  Qd5-e6  Qh3xe6+  Re8xe6  Bb5-d3  Re6-f6  Kf2-g2  Bd6-f4  Bc1xf4  Rf6xf4  Ra1-e1  g7-g5  Re1-e7  h6-h5  Bd3-e2  f7-f6  c3-c4
+    24/44-	06:00	    170'998k	474k	+1.10	
+    24/44	08:59	    258'302k	479k	+1.08	Nh4xg2  Kg1xg2  Bd7xh3+  Kg2-f2  Bh3xf1  Qd1xf1  h7-h6  Be2-b5  c7-c6  Qf1-h3+  Qd5-e6  Qh3xe6+  Re8xe6  Bb5-d3  Re6-f6  Kf2-g2  Kc8-b8  Bc1-d2  Bd6-f4  Bd2xf4+  Rf6xf4  Ra1-h1  c6-c5  Kg2-g3  Rf4-f6  Rh1-e1  c5xd4  c3xd4  g7-g6
+    25/45	10:50	    311'160k	478k	+1.08	Nh4xg2  Kg1xg2  Bd7xh3+  Kg2-f2  Bh3xf1  Qd1xf1  h7-h6  Be2-b5  c7-c6  Qf1-h3+  Qd5-e6  Qh3xe6+  Re8xe6  Bb5-d3  Re6-f6  Kf2-g2  Kc8-b8  Bc1-d2  Bd6-f4  Bd2xf4+  Rf6xf4  Ra1-h1  c6-c5  Kg2-g3  Rf4-f6  Rh1-e1  c5xd4  c3xd4  g7-g6
+    26/43+	11:49	    338'299k	477k	+1.16	Nh4xg2
+   11/02/2014 00:53:50, Time for this analysis: 00:15:00, Rated time: 52:22
+
+ 17 Qxf4; id "test 17"; 
+    Searching move: Qc1xf4
+    Best move (Vajolet2): Qc1xf4
+    Identical moves! Found in: 00:01
+     2/7	00:00	         202	202k	-3.57	Rh4xf4  Bd6xf4
+     3/8	00:00	         393	197k	-3.31	Rh4xf4  Bd6xf4  Qc1-c5
+     4/12	00:00	         900	225k	-3.41	Rh4xf4  Bd6xf4  Qc1-c5  a7-a5
+     5/8-	00:00	          1k	212k	-3.59	
+     5/9	00:00	          2k	236k	-3.68	Rh4xf4  Bd6xf4  Qc1-c5  Re8-e6  Bf6-h4
+     6/10-	00:00	          3k	229k	-3.77	
+     6/10	00:00	          3k	230k	-3.78	Rh4xf4  Bd6xf4  Qc1-c5  Re8-e6  Bf6-h4  a7-a5
+     7/12-	00:00	          8k	325k	-4.61	
+     7/14	00:00	          9k	351k	-4.87	Rh4xf4  Bd6xf4  Qc1-c5  Qc7-d6  Qc5xd6  Rd7xd6  Bf6-h4  Rd6xd4  Bd3-e4
+     8/12	00:00	         10k	356k	-4.87	Rh4xf4  Bd6xf4  Qc1-c5  Qc7-d6  Qc5xd6  Rd7xd6  Bf6-h4  Rd6xd4  Bd3-e4
+     9/15	00:00	         12k	373k	-4.80	Rh4xf4  Bd6xf4  Qc1-c5  Qc7-d6  Qc5xd6  Rd7xd6  Bf6-h4  Rd6xd4  Bd3-e4  c6-c5
+    10/16+	00:00	         17k	404k	-4.71	Rh4xf4
+    10/16+	00:00	         19k	415k	-4.63	Rh4xf4
+    10/15+	00:00	         45k	429k	-4.04	Rh4xf4
+    10/23	00:00	         62k	435k	-4.23	Rh4xf4  Bd6xf4  Rh1-e1  Re8-c8  Qc1-c2  Qc7-d6  Bf6-h4  Qd6-b4  Re1-a1  Kg8-g7  Bd3-e4  Qb4xd4  Be4xc6
+    11/20	00:00	         77k	421k	-4.23	Rh4xf4  Bd6xf4  Rh1-e1  Re8-c8  Qc1-c2  Qc7-d6  Bf6-h4  Qd6-b4  Re1-a1  Kg8-g7  Bd3-e4  Qb4xd4  Be4xc6
+    12/19+	00:00	         82k	418k	-4.15	Rh4xf4
+    12/22+	00:00	         86k	415k	-4.07	Rh4xf4
+    12/29-	00:00	        117k	402k	-4.31	
+    12/33	00:00	        202k	408k	-4.13	Rh4xf4  Bd6xf4  Rh1-e1  Re8-c8  Qc1-c2  Qc7-d6  Bf6-h4  a7-a6  Bh4-g3  f7-f5  Qc2-b3+  Kg8-g7  Qb3-c3  Kg7-h6  d4-d5  Bf4xg3  f2xg3  Qd6xd5
+    13/23	00:00	        211k	411k	-4.16	Rh4xf4  Bd6xf4  Rh1-e1  Re8-c8  Qc1-c2  Qc7-d6  Bf6-h4  a7-a6  Bh4-g3  f7-f5  Qc2-b3+  Kg8-h7  Qb3-c3  Rc8-d8
+    14/22	00:00	        250k	411k	-4.24	Rh4xf4  Bd6xf4  Rh1-e1  Re8-c8  Qc1-c2  Qc7-d6  Bf6-h4  a7-a6  Bh4-g3  f7-f5  Re1-d1  Kg8-h8  Qc2-c3  Kh8-h7
+    15/29+	00:01	        416k	415k	-4.16	Kg2-f1
+    15/28+	00:01	        594k	434k	-4.07	Qc1xf4
+    15/15+	00:02	      1'252k	478k	+M500	Qc1xf4
+    15/20	00:02	      1'343k	481k	+M6	Qc1xf4  Bd6xf4  Rh4xh5  g6xh5  Rh1xh5  Bf4-h6  Rh5xh6  Qc7-h2+  Kg2xh2  Kg8-f8  Rh6-h8+
+    16/21	00:03	      1'639k	501k	+M6	Qc1xf4  Bd6xf4  Rh4xh5  g6xh5  Rh1xh5  Bf4-h6  Rh5xh6  Qc7-h2+  Kg2xh2  Kg8-f8  Rh6-h8+
+    17/17	00:03	      1'750k	513k	+M6	Qc1xf4  Bd6xf4  Rh4xh5  g6xh5  Rh1xh5  Bf4-h6  Rh5xh6  Qc7-h2+  Kg2xh2  Kg8-f8  Rh6-h8+
+    18/18	00:03	      2'121k	550k	+M6	Qc1xf4  Bd6xf4  Rh4xh5  g6xh5  Rh1xh5  Bf4-h6  Rh5xh6  Qc7-h2+  Kg2xh2  Kg8-f8  Rh6-h8+
+   11/02/2014 00:53:56, Time for this analysis: 00:00:05, Rated time: 52:23
+
+ 18 d6; id "test 18";   
+    Searching move: d5-d6
+    Best move (Vajolet2): d5-d6
+    Identical moves! Found in: 00:00
+     2/6	00:00	         167	167k	-2.62	Ke4xd4  Bh2xg3  a4-a5
+     3/8	00:00	         350	175k	-3.15	Ke4xd4  Bh2xg3  a4-a5  h5-h4
+     4/8	00:00	         715	238k	-3.12	Ke4xd4  Bh2xg3  a4-a5  Bg3-f2+  Kd4-e4  h5-h4
+     5/11+	00:00	          1k	283k	-3.03	Ke4xd4
+     5/9+	00:00	          1k	321k	-2.95	Ke4xd4
+     5/10+	00:00	          2k	309k	-2.52	Ke4xd4
+     5/9	00:00	          2k	349k	-2.35	Ke4xd4  Bh2xg3  a4-a5  Bg3-f2+  Kd4-e4  h5-h4  a5-a6
+     6/9-	00:00	          2k	352k	-3.04	
+     6/11	00:00	          3k	376k	-3.07	Ke4xd4  Bh2xg3  a4-a5  h5-h4  a5-a6  Bg3-f2+  Kd4-e4  h4-h3  Ke4-f4
+     7/12+	00:00	          4k	359k	-2.99	a4-a5
+     7/9+	00:00	          4k	367k	-2.90	a4-a5
+     7/11+	00:00	          5k	369k	-2.29	a4-a5
+     7/13	00:00	          6k	372k	-2.87	a4-a5  Bh2xg3  a5-a6  Bg3-b8  Ke4xd4  h5-h4  Kd4-e4  h4-h3
+     8/15-	00:00	         12k	510k	-3.62	
+     8/15	00:00	         19k	573k	-3.55	d5-d6  e7xd6  a4-a5  Kd1-e2  Ke4xd4  Bh2xg3  a5-a6  h5-h4  Kd4-c4  Bg3-f2
+     9/14	00:00	         22k	598k	-3.59	d5-d6  e7xd6  a4-a5  Kd1-e2  Ke4xd4  Bh2xg3  a5-a6  h5-h4  Kd4-c4  Bg3-f2  Kc4-d5
+    10/17+	00:00	         29k	638k	-3.50	a4-a5
+    10/15	00:00	         30k	661k	-3.47	a4-a5  Bh2xg3  a5-a6  Bg3-b8  Ke4xd4  h5-h4  Kd4-e3  Kd1-e1  d5-d6  e7xd6  Ke3-f3  d6-d5  Kf3-g4  Bb8-g3
+    11/19-	00:00	         43k	705k	-3.76	
+    11/23	00:00	         73k	748k	-3.43	Ke4xd4  Bh2xg3  Kd4-e4  Kd1-e2  Ke4-f5  h5-h4  Kf5-g4  Bg3-e1  a4-a5  Be1xa5  Kg4xh4  Ba5-c3  Kh4-g4  Bc3-d4
+    12/18-	00:00	         92k	779k	-3.90	
+    12/23	00:00	        126k	805k	-3.75	a4-a5  Bh2xg3  a5-a6  Bg3-b8  Ke4xd4  h5-h4  Kd4-e4  h4-h3  Ke4-f3  Kd1-c1  d5-d6  h3-h2  Kf3-g2  Bb8xd6
+    13/23-	00:00	        162k	783k	-4.03	
+    13/22	00:00	        196k	744k	-4.14	Ke4xd4  Bh2xg3  Kd4-e4  h5-h4  Ke4-f3  Bg3-e1  Kf3-g4  Kd1-e2  a4-a5  Be1xa5  Kg4xh4  Ke2-d3  Kh4-g4  Kd3-c4  Kg4-h3  Kc4xd5
+    14/22-	00:00	        212k	736k	-4.22	
+    14/27+	00:00	        260k	711k	-4.06	d5-d6
+    14/26+	00:00	        519k	788k	-0.19	d5-d6
+    14/26	00:00	        636k	825k	 0.00	d5-d6  e7xd6  Ke4-d3  Bh2xg3  a4-a5  d6-d5  a5-a6  Bg3-b8  a6-a7  Bb8xa7
+    15/20	00:00	        660k	825k	 0.00	d5-d6  e7xd6  Ke4-d3  Bh2xg3  a4-a5  d6-d5  a5-a6  Bg3-b8  a6-a7  Bb8xa7
+    16/23	00:00	        682k	827k	 0.00	d5-d6  e7xd6  Ke4-d3  Bh2xg3  a4-a5  d6-d5  a5-a6  Bg3-b8  a6-a7  Bb8xa7
+    17/26	00:00	        740k	838k	 0.00	d5-d6  e7xd6  Ke4-d3  Bh2xg3  a4-a5  d6-d5  a5-a6  Bg3-b8  a6-a7  Bb8xa7
+   11/02/2014 00:53:59, Time for this analysis: 00:00:02, Rated time: 52:23
+
+ 19 f3; id "test 19";   
+    Searching move: f4-f3
+    Best move (Vajolet2): f4-f3
+    Identical moves! Found in: 00:00
+     2/11	00:00	          2k	258k	-1.99	Kg8xg7  Rf1-c1  Bg2xd5  c4xd5  Rd8xd5
+     3/11	00:00	          3k	256k	-1.54	Bg2xf1  Ra1xf1  Kg8xg7  g3xf4
+     4/15	00:00	          5k	254k	-1.29	Bg2xf1  Ra1xf1  Kg8xg7  Qd2-b4
+     5/13	00:00	          6k	290k	-1.30	Bg2xf1  Ra1xf1  Kg8xg7  Qd2-b4  Kg7-h8
+     6/15	00:00	          9k	334k	-1.37	Bg2xf1  Ra1xf1  Kg8xg7  Qd2-b4  Rd8-d7  Qb4-c5
+     7/17-	00:00	         18k	393k	-1.65	
+     7/19	00:00	         24k	418k	-1.76	Bg2xf1  Ra1xf1  Kg8xg7  Qd2-b4  Rd8-d7  Qb4-c5  a7-a6  Qc5-c8
+     8/17	00:00	         29k	433k	-1.76	Bg2xf1  Ra1xf1  Kg8xg7  Qd2-b4  Rd8-d7  Qb4-c5  a7-a6  Qc5-c8
+     9/21-	00:00	         45k	445k	-1.84	
+     9/23	00:00	         69k	470k	-1.86	Bg2xf1  Ra1xf1  Kg8xg7  Qd2-b4  Rd8-d7  Qb4-c5  Qh3-g4  e2-e3  d4xe3  f2xe3  Qg4-e2  e3xf4  e5xf4  Nd5xf4  Nh5xf4  Rf1xf4  Rd7xd3  Qc5xa7
+    10/20	00:00	         84k	478k	-1.86	Bg2xf1  Ra1xf1  Kg8xg7  Qd2-b4  Rd8-d7  Qb4-c5  Qh3-g4  e2-e3  d4xe3  f2xe3  Qg4-e2  e3xf4  e5xf4  Nd5xf4  Nh5xf4  Rf1xf4  Rd7xd3  Qc5xa7
+    11/21	00:00	        115k	483k	-1.86	Bg2xf1  Ra1xf1  Kg8xg7  Qd2-b4  Rd8-d7  Qb4-c5  Qh3-g4  e2-e3  d4xe3  f2xe3  Qg4-e2  e3xf4  e5xf4  Nd5xf4  Nh5xf4  Rf1xf4  Rd7xd3  Qc5xa7
+    12/27+	00:00	        374k	486k	-1.78	f4-f3
+    12/30+	00:01	        536k	493k	-1.70	f4-f3
+    12/30+	00:01	        960k	503k	-1.13	f4-f3
+    12/30	00:02	      1'195k	503k	-1.12	f4-f3  e2xf3  Bg2xf3  Nd5-e3  Nh5xg7  Qd2-c2  Ng7-f5  Ra1-e1  d4xe3  f2xe3  Qh3-h5  Qc2-f2  e5-e4  d3-d4  Kg8-g7
+    13/24	00:02	      1'270k	504k	-1.12	f4-f3  e2xf3  Bg2xf3  Nd5-e3  Nh5xg7  Qd2-c2  Ng7-f5  Ra1-e1  d4xe3  f2xe3  Qh3-h5  Qc2-f2  e5-e4  d3-d4  Kg8-g7
+    14/29	00:03	      1'555k	500k	-1.08	f4-f3  e2xf3  Bg2xf3  Nd5-e3  Nh5xg7  Ra1-a2  Kg8-h7  Ra2-b2  d4xe3  f2xe3  Bf3-e4  d3-d4  Ng7-f5  d4-d5  Rd8-c8  Rf1-c1
+    15/28+	00:03	      1'862k	501k	-1.00	f4-f3
+    15/36+	00:04	      2'287k	499k	-0.92	f4-f3
+   11/02/2014 00:54:04, Time for this analysis: 00:00:04, Rated time: 52:23
+
+ 20 Ra2; id "test 20";  
+    Searching move: Ra1-a2
+    Best move (Vajolet2): Ra1-a2
+    Identical moves! Found in: 00:00
+     2/9	00:00	         341	341k	+0.50	Nf3-g5  Qb2-g7
+     3/12	00:00	          4k	233k	+0.10	h2-h4  c5-c4  Nf3-g5
+     4/14	00:00	          6k	254k	+0.20	h2-h4  Rf8-d8  Nf3-g5  Bc2-b3
+     5/13-	00:00	          6k	267k	+0.12	
+     5/10+	00:00	          8k	278k	+0.38	Nf3-g5
+     5/8+	00:00	          8k	289k	+0.73	Nf3-g5
+     5/10	00:00	          8k	297k	+0.84	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Re1-c1  Bc2-b3  Rc1xc5
+     6/10-	00:00	          9k	296k	+0.76	
+     6/10	00:00	          9k	306k	+0.69	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Ra1-c1  Bc2-b3  Rc1xc5  f7-f6
+     7/13+	00:00	          9k	308k	+0.78	Nf3-g5
+     7/15	00:00	         10k	326k	+0.81	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Ra1-c1  Bc2-b3  Rc1xc5  Rf8-c8  Re1-c1  Rc8xc5  Rc1xc5
+     8/15-	00:00	         13k	341k	+0.73	
+     8/21	00:00	         20k	384k	+0.69	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Ra1-c1  Bc2-b3  Rc1xc5  Rf8-c8  Re1-c1  Rc8xc5  Rc1xc5  f7-f6  Ng5-e4
+     9/18-	00:00	         26k	393k	+0.61	
+     9/22	00:00	         34k	416k	+0.72	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Ra1-c1  Bc2-b3  Rc1xc5  Rf8-c8  Re1-c1  Rc8xc5  Rc1xc5  f7-f6  Ng5-e4  Ra8-e8  f2-f3
+    10/18	00:00	         38k	423k	+0.69	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Ra1-c1  Bc2-b3  Rc1xc5  Rf8-c8  Re1-c1  Rc8xc5  Rc1xc5  f7-f6  Ng5-e4
+    11/21	00:00	         50k	433k	+0.69	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Ra1-c1  Bc2-b3  Rc1xc5  Rf8-c8  Re1-c1  Rc8xc5  Rc1xc5  f7-f6  Ng5-e4
+    12/23	00:00	         70k	452k	+0.74	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Ra1-c1  Bc2-b3  Rc1xc5  Rf8-c8  Re1-c1  Rc8xc5  Rc1xc5  f7-f6  Ng5-e4  Ra8-e8
+    13/25	00:00	        109k	424k	+0.72	Nf3-g5  Qb2-h8  Qh6xh8+  Kg8xh8  Ra1-c1  Bc2-b3  Rc1xc5  Rf8-c8  Re1-c1  Rc8xc5  Rc1xc5  f7-f6  Ng5-e4  Ra8-e8  f2-f3
+    14/26+	00:00	        212k	446k	+0.80	Qh6-c1
+    14/25+	00:00	        248k	458k	+0.88	Qh6-c1
+    14/26	00:00	        361k	484k	+0.93	Qh6-c1  Qb2xc1  Ra1xc1  Bc2-e4  Rc1xc5  Ra8-c8  Re1-c1  Rc8xc5  Rc1xc5  f7-f5  g4-g5  Rf8-f7  h2-h4  Rf7-d7  Kg1-f1  Kg8-g7  Nf3-e5
+    15/28+	00:00	        434k	485k	+1.01	Ra1-a2
+    15/26+	00:00	        438k	485k	+1.09	Ra1-a2
+    15/34+	00:01	        734k	502k	+3.59	Ra1-a2
+    15/34	00:02	      1'340k	515k	+3.62	Ra1-a2  Qb2-g7  Qh6xg7+  Kg8xg7  Ra2xc2  Rf8-c8  h2-h4  Rc8-c7  Re1-c1  Ra8-e8  Be2-d3  Nb6-d7  Kg1-g2  f7-f6  Rc2-c4  Rc7-a7  Bd3-e4
+    16/27	00:02	      1'441k	517k	+3.62	Ra1-a2  Qb2-g7  Qh6xg7+  Kg8xg7  Ra2xc2  Rf8-c8  h2-h4  Rc8-c7  Re1-c1  Ra8-e8  Be2-d3  Nb6-d7  Kg1-g2  f7-f6  Rc2-c4  Rc7-a7  Bd3-e4
+    17/30	00:03	      1'773k	516k	+3.69	Ra1-a2  Qb2-g7  Qh6xg7+  Kg8xg7  Ra2xc2  Rf8-c8  h2-h4  Rc8-c7  Re1-c1  Ra8-e8  Be2-d3  Re8-d8  Bd3-b5  Rd8-c8  Bb5-a6  Rc8-a8  Ba6-f1  Ra8-c8
+    18/32+	00:05	      2'709k	522k	+3.77	Ra1-a2
+   11/02/2014 00:54:12, Time for this analysis: 00:00:06, Rated time: 52:23
+
+ 21 Re1; id "test 21";  
+    Searching move: Re4-e1
+    Best move (Vajolet2): g6-g7
+    Not found in: 15:00
+     2/7	00:00	         212	0	+5.97	g6-g7  Bd6-b8  b6-b7+  Ka8-a7
+     3/10	00:00	         930	465k	+7.33	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5
+     4/13	00:00	          2k	407k	+4.19	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  h5-h6  Qh1-a1+  Re4-a4
+     5/10-	00:00	          3k	407k	+4.00	
+     5/15	00:00	          3k	427k	+3.95	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1xe5  Qg8xg2  Qe5xh5
+     6/15	00:00	          4k	413k	+3.95	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-b5  Qc3xe5  Qg8xg2  Qe5xh5
+     7/23-	00:00	         22k	454k	+3.22	
+     7/21	00:00	         30k	480k	+3.04	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  b6-b7+  Ka8-a7  Qg8xg2  Ka7xa6
+     8/18+	00:00	         30k	482k	+3.14	g6-g7
+     8/15+	00:00	         31k	486k	+3.23	g6-g7
+     8/16+	00:00	         31k	484k	+3.57	g6-g7
+     8/18	00:00	         33k	492k	+3.63	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5xh5
+     9/25-	00:00	         74k	526k	+2.47	
+     9/24	00:00	         82k	532k	+3.32	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5-d6+  Kd7-e8  Qd6-e5+  Ke8-f7  Qe5xh5+  Kf7-e7
+    10/28-	00:00	        123k	531k	+2.14	
+    10/24	00:00	        135k	523k	+2.09	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5-d6+  Kd7-e8  Qd6xb6  d5-d6+  Ka8-a7  d6-d7  Ka7xa6
+    11/20+	00:00	        138k	520k	+2.18	g6-g7
+    11/22+	00:00	        139k	520k	+2.27	g6-g7
+    11/21+	00:00	        146k	511k	+2.87	g6-g7
+    11/30	00:00	        176k	505k	+2.44	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  h5-h6  Qe5-a1  Qg8xg2  Qa1-a4+  Kc6-c5  Qa4-a5+  Kc5-c4  Qa5-a4+  Kc4-c3  Bb8-e5+  Kc3-d2  Qa4xa6
+    12/37-	00:01	        615k	569k	+1.30	
+    12/43	00:01	      1'070k	568k	+1.03	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  h5-h6  Qe5-a1  a6-a7  Qa1-a4+  Kc6-c5  Qa4-a5+  Kc5-c4  Qa5-a4+  Kc4-c3  Qa4-a5+  Kc3-c2  Qa5-a4+  Kc2-d2  Qa4-d4+  Kd2-e2  Qd4-b2+  Ke2-f1  Ng2-e3+  Kf1-e1
+    13/24+	00:01	      1'076k	568k	+1.11	g6-g7
+    13/24+	00:01	      1'078k	568k	+1.19	g6-g7
+    13/30	00:01	      1'112k	570k	+1.11	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  h5-h6  Qe5-a1  a6-a7  Qa1-a4+  Kc6-c5  Qa4-a3+  Kc5-d4  Qa3-b4+  Kd4-d3  Ng2-f4+  Kd3-c2  Qb4-a4+  Kc2-b1  Qa4-b4+  Kb1-c1  Qb4xb6  a7xb8Q+  Qb6xb8  Qg8xb8+  Ka8xb8
+    14/28+	00:01	      1'134k	571k	+1.19	g6-g7
+    14/31	00:02	      1'161k	573k	+1.11	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  h5-h6  Qe5-a1  a6-a7  Qa1-a4+  Kc6-c5  Qa4-a3+  Kc5-d4  Qa3-b4+  Kd4-d3  Ng2-f4+  Kd3-c2  Qb4-a4+  Kc2-b1  Qa4-b4+  Kb1-c1  Qb4xb6  a7xb8Q+  Qb6xb8  Qg8xb8+  Ka8xb8
+    15/30	00:02	      1'272k	579k	+1.11	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  h5-h6  Qe5-a1  a6-a7  Qa1-a4+  Kc6-c5  Qa4-a3+  Kc5-d4  Qa3-b4+  Kd4-d3  Ng2-f4+  Kd3-c2  Qb4-a4+  Kc2-b1  Qa4-b4+  Kb1-c1  Qb4xb6  a7xb8Q+  Qb6xb8  Qg8xb8+  Ka8xb8
+    16/34	00:02	      1'605k	589k	+1.11	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  h5-h6  Qe5-a1  a6-a7  Qa1-a4+  Kc6-c5  Qa4-a3+  Kc5-d4  Qa3-b4+  Kd4-d3  Ng2-f4+  Kd3-c2  Qb4-a4+  Kc2-b1  Qa4-b4+  Kb1-c1  Qb4xb6  a7xb8Q+  Qb6xb8  Qg8xb8+  Ka8xb8
+    17/35-	00:04	      2'494k	599k	+0.95	
+    17/38+	00:06	      3'979k	617k	+1.19	g6-g7
+    17/40+	00:08	      5'101k	620k	+1.37	g6-g7
+    17/39-	00:08	      5'296k	623k	+0.83	
+    17/44	00:09	      6'176k	626k	+0.52	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  Qg8xg2  Qe5-e8+  Kc6-c5  Qe8-e3+  Kc5-c4  Qe3xb6  d5-d6+  Ka8-a7  Qg2-b7+  Qb6xb7  a6xb7  Bb8xd6  h5-h6  Ka7xb7  h6-h7  Bd6-e5  Kc4-d5  Be5-c3  Kd5-e6  Kb7-c6  Ke6-f7
+    18/31+	00:09	      6'258k	626k	+0.60	g6-g7
+    18/33	00:10	      6'535k	627k	+0.52	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  Qg8xg2  Qe5-e8+  Kc6-c5  Qe8-e3+  Kc5-c4  Qe3xb6  d5-d6+  Ka8-a7  Qg2-b7+  Qb6xb7  a6xb7  Bb8xd6  h5-h6  Ka7xb7  h6-h7  Bd6-e5  Kc4-d5  Be5-c3  Kd5-e6  Kb7-c6  Ke6-f7
+    19/38+	00:10	      6'727k	628k	+0.60	g6-g7
+    19/43	00:12	      8'227k	635k	+0.63	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  Qg8xg2  Qe5-e8+  Kc6-c5  Qe8-e3+  Kc5-c4  Qe3xb6  Qg2-g6  Qb6-b2  Qg6-c6+  Ka8-a7  Qc6-b7+  Qb2xb7  a6xb7  Bb8-f4  d5-d6  Bf4xd6  h5-h6  Ka7xb7  h6-h7  Bd6-e5  Kc4-d5  Be5-c3  Kd5-e6
+    20/35-	00:14	      9'491k	636k	+0.55	
+    20/43+	00:19	     12'780k	648k	+0.71	g6-g7
+    20/40	00:20	     13'052k	650k	+0.71	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  Qg8xg2  Qe5-e8+  Kc6-c5  Qe8-e3+  Kc5-c4  Qe3xb6  Qg2-g6  Qb6-b2  Qg6-e4  Bb8-d6  Qe4-e8+  Bd6-b8  Qe8-d7  Qb2-e2+  Kc4-b4  Qe2xa6  Qd7-c6+  Qa6xc6  d5xc6  Bb8-d6+  Kb4-b5  Ka8-b8
+    21/39	00:24	     16'334k	654k	+0.71	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2xe5  Qg8xg2  Qe5-e8+  Kc6-c5  Qe8-e3+  Kc5-c4  Qe3xb6  Qg2-g6  Qb6-b2  Qg6-e4  Bb8-d6  Qe4-e8+  Bd6-b8  Qe8-d7  Qb2-e2+  Kc4-b4  Qe2xa6  Qd7-c6+  Qa6xc6  d5xc6  Bb8-d6+  Kb4-b5  Ka8-b8
+    22/52-	01:09	     46'204k	666k	+0.25	
+    22/56	01:21	     54'569k	667k	 0.00	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5-d6+  Kd7-e8  Qd6-e5+  Ke8-f7  Qe5xh5+  Qg2-g6  Qh5xd5+  Qg6-e6  Qd5-f3+  Kf7-e8  Qf3-h5+  Ke8-d7  Qh5-h7+  Kd7-c6  Qh7-c2+  Kc6-b5  Qc2-b2+  Kb5-a4  Qb2-a1+  Ka4-b5  Qa1-b2+
+    23/40	01:29	     59'655k	668k	 0.00	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5-d6+  Kd7-e8  Qd6-e5+  Ke8-f7  Qe5xh5+  Qg2-g6  Qh5xd5+  Qg6-e6  Qd5-f3+  Kf7-e8  Qf3-h5+  Ke8-d7  Qh5-h7+  Kd7-c6  Qh7-c2+  Kc6-b5  Qc2-b2+  Kb5-a4  Qb2-a1+  Ka4-b5  Qa1-b2+
+    24/43	01:45	     70'437k	670k	 0.00	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5-d6+  Kd7-e8  Qd6-e5+  Ke8-f7  Qe5xh5+  Qg2-g6  Qh5xd5+  Qg6-e6  Qd5-f3+  Kf7-e8  Qf3-h5+  Ke8-d7  Qh5-h7+  Kd7-c6  Qh7-c2+  Kc6-b5  Qc2-b2+  Kb5-a4  Qb2-a1+  Ka4-b5  Qa1-b2+
+    25/47	02:29	    100'631k	672k	 0.00	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5-d6+  Kd7-e8  Qd6-e5+  Ke8-f7  Qe5xh5+  Qg2-g6  Qh5xd5+  Qg6-e6  Qd5-f3+  Kf7-e8  Qf3-h5+  Ke8-d7  Qh5-h7+  Kd7-c6  Qh7-c2+  Kc6-b5  Qc2-b2+  Kb5-a4  Qb2-a1+  Ka4-b5  Qa1-b2+
+    26/48	04:42	    190'588k	675k	 0.00	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5-d6+  Kd7-e8  Qd6-e5+  Ke8-f7  Qe5xh5+  Qg2-g6  Qh5xd5+  Qg6-e6  Qd5-f3+  Kf7-e8  Qf3-h5+  Ke8-d7  Qh5-h7+  Kd7-c6  Qh7-c2+  Kc6-b5  Qc2-b2+  Kb5-a4  Qb2-a1+  Ka4-b5  Qa1-b2+
+    27/49	09:00	    365'785k	676k	 0.00	g6-g7  h2-h1Q  g7-g8Q+  Bd6-b8  Re4xe5  Qh1-a1+  Ka5-b5  Qa1-b2+  Kb5-c6  Qb2-c3+  Kc6-d7  Qc3xe5  Qg8xg2  Qe5-d6+  Kd7-e8  Qd6-e5+  Ke8-f7  Qe5xh5+  Qg2-g6  Qh5xd5+  Qg6-e6  Qd5-f3+  Kf7-e8  Qf3-h5+  Ke8-d7  Qh5-h7+  Kd7-c6  Qh7-c2+  Kc6-b5  Qc2-b2+  Kb5-a4  Qb2-a1+  Ka4-b5  Qa1-b2+
+   11/02/2014 01:09:13, Time for this analysis: 00:15:00, Rated time: 1:07:23
+
+ 22 a3; id "test 22";   
+    Searching move: a2-a3
+    Best move (Vajolet2): a2-a3
+    Identical moves! Found in: 00:00
+     2/10	00:00	         400	133k	+0.03	Bg5xf6  Qe7xf6  Qd1xd5
+     3/15	00:00	          3k	178k	-0.15	Bg5xf6  Qe7xf6  c4xd5
+     4/15	00:00	          4k	191k	 0.00	Bg5xf6  Qe7xf6  Qd1xd5  Qf6-e5  Ra1-d1  Qe5xd5  c4xd5
+     5/12	00:00	          5k	216k	 0.00	Bg5xf6  Qe7xf6  Qd1xd5  Qf6-e5  Ra1-d1  Qe5xd5  c4xd5
+     6/14	00:00	          9k	259k	 0.00	Bg5xf6  Qe7xf6  Qd1xd5  Qf6-e5  Ra1-d1  Qe5xd5  c4xd5
+     7/14-	00:00	         13k	294k	-0.08	
+     7/17	00:00	         31k	345k	+0.02	c4xd5  Nb8-d7  f2-f3  b7-b5  e3-e4  Nd7-e5  Qd1-d2
+     8/18	00:00	         46k	357k	+0.05	c4xd5  Nb8-d7  a2-a3  Bb4-a5  Qd1-a4  Ba5-b6  Bg5-f4  O-O  b2-b3
+     9/21+	00:00	         64k	347k	+0.13	a2-a3
+     9/24+	00:00	         69k	354k	+0.21	a2-a3
+     9/23+	00:00	        154k	365k	+0.78	a2-a3
+     9/25	00:00	        189k	362k	+0.43	a2-a3  Bb4xc3+  Ne2xc3  d5xc4  Nc3-b5  Ke8-d7  Bg5-f4  Nf6-e4  Bf1xc4  g7-g5  Bf4-g3  Ne4xg3  h2xg3
+    10/21	00:00	        197k	362k	+0.43	a2-a3  Bb4xc3+  Ne2xc3  d5xc4  Nc3-b5  Ke8-d7  Bg5-f4  Nf6-e4  Bf1xc4  g7-g5  Bf4-g3  Ne4xg3  h2xg3
+    11/22	00:00	        217k	366k	+0.43	a2-a3  Bb4xc3+  Ne2xc3  d5xc4  Nc3-b5  Ke8-d7  Bg5-f4  Nf6-e4  Bf1xc4  g7-g5  Bf4-g3  Ne4xg3  h2xg3
+    12/23+	00:00	        245k	374k	+0.51	a2-a3
+    12/24+	00:00	        276k	383k	+0.59	a2-a3
+    12/26+	00:00	        398k	401k	+0.89	a2-a3
+    12/32	00:01	        645k	413k	+0.86	a2-a3  Bb4xc3+  Ne2xc3  d5xc4  Nc3-b5  O-O  Qd1xd6  Qe7-d7  Bf1xc4  a7-a6  Qd6xd7  Nb8xd7  Nb5-c7  Ra8-b8  Nc7-d5  b7-b5  Bg5-f4  b5xc4  Nd5xf6+  g7xf6  Bf4xb8  Nd7xb8
+   11/02/2014 01:09:15, Time for this analysis: 00:00:01, Rated time: 1:07:23
+
+ 23 g4; id "test 23";   
+    Searching move: g3-g4
+    Best move (Vajolet2): g3-g4
+    Identical moves! Found in: 03:32
+     2/5	00:00	         159	159k	+0.18	e2-e4  f5xe4  Kf4xe4
+     3/7	00:00	         471	236k	+0.24	Kf4xf5  a5-a4  e2-e4
+     4/6	00:00	         731	244k	+0.28	Kf4xf5  a5-a4  e2-e4  Kc3-c2
+     5/5+	00:00	         777	259k	+0.36	Kf4xf5
+     5/6+	00:00	         817	272k	+0.45	Kf4xf5
+     5/5+	00:00	         885	295k	+0.68	Kf4xf5
+     5/8	00:00	          2k	347k	+0.72	Kf4xf5  a5-a4  e2-e4  b3-b2  Ba3xb2+  Kc3xb2
+     6/8-	00:00	          3k	376k	+0.54	
+     6/8+	00:00	          3k	351k	+0.82	Kf4xf5
+     6/8-	00:00	          3k	375k	+0.42	
+     6/8+	00:00	          3k	392k	+1.01	Kf4xf5
+     6/8	00:00	          3k	414k	+1.04	Kf4xf5  a5-a4  e2-e4  Kc3-c2  e4-e5  h7-h5
+     7/7+	00:00	          4k	399k	+1.13	Kf4xf5
+     7/8+	00:00	          4k	423k	+1.21	Kf4xf5
+     7/7+	00:00	          4k	399k	+1.34	Kf4xf5
+     7/11-	00:00	          5k	423k	+0.96	
+     7/11	00:00	          7k	449k	+1.24	Kf4xf5  a5-a4  e2-e4  b3-b2  Ba3xb2+  Kc3xb2  e4-e5  a4-a3  e5-e6
+     8/9	00:00	          8k	458k	+1.24	Kf4xf5  a5-a4  e2-e4  b3-b2  Ba3xb2+  Kc3xb2  e4-e5  a4-a3  e5-e6
+     9/13-	00:00	         14k	533k	+1.04	
+     9/15	00:00	         18k	586k	+1.31	Kf4xf5  a5-a4  e2-e4  b3-b2  Ba3xb2+  Kc3xb2  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g4
+    10/12-	00:00	         22k	620k	+1.23	
+    10/19	00:00	         24k	638k	+1.29	Kf4xf5  a5-a4  e2-e4  b3-b2  Ba3xb2+  Kc3xb2  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g4  Qf1-c4+  Kg4-h3
+    11/13	00:00	         35k	695k	+1.37	Kf4xf5  a5-a4  e2-e4  b3-b2  Ba3xb2+  Kc3xb2  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q
+    12/22-	00:00	         93k	819k	+0.91	
+    12/25	00:00	        126k	828k	+1.24	Kf4xf5  a5-a4  e2-e4  b3-b2  Ba3xb2+  Kc3xb2  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h5  Qc1-d1+  Kh5-h4  Qd1-d4+  Kh4-h3
+    13/18	00:00	        156k	805k	+1.28	Kf4xf5  a5-a4  e2-e4  b3-b2  Ba3xb2+  Kc3xb2  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5
+    14/24-	00:00	        337k	882k	+0.55	
+    14/38	00:00	        672k	850k	+1.29	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h5  Qc1-c5+  Kh5-h4  Qc5-c4+  g3-g4  Qc4-d4  Qe8-e2+  Kb2-b3  h2-h3
+    15/27	00:00	        754k	867k	+1.28	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-h6+  Qe8-h5  Qh6-f6+  Qh5-g5
+    16/29	00:01	        896k	896k	+1.27	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-d4  Qe8-e2+  Kb2-b3
+    17/30	00:01	      1'172k	913k	+1.29	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-d4  Qe8-e2+  Kb2-b3  h2-h3
+    18/32	00:01	      1'476k	944k	+1.29	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-d4  Qe8-e2+  Kb2-b3  h2-h3
+    19/34	00:01	      1'923k	973k	+1.32	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-c2  Qe8-b5+  Kb2-a2  h2-h3  Qc2-f2+  Kh4-h5
+    20/36	00:02	      2'695k	995k	+1.35	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-c2  Qe8-b5+  Kb2-c1  h2-h3  Qc2-c3  Qb5-f1+  Kc1-b2  Qf1-f2+  Kb2-a3
+    21/36	00:03	      3'870k	1'012k	+1.35	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-f4  Qe8-b5+  Kb2-a2  Qb5-d5+  Ka2-b2  Qd5-b7+  Kb2-c3  Qb7-g7+  Kc3-c4  h2-h3  Qf4-f2+  Kh4-h5
+    22/38	00:05	      5'838k	1'016k	+1.39	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-f4  Qe8-b5+  Kb2-a2  Qb5-a6+  Ka2-b3  Qa6-e6+  Qf4-c4  Qe6xc4+  Kb3xc4  h2-h3  Kc4-d4
+    23/42	00:08	      8'974k	1'017k	+1.40	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-f4  Qe8-b5+  Kb2-c3  Qb5-c5+  Kc3-d2  h2-h3  Qf4-e3  Qc5xe3+  Kd2xe3  Kh4-g5  Ke3-d4
+    24/42	00:14	     14'234k	1'010k	+1.41	Kf4xf5  b3-b2  Ba3xb2+  Kc3xb2  e2-e4  a5-a4  e4-e5  a4-a3  e5-e6  a3-a2  e6-e7  a2-a1Q  e7-e8Q  Qa1-f1+  Kf5-g5  Qf1-c1+  Kg5-h4  Qc1-c4+  g3-g4  Qc4-f4  Qe8-b5+  Kb2-c3  Qb5-c5+  Kc3-d2  h2-h3  Qf4-e4  Qc5-d6+  Kd2-e2  Qd6-d7  h7-h6  Qd7-d6
+    25/44+	00:22	     21'938k	970k	+1.49	g3-g4
+    25/48+	00:23	     23'291k	972k	+1.57	g3-g4
+    25/60+	00:36	     36'005k	973k	+3.15	g3-g4
+    25/38	00:44	     43'388k	968k	+3.06	g3-g4  f5xg4  e2-e4  a5-a4  e4-e5  b3-b2  Ba3xb2+  Kc3xb2  e5-e6  a4-a3  e6-e7  a3-a2  e7-e8Q  a2-a1Q  Qe8-e5+  Kb2-b1  Qe5xa1+  Kb1xa1  Kf4xg4  Ka1-b2  Kg4-h5  Kb2-a2  h2-h4  Ka2-b3  Kh5-h6  Kb3-a4  Kh6xh7  Ka4-b5  h4-h5  Kb5-c6  h5-h6  Kc6-d7  Kh7-g8
+    26/44-	00:58	     57'468k	976k	+2.98	
+    26/40	01:04	     63'505k	988k	+2.92	g3-g4  f5xg4  e2-e4  a5-a4  e4-e5  b3-b2  Ba3xb2+  Kc3xb2  e5-e6  a4-a3  e6-e7  a3-a2  e7-e8Q  a2-a1Q  Qe8-e5+  Kb2-b1  Qe5xa1+  Kb1xa1  Kf4xg4  Ka1-b2  h2-h4  Kb2-c3  Kg4-h5  Kc3-d4  Kh5-h6  Kd4-e5  Kh6xh7  Ke5-f6  h4-h5  Kf6-f7  h5-h6  Kf7-f8  Kh7-g6  Kf8-g8  h6-h7+  Kg8-h8  Kg6-h6
+    27/39+	01:05	     64'521k	989k	+3.00	g3-g4
+    27/43+	01:07	     67'399k	994k	+3.08	g3-g4
+    27/43+	01:33	     92'856k	991k	+4.67	g3-g4
+    27/44	01:49	    108'710k	993k	+4.88	g3-g4  f5xg4  e2-e4  a5-a4  e4-e5  b3-b2  Ba3xb2+  Kc3xb2  e5-e6  a4-a3  e6-e7  a3-a2  e7-e8Q  a2-a1Q  Qe8-e5+  Kb2-a2  Qe5xa1+  Ka2xa1  Kf4xg4  Ka1-b2  Kg4-h5  Kb2-c3  Kh5-h6  Kc3-d4  Kh6xh7  Kd4-e5  Kh7-g6  Ke5-e6  h2-h4  Ke6-e7  Kg6-g7  Ke7-d8  h4-h5  Kd8-c7  h5-h6  Kc7-c8  h6-h7
+    28/44-	03:13	    200'729k	1'038k	+3.14	
+    28/44	03:32	    220'422k	1'035k	+3.08	g3-g4  f5xg4  e2-e4  a5-a4  e4-e5  b3-b2  Ba3xb2+  Kc3xb2  e5-e6  a4-a3  e6-e7  a3-a2  e7-e8Q  a2-a1Q  Qe8-e5+  Kb2-a2  Qe5xa1+  Ka2xa1  Kf4xg4  Ka1-b2  Kg4-h5  Kb2-c3  Kh5-h6  Kc3-d4  Kh6xh7  Kd4-e5  Kh7-g6  Ke5-e6  h2-h4  Ke6-e7  h4-h5  Ke7-f8  h5-h6  Kf8-g8  h6-h7+  Kg8-h8
+    29/44	04:03	    249'863k	1'028k	+3.08	g3-g4  f5xg4  e2-e4  a5-a4  e4-e5  b3-b2  Ba3xb2+  Kc3xb2  e5-e6  a4-a3  e6-e7  a3-a2  e7-e8Q  a2-a1Q  Qe8-e5+  Kb2-a2  Qe5xa1+  Ka2xa1  Kf4xg4  Ka1-b2  Kg4-h5  Kb2-c3  Kh5-h6  Kc3-d4  Kh6xh7  Kd4-e5  Kh7-g6  Ke5-e6  h2-h4  Ke6-e7  h4-h5  Ke7-f8  h5-h6  Kf8-g8  h6-h7+  Kg8-h8
+    30/41+	04:04	    251'496k	1'027k	+3.16	g3-g4
+    30/42+	04:07	    253'779k	1'027k	+3.24	g3-g4
+    30/51	08:45	    491'947k	936k	+3.08	g3-g4  f5xg4  e2-e4  a5-a4  e4-e5  g4-g3  Kf4xg3  b3-b2  Ba3xb2+  Kc3xb2  e5-e6  a4-a3  e6-e7  a3-a2  e7-e8Q  a2-a1Q  Qe8-h8+  Kb2-a2  Qh8xa1+  Ka2xa1  Kg3-g4  Ka1-b2  Kg4-h5  Kb2-c3  Kh5-h6  Kc3-d4  Kh6xh7  Kd4-e5  Kh7-g6  Ke5-e6  h2-h4  Ke6-e7  h4-h5  Ke7-f8  h5-h6  Kf8-g8  h6-h7+  Kg8-h8
+    31/50+	08:57	    501'485k	934k	+3.16	g3-g4
+   11/02/2014 01:18:15, Time for this analysis: 00:08:58, Rated time: 1:10:55
+
+ 24 g6; id "test 24";   
+    Searching move: g5-g6
+    Best move (Vajolet2): g5-g6
+    Identical moves! Found in: 01:00
+     2/8	00:00	         483	242k	+0.50	Nd2xb3+  Kd4xd5  Ra8-a5+  Kd5-d6
+     3/11	00:00	          1k	258k	+0.59	Ra8-a5  Kd4-e5  Nd2-f3+  Ke5-d6
+     4/12	00:00	          3k	284k	+0.32	Ra8-a5  Kd4-e5  Ke2-d3  Qh1-g2  Nd2-c4+  Ke5-f5
+     5/13-	00:00	          6k	315k	+0.03	
+     5/15	00:00	         12k	393k	+0.17	Nd2-f3+  Kd4xd5  Ra8-b8  Qh1-b1  Rb8xb3  Qb1-c2+  Nf3-d2
+     6/14	00:00	         14k	425k	+0.16	Nd2-f3+  Kd4xd5  Ra8-b8  Kd5-c6  Rb8xb3  d7-d5  Rb3-c3+  Kc6-b6
+     7/16+	00:00	         16k	439k	+0.25	Nd2-f3+
+     7/16	00:00	         16k	439k	+0.25	Nd2-f3+
+     8/17	00:00	         32k	520k	+0.17	Ra8-a5  Kd4-e5  Nd2-f3+  Ke5-e4  Ra5-a4+  Ke4xd5  Ra4-b4  Qh1-b1  Rb4xb3  Qb1-c2+  Nf3-d2
+     9/18	00:00	         54k	558k	+0.16	Ra8-a5  Kd4-e5  Nd2-f3+  Ke5-e4  Ra5-a4+  Ke4xd5  Ra4-b4  Kd5-c6  Rb4xb3  d7-d5  Rb3-c3+  Kc6-b6
+    10/22+	00:00	         94k	601k	+0.25	Ra8-a1
+    10/14+	00:00	         95k	604k	+0.33	Ra8-a1
+    10/18+	00:00	         98k	607k	+0.92	Ra8-a1
+    10/27	00:00	        129k	587k	+0.81	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-h4  d7-d6  Rh4xh7  Qg2-g4  Rh7-h4  Qg4-f5  Ke2-e3  Qf5-e6+  Ke3-d2  Qe6-f5  Rh4-d4+  Kd5-e6  Kd2-e3
+    11/18+	00:00	        130k	586k	+0.89	Ra8-a1
+    11/21	00:00	        154k	577k	+0.90	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-h4  d7-d6  Rh4xh7  Qg2-g4  Rh7-h4  Qg4-f5  Ke2-e3  Qf5-e6+  Ke3-d3
+    12/21	00:00	        188k	576k	+0.85	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-h4  d7-d6  Rh4xh7  Qg2-g4  Rh7-h4  Qg4-f5  Ke2-e3  Qf5-e6+  Ke3-d2
+    13/38-	00:01	        754k	614k	+0.20	
+    13/33	00:01	        959k	630k	+0.13	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-d4+  Kd5-c6  Rd4-c4+  Kc6-d5  Rc4-c3  Qg2-g4  Rc3xb3  Qg4-e4+  Rb3-e3  Qe4-c2+  Nf3-d2  Qc2xb2  f2-f4  Qb2-b5+  Ke2-f3  Qb5-b2  Re3-e7  Qb2-a3+  Re7-e3
+    14/25+	00:01	        967k	631k	+0.21	Ra8-a1
+    14/23+	00:01	        970k	630k	+0.29	Ra8-a1
+    14/23+	00:01	        972k	631k	+0.41	Ra8-a1
+    14/32	00:01	      1'091k	640k	+0.23	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-d4+  Kd5-c5  Rd4xd7  Qg2-g4  Rd7-d3  Qg4-e4+  Ke2-d2  Qe4-f4+  Kd2-d1  Qf4-a4  Rd3-c3+  Kc5-b6  Nf3-d2  Qa4-g4+  Kd1-e1  Qg4-g1+  Nd2-f1  Qg1xg5  Rc3xb3+  Kb6-a5  Rb3-a3+  Ka5-b5  Ra3xh3
+    15/28	00:02	      1'342k	653k	+0.22	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-d4+  Kd5-c5  Rd4xd7  Qg2-g4  Rd7-d3  Qg4-e4+  Ke2-d2  Qe4-f4+  Kd2-d1  Qf4-a4  Rd3-c3+  Kc5-b6  Nf3-d2  Qa4-g4+  Kd1-e1  Qg4-g1+  Nd2-f1  Qg1xg5  Rc3xb3+  Kb6-a5  Rb3xh3
+    16/29	00:02	      1'663k	663k	+0.23	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-d4+  Kd5-c5  Rd4xd7  Qg2-g4  Rd7-d3  Qg4-e4+  Ke2-d2  Qe4-f4+  Kd2-d1  Qf4-a4  Rd3-c3+  Kc5-b6  Nf3-d2  Qa4-g4+  Kd1-e1  Qg4-g1+  Nd2-f1  Qg1xg5  Rc3xb3+  Kb6-a5  Rb3-a3+  Ka5-b5  Ra3xh3
+    17/34	00:03	      2'086k	674k	+0.22	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-d4+  Kd5-c5  Rd4xd7  Qg2-g4  Rd7-d3  Qg4-e4+  Ke2-d2  Qe4-f4+  Kd2-d1  Qf4-a4  Rd3-c3+  Kc5-b6  Nf3-d2  Qa4-g4+  Kd1-e1  Qg4-g1+  Nd2-f1  Qg1xg5  Rc3xb3+  Kb6-c5  Rb3-c3+  Kc5-d6  Rc3xh3
+    18/47-	00:06	      4'638k	690k	+0.06	
+    18/40	00:09	      6'260k	694k	 0.00	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-b4  Kd5-c5  Rb4xb3  Qg2-g4  Rb3-c3+  Kc5-b4  Rc3-d3  Kb4-c5  Rd3-c3+
+    19/34	00:11	      7'657k	694k	 0.00	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-b4  Kd5-c5  Rb4xb3  Qg2-g4  Rb3-c3+  Kc5-b4  Rc3-d3  Kb4-c5  Rd3-c3+
+    20/37	00:13	      9'495k	697k	 0.00	Ra8-a1  Qh1-g2  Nd2-f3+  Kd4-e4  Ra1-a4+  Ke4xd5  Ra4-b4  Kd5-c5  Rb4xb3  Qg2-g4  Rb3-c3+  Kc5-b4  Rc3-d3  Kb4-c5  Rd3-c3+
+    21/39+	00:19	     13'428k	697k	+0.08	g5-g6
+    21/29+	00:19	     13'488k	698k	+0.16	g5-g6
+    21/38+	00:25	     17'640k	686k	+1.14	g5-g6
+    21/33	00:26	     18'386k	687k	+1.11	g5-g6  h7xg6  Ra8-a1  Qh1-g2  Ra1-g1  Kd4xd5  Rg1xg2  h3xg2  Nd2-f3  Kd5-e4  Nf3-g1  d7-d5  f2-f3+  Ke4-e5  h2-h4  Ke5-d4  f3-f4  Kd4-e4  Ng1-f3  d5-d4  Ke2-f2  d4-d3  Kf2xg2  Ke4xf4  Kg2-f2  Kf4-f5  Kf2-e3
+    22/35	00:28	     19'747k	687k	+1.11	g5-g6  h7xg6  Ra8-a1  Qh1-g2  Ra1-g1  Kd4xd5  Rg1xg2  h3xg2  Nd2-f3  Kd5-e4  Nf3-g1  d7-d5  f2-f3+  Ke4-e5  h2-h4  Ke5-d4  f3-f4  Kd4-e4  Ng1-f3  d5-d4  Ke2-f2  d4-d3  Kf2xg2  Ke4xf4  Kg2-f2  Kf4-f5  Kf2-e3
+    23/38-	00:32	     22'705k	697k	+0.95	
+    23/40+	00:33	     23'689k	698k	+1.19	g5-g6
+    23/50	00:36	     26'019k	709k	+1.19	g5-g6  h7xg6  Ra8-a1  Qh1-g2  Ra1-g1  Kd4xd5  Rg1xg2  h3xg2  Nd2-f3  Kd5-e4  Nf3-g1  d7-d5  f2-f3+  Ke4-e5  h2-h4  Ke5-d4  f3-f4  Kd4-e4  Ng1-f3  d5-d4  Ke2-f2  d4-d3  Kf2xg2  Ke4-e3  f4-f5  g6xf5  h4-h5  d3-d2  Nf3xd2  Ke3xd2  h5-h6
+    24/38-	00:38	     27'331k	713k	+1.11	
+    24/38+	00:40	     29'019k	713k	+1.27	g5-g6
+    24/44+	00:45	     32'463k	719k	+1.57	g5-g6
+    24/40	00:46	     33'708k	723k	+1.47	g5-g6  h7xg6  Ra8-a1  Qh1-g2  Ra1-g1  Kd4xd5  Rg1xg2  h3xg2  Nd2-f3  Kd5-e4  Nf3-g1  d7-d5  f2-f3+  Ke4-e5  h2-h4  Ke5-d4  f3-f4  Kd4-e4  Ng1-f3  d5-d4  Ke2-f2  g2-g1Q+  Nf3xg1  Ke4-d3  Ng1-e2  Kd3-c2  Ne2xd4+  Kc2xb2  f4-f5  g6xf5  Kf2-g3  Kb2-a2  Nd4xb3  Ka2xb3  h4-h5  Kb3-c2  h5-h6
+    25/38-	00:57	     42'395k	736k	+1.19	
+    25/40+	01:00	     44'659k	733k	+1.55	g5-g6
+    25/44	01:07	     49'358k	736k	+1.72	g5-g6  h7xg6  Ra8-a1  Qh1-g2  Ra1-g1  Kd4xd5  Rg1xg2  h3xg2  Nd2-f3  Kd5-e4  Nf3-g1  d7-d5  f2-f3+  Ke4-d4  f3-f4  Kd4-e4  Ng1-f3  d5-d4  Nf3-d2+  Ke4-f5  Ke2-f2  Kf5xf4  Kf2xg2  Kf4-e3  Nd2xb3  d4-d3  h2-h4  d3-d2  Nb3xd2  Ke3xd2  b2-b4  Kd2-d3  b4-b5  Kd3-d4
+    26/44	01:21	     59'368k	726k	+1.71	g5-g6  h7xg6  Ra8-a1  Qh1-g2  Ra1-g1  Kd4xd5  Rg1xg2  h3xg2  Nd2-f3  Kd5-e4  Nf3-g1  d7-d5  f2-f3+  Ke4-d4  f3-f4  Kd4-e4  Ng1-f3  d5-d4  Nf3-d2+  Ke4-f5  Ke2-f2  Kf5xf4  h2-h4  d4-d3  Kf2xg2  Kf4-g4  Kg2-f2  Kg4-f4  Nd2xb3  Kf4-e4  Kf2-e1
+    27/44	01:38	     71'282k	726k	+1.66	g5-g6  h7xg6  Ra8-a1  Qh1-g2  Ra1-g1  Kd4xd5  Rg1xg2  h3xg2  Nd2-f3  Kd5-e4  Nf3-g1  d7-d5  f2-f3+  Ke4-d4  f3-f4  Kd4-e4  Ng1-f3  d5-d4  Ke2-f2  d4-d3  Nf3-d2+  Ke4xf4  Kf2xg2  Kf4-e3  Nd2xb3  g6-g5  h2-h3  d3-d2  Nb3xd2  Ke3xd2  b2-b4  Kd2-d3  b4-b5
+    28/44+	01:55	     83'055k	719k	+1.74	g5-g6
+   11/02/2014 01:20:12, Time for this analysis: 00:01:56, Rated time: 1:11:55
+
+ 25 Nd3; id "test 25";  
+    Searching move: Ne5-d3
+    Best move (Vajolet2): ...
+    Not found in: 15:00
+     2/6	00:00	         217	217k	+1.31	g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1
+     3/7	00:00	         367	184k	+1.31	g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1
+     4/13	00:00	         989	247k	+1.15	g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3
+     5/14	00:00	          2k	278k	+1.22	g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  Kg1-f2  Ne3xd5  e4xd5
+     6/12	00:00	          2k	297k	+1.22	g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  Kg1-f2  Ne3xd5  e4xd5
+     7/15	00:00	          4k	308k	+1.22	g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  Kg1-f2  Ne3xd5  e4xd5
+     8/19	00:00	         15k	471k	+1.20	Kd6-c5  Nf4-e6+  Kc5-b4  Ne6-f4  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  e4-e5  f6xe5  Nf4xg2  Bf1xg2  Bd5xg2  Ne3xf5
+     9/19	00:00	         25k	525k	+1.19	Kd6-c5  Nf4-e6+  Kc5-b6  Ne6-f4  Kb6-b5  Bd5-e6  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3
+    10/21	00:00	         49k	583k	+1.18	Kd6-c5  Nf4-e6+  Kc5-b6  Ne6-f4  Kb6-b5  Bd5-e6  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  Be6-c4+  Kb5-c5  Nf4-e6+  Kc5-d6
+    11/23	00:00	         77k	617k	+1.25	Kd6-c5  Bd5-e6  Kc5-c6  Be6-d5+  Kc6-d6  Bd5-e6  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  Kg1-f2  Ne3-d1+  Kf2-g1
+    12/19-	00:00	         91k	627k	+1.17	
+    12/24+	00:00	        134k	607k	+1.33	Kd6-c5
+    12/21	00:00	        147k	597k	+1.36	Kd6-c5  Bd5-e6  Kc5-c6  Be6-d5+  Kc6-d6  Bd5-e6  Kd6-c5  Be6-d5  Kc5-b6  Bd5-e6  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1
+    13/22-	00:00	        174k	590k	+1.20	
+    13/19	00:00	        184k	578k	+1.20	Kd6-c5  Bd5-e6  Kc5-c6  Be6-d5+  Kc6-d6  Bd5-e6  Kd6-c5  Be6-d5  Kc5-b6  Bd5-e6  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3
+    14/23+	00:00	        207k	579k	+1.28	Kd6-c5
+    14/23+	00:00	        245k	595k	+1.36	Kd6-c5
+    14/25	00:00	        277k	602k	+1.28	Kd6-c5  Bd5-e6  Kc5-c6  Be6-d5+  Kc6-d6  Bd5-e6  Kd6-c5  Be6-d5  Kc5-b4  Bd5-e6  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  Kg1-f2  Ne3-d1+  Kf2-g1
+    15/25	00:00	        343k	613k	+1.28	Kd6-c5  Bd5-e6  Kc5-c6  Be6-d5+  Kc6-d6  Bd5-e6  Kd6-c5  Be6-d5  Kc5-b4  Bd5-e6  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  Kg1-f2  Ne3-d1+  Kf2-g1
+    16/26-	00:00	        445k	634k	+1.12	
+    16/30	00:00	        624k	642k	+1.20	Kd6-c5  Bd5-e6  Kc5-c6  Be6-d5+  Kc6-b6  Bd5-e6  Kb6-b5  Be6-d5  a5-a4  b3xa4+  Kb5xa4  Bd5-b7  Ka4-b5  Bb7-d5  Kb5-c5  Nf4-e6+  Kc5-b4  Ne6-f4  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1  Ng4-e3  e4-e5
+    17/30+	00:01	        790k	660k	+1.28	Kd6-c5
+    17/30	00:01	      1'318k	673k	+1.34	Kd6-c5  Bd5-e6  Kc5-c6  Be6-d5+  Kc6-b6  Bd5-e6  Kb6-b5  Be6-d5  a5-a4  b3xa4+  Kb5xa4  Bd5-b7  Ka4-b5  Bb7-d5  Kb5-c5  Nf4-e6+  Kc5-b4  Ne6-f4  g3-g2  Ke3-f2  Ne5-g4+  Kf2-g1
+    18/28-	00:02	      1'895k	681k	+1.18	
+    18/32+	00:03	      2'288k	681k	+1.42	Kd6-c5
+    18/31+	00:03	      2'673k	685k	+1.60	Kd6-c5
+    18/35	00:04	      3'142k	685k	+1.84	Kd6-c5  Bd5-e6  Kc5-b5  Be6-g8  Kb5-b4  Bg8-e6  Kb4-a3  Be6-d5  Ka3-b2  Bd5-e6  Kb2-c2  Be6-d5  Kc2-d1  Ke3-d4  g3-g2  Nf4xg2  Bf1xg2  Kd4-c5  Ne5-g4  Kc5-c4  Bg2-f3  Kc4-c5
+    19/34	00:05	      3'847k	688k	+1.86	Kd6-c5  Bd5-e6  Kc5-b4  Nf4-d5+  Kb4-a3  Nd5-f4  Ka3-b2  Be6-d5  Kb2-c2  Bd5-e6  Kc2-d1  Ke3-d4  g3-g2  Nf4xg2  Bf1xg2  Be6-d5  Bg2-f3  Kd4-c3  Kd1-e1  Kc3-d4  Bf3-d1  Kd4-c5  Ne5-d3+  Kc5-d4
+    20/36	00:06	      4'643k	692k	+1.91	Kd6-c5  Bd5-e6  Kc5-b4  Be6-d5  Kb4-a3  Bd5-e6  Ka3-b2  Be6-d5  Kb2-c2  Bd5-e6  Kc2-d1  Be6-d5  Kd1-e1  Bd5-g8  g3-g2  Nf4xg2+  Bf1xg2  Bg8-e6  Ke1-d1  Be6-d5  Bg2-f3  Ke3-d4  Kd1-d2  Kd4-c5  Ne5-d3+  Kc5-d6
+    21/31	00:07	      5'138k	696k	+1.91	Kd6-c5  Bd5-e6  Kc5-b4  Be6-d5  Kb4-a3  Bd5-e6  Ka3-b2  Be6-d5  Kb2-c2  Bd5-e6  Kc2-d1  Be6-d5  Kd1-e1  Bd5-g8  g3-g2  Nf4xg2+  Bf1xg2  Bg8-e6  Bg2-f3  Ke3-d4  Bf3-e2  Be6-c4  Ne5-c6+  Kd4-c5
+    22/36	00:08	      5'762k	699k	+1.90	Kd6-c5  Bd5-e6  Kc5-b4  Be6-d5  Kb4-a3  Bd5-e6  Ka3-b2  Be6-d5  Kb2-c2  Bd5-e6  Kc2-d1  Be6-d5  Kd1-e1  Bd5-g8  g3-g2  Nf4xg2+  Bf1xg2  Bg8-e6  Bg2-f3  Ke3-d4  Ne5-c6+  Kd4-e3  Bf3-d1  Be6-c4
+    23/34	00:09	      6'880k	705k	+1.92	Kd6-c5  Bd5-e6  Kc5-b4  Be6-d5  Kb4-a3  Bd5-e6  Ka3-b2  Be6-d5  Kb2-c2  Bd5-e6  Kc2-d1  Be6-d5  Kd1-e1  Bd5-g8  g3-g2  Nf4xg2+  Bf1xg2  Bg8-e6  Bg2-f3  Ke3-d4  Ke1-d2  Be6-d5  Bf3-e2  Bd5-c4  Ne5-c6+  Kd4-c5
+    24/36	00:11	      8'189k	712k	+1.92	Kd6-c5  Bd5-e6  Kc5-b4  Be6-d5  Kb4-a3  Bd5-e6  Ka3-b2  Be6-d5  Kb2-c2  Bd5-e6  Kc2-d1  Be6-d5  Kd1-e1  Bd5-g8  g3-g2  Nf4xg2+  Bf1xg2  Bg8-e6  Bg2-f3  Ke3-d4  Ke1-d2  Be6-d5  Bf3-e2  Bd5-c4  Ne5-c6+  Kd4-c5
+    25/40	00:14	     10'543k	717k	+1.93	Kd6-c5  Bd5-e6  Kc5-b4  Be6-d5  Kb4-a3  Bd5-e6  Ka3-b2  Be6-d5  Kb2-c2  Bd5-e6  Kc2-d1  Be6-d5  Kd1-e1  Bd5-e6  g3-g2  Nf4xg2+  Bf1xg2  Be6-d5  Bg2-f3  Ke3-d4  Ke1-d2  Bd5-b7  Kd2-d1  Kd4-c3  Bf3-e2  Bb7-d5
+    26/42	00:20	     14'506k	718k	+1.93	Kd6-c5  Bd5-e6  Kc5-b4  Be6-d5  Kb4-a3  Bd5-e6  Ka3-b2  Be6-d5  Kb2-c2  Bd5-e6  Kc2-d1  Be6-d5  Kd1-e1  Bd5-e6  g3-g2  Nf4xg2+  Bf1xg2  Be6-d5  Bg2-f3  Ke3-d4  Ke1-d2  Bd5-b7  Kd2-e2  Bb7-a6+  Ke2-d1  Ba6-b7  Bf3-g2  Kd4-c3
+    27/42+	00:30	     22'076k	728k	+2.01	Ne5-d3
+    27/42+	00:32	     23'581k	733k	+2.09	Ne5-d3
+    27/43+	00:45	     34'115k	750k	+3.06	Ne5-d3
+    27/43	00:53	     40'070k	752k	+3.55	Ne5-d3  Nf4xd3  Bf1xd3  Ke3-f3  Kd6-e5  Kf3xg3  Bd3xe4  Bd5-c4  Be4-d5  Bc4xd5  Ke5xd5  Kg3-f2  Kd5-e4  Kf2-e2  Ke4xf5  Ke2-d2  Kf5-g4  Kd2-c3  f6-f5  Kc3-d3  f5-f4  Kd3-e2  f4-f3+  Ke2-f1  Kg4-g3  Kf1-g1  f3-f2+  Kg1-f1  Kg3-f3  b3-b4  a5-a4
+    28/41+	00:58	     44'308k	758k	+3.63	Ne5-d3
+    28/43+	01:02	     48'127k	767k	+3.71	Ne5-d3
+    28/46+	01:19	     62'144k	779k	+4.28	Ne5-d3
+    28/52	01:38	     76'721k	779k	+4.68	Ne5-d3  e4-e5+  Kd6xe5  Nf4-h5  Nd3-b4  Bd5-a8  g3-g2  Ke3-f2  Nb4-d3+  Kf2-g1  Nd3-c5  Ba8xg2  Bf1xg2  Kg1xg2  Nc5xb3  Kg2-f3  a5-a4  Nh5-f4  Ke5xf5  Nf4-d5  a4-a3  Nd5-b4  Nb3-d4+  Kf3-e3  Kf5-e5  Ke3-d3  f6-f5  Nb4-a2  f5-f4  Na2-c3  Nd4-c6  Nc3-a2  Ke5-f5  Kd3-e2  Nc6-e5  Na2-c3  f4-f3+  Ke2-e3  Kf5-g4  Nc3-e4
+    29/42-	01:39	     77'830k	779k	+4.60	
+    29/49+	01:48	     84'759k	784k	+4.76	Ne5-d3
+    29/52+	02:20	    111'849k	798k	+5.33	Ne5-d3
+    29/54	02:33	    123'575k	803k	+5.50	Ne5-d3  e4-e5+  Kd6xe5  Nf4-h5  Nd3-b4  Bd5-a8  g3-g2  Ke3-f2  Nb4-d3+  Kf2-g1  Nd3-c5  Ba8xg2  Bf1xg2  Kg1xg2  Nc5xb3  Kg2-f3  a5-a4  Nh5-f4  Nb3-d4+  Kf3-e3  Nd4xf5+  Ke3-f3  Nf5-d4+  Kf3-e3  a4-a3  Nf4-d3+  Ke5-d5  Ke3-f2  Kd5-c4  Nd3-c1  f6-f5  Nc1-a2  f5-f4  Na2-c1  Kc4-c3  Nc1-a2+  Kc3-b2  Na2-b4  a3-a2  Nb4xa2  Kb2xa2  Kf2-f1  f4-f3  Kf1-e1  Ka2-b3  Ke1-f2  Kb3-c4  Kf2-e3  Kc4-d5
+    30/42-	02:38	    126'733k	801k	+5.22	
+    30/46	02:42	    130'615k	802k	+5.29	Ne5-d3  e4-e5+  Kd6xe5  Nf4-h5  Nd3-b4  Bd5-a8  g3-g2  Ke3-f2  Nb4-d3+  Kf2-g1  Nd3-c5  Ba8xg2  Bf1xg2  Kg1xg2  Nc5xb3  Kg2-f3  a5-a4  Nh5-f4  Nb3-d4+  Kf3-e3  Nd4xf5+  Ke3-f3  Nf5-d4+  Kf3-e3  a4-a3  Nf4-d3+  Ke5-d5  Ke3-f2  Kd5-c4  Nd3-c1  f6-f5  Nc1-a2  f5-f4  Na2-c1  Kc4-c3  Nc1-a2+  Kc3-b2  Na2-b4  a3-a2  Nb4xa2  Kb2xa2  Kf2-f1  f4-f3  Kf1-e1
+    31/43+	02:55	    140'616k	802k	+5.37	Ne5-d3
+    31/52+	03:08	    151'888k	806k	+5.45	Ne5-d3
+    31/53+	03:29	    169'557k	810k	+5.57	Ne5-d3
+    31/54	04:01	    194'895k	808k	+5.69	Ne5-d3  e4-e5+  Kd6xe5  Nf4-h5  Nd3-b4  Bd5-a8  g3-g2  Ke3-f2  Nb4-d3+  Kf2-g1  Nd3-c5  Ba8xg2  Bf1xg2  Kg1xg2  Nc5xb3  Kg2-f3  a5-a4  Nh5-f4  Nb3-d4+  Kf3-g4  a4-a3  Nf4-d3+  Ke5-e4  Nd3-c1  Nd4xf5  Kg4-h3  Nf5-e3  Kh3-g3  f6-f5  Kg3-f2  f5-f4  Kf2-e1  Ne3-d5  Ke1-d2  f4-f3  Nc1-a2  Ke4-f4  Kd2-d3  f3-f2  Kd3-e2  Kf4-g3  Na2-c1  Nd5-f4+  Ke2-f1
+    32/54+	04:38	    226'127k	812k	+5.77	Ne5-d3
+    32/55+	05:18	    258'804k	813k	+5.85	Ne5-d3
+    32/58+	06:15	    303'022k	807k	+5.97	Ne5-d3
+    32/60	07:13	    348'895k	804k	+6.06	Ne5-d3  e4-e5+  Kd6xe5  Nf4-h5  Nd3-b4  Bd5-f3  Nb4-c2+  Ke3-d2  Nc2-d4  Nh5xg3  Nd4xf3+  Kd2-e3  Bf1-g2  Ng3-e4  Nf3-d4  Ne4-c5  Nd4xf5+  Ke3-d3  Ke5-d6  Nc5-a4  Bg2-d5  Kd3-c3  Nf5-e3  Na4-b2  f6-f5  Nb2-d3  Ne3-d1+  Kc3-d2  Bd5xb3  Nd3-c1  Bb3-a4  Nc1-e2  Kd6-e5  Ne2-c1  Ke5-e4  Nc1-d3  Ke4-d4  Nd3-f4  Nd1-c3  Nf4-e6+  Kd4-c4  Ne6-f4  Nc3-e4+  Kd2-c1  Ba4-c6  Nf4-g2  Kc4-c5  Ng2-f4
+    33/49-	07:22	    355'043k	803k	+5.98	
+    33/54+	07:59	    386'091k	805k	+6.14	Ne5-d3
+    33/59	08:42	    419'958k	804k	+6.06	Ne5-d3  e4-e5+  Kd6xe5  Nf4-h5  Nd3-b4  Bd5-b7  g3-g2  Ke3-f2  Nb4-d3+  Kf2-g1  Nd3-c5  Bb7xg2  Bf1xg2  Kg1xg2  Nc5xb3  Kg2-f3  a5-a4  Nh5-f4  Nb3-d4+  Kf3-g4  a4-a3  Nf4-d3+  Ke5-e4  Nd3-c1  Nd4xf5  Kg4-h3  Nf5-e3  Kh3-g3  f6-f5  Kg3-f2  f5-f4  Kf2-e1  Ne3-d5  Ke1-f2  Nd5-c3  Kf2-e1  a3-a2  Nc1-b3  f4-f3  Ke1-d2  Nc3-d5  Nb3-c5+  Ke4-f4  Nc5-b3  f3-f2  Kd2-e2
+    34/46-	09:56	    478'909k	802k	+5.68	
+    34/52+	10:39	    514'435k	805k	+6.22	Ne5-d3
+    34/64	12:57	    620'955k	799k	+6.39	Ne5-d3  e4-e5+  Kd6xe5  Nf4-h5  Nd3-b4  Bd5-f3  Nb4-c2+  Ke3-d2  Nc2-d4  Nh5xg3  Nd4xf3+  Kd2-e3  Bf1-g2  Ng3-e4  Nf3-d4  Ne4-c5  Nd4xf5+  Ke3-d2  Nf5-d4  Nc5-d3+  Ke5-e4  b3-b4  a5xb4  Nd3xb4  f6-f5  Nb4-a2  f5-f4  Na2-c3+  Ke4-e5  Kd2-e1  Bg2-e4  Nc3-d1  f4-f3  Nd1-f2  Ke5-f4  Ke1-f1  Be4-d5  Kf1-g1  Nd4-e2+  Kg1-h1  Ne2-c3  Kh1-h2  Kf4-e3  Nf2-g4+  Ke3-e2  Kh2-g3  Bd5-e6  Ng4-f2  Be6-c4  Nf2-g4  Nc3-e4+  Kg3-f4
+    35/44-	14:07	    674'055k	795k	+6.23	
+   11/02/2014 01:35:13, Time for this analysis: 00:15:00, Rated time: 1:26:55
+
+ 26 f5; id "test 26";   
+    Searching move: f4-f5
+    Best move (Vajolet2): f4-f5
+    Identical moves! Found in: 00:00
+     2/10	00:00	         549	183k	+0.17	Rf1-c1  Rc7xc1+  Bb2xc1
+     3/11	00:00	          1k	200k	+0.04	Rf1-c1  Rc7xc1+  Bb2xc1  Nf6-e4
+     4/13	00:00	          2k	248k	-0.03	Rf1-c1  Nf6-e4  Qd2-e1  Rc7xc1  Bb2xc1
+     5/12+	00:00	          4k	288k	+0.04	f4-f5
+     5/11+	00:00	          5k	302k	+0.13	f4-f5
+     5/8+	00:00	          5k	299k	+0.44	f4-f5
+     5/12	00:00	          6k	305k	+0.48	f4-f5  g6xf5  Bd3xf5  Nf6-e4  Bf5xe4  d5xe4  Re3-g3+  Kg8-h8
+     6/14+	00:00	          7k	304k	+0.56	f4-f5
+     6/14+	00:00	          7k	311k	+0.69	f4-f5
+     6/16+	00:00	          8k	309k	+0.82	f4-f5
+     6/14	00:00	          9k	316k	+0.86	f4-f5  g6xf5  Bd3xf5  Nf6-e4  Bf5xe4  d5xe4  Re3-g3+  Kg8-h8  d4-d5+  e6-e5
+     7/18+	00:00	         10k	321k	+0.94	f4-f5
+     7/13+	00:00	         11k	319k	+1.02	f4-f5
+     7/16+	00:00	         13k	337k	+1.14	f4-f5
+     7/16	00:00	         14k	345k	+1.14	f4-f5  g6xf5  Bd3xf5  Nf6-e4  Bf5xe4  d5xe4  d4-d5  h7-h5  Re3xe4  Bb7xd5
+     8/20+	00:00	         21k	374k	+1.22	f4-f5
+     8/18+	00:00	         24k	389k	+1.31	f4-f5
+     8/14+	00:00	         26k	390k	+1.43	f4-f5
+     8/19	00:00	         29k	402k	+1.52	f4-f5  g6xf5  Bd3xf5  Nf6-e4  Bf5xe4  d5xe4  d4-d5  e6-e5  Re3xe4  Qe7-c5+  Re4-e3
+     9/21-	00:00	         56k	430k	+0.46	
+     9/21	00:00	         63k	436k	+0.87	f4-f5  Nf6-e4  Bd3xe4  d5xe4  f5xg6  h7xg6  Re3-g3  Qe7-h7  Rf1-f6  Rc7-c2  Rg3xg6+  Kg8-h8
+    10/17	00:00	         67k	442k	+0.87	f4-f5  Nf6-e4  Bd3xe4  d5xe4  f5xg6  h7xg6  Re3-g3  Qe7-h7  Rf1-f6  Rc7-c2  Rg3xg6+  Kg8-h8
+    11/20+	00:00	         74k	443k	+0.95	f4-f5
+    11/26+	00:00	         92k	425k	+1.03	f4-f5
+    11/30+	00:00	        176k	403k	+1.60	f4-f5
+    11/29	00:00	        233k	397k	+1.74	f4-f5  Nf6-e4  Bd3xe4  d5xe4  f5xg6  h7xg6  Re3-g3  Qe7-g7  d4-d5  e6-e5  Qd2-g5  Rc7-f7  Rf1xf7  Qg7xf7  Qg5xg6+  Qf7xg6  Rg3xg6+  Kg8-f7
+    12/22	00:00	        248k	395k	+1.74	f4-f5  Nf6-e4  Bd3xe4  d5xe4  f5xg6  h7xg6  Re3-g3  Qe7-g7  d4-d5  e6-e5  Qd2-g5  Rc7-f7  Rf1xf7  Qg7xf7  Qg5xg6+  Qf7xg6  Rg3xg6+  Kg8-f7
+   11/02/2014 01:35:15, Time for this analysis: 00:00:01, Rated time: 1:26:55
+
+ 27 e6; id "test 27";   
+    Searching move: e5-e6
+    Best move (Vajolet2): e5-e6
+    Identical moves! Found in: 00:04
+     2/6	00:00	         134	0	+0.27	Qf5xe4  Rd8-c8
+     3/6	00:00	         412	412k	+0.24	Qf5xe4  Rd8-c8  Kh2-g3
+     4/10	00:00	         930	465k	+0.17	Qf5xe4  Rd8-c8  Qe4-f5  Rd7-d8
+     5/7-	00:00	          2k	390k	 0.00	
+     5/10	00:00	          3k	454k	+0.10	Qf5xe4  Bc4-e2  Qe4-h4  a7-a6  Kh2-g3
+     6/15	00:00	          4k	454k	+0.10	Qf5xe4  Bc4-e2  Qe4-h4  a7-a6  Qh4-a4  Be2xh5  Qa4-c4+  Kg8-h8  Qc4xa6  Bh5xg6  Qa6xb6
+     7/15	00:00	          5k	433k	+0.10	Qf5xe4  Bc4-e2  Qe4-h4  a7-a6  Qh4-a4  Be2xh5  Qa4-c4+  Kg8-h8  Qc4xa6  Bh5xg6  Qa6xb6
+     8/15+	00:00	          8k	444k	+0.18	Qf5xe4
+     8/17+	00:00	         11k	422k	+0.26	Qf5xe4
+     8/16	00:00	         15k	449k	+0.25	Qf5xe4  Bc4-e2  Qe4-f5  Be2-c4  Kh2-g3  a7-a6  Kg3-g4  Rd8-e8  a3-a4  Bc4-e2+  Kg4-h4
+     9/16	00:00	         20k	470k	+0.25	Qf5xe4  Bc4-e2  Qe4-f5  Be2-c4  Kh2-g3  a7-a6  Kg3-g4  Rd8-e8  a3-a4  Bc4-e2+  Kg4-h4
+    10/19	00:00	         48k	513k	+0.28	Qf5xe4  Rd8-c8  Kh2-g3  a7-a6  Kg3-f3  Bc4-b3  Qe4-d4  Rd7-b7  Kf3-f4  Bb3-c4
+    11/21	00:00	         70k	537k	+0.20	Qf5xe4  Rd8-c8  Kh2-g3  a7-a6  a3-a4  Bc4-e6  Kg3-f3  Be6-c4  Kf3-f4  Kg8-h8  Kf4-g4
+    12/21+	00:00	         87k	542k	+0.28	Qf5xe4
+    12/21	00:00	        105k	547k	+0.29	Qf5xe4  Rd8-c8  Kh2-g3  a7-a6  Qe4-d4  Rc8-c6  Kg3-f4  b6-b5  Qd4-c3  Rc6-c8  Qc3-a5  Rd7-a7
+    13/22	00:00	        163k	551k	+0.26	Qf5xe4  Rd8-c8  Kh2-g3  a7-a6  Qe4-d4  Rc8-c6  Kg3-f4  b6-b5  Qd4-d2  Rc6-c8  Qd2-a5  Rc8-c6  e3-e4
+    14/20	00:00	        185k	558k	+0.28	Qf5xe4  Rd8-c8  Kh2-g3  a7-a6  Qe4-d4  Rc8-c6  Kg3-f4  Rd7-d8  Qd4-e4  Rd8-c8  Qe4-f5  Rc8-d8  e3-e4  Rd8-e8
+    15/27	00:00	        393k	558k	+0.24	Qf5xe4  Rd8-c8  Kh2-g3  Bc4-e6  Kg3-f3  a7-a6  a3-a4  Be6-c4  Kf3-f4  Bc4-e6  Kf4-g3  Be6-c4  Qe4-b1  Rd7-b7  Kg3-f4
+    16/27	00:00	        527k	564k	+0.29	Qf5xe4  Rd8-c8  Kh2-g3  Bc4-e6  Kg3-f3  a7-a6  a3-a4  Be6-c4  Kf3-f4  Bc4-e6  Kf4-g3  Be6-c4  Kg3-f3  Kg8-h8  Qe4-d4  Rd7-b7
+    17/25	00:01	        790k	567k	+0.29	Qf5xe4  Rd8-c8  Kh2-g3  Bc4-e6  Kg3-f3  a7-a6  Kf3-g3  Rd7-a7  Qe4-f3  Be6-c4  Kg3-g4  Bc4-e6+  Kg4-h4  Kg8-h8  e3-e4  Ra7-b7  Qf3-e3  Be6-c4
+    18/29	00:02	      1'433k	570k	+0.25	Qf5xe4  Rd8-c8  Kh2-g3  Bc4-e6  Kg3-f3  Rc8-f8+  Kf3-g2  Rf8-c8  Kg2-g3  Be6-c4  Qe4-d4  Rd7-d8  e3-e4  Rd8-e8  Qd4-e3  Rc8-c6  a3-a4  a7-a6  Kg3-g4
+    19/31+	00:03	      1'750k	573k	+0.33	Qf5xe4
+    19/27	00:03	      1'886k	576k	+0.30	Qf5xe4  Rd8-c8  Kh2-g3  Bc4-e6  Kg3-f3  Rc8-f8+  Kf3-g2  Rf8-c8  Kg2-g3  Be6-c4  Qe4-f5  Rd7-d8  Qf5-f3  b6-b5  Qf3-b7  a7-a5  Kg3-h4  Kg8-h8  Qb7-a7  Rc8-a8
+    20/32+	00:04	      2'666k	584k	+0.38	e5-e6
+    20/32+	00:04	      2'715k	587k	+0.46	e5-e6
+    20/30+	00:04	      2'877k	595k	+1.03	e5-e6
+    20/50	00:05	      3'449k	609k	+1.32	e5-e6  Rd7xd6  Qf5-f7+  Kg8-h8  e6-e7  Rd6-d2+  Kh2-g3  b6-b5  e7xd8Q+  Rd2xd8  Qf7xa7  Rd8-f8  Kg3-h4  Bc4-d3  Qa7-e7  Rf8-a8  Kh4-g3  Ra8-c8  Qe7-d7  Rc8-a8  Qd7-b7  Ra8-e8  Kg3-g4  Bd3-c4  Qb7-c7
+    21/37	00:05	      3'603k	613k	+1.38	e5-e6  Rd7xd6  Qf5-f7+  Kg8-h8  e6-e7  Rd6-d2+  Kh2-g3  b6-b5  e7xd8Q+  Rd2xd8  Qf7xa7  Rd8-f8  Kg3-h4  Bc4-d3  Qa7-e7  Rf8-a8  Kh4-g3  Ra8-c8  Qe7-d7  Rc8-a8  Qd7-b7  Ra8-e8  Kg3-g4  Bd3-e2+  Kg4-h4
+    22/34	00:07	      4'556k	618k	+1.32	e5-e6  Rd7xd6  Qf5-f7+  Kg8-h8  e6-e7  Rd6-d2+  Kh2-g3  b6-b5  e7xd8Q+  Rd2xd8  Qf7xa7  Rd8-f8  Kg3-h4  Bc4-d3  Qa7-e7  Rf8-a8  Kh4-g3  Ra8-c8  Qe7-d7  Rc8-a8  Qd7-f7  Ra8-c8  Qf7-e7  Bd3-e2  Kg3-h4
+    23/38	00:08	      5'173k	626k	+1.35	e5-e6  Rd7xd6  Qf5-f7+  Kg8-h8  e6-e7  Rd6-d2+  Kh2-g3  b6-b5  e7xd8Q+  Rd2xd8  Qf7xa7  Rd8-f8  Kg3-h4  Bc4-d3  Qa7-e7  Rf8-a8  Kh4-g3  Ra8-c8  Qe7-d7  Rc8-a8  Qd7-f7  Ra8-b8  Qf7-e6  Rb8-f8  Kg3-h4  Rf8-d8
+   11/02/2014 01:35:26, Time for this analysis: 00:00:09, Rated time: 1:26:59
+
+ 28 e5; id "test 28";   
+    Searching move: e4-e5
+    Best move (Vajolet2): e4-e5
+    Identical moves! Found in: 03:37
+     2/12	00:00	          1k	214k	-6.95	Qf3-d1  Bg1-b6  Nd5xb6  a7xb6
+     3/14	00:00	          5k	210k	-6.77	Ra1-e1  Bg1-b6  Nd5xb6  a7xb6
+     4/13	00:00	          7k	211k	-4.14	Nd5-c7+  Ke8-d8  Ra1-e1  Qb2xc2  Nc7xa8
+     5/9+	00:00	          7k	217k	-4.05	Nd5-c7+
+     5/9+	00:00	          7k	221k	-3.95	Nd5-c7+
+     5/11+	00:00	          8k	227k	-2.92	Nd5-c7+
+     5/15	00:00	          8k	238k	-2.89	Nd5-c7+  Ke8-d8  Ra1-e1  Qb2xc2  Nc7xa8  Bg1-h2  Bd6xh2  Qc2xh2  Nf5xg7  Qh2xa2
+     6/13	00:00	          9k	250k	-2.89	Nd5-c7+  Ke8-d8  Ra1-e1  Qb2xc2  Nc7xa8  Bg1-h2  Bd6xh2  Qc2xh2  Nf5xg7  Qh2xa2
+     7/13	00:00	         11k	270k	-2.89	Nd5-c7+  Ke8-d8  Ra1-e1  Qb2xc2  Nc7xa8  Bg1-h2  Bd6xh2  Qc2xh2  Nf5xg7  Qh2xa2
+     8/18	00:00	         14k	294k	-2.85	Nd5-c7+  Ke8-d8  Ra1-e1  Qb2xc2  Nc7xa8  Bg1-h2  e4-e5  Nb8-a6  Nf5xg7  Qc2xa2
+     9/19	00:00	         23k	332k	-2.85	Nd5-c7+  Ke8-d8  Ra1-e1  Qb2xc2  Nc7xa8  Bg1-h2  e4-e5  Nb8-a6  Nf5xg7  Qc2xa2
+    10/19+	00:00	         26k	343k	-2.77	Nd5-c7+
+    10/28+	00:00	         40k	367k	-2.69	Nd5-c7+
+    10/27	00:00	         66k	373k	-2.64	Nd5-c7+  Ke8-d8  Ra1-e1  Qb2xc2  Nc7xa8  Bg1-h2  e4-e5  Nb8-a6  Nf5xg7  Qc2xa2  g4-g5  b5-b4  d3-d4  Ng8-e7  Re1-c1
+    11/25	00:00	         79k	371k	-2.70	Nd5-c7+  Ke8-d8  Ra1-e1  Qb2xc2  Nc7xa8  Bg1-h2  e4-e5  Nb8-a6  Nf5xg7  Qc2xa2  g4-g5  b5-b4  d3-d4
+    12/23+	00:00	         86k	375k	-2.62	Nd5-c7+
+    12/31+	00:00	        145k	398k	-2.54	Nd5-c7+
+    12/28+	00:00	        298k	424k	-2.24	Nd5-c7+
+    12/27	00:00	        421k	433k	-2.13	Nd5-c7+  Ke8-d8  Ra1-e1  Bc8-b7  Nc7xa8  Bb7xa8  Kf1xg1  Nb8-c6  Qf3-g3  Qb2xc2  Bd6-c7+  Kd8-c8  Nf5-d6+  Kc8xc7  Nd6xf7+  Kc7-b7  Nf7xh8  Qc2xa2
+    13/28	00:01	        478k	437k	-2.13	Nd5-c7+  Ke8-d8  Ra1-e1  Bc8-b7  Nc7xa8  Bb7xa8  Kf1xg1  Nb8-c6  Qf3-g3  Qb2xc2  Bd6-c7+  Kd8-c8  Nf5-d6+  Kc8xc7  Nd6xf7+  Kc7-b7  Nf7xh8  Qc2xa2
+    14/28	00:01	        690k	444k	-2.13	Nd5-c7+  Ke8-d8  Ra1-e1  Bc8-b7  Nc7xa8  Bb7xa8  Kf1xg1  Nb8-c6  Qf3-g3  Qb2xc2  Bd6-c7+  Kd8-c8  Nf5-d6+  Kc8xc7  Nd6xf7+  Kc7-b7  Nf7xh8  Qc2xa2
+    15/30+	00:01	        773k	448k	-2.05	Nd5-c7+
+    15/32+	00:02	        985k	454k	-1.97	Nd5-c7+
+    15/37+	00:03	      1'645k	465k	-1.40	Nd5-c7+
+    15/39	00:05	      2'370k	466k	-1.40	Nd5-c7+  Ke8-d8  Ra1-e1  Nb8-a6  Nc7xa8  Bg1-d4  Qf3-g3  Bd4-c3  Bd6-c7+  Kd8-e8  Nf5-d6+  Ke8-f8  Nd6xc8  Bc3xe1  Qg3-d6+  Kf8-e8  Qd6xa6  Be1-b4  Qa6xb5  Qb2-b1+  Kf1-g2  Qb1xc2+  Kg2-h3  Qc2-d2  Nc8-d6+  Bb4xd6  Qb5-b8+  Ke8-e7  Bc7xd6+  Ke7-f6
+    16/30	00:05	      2'612k	466k	-1.42	Nd5-c7+  Ke8-d8  Ra1-e1  Nb8-a6  Nc7xa8  Bg1-d4  Qf3-g3  Bd4-c3  Bd6-c7+  Kd8-e8  Nf5-d6+  Ke8-f8  Nd6xc8  Bc3xe1  Qg3-d6+  Kf8-e8  Qd6xa6  Be1-b4  Qa6xb5  Qb2-b1+  Kf1-g2  Qb1xc2+  Kg2-f3
+    17/39+	00:11	      5'244k	459k	-1.34	Ra1-e1
+    17/34+	00:11	      5'436k	460k	-1.26	Ra1-e1
+    17/34	00:11	      5'436k	460k	-1.26	Ra1-e1
+    18/35+	00:22	     10'105k	459k	-1.18	Ra1-e1
+    18/35+	00:23	     10'706k	461k	-1.10	Ra1-e1
+    18/42	00:30	     14'048k	463k	-1.14	Ra1-e1  Bc8-b7  Nd5-c7+  Ke8-d8  Kf1xg1  Nb8-c6  Nc7xa8  Bb7xa8  Qf3-f4  f7-f6  Bd6-c7+  Kd8-e8  Nf5xg7+  Ke8-f7  Ng7-f5  Nc6-d4  Nf5-d6+  Kf7-f8  Nd6-f5  Nd4xf5  Qf4xf5  Ba8-c6  Qf5-c5+  Kf8-g7  Bc7-d6  Qb2xa2  Bd6-f8+  Kg7-f7  Re1-f1
+    19/34+	00:32	     14'932k	464k	-1.06	Ra1-e1
+    19/40	00:44	     20'710k	466k	-1.13	Ra1-e1  Bc8-b7  Nd5-c7+  Ke8-d8  Kf1xg1  Nb8-c6  Nc7xa8  Bb7xa8  Qf3-f4  f7-f6  Bd6-c7+  Kd8-e8  Nf5xg7+  Ke8-f7  Ng7-f5  Nc6-d4  Nf5-d6+  Kf7-f8  Nd6-f5  Nd4xf5  Qf4xf5  Ba8-c6  Qf5-c5+  Kf8-g7  Qc5xa7  Qb2xc2
+    20/40	01:08	     31'810k	462k	-1.13	Ra1-e1  Bc8-b7  Nd5-c7+  Ke8-d8  Kf1xg1  Nb8-c6  Nc7xa8  Bb7xa8  Qf3-f4  f7-f6  Bd6-c7+  Kd8-e8  Nf5xg7+  Ke8-f7  Ng7-f5  Nc6-d4  Nf5-d6+  Kf7-f8  Nd6-f5  Nd4xf5  Qf4xf5  Ba8-c6  Qf5-c5+  Kf8-g7  Qc5xa7  Qb2xc2
+    21/40+	01:29	     41'530k	462k	-1.05	Ra1-e1
+    21/33+	01:32	     42'833k	462k	-0.97	Ra1-e1
+    21/48+	02:17	     63'532k	462k	 0.00	Ra1-e1
+    21/43	02:49	     78'294k	461k	 0.00	Ra1-e1  Bc8-b7  Bd6xb8  Bg1-c5  Nd5-c7+  Ke8-d8  Nc7xa8  Qb2xc2  Qf3-g3  Ng8-f6  Qg3-c7+  Kd8-e8  Qc7-e5+  Ke8-d8  Qe5-c7+
+    22/43+	03:37	     99'905k	460k	+0.08	e4-e5
+    22/34+	03:38	    100'506k	460k	+0.16	e4-e5
+    22/46+	03:46	    104'831k	462k	+1.13	e4-e5
+    22/48	04:25	    123'285k	464k	+1.19	e4-e5  Qb2xa1+  Kf1-e2  Bc8-a6  Nd5-c7+  Ke8-d8  Nc7xa6  Bg1-b6  Qf3xa8  Qa1-c3  Qa8xb8+  Qc3-c8  Qb8xc8+  Kd8xc8  Bd6-f8  h7-h6  Nf5-d6+  Kc8-d8  Nd6xf7+  Kd8-e8  Nf7xh8  Ke8xf8  Nh8-g6+  Kf8-f7  Na6-b4  Bb6-c5  c2-c3  a7-a5  Nb4-c2  Ng8-e7  d3-d4  Bc5-b6  Nc2-a3  Ne7xg6  h5xg6+  Kf7xg6  Na3xb5
+    23/40+	04:29	    124'961k	464k	+1.27	e4-e5
+    23/46	06:02	    167'819k	463k	+1.27	e4-e5  Qb2xa1+  Kf1-e2  Bc8-a6  Nd5-c7+  Ke8-d8  Nc7xa6  Bg1-b6  Qf3xa8  Qa1-c3  Qa8xb8+  Qc3-c8  Qb8xc8+  Kd8xc8  Bd6-f8  h7-h6  Nf5-d6+  Kc8-d8  Nd6xf7+  Kd8-e8  Nf7xh8  Ke8xf8  Nh8-g6+  Kf8-f7  c2-c3  Ng8-e7  Ng6-f4  Ne7-c6  d3-d4  b5-b4  Na6xb4  Nc6xb4  c3xb4  Bb6xd4
+    24/46	08:25	    234'306k	464k	+1.27	e4-e5  Qb2xa1+  Kf1-e2  Bc8-a6  Nd5-c7+  Ke8-d8  Nc7xa6  Bg1-b6  Qf3xa8  Qa1-c3  Qa8xb8+  Qc3-c8  Qb8xc8+  Kd8xc8  Bd6-f8  h7-h6  Nf5-d6+  Kc8-d8  Nd6xf7+  Kd8-e8  Nf7xh8  Ke8xf8  Nh8-g6+  Kf8-f7  c2-c3  Ng8-e7  Ng6-f4  Ne7-c6  d3-d4  b5-b4  Na6xb4  Nc6xb4  c3xb4  Bb6xd4
+    25/48	12:50	    358'016k	465k	+1.27	e4-e5  Qb2xa1+  Kf1-e2  Bc8-a6  Nd5-c7+  Ke8-d8  Nc7xa6  Bg1-b6  Qf3xa8  Qa1-c3  Qa8xb8+  Qc3-c8  Qb8xc8+  Kd8xc8  Bd6-f8  h7-h6  Nf5-d6+  Kc8-d8  Nd6xf7+  Kd8-e8  Nf7xh8  Ke8xf8  Nh8-g6+  Kf8-f7  c2-c3  Ng8-e7  Ng6-f4  Ne7-c6  d3-d4  b5-b4  Na6xb4  Nc6xb4  c3xb4  Bb6xd4
+   11/02/2014 01:48:18, Time for this analysis: 00:12:51, Rated time: 1:30:36
+
+ 29 O-O-O; id "test 29" 
+    Searching move: O-O-O
+    Best move (Vajolet2): O-O-O
+    Identical moves! Found in: 00:35
+     2/10	00:00	         257	257k	+0.16	Qa4xc6  b7xc6
+     3/14	00:00	         919	184k	+0.17	Qa4xc6  b7xc6  O-O  c3xb2  Ra1-e1+  Nd7-e5  Re1xe5+  Bc8-e6  Bc4xe6  f7xe6  Re5xe6+  Ke8-f7
+     4/14	00:00	          1k	179k	+0.20	Qa4xc6  b7xc6  O-O  c3xb2  Ra1-e1+  Nd7-e5  Re1xe5+  Bc8-e6  Bc4xe6  f7xe6  Re5xe6+  Ke8-d7
+     5/14	00:00	          2k	192k	+0.20	Qa4xc6  b7xc6  O-O  c3xb2  Ra1-e1+  Nd7-e5  Re1xe5+  Bc8-e6  Bc4xe6  f7xe6  Re5xe6+  Ke8-d7
+     6/15-	00:00	          8k	264k	+0.04	
+     6/14	00:00	          9k	291k	+0.05	Qa4xc6  b7xc6  b2xc3  h7-h6  Bg5-f4  Nd7-b6  Bc4-b3
+     7/20	00:00	         20k	345k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e6  Qf4-e3+  Ke6-d6  Qe3-f4+  Kd6-e6
+     8/20-	00:00	         31k	374k	-0.08	
+     8/24	00:00	         46k	388k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+     9/15	00:00	         49k	392k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    10/23	00:00	         64k	402k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    11/27	00:00	        126k	405k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    12/26	00:00	        191k	387k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    13/27	00:00	        287k	397k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    14/32	00:01	        608k	430k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    15/31	00:03	      1'550k	443k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    16/34	00:07	      3'438k	456k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    17/38	00:16	      7'684k	463k	 0.00	Bc4xf7+  Ke8xf7  Qa4-f4+  Kf7-e8  Qf4-e3+  Ke8-f7  Qe3-f4+
+    18/39+	00:35	     16'727k	467k	+0.08	O-O-O
+    18/36+	00:37	     17'527k	467k	+0.16	O-O-O
+    18/32+	00:38	     17'900k	467k	+0.28	O-O-O
+    18/38	00:53	     24'970k	471k	+0.36	O-O-O  Bf8-e7  Qa4xc6  b7xc6  Bg5xe7  c3xb2+  Kc1xb2  Ke8xe7  Rh1-e1+  Ke7-d8  Bc4xf7  Ra8-b8+  Kb2-a1  Rb8-b7  Nf3-g5  Kd8-c7  Re1-e7  Kc7-b8  Ng5-e4  Nd7-e5  Re7xe5  Rb7xf7  Rd1-b1+  Kb8-a8  Re5xc5  Bc8-f5
+    19/38+	00:55	     26'147k	471k	+0.44	O-O-O
+    19/40+	00:56	     26'852k	472k	+0.52	O-O-O
+    19/41+	01:00	     28'644k	473k	+0.82	O-O-O
+    19/41	01:39	     47'589k	477k	+0.96	O-O-O  Bf8-e7  Qa4xc6  b7xc6  Bg5xe7  c3xb2+  Kc1xb2  Ke8xe7  Rh1-e1+  Ke7-f8  Nf3-g5  h7-h6  Ng5xf7  Rh8-h7  Rd1-d6  Ra8-b8+  Kb2-a1  g7-g6  Rd6xg6  Rh7xf7  Bc4xf7  Kf8xf7  Rg6xc6  h6-h5  f2-f3  a7-a5  f3-f4  Bc8-b7
+    20/42	02:25	     70'009k	481k	+0.97	O-O-O  Bf8-e7  Qa4xc6  b7xc6  Bg5xe7  c3xb2+  Kc1xb2  Ke8xe7  Rh1-e1+  Ke7-f8  Nf3-g5  h7-h6  Ng5xf7  Rh8-h7  Rd1-d6  Ra8-b8+  Kb2-a1  g7-g6  Rd6xg6  Rh7xf7  Bc4xf7  Kf8xf7  Rg6xc6  h6-h5  f2-f4  Bc8-b7
+    21/38+	02:30	     72'509k	481k	+1.05	O-O-O
+   11/02/2014 01:50:51, Time for this analysis: 00:02:32, Rated time: 1:31:11
+
+ 30 f4; id "test 30";   
+    Searching move: f3-f4
+    Best move (Vajolet2): f3-f4
+    Identical moves! Found in: 00:00
+     2/11	00:00	         594	297k	+1.19	d3-d4  Kc8-b7  d4xe5  Bd6xe5
+     3/11	00:00	          1k	293k	+1.20	d3-d4  h7-h5  d4xe5  Bd6xe5
+     4/14	00:00	          4k	357k	+1.02	f3-f4  e5xf4  d3-d4  h7-h5  e4-e5
+     5/13-	00:00	          6k	373k	+0.85	
+     5/12	00:00	          7k	410k	+0.73	f3-f4  e5xf4  d3-d4  h7-h5  e4-e5  h5-h4
+     6/14+	00:00	          8k	409k	+0.81	f3-f4
+     6/16	00:00	         12k	404k	+0.87	d3-d4  h7-h5  Nb3-a5  e5xd4  Na5xc6  Bd6-f8  Rg7-f7
+     7/17-	00:00	         15k	415k	+0.78	
+     7/20	00:00	         19k	442k	+0.81	d3-d4  h7-h5  d4xe5  Bd6xe5  Rg7-g8+  Kc8-d7  Nb3-c5+  Kd7-e7  b2-b4  Ke7-f7  Rg8-d8
+     8/15	00:00	         23k	460k	+0.81	d3-d4  h7-h5  d4xe5  Bd6xe5  Rg7-g8+  Kc8-d7  Nb3-c5+  Kd7-e7  b2-b4  Ke7-f7  Rg8-d8
+     9/21-	00:00	         58k	517k	+0.73	
+     9/20	00:00	         75k	534k	+0.71	f3-f4  e5xf4  d3-d4  Rh2-h3  Nb3-a5  c6-c5  e4-e5  c5xd4  e5xd6  c7xd6  Na5-c6  d4-d3+  Ke2-e1
+    10/21	00:00	         92k	537k	+0.71	f3-f4  e5xf4  d3-d4  Rh2-h3  Nb3-a5  c6-c5  e4-e5  c5xd4  e5xd6  c7xd6  Na5-c6  d4-d3+  Ke2-e1
+    11/23-	00:00	        183k	485k	+0.63	
+    11/26	00:00	        214k	474k	+0.68	f3-f4  e5xf4  d3-d4  Rh2-h3  Nb3-a5  c6-c5  e4-e5  c5xd4  e5xd6  c7xd6  Na5-b7  d4-d3+  Ke2-d2  h7-h5  Nb7xd6+  Kc8-d8  Rg7-a7  Rh3-f3
+    12/24	00:00	        315k	476k	+0.71	f3-f4  e5xf4  d3-d4  Rh2-h3  Nb3-a5  c6-c5  e4-e5  c5xd4  e5xd6  c7xd6  Na5-b7  d4-d3+  Ke2-d2  d6-d5  Nb7-d6+  Kc8-b8
+    13/24	00:00	        444k	513k	+0.67	f3-f4  e5xf4  d3-d4  Rh2-h3  Nb3-a5  c6-c5  e4-e5  c5xd4  e5xd6  c7xd6  Na5-b7  d4-d3+  Ke2-d2  h7-h5  Nb7xd6+  Kc8-d8  Nd6-b7+  Kd8-e8
+    14/26	00:01	        620k	536k	+0.68	f3-f4  e5xf4  d3-d4  Rh2-h3  Nb3-a5  c6-c5  e4-e5  c5xd4  e5xd6  c7xd6  Na5-b7  d4-d3+  Ke2-d2  h7-h5  Nb7xd6+  Kc8-d8  Rg7-a7  Rh3-f3
+   11/02/2014 01:50:55, Time for this analysis: 00:00:02, Rated time: 1:31:11
+
+26 of 30 matching moves
+11/02/2014 01:50:55, Total time: 02:01:15
+Rated time: 1:31:11 = 5471 Seconds

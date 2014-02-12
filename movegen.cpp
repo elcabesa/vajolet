@@ -1396,6 +1396,8 @@ Move  Movegen::getNextMove(){
 
 			}
 			else{
+				killerMoves[0]=pos.getActualState().killers[0];
+				killerMoves[1]=pos.getActualState().killers[1];
 				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
@@ -1466,7 +1468,7 @@ Move  Movegen::getNextMove(){
 			break;
 		case getKillers:
 			if(killerPos<2){
-				Move t= pos.getActualState().killers[killerPos];
+				Move t= killerMoves[killerPos];
 				killerPos++;
 
 				if((t != ttMove) && !pos.isCaptureMove(t) && isMoveLegal(pos,t)){

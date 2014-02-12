@@ -90,7 +90,9 @@ private:
 	Move ttMove;
 
 
+
 public:
+	Move killerMoves[2];
 	Movegen(const Position & p, Move & ttm): pos(p)
 	{
 		ttMove=ttm;

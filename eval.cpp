@@ -120,6 +120,7 @@ simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitma
 const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
 simdScore kingShieldBonus= simdScore(1600,0,0,0);
 simdScore kingFarShieldBonus= simdScore(1000,0,0,0);
+simdScore kingStormBonus= simdScore(100,0,0,0);
 //------------------------------------------------
 
 
@@ -1653,14 +1654,23 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	bScore=0;
 	simdScore kingSafety[2]={0,0};
 
+	tSquare ksq=pieceList[whiteKing][0];
 	bitMap pawnShield=kingShield[white]&bitBoard[whitePawns];
 	bitMap pawnFarShield=kingFarShield[white]&bitBoard[whitePawns];
+	bitMap pawnStorm=PASSED_PAWN[white][ksq]&bitBoard[blackPawns];
 	if(pawnShield){
 		kingSafety[0]+=bitCnt(pawnShield)*kingShieldBonus;
 	}
 	if(pawnFarShield){
 		kingSafety[0]+=bitCnt(pawnFarShield)*kingFarShieldBonus;
 	}
+
+	while(pawnStorm){
+		tSquare p=firstOne(pawnStorm);
+		kingSafety[0]-=(8-SQUARE_DISTANCE[p][ksq])*kingStormBonus;
+		pawnStorm&= pawnStorm-1;
+	}
+
 
 	if((st.castleRights & wCastleOO)
 		&& !(attackedSquares[blackPieces] & (bitSet(E1)|bitSet(F1)|bitSet(G1) ))
@@ -1674,11 +1684,17 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 		pawnShield=localKingShield&bitBoard[whitePawns];
 		pawnFarShield=localKingFarShield&bitBoard[whitePawns];
+		pawnStorm=PASSED_PAWN[white][G1]&bitBoard[blackPawns];
 		if(pawnShield){
 			ks=bitCnt(pawnShield)*kingShieldBonus;
 		}
 		if(pawnFarShield){
 			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		}
+		while(pawnStorm){
+			tSquare p=firstOne(pawnStorm);
+			ks-=(8-SQUARE_DISTANCE[p][G1])*kingStormBonus;
+			pawnStorm&= pawnStorm-1;
 		}
 		kingSafety[0]=max(ks,kingSafety[0]);
 	}
@@ -1695,25 +1711,39 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 		pawnShield=localKingShield&bitBoard[whitePawns];
 		pawnFarShield=localKingFarShield&bitBoard[whitePawns];
+		pawnStorm=PASSED_PAWN[white][C1]&bitBoard[blackPawns];
+
 		if(pawnShield){
 			ks=bitCnt(pawnShield)*kingShieldBonus;
 		}
 		if(pawnFarShield){
 			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
 		}
+		while(pawnStorm){
+			tSquare p=firstOne(pawnStorm);
+			ks-=(8-SQUARE_DISTANCE[p][C1])*kingStormBonus;
+			pawnStorm&= pawnStorm-1;
+		}
 		kingSafety[0]=max(ks,kingSafety[0]);
 	}
 	wScore=kingSafety[0];
 
 
+	ksq=pieceList[blackKing][0];
 
 	pawnShield=kingShield[black]&bitBoard[blackPawns];
 	pawnFarShield=kingFarShield[black]&bitBoard[blackPawns];
+	pawnStorm=PASSED_PAWN[black][ksq]&bitBoard[whitePawns];
 	if(pawnShield){
 		kingSafety[1]+=bitCnt(pawnShield)*kingShieldBonus;
 	}
 	if(pawnFarShield){
 		kingSafety[1]+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+	}
+	while(pawnStorm){
+		tSquare p=firstOne(pawnStorm);
+		kingSafety[1]-=(8-SQUARE_DISTANCE[p][ksq])*kingStormBonus;
+		pawnStorm&= pawnStorm-1;
 	}
 
 	if((st.castleRights & bCastleOO)
@@ -1728,11 +1758,17 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 		pawnShield=localKingShield&bitBoard[blackPawns];
 		pawnFarShield=localKingFarShield&bitBoard[blackPawns];
+		pawnStorm=PASSED_PAWN[black][G8]&bitBoard[whitePawns];
 		if(pawnShield){
 			ks=bitCnt(pawnShield)*kingShieldBonus;
 		}
 		if(pawnFarShield){
 			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		}
+		while(pawnStorm){
+			tSquare p=firstOne(pawnStorm);
+			ks-=(8-SQUARE_DISTANCE[p][G8])*kingStormBonus;
+			pawnStorm&= pawnStorm-1;
 		}
 		kingSafety[1]=max(ks,kingSafety[1]);
 	}
@@ -1749,11 +1785,17 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 		pawnShield=localKingShield&bitBoard[blackPawns];
 		pawnFarShield=localKingFarShield&bitBoard[blackPawns];
+		pawnStorm=PASSED_PAWN[black][C8]&bitBoard[whitePawns];
 		if(pawnShield){
 			ks=bitCnt(pawnShield)*kingShieldBonus;
 		}
 		if(pawnFarShield){
 			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+		}
+		while(pawnStorm){
+			tSquare p=firstOne(pawnStorm);
+			ks-=(8-SQUARE_DISTANCE[p][C8])*kingStormBonus;
+			pawnStorm&= pawnStorm-1;
 		}
 		kingSafety[1]=max(ks,kingSafety[1]);
 	}
@@ -1762,7 +1804,6 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	res+=kingSafety[0]-kingSafety[1];
 
 
-	// todo pawn storm
 
 	if(kingAttackersCount[white]>=2 && kingAdjacentZoneAttacksCount[white])
 	{
