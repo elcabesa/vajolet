@@ -118,9 +118,9 @@ simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitma
 //king safety
 //------------------------------------------------
 const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
-simdScore kingShieldBonus= simdScore(1600,0,0,0);
-simdScore kingFarShieldBonus= simdScore(1000,0,0,0);
-simdScore kingStormBonus= simdScore(100,0,0,0);
+Score kingShieldBonus= 1600;
+Score kingFarShieldBonus= 1000;
+Score kingStormBonus= 100;
 //------------------------------------------------
 
 
@@ -1030,6 +1030,34 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	return res;
 }
 
+template<color c>
+Score evalShieldStorm(const Position &pos, tSquare ksq){
+	Score ks=0;
+	const bitMap ourPawns =c?pos.bitBoard[Position::blackPawns]:pos.bitBoard[Position::whitePawns];
+	const bitMap theirPawns =c?pos.bitBoard[Position::whitePawns]:pos.bitBoard[Position::blackPawns];
+
+	bitMap localKingRing=Movegen::attackFromKing(ksq);
+	bitMap localKingShield=localKingRing;
+	localKingRing|=Movegen::attackFromKing(ksq+pawnPush(c));
+	bitMap localKingFarShield=localKingRing&~(localKingShield);
+
+	bitMap pawnShield=localKingShield&ourPawns;
+	bitMap pawnFarShield=localKingFarShield&ourPawns;
+	bitMap pawnStorm=PASSED_PAWN[c][ksq]&theirPawns;
+	if(pawnShield){
+		ks=bitCnt(pawnShield)*kingShieldBonus;
+	}
+	if(pawnFarShield){
+		ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
+	}
+	while(pawnStorm){
+		tSquare p=firstOne(pawnStorm);
+		ks-=(8-SQUARE_DISTANCE[p][ksq])*kingStormBonus;
+		pawnStorm&= pawnStorm-1;
+	}
+	return ks;
+}
+
 
 /*! \brief do a pretty simple evalutation
 	\author Marco Belli
@@ -1652,156 +1680,45 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	//--------------------------------------
 	wScore=0;
 	bScore=0;
-	simdScore kingSafety[2]={0,0};
+	Score kingSafety[2]={0,0};
 
-	tSquare ksq=pieceList[whiteKing][0];
-	bitMap pawnShield=kingShield[white]&bitBoard[whitePawns];
-	bitMap pawnFarShield=kingFarShield[white]&bitBoard[whitePawns];
-	bitMap pawnStorm=PASSED_PAWN[white][ksq]&bitBoard[blackPawns];
-	if(pawnShield){
-		kingSafety[0]+=bitCnt(pawnShield)*kingShieldBonus;
-	}
-	if(pawnFarShield){
-		kingSafety[0]+=bitCnt(pawnFarShield)*kingFarShieldBonus;
-	}
-
-	while(pawnStorm){
-		tSquare p=firstOne(pawnStorm);
-		kingSafety[0]-=(8-SQUARE_DISTANCE[p][ksq])*kingStormBonus;
-		pawnStorm&= pawnStorm-1;
-	}
-
+	kingSafety[0]=evalShieldStorm<white>(*this, pieceList[whiteKing][0]);
 
 	if((st.castleRights & wCastleOO)
 		&& !(attackedSquares[blackPieces] & (bitSet(E1)|bitSet(F1)|bitSet(G1) ))
 		&& !(bitBoard[occupiedSquares] & (bitSet(F1)|bitSet(G1)))
 		){
-		simdScore ks=0;
-		bitMap localKingRing=Movegen::attackFromKing(G1);
-		bitMap localKingShield=localKingRing;
-		localKingRing|=Movegen::attackFromKing(G2);
-		bitMap localKingFarShield=localKingRing&~(localKingShield);
-
-		pawnShield=localKingShield&bitBoard[whitePawns];
-		pawnFarShield=localKingFarShield&bitBoard[whitePawns];
-		pawnStorm=PASSED_PAWN[white][G1]&bitBoard[blackPawns];
-		if(pawnShield){
-			ks=bitCnt(pawnShield)*kingShieldBonus;
-		}
-		if(pawnFarShield){
-			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
-		}
-		while(pawnStorm){
-			tSquare p=firstOne(pawnStorm);
-			ks-=(8-SQUARE_DISTANCE[p][G1])*kingStormBonus;
-			pawnStorm&= pawnStorm-1;
-		}
-		kingSafety[0]=max(ks,kingSafety[0]);
+		kingSafety[0]=std::max(evalShieldStorm<white>(*this, G1),kingSafety[0]);
 	}
 
 	if((st.castleRights & wCastleOOO)
 		&& !(attackedSquares[blackPieces] & (bitSet(E1)|bitSet(D1)|bitSet(C1) ))
 		&& !(bitBoard[occupiedSquares] & (bitSet(D1)|bitSet(C1)|bitSet(B1)))
 		){
-		simdScore ks=0;
-		bitMap localKingRing=Movegen::attackFromKing(C1);
-		bitMap localKingShield=localKingRing;
-		localKingRing|=Movegen::attackFromKing(C2);
-		bitMap localKingFarShield=localKingRing&~(localKingShield);
-
-		pawnShield=localKingShield&bitBoard[whitePawns];
-		pawnFarShield=localKingFarShield&bitBoard[whitePawns];
-		pawnStorm=PASSED_PAWN[white][C1]&bitBoard[blackPawns];
-
-		if(pawnShield){
-			ks=bitCnt(pawnShield)*kingShieldBonus;
-		}
-		if(pawnFarShield){
-			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
-		}
-		while(pawnStorm){
-			tSquare p=firstOne(pawnStorm);
-			ks-=(8-SQUARE_DISTANCE[p][C1])*kingStormBonus;
-			pawnStorm&= pawnStorm-1;
-		}
-		kingSafety[0]=max(ks,kingSafety[0]);
+		kingSafety[0]=std::max(evalShieldStorm<white>(*this, C1),kingSafety[0]);
 	}
-	wScore=kingSafety[0];
+	wScore=simdScore(kingSafety[0],0,0,0);
 
 
-	ksq=pieceList[blackKing][0];
-
-	pawnShield=kingShield[black]&bitBoard[blackPawns];
-	pawnFarShield=kingFarShield[black]&bitBoard[blackPawns];
-	pawnStorm=PASSED_PAWN[black][ksq]&bitBoard[whitePawns];
-	if(pawnShield){
-		kingSafety[1]+=bitCnt(pawnShield)*kingShieldBonus;
-	}
-	if(pawnFarShield){
-		kingSafety[1]+=bitCnt(pawnFarShield)*kingFarShieldBonus;
-	}
-	while(pawnStorm){
-		tSquare p=firstOne(pawnStorm);
-		kingSafety[1]-=(8-SQUARE_DISTANCE[p][ksq])*kingStormBonus;
-		pawnStorm&= pawnStorm-1;
-	}
+	kingSafety[1]=evalShieldStorm<black>(*this, pieceList[blackKing][0]);
 
 	if((st.castleRights & bCastleOO)
 		&& !(attackedSquares[whitePieces] & (bitSet(E8)|bitSet(F8)|bitSet(G8) ))
 		&& !(bitBoard[occupiedSquares] & (bitSet(F8)|bitSet(G8)))
 		){
-		simdScore ks=0;
-		bitMap localKingRing=Movegen::attackFromKing(G8);
-		bitMap localKingShield=localKingRing;
-		localKingRing|=Movegen::attackFromKing(G7);
-		bitMap localKingFarShield=localKingRing&~(localKingShield);
 
-		pawnShield=localKingShield&bitBoard[blackPawns];
-		pawnFarShield=localKingFarShield&bitBoard[blackPawns];
-		pawnStorm=PASSED_PAWN[black][G8]&bitBoard[whitePawns];
-		if(pawnShield){
-			ks=bitCnt(pawnShield)*kingShieldBonus;
-		}
-		if(pawnFarShield){
-			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
-		}
-		while(pawnStorm){
-			tSquare p=firstOne(pawnStorm);
-			ks-=(8-SQUARE_DISTANCE[p][G8])*kingStormBonus;
-			pawnStorm&= pawnStorm-1;
-		}
-		kingSafety[1]=max(ks,kingSafety[1]);
+		kingSafety[1]=std::max(evalShieldStorm<black>(*this, G8),kingSafety[1]);
 	}
 
 	if((st.castleRights & bCastleOOO)
 		&& !(attackedSquares[whitePieces] & (bitSet(E8)|bitSet(D8)|bitSet(C8) ))
 		&& !(bitBoard[occupiedSquares] & (bitSet(D8)|bitSet(C8)|bitSet(B8)))
 		){
-		simdScore ks=0;
-		bitMap localKingRing=Movegen::attackFromKing(C8);
-		bitMap localKingShield=localKingRing;
-		localKingRing|=Movegen::attackFromKing(C7);
-		bitMap localKingFarShield=localKingRing&~(localKingShield);
-
-		pawnShield=localKingShield&bitBoard[blackPawns];
-		pawnFarShield=localKingFarShield&bitBoard[blackPawns];
-		pawnStorm=PASSED_PAWN[black][C8]&bitBoard[whitePawns];
-		if(pawnShield){
-			ks=bitCnt(pawnShield)*kingShieldBonus;
-		}
-		if(pawnFarShield){
-			ks+=bitCnt(pawnFarShield)*kingFarShieldBonus;
-		}
-		while(pawnStorm){
-			tSquare p=firstOne(pawnStorm);
-			ks-=(8-SQUARE_DISTANCE[p][C8])*kingStormBonus;
-			pawnStorm&= pawnStorm-1;
-		}
-		kingSafety[1]=max(ks,kingSafety[1]);
+		kingSafety[1]=std::max(evalShieldStorm<black>(*this, C8),kingSafety[1]);
 	}
-	bScore=kingSafety[1];
+	bScore=simdScore(kingSafety[1],0,0,0);
 
-	res+=kingSafety[0]-kingSafety[1];
+	res+=simdScore(kingSafety[0]-kingSafety[1],0,0,0);
 
 
 
@@ -1821,7 +1738,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[white] * kingAttackersWeight[white]) / 2)
 		                     + 3 * (kingAdjacentZoneAttacksCount[white] + bitCnt(undefendedSquares))
 		                     + KingExposed[63-pieceList[blackKing][0]]
-		                     - kingSafety[0][0] / 500;
+		                     - kingSafety[0] / 500;
 
 
 		// safe contact queen check
@@ -1889,7 +1806,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[black] * kingAttackersWeight[black]) / 2)
 							 + 3 * (kingAdjacentZoneAttacksCount[black] + bitCnt(undefendedSquares))
 							 + KingExposed[pieceList[whiteKing][0]]
-							 - kingSafety[1][0] / 500;
+							 - kingSafety[1] / 500;
 
 		// safe contact queen check
 		bitMap safeContactSquare=undefendedSquares & attackedSquares[blackQueens];
