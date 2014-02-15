@@ -348,7 +348,7 @@ void search::startThinking(Position & p,searchLimits & l){
 
 		my_thread::timeMan.depth=depth;
 		unsigned long time=my_thread::timeMan.minSearchTime;
-		my_thread::timeMan.allocatedTime=std::max(time,(unsigned long int)(my_thread::timeMan.allocatedTime*0.87));
+		my_thread::timeMan.allocatedTime=std::max(time,(unsigned long int)(my_thread::timeMan.allocatedTime*0.90));
 		//sync_cout<<"nuovo tempo allocato="<<my_thread::timeMan.allocatedTime<<sync_endl;
 
 		my_thread::timeMan.idLoopIterationFinished=true;
@@ -715,8 +715,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		depth>=5*ONE_PLY &&
 		!actualState.skipNullMove &&
 		abs(beta)<SCORE_KNOWN_WIN
+		//eval> beta-40000
 		//&& abs(beta)<SCORE_MATE_IN_MAX_PLY
 	){
+
 		Score s;
 		Score rBeta=beta+8000;
 		int rDepth=depth -ONE_PLY- 3*ONE_PLY;

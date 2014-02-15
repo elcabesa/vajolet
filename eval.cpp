@@ -757,7 +757,6 @@ const materialStruct* getMaterialData(const Position& p){
 
 template<color c>
 simdScore evalPawn(const Position & p,tSquare sq, bitMap & weakPawns, bitMap & passedPawns){
-
 	simdScore res=0;
 
 	bool passed, isolated, doubled, opposed, chain, backward;
@@ -854,7 +853,7 @@ simdScore evalPawn(const Position & p,tSquare sq, bitMap & weakPawns, bitMap & p
 }
 
 template<Position::bitboardIndex piece>
-simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap * const kingRing,unsigned int * const kingAttackersCount,unsigned int * const kingAttackersWeight,unsigned int * const kingAdjacentZoneAttacksCount){
+simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes,bitMap const blockedPawns, bitMap * const kingRing,unsigned int * const kingAttackersCount,unsigned int * const kingAttackersWeight,unsigned int * const kingAdjacentZoneAttacksCount){
 	simdScore res=0;
 	bitMap tempPieces=p.bitBoard[piece];
 	bitMap enemyKing =(piece>Position::separationBitmap)? p.bitBoard[Position::whiteKing]:p.bitBoard[Position::blackKing];
@@ -1006,6 +1005,14 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 					res += bishopOnHole;
 				}
 
+			}
+			// alfiere cattivo
+			{
+				int color =SQUARE_COLOR[sq];
+				bitMap blockingPawns=ourPieces & blockedPawns & BITMAP_COLOR[color];
+				if(moreThanOneBit(blockingPawns)){
+					res-=bitCnt(blockingPawns)*simdScore(200,130,0,0);
+				}
 			}
 
 			break;
@@ -1216,6 +1223,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 
 
+
 	//----------------------------------------------
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
@@ -1328,6 +1336,12 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	}
 
 
+	//-----------------------------------------
+	//	blocked pawns
+	//-----------------------------------------
+
+	bitMap blockedPawns=(bitBoard[whitePawns]<<8) & bitBoard[blackPawns];
+	blockedPawns|=blockedPawns>>8;
 
 
 
@@ -1337,8 +1351,8 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 	simdScore wScore;
 	simdScore bScore;
-	wScore=evalPieces<Position::whiteKnights>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	bScore=evalPieces<Position::blackKnights>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteKnights>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	bScore=evalPieces<Position::blackKnights>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "knights" << " |"
@@ -1351,8 +1365,8 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		traceRes=res;
 	}
 
-	wScore=evalPieces<Position::whiteBishops>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	bScore=evalPieces<Position::blackBishops>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteBishops>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	bScore=evalPieces<Position::blackBishops>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "bishops" << " |"
@@ -1365,8 +1379,8 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		traceRes=res;
 	}
 
-	wScore=evalPieces<Position::whiteRooks>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	bScore=evalPieces<Position::blackRooks>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteRooks>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	bScore=evalPieces<Position::blackRooks>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "rooks" << " |"
@@ -1379,8 +1393,8 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		traceRes=res;
 	}
 
-	wScore=evalPieces<Position::whiteQueens>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	bScore=evalPieces<Position::blackQueens>(*this,weakSquares,attackedSquares,holes,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteQueens>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	bScore=evalPieces<Position::blackQueens>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "queens" << " |"
@@ -1724,7 +1738,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 	if(kingAttackersCount[white]>=2 && kingAdjacentZoneAttacksCount[white])
 	{
-		res+=kingSafety[0];
+		//res+=simdScore(kingSafety[0],0,0,0);
 
 		bitMap undefendedSquares=
 			attackedSquares[whitePieces]& attackedSquares[blackKing];
@@ -1793,7 +1807,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	if(kingAttackersCount[black]>=2 && kingAdjacentZoneAttacksCount[black])
 	{
 
-		res-=kingSafety[1];
+		//res-=simdScore(kingSafety[1],0,0,0);
 		bitMap undefendedSquares=
 			attackedSquares[blackPieces] & attackedSquares[whiteKing];
 		undefendedSquares&=

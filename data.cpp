@@ -59,6 +59,7 @@ const int SQUARE_COLOR[squareNumber]={
 	0,1,0,1,0,1,0,1,
 	1,0,1,0,1,0,1,0
 };
+bitMap BITMAP_COLOR[2];
 
 bitMap RANKMASK[squareNumber];			//!< bitmask of a rank given a square on the rank
 bitMap FILEMASK[squareNumber];			//!< bitmask of a file given a square on the rank
@@ -312,6 +313,18 @@ void initData(void){
 		for(int square2=0;square2<squareNumber;square2++){
 
 			SQUARE_DISTANCE[square][square2]=std::max(std::abs(FILES[square]-FILES[square2]),std::abs(RANKS[square]-RANKS[square2]));
+		}
+	}
+
+	BITMAP_COLOR[0]=0;
+	BITMAP_COLOR[1]=0;
+
+	for(int square=0;square<squareNumber;square++){
+		if(SQUARE_COLOR[square]){
+			BITMAP_COLOR[1] |=BITSET[square];
+		}
+		else{
+			BITMAP_COLOR[0] |=BITSET[square];
 		}
 	}
 

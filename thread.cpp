@@ -113,7 +113,7 @@ void my_thread::timerThread() {
 				}
 			}
 
-			if(timeMan.idLoopIterationFinished && time>=timeMan.allocatedTime*0.6 && !(limits.infinite || limits.ponder)){
+			if(timeMan.idLoopIterationFinished && time>=timeMan.allocatedTime*0.8 && !(limits.infinite || limits.ponder)){
 				src.signals.stop=true;
 			}
 
