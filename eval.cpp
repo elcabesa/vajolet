@@ -1887,6 +1887,10 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 	//sync_cout<<"kingSafety:"<<res[0]<<":"<<res[1]<<sync_endl;
 	//todo scaling
+	if(pieceCount[whitePawns]+pieceCount[whitePawns]==0){
+		mulCoeff=102;
+	}
+
 
 
 

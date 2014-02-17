@@ -201,6 +201,7 @@ void search::startThinking(Position & p,searchLimits & l){
 			//sync_cout<<"PVIdx="<<PVIdx<<sync_endl;
 
 
+
 			if (depth >= 5)
 			{
 				delta = 800;
@@ -237,6 +238,7 @@ void search::startThinking(Position & p,searchLimits & l){
 				}
 			}
 
+			unsigned int reduction=0;
 
 			do{
 
@@ -245,7 +247,7 @@ void search::startThinking(Position & p,searchLimits & l){
 				newPV.clear();
 				p.cleanStateInfo();
 				//sync_cout<<"search line "<<PVIdx<<sync_endl;
-				res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,depth*ONE_PLY,alpha,beta,newPV);
+				res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,(depth-reduction)*ONE_PLY,alpha,beta,newPV);
 
 				/*sync_cout<<"FINISHED SEARCH"<<sync_endl;
 				sync_cout<<"res="<<res<<sync_endl;
@@ -264,7 +266,7 @@ void search::startThinking(Position & p,searchLimits & l){
 						it->score=res;
 						it->previousScore=res;
 						it->selDepth=selDepth-selDepthBase;
-						it->depth=depth;
+						it->depth=depth-reduction;
 						it->nodes=visitedNodes;
 						it->time= now-startTime;
 					}
@@ -278,7 +280,7 @@ void search::startThinking(Position & p,searchLimits & l){
 					//sync_cout<<"res<=alpha "<<sync_endl;
 
 					//my_thread::timeMan.idLoopRequestToExtend=true;
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
+					printPV(res,depth-reduction,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
 					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 
 					TT.store(p.getActualState().key, transpositionTable::scoreToTT(rootMoves[PVIdx].previousScore, 0),typeExact,depth*ONE_PLY, (rootMoves[PVIdx].PV[0]).packed, p.eval<false>(pawnHashTable, evalHashTable));
@@ -290,8 +292,11 @@ void search::startThinking(Position & p,searchLimits & l){
 						//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 					}
 					//sync_cout<<"res>=beta "<<sync_endl;
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
+					printPV(res,depth-reduction,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
 					beta = std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
+					if(depth>1){
+						reduction=1;
+					}
 					//sync_cout<<"new beta "<<beta<<sync_endl;
 				}else{
 					break;
