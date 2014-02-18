@@ -20,6 +20,7 @@
 #include "vajolet.h"
 #include "position.h"
 #include "move.h"
+#include "history.h"
 #include "eval.h"
 #include <vector>
 #include <list>
@@ -73,6 +74,7 @@ inline Score matedIn(int ply) {
 
 class search{
 
+	History history;
 	static Score futility[5];
 	static Score futilityMargin[7];
 	static Score FutilityMoveCounts[11];

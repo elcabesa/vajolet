@@ -487,7 +487,8 @@ Move PolyglotBook::probe(const Position& pos, const std::string& fName, bool pic
 
 	Move mm;
 	mm.packed=0;
-	Movegen mg(pos,mm);
+	History h;
+	Movegen mg(pos,h,mm);
 	while((mm=mg.getNextMove()).packed){
 		if(m.from==mm.from && m.to==mm.to)
 		{

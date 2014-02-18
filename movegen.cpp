@@ -1276,7 +1276,7 @@ Move  Movegen::getNextMove(){
 		case generateQuietMoves:
 			generateMoves<Movegen::genType::quietMg>();
 			for(unsigned int i=moveListPosition;i<moveListSize;i++){
-				moveList[i].score=History::instance().getValue(pos.squares[moveList[i].m.from],(tSquare)moveList[i].m.to);
+				moveList[i].score=h.getValue(pos.squares[moveList[i].m.from],(tSquare)moveList[i].m.to);
 			}
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
@@ -1296,7 +1296,7 @@ Move  Movegen::getNextMove(){
 		case generateQuietCheks:
 			generateMoves<Movegen::quietChecksMg>();
 			for(unsigned int i=moveListPosition;i<moveListSize;i++){
-				moveList[i].score=History::instance().getValue(pos.squares[moveList[i].m.from],(tSquare)moveList[i].m.to);
+				moveList[i].score=h.getValue(pos.squares[moveList[i].m.from],(tSquare)moveList[i].m.to);
 			}
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;

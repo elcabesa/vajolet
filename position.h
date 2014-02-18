@@ -459,7 +459,7 @@ public:
 			//s.killers[1].packed=0;
 			s.skipNullMove=true;
 			s.excludedMove=0;
-			s.currentMove=0;
+			//s.currentMove=0;
 		}
 	}
 

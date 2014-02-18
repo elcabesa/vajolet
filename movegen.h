@@ -87,13 +87,14 @@ private:
 
 
 	const Position & pos;
+	const History & h;
 	Move ttMove;
 
 
 
 public:
 	Move killerMoves[2];
-	Movegen(const Position & p, Move & ttm): pos(p)
+	Movegen(const Position & p,const History & his, Move & ttm): pos(p), h(his)
 	{
 		ttMove=ttm;
 		Position::state &s =pos.getActualState();

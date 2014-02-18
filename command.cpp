@@ -80,7 +80,8 @@ Move moveFromUci(Position& pos, std::string& str) {
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
 	Move m;
 	m=0;
-	Movegen mg(pos,m);
+	History h;
+	Movegen mg(pos,h,m);
 
 	while( (m=mg.getNextMove()).packed){
 		if(str==pos.displayUci(m)){
@@ -224,9 +225,9 @@ void setoption(std::istringstream& is) {
 		}
 	}
 	else if(name =="UCI_Elo"){
-			int i=stoi(value);
-			search::eloStrenght=i<3000?(i>1000?i:1000):3000;
-		}
+		int i=stoi(value);
+		search::eloStrenght=i<3000?(i>1000?i:1000):3000;
+	}
 	else{
 		sync_cout << "No such option: " << name << sync_endl;
 	}

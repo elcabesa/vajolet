@@ -28,10 +28,6 @@
 
 class History{
 public :
-	static History& instance(){
-	  static History instance;
-	  return instance;
-	}
 
 	void clear() { std::memset(table, 0, sizeof(table)); }
 
@@ -51,15 +47,16 @@ public :
 			while(1);
 		}*/
 	}
-	inline Score getValue(Position::bitboardIndex p, tSquare to){
+	inline Score getValue(Position::bitboardIndex p, tSquare to) const {
 		assert(p<Position::lastBitboard);
 		assert(to<squareNumber);
 		return table[p][to];
 	}
 
+	History(){}
 private:
 
-	History(){}
+
 	static const Score Max = Score(500000);
 	Score table[Position::lastBitboard][squareNumber];
 };

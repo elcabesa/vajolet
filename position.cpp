@@ -1107,7 +1107,8 @@ unsigned long long Position::perft(unsigned int depth){
 	unsigned long long tot = 0;
 	Move m;
 	m=0;
-	Movegen mg(*this,m);
+	History h;
+	Movegen mg(*this,h,m);
 #ifdef FAST_PERFT
 	if(depth==1){
 		mg.generateMoves<Movegen::allMg>();
@@ -1133,7 +1134,8 @@ unsigned long long Position::divide(unsigned int depth){
 
 	Move m;
 	m=0;
-	Movegen mg(*this,m);
+	History h;
+	Movegen mg(*this,h,m);
 	unsigned long long tot = 0;
 	unsigned int mn=0;
 	while ((m=mg.getNextMove()).packed) {
@@ -1327,7 +1329,8 @@ bool Position::isDraw() const {
 		}
 		Move m;
 		m=0;
-		Movegen mg(*this,m);
+		History h;
+		Movegen mg(*this,h,m);
 		mg.generateMoves<Movegen::genType::allMg>();
 		if(mg.getGeneratedMoveNumber()){
 			return true;
