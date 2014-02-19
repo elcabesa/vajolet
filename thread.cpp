@@ -68,19 +68,17 @@ void timeManagerInit(Position& pos, searchLimits& lim, timeManagementStruct& tim
 
 volatile bool my_thread::quit=false;
 volatile bool my_thread::startThink=false;
-Position *my_thread::pos;
-search my_thread::src;
+
+
 timeManagementStruct my_thread::timeMan;
-searchLimits my_thread::limits;
 
-
-std::mutex my_thread::searchMutex;
-std::condition_variable my_thread::searchCond;
-std::condition_variable my_thread::timerCond;
 
 unsigned long my_thread::startTime;
 unsigned long my_thread::lastHasfullMessage;
 
+
+my_thread * my_thread::pInstance;
+std::mutex  my_thread::_mutex;
 
 
 void my_thread::timerThread() {
@@ -164,8 +162,8 @@ void my_thread::searchThread() {
 
 
 void my_thread::initThreads(){
-	timer=std::thread(timerThread);
-	searcher=std::thread(searchThread);
+	timer=std::thread(&my_thread::timerThread,this);
+	searcher=std::thread(&my_thread::searchThread,this);
 	src.signals.stop=true;
 }
 

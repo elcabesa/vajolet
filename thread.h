@@ -42,34 +42,54 @@ typedef struct timeManagement{
 
 class my_thread{
 
+	my_thread(){
+		initThreads();
+	};
+
+	static my_thread * pInstance;
 
 
 	volatile static bool quit;
 	volatile static bool startThink;
 	std::thread timer;
 	std::thread searcher;
-	static std::mutex searchMutex;
-	static std::condition_variable searchCond;
-	static std::condition_variable timerCond;
-	static Position *pos;
-	static search src;
-	static searchLimits limits;
+	std::mutex searchMutex;
+	std::condition_variable searchCond;
+	std::condition_variable timerCond;
+	Position *pos;
+	search src;
+	searchLimits limits;
 
 	static unsigned long startTime;
 	static unsigned long lastHasfullMessage;
 
 	void initThreads();
 	void quitThreads();
-	static void timerThread();
-	static void searchThread();
+	void timerThread();
+	void searchThread();
 public :
+
+	static std::mutex  _mutex;
+
+	static my_thread* getInstance()
+	{
+		if (!pInstance)
+		{
+			std::lock_guard<std::mutex> lock(_mutex);
+
+			if (!pInstance)
+			{
+				my_thread * temp = new my_thread;
+			    pInstance = temp;
+			}
+		}
+
+		return pInstance;
+	}
 	unsigned long long getVisitedNodes(){
 		return src.getVisitedNodes();
 	}
 	static timeManagementStruct timeMan;
-	my_thread(){
-		initThreads();
-	};
 	~my_thread(){
 		quitThreads();
 	}

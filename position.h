@@ -19,6 +19,7 @@
 
 #include <exception>
 #include <vector>
+#include <list>
 #include <string>
 #include "data.h"
 #include "vectorclass/vectorclass.h"
@@ -159,7 +160,7 @@ public:
 	static void initScoreValues(void);
 	static void initPstValues(void);
 	void display(void) const;
-	void displayFen(void) const;
+	std::string displayFen(void) const;
 	std::string getSymmetricFen() const;
 	void doNullMove(void);
 	void doMove(Move &m);
@@ -182,6 +183,7 @@ public:
 	Position()
 	{
 		stateIndex=0;
+		stateInfo.reserve(2000);
 	}
 
 	/*! \brief tell if the piece is a pawn
@@ -490,7 +492,7 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::vector< state> stateInfo;
+	std::vector<state> stateInfo;
 
 
 	/*! \brief put a piece on the board

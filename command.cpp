@@ -137,7 +137,7 @@ void static doPerft(unsigned int n, Position & pos){
 }
 
 
-void static go(std::istringstream& is, Position & pos, my_thread & thr) {
+void static go(std::istringstream& is, Position & pos, my_thread * thr) {
 	searchLimits limits;
 	std::string token;
 
@@ -165,7 +165,7 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr) {
         else if (token == "ponder")    limits.ponder = true;
     }
 
-    thr.startTinking(&pos,limits);
+    thr->startTinking(&pos,limits);
 }
 
 
@@ -288,7 +288,7 @@ void setvalue(std::istringstream& is) {
 	\date 21/10/2013
 */
 void uciLoop(){
-	my_thread thr;
+	my_thread *thr= my_thread::getInstance();
 	Position pos;
 	pos.setupFromFen(StartFEN);
 	std::string token, cmd;
@@ -306,7 +306,7 @@ void uciLoop(){
 			printUciInfo();
 		}
 		else if (token =="quit" || token =="stop"){
-			thr.stopThinking();
+			thr->stopThinking();
 		}
 		else if (token =="ucinewgame"){
 		}
@@ -354,7 +354,7 @@ void uciLoop(){
 			benchmark();
 		}
 		else if (token == "ponderhit"){
-			thr.ponderHit();
+			thr->ponderHit();
 		}
 		else{
 			sync_cout<<"unknown command"<<sync_endl;
