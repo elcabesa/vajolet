@@ -118,7 +118,7 @@ public:
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
 		bitMap checkers;	/*!< checking pieces*/
-		bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
+		//bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 		Move killers[2];	/*!< killer move at ply x*/
 		bool skipNullMove;
 		Move excludedMove;
@@ -251,6 +251,10 @@ public:
 	*/
 	inline void undoNullMove(void){
 		removeState();
+		std::swap(Us,Them);
+		assert(Us==getActualState().Us);
+		assert(Them==getActualState().Them);
+
 #ifdef ENABLE_CHECK_CONSISTENCY
 		checkPosConsistency(0);
 #endif
@@ -359,9 +363,9 @@ public:
 	std::string displayMove(Move & m)const {
 
 		std::string s;
-		state st=getActualState();
+		//state st=getActualState();
 
-		bool capture = (bitSet((tSquare)m.to) & st.Them[Pieces]);
+		bool capture = (bitSet((tSquare)m.to) & Them[Pieces]);
 		if(!isPawn(squares[m.from])){
 			s+=PIECE_NAMES_FEN[squares[m.from]%Position::separationBitmap];
 		}
@@ -582,7 +586,7 @@ public:
 	unsigned int pieceCount[lastBitboard];	// number of pieces indexed by bitboardIndex enum
 	tSquare pieceList[lastBitboard][64];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 64 pezzi di ogni tipo)
 	unsigned int index[squareNumber];		// indice del pezzo all'interno della sua lista
-
+	bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 
 };
 

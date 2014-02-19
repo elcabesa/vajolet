@@ -106,8 +106,12 @@ void Position::setupFromFen(const std::string& fenStr){
 
 	ss >> token;
 	x.nextMove = (token == 'w' ? whiteTurn : blackTurn);
-	x.Us=&bitBoard[x.nextMove];
-	x.Them=&bitBoard[(blackTurn-x.nextMove)];
+	//x.Us=&bitBoard[x.nextMove];
+	//x.Them=&bitBoard[(blackTurn-x.nextMove)];
+
+	Us=&bitBoard[x.nextMove];
+	Them=&bitBoard[(blackTurn-x.nextMove)];
+
 	ss >> token;
 
 	x.castleRights=(eCastle)0;
@@ -639,11 +643,16 @@ void Position::doNullMove(void){
 	x.pliesFromNull = 0;
 	x.skipNullMove=true;
 	x.nextMove= (eNextMove)(blackTurn-x.nextMove);
-	x.Us=&bitBoard[x.nextMove];
-	x.Them=&bitBoard[(blackTurn-x.nextMove)];
+	//x.Us=&bitBoard[x.nextMove];
+	//x.Them=&bitBoard[(blackTurn-x.nextMove)];
 	x.ply++;
 	x.capturedPiece=empty;
 	x.excludedMove=0;
+
+	std::swap(Us,Them);
+
+	assert(Us==getActualState().Us);
+	assert(Them==getActualState().Them);
 
 	calcCheckingSquares();
 	assert(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0]!=squareNone);
@@ -784,7 +793,7 @@ void Position::doMove(Move & m){
 
 		if(
 				abs(from-to)==16
-				&& (getAttackersTo((tSquare)((from+to)>>1))  & x.Them[Pawns])
+				&& (getAttackersTo((tSquare)((from+to)>>1))  & Them[Pawns])
 		){
 			x.epSquare=(tSquare)((from+to)>>1);
 			assert(x.epSquare<squareNumber);
@@ -819,17 +828,22 @@ void Position::doMove(Move & m){
 
 
 	x.nextMove= (eNextMove)(blackTurn-x.nextMove);
-	x.Us=&bitBoard[x.nextMove];
-	x.Them=&bitBoard[(blackTurn-x.nextMove)];
+	//x.Us=&bitBoard[x.nextMove];
+	//x.Them=&bitBoard[(blackTurn-x.nextMove)];
+
+	std::swap(Us,Them);
 	assert(x.Us);
 	assert(x.Them);
+
+	assert(Us==getActualState().Us);
+	assert(Them==getActualState().Them);
 
 	x.checkers=0;
 	if(moveIsCheck){
 
 		if(m.flags !=Move::fnone){
 			assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
-			x.checkers |= getAttackersTo(pieceList[whiteKing+x.nextMove][0]) & x.Them[Pieces];
+			x.checkers |= getAttackersTo(pieceList[whiteKing+x.nextMove][0]) & Them[Pieces];
 		}
 		else{
 			if(n.checkingSquares[piece] & bitSet(to)){
@@ -838,11 +852,11 @@ void Position::doMove(Move & m){
 			if(n.hiddenCheckersCandidate && (n.hiddenCheckersCandidate & bitSet(from))){
 				if(!isRook(piece)){
 					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
-					x.checkers|=Movegen::attackFromRook(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (x.Them[Queens] |x.Them[Rooks]);
+					x.checkers|=Movegen::attackFromRook(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
 				}
 				if(!isBishop(piece)){
 					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
-					x.checkers|=Movegen::attackFromBishop(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (x.Them[Queens] |x.Them[Bishops]);
+					x.checkers|=Movegen::attackFromBishop(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]);
 				}
 			}
 		}
@@ -913,6 +927,10 @@ void Position::undoMove(Move & m){
 		putPiece(x.capturedPiece,capSq);
 	}
 	removeState();
+
+	std::swap(Us,Them);
+	assert(Us==getActualState().Us);
+	assert(Them==getActualState().Them);
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(0);
@@ -1305,8 +1323,8 @@ bool Position::moveGivesCheck(Move& m)const {
 		bitMap captureSquare= FILEMASK[m.to] & RANKMASK[m.from];
 		bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.from)^bitSet((tSquare)m.to)^captureSquare;
 		return
-				(Movegen::attackFromRook(kingSquare, occ) & (s.Us[Queens] |s.Us[Rooks]))
-			   | (Movegen::attackFromBishop(kingSquare, occ) & (s.Us[Queens] |s.Us[Bishops]));
+				(Movegen::attackFromRook(kingSquare, occ) & (Us[Queens] |Us[Rooks]))
+			   | (Movegen::attackFromBishop(kingSquare, occ) & (Us[Queens] |Us[Bishops]));
 
 	}
 		break;

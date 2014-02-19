@@ -147,7 +147,7 @@ public:
 
 	static void initMovegenConstant(void);
 	template<Movegen::genType type>	void generateMoves();
-	static bool isMoveLegal(const Position&p, Move &m);
+	bool isMoveLegal(Move &m);
 	inline unsigned int getGeneratedMoveNumber(void){ return moveListSize;}
 
 	Move  getNextMove(void);

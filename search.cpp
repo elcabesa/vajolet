@@ -215,8 +215,8 @@ void search::startThinking(Position & p,searchLimits & l){
 			for(unsigned int i =0; i<=PVIdx; i++){
 				int n=0;
 				if(/*nodeType==typeExact && */rootMoves[i].PV.size()>0){
-					for (auto it= rootMoves[i].PV.begin(); it != rootMoves[i].PV.end() && Movegen::isMoveLegal(p,*it); ++it){
-							/*if(!Movegen::isMoveLegal(p,*it)){
+					for (auto it= rootMoves[i].PV.begin(); it != rootMoves[i].PV.end() && mg.isMoveLegal(*it); ++it){
+							/*if(!mg.isMoveLegal(*it)){
 								p.display();
 								sync_cout<<"move:"<<p.displayUci(*it)<<sync_endl;
 								sync_cout<<"packed:"<<(*it).packed<<sync_endl;
@@ -487,7 +487,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		}
 
 
-		if(ttMove.packed && Movegen::isMoveLegal(pos,ttMove)){
+		Movegen mg(pos,history,ttMove);
+		if(ttMove.packed && mg.isMoveLegal(ttMove)){
 			PV.clear();
 			PV.push_back(ttMove);
 		}
@@ -1256,7 +1257,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	{
 		TT.refresh(tte);
 
-		/*if(ttMove.packed && Movegen::isMoveLegal(pos,ttMove)){
+		/*if(ttMove.packed && Movegen::isMoveLegal(ttMove)){
 			PV.clear();
 			PV.push_back(ttMove);
 		}*/
