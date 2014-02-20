@@ -102,7 +102,7 @@ void my_thread::timerThread() {
 				}*/
 				src.signals.stop=true;
 			}
-
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			if(time - lastHasfullMessage>1000){
 				lastHasfullMessage=time;
 				sync_cout<<"info hashfull "<<TT.getFullness()<<sync_endl;
@@ -110,6 +110,7 @@ void my_thread::timerThread() {
 					src.showLine=true;
 				}
 			}
+#endif
 
 			if(timeMan.idLoopIterationFinished && time>=timeMan.allocatedTime*0.8 && !(limits.infinite || limits.ponder)){
 				src.signals.stop=true;

@@ -1042,10 +1042,13 @@ Score evalShieldStorm(const Position &pos, tSquare ksq){
 	Score ks=0;
 	const bitMap ourPawns =c?pos.bitBoard[Position::blackPawns]:pos.bitBoard[Position::whitePawns];
 	const bitMap theirPawns =c?pos.bitBoard[Position::whitePawns]:pos.bitBoard[Position::blackPawns];
-
+	const unsigned int disableRank= c? 0: 7;
 	bitMap localKingRing=Movegen::attackFromKing(ksq);
 	bitMap localKingShield=localKingRing;
+	if(RANKS[ksq]!=disableRank)
+	{
 	localKingRing|=Movegen::attackFromKing(ksq+pawnPush(c));
+	}
 	bitMap localKingFarShield=localKingRing&~(localKingShield);
 
 	bitMap pawnShield=localKingShield&ourPawns;
@@ -1697,7 +1700,6 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	Score kingSafety[2]={0,0};
 
 	kingSafety[0]=evalShieldStorm<white>(*this, pieceList[whiteKing][0]);
-
 	if((st.castleRights & wCastleOO)
 		&& !(attackedSquares[blackPieces] & (bitSet(E1)|bitSet(F1)|bitSet(G1) ))
 		&& !(bitBoard[occupiedSquares] & (bitSet(F1)|bitSet(G1)))
@@ -1715,7 +1717,6 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 
 	kingSafety[1]=evalShieldStorm<black>(*this, pieceList[blackKing][0]);
-
 	if((st.castleRights & bCastleOO)
 		&& !(attackedSquares[whitePieces] & (bitSet(E8)|bitSet(F8)|bitSet(G8) ))
 		&& !(bitBoard[occupiedSquares] & (bitSet(F8)|bitSet(G8)))
@@ -1733,8 +1734,6 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	bScore=simdScore(kingSafety[1],0,0,0);
 
 	res+=simdScore(kingSafety[0]-kingSafety[1],0,0,0);
-
-
 
 	if(kingAttackersCount[white]>=2 && kingAdjacentZoneAttacksCount[white])
 	{
@@ -1873,6 +1872,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 	}
 
+
 	if(trace){
 		sync_cout << std::setw(20) << "king safety" << " |"
 				  << std::setw(6)  << (wScore[0])/10000.0 << " "
@@ -1887,7 +1887,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 	//sync_cout<<"kingSafety:"<<res[0]<<":"<<res[1]<<sync_endl;
 	//todo scaling
-	if(pieceCount[whitePawns]+pieceCount[whitePawns]==0){
+	if(pieceCount[whitePawns]+pieceCount[blackPawns]==0){
 		mulCoeff=102;
 	}
 

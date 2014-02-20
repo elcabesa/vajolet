@@ -400,6 +400,7 @@ void search::startThinking(Position & p,searchLimits & l){
 
 template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,std::vector<Move>& PV){
 
+	//bool verbose=false;
 #ifdef PRINT_STATISTICS
 	Score originalAlpha=alpha;
 #endif
@@ -408,7 +409,14 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 	assert(PV.size()==0);
-	//sync_cout<<"alpha beta depth="<<(depth/ONE_PLY)<<sync_endl;
+	/*if(visitedNodes>598000 && visitedNodes<670000){
+		sync_cout<<"AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
+	}
+	if(pos.displayFen()=="3q1N2/p7/1pb5/5p2/1Q5P/5P2/2P3P1/1k5K b - - 2 3"){
+		sync_cout<<"eccomi"<<sync_endl;
+		//verbose=true;
+	}*/
+	//if(verbose){sync_cout<<"eccomi"<<sync_endl;}
 	visitedNodes++;
 	Position::state & actualState=pos.getActualState();
 	const bool PVnode=(type==search::nodeType::PV_NODE || type==search::nodeType::ROOT_NODE);
@@ -517,6 +525,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
 		if(test!=eval){
 			pos.display();
+			while(1);
 		}
 #endif
 	}
@@ -548,6 +557,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
 			if(test!=eval){
 				pos.display();
+				while(1);
 			}
 #endif
 		}
@@ -899,9 +909,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			unsigned long elapsed=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
 			if(
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-				elapsed>3000
+				elapsed>3000 &&
 #endif
-				&& !signals.stop
+				!signals.stop
 				){
 				sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<<" time "<<elapsed << sync_endl;
 			}
@@ -1208,8 +1218,13 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	assert(beta<=SCORE_INFINITE);
 	assert(alpha>=-SCORE_INFINITE);
 
-	Position::state & actualState=pos.getActualState();
 
+
+	/*if(visitedNodes>598000 && visitedNodes<670000){
+		sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
+	}*/
+
+	Position::state & actualState=pos.getActualState();
 	const bool PVnode=(type==search::nodeType::PV_NODE);
 	assert(PVnode || alpha+1==beta);
 	bool inCheck=actualState.checkers;
@@ -1290,6 +1305,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
 		if(test!=staticEval){
 			pos.display();
+			while(1);
 		}
 #endif
 		bestScore=-SCORE_INFINITE;
@@ -1297,6 +1313,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	else{
 		if(tte)
 		{
+
 			staticEval=tte->getStaticValue();
 		}
 		else
@@ -1308,6 +1325,8 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 			Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
 			if(test!=staticEval){
 				pos.display();
+
+				while(1);
 			}
 #endif
 		}
@@ -1365,6 +1384,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 			if (futilityValue < beta)
 			{
+
 				bestScore = std::max(bestScore, futilityValue);
 				continue;
 			}
