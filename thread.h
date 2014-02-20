@@ -98,6 +98,7 @@ public :
 		src.signals.stop=true;
 		lastHasfullMessage=0;
 
+
 		//sync_cout<<"STOOOOOOPPPPE"<<sync_endl;
 		while(startThink){
 			//sync_cout<<"attesa"<<sync_endl;

@@ -38,7 +38,36 @@
 
 
 class Position{
-public:
+	public:
+	Position(const Position& other)
+	    : stateIndex(other.stateIndex), // calls the copy constructor of the age
+		stateInfo(other.stateInfo)
+	{
+		for(int i=0;i<squareNumber;i++){
+			squares[i]=other.squares[i];
+			index[i]=other.index[i];
+		}
+		for(int i=0;i<lastBitboard;i++){
+			bitBoard[i]=other.bitBoard[i];
+			pieceCount[i]=other.pieceCount[i];
+			for(int n=0;n<64;n++){
+				pieceList[i][n] =other.pieceList[i][n];
+			}
+		}
+
+		/*if(stateIndex!=0){
+			actualState= &stateInfo[stateIndex-1];
+		}
+		else{
+			actualState=nullptr;
+		}*/
+
+
+		Us=&bitBoard[getActualState().nextMove];
+		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
+	};
+
+
 	/*! \brief define the index of the bitboards
 		\author Marco Belli
 		\version 1.0
@@ -124,6 +153,38 @@ public:
 		Move excludedMove;
 		Move currentMove;
 
+		/*state(){}
+		state(const state& other){
+			key=other.key;
+			pawnKey=other.pawnKey;
+			materialKey=other.materialKey;
+			nonPawnMaterial[0]=other.nonPawnMaterial[0];
+			nonPawnMaterial[1]=other.nonPawnMaterial[1];
+			nonPawnMaterial[2]=other.nonPawnMaterial[2];
+			nonPawnMaterial[3]=other.nonPawnMaterial[3];
+			nextMove=other.nextMove;
+			castleRights=other.castleRights;
+			epSquare=other.epSquare;
+			fiftyMoveCnt=other.fiftyMoveCnt;
+			pliesFromNull=other.fiftyMoveCnt;
+			ply=other.ply;
+			capturedPiece=other.capturedPiece;
+			material[0]=other.material[0];
+			material[1]=other.material[1];
+
+			for(int i=0;i<lastBitboard;i++){
+				checkingSquares[i]=other.checkingSquares[i];
+			}
+			hiddenCheckersCandidate=other.hiddenCheckersCandidate;
+			pinnedPieces=other.pinnedPieces;
+			checkers=other.checkers;
+			killers[0]=other.killers[0];
+			killers[1]=other.killers[1];
+			skipNullMove=other.skipNullMove;
+			excludedMove=other.excludedMove;
+			currentMove=other.currentMove;
+		}*/
+
 	};
 
 	/*! \brief helper mask used to speedup castle right management
@@ -137,7 +198,7 @@ public:
 private:
 
 	unsigned int stateIndex;
-	state * actualState;
+	//state * actualState;
 	/*! \brief array of char to create the fen string
 		\author Marco Belli
 		\version 1.0
@@ -183,7 +244,7 @@ public:
 	Position()
 	{
 		stateIndex=0;
-		stateInfo.reserve(2000);
+		stateInfo.reserve(1);
 	}
 
 	/*! \brief tell if the piece is a pawn
@@ -277,7 +338,6 @@ public:
 			assert(stateIndex>=1);
 			assert(n<stateInfo.size());
 			return (state&) stateInfo[n];
-			//return (state&) *actualState;
 		}
 
 	/*! \brief insert a new state in memory
@@ -308,7 +368,7 @@ public:
 		}
 
 		stateIndex++;
-		actualState= &stateInfo[stateIndex-1];
+		//actualState= &stateInfo[stateIndex-1];
 	}
 
 	/*! \brief  remove the last state
@@ -320,7 +380,7 @@ public:
 	inline void removeState(){
 		assert(stateIndex>=1);
 		stateIndex--;
-		actualState= &stateInfo[stateIndex-1];
+		//actualState= &stateInfo[stateIndex-1];
 	}
 
 

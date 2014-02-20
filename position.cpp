@@ -314,7 +314,7 @@ void Position::clear() {
 		}
 	}
 	stateIndex=0;
-	actualState=nullptr;
+	//actualState=nullptr;
 	stateInfo.clear();
 }
 
