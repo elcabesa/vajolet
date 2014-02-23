@@ -939,7 +939,6 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 			res+=bitCnt(attack & bigCenterBitmap)*simdScore(100,0,0,0);
 		}
 
-		//todo alfiere buono cattivo
 		switch(piece){
 		case Position::whiteQueens:
 		case Position::blackQueens:
@@ -1076,6 +1075,7 @@ Score evalShieldStorm(const Position &pos, tSquare ksq){
 */
 template<bool trace>
 Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
+
 
 	state &st =getActualState();
 	evalEntry* probeEval= evalTable.probe(st.key);
@@ -1410,7 +1410,6 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		traceRes=res;
 	}
 
-	//todo valutazione pezzi
 
 	//sync_cout<<"pieces:"<<res[0]<<":"<<res[1]<<sync_endl;
 	attackedSquares[whiteKing]=Movegen::attackFromKing(pieceList[whiteKing][0]);
@@ -1674,6 +1673,12 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		}
 		weakPieces&=weakPieces-1;
 	}
+
+	// trapped pieces
+	// rook trapped on first rank by own king
+
+
+
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "threat" << " |"
