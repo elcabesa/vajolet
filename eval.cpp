@@ -867,6 +867,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	const bitMap & supportedSquares=(piece>Position::separationBitmap)? attackedSquares[Position::blackPawns]:attackedSquares[Position::whitePawns];
 	const bitMap & threatenSquares=(piece>Position::separationBitmap)? attackedSquares[Position::whitePawns]:attackedSquares[Position::blackPawns];
 	const bitMap ourPieces=(piece>Position::separationBitmap)? p.bitBoard[Position::blackPieces]:p.bitBoard[Position::whitePieces];
+	const bitMap ourPawns=(piece>Position::separationBitmap)? p.bitBoard[Position::blackPawns]:p.bitBoard[Position::whitePawns];
 	while(tempPieces){
 		tSquare sq=firstOne(tempPieces);
 		tempPieces&= tempPieces-1;
@@ -919,11 +920,11 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		attackedSquares[piece]|=attack;
 
 
-		bitMap defendedPieces=attack&ourPieces;
+		bitMap defendedPieces=attack&ourPieces&~ourPawns;
 		// piece coordination
-		res+=bitCnt(defendedPieces)*simdScore(200,180,0,0);
+		res+=bitCnt(defendedPieces)*simdScore(400,300,0,0);
 
-		unsigned int mobility= bitCnt(attack&~(threatenSquares/*|ourPieces*/));
+		unsigned int mobility= (bitCnt(attack&~(threatenSquares|ourPieces))+ bitCnt(attack&~(ourPieces)))/2;
 		//sync_cout<<mobility<<sync_endl;
 		res+=mobilityBonus[piece%Position::separationBitmap][mobility];
 		if(!(attack&~(threatenSquares|ourPieces)) && (threatenSquares&bitSet(sq))){ // zero mobility && attacked by pawn
