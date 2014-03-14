@@ -41,7 +41,6 @@ void transpositionTable::clear(){
 
 ttEntry* transpositionTable::probe(const U64 key) const {
 
-
 	ttCluster * ttc=findCluster(key);
 	assert(ttc!=nullptr);
 	unsigned int keyH = key >> 32;

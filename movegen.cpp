@@ -1339,7 +1339,7 @@ Move  Movegen::getNextMove(){
 				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
-		case iterateQuietcChecks:
+		case iterateQuietChecks:
 			if(moveListPosition<moveListSize){
 				Score bestScore=-SCORE_INFINITE;
 				unsigned int bestIndex=moveListPosition;

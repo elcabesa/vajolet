@@ -29,11 +29,157 @@
 #include "transposition.h"
 
 
+simdScore initialPieceValue[Position::lastBitboard]={
+		simdScore(0,0,0,0),
+		simdScore(3000000,3000000,0,0),//king
+		simdScore(137000,100000,0,0),//queen
+		simdScore(52000,61000,0,0),//rook
+		simdScore(35300,36100,0,0),//bishop
+		simdScore(34500,34900,0,0),//knight
+		simdScore(5700,10000,0,0),//panws
+		simdScore(0,0,0,0),
+		simdScore(0,0,0,0),
+		simdScore(0,0,0,0),
+		simdScore(0,0,0,0),
+		simdScore(0,0,0,0),
+		simdScore(0,0,0,0),
+		simdScore(0,0,0,0),
+		simdScore(0,0,0,0),
+		simdScore(0,0,0,0)
+};
+
+simdScore PawnD3=simdScore(1755,0,0,0);
+simdScore PawnD4=simdScore(2100,0,0,0);
+simdScore PawnD5=simdScore(85,0,0,0);
+simdScore PawnE3=simdScore(185,0,0,0);
+simdScore PawnE4=simdScore(620,0,0,0);
+simdScore PawnE5=simdScore(-5,0,0,0);
+simdScore PawnCentering=simdScore(141,-119,0,0);
+simdScore PawnRankBonus=simdScore(450,30,0,0);
+simdScore KnightPST=simdScore(545,462,0,0);
+simdScore BishopPST=simdScore(22,273,0,0);
+simdScore RookPST=simdScore(418,-290,0,0);
+simdScore QueenPST=simdScore(-170,342,0,0);
+simdScore KingPST=simdScore(700,787,0,0);
+
+simdScore BishopBackRankOpening=simdScore(400,-200,0,0);
+simdScore KnightBackRankOpening=simdScore(-800,-300,0,0);
+simdScore RookBackRankOpening=simdScore(-400,400,0,0);
+simdScore QueenBackRankOpening=simdScore(200,3900,0,0);
+simdScore BishopOnBigDiagonals=simdScore(1400,600,0,0);
+
+
+
+/* PST data */
+const int Center[8]	= { -3, -1, +0, +1, +1, +0, -1, -3};
+const int KFile[8]	= { +3, +4, +2, +0, +0, +2, +4, +3};
+const int KRank[8]	= { +1, +0, -2, -3, -4, -5, -6, -7};
 
 simdScore Position::pieceValue[lastBitboard];
 simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 int Position::castleRightsMask[squareNumber];
+
+void Position::initPstValues(void){
+	for(int piece=0;piece<lastBitboard;piece++){
+		for(tSquare s=(tSquare)0;s<squareNumber;s++){
+			assert(piece<lastBitboard);
+			assert(s<squareNumber);
+			nonPawnValue[piece]=0;
+			pstValue[piece][s]=0;
+			int rank=RANKS[s];
+			int file=FILES[s];
+
+			if(piece >occupiedSquares && piece <whitePieces ){
+
+				if(piece == Pawns){
+					pstValue[piece][s]=0;
+					if(s==D3){
+						pstValue[piece][s]=PawnD3;
+					}
+					if(s==D4){
+						pstValue[piece][s]=PawnD4;
+					}
+					if(s==D5){
+						pstValue[piece][s]=PawnD5;
+					}
+					if(s==E3){
+						pstValue[piece][s]=PawnE3;
+					}
+					if(s==E4){
+						pstValue[piece][s]=PawnE4;
+					}
+					if(s==E5){
+						pstValue[piece][s]=PawnE5;
+					}
+					pstValue[piece][s]+=PawnRankBonus*(rank-2);
+					pstValue[piece][s]+=Center[file]*PawnCentering;
+				}
+				if(piece== Knights){
+					pstValue[piece][s]=KnightPST*(Center[file]+Center[rank]);
+					if(rank==0){
+						pstValue[piece][s]-=KnightBackRankOpening;
+					}
+				}
+				if(piece== Bishops){
+					pstValue[piece][s]=BishopPST*(Center[file]+Center[rank]);
+					if(rank==0){
+						pstValue[piece][s]-=BishopBackRankOpening;
+					}
+					if((file==rank) || (file+rank==7)){
+						pstValue[piece][s]+=BishopOnBigDiagonals;
+					}
+				}
+				if(piece==Rooks){
+					pstValue[piece][s]=RookPST*(Center[file]);
+					if(rank==0){
+						pstValue[piece][s]-=RookBackRankOpening;
+					}
+				}
+				if(piece== Queens){
+					pstValue[piece][s]=QueenPST*(Center[file]+Center[rank]);
+					if(rank==0){
+						pstValue[piece][s]-=QueenBackRankOpening;
+					}
+				}
+				if(piece== King){
+					pstValue[piece][s]=simdScore(
+						(KFile[file]+KRank[rank])*KingPST[0],
+						(Center[file]+Center[rank])*KingPST[1],
+						0,0);
+				}
+				if(!isKing((bitboardIndex)piece)){
+					pstValue[piece][s]+=pieceValue[piece];
+				}
+
+				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
+					nonPawnValue[piece].insert(0,pieceValue[piece][0]);
+					nonPawnValue[piece].insert(1,pieceValue[piece][1]);
+				}
+
+			}
+			else if(piece >separationBitmap && piece <blackPieces ){
+				int r=7-rank;
+				int f =7-file;
+				pstValue[piece][s]=-pstValue[piece-separationBitmap][BOARDINDEX[f][r]];
+
+				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
+					nonPawnValue[piece].insert(2,-pieceValue[piece][0]);
+					nonPawnValue[piece].insert(3,-pieceValue[piece][1]);
+				}
+			}
+			else{
+				pstValue[piece][s]=0;
+			}
+		}
+	}
+
+	/*for(tSquare s=(tSquare)(squareNumber-1);s>=0;s--){
+		std::cout<<pstValue[whiteBishops][s][0]/10000.0<<" ";
+		if(s%8==0)std::cout<<std::endl;
+	}*/
+}
+
 
 /*! \brief setup a position from a fen string
 	\author Marco Belli
@@ -181,91 +327,7 @@ void Position::setupFromFen(const std::string& fenStr){
 }
 
 
-void Position::initPstValues(void){
-	for(int piece=0;piece<lastBitboard;piece++){
-		for(tSquare s=(tSquare)0;s<squareNumber;s++){
-			assert(piece<lastBitboard);
-			assert(s<squareNumber);
-			nonPawnValue[piece]=0;
-			pstValue[piece][s]=0;
-			int rank=RANKS[s];
-			int file=FILES[s];
 
-			if(piece >occupiedSquares && piece <whitePieces ){
-
-				if(piece == Pawns){
-					pstValue[piece][s]=0;
-					if(s== D5 || s==E5 || s== D3 || s==E3){
-						pstValue[piece][s].insert(0,935);
-					}
-					if(s== D4 || s==E4){
-						pstValue[piece][s].insert(0,1750);
-					}
-					pstValue[piece][s].insert(1,10*(rank-2));
-					pstValue[piece][s]-=std::abs(file-3.5);
-				}
-				if(piece== Knights){
-					pstValue[piece][s]=simdScore(
-							-(std::abs(file-3.5)+std::abs(rank-3.5))*95,
-							-(std::abs(file-3.5)+std::abs(rank-3.5))*32,
-							0,0);
-				}
-				if(piece== Bishops){
-					pstValue[piece][s]=simdScore(
-							-(std::abs(file-3.5)+std::abs(rank-3.5))*32,
-							-(std::abs(file-3.5)+std::abs(rank-3.5))*23,
-							0,0);
-				}
-				if(piece==Rooks){
-					pstValue[piece][s]=simdScore(
-						-std::abs(file-3.5)*28,
-						0,
-						0,0);
-				}
-				if(piece== Queens){
-					pstValue[piece][s]=simdScore(
-						0,
-						-(std::abs(file-3.5)+std::abs(rank-3.5))*42,
-						0,0);
-				}
-				if(piece== King){
-					pstValue[piece][s]=simdScore(
-						std::abs(file-3.5)*110+(1-rank)*150,
-						-(std::abs(file-3.5)+std::abs(rank-3.5))*127,
-
-						0,0);
-				}
-				if(!isKing((bitboardIndex)piece)){
-					pstValue[piece][s]+=pieceValue[piece];
-				}
-
-				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
-					nonPawnValue[piece].insert(0,pieceValue[piece][0]);
-					nonPawnValue[piece].insert(1,pieceValue[piece][1]);
-				}
-
-			}
-			else if(piece >separationBitmap && piece <blackPieces ){
-				int r=7-rank;
-				int f =7-file;
-				pstValue[piece][s]=-pstValue[piece-separationBitmap][BOARDINDEX[f][r]];
-
-				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
-					nonPawnValue[piece].insert(2,-pieceValue[piece][0]);
-					nonPawnValue[piece].insert(3,-pieceValue[piece][1]);
-				}
-			}
-			else{
-				pstValue[piece][s]=0;
-			}
-		}
-	}
-
-	/*for(tSquare s=(tSquare)(squareNumber-1);s>=0;s--){
-		std::cout<<pstValue[whiteKing][s][0]/10000.0<<" ";
-		if(s%8==0)std::cout<<std::endl;
-	}*/
-}
 
 /*! \brief init the score value in the static const
 	\author Marco Belli
@@ -276,12 +338,12 @@ void Position::initScoreValues(void){
 	for(auto &val :pieceValue){
 		val=0;
 	}
-	pieceValue[whitePawns]=simdScore(7800,10000,0,0);
-	pieceValue[whiteKnights]=simdScore(32000,32000,0,0);
-	pieceValue[whiteBishops]=simdScore(32500,32500,0,0);
-	pieceValue[whiteRooks]=simdScore(53000,53000,0,0);
-	pieceValue[whiteQueens]=simdScore(99000,99000,0,0);
-	pieceValue[whiteKing]=simdScore(3000000,3000000,0,0);
+	pieceValue[whitePawns]=initialPieceValue[whitePawns];
+	pieceValue[whiteKnights]=initialPieceValue[whiteKnights];
+	pieceValue[whiteBishops]=initialPieceValue[whiteBishops];
+	pieceValue[whiteRooks]=initialPieceValue[whiteRooks];
+	pieceValue[whiteQueens]=initialPieceValue[whiteQueens];
+	pieceValue[whiteKing]=initialPieceValue[whiteKing];
 
 	pieceValue[blackPawns]=-pieceValue[whitePawns];
 	pieceValue[blackKnights]=-pieceValue[whiteKnights];
@@ -1335,7 +1397,7 @@ bool Position::moveGivesCheck(Move& m)const {
 }
 
 
-bool Position::isDraw() const {
+bool Position::isDraw(bool isPVline) const {
 
 	// Draw by material?
 
@@ -1359,12 +1421,16 @@ bool Position::isDraw() const {
 	}
 
 	// Draw by repetition?
+	unsigned int counter=1;
 	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2){
 		unsigned int stateIndexPointer=stateIndex-1-i;
 		assert(stateIndex>=i+1);
 		const state* stp=&stateInfo[stateIndexPointer];
 		if(stp->key==getActualState().key){
-			return true;
+			counter++;
+			if(!isPVline || counter>=3){
+				return true;
+			}
 		}
 	}
 	return false;

@@ -27,6 +27,7 @@
 #include "statistics.h"
 #include "search.h"
 #include "eval.h"
+#include "tune.h"
 
 /*!	\brief	print the startup information
 	\author Marco Belli
@@ -69,12 +70,19 @@ int main()
 	initMaterialKeys();
 	initMobilityBonus();
 
-
-
 	//----------------------------------
 	//	main loop
 	//----------------------------------
 	printStartInfo();
+
+//	Tuner t;
+//	t.tuneParameters();
+	//t.parseEpd(true);
+	//t.createEpd();
+	//t.drawSigmoid();
+	//t.drawAverageEvolution();
+
+
 
 #ifdef PRINT_STATISTICS
 	Statistics::instance().initNodeTypeStat();

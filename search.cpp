@@ -30,6 +30,7 @@
 #include "book.h"
 #include "thread.h"
 
+
 inline signed int razorMargin(unsigned int depth){
 	return 20000+depth*78;
 }
@@ -442,7 +443,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 							search::nodeType::PV_NODE;
 
 	if(type !=search::nodeType::ROOT_NODE){
-		if(pos.isDraw() || signals.stop){
+		if(pos.isDraw(PVnode) || signals.stop){
 			//if(signals.stop){sync_cout<<"alpha beta initial Stop"<<sync_endl;}
 			return 0;
 		}
@@ -1235,7 +1236,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	}
 	visitedNodes++;
 
-	if(pos.isDraw() || signals.stop){
+	if(pos.isDraw(PVnode) || signals.stop){
 #ifdef PRINT_STATISTICS
 		Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
 #endif

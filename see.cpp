@@ -46,7 +46,9 @@ Score Position::see(Move m) const {
 	sync_cout<<displayUci(m)<<sync_endl;
 #endif
 
+
 	tSquare from=(tSquare)m.from, to=(tSquare)m.to;
+	const int relativeRank =getActualState().nextMove?7-RANKS[to] :RANKS[to];
 	bitMap occupied=bitBoard[occupiedSquares]^bitSet(from);
 //	displayBitMap(occupied);
 	eNextMove color=squares[from]>separationBitmap?blackTurn:whiteTurn;
@@ -57,13 +59,20 @@ Score Position::see(Move m) const {
 	bitboardIndex captured;
 
 	swapList[0] = pieceValue[squares[to]%separationBitmap][0];
+	captured = bitboardIndex(squares[from]%separationBitmap);
 
 	if(m.flags== Move::fenpassant){
 		occupied ^= to- pawnPush(color);
 		swapList[0] = pieceValue[whitePawns][0];
 	}
+	if(m.flags== Move::fcastle){
+		return 0;
+	}
 	if(m.flags== Move::fpromotion){
-		swapList[0] =pieceValue[whiteQueens+m.promotion][0]-pieceValue[whitePawns][0];
+		//display();
+		//sync_cout<<displayUci(m) <<sync_endl;
+		captured=bitboardIndex(whiteQueens+m.promotion);
+		swapList[0] +=pieceValue[whiteQueens+m.promotion][0]-pieceValue[whitePawns][0];
 	}
 
 	// Find all attackers to the destination square, with the moving piece
@@ -92,7 +101,7 @@ Score Position::see(Move m) const {
 	// destination square, where the sides alternately capture, and always
 	// capture with the least valuable piece. After each capture, we look for
 	// new X-ray attacks from behind the capturing piece.
-	captured = bitboardIndex(squares[from]%separationBitmap);
+
 	assert(captured<lastBitboard);
 	assert(squares[from]!=empty);
 	do {
@@ -100,9 +109,6 @@ Score Position::see(Move m) const {
 
 		// Add the new entry to the swap list
 		swapList[slIndex] = -swapList[slIndex - 1] + pieceValue[captured][0];
-		if(m.flags== Move::fpromotion){
-			swapList[0] =pieceValue[whiteQueens+m.promotion][0]-pieceValue[whitePawns][0];
-		}
 		slIndex++;
 
 		// Locate and remove the next least valuable attacker
@@ -129,7 +135,9 @@ Score Position::see(Move m) const {
 				attackers &= occupied;
 //				displayBitMap(attackers);
 				captured=nextAttacker;
-
+				if(relativeRank==7 && captured==whitePawns){
+					captured=whiteQueens;
+				}
 				break;
 			}
 			nextAttacker=bitboardIndex(nextAttacker-1);
@@ -150,17 +158,6 @@ Score Position::see(Move m) const {
 
 	} while (colorAttackers);
 
-
-/*	// If we are doing asymmetric SEE evaluation and the same side does the first
-	  // and the last capture, he loses a tempo and gain must be at least worth
-	  // 'asymmThreshold', otherwise we replace the score with a very low value,
-	  // before negamaxing.
-	  if (asymmThreshold)
-	      for (int i = 0; i < slIndex; i += 2)
-	          if (swapList[i] < asymmThreshold)
-	              swapList[i] = - QueenValueMg * 16;
-
-*/
 	// Having built the swap list, we negamax through it to find the best
 	// achievable score from the point of view of the side to move.
 	while (--slIndex){

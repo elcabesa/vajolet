@@ -26,7 +26,7 @@
 #include "hashKeys.h"
 #include "move.h"
 #include "io.h"
-#include "eval.h"
+#include "tables.h"
 
 
 
@@ -39,6 +39,7 @@
 
 class Position{
 	public:
+	//static unsigned long testPointCounter;
 	Position(const Position& other)
 	    : stateIndex(other.stateIndex), // calls the copy constructor of the age
 		stateInfo(other.stateInfo)
@@ -234,7 +235,7 @@ public:
 	bool moveGivesCheck(Move& m)const ;
 	Score see(Move m) const;
 	Score seeSign(Move m) const;
-	bool isDraw() const;
+	bool isDraw(bool isPVline) const;
 
 	/*! \brief constructor
 		\author Marco Belli
@@ -650,5 +651,25 @@ public:
 
 };
 
+extern simdScore initialPieceValue[Position::lastBitboard];
+extern simdScore PawnD3;
+extern simdScore PawnD4;
+extern simdScore PawnD5;
+extern simdScore PawnE3;
+extern simdScore PawnE4;
+extern simdScore PawnE5;
+extern simdScore PawnCentering;
+extern simdScore PawnRankBonus;
+extern simdScore KnightPST;
+extern simdScore BishopPST;
+extern simdScore RookPST;
+extern simdScore QueenPST;
+extern simdScore KingPST;
+
+extern simdScore BishopBackRankOpening;
+extern simdScore KnightBackRankOpening;
+extern simdScore RookBackRankOpening;
+extern simdScore QueenBackRankOpening;
+extern simdScore BishopOnBigDiagonals;
 
 #endif /* POSITION_H_ */

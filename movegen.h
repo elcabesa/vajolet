@@ -70,7 +70,7 @@ public:
 		generateQuiescentCaptures,
 		iterateQuiescentCaptures,
 		generateQuietCheks,
-		iterateQuietcChecks,
+		iterateQuietChecks,
 		finishedQuiescentQuietStage,
 
 	}stagedGeneratorState;

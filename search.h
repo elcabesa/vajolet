@@ -74,7 +74,7 @@ inline Score matedIn(int ply) {
 
 class search{
 
-	History history;
+
 	static Score futility[5];
 	static Score futilityMargin[7];
 	static Score FutilityMoveCounts[11];
@@ -90,6 +90,7 @@ class search{
 	void printAllPV(Position & p,unsigned int count);
 	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::vector<Move>& PV,unsigned long long nods);
 public:
+	History history;
 	std::vector<rootMove> rootMoves;
 	static unsigned int multiPVLines;
 	static unsigned int limitStrength;
@@ -122,9 +123,10 @@ public:
 	unsigned long long getVisitedNodes(){
 		return visitedNodes;
 	}
+	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
 private:
 	template<nodeType type>Score alphaBeta(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
-	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::vector<Move> & PV);
+
 	unsigned long long visitedNodes;
 	unsigned int selDepth;
 	bool stop;

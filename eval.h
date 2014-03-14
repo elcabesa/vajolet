@@ -16,99 +16,77 @@
 */
 
 
+
 #ifndef EVAL_H_
 #define EVAL_H_
 
-#include <vector>
 #include "vajolet.h"
+#include "position.h"
+#include "tables.h"
 
 void initMaterialKeys();
 void initMobilityBonus();
 
-template<class Entry, int Size>
-struct HashTable
-{
-public:
-	HashTable() : e(Size, Entry()) {}
-	Entry* operator[](U64 k) {return &e[(unsigned int)k % (Size)]; }
 
-private:
-  std::vector<Entry> e;
-};
+// DONE
+extern simdScore tempo;
+extern simdScore bishopPair;
+extern simdScore isolatedPawnPenalty;
+extern simdScore isolatedPawnPenaltyOpp;
+extern simdScore doubledPawnPenalty;
+extern simdScore backwardPawnPenalty;
+extern simdScore chainedPawnBonus;
+extern simdScore passedPawnFileAHPenalty;
+extern simdScore passedPawnSupportedBonus;
+extern simdScore candidateBonus;
+extern simdScore holesPenalty;
+extern simdScore pawnCenterControl;
+extern simdScore pawnBigCenterControl;
+extern simdScore pieceCoordination;
+extern simdScore piecesCenterControl;
+extern simdScore piecesBigCenterControl;
+extern simdScore passedPawnBonus;
+extern simdScore ownKingNearPassedPawn;
+extern simdScore enemyKingNearPassedPawn;
+extern simdScore passedPawnUnsafeSquares;
+extern simdScore passedPawnBlockedSquares;
+extern simdScore passedPawnDefendedSquares;
+extern simdScore passedPawnDefendedBlockingSquare;
+extern simdScore queenMobilityPars;
+extern simdScore rookMobilityPars;
+extern simdScore bishopMobilityPars;
+extern simdScore knightMobilityPars;
+extern simdScore rookOn7Bonus;
+extern simdScore rookOnPawns;
+extern simdScore queenOn7Bonus;
+extern simdScore queenOnPawns;
+extern simdScore rookOnOpen;
+extern simdScore rookOnSemi;
+extern simdScore knightOnOutpost;
+extern simdScore knightOnOutpostSupported;
+extern simdScore knightOnHole;
+extern simdScore bishopOnOutpost;
+extern simdScore bishopOnOutpostSupported;
+extern simdScore bishopOnHole;
+extern simdScore badBishop;
+extern simdScore spaceBonus;
+extern simdScore undefendedMinorPenalty;
+extern simdScore attackedByPawnPenalty[Position::separationBitmap];
+extern simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitmap];
+// IN PROGRESS
+extern simdScore kingShieldBonus;// only one value
+extern simdScore  kingFarShieldBonus;// only one value
+extern simdScore  kingStormBonus;// only one value
+extern simdScore kingSafetyBonus;
 
-
-class pawnEntry
-{
-public:
-	U64 key;
-	bitMap weakPawns;
-	bitMap passedPawns;
-	bitMap pawnAttacks[2];
-	bitMap weakSquares[2];
-	bitMap holes[2];
-	Score res[2];
-};
-
-class pawnTable
-{
-public:
-	void insert(U64 key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
-		pawnEntry* x=pawnTable[key];
-		x->key=key;
-		x->res[0]=res[0];
-		x->res[1]=res[1];
-
-		x->weakPawns=weak;
-		x->passedPawns=passed;
-
-		x->pawnAttacks[0]=whiteAttack;
-		x->pawnAttacks[1]=blackAttack;
-		x->weakSquares[0]=weakSquareWhite;
-		x->weakSquares[1]=weakSquareBlack;
-		x->holes[0]=whiteHoles ;
-		x->holes[1]=blackHoles;
-	}
-
-	pawnEntry* probe(U64 key){
-		pawnEntry* x=pawnTable[key];
-		if(x->key==key){
-			return x;
-		}
-		return nullptr;
-
-	}
-private:
-	HashTable<pawnEntry, 65536> pawnTable;
-};
+// TODO
 
 
-class evalEntry
-{
-public:
-	U64 key;
-	Score res;
-};
+//TODO  zero mobility
 
-class evalTable
-{
-public:
-	void insert(U64 key,Score res){
-		evalEntry* x=evalTable[key];
-		x->key=key;
-		x->res=res;
-	}
 
-	evalEntry* probe(U64 key){
-		evalEntry* x=evalTable[key];
-		if(x->key==key){
-			return x;
-		}
-		return nullptr;
 
-	}
-private:
-	HashTable<evalEntry, 524288> evalTable;
-};
+
 
 
 #endif /* EVAL_H_ */
