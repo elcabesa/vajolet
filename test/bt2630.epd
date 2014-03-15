@@ -28,6 +28,3 @@ R7/3p3p/8/3P2P1/3k4/1p5p/1P1NKP1P/7q w - - bm g6; id "test 24";
 rnb1k1nr/p2p1ppp/3B4/1p1N1N1P/4P1P1/3P1Q2/PqP5/R4Kb1 w kq - bm e5; id "test 28";
 r1b1kb1r/pp1n1ppp/2q5/2p3B1/Q1B5/2p2N2/PP3PPP/R3K2R w KQkq - bm O-O-O; id "test 29";
 2k5/2p3Rp/p1pb4/1p2p3/4P3/PN1P1P2/1P2KP1r/8 w - - bm f4; id "test 30
-
-position fen 5r2/p1q4N/1pb5/5p2/7P/3Q1P2/2P3P1/2k4K w - -
-3q1N2/p7/1pb5/5p2/1Q5P/5P2/2P3P1/k6K b - - 4 4 ->primo nodo che sviluppa differentemente
