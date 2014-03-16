@@ -32,7 +32,7 @@
 //	configuration defines
 //---------------------------------------------
 
-#define PROGRAM_NAME	"Vajolet"
+#define PROGRAM_NAME	"Vajolet2"
 #define VERSION			"1.23"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
