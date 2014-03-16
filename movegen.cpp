@@ -1282,6 +1282,8 @@ Move  Movegen::getNextMove(){
 			break;
 		case generateEvasionMoves:
 			generateMoves<Movegen::allEvasionMg>();
+			killerMoves[0]=pos.getActualState().killers[0];
+			killerMoves[1]=pos.getActualState().killers[1];
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 		case generateQuiescentMoves:

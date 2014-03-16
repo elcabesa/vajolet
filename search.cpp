@@ -410,12 +410,13 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 	assert(PV.size()==0);
-	/*if(visitedNodes>598000 && visitedNodes<670000){
-		sync_cout<<"AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
-	}
-	if(pos.displayFen()=="3q1N2/p7/1pb5/5p2/1Q5P/5P2/2P3P1/1k5K b - - 2 3"){
+	/*if(visitedNodes>709000 && visitedNodes<710000){
+		sync_cout<<visitedNodes<<" AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
+	}*/
+	/*if(pos.displayFen()=="rn1qkb1r/ppp2ppp/4bn2/1B6/8/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 5"){
 		sync_cout<<"eccomi"<<sync_endl;
-		//verbose=true;
+		verbose=true;
+		pos.display();
 	}*/
 	//if(verbose){sync_cout<<"eccomi"<<sync_endl;}
 	visitedNodes++;
@@ -807,7 +808,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	//sync_cout<<"iterating moves"<<sync_endl;
 	while (bestScore <beta  && (m=mg.getNextMove()).packed) {
 
-		//sync_cout<<"move "<<pos.displayUci(m)<<sync_endl;
+		/*if(verbose){
+			sync_cout<<"move "<<pos.displayUci(m)<<sync_endl;
+		}*/
+
 		assert(m.packed);
 		if(m== excludedMove){
 			continue;
@@ -914,7 +918,11 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 #endif
 				!signals.stop
 				){
-				sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<<" time "<<elapsed << sync_endl;
+				sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<<
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+						" time "<<elapsed <<
+#endif
+						sync_endl;
 			}
 		}
 
@@ -1029,6 +1037,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 				if(reduction!=0){
 					childPV.clear();
+					/*if(verbose){
+						sync_cout<<"LMR search depth "<<d<<sync_endl;
+					}*/
 					val=-alphaBeta<childNodesType>(ply+1,pos,d,-alpha-1,-alpha,childPV);
 					if(val<=alpha){
 						doFullDepthSearch=false;
@@ -1044,15 +1055,27 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 				if(moveNumber<5){
 					if(newDepth<ONE_PLY){
+						/*if(verbose){
+							sync_cout<<"qsearch depth "<<newDepth<<sync_endl;
+						}*/
 						val=-qsearch<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}else{
+						/*if(verbose){
+							sync_cout<<"search depth "<<newDepth<<sync_endl;
+						}*/
 						val=-alphaBeta<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}
 				}
 				else{
 					if(newDepth<ONE_PLY){
+						/*if(verbose){
+							sync_cout<<"qsearch depth "<<newDepth<<sync_endl;
+						}*/
 						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}else{
+						/*if(verbose){
+							sync_cout<<"search depth "<<newDepth<<sync_endl;
+						}*/
 						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}
 
@@ -1221,7 +1244,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 
 
-	/*if(visitedNodes>598000 && visitedNodes<670000){
+	/*if(visitedNodes>599000 && visitedNodes<800000){
 		sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
 	}*/
 
