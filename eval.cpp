@@ -200,6 +200,36 @@ bool evalKBPvsK(const Position& p, Score& res){
 
 }
 
+bool evalKRPvsKr(const Position& p, Score& res){
+	color Pcolor=p.bitBoard[Position::whitePawns]?white:black;
+	tSquare pawnSquare;
+	if(Pcolor==white){
+		pawnSquare = p.pieceList[Position::whitePawns][0];
+		if(	FILES[pawnSquare]== FILES[p.pieceList[Position::blackKing][0]]
+		    && RANKS[pawnSquare]<=6
+		    && RANKS[pawnSquare]<RANKS[p.pieceList[Position::blackKing][0]]
+		){
+			res=128;
+			//p.display();
+			return true;
+		}
+	}
+	else{
+		pawnSquare = p.pieceList[Position::blackPawns][0];
+		if(	FILES[pawnSquare]== FILES[p.pieceList[Position::whiteKing][0]]
+			&& RANKS[pawnSquare]>=1
+			&& RANKS[pawnSquare]>RANKS[p.pieceList[Position::blackKing][0]]
+		){
+			res=128;
+			//p.display();
+			return true;
+		}
+
+	}
+	return false;
+
+}
+
 bool evalKBNvsK(const Position& p, Score& res){
 	color color=p.bitBoard[Position::whiteBishops]?white:black;
 	tSquare bishopSquare;
@@ -724,6 +754,26 @@ void initMaterialKeys(void){
 	key=p.getActualState().materialKey;
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKRvsKm;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	kr vs KRP
+	//------------------------------------------
+	p.setupFromFen("kr6/8/8/8/8/8/8/5PRK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::multiplicativeFunction;
+	t.pointer=&evalKRPvsKr;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	krp vs KR
+	//------------------------------------------
+	p.setupFromFen("krp5/8/8/8/8/8/8/6RK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::multiplicativeFunction;
+	t.pointer=&evalKRPvsKr;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 }
