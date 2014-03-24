@@ -75,8 +75,8 @@ int main()
 	//----------------------------------
 	printStartInfo();
 
-//	Tuner t;
-//	t.tuneParameters();
+	//Tuner t;
+	//t.tuneParameters();
 	//t.parseEpd(true);
 	//t.createEpd();
 	//t.drawSigmoid();

@@ -82,7 +82,8 @@ bool search::useOwnBook=true;
 bool search::bestMoveBook=false;
 bool search::showCurrentLine=false;
 
-void search::startThinking(Position & p,searchLimits & l){
+Score search::startThinking(Position & p,searchLimits & l){
+	Score res=0;
 	signals.stop=false;
 	TT.newSearch();
 	history.clear();
@@ -152,12 +153,12 @@ void search::startThinking(Position & p,searchLimits & l){
 	if(legalMoves==0){
 		while((limits.infinite && !signals.stop) || limits.ponder){}
 		sync_cout<<"bestmove 0000"<<sync_endl;
-		return;
+		return res;
 	}else if(legalMoves==1){
 		sync_cout<<"info pv "<<p.displayUci(lastLegalMove)<<sync_endl;
 		while((limits.infinite && !signals.stop) || limits.ponder){}
 		sync_cout<<"bestmove "<<p.displayUci(lastLegalMove)<<sync_endl;
-		return;
+		return res;
 	}
 
 	//----------------------------------------------
@@ -172,7 +173,7 @@ void search::startThinking(Position & p,searchLimits & l){
 			sync_cout<<"info pv "<<p.displayUci(bookM)<<sync_endl;
 			while((limits.infinite && !signals.stop) || limits.ponder){}
 			sync_cout<<"bestmove "<<p.displayUci(bookM)<<sync_endl;
-			return;
+			return res;
 		}
 	}
 
@@ -186,7 +187,6 @@ void search::startThinking(Position & p,searchLimits & l){
 
 	Score alpha=-SCORE_INFINITE,beta =SCORE_INFINITE;
 	Score delta=1600;
-	Score res=0;
 	selDepth=selDepthBase;
 
 	do{
@@ -377,9 +377,9 @@ void search::startThinking(Position & p,searchLimits & l){
 		std::exponential_distribution<> uint_dist(lambda);
 		unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 		rnd.seed(now);
-		double res = uint_dist(rnd);
+		double dres = uint_dist(rnd);
 
-		unsigned int pos=res;
+		unsigned int pos=dres;
 		bestMoveLine =std::min(pos,PVSize-1);
 	}
 	//sync_cout<<"bestMove index "<<bestMoveLine<<sync_endl;
@@ -394,6 +394,8 @@ void search::startThinking(Position & p,searchLimits & l){
 #ifdef PRINT_STATISTICS
 	Statistics::instance().printNodeTypeStat();
 #endif
+
+	return res;
 
 
 
@@ -836,7 +838,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		bool isDangerous=moveGivesCheck || pos.isCastleMove(m) || pos.isPassedPawnMove(m);
 
 		int ext=0;
-		if(PVnode && isDangerous){
+		if(PVnode && (isDangerous || moveGivesCheck)){
 			ext = ONE_PLY;
 		}else if(moveGivesCheck && pos.seeSign(m) >= 0){
 			ext = ONE_PLY / 2;
@@ -1458,6 +1460,23 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		}
 
 	}
+
+	if (bestScore >= beta &&
+			// TODO provare a fare solamente pos.isCaptureMove
+		!pos.isCaptureMoveOrPromotion(bestMove) &&
+		!inCheck)
+	{
+		//sync_cout<<pos.displayUci(bestMove)<<sync_endl;
+		if(pos.getActualState().killers[0] != bestMove)
+		{
+			pos.getActualState().killers[1] = pos.getActualState().killers[0];
+			pos.getActualState().killers[0] = bestMove;
+		}
+
+
+
+	}
+
 
 
 	if(bestScore == -SCORE_INFINITE/* && inCheck*/){

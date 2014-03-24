@@ -222,6 +222,9 @@ void Tuner::drawAverageEvolution(void){
 }
 
 void Tuner::createEpd(void){
+	searchLimits sl;
+
+	search searcher;
 	sync_cout<<"start parsing epd"<<sync_endl;
 	std::ifstream ifs ("out.epd", std::ifstream::in);
 	std::ifstream ifs2 ("out.epd", std::ifstream::in);
@@ -251,7 +254,31 @@ void Tuner::createEpd(void){
 				////////////////////////////////////////////
 				//detect the result of the previous game
 				////////////////////////////////////////////
-				unsigned int res=lastFen.find('#');
+				std::string tempFen=lastFen;
+				std::string clearTempFen=tempFen.substr(0,tempFen.find("bm")-1);
+				Position pos;
+				pos.setupFromFen(clearTempFen);
+				sl.depth=10;
+				Score searchRes=searcher.startThinking(pos,sl);
+				unsigned int res=lastFen.find('w');
+
+				if(abs(searchRes)<10000){
+					draw=true;
+					result=0.5;
+				}
+				else{
+					draw=false;
+					sync_cout<<"game result "<<searchRes<<sync_endl;
+					if(res!=std::string::npos && searchRes>=10000){ // white
+						result=1;
+						//ofs.write("white win\n",9);
+					}
+					else{
+						//ofs.write("black win\n",9);
+						result=0;
+					}
+				}
+				/*unsigned int res=lastFen.find('#');
 				if(res!=std::string::npos){
 					res=lastFen.find('w');
 					if(res!=std::string::npos){
@@ -268,22 +295,44 @@ void Tuner::createEpd(void){
 					sync_cout<<"draw"<<sync_endl;
 					result=0.5;
 					draw=true;
-				}
+				}*/
 				unsigned long startLine=line2;
 				////////////////////////////////////////////////////////////////////////////////
 				// now that i know the result i can create the new file with the result appended
 				////////////////////////////////////////////////////////////////////////////////
 				ofs.write("new game\n",9);
+				sl.depth=5;
 				while(line2<line-1){
+
+
+
 
 
 					ifs2.getline(fenstr,256);
 					std::string fen=fenstr;
+
 					std::string clearFen=fen.substr(0,fen.find("bm")-1);
-					if(line2-startLine>16 && (draw || line-line2>8)){
+					if(line2-startLine>=0 && (draw || line-line2>=0)){
+						Position pos;
+						pos.setupFromFen(clearFen);
+						Score searchRes;
+						if(result==0){
+							searchRes=searcher.startThinking(pos,sl);
+							searchRes-=5000.0+10000.0*(line2-startLine)/(line-startLine);
+						}
+						else if (result==1)
+						{
+							searchRes=searcher.startThinking(pos,sl);
+							searchRes+=5000.0+10000.0*(line2-startLine)/(line-startLine);
+						}
+						else{
+							searchRes=0.5;
+						}
+
+						double sigmoid=1.0/(1+std::pow(2.71828182846,-searchRes/scaling));
 						ofs.write(clearFen.c_str(),clearFen.length());
 						ofs.write(" result ",8);
-						std::string strRes=std::to_string(result);
+						std::string strRes=std::to_string(sigmoid);
 						//sync_cout<<line2<<" * "<<sync_endl;
 						ofs.write(strRes.c_str(),strRes.length());
 						ofs.write("\n",1);
@@ -330,7 +379,7 @@ void Tuner::tuneParameters(void){
 	}state;
 	std::vector<parameterStruct> parameters;
 
-	/*parameters.push_back(parameterStruct("queen opening value",&initialPieceValue[Position::whiteQueens],0,1000));
+	parameters.push_back(parameterStruct("queen opening value",&initialPieceValue[Position::whiteQueens],0,1000));
 	parameters.push_back(parameterStruct("queen endgame value",&initialPieceValue[Position::whiteQueens],1,1000));
 	parameters.push_back(parameterStruct("rook opening value",&initialPieceValue[Position::whiteRooks],0,1000));
 	parameters.push_back(parameterStruct("rook endgame value",&initialPieceValue[Position::whiteRooks],1,1000));
@@ -339,7 +388,7 @@ void Tuner::tuneParameters(void){
 	parameters.push_back(parameterStruct("knight opening value",&initialPieceValue[Position::whiteKnights],0,100));
 	parameters.push_back(parameterStruct("knight endgame value",&initialPieceValue[Position::whiteKnights],1,100));
 	parameters.push_back(parameterStruct("pawn opening value",&initialPieceValue[Position::whitePawns],0,100));
-
+/*
 	parameters.push_back(parameterStruct("PawnD3 opening bonus",&PawnD3,0,10));
 //	parameters.push_back(parameterStruct("PawnD3 endgame bonus",&PawnD3,1,10));
 	parameters.push_back(parameterStruct("PawnD4 opening bonus",&PawnD4,0,10));
@@ -365,7 +414,8 @@ void Tuner::tuneParameters(void){
 	parameters.push_back(parameterStruct("QueenPST opening bonus",&QueenPST,0,10));
 	parameters.push_back(parameterStruct("QueenPST endgame bonus",&QueenPST,1,10));
 	parameters.push_back(parameterStruct("KingPST opening bonus",&KingPST,0,10));
-	parameters.push_back(parameterStruct("KingPST endgame bonus",&KingPST,1,10));
+	parameters.push_back(parameterStruct("KingPST endgame bonus",&KingPST,1,10));*/
+	/*
 	parameters.push_back(parameterStruct("BishopBackRankOpening opening penalty",&BishopBackRankOpening,0,100));
 	parameters.push_back(parameterStruct("BishopBackRankOpening endgame penalty",&BishopBackRankOpening,1,100));
 	parameters.push_back(parameterStruct("KnightBackRankOpening opening penalty",&KnightBackRankOpening,0,100));
@@ -546,11 +596,11 @@ void Tuner::tuneParameters(void){
 	parameters.push_back(parameterStruct("weakPiecePenalty[Knights][knight] endgame bonus",&weakPiecePenalty[Position::Knights][Position::Knights],1,100));
 	parameters.push_back(parameterStruct("weakPiecePenalty[Knights][pawn] endgame bonus",&weakPiecePenalty[Position::Knights][Position::Pawns],1,100));*/
 
-	parameters.push_back(parameterStruct("kingShieldBonus bonus",&kingShieldBonus,0,100));
+	/*parameters.push_back(parameterStruct("kingShieldBonus bonus",&kingShieldBonus,0,100));
 	parameters.push_back(parameterStruct("kingFarShieldBonus bonus",&kingFarShieldBonus,0,100));
 	parameters.push_back(parameterStruct("kingStormBonus bonus",&kingStormBonus,0,10));
 	parameters.push_back(parameterStruct("kingSafetyBonus opening bonus",&kingSafetyBonus,0,1));
-	parameters.push_back(parameterStruct("kingSafetyBonus endgame bonus",&kingSafetyBonus,1,1));
+	parameters.push_back(parameterStruct("kingSafetyBonus endgame bonus",&kingSafetyBonus,1,1));*/
 
 	while(1){
 		showValues(parameters);

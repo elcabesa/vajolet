@@ -119,7 +119,7 @@ public:
 		ALL_NODE,
 		CUT_NODE
 	} nodeType;
-	void startThinking(Position & p,searchLimits & limits);
+	Score startThinking(Position & p,searchLimits & limits);
 	unsigned long long getVisitedNodes(){
 		return visitedNodes;
 	}
