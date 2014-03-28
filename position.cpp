@@ -31,12 +31,18 @@
 
 simdScore initialPieceValue[Position::lastBitboard]={
 		simdScore(0,0,0,0),
-		simdScore(3000000,3000000,0,0),//king
+/*		simdScore(3000000,3000000,0,0),//king
 		simdScore(130000,100000,0,0),//queen
 		simdScore(48000,61000,0,0),//rook
 		simdScore(34500,36400,0,0),//bishop
 		simdScore(34500,35400,0,0),//knight
-		simdScore(4100,10000,0,0),//panws
+		simdScore(4100,10000,0,0),//panws*/
+		simdScore(3000000,3000000,0,0),//king
+		simdScore(137000,100000,0,0),//queen
+		simdScore(52000,61000,0,0),//rook
+		simdScore(35300,36100,0,0),//bishop
+		simdScore(34500,34900,0,0),//knight
+		simdScore(5700,10000,0,0),//panws
 		simdScore(0,0,0,0),
 		simdScore(0,0,0,0),
 		simdScore(0,0,0,0),
@@ -649,8 +655,11 @@ U64 Position::calcMaterialKey(void) const {
 simdScore Position::calcMaterialValue(void) const{
 	simdScore score=0;
 	for (tSquare s=(tSquare)0;s<squareNumber;s++){
+
 		bitboardIndex val=squares[s];
 		score+=pstValue[val][s];
+
+		//sync_cout<<"square["<<s<<"] piece:"<<val<<" score:"<<pstValue[val][s][0]<<sync_endl;
 	}
 	return score;
 
@@ -734,6 +743,7 @@ void Position::doNullMove(void){
 	\date 27/10/2013
 */
 void Position::doMove(Move & m){
+	//sync_cout<<displayUci(m)<<sync_endl;
 	assert(m.packed);
 	state n=getActualState();
 	bool moveIsCheck=moveGivesCheck(m);

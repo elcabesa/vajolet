@@ -1937,7 +1937,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 	//sync_cout<<"kingSafety:"<<res[0]<<":"<<res[1]<<sync_endl;
 	//todo scaling
-	if(pieceCount[whitePawns]+pieceCount[blackPawns]==0){
+	if((pieceCount[whitePawns]+pieceCount[blackPawns]==0) && abs(st.material[0])<40000 && st.nonPawnMaterial[0]<60000 && st.nonPawnMaterial[2]<60000 ){
 		mulCoeff=102;
 	}
 

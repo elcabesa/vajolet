@@ -415,6 +415,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	/*if(visitedNodes>709000 && visitedNodes<710000){
 		sync_cout<<visitedNodes<<" AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
 	}*/
+	//sync_cout<<"AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
 	/*if(pos.displayFen()=="rn1qkb1r/ppp2ppp/4bn2/1B6/8/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 5"){
 		sync_cout<<"eccomi"<<sync_endl;
 		verbose=true;
@@ -483,7 +484,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
 		                              : (tte->getType() ==  typeScoreLowerThanAlpha || tte->getType() == typeExact)))
 	{
-
 		TT.refresh(tte);
 
 		if (ttValue >= beta &&
@@ -738,7 +738,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		//eval> beta-40000
 		//&& abs(beta)<SCORE_MATE_IN_MAX_PLY
 	){
-
 		Score s;
 		Score rBeta=beta+8000;
 		int rDepth=depth -ONE_PLY- 3*ONE_PLY;
@@ -838,7 +837,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		bool isDangerous=moveGivesCheck || pos.isCastleMove(m) || pos.isPassedPawnMove(m);
 
 		int ext=0;
-		if(PVnode && (isDangerous || moveGivesCheck)){
+		if(PVnode && isDangerous){
 			ext = ONE_PLY;
 		}else if(moveGivesCheck && pos.seeSign(m) >= 0){
 			ext = ONE_PLY / 2;
@@ -1249,6 +1248,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	/*if(visitedNodes>599000 && visitedNodes<800000){
 		sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
 	}*/
+	//sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
 
 	//Position::state & actualState=pos.getActualState();
 	const bool PVnode=(type==search::nodeType::PV_NODE);
