@@ -1931,6 +1931,14 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
 				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
 				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+		sync_cout <<"---------------------+--------------+--------------+-----------------"<<sync_endl;
+		sync_cout << std::setw(20) << "result" << " |"
+				  << std::setw(6)  << " " << " "
+				  << std::setw(6)  << " "<< " |"
+				  << std::setw(6)  << " "<< " "
+				  << std::setw(6)  << " " << " | "
+				  << std::setw(6)  << (res[0])/10000.0 << " "
+				  << std::setw(6)  << (res[1])/10000.0 << " "<<sync_endl;
 		traceRes=res;
 	}
 
