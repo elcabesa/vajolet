@@ -1288,7 +1288,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	Move ttMove;
 	ttMove=tte ? tte->getPackedMove() : 0;
 	Movegen mg(pos,history,ttMove);
-	int TTdepth=mg.setupQuiescentSearch(pos.getActualState().checkers,depth);
+	int TTdepth=mg.setupQuiescentSearch(inCheck,depth);
 	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
 
 	if (tte
