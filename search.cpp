@@ -87,6 +87,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 	signals.stop=false;
 	TT.newSearch();
 	history.clear();
+	visitedNodes=0;
 
 	limits=l;
 	rootMoves.clear();
@@ -180,7 +181,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 
 	unsigned int selDepthBase=p.getActualState().ply;
-	visitedNodes=0;
+
 	startTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 	std::vector<Move> newPV;
 	unsigned int depth=1;
@@ -281,6 +282,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 					//sync_cout<<"res<=alpha "<<sync_endl;
 
 					//my_thread::timeMan.idLoopRequestToExtend=true;
+					newPV.push_back(rootMoves[PVIdx].PV[0]);
 					printPV(res,depth-reduction,selDepth-selDepthBase,alpha,beta, p, now-startTime,PVIdx,newPV,visitedNodes);
 					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 

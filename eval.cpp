@@ -71,6 +71,7 @@ simdScore passedPawnUnsafeSquares =simdScore(-10,70,0,0);
 simdScore passedPawnBlockedSquares =simdScore(150,370,0,0);
 simdScore passedPawnDefendedSquares = simdScore(150,240,0,0);
 simdScore passedPawnDefendedBlockingSquare = simdScore(260,170,0,0);
+simdScore unstoppablePassed = simdScore(0,2000,0,0);
 
 simdScore holesPenalty=simdScore(100,260,0,0);
 simdScore pawnCenterControl=simdScore(70,120,0,0);
@@ -1534,11 +1535,18 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 			passedPawnsBonus+=passedPawnSupportedBonus*(r/2);
 		}
 
+		if(st.nonPawnMaterial[2]==0){
+			tSquare promotionSquare=BOARDINDEX[FILES[ppSq]][7];
+			if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[pieceList[blackKing][0]][promotionSquare] - (st.nextMove==whiteTurn?0:1),0) )
+			{
+				passedPawnsBonus+=unstoppablePassed*rr;
+			}
+		}
+
+
 		wScore+=passedPawnsBonus;
 
 	}
-
-	// todo unsotppable passed pawn: ( more value to unstoppable passed pawn, less value or 0 for stobbable ones
 	pp=passedPawns&bitBoard[blackPawns];
 
 	bScore=0;
@@ -1590,6 +1598,16 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		}
 		if(supportingPawns & RANKMASK[ppSq-pawnPush(1)]){
 			passedPawnsBonus+=passedPawnSupportedBonus*(r/2);
+		}
+
+		if(st.nonPawnMaterial[0]==0){
+			tSquare promotionSquare=BOARDINDEX[FILES[ppSq]][0];
+			if ( std::min( 5, (int)(7- relativeRank)) < std::max(SQUARE_DISTANCE[pieceList[whiteKing][0]][promotionSquare] - (st.nextMove==whiteTurn?1:0),0) )
+			{
+				passedPawnsBonus+=unstoppablePassed*rr;
+
+			}
+
 		}
 
 		bScore+=passedPawnsBonus;
