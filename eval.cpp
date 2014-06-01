@@ -1782,7 +1782,6 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	}
 	wScore=simdScore(kingSafety[0],0,0,0);
 
-
 	kingSafety[1]=evalShieldStorm<black>(*this, pieceList[blackKing][0]);
 	if((st.castleRights & bCastleOO)
 		&& !(attackedSquares[whitePieces] & (bitSet(E8)|bitSet(F8)|bitSet(G8) ))
@@ -1818,8 +1817,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[white] * kingAttackersWeight[white]) / 2)
 		                     + 3 * (kingAdjacentZoneAttacksCount[white] + bitCnt(undefendedSquares))
 		                     + KingExposed[63-pieceList[blackKing][0]]
-		                     - kingSafety[0] / 500;
-
+		                     - kingSafety[1] / 500;
 
 		// safe contact queen check
 		bitMap safeContactSquare=undefendedSquares & attackedSquares[whiteQueens];
@@ -1887,8 +1885,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[black] * kingAttackersWeight[black]) / 2)
 							 + 3 * (kingAdjacentZoneAttacksCount[black] + bitCnt(undefendedSquares))
 							 + KingExposed[pieceList[whiteKing][0]]
-							 - kingSafety[1] / 500;
-
+							 - kingSafety[0] / 500;
 		// safe contact queen check
 		bitMap safeContactSquare=undefendedSquares & attackedSquares[blackQueens];
 		safeContactSquare &= (attackedSquares[blackRooks]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
@@ -1928,8 +1925,6 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		if(longDistCheck){
 			attackUnits+=bitCnt(longDistCheck);
 		}
-
-
 		attackUnits = std::min(99, std::max(0, attackUnits));
 		attackUnits*=attackUnits;
 		res-=(kingSafetyBonus*attackUnits)/32;
