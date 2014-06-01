@@ -303,7 +303,7 @@ void Position::setupFromFen(const std::string& fenStr){
 
 	}else{
 		ss>> x.ply;
-		x.ply = std::max(2 * (x.ply - 1), 0) + int(x.nextMove == blackTurn);
+		x.ply = std::max(2 * (x.ply - 1), (unsigned int)0) + int(x.nextMove == blackTurn);
 	}
 
 	x.pliesFromNull=0;

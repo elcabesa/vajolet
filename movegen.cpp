@@ -779,7 +779,8 @@ void Movegen::generateMoves(){
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.promotion=prom;
-					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
+					//if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+					{
 						//moveList.push_back(m);
 						assert(moveListSize<MAX_MOVE_PER_POSITION);
 						moveList[moveListSize++].m=m;

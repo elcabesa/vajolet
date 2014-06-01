@@ -592,7 +592,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		Score ralpha = alpha - razorMargin(depth);
 		assert(ralpha>=-SCORE_INFINITE);
 		std::vector<Move> childPV;
-		Score v = qsearch<childNodesType>(ply,pos,0, ralpha, ralpha+1, childPV);
+		Score v = qsearch<CUT_NODE>(ply,pos,0, ralpha, ralpha+1, childPV);
 		if (v <= ralpha)
 		{
 #ifdef PRINT_STATISTICS
@@ -1389,6 +1389,10 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		moveNumber++;
 
 		assert(m.packed);
+
+		if(!inCheck && m.flags==Move::fpromotion && m.promotion!= Move::promQueen){
+			continue;
+		}
 
 		if(depth<-7*ONE_PLY && !inCheck){
 			if(pos.getActualState().currentMove.to!= m.to){

@@ -138,7 +138,7 @@ class Position{
 		eNextMove nextMove; /*!< who is the active player*/
 		eCastle castleRights; /*!<  actual castle rights*/
 		tSquare epSquare;	/*!<  en passant square*/
-		int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
+		unsigned int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
 			pliesFromNull,	/*!<  plies from null move*/
 			ply;			/*!<  ply from the start*/
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
