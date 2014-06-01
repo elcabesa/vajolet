@@ -1390,7 +1390,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 		assert(m.packed);
 
-		if(!inCheck && m.flags==Move::fpromotion && m.promotion!= Move::promQueen){
+		if(!inCheck && (TTdepth<-1* ONE_PLY) && m.flags==Move::fpromotion && m.promotion!= Move::promQueen){
 			continue;
 		}
 
