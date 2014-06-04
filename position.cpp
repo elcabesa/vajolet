@@ -384,6 +384,7 @@ void Position::clear() {
 	stateIndex=0;
 	//actualState=nullptr;
 	stateInfo.clear();
+	stateInfo.reserve(1000);
 }
 
 

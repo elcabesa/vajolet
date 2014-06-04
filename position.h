@@ -66,6 +66,7 @@ class Position{
 
 		Us=&bitBoard[getActualState().nextMove];
 		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
+		stateInfo.reserve(1000);
 	};
 
 
@@ -245,7 +246,7 @@ public:
 	Position()
 	{
 		stateIndex=0;
-		stateInfo.reserve(1);
+		stateInfo.reserve(1000);
 	}
 
 	/*! \brief tell if the piece is a pawn
