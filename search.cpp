@@ -1257,10 +1257,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	assert(PVnode || alpha+1==beta);
 	bool inCheck=pos.getActualState().checkers;
 
-
-	if(pos.getActualState().ply>selDepth){
-		selDepth=pos.getActualState().ply;
-	}
+	selDepth=std::max(pos.getActualState().ply,selDepth);
 	visitedNodes++;
 
 	if(pos.isDraw(PVnode) || signals.stop){
@@ -1320,57 +1317,37 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 	ttType TTtype=typeScoreLowerThanAlpha;
 
+
+	Score staticEval= tte?tte->getStaticValue():pos.eval<false>(pawnHashTable, evalHashTable);
+#ifdef DEBUG_EVAL_SIMMETRY
+	Position ppp;
+	ppp.setupFromFen(pos.getSymmetricFen());
+	Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
+	if(test!=staticEval){
+		pos.display();
+
+		while(1);
+	}
+#endif
+
+
 	//----------------------------
 	//	stand pat score
 	//----------------------------
-	Score staticEval;
-	Score bestScore;
-	if(inCheck){
-		staticEval=pos.eval<false>(pawnHashTable, evalHashTable);
-#ifdef DEBUG_EVAL_SIMMETRY
-		Position ppp;
-		ppp.setupFromFen(pos.getSymmetricFen());
-		Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
-		if(test!=staticEval){
-			pos.display();
-			while(1);
-		}
-#endif
-		bestScore=-SCORE_INFINITE;
-	}
-	else{
-		if(tte)
-		{
-
-			staticEval=tte->getStaticValue();
-		}
-		else
-		{
-			staticEval=pos.eval<false>(pawnHashTable, evalHashTable);
-#ifdef DEBUG_EVAL_SIMMETRY
-			Position ppp;
-			ppp.setupFromFen(pos.getSymmetricFen());
-			Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
-			if(test!=staticEval){
-				pos.display();
-
-				while(1);
-			}
-#endif
-		}
+	Score bestScore = -SCORE_INFINITE;
+	if(!inCheck){
 		bestScore=staticEval;
-
 	}
 
 
 	if(bestScore>alpha){
-
+		assert(!incheck);
 		alpha=bestScore;
 		// TODO testare se la riga TTtype=typeExact; ha senso
 		TTtype=typeExact;
-		if(bestScore>=beta){
+		/*if(bestScore>=beta){
 			return bestScore;
-		}
+		}*/
 	}
 	// todo trovare un valore buono per il futility
 	Score futilityBase=bestScore+5000;
@@ -1380,8 +1357,8 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	//----------------------------
 	unsigned int moveNumber=0;
 	Move m;
-	Move bestMove;
-	bestMove=0;
+	Move bestMove=ttMove;
+	//bestMove=0;
 	while (bestScore <beta  &&  (m=mg.getNextMove()).packed) {
 		assert(alpha<beta);
 		assert(beta<=SCORE_INFINITE);
@@ -1491,10 +1468,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	}
 
 	assert(bestScore != -SCORE_INFINITE);
-	/*
-	if (bestScore == -SCORE_INFINITE){
-		bestScore = alpha;
-	}*/
 
 	if(!signals.stop){
 		TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
