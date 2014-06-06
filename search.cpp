@@ -791,8 +791,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 	Score bestScore=-SCORE_INFINITE;
 
-	Move bestMove;
-	bestMove=0;
+	Move bestMove=ttMove;
+	//bestMove=0;
 	Move m;
 	Movegen mg(pos,history,ttMove);
 	unsigned int moveNumber=0;
@@ -1345,9 +1345,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		alpha=bestScore;
 		// TODO testare se la riga TTtype=typeExact; ha senso
 		TTtype=typeExact;
-		/*if(bestScore>=beta){
+		if(bestScore>=beta){
 			return bestScore;
-		}*/
+		}
 	}
 	// todo trovare un valore buono per il futility
 	Score futilityBase=bestScore+5000;
