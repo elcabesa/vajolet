@@ -216,7 +216,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 			// reload the last PV in the transposition table
 			for(unsigned int i =0; i<=PVIdx; i++){
 				int n=0;
-				if(/*nodeType==typeExact && */rootMoves[i].PV.size()>0){
+				if(rootMoves[i].PV.size()>0){
 					for (auto it= rootMoves[i].PV.begin(); it != rootMoves[i].PV.end() && mg.isMoveLegal(*it); ++it){
 							/*if(!mg.isMoveLegal(*it)){
 								p.display();
@@ -271,8 +271,9 @@ Score search::startThinking(Position & p,searchLimits & l){
 						it->depth=depth-reduction;
 						it->nodes=visitedNodes;
 						it->time= now-startTime;
+						std::iter_swap( it, rootMoves.begin()+PVIdx);
+						std::stable_sort(rootMoves.begin() + PVIdx+1, rootMoves.end());
 					}
-					std::stable_sort(rootMoves.begin() + PVIdx, rootMoves.end());
 					//sync_cout<<"stableSort OK "<<sync_endl;
 
 				}
