@@ -398,7 +398,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 	Statistics::instance().printNodeTypeStat();
 #endif
 
-	history.printBestMoves();
+	//history.printBestMoves();
 	return res;
 
 
@@ -794,6 +794,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	Score bestScore=-SCORE_INFINITE;
 
 	Move bestMove;
+	bestMove=0;
 	Move m;
 	Movegen mg(pos,history,ttMove);
 	unsigned int moveNumber=0;
@@ -1160,7 +1161,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		// update history
 		// todo controllare se fare +=depth^2 e -=(depth^2)/(numero di mosse quiet) per avere media nulla
 		// todo controllare se usare depth o qualche depth scalata
-		Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
+		Score bonus = Score(depth * depth)/*/(ONE_PLY*ONE_PLY)*/;
 		history.update(pos.squares[bestMove.from],(tSquare) bestMove.to, bonus);
 		//sync_cout<<"pezzo:"<<pos.PIECE_NAMES_FEN[pos.squares[bestMove.from]]<<sync_endl;
 		if(quietMoveCount>1){
@@ -1347,9 +1348,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		alpha=bestScore;
 		// TODO testare se la riga TTtype=typeExact; ha senso
 		TTtype=typeExact;
-		if(bestScore>=beta){
+		/*if(bestScore>=beta){
 			return bestScore;
-		}
+		}*/
 	}
 	// todo trovare un valore buono per il futility
 	Score futilityBase=bestScore+5000;
