@@ -262,7 +262,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 				}
 				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 				if(newPV.size()!=0 && res > alpha /*&& res < beta*/){
-					std::vector<rootMove>::iterator it=std::find(rootMoves.begin(),rootMoves.end(),newPV[0]);
+					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+PVIdx,rootMoves.end(),newPV[0]);
 					if(it->firstMove==newPV[0]){
 						it->PV=newPV;
 						it->score=res;
@@ -398,6 +398,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 	Statistics::instance().printNodeTypeStat();
 #endif
 
+	history.printBestMoves();
 	return res;
 
 
@@ -792,8 +793,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 	Score bestScore=-SCORE_INFINITE;
 
-	Move bestMove=ttMove;
-	//bestMove=0;
+	Move bestMove;
 	Move m;
 	Movegen mg(pos,history,ttMove);
 	unsigned int moveNumber=0;
@@ -1140,12 +1140,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta  ? typeScoreHigherThanBeta :
 					(PVnode && bestMove.packed) ? typeExact : typeScoreLowerThanAlpha,
-							depth, bestMove.packed, staticEval);
+							depth, bestMove.packed?bestMove.packed:ttMove.packed, staticEval);
 	}
 
 
 	// save killer move & update history
-	if (bestScore >= beta &&
+	if (bestScore > alpha &&
 			// TODO provare a fare solamente pos.isCaptureMove
 		!pos.isCaptureMoveOrPromotion(bestMove) &&
 		!inCheck)
@@ -1160,8 +1160,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		// update history
 		// todo controllare se fare +=depth^2 e -=(depth^2)/(numero di mosse quiet) per avere media nulla
 		// todo controllare se usare depth o qualche depth scalata
-		Score bonus = Score(depth * depth);
+		Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
 		history.update(pos.squares[bestMove.from],(tSquare) bestMove.to, bonus);
+		//sync_cout<<"pezzo:"<<pos.PIECE_NAMES_FEN[pos.squares[bestMove.from]]<<sync_endl;
 		if(quietMoveCount>1){
 			for (int i = 0; i < quietMoveCount - 1; i++){
 				Move m;

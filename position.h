@@ -197,16 +197,17 @@ class Position{
 	static int castleRightsMask[squareNumber];
 public:
 	unsigned int getStateIndex(void){ return stateIndex;}
-private:
-
-	unsigned int stateIndex;
-	//state * actualState;
 	/*! \brief array of char to create the fen string
 		\author Marco Belli
 		\version 1.0
 		\date 27/10/2013
 	*/
 	const char PIECE_NAMES_FEN[lastBitboard]={' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
+private:
+
+	unsigned int stateIndex;
+	//state * actualState;
+
 
 	/*! \brief piece values used to calculate scores
 		\author Marco Belli

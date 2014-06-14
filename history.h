@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <array>
 #include "vajolet.h"
 #include "position.h"
 
@@ -44,6 +45,7 @@ public :
 		}
 		/*else{
 			sync_cout<<"saturation"<<sync_endl;
+			sync_cout<<table[p][to]<<sync_endl;
 			while(1);
 		}*/
 	}
@@ -51,6 +53,43 @@ public :
 		assert(p<Position::lastBitboard);
 		assert(to<squareNumber);
 		return table[p][to];
+	}
+
+	inline void printBestMoves()const {
+#define arrayLenght 100
+		typedef struct s_elem{
+			int to;
+			int p;
+			int max;
+			bool operator<(const s_elem& m) const { return max > m.max; } // Ascending sort
+			bool operator==(const s_elem& m) const { return max == m.max; }
+		}elem ;
+		std::array<elem,arrayLenght> bestMoves;
+
+		for(int i=0;i<arrayLenght;i++){
+			bestMoves[i].max=-2*Max;
+		}
+
+		for(int p=0; p<Position::lastBitboard;p++){
+			for( int to =0;to<squareNumber;to++){
+				if(table[p][to]>=bestMoves[arrayLenght-1].max && table[p][to]!=0){
+					bestMoves[arrayLenght-1].max=table[p][to];
+					bestMoves[arrayLenght-1].p=p;
+					bestMoves[arrayLenght-1].to=to;
+
+					std::stable_sort(bestMoves.begin(), bestMoves.end());
+				}
+
+			}
+		}
+
+		Position pp;
+		int MAX= bestMoves[0].max;
+		for(int i=0;i<arrayLenght;i++){
+			if(bestMoves[i].max>std::max(0.2*MAX,0.0 )){
+				sync_cout<<i<<") mossa minacciata "<<pp.PIECE_NAMES_FEN[bestMoves[i].p] <<" in "<<char('a'+FILES[bestMoves[i].to])<<char('1'+RANKS[bestMoves[i].to])<<" (value: "<< bestMoves[i].max<<")"<<sync_endl;
+			}
+		}
 	}
 
 	History(){}
