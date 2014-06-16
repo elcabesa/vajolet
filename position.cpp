@@ -723,8 +723,6 @@ void Position::doNullMove(void){
 
 	std::swap(Us,Them);
 
-	assert(Us==getActualState().Us);
-	assert(Them==getActualState().Them);
 
 	calcCheckingSquares();
 	assert(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0]!=squareNone);
@@ -905,11 +903,7 @@ void Position::doMove(Move & m){
 	//x.Them=&bitBoard[(blackTurn-x.nextMove)];
 
 	std::swap(Us,Them);
-	assert(x.Us);
-	assert(x.Them);
 
-	assert(Us==getActualState().Us);
-	assert(Them==getActualState().Them);
 
 	x.checkers=0;
 	if(moveIsCheck){
@@ -1002,8 +996,7 @@ void Position::undoMove(Move & m){
 	removeState();
 
 	std::swap(Us,Them);
-	assert(Us==getActualState().Us);
-	assert(Them==getActualState().Them);
+
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(0);

@@ -177,7 +177,6 @@ bool evalKBPvsK(const Position& p, Score& res){
 				if(RANKS[kingSquare]>=6  && abs(pawnFile-FILES[kingSquare])<=1){
 					res=0;
 					return true;
-
 				}
 			}
 		}
@@ -232,6 +231,7 @@ bool evalKRPvsKr(const Position& p, Score& res){
 }
 
 bool evalKBNvsK(const Position& p, Score& res){
+	//p.display();
 	color color=p.bitBoard[Position::whiteBishops]?white:black;
 	tSquare bishopSquare;
 	tSquare kingSquare;
@@ -253,6 +253,7 @@ bool evalKBNvsK(const Position& p, Score& res){
 	}
 	int mateColor =SQUARE_COLOR[bishopSquare];
 	if(mateColor== 0){
+
 		mateSquare1=A1;
 		mateSquare2=H8;
 	}else{
@@ -270,6 +271,8 @@ bool evalKBNvsK(const Position& p, Score& res){
 
 
 	res *=mul;
+	res/=10000;
+	//sync_cout<<"RES:"<<res<<sync_endl;
 	return true;
 
 }
@@ -284,8 +287,13 @@ bool evalOppositeBishopEndgame(const Position& p, Score& res){
 }
 
 bool evalKRvsKm(const Position& p, Score& res){
-		res=64;
-		return true;
+	res=64;
+	return true;
+}
+
+bool evalKNNvsK(const Position& p, Score& res){
+	res=10;
+	return true;
 }
 
 
@@ -328,6 +336,7 @@ void initMaterialKeys(void){
 	 * kbn vs k		-> win
 	 * opposite bishop endgame -> look drawish
 	 * kr vs km		-> look drawish
+	 * knn vs k		-> very drawish
 	 ----------------------------------------------*/
 
 
@@ -757,6 +766,27 @@ void initMaterialKeys(void){
 	t.pointer=&evalKRvsKm;
 	t.val=0;
 	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	knn vs K
+	//------------------------------------------
+	p.setupFromFen("knn5/8/8/8/8/8/8/7K w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::multiplicativeFunction;
+	t.pointer=&evalKNNvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	k vs KNN
+	//------------------------------------------
+	p.setupFromFen("k7/8/8/8/8/8/8/5NNK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::multiplicativeFunction;
+	t.pointer=&evalKNNvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
 
 	//------------------------------------------
 	//	kr vs KRP
@@ -1955,12 +1985,11 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 		traceRes=res;
 	}
 
-
-	//sync_cout<<"kingSafety:"<<res[0]<<":"<<res[1]<<sync_endl;
 	//todo scaling
-	if((pieceCount[whitePawns]+pieceCount[blackPawns]==0) && abs(st.material[0])<40000 && st.nonPawnMaterial[0]<60000 && st.nonPawnMaterial[2]<60000 ){
+	if(mulCoeff==256 && (pieceCount[whitePawns]+pieceCount[blackPawns]==0) && abs(st.material[0])<40000 && st.nonPawnMaterial[0]<60000 && st.nonPawnMaterial[2]<60000 ){
 		mulCoeff=102;
 	}
+
 
 
 
@@ -1968,8 +1997,9 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	//--------------------------------------
 	//	finalizing
 	//--------------------------------------
-	signed int gamePhase=getGamePhase();
 
+
+	signed int gamePhase=getGamePhase();
 	signed long long r=((signed long long)res[0])*(65536-gamePhase)+((signed long long)res[1])*gamePhase;
 
 	Score score =(r)/65536;

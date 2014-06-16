@@ -316,8 +316,6 @@ public:
 	inline void undoNullMove(void){
 		removeState();
 		std::swap(Us,Them);
-		assert(Us==getActualState().Us);
-		assert(Them==getActualState().Them);
 
 #ifdef ENABLE_CHECK_CONSISTENCY
 		checkPosConsistency(0);
@@ -331,7 +329,6 @@ public:
 	*/
 	inline state& getActualState(void)const {
 		assert(stateIndex>=1);
-		assert(actualState);
 		assert(stateIndex-1<stateInfo.size());
 		return (state&) stateInfo[stateIndex-1];
 		//return (state&) *actualState;
@@ -485,7 +482,7 @@ public:
 		return s;
 	}
 
-	/*! \brief return the mvvlva score
+	/*! \brief return the gamephase for interpolation
 		\author Marco Belli
 		\version 1.0
 		\date 08/11/2013
