@@ -271,7 +271,6 @@ bool evalKBNvsK(const Position& p, Score& res){
 
 
 	res *=mul;
-	res/=10000;
 	//sync_cout<<"RES:"<<res<<sync_endl;
 	return true;
 
