@@ -84,12 +84,13 @@ class search{
 	pawnTable pawnHashTable;
 	evalTable evalHashTable;
 
-	searchLimits limits;
+
 
 	unsigned int indexPV;
 	void printAllPV(Position & p,unsigned int count);
 	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::vector<Move>& PV,unsigned long long nods);
 public:
+	searchLimits limits;
 	History history;
 	std::vector<rootMove> rootMoves;
 	static unsigned int multiPVLines;

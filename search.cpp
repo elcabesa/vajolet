@@ -158,7 +158,20 @@ Score search::startThinking(Position & p,searchLimits & l){
 	}else if(legalMoves==1){
 		sync_cout<<"info pv "<<p.displayUci(lastLegalMove)<<sync_endl;
 		while((limits.infinite && !signals.stop) || limits.ponder){}
-		sync_cout<<"bestmove "<<p.displayUci(lastLegalMove)<<sync_endl;
+		sync_cout<<"bestmove "<<p.displayUci(lastLegalMove);
+
+
+		p.doMove(lastLegalMove);
+		U64 posKey=p.getKey();
+		ttEntry* tte = TT.probe(posKey);
+		p.undoMove(lastLegalMove);
+		if(tte && tte->getPackedMove()){
+			Move m;
+			m.packed=tte->getPackedMove();
+			std::cout<<" ponder "<<p.displayUci(m);
+		}
+
+		std::cout<<sync_endl;
 		return res;
 	}
 
@@ -400,6 +413,18 @@ Score search::startThinking(Position & p,searchLimits & l){
 	if(rootMoves[0].PV.size()>1)
 	{
 		std::cout<<" ponder "<<p.displayUci(rootMoves[bestMoveLine].PV[1]);
+	}
+	else{
+		p.doMove(rootMoves[bestMoveLine].PV[0]);
+		U64 posKey=p.getKey();
+		ttEntry* tte = TT.probe(posKey);
+		p.undoMove(rootMoves[bestMoveLine].PV[0]);
+		if(tte && tte->getPackedMove()){
+			Move m;
+			m.packed=tte->getPackedMove();
+			std::cout<<" ponder "<<p.displayUci(m);
+		}
+
 	}
 	std::cout<<sync_endl;
 

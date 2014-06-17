@@ -119,12 +119,14 @@ public :
 	void stopThinking(){
 		//sync_cout<<"received stop"<<sync_endl;
 		src.signals.stop=true;
+		src.limits.ponder=false;
 		limits.ponder=false;
 	}
 
 	void ponderHit(){
 		startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 		limits.ponder=false;
+		src.limits.ponder=false;
 	}
 
 
