@@ -141,6 +141,7 @@ simdScore kingSafetyBonus=simdScore(227,-73,0,0);
 //------------------------------------------------
 
 
+simdScore queenVsRook2MinorsImbalance=simdScore(20000,20000,0,0);
 
 
 //---------------------------------------------
@@ -1280,6 +1281,21 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 			res-=bishopPair;
 		}
 	}
+	if(pieceCount[whiteQueens]-pieceCount[blackQueens]==1
+			&& pieceCount[blackRooks]-pieceCount[whiteRooks]==1
+			&& pieceCount[blackBishops] +pieceCount[blackKnights]-pieceCount[whiteBishops] -pieceCount[whiteKnights]==2)
+	{
+		res -= queenVsRook2MinorsImbalance;
+
+	}
+	else if(pieceCount[whiteQueens]-pieceCount[blackQueens]==-1
+			&& pieceCount[blackRooks]-pieceCount[whiteRooks]==-1
+			&& pieceCount[blackBishops] +pieceCount[blackKnights]-pieceCount[whiteBishops] -pieceCount[whiteKnights]==-2)
+	{
+		res += queenVsRook2MinorsImbalance;
+
+	}
+
 	if(trace){
 		sync_cout << std::setw(20) << "imbalancies" << " |   ---    --- |   ---    --- | "
 				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "

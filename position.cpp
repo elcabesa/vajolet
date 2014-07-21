@@ -250,9 +250,7 @@ void Position::setupFromFen(const std::string& fenStr){
 			sq++;
 		}
 	}
-	state s;
 
-	insertState(s);
 	state &x= getActualState();
 
 
@@ -383,8 +381,6 @@ void Position::clear() {
 	}
 	stateIndex=0;
 	//actualState=nullptr;
-	stateInfo.clear();
-	stateInfo.reserve(1000);
 }
 
 
@@ -744,6 +740,7 @@ void Position::doNullMove(void){
 void Position::doMove(Move & m){
 	//sync_cout<<displayUci(m)<<sync_endl;
 	assert(m.packed);
+
 	state n=getActualState();
 	bool moveIsCheck=moveGivesCheck(m);
 	insertState(n);
@@ -1427,8 +1424,8 @@ bool Position::isDraw(bool isPVline) const {
 	// Draw by repetition?
 	unsigned int counter=1;
 	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2){
-		unsigned int stateIndexPointer=stateIndex-1-i;
-		assert(stateIndex>=i+1);
+		unsigned int stateIndexPointer=stateIndex-i;
+		assert(stateIndex>=i);
 		const state* stp=&stateInfo[stateIndexPointer];
 		if(stp->key==getActualState().key){
 			counter++;

@@ -21,6 +21,7 @@
 #include <vector>
 #include <list>
 #include <string>
+#include "vajolet.h"
 #include "data.h"
 #include "vectorclass/vectorclass.h"
 #include "hashKeys.h"
@@ -41,9 +42,12 @@ class Position{
 	public:
 	//static unsigned long testPointCounter;
 	Position(const Position& other)
-	    : stateIndex(other.stateIndex), // calls the copy constructor of the age
-		stateInfo(other.stateInfo)
+	    : stateIndex(other.stateIndex) // calls the copy constructor of the age
+
 	{
+		for(int i=0;i<STATE_INFO_LENGHT;i++){
+			stateInfo[i]=other.stateInfo[i];
+		}
 		for(int i=0;i<squareNumber;i++){
 			squares[i]=other.squares[i];
 			index[i]=other.index[i];
@@ -57,7 +61,7 @@ class Position{
 		}
 
 		/*if(stateIndex!=0){
-			actualState= &stateInfo[stateIndex-1];
+			actualState= &stateInfo[stateIndex];
 		}
 		else{
 			actualState=nullptr;
@@ -66,7 +70,6 @@ class Position{
 
 		Us=&bitBoard[getActualState().nextMove];
 		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
-		stateInfo.reserve(1000);
 	};
 
 
@@ -247,7 +250,6 @@ public:
 	Position()
 	{
 		stateIndex=0;
-		stateInfo.reserve(1000);
 	}
 
 	/*! \brief tell if the piece is a pawn
@@ -328,15 +330,15 @@ public:
 		\date 21/11/2013
 	*/
 	inline state& getActualState(void)const {
-		assert(stateIndex>=1);
-		assert(stateIndex-1<stateInfo.size());
-		return (state&) stateInfo[stateIndex-1];
+		assert(stateIndex>=0);
+		assert(stateIndex<STATE_INFO_LENGHT);
+		return (state&) stateInfo[stateIndex];
 		//return (state&) *actualState;
 	}
 
 	inline state& getState(unsigned int n)const {
-			assert(stateIndex>=1);
-			assert(n<stateInfo.size());
+			assert(stateIndex>=0);
+			assert(stateIndex<STATE_INFO_LENGHT);
 			return (state&) stateInfo[n];
 		}
 
@@ -347,28 +349,20 @@ public:
 		\date 21/11/2013
 	*/
 	inline void insertState(state & s){
-		assert(stateIndex<=60000);
-		assert(stateInfo.size()<1000);
-		if(stateIndex>=stateInfo.size()){
-			stateInfo.push_back(s);
-			assert(stateIndex<stateInfo.size());
-			stateInfo[stateIndex].killers[0].packed=0;
-			stateInfo[stateIndex].killers[1].packed=0;
-		}
-		else{
-			assert(stateIndex<stateInfo.size());
-			Move killer0;
-			Move killer1;
-			killer0=stateInfo[stateIndex].killers[0];
-			killer1=stateInfo[stateIndex].killers[1];
-			stateInfo[stateIndex]=s;
-			stateInfo[stateIndex].killers[0]=killer0;
-			stateInfo[stateIndex].killers[1]=killer1;
-
-		}
+		assert(stateIndex<STATE_INFO_LENGHT);
 
 		stateIndex++;
-		//actualState= &stateInfo[stateIndex-1];
+		Move killer0;
+		Move killer1;
+		killer0=stateInfo[stateIndex].killers[0];
+		killer1=stateInfo[stateIndex].killers[1];
+		stateInfo[stateIndex]=s;
+		stateInfo[stateIndex].killers[0]=killer0;
+		stateInfo[stateIndex].killers[1]=killer1;
+
+
+
+		//actualState= &stateInfo[stateIndex];
 	}
 
 	/*! \brief  remove the last state
@@ -378,9 +372,9 @@ public:
 		\date 21/11/2013
 	*/
 	inline void removeState(){
-		assert(stateIndex>=1);
+		assert(stateIndex>=0);
 		stateIndex--;
-		//actualState= &stateInfo[stateIndex-1];
+		//actualState= &stateInfo[stateIndex];
 	}
 
 
@@ -556,7 +550,7 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::vector<state> stateInfo;
+	state stateInfo[STATE_INFO_LENGHT];
 
 
 	/*! \brief put a piece on the board
