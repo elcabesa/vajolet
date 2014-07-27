@@ -228,6 +228,8 @@ void setoption(std::istringstream& is) {
 		int i=stoi(value);
 		search::eloStrenght=i<3000?(i>1000?i:1000):3000;
 	}
+	else if(name =="Ponder"){
+	}
 	else{
 		sync_cout << "No such option: " << name << sync_endl;
 	}

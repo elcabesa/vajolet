@@ -153,7 +153,7 @@ class Position{
 		bitMap pinnedPieces;	/*!< pinned pieces*/
 		bitMap checkers;	/*!< checking pieces*/
 		//bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
-		Move killers[2];	/*!< killer move at ply x*/
+		//Move killers[2];	/*!< killer move at ply x*/
 		bool skipNullMove;
 		Move excludedMove;
 		Move currentMove;
@@ -352,13 +352,13 @@ public:
 		assert(stateIndex<STATE_INFO_LENGHT);
 
 		stateIndex++;
-		Move killer0;
-		Move killer1;
-		killer0=stateInfo[stateIndex].killers[0];
-		killer1=stateInfo[stateIndex].killers[1];
+		//Move killer0;
+		//Move killer1;
+		//killer0=stateInfo[stateIndex].killers[0];
+		//killer1=stateInfo[stateIndex].killers[1];
 		stateInfo[stateIndex]=s;
-		stateInfo[stateIndex].killers[0]=killer0;
-		stateInfo[stateIndex].killers[1]=killer1;
+		//stateInfo[stateIndex].killers[0]=killer0;
+		//stateInfo[stateIndex].killers[1]=killer1;
 
 
 
@@ -523,6 +523,18 @@ public:
 		}
 	}
 
+	const  Move *  getKillers() const { return killers[stateIndex];}
+
+	void saveKillers(Move& m)
+	{
+		if(killers[stateIndex][0] != m)
+		{
+			killers[stateIndex][1] = killers[stateIndex][0];
+			killers[stateIndex][0] = m;
+		}
+
+	}
+
 
 
 
@@ -552,6 +564,7 @@ private:
 	*/
 	state stateInfo[STATE_INFO_LENGHT];
 
+	Move killers[STATE_INFO_LENGHT][2];
 
 	/*! \brief put a piece on the board
 		\author STOCKFISH

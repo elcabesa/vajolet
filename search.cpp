@@ -209,8 +209,12 @@ Score search::startThinking(Position & p,searchLimits & l){
 			rm.previousScore = rm.score;
 		}
 
+
 		for (indexPV = 0; indexPV < PVSize; indexPV++)
 		{
+			for (unsigned int x =indexPV; x<PVSize ; x++){
+				rootMoves[x].score=-SCORE_INFINITE;
+			}
 
 			//sync_cout<<"PVIdx="<<PVIdx<<sync_endl;
 
@@ -225,11 +229,11 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 			unsigned int reduction=0;
 
+
+
 			do{
 
-				for (unsigned int x =indexPV; x<PVSize ; x++){
-					rootMoves[x].score=-SCORE_INFINITE;
-				}
+
 
 				//sync_cout<<"SEARCH"<<sync_endl;
 				selDepth=selDepthBase;
@@ -253,6 +257,9 @@ Score search::startThinking(Position & p,searchLimits & l){
 					sync_cout<<"ERRORE NEWPV"<<sync_endl;
 				}
 				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+
+
+
 				if(newPV.lenght!=0 && res > alpha /*&& res < beta*/){
 					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+indexPV,rootMoves.end(),newPV.list[0]);
 					if(it->firstMove==newPV.list[0]){
@@ -279,15 +286,22 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 
 				// reload the last PV in the transposition table
-				for(unsigned int i =0; i<=indexPV; i++){
+				/*for(unsigned int i =0; i<=indexPV; i++){
 					int n=0;
 					if(rootMoves[i].PV.lenght>0){
 						const ttEntry* tte;
 
+						sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
 						for (unsigned int z= 0; z < rootMoves[i].PV.lenght && mg.isMoveLegal(rootMoves[i].PV.list[z]); z++){
 							tte = TT.probe(p.getActualState().key);
+							if(((n%2)?-rootMoves[i].score:rootMoves[i].score)>=SCORE_MATE)
+							{
+								sync_cout<<"pippo mate "<<((n%2)?-rootMoves[i].score:rootMoves[i].score)<<sync_endl;
+								p.display();
+							}
+
 							if (!tte || tte->getPackedMove() != (rootMoves[i].PV.list[z]).packed){// Don't overwrite correct entries
-								TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].previousScore:rootMoves[i].previousScore, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>(pawnHashTable,evalHashTable));
+								TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>(pawnHashTable,evalHashTable));
 							}
 
 							//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
@@ -300,7 +314,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 							p.undoMove(rootMoves[i].PV.list[n]);
 						}
 					}
-				}
+				}*/
 
 
 				if (res <= alpha)
@@ -331,6 +345,8 @@ Score search::startThinking(Position & p,searchLimits & l){
 				}else{
 					break;
 				}
+
+
 				delta += delta / 2;
 
 			}while(1);
@@ -546,11 +562,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			!pos.isCaptureMoveOrPromotion(ttMove) &&
 			!inCheck)
 		{
-			if(pos.getActualState().killers[0] != ttMove)
-			{
-				pos.getActualState().killers[1] = pos.getActualState().killers[0];
-				pos.getActualState().killers[0] = ttMove;
-			}
+			pos.saveKillers(ttMove);
 		}
 
 
@@ -1180,6 +1192,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		bestScore = alpha;
 
 
+
+
+
 	if(!signals.stop){
 	//Statistics::instance().gatherNodeTypeStat(type,bestScore >= beta?CUT_NODE:PVnode && bestMove.packed? PV_NODE:ALL_NODE );
 	TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
@@ -1196,11 +1211,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		!pos.isCaptureMoveOrPromotion(bestMove) &&
 		!inCheck)
 	{
-		if(pos.getActualState().killers[0] != bestMove)
-		{
-			pos.getActualState().killers[1] = pos.getActualState().killers[0];
-			pos.getActualState().killers[0] = bestMove;
-		}
+		pos.saveKillers(bestMove);
+
 
 
 		// update history
@@ -1525,12 +1537,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 		!inCheck)
 	{
 		//sync_cout<<pos.displayUci(bestMove)<<sync_endl;
-		if(pos.getActualState().killers[0] != bestMove)
-		{
-			pos.getActualState().killers[1] = pos.getActualState().killers[0];
-			pos.getActualState().killers[0] = bestMove;
-		}
-
+		pos.saveKillers(bestMove);
 
 
 	}
@@ -1543,6 +1550,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	}
 
 	assert(bestScore != -SCORE_INFINITE);
+
+
+
 
 	if(!signals.stop){
 		TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
