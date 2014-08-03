@@ -90,6 +90,7 @@ void my_thread::timerThread() {
 	std::mutex mutex;
 	while (!quit)
 	{
+
 		std::unique_lock<std::mutex> lk(mutex);
 
 		timerCond.wait(lk,[&]{return startThink||quit;});
@@ -139,10 +140,10 @@ void my_thread::timerThread() {
 }
 
 void my_thread::searchThread() {
-
+	std::mutex mutex;
 	while (!quit)
 	{
-		std::mutex mutex;
+
 		std::unique_lock<std::mutex> lk(mutex);
 		searchCond.wait(lk,[&]{return startThink||quit;});
 		if(!quit){
