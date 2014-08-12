@@ -36,9 +36,6 @@ double Tuner::parseEpd(bool save=false){
 	char fenstr[256];
 
 
-	pawnTable pawnHashTable;
-	evalTable evalHashTable;
-
 	std::string newGameString("new game");
 	Position pos;
 	search searcher;
@@ -98,9 +95,6 @@ void Tuner::drawSigmoid(void){
 
 	char fenstr[256];
 
-
-	pawnTable pawnHashTable;
-	evalTable evalHashTable;
 	std::string newGameString("new game");
 	Position pos;
 	search searcher;
@@ -170,9 +164,6 @@ void Tuner::drawAverageEvolution(void){
 
 	char fenstr[256];
 
-
-	pawnTable pawnHashTable;
-	evalTable evalHashTable;
 	std::string newGameString("new game");
 	Position pos;
 	search searcher;

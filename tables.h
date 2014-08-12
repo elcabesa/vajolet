@@ -51,6 +51,8 @@ class pawnTable
 public:
 	void insert(U64 key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
 		pawnEntry* x=pawnTable[key];
+
+		assert(x);
 		x->key=key;
 		x->res[0]=res[0];
 		x->res[1]=res[1];
@@ -68,6 +70,7 @@ public:
 
 	pawnEntry* probe(U64 key){
 		pawnEntry* x=pawnTable[key];
+		assert(x);
 		if(x->key==key){
 			return x;
 		}
@@ -91,12 +94,14 @@ class evalTable
 public:
 	void insert(U64 key,Score res){
 		evalEntry* x=evalTable[key];
+		assert(x);
 		x->key=key;
 		x->res=res;
 	}
 
 	evalEntry* probe(U64 key){
 		evalEntry* x=evalTable[key];
+		assert(x);
 		if(x->key==key){
 			return x;
 		}

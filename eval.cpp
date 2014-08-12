@@ -1135,11 +1135,11 @@ Score evalShieldStorm(const Position &pos, tSquare ksq){
 	\date 27/10/2013
 */
 template<bool trace>
-Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
+Score Position::eval(void) {
 
 
 	state &st =getActualState();
-	evalEntry* probeEval= evalTable.probe(st.key);
+	evalEntry* probeEval= evalHashTable.probe(st.key);
 	if(probeEval!=nullptr){
 		if(st.nextMove)
 		{
@@ -2027,7 +2027,7 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 	score=std::min(highSat,score);
 	score=std::max(lowSat,score);
 
-	evalTable.insert(st.pawnKey,score);
+	evalHashTable.insert(st.pawnKey,score);
 
 
 	if(st.nextMove)
@@ -2040,5 +2040,5 @@ Score Position::eval(pawnTable& pawnHashTable, evalTable& evalTable) const {
 
 }
 
-template Score Position::eval<false>(pawnTable& pawnHashTable, evalTable& evalTable) const;
-template Score Position::eval<true>(pawnTable& pawnHashTable, evalTable& evalTable) const;
+template Score Position::eval<false>(void);
+template Score Position::eval<true>(void);

@@ -234,7 +234,7 @@ public:
 	void undoMove(Move &m);
 	static void initCastleRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
-	template<bool trace>Score eval(pawnTable& pawnHashTable, evalTable& evalTable) const;
+	template<bool trace>Score eval(void);
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 	bool moveGivesCheck(Move& m)const ;
@@ -330,14 +330,14 @@ public:
 		\date 21/11/2013
 	*/
 	inline state& getActualState(void)const {
-		assert(stateIndex>=0);
+		//assert(stateIndex>=0);
 		assert(stateIndex<STATE_INFO_LENGHT);
 		return (state&) stateInfo[stateIndex];
 		//return (state&) *actualState;
 	}
 
 	inline state& getState(unsigned int n)const {
-			assert(stateIndex>=0);
+			//assert(stateIndex>=0);
 			assert(stateIndex<STATE_INFO_LENGHT);
 			return (state&) stateInfo[n];
 		}
@@ -349,9 +349,10 @@ public:
 		\date 21/11/2013
 	*/
 	inline void insertState(state & s){
-		assert(stateIndex<STATE_INFO_LENGHT);
+
 
 		stateIndex++;
+		assert(stateIndex<STATE_INFO_LENGHT);
 		//Move killer0;
 		//Move killer1;
 		//killer0=stateInfo[stateIndex].killers[0];
@@ -372,8 +373,10 @@ public:
 		\date 21/11/2013
 	*/
 	inline void removeState(){
-		assert(stateIndex>=0);
+		//assert(stateIndex>=0);
+
 		stateIndex--;
+		assert(stateIndex<STATE_INFO_LENGHT);
 		//actualState= &stateInfo[stateIndex];
 	}
 
@@ -553,6 +556,9 @@ private:
 	void clear();
 	inline void calcCheckingSquares(void);
 	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next);
+
+	pawnTable pawnHashTable;
+	evalTable evalHashTable;
 
 
 

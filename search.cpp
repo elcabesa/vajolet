@@ -456,7 +456,6 @@ Score search::startThinking(Position & p,searchLimits & l){
 	Statistics::instance().printNodeTypeStat();
 #endif
 
-	//history.printBestMoves();
 	return res;
 
 
@@ -591,7 +590,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	Score staticEval;
 	Score eval;
 	if(inCheck){
-		staticEval=pos.eval<false>(pawnHashTable, evalHashTable);
+		staticEval=pos.eval<false>();
 		eval=staticEval;
 #ifdef DEBUG_EVAL_SIMMETRY
 		Position ppp;
@@ -623,12 +622,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		}
 		else
 		{
-			staticEval=pos.eval<false>(pawnHashTable, evalHashTable);
+			staticEval=pos.eval<false>();
 			eval=staticEval;
 #ifdef DEBUG_EVAL_SIMMETRY
 			Position ppp;
 			ppp.setupFromFen(pos.getSymmetricFen());
-			Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
+			Score test=ppp.eval<false>();
 			if(test!=eval){
 				pos.display();
 				while(1);
@@ -1392,11 +1391,11 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	ttType TTtype=typeScoreLowerThanAlpha;
 
 
-	Score staticEval= tte?tte->getStaticValue():pos.eval<false>(pawnHashTable, evalHashTable);
+	Score staticEval= tte?tte->getStaticValue():pos.eval<false>();
 #ifdef DEBUG_EVAL_SIMMETRY
 	Position ppp;
 	ppp.setupFromFen(pos.getSymmetricFen());
-	Score test=ppp.eval<false>(pawnHashTable,evalHashTable);
+	Score test=ppp.eval<false>();
 	if(test!=staticEval){
 		pos.display();
 

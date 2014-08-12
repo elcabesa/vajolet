@@ -64,10 +64,11 @@ class my_thread{
 	static unsigned long lastHasfullMessage;
 
 	void initThreads();
-	void quitThreads();
+
 	void timerThread();
 	void searchThread();
 public :
+	void quitThreads();
 
 	static std::mutex  _mutex;
 

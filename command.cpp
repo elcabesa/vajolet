@@ -296,6 +296,7 @@ void uciLoop(){
 	std::string token, cmd;
 
 	do{
+		assert(thr);
 		if (!std::getline(std::cin, cmd)) // Block here waiting for input
 			cmd = "quit";
 		std::istringstream is(cmd);
@@ -325,9 +326,7 @@ void uciLoop(){
 			setvalue(is);
 		}
 		else if (token =="eval"){
-			pawnTable pawnHashTable;
-			evalTable evalHashTable;
-			sync_cout<<"Eval:" <<pos.eval<true>(pawnHashTable,evalHashTable)/10000.0<<sync_endl;
+			sync_cout<<"Eval:" <<pos.eval<true>()/10000.0<<sync_endl;
 			sync_cout<<"gamePhase:" <<pos.getGamePhase()/65536.0*100<<"%"<<sync_endl;
 #ifdef DEBUG_EVAL_SIMMETRY
 
@@ -362,4 +361,7 @@ void uciLoop(){
 			sync_cout<<"unknown command"<<sync_endl;
 		}
 	}while(token!="quit");
+
+	thr->quitThreads();
+
 }

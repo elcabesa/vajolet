@@ -1426,7 +1426,9 @@ bool Position::isDraw(bool isPVline) const {
 	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2){
 		unsigned int stateIndexPointer=stateIndex-i;
 		assert(stateIndex>=i);
+		assert(stateIndexPointer<STATE_INFO_LENGHT);
 		const state* stp=&stateInfo[stateIndexPointer];
+		assert(stp);
 		if(stp->key==getActualState().key){
 			counter++;
 			if(!isPVline || counter>=3){
