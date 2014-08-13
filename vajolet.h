@@ -20,7 +20,7 @@
 
 
 // disable assert define
-//#define NDEBUG
+#define NDEBUG
 #include <cassert>
 
 //---------------------------------------------
@@ -121,7 +121,7 @@ typedef enum enSquare{						/*!< square name and directions*/
 ENABLE_OPERATORS_ON(tSquare);
 
 
-typedef Vec4i simdScore;					/*!< score saved as a vector of 4 signed int scores*/
+typedef Vec4i  simdScore alignas(16);					/*!< score saved as a vector of 4 signed int scores*/
 typedef signed int Score;					/*!< score saved as a single signed int value*/
 
 

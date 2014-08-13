@@ -33,6 +33,7 @@ enum color{
 };
 
 
+simdScore traceRes=simdScore(0,0,0,0);
 
 const int KingExposed[] = {
      2,  0,  2,  5,  5,  2,  0,  2,
@@ -1150,7 +1151,7 @@ Score Position::eval(void) {
 		}
 	}
 
-	simdScore traceRes=0;
+	traceRes=0;
 	if(trace){
 
 		sync_cout <<std::setprecision(3)<< std::setw(21) << "Eval term " << "|     White    |     Black    |      Total     \n"
