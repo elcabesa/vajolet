@@ -244,10 +244,9 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 
 
-				/*sync_cout<<"FINISHED SEARCH"<<sync_endl;
-				sync_cout<<"res="<<res<<sync_endl;
-				sync_cout<<p.displayUci(newPV[0])<<sync_endl;
-				sync_cout<<"PVsize "<<newPV.size()<<sync_endl;*/
+
+				sync_cout<<"FINISHED SEARCH"<<sync_endl;
+				sync_cout<<"PVsize "<<newPV.lenght<<sync_endl;
 
 				if(depth!=1 && signals.stop){
 					//sync_cout<<"iterative deepening Stop"<<sync_endl;
@@ -266,6 +265,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 						it->PV.lenght=newPV.lenght;
 						for(unsigned int i=0;i<newPV.lenght;i++)
 						{
+							assert(i<MAX_PV_LENGHT);
 							it->PV.list[i]=newPV.list[i];
 						}
 
@@ -493,6 +493,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 	if(PVnode)
 	{
+		assert(PV);
 		PV->lenght=0;
 	}
 
@@ -1316,6 +1317,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	assert(PVnode || alpha+1==beta);
 
 	if(PVnode){
+		assert(pvLine);
 		pvLine->lenght=0;
 	}
 
