@@ -83,7 +83,6 @@ int main()
 	//t.drawAverageEvolution();
 
 
-
 #ifdef PRINT_STATISTICS
 	Statistics::instance().initNodeTypeStat();
 #endif
