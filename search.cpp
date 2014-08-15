@@ -245,8 +245,8 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 
 
-				sync_cout<<"FINISHED SEARCH"<<sync_endl;
-				sync_cout<<"PVsize "<<newPV.lenght<<sync_endl;
+				//sync_cout<<"FINISHED SEARCH"<<sync_endl;
+				//sync_cout<<"PVsize "<<newPV.lenght<<sync_endl;
 
 				if(depth!=1 && signals.stop){
 					//sync_cout<<"iterative deepening Stop"<<sync_endl;
