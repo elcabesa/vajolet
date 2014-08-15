@@ -45,7 +45,7 @@ class Position{
 	    : stateIndex(other.stateIndex) // calls the copy constructor of the age
 
 	{
-		for(int i=0;i<STATE_INFO_LENGHT;i++){
+		for(int i=0;i<STATE_INFO_LENGTH;i++){
 			stateInfo[i]=other.stateInfo[i];
 		}
 		for(int i=0;i<squareNumber;i++){
@@ -568,9 +568,9 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	state stateInfo[STATE_INFO_LENGHT];
+	state stateInfo[STATE_INFO_LENGTH];
 
-	Move killers[STATE_INFO_LENGHT][2];
+	Move killers[STATE_INFO_LENGTH][2];
 
 	/*! \brief put a piece on the board
 		\author STOCKFISH

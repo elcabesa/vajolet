@@ -263,9 +263,9 @@ Score search::startThinking(Position & p,searchLimits & l){
 					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+indexPV,rootMoves.end(),newPV.list[0]);
 					if(it->firstMove==newPV.list[0]){
 						it->PV.lenght=newPV.lenght;
-						for(unsigned int i=0;i<newPV.lenght;i++)
+						for(unsigned int i=0;i<std::min(newPV.lenght,(unsigned int)MAX_PV_LENGTH);i++)
 						{
-							assert(i<MAX_PV_LENGHT);
+							assert(i<MAX_PV_LENGTH);
 							it->PV.list[i]=newPV.list[i];
 						}
 
@@ -462,7 +462,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 }
 
-template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,PVline * PV){
+template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,PVline * pvLine){
 
 	//bool verbose=false;
 #ifdef PRINT_STATISTICS
@@ -493,8 +493,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 	if(PVnode)
 	{
-		assert(PV);
-		PV->lenght=0;
+		assert(pvLine);
+		pvLine->lenght=0;
 	}
 
 	if( showLine && depth <=ONE_PLY){
@@ -517,7 +517,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	if(type !=search::nodeType::ROOT_NODE){
 		if(pos.isDraw(PVnode) || signals.stop){
 			if(PVnode){
-				PV->lenght=0;
+				pvLine->lenght=0;
 			}
 			//if(signals.stop){sync_cout<<"alpha beta initial Stop"<<sync_endl;}
 			return 0;
@@ -570,8 +570,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		if(ttMove.packed && mg.isMoveLegal(ttMove)){
 			if(PVnode)
 			{
-				PV->lenght=1;
-				PV->list[1]=ttMove;
+				pvLine->lenght=1;
+				pvLine->list[0]=ttMove;
 			}
 		}
 #ifdef PRINT_STATISTICS
@@ -836,6 +836,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		pos.getActualState().skipNullMove=true;
 
 		PVline childPV;
+		childPV.lenght=0;
 		const search::nodeType iidType=type;
 		assert(d>=ONE_PLY);
 		alphaBeta<iidType>(ply,pos, d, alpha, beta, &childPV);
@@ -992,6 +993,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 		Score val;
 		PVline childPV;
+		childPV.lenght=0;
 		if(PVnode){
 			if(moveNumber==1){
 #ifdef DEBUG1
@@ -1000,6 +1002,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				}
 #endif
 
+				childPV.lenght=0;
 				if(newDepth<ONE_PLY){
 					val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
 				}else{
@@ -1162,9 +1165,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				if(type ==search::nodeType::ROOT_NODE|| (PVnode &&!signals.stop)){
 					if(PVnode){
 
-						PV->lenght=childPV.lenght+1;
-						PV->list[0]=bestMove;
-						memcpy(PV->list + 1, childPV.list,  std::min(childPV.lenght,(unsigned int)(MAX_PV_LENGHT-1)) * sizeof(Move));
+						pvLine->lenght=std::min(childPV.lenght+1, (unsigned int)(MAX_PV_LENGTH));
+						pvLine->list[0]=bestMove;
+						memcpy(pvLine->list + 1, childPV.list,  std::min(childPV.lenght,(unsigned int)(MAX_PV_LENGTH-1)) * sizeof(Move));
 					}
 				}
 			}
@@ -1435,6 +1438,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	Move bestMove=ttMove;
 	//bestMove=0;
 	PVline childPV;
+	childPV.lenght=0;
 
 	while (bestScore <beta  &&  (m=mg.getNextMove()).packed) {
 		assert(alpha<beta);
@@ -1520,11 +1524,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 				TTtype=typeExact;
 				alpha =val;
 				if(PVnode &&!signals.stop){
-					if(PVnode){
-						pvLine->lenght=childPV.lenght+1;
-						pvLine->list[0]=bestMove;
-						memcpy(pvLine->list + 1, childPV.list, std::min(childPV.lenght,(unsigned int)(MAX_PV_LENGHT-1)) * sizeof(Move));
-					}
+					pvLine->lenght=std::min(childPV.lenght+1, (unsigned int)(MAX_PV_LENGTH));
+					pvLine->list[0]=bestMove;
+					memcpy((pvLine->list) + 1, childPV.list, std::min(childPV.lenght,(unsigned int)(MAX_PV_LENGTH-1)) * sizeof(Move));
 
 				}
 			}

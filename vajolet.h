@@ -54,8 +54,8 @@
 #define MAX_MOVE_PER_POSITION (512)
 #define ONE_PLY		(16)
 #define ONE_PLY_SHIFT (4)
-#define MAX_PV_LENGHT	(200)
-#define STATE_INFO_LENGHT (2000)
+#define MAX_PV_LENGTH	(200)
+#define STATE_INFO_LENGTH (2000)
 
 //---------------------------------------------
 //SCORE DEFINITION

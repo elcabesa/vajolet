@@ -29,7 +29,7 @@
 
 typedef struct pvl{
 	unsigned int lenght;
-	Move list[MAX_PV_LENGHT];
+	Move list[MAX_PV_LENGTH];
 }PVline;
 
 
@@ -132,7 +132,7 @@ public:
 	}
 	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,PVline * pvLine);
 private:
-	template<nodeType type>Score alphaBeta(unsigned int ply,Position & p,int depth,Score alpha,Score beta,PVline *  PV);
+	template<nodeType type>Score alphaBeta(unsigned int ply,Position & p,int depth,Score alpha,Score beta,PVline *  pvLine);
 
 	unsigned long long visitedNodes;
 	unsigned int selDepth;
