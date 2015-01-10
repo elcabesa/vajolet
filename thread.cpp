@@ -93,7 +93,7 @@ void my_thread::timerThread() {
 
 		std::unique_lock<std::mutex> lk(mutex);
 
-		timerCond.wait(lk,[&]{return startThink||quit;});
+		timerCond.wait(lk,[&]{return (startThink && src.signals.stop==false )||quit;});
 		if (!quit){
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
 			unsigned long time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
@@ -149,6 +149,7 @@ void my_thread::searchThread() {
 		if(!quit){
 			timeManagerInit(*pos, limits,timeMan);
 			startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+			src.signals.stop=false;
 			timerCond.notify_one();
 			src.startThinking(*pos,limits);
 			//sync_cout<<"startThink=false"<<sync_endl;
