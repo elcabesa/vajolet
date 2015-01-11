@@ -4,4 +4,5 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.000		+0							10/01/2015	cutechess-cli freeze patch
 2.001		+0							11/01/2015	nuova vectorlib, eliminti alcuni warning e saturata uscita CP
 2.002		+0							11/01/2015	eliminati ultimi warning e FORSE faster code (+0,3%????)
-2.003									11/01/2015
+2.003		+5(vs 2.000)				11/01/2015	modificata gestione tempo
+2.004									11/01/2015	modificato eval, speedup (....%)
