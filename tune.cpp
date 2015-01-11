@@ -251,7 +251,7 @@ void Tuner::createEpd(void){
 				pos.setupFromFen(clearTempFen);
 				sl.depth=10;
 				Score searchRes=searcher.startThinking(pos,sl);
-				unsigned int res=lastFen.find('w');
+				size_t res=lastFen.find('w');
 
 				if(abs(searchRes)<10000){
 					draw=true;

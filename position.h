@@ -457,11 +457,11 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline bitMap getAttackersTo(tSquare to) const {
+	inline bitMap getAttackersTo(const tSquare to) const {
 		return getAttackersTo(to, bitBoard[occupiedSquares]);
 	}
 
-	bitMap getAttackersTo(tSquare to, bitMap occupancy) const;
+	bitMap getAttackersTo(const tSquare to, const bitMap occupancy) const;
 
 
 	/*! \brief return the mvvlva score
@@ -469,7 +469,7 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline Score getMvvLvaScore(Move & m) const {
+	inline Score getMvvLvaScore(const Move & m) const {
 		Score s=pieceValue[squares[m.to]%separationBitmap][0]-(squares[m.from]%separationBitmap);
 		if (m.flags == Move::fpromotion){
 			s += (pieceValue[whiteQueens +m.promotion] - pieceValue[whitePawns])[0];
@@ -499,16 +499,16 @@ public:
 
 
 
-	inline bool isCaptureMove(Move & m) const {
+	inline bool isCaptureMove(const Move & m) const {
 		return squares[m.to]!=empty || m.flags==Move::fenpassant;
 	}
-	inline bool isCastleMove(Move & m) const {
+	inline bool isCastleMove(const Move & m) const {
 		return  m.flags==Move::fcastle;
 	}
-	inline bool isCaptureMoveOrPromotion(Move & m) const {
+	inline bool isCaptureMoveOrPromotion(const Move & m) const {
 		return squares[m.to]!=empty || m.flags==Move::fenpassant || m.flags == Move::fpromotion;
 	}
-	inline bool isPassedPawnMove(Move & m) const {
+	inline bool isPassedPawnMove(const Move & m) const {
 		if(isPawn(squares[m.to])){
 			bool color=squares[m.to]>=separationBitmap;
 			bitMap theirPawns=color? bitBoard[whitePawns]:bitBoard[blackPawns];

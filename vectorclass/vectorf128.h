@@ -823,7 +823,7 @@ static inline Vec4f pow(Vec4f const & a, int n) {
     }
 }
 // prevent implicit conversion of float exponent to int
-static Vec4f pow(Vec4f const & x, float y);
+//static Vec4f pow(Vec4f const & x, float y);
 
 // Raise floating point numbers to integer power n, where n is a compile-time constant
 template <int n>
@@ -1014,7 +1014,7 @@ static inline Vec4f exp2(Vec4i const & n) {
     Vec4i t4 = t3 << 23;               // put exponent into position 23
     return _mm_castsi128_ps(t4);       // reinterpret as float
 }
-static Vec4f exp2(Vec4f const & x); // defined in vectormath_exp.h
+//static Vec4f exp2(Vec4f const & x); // defined in vectormath_exp.h
 
 
 // Control word manipulaton
@@ -1731,7 +1731,7 @@ static inline Vec2d pow(Vec2d const & a, int n) {
     }
 }
 // prevent implicit conversion of exponent to int
-static Vec2d pow(Vec2d const & x, double y);
+//static Vec2d pow(Vec2d const & x, double y);
 
 
 // Raise floating point numbers to integer power n, where n is a compile-time constant
@@ -1982,7 +1982,7 @@ static inline Vec2d exp2(Vec2q const & n) {
     Vec2q t4 = t3 << 52;               // put exponent into position 52
     return _mm_castsi128_pd(t4);       // reinterpret as double
 }
-static Vec2d exp2(Vec2d const & x); // defined in vectormath_exp.h
+//static Vec2d exp2(Vec2d const & x); // defined in vectormath_exp.h
 
 
 // Categorization functions

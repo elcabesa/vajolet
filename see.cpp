@@ -17,6 +17,7 @@
 
 #include "vajolet.h"
 
+#include "io.h"
 #include "move.h"
 #include "position.h"
 #include "movegen.h"
@@ -55,7 +56,7 @@ Score Position::see(Move m) const {
 
 	Score swapList[64];
 	unsigned int slIndex = 1;
-	bitMap attackers,colorAttackers;
+	bitMap colorAttackers;
 	bitboardIndex captured;
 
 	swapList[0] = pieceValue[squares[to]%separationBitmap][0];
@@ -77,7 +78,7 @@ Score Position::see(Move m) const {
 
 	// Find all attackers to the destination square, with the moving piece
 	// removed, but possibly an X-ray attacker added behind it.
-	attackers = getAttackersTo(to, occupied) & occupied;
+	bitMap && attackers = getAttackersTo(to, occupied) & occupied;
 //	displayBitMap(attackers);
 
 	// If the opponent has no attackers we are finished

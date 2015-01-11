@@ -847,7 +847,7 @@ static inline Vec8f pow(Vec8f const & a, int n) {
     return Vec8f(pow(a.get_low(),n), pow(a.get_high(),n));
 }
 // prevent implicit conversion of exponent to int
-static Vec8f pow(Vec8f const & x, float y);
+//static Vec8f pow(Vec8f const & x, float y);
 
 
 // Raise floating point numbers to integer power n, where n is a compile-time constant
@@ -941,7 +941,7 @@ static inline Vec8f fraction(Vec8f const & a) {
 static inline Vec8f exp2(Vec8i const & a) {
     return Vec8f(exp2(a.get_low()), exp2(a.get_high()));
 }
-static Vec8f exp2(Vec8f const & x); // defined in vectormath_exp.h
+//static Vec8f exp2(Vec8f const & x); // defined in vectormath_exp.h
 #endif // VECTORI256_H
 
 
@@ -1407,7 +1407,7 @@ static inline Vec4d pow(Vec4d const & a, int n) {
     return Vec4d(pow(a.get_low(),n), pow(a.get_high(),n));
 }
 // prevent implicit conversion of exponent to int
-static Vec4d pow(Vec4d const & x, double y);
+//static Vec4d pow(Vec4d const & x, double y);
 
 
 // Raise floating point numbers to integer power n, where n is a compile-time constant
@@ -1539,7 +1539,7 @@ static inline Vec4d fraction(Vec4d const & a) {
 static inline Vec4d exp2(Vec4q const & a) {
     return Vec4d(exp2(a.get_low()), exp2(a.get_high()));
 }
-static Vec4d exp2(Vec4d const & x); // defined in vectormath_exp.h
+//static Vec4d exp2(Vec4d const & x); // defined in vectormath_exp.h
 #endif
 
 

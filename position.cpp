@@ -1305,21 +1305,21 @@ bitMap Position::getHiddenCheckers(tSquare kingSquare,eNextMove next){
 	\version 1.0
 	\date 08/11/2013
 */
-bitMap Position::getAttackersTo(tSquare to, bitMap occupancy) const {
+bitMap Position::getAttackersTo(const tSquare to, const bitMap occupancy) const {
 	assert(to<squareNumber);
 	bitMap res=(Movegen::attackFromPawn(to,1) & bitBoard[whitePawns])
 			|(Movegen::attackFromPawn(to,0) & bitBoard[blackPawns])
 			|(Movegen::attackFromKnight(to) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))
 			|(Movegen::attackFromKing(to) & (bitBoard[blackKing]|bitBoard[whiteKing]));
 	bitMap mask=(bitBoard[blackBishops]|bitBoard[whiteBishops]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
-	if(Movegen::getBishopPseudoAttack(to) &mask){
-		res |=Movegen::attackFromBishop(to,occupancy) & mask;
+	if(mask & Movegen::getBishopPseudoAttack(to) ){
+		res |= Movegen::attackFromBishop(to,occupancy) & mask;
 	}
 	mask= (bitBoard[blackRooks]|bitBoard[whiteRooks]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
-	if(Movegen::getRookPseudoAttack(to) &mask){
+	if(mask & Movegen::getRookPseudoAttack(to)){
 		res |=Movegen::attackFromRook(to,occupancy) & mask;
 	}
-	return	res;
+	return res;
 }
 
 
