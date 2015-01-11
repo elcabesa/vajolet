@@ -1282,16 +1282,16 @@ Score Position::eval(void) {
 			res-=bishopPair;
 		}
 	}
-	if(pieceCount[whiteQueens]-pieceCount[blackQueens]==1
-			&& pieceCount[blackRooks]-pieceCount[whiteRooks]==1
-			&& pieceCount[blackBishops] +pieceCount[blackKnights]-pieceCount[whiteBishops] -pieceCount[whiteKnights]==2)
+	if((int)pieceCount[whiteQueens]-(int)pieceCount[blackQueens]==1
+			&& (int)pieceCount[blackRooks]-(int)pieceCount[whiteRooks]==1
+			&& (int)pieceCount[blackBishops] +(int)pieceCount[blackKnights]-(int)pieceCount[whiteBishops] -(int)pieceCount[whiteKnights]==2)
 	{
 		res -= queenVsRook2MinorsImbalance;
 
 	}
-	else if(pieceCount[whiteQueens]-pieceCount[blackQueens]==-1
-			&& pieceCount[blackRooks]-pieceCount[whiteRooks]==-1
-			&& pieceCount[blackBishops] +pieceCount[blackKnights]-pieceCount[whiteBishops] -pieceCount[whiteKnights]==-2)
+	else if((int)pieceCount[whiteQueens]-(int)pieceCount[blackQueens]==-1
+			&& (int)pieceCount[blackRooks]-(int)pieceCount[whiteRooks]==-1
+			&& (int)pieceCount[blackBishops] +(int)pieceCount[blackKnights]-(int)pieceCount[whiteBishops] -(int)pieceCount[whiteKnights]==-2)
 	{
 		res += queenVsRook2MinorsImbalance;
 

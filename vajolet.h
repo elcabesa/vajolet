@@ -33,7 +33,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.0.000"
+#define VERSION			"2.0.001"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
 
@@ -68,6 +68,8 @@
 #define SCORE_MATE_IN_MAX_PLY	(1999999000)
 #define SCORE_KNOWN_WIN			(1000000000)
 #define SCORE_MATED_IN_MAX_PLY	(-SCORE_MATE_IN_MAX_PLY)
+#define SCORE_MAX_OUTPUT_VALUE	(360000)
+#define SCORE_MIN_OUTPUT_VALUE	(-SCORE_MAX_OUTPUT_VALUE)
 
 //---------------------------------------------
 //

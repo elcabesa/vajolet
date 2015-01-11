@@ -303,7 +303,7 @@ void Tuner::createEpd(void){
 					std::string fen=fenstr;
 
 					std::string clearFen=fen.substr(0,fen.find("bm")-1);
-					if(line2-startLine>=0 && (draw || line-line2>=0)){
+					if((signed long)(line2-startLine)>=0 && (draw || (signed long)(line-line2)>=0)){
 						Position pos;
 						pos.setupFromFen(clearFen);
 						Score searchRes;
