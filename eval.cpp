@@ -2002,8 +2002,8 @@ Score Position::eval(void) {
 	}
 
 	//todo scaling
-	if(mulCoeff==256 && (pieceCount[whitePawns]+pieceCount[blackPawns]==0) && abs(st.material[0])<40000 && st.nonPawnMaterial[0]<60000 && st.nonPawnMaterial[2]<60000 ){
-		mulCoeff=102;
+	if(mulCoeff==256 && (pieceCount[whitePawns]+pieceCount[blackPawns]==0) && abs(st.material[0])<40000 && st.nonPawnMaterial[0]<90000 && st.nonPawnMaterial[2]<90000 ){
+		mulCoeff=40;
 	}
 
 
