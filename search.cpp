@@ -551,9 +551,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 			tte!=nullptr
 			&& tte->getDepth() >= depth
 		    && ttValue != SCORE_NONE // Only in case of TT access race
-		    //&& (	PVnode ?  tte->getType() == typeExact
+		    && (	PVnode ?  tte->getType() == typeExact
 		    // TODO vedere se nei PV node in cui ho un beta cutoff o un alpha cutoff ritornare il valore del TT
-		    && (	PVnode ?  false
+		    //&& (	PVnode ?  false
 		            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
 		                              : (tte->getType() ==  typeScoreLowerThanAlpha || tte->getType() == typeExact)))
 	{
@@ -568,12 +568,17 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		}
 
 
-		Movegen mg(pos,history,ttMove);
-		if(ttMove.packed && mg.isMoveLegal(ttMove)){
-			if(PVnode)
-			{
+
+		if(PVnode)
+		{
+			Movegen mg(pos,history,ttMove);
+			if(ttMove.packed && mg.isMoveLegal(ttMove)){
 				pvLine->lenght=1;
 				pvLine->list[0]=ttMove;
+			}
+			else
+			{
+				pvLine->lenght=0;
 			}
 		}
 #ifdef PRINT_STATISTICS
@@ -1368,14 +1373,28 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	if (tte
 		&& tte->getDepth() >= TTdepth
 	    && ttValue != SCORE_NONE // Only in case of TT access race
-	    && (	PVnode ?  false/*tte->getType() == typeExact*/
+	    && (	PVnode ?  tte->getType() == typeExact
 	            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta|| tte->getType() == typeExact)
 	                              : (tte->getType() ==  typeScoreLowerThanAlpha|| tte->getType() == typeExact)))
 	{
 		TT.refresh(tte);
-		if(PVnode){
-			pvLine->lenght=0;
+
+
+
+		if(PVnode)
+		{
+			Movegen mg(pos,history,ttMove);
+			if(ttMove.packed && mg.isMoveLegal(ttMove))
+			{
+				pvLine->lenght=1;
+				pvLine->list[0]=ttMove;
+			}
+			else
+			{
+				pvLine->lenght=0;
+			}
 		}
+
 
 		/*if(ttMove.packed && Movegen::isMoveLegal(ttMove)){
 			PV.clear();

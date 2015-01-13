@@ -6,4 +6,5 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.002		+0							11/01/2015	eliminati ultimi warning e FORSE faster code (+0,3% vs 1.45)
 2.003		+4(vs 2.000)				11/01/2015	modificata gestione tempo
 2.004		+2(vs 2.000)				11/01/2015	modificato eval, speedup (+0.7% vs 1.45)
-2.005									12/01/2015modificat gestione finali patti
+2.005		+6(vs 2.000)				12/01/2015	modificato gestione finali patti
+2.006		(vs 2.000)					13/01/2015	uso TT exact anche nella PV
