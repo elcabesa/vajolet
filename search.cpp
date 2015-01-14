@@ -1011,7 +1011,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 				childPV.lenght=0;
 				if(newDepth<ONE_PLY){
-					val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
+					val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,0,-beta,-alpha,&childPV);
 				}else{
 					val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
 				}
@@ -1058,7 +1058,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 					}
 #endif
 					if(newDepth<ONE_PLY){
-						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,0,-alpha-1,-alpha,NULL);
 					}else{
 						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
 					}
@@ -1076,7 +1076,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						}
 #endif
 						if(newDepth<ONE_PLY){
-							val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
+							val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,0,-beta,-alpha,&childPV);
 						}
 						else{
 							val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
@@ -1127,7 +1127,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						/*if(verbose){
 							sync_cout<<"qsearch depth "<<newDepth<<sync_endl;
 						}*/
-						val=-qsearch<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-qsearch<childNodesType>(ply+1,pos,0,-alpha-1,-alpha,NULL);
 					}else{
 						/*if(verbose){
 							sync_cout<<"search depth "<<newDepth<<sync_endl;
@@ -1140,7 +1140,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						/*if(verbose){
 							sync_cout<<"qsearch depth "<<newDepth<<sync_endl;
 						}*/
-						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,0,-alpha-1,-alpha,NULL);
 					}else{
 						/*if(verbose){
 							sync_cout<<"search depth "<<newDepth<<sync_endl;
