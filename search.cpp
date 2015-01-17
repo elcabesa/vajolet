@@ -264,11 +264,15 @@ Score search::startThinking(Position & p,searchLimits & l){
 				if(newPV.lenght!=0 && res > alpha /*&& res < beta*/){
 					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+indexPV,rootMoves.end(),newPV.list[0]);
 					if(it->firstMove==newPV.list[0]){
-						it->PV.lenght=newPV.lenght;
-						for(unsigned int i=0;i<std::min(newPV.lenght,(unsigned int)MAX_PV_LENGTH);i++)
+
+						//if(res<beta)
 						{
-							assert(i<MAX_PV_LENGTH);
-							it->PV.list[i]=newPV.list[i];
+							it->PV.lenght=newPV.lenght;
+							for(unsigned int i=0;i<std::min(newPV.lenght,(unsigned int)MAX_PV_LENGTH);i++)
+							{
+								assert(i<MAX_PV_LENGTH);
+								it->PV.list[i]=newPV.list[i];
+							}
 						}
 
 						it->score=res;
@@ -280,7 +284,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 					}
 					else{
-						sync_cout<<"NOT FOUND NEW_PV"<<sync_endl;
+						sync_cout<<"ERRORE NOT FOUND NEW_PV"<<sync_endl;
 					}
 
 				}
@@ -288,22 +292,24 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 
 				// reload the last PV in the transposition table
-				/*for(unsigned int i =0; i<=indexPV; i++){
+				for(unsigned int i =0; i<=indexPV; i++){
 					int n=0;
 					if(rootMoves[i].PV.lenght>0){
 						const ttEntry* tte;
 
-						sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
-						for (unsigned int z= 0; z < rootMoves[i].PV.lenght && mg.isMoveLegal(rootMoves[i].PV.list[z]); z++){
-							tte = TT.probe(p.getActualState().key);
-							if(((n%2)?-rootMoves[i].score:rootMoves[i].score)>=SCORE_MATE)
+						//sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
+						for (unsigned int z= 0; z < rootMoves[i].PV.lenght; z++){
+							if(!mg.isMoveLegal(rootMoves[i].PV.list[z]))
 							{
-								sync_cout<<"pippo mate "<<((n%2)?-rootMoves[i].score:rootMoves[i].score)<<sync_endl;
-								p.display();
+								sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
+								break;
 							}
+							tte = TT.probe(p.getActualState().key);
 
 							if (!tte || tte->getPackedMove() != (rootMoves[i].PV.list[z]).packed){// Don't overwrite correct entries
-								TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>(pawnHashTable,evalHashTable));
+								sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
+								//TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
+								TT.store(p.getActualState().key, SCORE_NONE,typeExact,-1000, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
 							}
 
 							//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
@@ -316,7 +322,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 							p.undoMove(rootMoves[i].PV.list[n]);
 						}
 					}
-				}*/
+				}
 
 
 				if (res <= alpha)

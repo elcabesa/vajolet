@@ -9,7 +9,10 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.005		+6(vs 2.000)				12/01/2015	modificato gestione finali patti
 2.006		-2(vs 2.000)				13/01/2015	uso TT exact anche nella PV
 2.007		-0(vs 2.000)				13/01/2015	primo qsearch fatto con depth=0, era newdepth
-2.008		(vs 2.000)					14/01/2015	eliminato codice della versione 2.006
+2.008		+6(vs 2.000)	0			14/01/2015	eliminato codice della versione 2.006
+			-1(vs 2.005)
 
 da fare
 rimettere dopo ogni ricerca la PV nella TT
+
+fare pfutility puning in tutti anche in PV ma non in root
