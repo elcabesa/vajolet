@@ -231,6 +231,40 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 			unsigned int reduction=0;
 
+			// reload the last PV in the transposition table
+			for(unsigned int i =0; i<=indexPV; i++){
+				sync_cout<<"LENGHT "<<rootMoves[i].PV.lenght<<sync_endl;
+				int n=0;
+				if(rootMoves[i].PV.lenght>0){
+					const ttEntry* tte;
+
+					//sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
+					for (unsigned int z= 0; z < rootMoves[i].PV.lenght; z++){
+						if(!mg.isMoveLegal(rootMoves[i].PV.list[z]))
+						{
+							sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
+							break;
+						}
+						tte = TT.probe(p.getActualState().key);
+
+						if (!tte || tte->getPackedMove() != (rootMoves[i].PV.list[z]).packed){// Don't overwrite correct entries
+							sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
+							//TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
+							TT.store(p.getActualState().key, SCORE_NONE,typeExact,-1000, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
+						}
+
+						//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
+						p.doMove(rootMoves[i].PV.list[z]);
+						n++;
+
+					}
+					for (n--;n>=0;n--){
+						//sync_cout<<"undo move "<<p.displayUci(rootMoves[i].PV[n])<<sync_endl;
+						p.undoMove(rootMoves[i].PV.list[n]);
+					}
+				}
+			}
+
 
 
 			do{
@@ -291,38 +325,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 
 
-				// reload the last PV in the transposition table
-				for(unsigned int i =0; i<=indexPV; i++){
-					int n=0;
-					if(rootMoves[i].PV.lenght>0){
-						const ttEntry* tte;
 
-						//sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
-						for (unsigned int z= 0; z < rootMoves[i].PV.lenght; z++){
-							if(!mg.isMoveLegal(rootMoves[i].PV.list[z]))
-							{
-								sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
-								break;
-							}
-							tte = TT.probe(p.getActualState().key);
-
-							if (!tte || tte->getPackedMove() != (rootMoves[i].PV.list[z]).packed){// Don't overwrite correct entries
-								sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
-								//TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
-								TT.store(p.getActualState().key, SCORE_NONE,typeExact,-1000, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
-							}
-
-							//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
-							p.doMove(rootMoves[i].PV.list[z]);
-							n++;
-
-						}
-						for (n--;n>=0;n--){
-							//sync_cout<<"undo move "<<p.displayUci(rootMoves[i].PV[n])<<sync_endl;
-							p.undoMove(rootMoves[i].PV.list[n]);
-						}
-					}
-				}
 
 
 				if (res <= alpha)
