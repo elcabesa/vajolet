@@ -233,7 +233,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 			// reload the last PV in the transposition table
 			for(unsigned int i =0; i<=indexPV; i++){
-				sync_cout<<"LENGHT "<<rootMoves[i].PV.lenght<<sync_endl;
+				//sync_cout<<"LENGHT "<<rootMoves[i].PV.lenght<<sync_endl;
 				int n=0;
 				if(rootMoves[i].PV.lenght>0){
 					const ttEntry* tte;
@@ -242,13 +242,13 @@ Score search::startThinking(Position & p,searchLimits & l){
 					for (unsigned int z= 0; z < rootMoves[i].PV.lenght; z++){
 						if(!mg.isMoveLegal(rootMoves[i].PV.list[z]))
 						{
-							sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
+							//sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
 							break;
 						}
 						tte = TT.probe(p.getActualState().key);
 
 						if (!tte || tte->getPackedMove() != (rootMoves[i].PV.list[z]).packed){// Don't overwrite correct entries
-							sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
+							//sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
 							//TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
 							TT.store(p.getActualState().key, SCORE_NONE,typeExact,-1000, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
 						}
@@ -311,7 +311,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 						it->score=res;
 						it->selDepth=selDepth-selDepthBase;
-						it->depth=depth-reduction;
+						it->depth=depth;
 						it->nodes=visitedNodes;
 						it->time= now-startTime;
 						std::iter_swap( it, rootMoves.begin()+indexPV);
@@ -335,8 +335,10 @@ Score search::startThinking(Position & p,searchLimits & l){
 					//my_thread::timeMan.idLoopRequestToExtend=true;
 					newPV.lenght=1;
 					newPV.list[0]=(rootMoves[indexPV].PV.list[0]);
-					printPV(res,depth-reduction,selDepth-selDepthBase,alpha,beta, p, now-startTime,indexPV,&newPV,visitedNodes);
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,indexPV,&newPV,visitedNodes);
 					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
+
+					reduction = 0;
 
 					//TT.store(p.getActualState().key, transpositionTable::scoreToTT(rootMoves[indexPV].previousScore, 0),typeExact,depth*ONE_PLY, (rootMoves[indexPV].PV[0]).packed, p.eval<false>(pawnHashTable, evalHashTable));
 					//sync_cout<<"new alpha "<<alpha<<sync_endl;

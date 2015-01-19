@@ -87,6 +87,7 @@ void my_thread::timerThread() {
 	 * provare, usando la statistica e la define PRINT_PV_CHANGES a capire quante volte cambia la PV durante la ricerca,
 	 * dargli uun peso in base al depth^2 e decidere in base a soglie o rapporti con i nodi etc se la posizione � calma o problematica
 	*/
+	unsigned int oldFullness=0;
 	std::mutex mutex;
 	while (!quit)
 	{
@@ -105,11 +106,15 @@ void my_thread::timerThread() {
 			}
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			if(time - lastHasfullMessage>1000){
+				unsigned int fullness = TT.getFullness();
 				lastHasfullMessage=time;
-				sync_cout<<"info hashfull "<<TT.getFullness()<<sync_endl;
+				if(fullness!=oldFullness){
+					sync_cout<<"info hashfull "<<fullness<<sync_endl;
+				}
 				if(src.showCurrentLine){
 					src.showLine=true;
 				}
+				oldFullness = fullness;
 			}
 #endif
 

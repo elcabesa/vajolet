@@ -11,8 +11,8 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.007		-0(vs 2.000)				13/01/2015	primo qsearch fatto con depth=0, era newdepth
 2.008		+6(vs 2.000)	0			14/01/2015	eliminato codice della versione 2.006
 			-1(vs 2.005)
+2.009		+8(vs 2.000)				18/01/2015	inserita PV nell tt prima di una nuova ricerca
 
 da fare
-rimettere dopo ogni ricerca la PV nella TT
 
 fare pfutility puning in tutti anche in PV ma non in root
