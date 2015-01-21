@@ -166,7 +166,7 @@ void Position::initPstValues(void){
 			}
 			else if(piece >separationBitmap && piece <blackPieces ){
 				int r=7-rank;
-				int f =file;
+				int f =7-file;
 				pstValue[piece][s]=-pstValue[piece-separationBitmap][BOARDINDEX[f][r]];
 
 				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){

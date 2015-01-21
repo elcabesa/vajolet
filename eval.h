@@ -78,6 +78,10 @@ extern simdScore kingShieldBonus;// only one value
 extern simdScore  kingFarShieldBonus;// only one value
 extern simdScore  kingStormBonus;// only one value
 extern simdScore kingSafetyBonus;
+extern simdScore  kingSafetyScaling;
+extern simdScore KingSafetyMaxAttack;
+extern simdScore KingSafetyLinearCoefficent;
+extern simdScore KingSafetyMaxResult;
 
 // TODO
 

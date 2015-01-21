@@ -90,6 +90,8 @@ simdScore queenOn7Bonus=simdScore(-3200,7000,0,0);
 simdScore queenOnPawns=simdScore(-1000,3000,0,0);
 simdScore rookOnOpen=simdScore(2000,500,0,0);
 simdScore rookOnSemi=simdScore(500,1100,0,0);
+simdScore rookTrapped = simdScore(300,0,0,0);
+simdScore rookTrappedKingWithoutCastlig = simdScore(300,0,0,0);
 
 simdScore knightOnOutpost= simdScore(1900,-280,0,0);
 simdScore knightOnOutpostSupported= simdScore(-2490,1290,0,0);
@@ -138,7 +140,11 @@ const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
 simdScore kingShieldBonus= 2400;
 simdScore  kingFarShieldBonus= 1800;
 simdScore  kingStormBonus= 80;
-simdScore kingSafetyBonus=simdScore(227,-73,0,0);
+simdScore kingSafetyBonus=simdScore(63,-10,0,0);
+simdScore  kingSafetyScaling=simdScore(310,0,0,0);
+simdScore KingSafetyMaxAttack=simdScore(93,0,0,0);
+simdScore KingSafetyLinearCoefficent=simdScore(5,0,0,0);
+simdScore KingSafetyMaxResult=simdScore(1000,0,0,0);
 //------------------------------------------------
 
 
@@ -1052,6 +1058,41 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 					res+=rookOnSemi;
 				}
 			}
+			//--------------------------------
+			// torre intrappolata
+			//--------------------------------
+			else if(mobility<3)
+			{
+
+				tSquare ksq= (piece<=Position::separationBitmap)? p.pieceList[Position::whiteKing][0]:p.pieceList[Position::blackKing][0];
+				unsigned int relativeRankKing =(piece>Position::separationBitmap)? 7-RANKS[ksq]:RANKS[ksq];
+
+
+				if(
+					((FILES[ksq] < 4) == (FILES[sq] < FILES[ksq])) &&
+					(RANKS[ksq] == RANKS[sq] && relativeRankKing == 0)
+				)
+				{
+
+					res -= rookTrapped*(3-mobility);
+					Position::state & st = p.getActualState();
+					if(piece<=Position::separationBitmap)
+					{
+						if(!(st.castleRights & (Position::wCastleOO| Position::wCastleOOO)) )
+						{
+							res-= rookTrappedKingWithoutCastlig*(3-mobility) ;
+						}
+					}
+					else
+					{
+						if(!(st.castleRights & (Position::bCastleOO| Position::bCastleOOO)) )
+						{
+							res-= rookTrappedKingWithoutCastlig*(3-mobility);
+						}
+
+					}
+				}
+			}
 			break;
 		}
 		case Position::whiteBishops:
@@ -1193,7 +1234,6 @@ Score Position::eval(void) {
 	// material + pst
 
 	simdScore res=simdScore(st.material[0],st.material[1],0,0);
-
 
 
 	//-----------------------------------------------------
@@ -1847,7 +1887,7 @@ Score Position::eval(void) {
 
 	res+=simdScore(kingSafety[0]-kingSafety[1],0,0,0);
 
-	if(kingAttackersCount[white]>=2 && kingAdjacentZoneAttacksCount[white])
+	if(kingAttackersCount[white])
 	{
 		//res+=simdScore(kingSafety[0],0,0,0);
 
@@ -1860,13 +1900,16 @@ Score Position::eval(void) {
 			|attackedSquares[blackRooks]
 			|attackedSquares[blackQueens]);
 
+
 		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[white] * kingAttackersWeight[white]) / 2)
 		                     + 3 * (kingAdjacentZoneAttacksCount[white] + bitCnt(undefendedSquares))
 		                     + KingExposed[63-pieceList[blackKing][0]]
-		                     - kingSafety[1] / 500;
+		                     - kingSafety[1] / kingSafetyScaling[0];
+
+
 
 		// safe contact queen check
-		bitMap safeContactSquare=undefendedSquares & attackedSquares[whiteQueens];
+		bitMap safeContactSquare=undefendedSquares & attackedSquares[whiteQueens] & ~bitBoard[whitePieces];
 		safeContactSquare &= (attackedSquares[whiteRooks]| attackedSquares[whiteBishops] | attackedSquares[whiteKnights]| attackedSquares[whitePawns]);
 
 		if(safeContactSquare){
@@ -1874,7 +1917,7 @@ Score Position::eval(void) {
 		}
 
 		// safe contact rook check
-		safeContactSquare=undefendedSquares & attackedSquares[whiteRooks];
+		safeContactSquare=undefendedSquares & attackedSquares[whiteRooks] & ~bitBoard[whitePieces];
 		safeContactSquare &= (attackedSquares[whiteRooks]| attackedSquares[whiteBishops] | attackedSquares[whiteKnights]| attackedSquares[whitePawns]);
 
 		safeContactSquare &=Movegen::getRookPseudoAttack(pieceList[blackKing][0]);
@@ -1904,18 +1947,20 @@ Score Position::eval(void) {
 		if(longDistCheck){
 			attackUnits+=bitCnt(longDistCheck);
 		}
-		attackUnits = std::min(99, std::max(0, attackUnits));
-		attackUnits*=attackUnits;
+		attackUnits = std::min(KingSafetyMaxAttack[0], std::max(0, attackUnits));
 
-		res+=(kingSafetyBonus*attackUnits)/32;
+		attackUnits*=std::min(KingSafetyLinearCoefficent[0], attackUnits);
+		attackUnits=std::min(KingSafetyMaxResult[0], attackUnits);
+
+
+		res+=(kingSafetyBonus*attackUnits);
 		if(trace){
-			wScore +=(kingSafetyBonus*attackUnits)/32;
+			wScore +=(kingSafetyBonus*attackUnits);
 		}
 
 	}
 
-
-	if(kingAttackersCount[black]>=2 && kingAdjacentZoneAttacksCount[black])
+	if(kingAttackersCount[black])
 	{
 
 		//res-=simdScore(kingSafety[1],0,0,0);
@@ -1931,9 +1976,10 @@ Score Position::eval(void) {
 		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount[black] * kingAttackersWeight[black]) / 2)
 							 + 3 * (kingAdjacentZoneAttacksCount[black] + bitCnt(undefendedSquares))
 							 + KingExposed[pieceList[whiteKing][0]]
-							 - kingSafety[0] / 500;
+							 - kingSafety[0] / kingSafetyScaling[0];
+
 		// safe contact queen check
-		bitMap safeContactSquare=undefendedSquares & attackedSquares[blackQueens];
+		bitMap safeContactSquare=undefendedSquares & attackedSquares[blackQueens]  & ~bitBoard[blackPieces];
 		safeContactSquare &= (attackedSquares[blackRooks]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
 
 		if(safeContactSquare){
@@ -1941,7 +1987,7 @@ Score Position::eval(void) {
 		}
 		// safe contact rook check
 
-		safeContactSquare=undefendedSquares & attackedSquares[blackRooks];
+		safeContactSquare=undefendedSquares & attackedSquares[blackRooks] & ~bitBoard[blackPieces];
 		safeContactSquare &= (attackedSquares[blackRooks]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
 
 		safeContactSquare &=Movegen::getRookPseudoAttack(pieceList[whiteKing][0]);
@@ -1971,11 +2017,12 @@ Score Position::eval(void) {
 		if(longDistCheck){
 			attackUnits+=bitCnt(longDistCheck);
 		}
-		attackUnits = std::min(99, std::max(0, attackUnits));
-		attackUnits*=attackUnits;
-		res-=(kingSafetyBonus*attackUnits)/32;
+		attackUnits = std::min(KingSafetyMaxAttack[0], std::max(0, attackUnits));
+		attackUnits*=std::min(KingSafetyLinearCoefficent[0], attackUnits);
+		attackUnits=std::min(KingSafetyMaxResult[0], attackUnits);
+		res-=(kingSafetyBonus*attackUnits);
 		if(trace){
-			bScore +=(kingSafetyBonus*attackUnits)/32;
+			bScore +=(kingSafetyBonus*attackUnits);
 		}
 
 
