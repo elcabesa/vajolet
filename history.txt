@@ -15,7 +15,8 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.010		+6(vs 2.000)				19/01/2015	debug reduction in iterative deepening + estetic changes
 2.011		+0(vs 2.000)				20/01/2015	position pst debug
 			-4(vs 2.010)				
-2.012		(vs 2.000)				20/01/2015	elimintata position pst debug, inserita valutazione rook trapped, modificata sicurezza re
+2.012		+12(vs 2.000)	+22			20/01/2015	elimintata position pst debug, inserita valutazione rook trapped, modificata sicurezza re
+2.013		+12(vs 2.000)				23/01/2015	modificata mobility
 da fare
 
 fare pfutility puning in tutti anche in PV ma non in root

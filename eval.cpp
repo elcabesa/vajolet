@@ -970,7 +970,9 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 			case Position::blackQueens:
 			case Position::whiteKnights:
 			case Position::blackKnights:
+
 				attack = Movegen::attackFrom(piece,sq,p.bitBoard[Position::occupiedSquares]);
+				break;
 			default:
 				break;
 		}
@@ -991,7 +993,9 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		// piece coordination
 		res+=bitCnt(defendedPieces)*pieceCoordination;
 
-		unsigned int mobility= (bitCnt(attack&~(threatenSquares|ourPieces))+ bitCnt(attack&~(ourPieces)))/2;
+
+		//unsigned int mobility= (bitCnt(attack&~(threatenSquares|ourPieces))+ bitCnt(attack&~(ourPieces)))/2;
+		unsigned int mobility= bitCnt(attack&~(threatenSquares|ourPieces));
 		//sync_cout<<mobility<<sync_endl;
 		res+=mobilityBonus[piece%Position::separationBitmap][mobility];
 		if(!(attack&~(threatenSquares|ourPieces)) && (threatenSquares&bitSet(sq))){ // zero mobility && attacked by pawn
