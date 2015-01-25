@@ -93,9 +93,10 @@ simdScore rookOnSemi=simdScore(500,1100,0,0);
 simdScore rookTrapped = simdScore(300,0,0,0);
 simdScore rookTrappedKingWithoutCastlig = simdScore(300,0,0,0);
 
-simdScore knightOnOutpost= simdScore(1900,-280,0,0);
-simdScore knightOnOutpostSupported= simdScore(-2490,1290,0,0);
+simdScore knightOnOutpost= simdScore(380,0,0,0);
+simdScore knightOnOutpostSupported= simdScore(100,1290,0,0);
 simdScore knightOnHole= simdScore(1610,1190,0,0);
+simdScore KnightAttackingWeakPawn= simdScore(300,300,0,0);
 
 simdScore bishopOnOutpost= simdScore(-1020,810,0,0);
 simdScore bishopOnOutpostSupported= simdScore(3600,270,0,0);
@@ -140,7 +141,7 @@ const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
 simdScore kingShieldBonus= 2400;
 simdScore  kingFarShieldBonus= 1800;
 simdScore  kingStormBonus= 80;
-simdScore kingSafetyBonus=simdScore(63,-10,0,0);
+simdScore kingSafetyBonus=simdScore(263,-10,0,0);
 simdScore  kingSafetyScaling=simdScore(310,0,0,0);
 simdScore KingSafetyMaxAttack=simdScore(93,0,0,0);
 simdScore KingSafetyLinearCoefficent=simdScore(5,0,0,0);
@@ -323,6 +324,17 @@ void initMobilityBonus(void){
 	for(int n=0;n<32;n++){
 		mobilityBonus[Position::Knights][n] =simdScore(knightMobilityPars[2]*(n-knightMobilityPars[0]),knightMobilityPars[3]*(n-knightMobilityPars[1]),0,0);
 	}
+
+	mobilityBonus[Position::Knights][0].insert(0,-4000.0);
+	mobilityBonus[Position::Knights][1].insert(0,-1000.0);
+	mobilityBonus[Position::Knights][2].insert(0,-500.0);
+	mobilityBonus[Position::Knights][3].insert(0,0.0);
+	mobilityBonus[Position::Knights][4].insert(0,280.0);
+	mobilityBonus[Position::Knights][5].insert(0,600.0);
+	mobilityBonus[Position::Knights][6].insert(0,900.0);
+	mobilityBonus[Position::Knights][7].insert(0,1300.0);
+	mobilityBonus[Position::Knights][8].insert(0,1400.0);
+
 
 
 }
@@ -906,6 +918,10 @@ simdScore evalPawn(const Position & p,tSquare sq, bitMap & weakPawns, bitMap & p
     if (chain){
     	res+= chainedPawnBonus;
 	}
+	else
+	{
+		weakPawns|=BITSET[sq];
+	}
 
 
 	//passed pawn
@@ -921,7 +937,7 @@ simdScore evalPawn(const Position & p,tSquare sq, bitMap & weakPawns, bitMap & p
 }
 
 template<Position::bitboardIndex piece>
-simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes,bitMap const blockedPawns, bitMap * const kingRing,unsigned int * const kingAttackersCount,unsigned int * const kingAttackersWeight,unsigned int * const kingAdjacentZoneAttacksCount){
+simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes,bitMap const blockedPawns, bitMap * const kingRing,unsigned int * const kingAttackersCount,unsigned int * const kingAttackersWeight,unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns){
 	simdScore res=0;
 	bitMap tempPieces=p.bitBoard[piece];
 	bitMap enemyKing =(piece>Position::separationBitmap)? p.bitBoard[Position::whiteKing]:p.bitBoard[Position::blackKing];
@@ -936,6 +952,8 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	const bitMap & threatenSquares=(piece>Position::separationBitmap)? attackedSquares[Position::whitePawns]:attackedSquares[Position::blackPawns];
 	const bitMap ourPieces=(piece>Position::separationBitmap)? p.bitBoard[Position::blackPieces]:p.bitBoard[Position::whitePieces];
 	const bitMap ourPawns=(piece>Position::separationBitmap)? p.bitBoard[Position::blackPawns]:p.bitBoard[Position::whitePawns];
+	const bitMap theirPieces=(piece>Position::separationBitmap)? p.bitBoard[Position::whitePieces]:p.bitBoard[Position::blackPieces];
+	const bitMap theirPawns=(piece>Position::separationBitmap)? p.bitBoard[Position::whitePawns]:p.bitBoard[Position::blackPawns];
 	while(tempPieces){
 		tSquare sq=firstOne(tempPieces);
 		tempPieces&= tempPieces-1;
@@ -998,6 +1016,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		unsigned int mobility= bitCnt(attack&~(threatenSquares|ourPieces));
 		//sync_cout<<mobility<<sync_endl;
 		res+=mobilityBonus[piece%Position::separationBitmap][mobility];
+		if(piece!=Position::whiteKnights && piece!=Position::blackKnights)
 		if(!(attack&~(threatenSquares|ourPieces)) && (threatenSquares&bitSet(sq))){ // zero mobility && attacked by pawn
 			res-=(Position::pieceValue[piece%Position::separationBitmap]/4);
 		}
@@ -1124,9 +1143,9 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 			break;
 		case Position::whiteKnights:
 		case Position::blackKnights:
-			if(relativeRank>=4 && (enemyWeakSquares& BITSET[sq]))
+			if(enemyWeakSquares& BITSET[sq])
 			{
-				res+=knightOnOutpost;
+				res+=knightOnOutpost*(5-std::abs(relativeRank-5));
 				if(supportedSquares &BITSET[sq]){
 					res += knightOnOutpostSupported;
 				}
@@ -1134,6 +1153,13 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 					res += knightOnHole;
 				}
 
+			}
+			{
+			bitMap wpa=attack & (weakPawns) & theirPieces;
+				if(wpa)
+				{
+					res += bitCnt(wpa)*KnightAttackingWeakPawn;
+				}
 			}
 			break;
 		default:
@@ -1490,8 +1516,8 @@ Score Position::eval(void) {
 
 	simdScore wScore;
 	simdScore bScore;
-	wScore=evalPieces<Position::whiteKnights>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	bScore=evalPieces<Position::blackKnights>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteKnights>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount,weakPawns);
+	bScore=evalPieces<Position::blackKnights>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount,weakPawns);
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "knights" << " |"
@@ -1504,8 +1530,8 @@ Score Position::eval(void) {
 		traceRes=res;
 	}
 
-	wScore=evalPieces<Position::whiteBishops>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	bScore=evalPieces<Position::blackBishops>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteBishops>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount,weakPawns);
+	bScore=evalPieces<Position::blackBishops>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount,weakPawns);
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "bishops" << " |"
@@ -1518,8 +1544,8 @@ Score Position::eval(void) {
 		traceRes=res;
 	}
 
-	wScore=evalPieces<Position::whiteRooks>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	bScore=evalPieces<Position::blackRooks>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteRooks>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount,weakPawns);
+	bScore=evalPieces<Position::blackRooks>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount,weakPawns);
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "rooks" << " |"
@@ -1532,8 +1558,8 @@ Score Position::eval(void) {
 		traceRes=res;
 	}
 
-	wScore=evalPieces<Position::whiteQueens>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
-	bScore=evalPieces<Position::blackQueens>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount);
+	wScore=evalPieces<Position::whiteQueens>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount,weakPawns);
+	bScore=evalPieces<Position::blackQueens>(*this,weakSquares,attackedSquares,holes,blockedPawns,kingRing,kingAttackersCount,kingAttackersWeight,kingAdjacentZoneAttacksCount,weakPawns);
 	res+=wScore-bScore;
 	if(trace){
 		sync_cout << std::setw(20) << "queens" << " |"
