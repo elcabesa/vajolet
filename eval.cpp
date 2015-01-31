@@ -2079,6 +2079,12 @@ Score Position::eval(void) {
 	if(mulCoeff==256 && (pieceCount[whitePawns]+pieceCount[blackPawns]==0) && abs(st.material[0])<40000 && st.nonPawnMaterial[0]<90000 && st.nonPawnMaterial[2]<90000 ){
 		mulCoeff=40;
 	}
+	if(mulCoeff==256  && st.nonPawnMaterial[0]+ st.nonPawnMaterial[2]<40000  &&  st.nonPawnMaterial[0]+ st.nonPawnMaterial[2]!=0 && pieceCount[whitePawns]== pieceCount[blackPawns] && !passedPawns ){
+		mulCoeff = std::min((unsigned int)256,pieceCount[whitePawns]*80);
+		//display();
+	}
+
+	//sync_cout<<mulCoeff<<sync_endl;
 
 
 
