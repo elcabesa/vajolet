@@ -1885,14 +1885,14 @@ Score Position::eval(void) {
 	kingSafety[0]=evalShieldStorm<white>(*this, pieceList[whiteKing][0]);
 	if((st.castleRights & wCastleOO)
 		&& !(attackedSquares[blackPieces] & (bitSet(E1)|bitSet(F1)|bitSet(G1) ))
-		&& !(bitBoard[occupiedSquares] & (bitSet(F1)|bitSet(G1)))
+		&& bitCnt(bitBoard[occupiedSquares] & (bitSet(F1)|bitSet(G1)))<=1
 		){
 		kingSafety[0]=std::max(evalShieldStorm<white>(*this, G1),kingSafety[0]);
 	}
 
 	if((st.castleRights & wCastleOOO)
 		&& !(attackedSquares[blackPieces] & (bitSet(E1)|bitSet(D1)|bitSet(C1) ))
-		&& !(bitBoard[occupiedSquares] & (bitSet(D1)|bitSet(C1)|bitSet(B1)))
+		&& bitCnt(bitBoard[occupiedSquares] & (bitSet(D1)|bitSet(C1)|bitSet(B1)))<=1
 		){
 		kingSafety[0]=std::max(evalShieldStorm<white>(*this, C1),kingSafety[0]);
 	}
@@ -1901,7 +1901,7 @@ Score Position::eval(void) {
 	kingSafety[1]=evalShieldStorm<black>(*this, pieceList[blackKing][0]);
 	if((st.castleRights & bCastleOO)
 		&& !(attackedSquares[whitePieces] & (bitSet(E8)|bitSet(F8)|bitSet(G8) ))
-		&& !(bitBoard[occupiedSquares] & (bitSet(F8)|bitSet(G8)))
+		&& bitCnt(bitBoard[occupiedSquares] & (bitSet(F8)|bitSet(G8)))<=1
 		){
 
 		kingSafety[1]=std::max(evalShieldStorm<black>(*this, G8),kingSafety[1]);
@@ -1909,7 +1909,7 @@ Score Position::eval(void) {
 
 	if((st.castleRights & bCastleOOO)
 		&& !(attackedSquares[whitePieces] & (bitSet(E8)|bitSet(D8)|bitSet(C8) ))
-		&& !(bitBoard[occupiedSquares] & (bitSet(D8)|bitSet(C8)|bitSet(B8)))
+		&& bitCnt(bitBoard[occupiedSquares] & (bitSet(D8)|bitSet(C8)|bitSet(B8)))<=1
 		){
 		kingSafety[1]=std::max(evalShieldStorm<black>(*this, C8),kingSafety[1]);
 	}
