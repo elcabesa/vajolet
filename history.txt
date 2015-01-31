@@ -18,6 +18,9 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.012		+12(vs 2.000)	+22			20/01/2015	elimintata position pst debug, inserita valutazione rook trapped, modificata sicurezza re
 2.013		+15(vs 2.000)				23/01/2015	modificata mobility
 2.014		+21(vs 2.000)				24/01/2015	modificata eval cavalli
+2.015		+35(vs 2.000)				25/01/2015	sicureza re
+2.016		+29(vs 2.000)				25/01/2015	scalature finali
+			+30(vs 2.000)
 
 
 

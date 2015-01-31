@@ -141,7 +141,7 @@ const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
 simdScore kingShieldBonus= 2400;
 simdScore  kingFarShieldBonus= 1800;
 simdScore  kingStormBonus= 80;
-simdScore kingSafetyBonus=simdScore(263,-10,0,0);
+simdScore kingSafetyBonus=simdScore(63,-10,0,0);
 simdScore  kingSafetyScaling=simdScore(310,0,0,0);
 simdScore KingSafetyMaxAttack=simdScore(93,0,0,0);
 simdScore KingSafetyLinearCoefficent=simdScore(5,0,0,0);
@@ -1941,9 +1941,8 @@ Score Position::eval(void) {
 		// safe contact queen check
 		bitMap safeContactSquare=undefendedSquares & attackedSquares[whiteQueens] & ~bitBoard[whitePieces];
 		safeContactSquare &= (attackedSquares[whiteRooks]| attackedSquares[whiteBishops] | attackedSquares[whiteKnights]| attackedSquares[whitePawns]);
-
 		if(safeContactSquare){
-			attackUnits+=5*bitCnt(safeContactSquare);
+			attackUnits+=20*bitCnt(safeContactSquare);
 		}
 
 		// safe contact rook check
@@ -1953,7 +1952,7 @@ Score Position::eval(void) {
 		safeContactSquare &=Movegen::getRookPseudoAttack(pieceList[blackKing][0]);
 
 		if(safeContactSquare){
-			attackUnits+=3*bitCnt(safeContactSquare);
+			attackUnits+=15*bitCnt(safeContactSquare);
 		}
 
 		// long distance check
@@ -1963,13 +1962,13 @@ Score Position::eval(void) {
 		// vertical check
 		bitMap longDistCheck=rMap & (attackedSquares[whiteRooks]| attackedSquares[whiteQueens]) & ~attackedSquares[blackPieces] & ~bitBoard[whitePieces];
 		if(longDistCheck){
-			attackUnits+=3*bitCnt(longDistCheck);
+			attackUnits+=8*bitCnt(longDistCheck);
 		}
 
 		// diagonal check
 		longDistCheck=bMap & (attackedSquares[whiteBishops]| attackedSquares[whiteQueens]) & ~attackedSquares[blackPieces] & ~bitBoard[whitePieces];
 		if(longDistCheck){
-			attackUnits+=2*bitCnt(longDistCheck);
+			attackUnits+=3*bitCnt(longDistCheck);
 		}
 
 		///knight check;
@@ -1981,7 +1980,6 @@ Score Position::eval(void) {
 
 		attackUnits*=std::min(KingSafetyLinearCoefficent[0], attackUnits);
 		attackUnits=std::min(KingSafetyMaxResult[0], attackUnits);
-
 
 		res+=(kingSafetyBonus*attackUnits);
 		if(trace){
@@ -2011,9 +2009,8 @@ Score Position::eval(void) {
 		// safe contact queen check
 		bitMap safeContactSquare=undefendedSquares & attackedSquares[blackQueens]  & ~bitBoard[blackPieces];
 		safeContactSquare &= (attackedSquares[blackRooks]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
-
 		if(safeContactSquare){
-			attackUnits+=5*bitCnt(safeContactSquare);
+			attackUnits+=20*bitCnt(safeContactSquare);
 		}
 		// safe contact rook check
 
@@ -2023,7 +2020,7 @@ Score Position::eval(void) {
 		safeContactSquare &=Movegen::getRookPseudoAttack(pieceList[whiteKing][0]);
 
 		if(safeContactSquare){
-			attackUnits+=3*bitCnt(safeContactSquare);
+			attackUnits+=15*bitCnt(safeContactSquare);
 		}
 
 		// long distance check
@@ -2033,13 +2030,13 @@ Score Position::eval(void) {
 		// vertical check
 		bitMap longDistCheck=rMap & (attackedSquares[blackRooks]| attackedSquares[blackQueens]) & ~attackedSquares[whitePieces] & ~bitBoard[blackPieces];
 		if(longDistCheck){
-			attackUnits+=3*bitCnt(longDistCheck);
+			attackUnits+=8*bitCnt(longDistCheck);
 		}
 
 		// diagonal check
 		longDistCheck=bMap & (attackedSquares[blackBishops]| attackedSquares[blackQueens]) & ~attackedSquares[whitePieces] & ~bitBoard[blackPieces];
 		if(longDistCheck){
-			attackUnits+=2*bitCnt(longDistCheck);
+			attackUnits+=3*bitCnt(longDistCheck);
 		}
 
 		///knight check;
