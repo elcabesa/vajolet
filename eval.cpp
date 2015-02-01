@@ -1754,8 +1754,10 @@ Score Position::eval(void) {
 	spacew|=spacew>>8;
 	spacew|=spacew>>16;
 	spacew|=spacew>>32;
-	spacew &=~attackedSquares[blackPieces];
-	//displayBitmap(spacew);
+	spacew &= ~attackedSquares[blackPawns];
+	spacew &=attackedSquares[whitePieces] | ~attackedSquares[blackPieces];
+
+
 
 
 
@@ -1764,10 +1766,22 @@ Score Position::eval(void) {
 	spaceb|=spaceb<<8;
 	spaceb|=spaceb<<16;
 	spaceb|=spaceb<<32;
-	spaceb &=~attackedSquares[whitePieces];
+	spaceb &= ~attackedSquares[whitePawns];
+	spaceb &=attackedSquares[blackPieces] | ~attackedSquares[whitePieces];
 
-	//displayBitmap(spaceb);
-	res+=(bitCnt(spacew)-bitCnt(spaceb))*spaceBonus;
+
+
+	bitMap spacew2 = ~spaceb;
+	bitMap spaceb2 = ~spacew;
+	spacew2 &= 0x00000000FFFFFF00;
+	spacew2 &= ~attackedSquares[blackPawns];
+
+	spaceb2 &= 0x00FFFFFF00000000;
+	spaceb2 &= ~attackedSquares[whitePawns];
+
+
+
+	res+=(bitCnt(spacew)-bitCnt(spaceb)+ bitCnt(spacew2)-bitCnt(spaceb2))*spaceBonus;
 
 	if(trace){
 		wScore=bitCnt(spacew)*spaceBonus;
@@ -1805,7 +1819,7 @@ Score Position::eval(void) {
 
 	// todo fare un weak piece migliore:qualsiasi pezzo attaccato riceve un malus dipendente dal suo più debole attaccante e dal suo valore.
 	// volendo anche da quale pezzo è difeso
-	bitMap weakPieces=bitBoard[whitePieces] & attackedSquares[blackPieces] &~attackedSquares[whitePawns];
+	bitMap weakPieces=bitBoard[whitePieces] & attackedSquares[blackPieces] &~attackedSquares[whitePieces];
 	bitMap undefendedMinors =  (bitBoard[whiteKnights] | bitBoard[whiteBishops])  & ~attackedSquares[whitePieces];
 	if (undefendedMinors){
 		wScore-=undefendedMinorPenalty;
@@ -1834,7 +1848,8 @@ Score Position::eval(void) {
 		bScore-=attackedByPawnPenalty[squares[attacked]%separationBitmap];
 		pawnAttackedPieces &=pawnAttackedPieces-1;
 	}
-	weakPieces=bitBoard[blackPieces] & attackedSquares[whitePieces] &~attackedSquares[blackPawns];
+
+	weakPieces=bitBoard[blackPieces] & attackedSquares[whitePieces] &~attackedSquares[blackPieces];
 	undefendedMinors =  (bitBoard[blackKnights] | bitBoard[blackBishops])  & ~attackedSquares[blackPieces];
 	if (undefendedMinors){
 		bScore-=undefendedMinorPenalty;

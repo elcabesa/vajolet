@@ -21,6 +21,8 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.015		+35(vs 2.000)	da verificare			25/01/2015	sicureza re
 2.016		+29(vs 2.000)				25/01/2015	scalature finali
 			+30(vs 2.000)
+2.017		+36(vs 2.000)				31/01/2015	pawn storm e sicurezza re
+2.018									01/02/2015	nuovo space e nuove minacce
 
 
 
