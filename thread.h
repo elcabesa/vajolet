@@ -94,7 +94,7 @@ public :
 	~my_thread(){
 		quitThreads();
 	}
-	void startTinking(Position * p,searchLimits& l){
+	void startThinking(Position * p,searchLimits& l){
 
 		src.signals.stop=true;
 		lastHasfullMessage=0;

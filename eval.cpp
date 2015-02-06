@@ -287,7 +287,38 @@ bool evalKBNvsK(const Position& p, Score& res){
 
 bool evalOppositeBishopEndgame(const Position& p, Score& res){
 	if(SQUARE_COLOR[p.pieceList[Position::blackBishops][0]] !=SQUARE_COLOR[ p.pieceList[Position::whiteBishops][0]]){
-		res=128;
+
+		res=30;
+		bitMap pawns= p.bitBoard[Position::whitePawns];
+		while(pawns)
+		{
+			tSquare pawn =firstOne(pawns);
+			if( !(PASSED_PAWN[0][pawn] & p.bitBoard[Position::blackPawns]))
+			{
+				if(!(Movegen::getBishopPseudoAttack(p.pieceList[Position::blackBishops][0]) & SQUARES_IN_FRONT_OF[0][pawn] ))
+				{
+					res = 256;
+				}
+			}
+
+			pawns &= pawns -1;
+		}
+
+		pawns= p.bitBoard[Position::blackPawns];
+		while(pawns)
+		{
+			tSquare pawn =firstOne(pawns);
+			if(!( PASSED_PAWN[1][pawn] & p.bitBoard[Position::whitePawns]))
+			{
+				if(!(Movegen::getBishopPseudoAttack(p.pieceList[Position::whiteBishops][0]) & SQUARES_IN_FRONT_OF[1][pawn] ))
+				{
+					res = 256;
+				}
+			}
+
+			pawns &= pawns -1;
+		}
+
 		return true;
 	}
 	return false;
@@ -1754,10 +1785,8 @@ Score Position::eval(void) {
 	spacew|=spacew>>8;
 	spacew|=spacew>>16;
 	spacew|=spacew>>32;
-	spacew &= ~attackedSquares[blackPawns];
-	spacew &=attackedSquares[whitePieces] | ~attackedSquares[blackPieces];
-
-
+	spacew &=~attackedSquares[blackPieces];
+	//displayBitmap(spacew);
 
 
 
@@ -1766,22 +1795,10 @@ Score Position::eval(void) {
 	spaceb|=spaceb<<8;
 	spaceb|=spaceb<<16;
 	spaceb|=spaceb<<32;
-	spaceb &= ~attackedSquares[whitePawns];
-	spaceb &=attackedSquares[blackPieces] | ~attackedSquares[whitePieces];
+	spaceb &=~attackedSquares[whitePieces];
 
-
-
-	bitMap spacew2 = ~spaceb;
-	bitMap spaceb2 = ~spacew;
-	spacew2 &= 0x00000000FFFFFF00;
-	spacew2 &= ~attackedSquares[blackPawns];
-
-	spaceb2 &= 0x00FFFFFF00000000;
-	spaceb2 &= ~attackedSquares[whitePawns];
-
-
-
-	res+=(bitCnt(spacew)-bitCnt(spaceb)+ bitCnt(spacew2)-bitCnt(spaceb2))*spaceBonus;
+	//displayBitmap(spaceb);
+	res+=(bitCnt(spacew)-bitCnt(spaceb))*spaceBonus;
 
 	if(trace){
 		wScore=bitCnt(spacew)*spaceBonus;
@@ -1819,7 +1836,7 @@ Score Position::eval(void) {
 
 	// todo fare un weak piece migliore:qualsiasi pezzo attaccato riceve un malus dipendente dal suo più debole attaccante e dal suo valore.
 	// volendo anche da quale pezzo è difeso
-	bitMap weakPieces=bitBoard[whitePieces] & attackedSquares[blackPieces] &~attackedSquares[whitePieces];
+	bitMap weakPieces=bitBoard[whitePieces] & attackedSquares[blackPieces] &~attackedSquares[whitePawns];
 	bitMap undefendedMinors =  (bitBoard[whiteKnights] | bitBoard[whiteBishops])  & ~attackedSquares[whitePieces];
 	if (undefendedMinors){
 		wScore-=undefendedMinorPenalty;
@@ -1848,8 +1865,7 @@ Score Position::eval(void) {
 		bScore-=attackedByPawnPenalty[squares[attacked]%separationBitmap];
 		pawnAttackedPieces &=pawnAttackedPieces-1;
 	}
-
-	weakPieces=bitBoard[blackPieces] & attackedSquares[whitePieces] &~attackedSquares[blackPieces];
+	weakPieces=bitBoard[blackPieces] & attackedSquares[whitePieces] &~attackedSquares[blackPawns];
 	undefendedMinors =  (bitBoard[blackKnights] | bitBoard[blackBishops])  & ~attackedSquares[blackPieces];
 	if (undefendedMinors){
 		bScore-=undefendedMinorPenalty;

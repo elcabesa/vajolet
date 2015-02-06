@@ -165,7 +165,7 @@ void static go(std::istringstream& is, Position & pos, my_thread * thr) {
         else if (token == "ponder")    limits.ponder = true;
     }
 
-    thr->startTinking(&pos,limits);
+    thr->startThinking(&pos,limits);
 }
 
 
