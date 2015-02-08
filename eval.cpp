@@ -287,17 +287,22 @@ bool evalKBNvsK(const Position& p, Score& res){
 
 bool evalOppositeBishopEndgame(const Position& p, Score& res){
 	if(SQUARE_COLOR[p.pieceList[Position::blackBishops][0]] !=SQUARE_COLOR[ p.pieceList[Position::whiteBishops][0]]){
+		unsigned int pawnCount = 0;
+		unsigned int pawnDifference = 0;
+		unsigned int freePawn = 0;
 
-		res=30;
 		bitMap pawns= p.bitBoard[Position::whitePawns];
 		while(pawns)
 		{
+			pawnCount ++;
+			pawnDifference++;
 			tSquare pawn =firstOne(pawns);
 			if( !(PASSED_PAWN[0][pawn] & p.bitBoard[Position::blackPawns]))
 			{
 				if(!(Movegen::getBishopPseudoAttack(p.pieceList[Position::blackBishops][0]) & SQUARES_IN_FRONT_OF[0][pawn] ))
 				{
 					res = 256;
+					freePawn++;
 				}
 			}
 
@@ -307,11 +312,15 @@ bool evalOppositeBishopEndgame(const Position& p, Score& res){
 		pawns= p.bitBoard[Position::blackPawns];
 		while(pawns)
 		{
+			pawnCount ++;
+			pawnDifference--;
+
 			tSquare pawn =firstOne(pawns);
 			if(!( PASSED_PAWN[1][pawn] & p.bitBoard[Position::whitePawns]))
 			{
 				if(!(Movegen::getBishopPseudoAttack(p.pieceList[Position::whiteBishops][0]) & SQUARES_IN_FRONT_OF[1][pawn] ))
 				{
+					freePawn++;
 					res = 256;
 				}
 			}
@@ -319,7 +328,12 @@ bool evalOppositeBishopEndgame(const Position& p, Score& res){
 			pawns &= pawns -1;
 		}
 
-		return true;
+		if(freePawn==0 && std::abs(pawnDifference)<=1  )
+		{
+			res = std::min(20+pawnCount * 25,(unsigned int)256);
+			return true;
+		}
+
 	}
 	return false;
 

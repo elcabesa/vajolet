@@ -24,7 +24,7 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.017		+30(vs 2.000)	+31			31/01/2015	pawn storm e sicurezza re
 2.018		-30							01/02/2015	nuovo space e nuove minacce
 2.019		+10							01/02/2015	riparto da 2.0.017 e aggiungo codice per minacce
-2.020									06/02/2015	riparto da 2.0.017 e modifico scalatra finali con alfieri colore diverso
+2.020		+27(vs 2.000)				06/02/2015	riparto da 2.0.017 e modifico scalatura finali con alfieri colore diverso
 
 
 da fare
