@@ -1447,6 +1447,16 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	Score bestScore = -SCORE_INFINITE;
 	if(!inCheck){
 		bestScore=staticEval;
+
+		if (ttValue != SCORE_NONE){
+			if (
+					((tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact) && (ttValue > staticEval) )
+					|| ((tte->getType() == typeScoreLowerThanAlpha || tte->getType() == typeExact ) && (ttValue < staticEval) )
+				)
+			{
+				bestScore = ttValue;
+			}
+		}
 	}
 
 
