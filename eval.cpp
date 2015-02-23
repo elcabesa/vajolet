@@ -139,10 +139,10 @@ simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitma
 //------------------------------------------------
 const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
 simdScore kingShieldBonus= 2400;
-simdScore  kingFarShieldBonus= 1800;
-simdScore  kingStormBonus= 80;
-simdScore kingSafetyBonus=simdScore(63,-10,0,0);
-simdScore  kingSafetyScaling=simdScore(310,0,0,0);
+simdScore kingFarShieldBonus= 1800;
+simdScore kingStormBonus= 80;
+simdScore kingSafetyBonus=simdScore(93,-5,0,0);
+simdScore kingSafetyScaling=simdScore(310,0,0,0);
 simdScore KingSafetyMaxAttack=simdScore(93,0,0,0);
 simdScore KingSafetyLinearCoefficent=simdScore(5,0,0,0);
 simdScore KingSafetyMaxResult=simdScore(1000,0,0,0);
@@ -1962,6 +1962,7 @@ Score Position::eval(void) {
 
 	res+=simdScore(kingSafety[0]-kingSafety[1],0,0,0);
 
+	// attacco contro il re nero
 	if(kingAttackersCount[white])
 	{
 		//res+=simdScore(kingSafety[0],0,0,0);
@@ -2021,6 +2022,8 @@ Score Position::eval(void) {
 		if(longDistCheck){
 			attackUnits+=bitCnt(longDistCheck);
 		}
+
+		attackUnits = std::max(attackUnits,0);
 		attackUnits = std::min(KingSafetyMaxAttack[0], std::max(0, attackUnits));
 
 		attackUnits*=std::min(KingSafetyLinearCoefficent[0], attackUnits);
@@ -2089,6 +2092,8 @@ Score Position::eval(void) {
 		if(longDistCheck){
 			attackUnits+=bitCnt(longDistCheck);
 		}
+
+		attackUnits = std::max(attackUnits,0);
 		attackUnits = std::min(KingSafetyMaxAttack[0], std::max(0, attackUnits));
 		attackUnits*=std::min(KingSafetyLinearCoefficent[0], attackUnits);
 		attackUnits=std::min(KingSafetyMaxResult[0], attackUnits);

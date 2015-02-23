@@ -26,6 +26,8 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.019		+10							01/02/2015	riparto da 2.0.017 e aggiungo codice per minacce
 2.020		+27(vs 2.000)				06/02/2015	riparto da 2.0.017 e modifico scalatura finali con alfieri colore diverso
 2.021		+37(vs 2.000)	+32			09/02/2015	modificata ricerca, standpat value in qsearch
+2.022		+33(vs 2.000)			15/02/2015	tuning eval
+			+34
 
 
 da fare
