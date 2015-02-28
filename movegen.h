@@ -117,7 +117,7 @@ public:
 			stagedGeneratorState=getTTevasion;
 			return -1*ONE_PLY;
 		}else{
-			if(depth>-1*ONE_PLY){
+			if(depth>=0*ONE_PLY){
 				stagedGeneratorState=getQsearchTTquiet;
 				return -1*ONE_PLY;
 			}else{

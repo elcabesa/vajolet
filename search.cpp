@@ -781,7 +781,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				assert(depth - red>=ONE_PLY);
 				Score val;
 				if(depth-red<ONE_PLY){
-					val = qsearch<childNodesType>(ply,pos, 0, beta-1, beta,NULL);
+					val = qsearch<childNodesType>(ply,pos, depth-red, beta-1, beta,NULL);
 				}
 				else{
 					val = alphaBeta<childNodesType>(ply,pos, depth - red, beta-1, beta, NULL);
@@ -1022,7 +1022,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 				childPV.lenght=0;
 				if(newDepth<ONE_PLY){
-					val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,0,-beta,-alpha,&childPV);
+					val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
 				}else{
 					val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
 				}
@@ -1044,6 +1044,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 					&&  m != mg.killerMoves[1]
 				)
 				{
+					assert(moveNumber!=0);
+
 					int reduction = PVreduction[std::min(depth,32*ONE_PLY-1)][std::min(moveNumber,(unsigned int)63)];
 					int d = std::max(newDepth - reduction, ONE_PLY);
 
@@ -1069,7 +1071,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 					}
 #endif
 					if(newDepth<ONE_PLY){
-						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,0,-alpha-1,-alpha,NULL);
+						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
 					}else{
 						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
 					}
@@ -1087,7 +1089,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						}
 #endif
 						if(newDepth<ONE_PLY){
-							val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,0,-beta,-alpha,&childPV);
+							val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
 						}
 						else{
 							val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
@@ -1138,7 +1140,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						/*if(verbose){
 							sync_cout<<"qsearch depth "<<newDepth<<sync_endl;
 						}*/
-						val=-qsearch<childNodesType>(ply+1,pos,0,-alpha-1,-alpha,NULL);
+						val=-qsearch<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
 					}else{
 						/*if(verbose){
 							sync_cout<<"search depth "<<newDepth<<sync_endl;
@@ -1151,7 +1153,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						/*if(verbose){
 							sync_cout<<"qsearch depth "<<newDepth<<sync_endl;
 						}*/
-						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,0,-alpha-1,-alpha,NULL);
+						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
 					}else{
 						/*if(verbose){
 							sync_cout<<"search depth "<<newDepth<<sync_endl;
@@ -1540,6 +1542,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 				!inCheck &&
 				m.flags != Move::fpromotion &&
 				m != ttMove &&
+				//!pos.moveGivesCheck(m) && -50ELO
 				pos.seeSign(m)<0){
 			continue;
 		}

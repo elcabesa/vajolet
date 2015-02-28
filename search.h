@@ -110,8 +110,8 @@ public:
 		for (int d = 1; d < 32*ONE_PLY; d++)
 			for (int mc = 1; mc < 64; mc++)
 			{
-				double    PVRed = 0.08*log(double(d)) * log(double(mc));
-				double nonPVRed = 0.33 + 0.213*log(double(d)) * log(double(mc));
+				double    PVRed = -1.5 + 0.33*log(double(d)) * log(double(mc));
+				double nonPVRed = -1.2 + 0.4*log(double(d)) * log(double(mc));
 				PVreduction[d][mc]=(Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
 				nonPVreduction[d][mc]=(Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
 			}
