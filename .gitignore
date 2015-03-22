@@ -7,6 +7,6 @@
 /vectorclass/special
 /vectorclass/changelog.txt
 *.exe
-/Release/
-/release64/
+/.Release/
+/.release64/
 
