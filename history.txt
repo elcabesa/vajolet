@@ -27,8 +27,10 @@ Versione	delta ELO		delta ELO	data		Modifiche
 2.020		+27(vs 2.000)				06/02/2015	riparto da 2.0.017 e modifico scalatura finali con alfieri colore diverso
 2.021		+37(vs 2.000)	+32			09/02/2015	modificata ricerca, standpat value in qsearch
 2.022		+40(vs 2.000)				15/02/2015	king safety
-2.023		+52(vs 2.000)				28/02/2015	search enanchement
-2.024		+82(vs 2.000)				28/02/2015	LMR refinement
+2.023		+38 +52(vs 2.000)				28/02/2015	search enanchement
+2.024		+46 +82(vs 2.000)				28/02/2015	LMR refinement
+
+
 
 da fare
 
