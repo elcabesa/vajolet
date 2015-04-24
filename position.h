@@ -440,11 +440,11 @@ public:
 		s+=char('a'+FILES[m.to]);
 		s+=char('1'+RANKS[m.to]);
 		if(moveGivesCheck(m)){
-			s+"+";
+			s+="+";
 		}
 		//promotion
 		if(m.flags == Move::fpromotion){
-			s +"=";
+			s +="=";
 			s += Position::PIECE_NAMES_FEN[m.promotion+Position::whiteQueens];
 		}
 		return s;

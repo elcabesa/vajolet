@@ -1268,6 +1268,8 @@ Move  Movegen::getNextMove(){
 	while(true){
 		switch(stagedGeneratorState){
 		case generateCaptureMoves:
+			moveListPosition =0;
+			moveListSize =0;
 			generateMoves<Movegen::genType::captureMg>();
 			for(unsigned int i=moveListPosition;i<moveListSize;i++){
 				moveList[i].score=pos.getMvvLvaScore(moveList[i].m);
@@ -1275,6 +1277,8 @@ Move  Movegen::getNextMove(){
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 		case generateQuietMoves:
+			moveListPosition =0;
+			moveListSize =0;
 			generateMoves<Movegen::genType::quietMg>();
 			for(unsigned int i=moveListPosition;i<moveListSize;i++){
 				moveList[i].score=h.getValue(pos.squares[moveList[i].m.from],(tSquare)moveList[i].m.to);

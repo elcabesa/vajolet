@@ -76,7 +76,7 @@ public:
 	}stagedGeneratorState;
 private:
 	extMove moveList[MAX_MOVE_PER_POSITION];
-	extMove badCaptureList[MAX_MOVE_PER_POSITION];
+	extMove badCaptureList[MAX_BAD_MOVE_PER_POSITION];
 	unsigned int moveListSize;
 	unsigned int moveListPosition;
 
