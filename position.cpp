@@ -1397,6 +1397,41 @@ bool Position::moveGivesCheck(Move& m)const {
 	return false;
 }
 
+bool Position::moveGivesDoubleCheck(Move& m)const {
+	assert(m.packed);
+	tSquare from = (tSquare)m.from;
+	tSquare to = (tSquare)m.to;
+	bitboardIndex piece = squares[from];
+	assert(piece!=occupiedSquares);
+	assert(piece!=separationBitmap);
+	assert(piece!=whitePieces);
+	assert(piece!=blackPieces);
+	state & s=getActualState();
+
+
+	// Direct check ?
+	return ((s.checkingSquares[piece] & bitSet(to)) && (s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from))));
+
+
+}
+
+bool Position::moveGivesSafeDoubleCheck(Move& m)const {
+	assert(m.packed);
+	tSquare from = (tSquare)m.from;
+	tSquare to = (tSquare)m.to;
+	bitboardIndex piece = squares[from];
+	assert(piece!=occupiedSquares);
+	assert(piece!=separationBitmap);
+	assert(piece!=whitePieces);
+	assert(piece!=blackPieces);
+	state & s=getActualState();
+
+	tSquare kingSquare =pieceList[blackKing-s.nextMove][0];
+	return (!(Movegen::attackFromKing(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from))));
+
+
+}
+
 
 bool Position::isDraw(bool isPVline) const {
 

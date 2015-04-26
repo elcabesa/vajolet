@@ -238,6 +238,8 @@ public:
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 	bool moveGivesCheck(Move& m)const ;
+	bool moveGivesDoubleCheck(Move& m)const;
+	bool moveGivesSafeDoubleCheck(Move& m)const;
 	Score see(Move m) const;
 	Score seeSign(Move m) const;
 	bool isDraw(bool isPVline) const;
