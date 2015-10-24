@@ -496,7 +496,7 @@ public:
 			return 65536;
 
 		}
-		return (570000-tot)*(65536.0/(570000-120000));
+		return (unsigned int)((float)(570000-tot)*(65536.0f/(570000.0f-120000.0f)));
 	}
 
 

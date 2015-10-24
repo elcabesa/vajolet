@@ -21,8 +21,9 @@
 
 transpositionTable TT;
 
-void transpositionTable::setSize(unsigned int mbSize){
-	unsigned int size =  (mbSize << 20) / sizeof(ttCluster);
+void transpositionTable::setSize(long long unsigned int mbSize){
+	long long unsigned int size =  (mbSize << 20) / sizeof(ttCluster);
+	sync_cout<<size<<sync_endl;
 	elements=size;
 	if(table){
 		free(table);
@@ -43,7 +44,7 @@ ttEntry* transpositionTable::probe(const U64 key) const {
 
 	ttCluster * ttc=findCluster(key);
 	assert(ttc!=nullptr);
-	unsigned int keyH = key >> 32;
+	unsigned int keyH = (unsigned int)(key >> 32);
 
 
 	for (unsigned i = 0; i < 4; i++){
@@ -58,7 +59,7 @@ void transpositionTable::store(const U64 key, Score v, unsigned char b, signed s
 
 	int c1, c2, c3;
 	ttEntry *tte, *replace;
-	unsigned int key32 = key >> 32; // Use the high 32 bits as key inside the cluster
+	unsigned int key32 = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
 
 	ttCluster * ttc=findCluster(key);
 	assert(ttc!=nullptr);

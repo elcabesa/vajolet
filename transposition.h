@@ -79,8 +79,8 @@ struct ttCluster{
 
 class transpositionTable{
 	ttCluster* table;
-	unsigned int elements;
-	unsigned int usedElements;
+	unsigned long int elements;
+	unsigned long int usedElements;
 	unsigned char generation;
 public:
 	transpositionTable(){
@@ -95,7 +95,7 @@ public:
 		}
 	}
 	void newSearch() { generation++; usedElements=0; }
-	void setSize(unsigned int mbSize);
+	void setSize(unsigned long long int mbSize);
 	void clear();
 
 	inline ttCluster* findCluster(U64 key) const {
@@ -115,7 +115,7 @@ public:
 	void store(const U64 key, Score v, unsigned char b, signed short int d, unsigned short m, Score statV);
 
 	unsigned int getFullness(void){
-		unsigned int ret = usedElements*250.0/(elements);
+		unsigned int ret = (unsigned int)((usedElements*250)/elements);
 		return ret;
 	}
 

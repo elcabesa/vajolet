@@ -56,7 +56,7 @@ void benchmark(void) {
 
 
 	unsigned long long nodes = 0;
-	unsigned long elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+	long long int elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 	for (unsigned int i = 0; i < positions.size(); i++)
 	{
 		 Position pos;

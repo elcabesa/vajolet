@@ -73,8 +73,8 @@ volatile bool my_thread::startThink=false;
 timeManagementStruct my_thread::timeMan;
 
 
-unsigned long my_thread::startTime;
-unsigned long my_thread::lastHasfullMessage;
+long long int my_thread::startTime;
+long long my_thread::lastHasfullMessage;
 
 
 my_thread * my_thread::pInstance;

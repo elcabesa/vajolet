@@ -60,8 +60,8 @@ class my_thread{
 	search src;
 	searchLimits limits;
 
-	static unsigned long startTime;
-	static unsigned long lastHasfullMessage;
+	static long long startTime;
+	static long long lastHasfullMessage;
 
 	void initThreads();
 

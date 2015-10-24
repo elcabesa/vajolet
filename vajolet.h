@@ -121,7 +121,7 @@ typedef enum enSquare{						/*!< square name and directions*/
 	square0=0
 }tSquare;
 
-ENABLE_OPERATORS_ON(tSquare);
+ENABLE_OPERATORS_ON(tSquare)
 
 
 typedef Vec4i  simdScore;					/*!< score saved as a vector of 4 signed int scores*/
