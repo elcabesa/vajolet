@@ -27,6 +27,13 @@
  */
 struct Move
 {
+	Move(){}
+
+
+	Move(unsigned short i)
+	{
+		packed=i;
+	}
 	union
 	{
 		struct

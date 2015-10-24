@@ -109,6 +109,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 			rm.depth=0;
 			rm.nodes=0;
 			rm.time=0;
+			rm.PV.lenght = 0;
 
 			rootMoves.push_back(rm);
 		}
@@ -123,6 +124,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 			rm.depth=0;
 			rm.nodes=0;
 			rm.time=0;
+			rm.PV.lenght = 0;
 			rootMoves.push_back(rm);
 		}
 	}
