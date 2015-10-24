@@ -339,12 +339,12 @@ bool evalOppositeBishopEndgame(const Position& p, Score& res){
 
 }
 
-bool evalKRvsKm(const Position& p, Score& res){
+bool evalKRvsKm(const Position& , Score& res){
 	res=64;
 	return true;
 }
 
-bool evalKNNvsK(const Position& p, Score& res){
+bool evalKNNvsK(const Position& , Score& res){
 	res=10;
 	return true;
 }
@@ -999,6 +999,9 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	const bitMap ourPawns=(piece>Position::separationBitmap)? p.bitBoard[Position::blackPawns]:p.bitBoard[Position::whitePawns];
 	const bitMap theirPieces=(piece>Position::separationBitmap)? p.bitBoard[Position::whitePieces]:p.bitBoard[Position::blackPieces];
 	const bitMap theirPawns=(piece>Position::separationBitmap)? p.bitBoard[Position::whitePawns]:p.bitBoard[Position::blackPawns];
+
+	(void)theirPawns;
+
 	while(tempPieces){
 		tSquare sq=firstOne(tempPieces);
 		tempPieces&= tempPieces-1;

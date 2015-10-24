@@ -109,6 +109,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 			rm.depth=0;
 			rm.nodes=0;
 			rm.time=0;
+			rm.PV.lenght = 0;
 
 			rootMoves.push_back(rm);
 		}
@@ -123,6 +124,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 			rm.depth=0;
 			rm.nodes=0;
 			rm.time=0;
+			rm.PV.lenght = 0;
 			rootMoves.push_back(rm);
 		}
 	}
@@ -671,7 +673,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		&&  alpha >= -SCORE_INFINITE+razorMargin(depth)
 		//&&  abs(alpha) < SCORE_MATE_IN_MAX_PLY // implicito nell riga precedente
 		&&  ((!ttMove.packed ) || type==ALL_NODE)
-		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
+		//&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&& !((pos.getActualState().nextMove && (pos.bitBoard[Position::blackPawns] & RANKMASK[A2])) || (!pos.getActualState().nextMove && (pos.bitBoard[Position::whitePawns] & RANKMASK[A7]) ) )
 	)
 	{
@@ -707,7 +709,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		&&  depth < 4 * ONE_PLY
 		&& eval >-SCORE_INFINITE + futility[depth>>ONE_PLY_SHIFT]
 		&&  eval - futility[depth>>ONE_PLY_SHIFT] >= beta
-		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
+		//&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&&  abs(eval) < SCORE_KNOWN_WIN
 		&&  ((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0])))
 	{
@@ -731,7 +733,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		&& depth>=ONE_PLY
 		&& eval>=beta
 		&& !pos.getActualState().skipNullMove
-		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
+		//&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&&((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0]))
 	){
 		// Null move dynamic reduction based on depth
