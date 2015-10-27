@@ -51,12 +51,12 @@
 //#define ENABLE_CHECK_CONSISTENCY
 
 
-#define MAX_MOVE_PER_POSITION (512)
-#define MAX_BAD_MOVE_PER_POSITION (512)
+#define MAX_MOVE_PER_POSITION (128)
+#define MAX_BAD_MOVE_PER_POSITION (32)
 #define ONE_PLY		(16)
 #define ONE_PLY_SHIFT (4)
 #define MAX_PV_LENGTH	(200)
-#define STATE_INFO_LENGTH (2000)
+#define STATE_INFO_LENGTH (800)
 
 //---------------------------------------------
 //SCORE DEFINITION
