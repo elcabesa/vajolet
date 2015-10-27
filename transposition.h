@@ -20,7 +20,6 @@
 #include "vajolet.h"
 #include <stdlib.h>
 #include <cstring>
-#include "io.h"
 
 
 
@@ -140,9 +139,7 @@ public:
 	// from current position) to "plies to mate/be mated from the root".
 
 	static Score scoreFromTT(Score v, int ply){
-		/*if(v-ply>=SCORE_MATE){
-			sync_cout<<"ECCOMI "<<v<<" "<<ply<<" "<<SCORE_MATE<<sync_endl;
-		}*/
+
 		assert(ply>=0);
 		assert(v-ply<SCORE_MATE || v == SCORE_NONE);
 		assert(v+ply>SCORE_MATED);
