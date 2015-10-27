@@ -20,6 +20,7 @@
 #include "vajolet.h"
 #include <stdlib.h>
 #include <cstring>
+#include "io.h"
 
 
 
@@ -42,18 +43,18 @@ private :
 	unsigned char type;			/*! 8 bit for the type of the entry*/
 								/*  144 bits total =18 bytes*/
 public:
-	void save(unsigned int k,Score val,unsigned char t,signed short int d,unsigned short m,Score sv){
-		assert(val<SCORE_INFINITE);
-		assert(val>-SCORE_INFINITE);
-		assert(sv<SCORE_INFINITE);
-		assert(sv>-SCORE_INFINITE);
-		assert(type<=2);
-		key=k;
-		value=val;
-		staticValue=sv;
-		packedMove= m;
-		depth=d;
-		type=t;
+	void save(unsigned int Key,Score Value,unsigned char Type,signed short int Depth,unsigned short Move,Score StaticValue){
+		assert(Value<SCORE_INFINITE || Value == SCORE_NONE);
+		assert(Value>-SCORE_INFINITE);
+		assert(StaticValue<SCORE_INFINITE);
+		assert(StaticValue>-SCORE_INFINITE);
+		assert(Type<=typeScoreHigherThanBeta);
+		key=Key;
+		value=Value;
+		staticValue=StaticValue;
+		packedMove= Move;
+		depth=Depth;
+		type=Type;
 
 	}
 	void setGeneration(unsigned char gen){
@@ -112,7 +113,7 @@ public:
 	}
 
 	ttEntry* probe(const U64 key) const;
-	void store(const U64 key, Score v, unsigned char b, signed short int d, unsigned short m, Score statV);
+	void store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
 
 	unsigned int getFullness(void){
 		unsigned int ret = (unsigned int)((usedElements*250)/elements);
@@ -139,12 +140,14 @@ public:
 	// from current position) to "plies to mate/be mated from the root".
 
 	static Score scoreFromTT(Score v, int ply){
-		assert(v!=SCORE_NONE);
+		/*if(v-ply>=SCORE_MATE){
+			sync_cout<<"ECCOMI "<<v<<" "<<ply<<" "<<SCORE_MATE<<sync_endl;
+		}*/
 		assert(ply>=0);
-		assert(v-ply<SCORE_MATE);
+		assert(v-ply<SCORE_MATE || v == SCORE_NONE);
 		assert(v+ply>SCORE_MATED);
 		assert(v>=SCORE_MATED);
-		assert(v<=SCORE_MATE);
+		assert(v<=SCORE_MATE || v == SCORE_NONE);
 		return  v == SCORE_NONE ? SCORE_NONE
 				: v >= SCORE_MATE_IN_MAX_PLY  ? v - ply
 				: v <= SCORE_MATED_IN_MAX_PLY ? v + ply : v;

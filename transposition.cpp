@@ -23,7 +23,6 @@ transpositionTable TT;
 
 void transpositionTable::setSize(long long unsigned int mbSize){
 	long long unsigned int size =  (mbSize << 20) / sizeof(ttCluster);
-	sync_cout<<size<<sync_endl;
 	elements=size;
 	if(table){
 		free(table);
@@ -55,7 +54,7 @@ ttEntry* transpositionTable::probe(const U64 key) const {
 	return nullptr;
 }
 
-void transpositionTable::store(const U64 key, Score v, unsigned char b, signed short int d, unsigned short m, Score statV) {
+void transpositionTable::store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue) {
 
 	int c1, c2, c3;
 	ttEntry *tte, *replace;
@@ -72,8 +71,8 @@ void transpositionTable::store(const U64 key, Score v, unsigned char b, signed s
 	{
 		if(!tte->getKey() || tte->getKey() == key32) // Empty or overwrite old
 		{
-			if (!m){
-				m = tte->getPackedMove(); // Preserve any existing ttMove
+			if (!move){
+				move = tte->getPackedMove(); // Preserve any existing ttMove
 			}
 
 			replace = tte;
@@ -93,7 +92,7 @@ void transpositionTable::store(const U64 key, Score v, unsigned char b, signed s
 	if(replace->getSearchId()!=generation){
 		usedElements++;
 	}
-	replace->save(key32, v, b, d, m, statV);
+	replace->save(key32, value, type, depth, move, statValue);
 	replace->setGeneration(generation);
 
 
