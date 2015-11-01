@@ -140,7 +140,7 @@ public:
 			stagedGeneratorState=getProbCutTT;
 		}
 		captureThreshold=Position::pieceValue[capturePiece%Position::separationBitmap][0];
-		if(ttMove.packed && (!pos.isCaptureMove(ttMove) || !pos.see(ttMove)<captureThreshold)){
+		if(ttMove.packed && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove)<captureThreshold))){
 			ttMove=0;
 		}
 	}
