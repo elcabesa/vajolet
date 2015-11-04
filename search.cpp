@@ -54,7 +54,7 @@ void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score al
 	}
 	else{
 		int satRes= std::min(res,SCORE_MAX_OUTPUT_VALUE);
-		satRes= std::max(res,SCORE_MIN_OUTPUT_VALUE);
+		satRes= std::max(satRes,SCORE_MIN_OUTPUT_VALUE);
 		std::cout<< "cp "<<(int)((float)satRes/100.0);
 	}
 	std::cout<<(res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");

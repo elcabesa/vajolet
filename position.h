@@ -487,16 +487,18 @@ public:
 		\date 08/11/2013
 	*/
 	inline unsigned int getGamePhase() const{
+		const int opening = 570000;
+		const int endgame = 150000;
 		Score tot=getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
-		if(tot>570000){ //opening
+		if(tot>opening){ //opening
 			return 0;
 
 		}
-		if(tot<120000){	//endgame
+		if(tot<endgame){	//endgame
 			return 65536;
 
 		}
-		return (unsigned int)((float)(570000-tot)*(65536.0f/(570000.0f-120000.0f)));
+		return (unsigned int)((float)(opening-tot)*(65536.0f/(float)(opening-endgame)));
 	}
 
 
