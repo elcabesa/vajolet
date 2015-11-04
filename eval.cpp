@@ -209,6 +209,54 @@ bool evalKBPvsK(const Position& p, Score& res){
 
 }
 
+bool evalKQvsKP(const Position& p, Score& res){
+	color Pcolor=p.bitBoard[Position::whitePawns]?white:black;
+	tSquare pawnSquare;
+	tSquare winningKingSquare;
+	tSquare losingKingSquare;
+
+
+	if(Pcolor==white){
+		pawnSquare = p.pieceList[Position::whitePawns][0];
+		winningKingSquare = p.pieceList[Position::blackKing][0];
+		losingKingSquare = p.pieceList[Position::whiteKing][0];
+
+		int pawnFile=FILES[pawnSquare];
+		int pawnRank=RANKS[pawnSquare];
+		res = -100*(7- SQUARE_DISTANCE[winningKingSquare][losingKingSquare]);
+
+		if(
+				pawnRank!=6
+				|| SQUARE_DISTANCE[losingKingSquare][pawnSquare]!=1
+				|| (pawnFile==1 || pawnFile==3 || pawnFile==4 || pawnFile==6) ){
+			res -=90000;
+		}
+		return true;
+
+	}
+	else{
+		pawnSquare = p.pieceList[Position::blackPawns][0];
+		winningKingSquare = p.pieceList[Position::whiteKing][0];
+		losingKingSquare = p.pieceList[Position::blackKing][0];
+
+		int pawnFile=FILES[pawnSquare];
+		int pawnRank=RANKS[pawnSquare];
+		res = 100*(7- SQUARE_DISTANCE[winningKingSquare][losingKingSquare]);
+
+		if(
+				pawnRank!=1
+				|| SQUARE_DISTANCE[losingKingSquare][pawnSquare]!=1
+				|| (pawnFile==1 || pawnFile==3 || pawnFile==4 || pawnFile==6) ){
+			res +=90000;
+		}
+		return true;
+
+	}
+	return false;
+
+}
+
+
 bool evalKRPvsKr(const Position& p, Score& res){
 	color Pcolor=p.bitBoard[Position::whitePawns]?white:black;
 	tSquare pawnSquare;
@@ -401,6 +449,7 @@ void initMaterialKeys(void){
 	 * opposite bishop endgame -> look drawish
 	 * kr vs km		-> look drawish
 	 * knn vs k		-> very drawish
+	 * kq vs kp
 	 ----------------------------------------------*/
 
 
@@ -871,6 +920,26 @@ void initMaterialKeys(void){
 	t.pointer=&evalKRPvsKr;
 	t.val=0;
 	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	kq vs KP
+	//------------------------------------------
+	p.setupFromFen("kq6/8/8/8/8/8/8/6PK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKQvsKP;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	kp vs KQ
+	//------------------------------------------
+	p.setupFromFen("kp6/8/8/8/8/8/8/6QK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKQvsKP;
+	t.val=0;
+	materialKeyMap.insert({key,t});
 }
 
 
@@ -1339,7 +1408,7 @@ Score Position::eval(void) {
 			break;
 		}
 		case materialStruct::exactFunction:
-		{	Score r;
+		{	Score r = 0;
 
 			if(materialData->pointer(*this,r)){
 				if(st.nextMove)
