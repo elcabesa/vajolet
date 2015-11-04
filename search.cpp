@@ -1452,7 +1452,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	if(!inCheck){
 		bestScore=staticEval;
 
-		if (ttValue != SCORE_NONE){
+		/*if (ttValue != SCORE_NONE){
 			if (
 					((tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact) && (ttValue > staticEval) )
 					|| ((tte->getType() == typeScoreLowerThanAlpha || tte->getType() == typeExact ) && (ttValue < staticEval) )
@@ -1460,7 +1460,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 			{
 				bestScore = ttValue;
 			}
-		}
+		}*/
 	}
 
 
