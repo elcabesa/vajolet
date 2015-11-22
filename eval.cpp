@@ -1733,8 +1733,8 @@ Score Position::eval(void) {
 		if(rr){
 			tSquare blockingSquare=ppSq+pawnPush(white);
 			// bonus for king proximity to blocking square
-			passedPawnsBonus+=ownKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*rr);
-			passedPawnsBonus-=enemyKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*rr);
+			passedPawnsBonus-=ownKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*rr);
+			passedPawnsBonus+=enemyKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*rr);
 
 			if(squares[blockingSquare]==empty){
 				bitMap forwardSquares=SQUARES_IN_FRONT_OF[0][ppSq];
@@ -1799,8 +1799,8 @@ Score Position::eval(void) {
 			tSquare blockingSquare=ppSq+pawnPush(black);
 
 			// bonus for king proximity to blocking square
-			passedPawnsBonus+=ownKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*rr);
-			passedPawnsBonus-=enemyKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*rr);
+			passedPawnsBonus-=ownKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*rr);
+			passedPawnsBonus+=enemyKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*rr);
 
 			if(squares[blockingSquare]==empty){
 				bitMap forwardSquares=SQUARES_IN_FRONT_OF[1][ppSq];
