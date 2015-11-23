@@ -106,8 +106,8 @@ simdScore badBishop= simdScore(-200,1530,0,0);
 simdScore tempo= simdScore(530,480,0,0);
 simdScore bishopPair =simdScore(3260,4690,0,0);
 
-simdScore ownKingNearPassedPawn=simdScore(10,250,0,0);
-simdScore enemyKingNearPassedPawn=simdScore(0,150,0,0);
+simdScore ownKingNearPassedPawn=simdScore(0,150,0,0);
+simdScore enemyKingNearPassedPawn=simdScore(10,260,0,0);
 
 simdScore spaceBonus=simdScore(600,200,0,0);
 simdScore undefendedMinorPenalty = simdScore(756,354,0,0);
@@ -1733,8 +1733,8 @@ Score Position::eval(void) {
 		if(rr){
 			tSquare blockingSquare=ppSq+pawnPush(white);
 			// bonus for king proximity to blocking square
-			passedPawnsBonus-=ownKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*rr);
-			passedPawnsBonus+=enemyKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*rr);
+			passedPawnsBonus+=enemyKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*rr);
+			passedPawnsBonus-=ownKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*rr);
 
 			if(squares[blockingSquare]==empty){
 				bitMap forwardSquares=SQUARES_IN_FRONT_OF[0][ppSq];
@@ -1799,8 +1799,8 @@ Score Position::eval(void) {
 			tSquare blockingSquare=ppSq+pawnPush(black);
 
 			// bonus for king proximity to blocking square
-			passedPawnsBonus-=ownKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*rr);
-			passedPawnsBonus+=enemyKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*rr);
+			passedPawnsBonus+=enemyKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[whiteKing][0]]*rr);
+			passedPawnsBonus-=ownKingNearPassedPawn*(SQUARE_DISTANCE[blockingSquare][pieceList[blackKing][0]]*rr);
 
 			if(squares[blockingSquare]==empty){
 				bitMap forwardSquares=SQUARES_IN_FRONT_OF[1][ppSq];
