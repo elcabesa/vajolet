@@ -73,6 +73,8 @@ simdScore passedPawnBlockedSquares =simdScore(150,370,0,0);
 simdScore passedPawnDefendedSquares = simdScore(150,240,0,0);
 simdScore passedPawnDefendedBlockingSquare = simdScore(260,170,0,0);
 simdScore unstoppablePassed = simdScore(0,2000,0,0);
+simdScore rookBehindPassedPawn = simdScore(0,10,0,0);
+simdScore EnemyRookBehindPassedPawn = simdScore(0,10,0,0);
 
 simdScore holesPenalty=simdScore(100,260,0,0);
 simdScore pawnCenterControl=simdScore(70,120,0,0);
@@ -107,7 +109,7 @@ simdScore tempo= simdScore(530,480,0,0);
 simdScore bishopPair =simdScore(3260,4690,0,0);
 
 simdScore ownKingNearPassedPawn=simdScore(0,150,0,0);
-simdScore enemyKingNearPassedPawn=simdScore(10,260,0,0);
+simdScore enemyKingNearPassedPawn=simdScore(10,240,0,0);
 
 simdScore spaceBonus=simdScore(600,200,0,0);
 simdScore undefendedMinorPenalty = simdScore(756,354,0,0);
@@ -332,6 +334,74 @@ bool evalKBNvsK(const Position& p, Score& res){
 	return true;
 
 }
+
+bool evalKQvsK(const Position& p, Score& res){
+	//p.display();
+	color color=p.bitBoard[Position::whiteQueens]?white:black;
+	tSquare queenSquare;
+	tSquare kingSquare;
+	tSquare enemySquare;
+	int mul=1;
+	if(color==white){
+		mul=1;
+		queenSquare = p.pieceList[Position::whiteQueens][0];
+		kingSquare = p.pieceList[Position::whiteKing][0];
+		enemySquare = p.pieceList[Position::blackKing][0];
+	}
+	else{
+		mul=-1;
+		queenSquare = p.pieceList[Position::blackQueens][0];
+		kingSquare = p.pieceList[Position::blackKing][0];
+		enemySquare = p.pieceList[Position::whiteKing][0];
+
+	}
+
+
+	res= SCORE_KNOWN_WIN+50000;
+	res -= 5*SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
+	res -= 5*SQUARE_DISTANCE[enemySquare][queenSquare];// devo portare il re avversario nel giusto angolo
+
+
+
+	res *=mul;
+	return true;
+
+}
+
+bool evalKPvsK(const Position& p, Score& res){
+	//p.display();
+	color color=p.bitBoard[Position::whitePawns]?white:black;
+	tSquare pawnSquare;
+	tSquare kingSquare;
+	tSquare enemySquare;
+	if(color==white){
+		pawnSquare = p.pieceList[Position::whitePawns][0];
+		kingSquare = p.pieceList[Position::whiteKing][0];
+		enemySquare = p.pieceList[Position::blackKing][0];
+
+		if(RANKS[enemySquare]+(p.getActualState().nextMove == Position::blackTurn)<std::max(2,RANKS[pawnSquare]))
+		{
+			res = SCORE_KNOWN_WIN + RANKS[pawnSquare];
+			return true;
+		}
+	}
+	else{
+		pawnSquare = p.pieceList[Position::blackPawns][0];
+		kingSquare = p.pieceList[Position::blackKing][0];
+		enemySquare = p.pieceList[Position::whiteKing][0];
+
+		if(RANKS[enemySquare]-(p.getActualState().nextMove == Position::whiteTurn)>std::min(5,RANKS[pawnSquare]))
+		{
+			res = -SCORE_KNOWN_WIN -7 + RANKS[pawnSquare];
+			return true;
+		}
+
+	}
+
+
+	return false;
+}
+
 
 bool evalOppositeBishopEndgame(const Position& p, Score& res){
 	if(SQUARE_COLOR[p.pieceList[Position::blackBishops][0]] !=SQUARE_COLOR[ p.pieceList[Position::whiteBishops][0]]){
@@ -813,6 +883,44 @@ void initMaterialKeys(void){
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
+/*	//------------------------------------------
+	//	k vs KQ
+	//------------------------------------------
+	p.setupFromFen("k7/8/8/8/8/8/8/6QK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKQvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kq vs K
+	//------------------------------------------
+	p.setupFromFen("kq6/8/8/8/8/8/8/7K w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKQvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+
+	//------------------------------------------
+	//	k vs KP
+	//------------------------------------------
+	p.setupFromFen("k7/8/8/8/8/8/8/6PK w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKPvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+	//------------------------------------------
+	//	kp vs K
+	//------------------------------------------
+	p.setupFromFen("kp6/8/8/8/8/8/8/7K w - -");
+	key=p.getActualState().materialKey;
+	t.type=materialStruct::exactFunction;
+	t.pointer=&evalKPvsK;
+	t.val=0;
+	materialKeyMap.insert({key,t});
+*/
 
 	//------------------------------------------
 	//	opposite bishop endgame
@@ -1738,6 +1846,7 @@ Score Position::eval(void) {
 
 			if(squares[blockingSquare]==empty){
 				bitMap forwardSquares=SQUARES_IN_FRONT_OF[0][ppSq];
+				bitMap backWardSquares=SQUARES_IN_FRONT_OF[1][ppSq];
 				bitMap defendedSquares = forwardSquares & attackedSquares[whitePieces];
 
 				bitMap unsafeSquares = forwardSquares & (attackedSquares[blackPieces] |bitBoard[blackPieces] );
@@ -1754,6 +1863,15 @@ Score Position::eval(void) {
 						passedPawnsBonus+=passedPawnDefendedBlockingSquare*rr;
 					}
 				}
+				if(backWardSquares & bitBoard[whiteRooks])
+				{
+					passedPawnsBonus+=rookBehindPassedPawn*rr;
+				}
+				if(backWardSquares & bitBoard[blackRooks])
+				{
+					passedPawnsBonus-=EnemyRookBehindPassedPawn*rr;
+				}
+
 			}
 		}
 
@@ -1804,13 +1922,15 @@ Score Position::eval(void) {
 
 			if(squares[blockingSquare]==empty){
 				bitMap forwardSquares=SQUARES_IN_FRONT_OF[1][ppSq];
+				bitMap backWardSquares=SQUARES_IN_FRONT_OF[0][ppSq];
 				bitMap defendedSquares = forwardSquares & attackedSquares[blackPieces];
 
 				bitMap unsafeSquares = forwardSquares & (attackedSquares[whitePieces] | bitBoard[whitePieces]);
-
-				passedPawnsBonus-=passedPawnUnsafeSquares*rr;
-				if(unsafeSquares & bitSet(blockingSquare)){
-						passedPawnsBonus-=passedPawnBlockedSquares*rr;
+				if(unsafeSquares){
+					passedPawnsBonus-=passedPawnUnsafeSquares*rr;
+					if(unsafeSquares & bitSet(blockingSquare)){
+							passedPawnsBonus-=passedPawnBlockedSquares*rr;
+					}
 				}
 
 				if(defendedSquares){
@@ -1818,6 +1938,14 @@ Score Position::eval(void) {
 					if(defendedSquares & bitSet(blockingSquare)){
 						passedPawnsBonus+=passedPawnDefendedBlockingSquare*rr;
 					}
+				}
+				if(backWardSquares & bitBoard[whiteRooks])
+				{
+					passedPawnsBonus+=rookBehindPassedPawn*rr;
+				}
+				if(backWardSquares & bitBoard[blackRooks])
+				{
+					passedPawnsBonus-=EnemyRookBehindPassedPawn*rr;
 				}
 			}
 		}
