@@ -374,15 +374,53 @@ bool evalKPvsK(const Position& p, Score& res){
 	tSquare pawnSquare;
 	tSquare kingSquare;
 	tSquare enemySquare;
+
 	if(color==white){
 		pawnSquare = p.pieceList[Position::whitePawns][0];
 		kingSquare = p.pieceList[Position::whiteKing][0];
 		enemySquare = p.pieceList[Position::blackKing][0];
 
-		if(RANKS[enemySquare]+(p.getActualState().nextMove == Position::blackTurn)<std::max(2,RANKS[pawnSquare]))
+
+		tSquare promotionSquare=BOARDINDEX[FILES[pawnSquare]][7];
+		const int relativeRank =RANKS[pawnSquare];
+		// Rule of the square
+		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (p.getActualState().nextMove==Position::whiteTurn?0:1),0) )
 		{
-			res = SCORE_KNOWN_WIN + RANKS[pawnSquare];
+			res = SCORE_KNOWN_WIN + relativeRank;
 			return true;
+		}
+		if(FILES[pawnSquare]!=0 && FILES[pawnSquare]!= 7)
+		{
+
+			if(SQUARE_DISTANCE[enemySquare][pawnSquare]>=2 || p.getActualState().nextMove==Position::whiteTurn)
+			{
+				//winning king on a key square
+				if(relativeRank < 4)
+				{
+					if(kingSquare >= pawnSquare+15 && kingSquare <= pawnSquare+17 )
+					{
+						res = SCORE_KNOWN_WIN + relativeRank;
+						return true;
+					}
+				}
+				else if(relativeRank < 6)
+				{
+					if((kingSquare >= pawnSquare+15 && kingSquare <= pawnSquare+17) || (kingSquare >= pawnSquare+7 && kingSquare <= pawnSquare+9))
+					{
+						res = SCORE_KNOWN_WIN + relativeRank;
+						return true;
+					}
+				}
+				else{
+
+					if((kingSquare >= pawnSquare-1 && kingSquare <= pawnSquare+1) || (kingSquare >= pawnSquare+7 && kingSquare <= pawnSquare+9))
+					{
+						res = SCORE_KNOWN_WIN + relativeRank;
+						return true;
+					}
+
+				}
+			}
 		}
 	}
 	else{
@@ -390,12 +428,45 @@ bool evalKPvsK(const Position& p, Score& res){
 		kingSquare = p.pieceList[Position::blackKing][0];
 		enemySquare = p.pieceList[Position::whiteKing][0];
 
-		if(RANKS[enemySquare]-(p.getActualState().nextMove == Position::whiteTurn)>std::min(5,RANKS[pawnSquare]))
+
+
+		tSquare promotionSquare=BOARDINDEX[FILES[pawnSquare]][0];
+		const int relativeRank =7-RANKS[pawnSquare];
+		// Rule of the square
+		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (p.getActualState().nextMove==Position::blackTurn?0:1),0) )
 		{
-			res = -SCORE_KNOWN_WIN -7 + RANKS[pawnSquare];
+			res = -SCORE_KNOWN_WIN -relativeRank;
 			return true;
 		}
+		if(FILES[pawnSquare]!=0 && FILES[pawnSquare]!= 7)
+		{
+			//winning king on a key square
+			if(relativeRank < 4)
+			{
+				if(kingSquare >= pawnSquare-17 && kingSquare <= pawnSquare-15 && (SQUARE_DISTANCE[enemySquare][pawnSquare]>=2 || p.getActualState().nextMove==Position::blackTurn))
+				{
+					res = -SCORE_KNOWN_WIN - relativeRank;
+					return true;
+				}
+				else if(relativeRank < 6)
+				{
+					if((kingSquare >= pawnSquare-17 && kingSquare <= pawnSquare-15) || (kingSquare >= pawnSquare-9 && kingSquare <= pawnSquare+7))
+					{
+						res = -SCORE_KNOWN_WIN - relativeRank;
+						return true;
+					}
+				}
+				else{
 
+					if((kingSquare >= pawnSquare-1 && kingSquare <= pawnSquare+1) || (kingSquare >= pawnSquare-9 && kingSquare <= pawnSquare-7))
+					{
+						res = -SCORE_KNOWN_WIN - relativeRank;
+						return true;
+					}
+
+				}
+			}
+		}
 	}
 
 
@@ -883,7 +954,7 @@ void initMaterialKeys(void){
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
-/*	//------------------------------------------
+	//------------------------------------------
 	//	k vs KQ
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/6QK w - -");
@@ -920,7 +991,7 @@ void initMaterialKeys(void){
 	t.pointer=&evalKPvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
-*/
+
 
 	//------------------------------------------
 	//	opposite bishop endgame
