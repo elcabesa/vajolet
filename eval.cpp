@@ -421,6 +421,23 @@ bool evalKPvsK(const Position& p, Score& res){
 
 				}
 			}
+			//draw rule
+			if((enemySquare==pawnSquare+8) || (enemySquare==pawnSquare+16 && RANKS[enemySquare]!=7))
+			{
+				res = 0;
+				return true;
+			}
+		}
+		else
+		{
+			//ROOKS PAWN
+			if(abs(FILES[enemySquare] -FILES[pawnSquare])<=1  && RANKS[enemySquare]>5)
+			{
+				res = 0;
+				return true;
+			}
+
+
 		}
 	}
 	else{
@@ -440,17 +457,20 @@ bool evalKPvsK(const Position& p, Score& res){
 		}
 		if(FILES[pawnSquare]!=0 && FILES[pawnSquare]!= 7)
 		{
-			//winning king on a key square
-			if(relativeRank < 4)
+			if(SQUARE_DISTANCE[enemySquare][pawnSquare]>=2 || p.getActualState().nextMove==Position::blackTurn)
 			{
-				if(kingSquare >= pawnSquare-17 && kingSquare <= pawnSquare-15 && (SQUARE_DISTANCE[enemySquare][pawnSquare]>=2 || p.getActualState().nextMove==Position::blackTurn))
+				//winning king on a key square
+				if(relativeRank < 4)
 				{
-					res = -SCORE_KNOWN_WIN - relativeRank;
-					return true;
+					if(kingSquare >= pawnSquare-17 && kingSquare <= pawnSquare-15 )
+					{
+						res = -SCORE_KNOWN_WIN - relativeRank;
+						return true;
+					}
 				}
 				else if(relativeRank < 6)
 				{
-					if((kingSquare >= pawnSquare-17 && kingSquare <= pawnSquare-15) || (kingSquare >= pawnSquare-9 && kingSquare <= pawnSquare+7))
+					if((kingSquare >= pawnSquare-17 && kingSquare <= pawnSquare-15) || (kingSquare >= pawnSquare-9 && kingSquare <= pawnSquare-7))
 					{
 						res = -SCORE_KNOWN_WIN - relativeRank;
 						return true;
@@ -463,9 +483,25 @@ bool evalKPvsK(const Position& p, Score& res){
 						res = -SCORE_KNOWN_WIN - relativeRank;
 						return true;
 					}
-
 				}
 			}
+			//draw rule
+			if((enemySquare==pawnSquare-8) || (enemySquare==pawnSquare-16 && RANKS[enemySquare]!=7))
+			{
+				res = 0;
+				return true;
+			}
+		}
+		else
+		{
+			//ROOKS PAWN
+			if(abs(FILES[enemySquare] -FILES[pawnSquare])<=1  && RANKS[enemySquare]<2)
+			{
+				res = 0;
+				return true;
+			}
+
+
 		}
 	}
 
