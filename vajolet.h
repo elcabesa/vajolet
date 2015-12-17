@@ -33,7 +33,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.1.20"
+#define VERSION			"2.1.21"
 #define PRECALCULATED_BITSET
 #define HW_BITCOUNT
 
@@ -55,7 +55,6 @@
 #define MAX_BAD_MOVE_PER_POSITION (32)
 #define ONE_PLY		(16)
 #define ONE_PLY_SHIFT (4)
-#define MAX_PV_LENGTH	(200)
 #define STATE_INFO_LENGTH (800)
 
 //---------------------------------------------

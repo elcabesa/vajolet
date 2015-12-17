@@ -55,9 +55,8 @@ double Tuner::parseEpd(bool save=false){
 				//double modifiedScoreRes=std::min(std::max((0.5+(scoreRes-0.5)*0.005*positions),0.0),1.0);
 
 
-				pos.setupFromFen(clearFen);
-				PVline childPV;
-				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,&childPV);
+				std::list<Move> childPV;
+				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
 
 				double error=std::pow(scoreRes-(1.0/(1+std::pow(2.71828182846,-score/scaling))),2);
 				if(save && std::abs(error)>1.1){
@@ -112,8 +111,8 @@ void Tuner::drawSigmoid(void){
 
 
 				pos.setupFromFen(clearFen);
-				PVline childPV;
-				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,&childPV);
+				std::list<Move> childPV;
+				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
 				unsigned int index=0;
 
 				//sync_cout<<"fen "<<clearFen<<" result "<<scoreRes<< " score "<< score<<sync_endl;
@@ -181,8 +180,8 @@ void Tuner::drawAverageEvolution(void){
 
 
 				pos.setupFromFen(clearFen);
-				PVline childPV;
-				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,&childPV);
+				std::list<Move> childPV;
+				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
 				if(scoreRes!=0.5){
 					double error=std::abs(scoreRes-(1.0/(1+std::pow(2.71828182846,-score/scaling))));
 					unsigned int index=std::min(positions,(unsigned long int)199);

@@ -19,6 +19,7 @@
 #include <ctime>
 #include <chrono>
 #include <vector>
+#include <list>
 #include <algorithm>    // std::copy
 #include <iterator>     // std::back_inserter
 #include "search.h"
@@ -42,12 +43,12 @@ void search::printAllPV(Position & p, unsigned int count){
 		Score res=rootMoves[i].score;
 		if(rootMoves[i].nodes)
 		{
-			printPV(res,rootMoves[i].depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,rootMoves[i].time,i,&rootMoves[i].PV,rootMoves[i].nodes);
+			printPV(res,rootMoves[i].depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,rootMoves[i].time,i,rootMoves[i].PV,rootMoves[i].nodes);
 		}
 	}
 }
 
-void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,PVline * PV,unsigned long long nodes){
+void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes){
 	sync_cout<<"info multipv "<< count+1<< " depth "<<(depth)<<" seldepth "<<seldepth <<" score ";
 	if(abs(res) >SCORE_MATE_IN_MAX_PLY){
 		std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
@@ -64,10 +65,9 @@ void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score al
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 	std::cout<<" nps "<<(unsigned int)((double)nodes*1000/(time))<<" time "<<(time);
 #endif
+
 	std::cout<<" pv ";
-	for (unsigned int i= 0; i < PV->lenght; i++){
-		std::cout<<p.displayUci(PV->list[i])<<" ";
-	}
+	for_each(PV.begin(), PV.end(), [&](Move &m){std::cout<<p.displayUci(m)<<" ";});
 	std::cout<<sync_endl;
 }
 
@@ -109,24 +109,27 @@ Score search::startThinking(Position & p,searchLimits & l){
 			rm.depth=0;
 			rm.nodes=0;
 			rm.time=0;
-			rm.PV.lenght = 0;
+			rm.PV.clear();
 
 			rootMoves.push_back(rm);
 		}
 	}
 	else{
-		for(std::list<Move>::iterator it = limits.searchMoves.begin(); it != limits.searchMoves.end(); ++it){
+		for_each(limits.searchMoves.begin(), limits.searchMoves.end(),
+			[&](Move &m)
+			{
 			rootMove rm;
 			rm.previousScore=-SCORE_INFINITE;
 			rm.score=-SCORE_INFINITE;
-			rm.firstMove=*it;
+			rm.firstMove=m;
 			rm.selDepth=0;
 			rm.depth=0;
 			rm.nodes=0;
 			rm.time=0;
-			rm.PV.lenght = 0;
+			rm.PV.clear();
 			rootMoves.push_back(rm);
-		}
+			}
+		);
 	}
 
 	//sync_cout<<"legal moves ="<<rootMoves.size()<<sync_endl;
@@ -205,7 +208,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 	unsigned int selDepthBase=p.getActualState().ply;
 
 	startTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-	PVline newPV;
+	std::list<Move> newPV;
 	unsigned int depth=1;
 
 	Score alpha=-SCORE_INFINITE,beta =SCORE_INFINITE;
@@ -241,33 +244,35 @@ Score search::startThinking(Position & p,searchLimits & l){
 			// reload the last PV in the transposition table
 			for(unsigned int i =0; i<=indexPV; i++){
 				//sync_cout<<"LENGHT "<<rootMoves[i].PV.lenght<<sync_endl;
-				int n=0;
-				if(rootMoves[i].PV.lenght>0){
+				if(rootMoves[i].PV.size()>0){
 					const ttEntry* tte;
 
+					auto it = begin(rootMoves[i].PV);
 					//sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
-					for (unsigned int z= 0; z < rootMoves[i].PV.lenght; z++){
-						if(!mg.isMoveLegal(rootMoves[i].PV.list[z]))
+					for (;it!=end(rootMoves[i].PV);it++)
+					{
+						if(!mg.isMoveLegal(*it))
 						{
 							//sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
 							break;
 						}
 						tte = TT.probe(p.getActualState().key);
 
-						if (!tte || tte->getPackedMove() != (rootMoves[i].PV.list[z]).packed){// Don't overwrite correct entries
+						if (!tte || tte->getPackedMove() != (*it).packed){// Don't overwrite correct entries
 							//sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
 							//TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
-							TT.store(p.getActualState().key, SCORE_NONE,typeExact,-1000, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
+							TT.store(p.getActualState().key, SCORE_NONE,typeExact,-1000, (*it).packed, p.eval<false>());
 						}
 
 						//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
-						p.doMove(rootMoves[i].PV.list[z]);
-						n++;
+						p.doMove(*it);
 
 					}
-					for (n--;n>=0;n--){
+					for (;it!=begin(rootMoves[i].PV);)
+					{
+						--it;
 						//sync_cout<<"undo move "<<p.displayUci(rootMoves[i].PV[n])<<sync_endl;
-						p.undoMove(rootMoves[i].PV.list[n]);
+						p.undoMove(*it);
 					}
 				}
 			}
@@ -280,40 +285,35 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 				//sync_cout<<"SEARCH"<<sync_endl;
 				selDepth=selDepthBase;
-				newPV.lenght=0;
+				newPV.clear();
 				p.cleanStateInfo();
 				//sync_cout<<"search line "<<PVIdx<<sync_endl;
-				res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,(depth-reduction)*ONE_PLY,alpha,beta,&newPV);
+				res=alphaBeta<search::nodeType::ROOT_NODE>(0,p,(depth-reduction)*ONE_PLY,alpha,beta,newPV);
 
 
 
 
 				//sync_cout<<"FINISHED SEARCH"<<sync_endl;
-				//sync_cout<<"PVsize "<<newPV.lenght<<sync_endl;
+				//sync_cout<<"PVsize "<<newPV.size()<<sync_endl;
 
 				if(depth!=1 && signals.stop){
 					//sync_cout<<"iterative deepening Stop"<<sync_endl;
 					break;
 				}
-				if(newPV.lenght!=0 &&  res <= alpha){
+				if(newPV.size()!=0 &&  res <= alpha){
 					sync_cout<<"ERRORE NEWPV"<<sync_endl;
 				}
 				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 
 
 
-				if(newPV.lenght!=0 && res > alpha /*&& res < beta*/){
-					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+indexPV,rootMoves.end(),newPV.list[0]);
-					if(it->firstMove==newPV.list[0]){
+				if(newPV.size()!=0 && res > alpha /*&& res < beta*/){
+					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+indexPV,rootMoves.end(),newPV.front());
+					if(it->firstMove==newPV.front()){
 
 						//if(res<beta)
 						{
-							it->PV.lenght=newPV.lenght;
-							for(unsigned int i=0;i<std::min(newPV.lenght,(unsigned int)MAX_PV_LENGTH);i++)
-							{
-								assert(i<MAX_PV_LENGTH);
-								it->PV.list[i]=newPV.list[i];
-							}
+							it->PV = newPV;
 						}
 
 						it->score=res;
@@ -340,9 +340,9 @@ Score search::startThinking(Position & p,searchLimits & l){
 					//sync_cout<<"res<=alpha "<<sync_endl;
 
 					//my_thread::timeMan.idLoopRequestToExtend=true;
-					newPV.lenght=1;
-					newPV.list[0]=(rootMoves[indexPV].PV.list[0]);
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,indexPV,&newPV,visitedNodes);
+					newPV.clear();
+					newPV.push_back(rootMoves[indexPV].PV.front());
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,indexPV,newPV,visitedNodes);
 					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 
 					reduction = 0;
@@ -351,12 +351,12 @@ Score search::startThinking(Position & p,searchLimits & l){
 					//sync_cout<<"new alpha "<<alpha<<sync_endl;
 				}
 				else if (res >= beta){
-					if(oldBestMove.packed && oldBestMove!=newPV.list[0]){
+					if(oldBestMove.packed && oldBestMove!=newPV.front()){
 						my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
 						//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 					}
 					//sync_cout<<"res>=beta "<<sync_endl;
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,indexPV,&newPV,visitedNodes);
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,indexPV,newPV,visitedNodes);
 					beta = std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 					if(depth>1){
 						reduction=1;
@@ -398,10 +398,10 @@ Score search::startThinking(Position & p,searchLimits & l){
 		{
 
 			Score rBeta = res - 20000;
-			p.getActualState().excludedMove=newPV.list[0];
+			p.getActualState().excludedMove=newPV.front();
 			p.getActualState().skipNullMove=true;
-			PVline  locChildPV;
-			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0,p,(depth-3)*ONE_PLY,rBeta-1,rBeta,&locChildPV);
+			std::list<Move> locChildPV;
+			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0,p,(depth-3)*ONE_PLY,rBeta-1,rBeta,locChildPV);
 			p.getActualState().skipNullMove=false;
 			p.getActualState().excludedMove.packed=0;
 
@@ -410,11 +410,11 @@ Score search::startThinking(Position & p,searchLimits & l){
 			}
 		}
 
-		if(oldBestMove.packed && oldBestMove!=newPV.list[0]){
+		if(oldBestMove.packed && oldBestMove!=newPV.front()){
 			my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
 			//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 		}
-		oldBestMove=newPV.list[0];
+		oldBestMove=newPV.front();
 
 		my_thread::timeMan.depth=depth;
 		unsigned long time=my_thread::timeMan.minSearchTime;
@@ -451,16 +451,18 @@ Score search::startThinking(Position & p,searchLimits & l){
 	//sync_cout<<"bestMove index "<<bestMoveLine<<sync_endl;
 
 
-	sync_cout<<"bestmove "<<p.displayUci(rootMoves[bestMoveLine].PV.list[0]);
-	if(rootMoves[0].PV.lenght>1)
+	sync_cout<<"bestmove "<<p.displayUci(rootMoves[bestMoveLine].PV.front());
+	if(rootMoves[bestMoveLine].PV.size()>1)
 	{
-		std::cout<<" ponder "<<p.displayUci(rootMoves[bestMoveLine].PV.list[1]);
+		std::list<Move>::iterator it = rootMoves[bestMoveLine].PV.begin();
+		std::advance(it, 1);
+		std::cout<<" ponder "<<p.displayUci(*it);
 	}
 	else{
-		p.doMove(rootMoves[bestMoveLine].PV.list[0]);
+		p.doMove(rootMoves[bestMoveLine].PV.front());
 		U64 posKey=p.getKey();
 		ttEntry* tte = TT.probe(posKey);
-		p.undoMove(rootMoves[bestMoveLine].PV.list[0]);
+		p.undoMove(rootMoves[bestMoveLine].PV.front());
 		if(tte && tte->getPackedMove()){
 			Move m;
 			m.packed=tte->getPackedMove();
@@ -482,7 +484,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 
 }
 
-template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,PVline * pvLine){
+template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,std::list<Move>& pvLine){
 
 	//bool verbose=false;
 #ifdef PRINT_STATISTICS
@@ -514,7 +516,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	if(PVnode)
 	{
 		assert(pvLine);
-		pvLine->lenght=0;
+		pvLine.clear();
 	}
 
 	if( showLine && depth <=ONE_PLY){
@@ -537,7 +539,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 	if(type !=search::nodeType::ROOT_NODE){
 		if(pos.isDraw(PVnode) || signals.stop){
 			if(PVnode){
-				pvLine->lenght=0;
+				pvLine.clear();
 			}
 			//if(signals.stop){sync_cout<<"alpha beta initial Stop"<<sync_endl;}
 			return 0;
@@ -591,12 +593,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		{
 			Movegen mg(pos,history,ttMove);
 			if(ttMove.packed && mg.isMoveLegal(ttMove)){
-				pvLine->lenght=1;
-				pvLine->list[0]=ttMove;
+				pvLine.clear();
+				pvLine.push_back(ttMove);
 			}
 			else
 			{
-				pvLine->lenght=0;
+				pvLine.clear();
 			}
 		}
 #ifdef PRINT_STATISTICS
@@ -685,7 +687,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		Score ralpha = alpha - razorMargin(depth);
 		assert(ralpha>=-SCORE_INFINITE);
 
-		Score v = qsearch<CUT_NODE>(ply,pos,0, ralpha, ralpha+1, NULL);
+		std::list<Move> childPV;
+		Score v = qsearch<CUT_NODE>(ply,pos,0, ralpha, ralpha+1, childPV);
 		if (v <= ralpha)
 		{
 #ifdef PRINT_STATISTICS
@@ -753,11 +756,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 
 
 		Score nullVal;
+		std::list<Move> childPV;
 		if(depth-red<ONE_PLY ){
-			nullVal = -qsearch<childNodesType>(ply+1,pos,0,-beta,-beta+1,NULL);
+			nullVal = -qsearch<childNodesType>(ply+1,pos,0,-beta,-beta+1,childPV);
 		}else
 		{
-			nullVal = -alphaBeta<childNodesType>(ply+1,pos, depth - red, -beta, -beta+1,NULL);
+			nullVal = -alphaBeta<childNodesType>(ply+1,pos, depth - red, -beta, -beta+1,childPV);
 		}
 		pos.undoNullMove();
 
@@ -788,10 +792,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				assert(depth - red>=ONE_PLY);
 				Score val;
 				if(depth-red<ONE_PLY){
-					val = qsearch<childNodesType>(ply,pos, depth-red, beta-1, beta,NULL);
+					val = qsearch<childNodesType>(ply,pos, depth-red, beta-1, beta,childPV);
 				}
 				else{
-					val = alphaBeta<childNodesType>(ply,pos, depth - red, beta-1, beta, NULL);
+					val = alphaBeta<childNodesType>(ply,pos, depth - red, beta-1, beta, childPV);
 				}
 				pos.getActualState().skipNullMove=false;
 				if (val >= beta){
@@ -833,10 +837,11 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		mg.setupProbCutSearch(pos.getActualState().capturedPiece);
 
 		Move m;
+		std::list<Move> childPV;
 		while((m=mg.getNextMove()).packed){
 			pos.doMove(m);
 			assert(rDepth>=ONE_PLY);
-			s=-alphaBeta<childNodesType>(ply+1,pos,rDepth,-rBeta,-rBeta+1,NULL);
+			s=-alphaBeta<childNodesType>(ply+1,pos,rDepth,-rBeta,-rBeta+1,childPV);
 			pos.undoMove(m);
 			if(s>=rBeta){
 #ifdef PRINT_STATISTICS
@@ -860,11 +865,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		bool skipBackup=pos.getActualState().skipNullMove;
 		pos.getActualState().skipNullMove=true;
 
-		PVline childPV;
-		childPV.lenght=0;
+		std::list<Move> childPV;
 		const search::nodeType iidType=type;
 		assert(d>=ONE_PLY);
-		alphaBeta<iidType>(ply,pos, d, alpha, beta, &childPV);
+		alphaBeta<iidType>(ply,pos, d, alpha, beta, childPV);
 
 		pos.getActualState().skipNullMove=skipBackup;
 
@@ -941,11 +945,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		)
 		{
 
+			std::list<Move> childPv;
 			Score rBeta = ttValue - int(depth*20);
 			pos.getActualState().excludedMove=m;
 			bool backup=pos.getActualState().skipNullMove;
 			pos.getActualState().skipNullMove=true;
-			Score temp = alphaBeta<ALL_NODE>(ply,pos,depth/2,rBeta-1,rBeta,NULL);
+			Score temp = alphaBeta<ALL_NODE>(ply,pos,depth/2,rBeta-1,rBeta,childPv);
 			pos.getActualState().skipNullMove=backup;
 			pos.getActualState().excludedMove.packed=0;
 
@@ -1017,8 +1022,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 		pos.doMove(m);
 
 		Score val;
-		PVline childPV;
-		childPV.lenght=0;
+		std::list<Move> childPV;
 		if(PVnode){
 			if(moveNumber==1){
 #ifdef DEBUG1
@@ -1027,11 +1031,11 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				}
 #endif
 
-				childPV.lenght=0;
+				childPV.clear();
 				if(newDepth<ONE_PLY){
-					val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
+					val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,childPV);
 				}else{
-					val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
+					val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,childPV);
 				}
 #ifdef PRINT_PV_CHANGES
 				sync_cout<<"FIRST ply "<<ply<<" alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<" res "<<val/10000.0<<" "<<pos.displayUci(m)<<sync_endl;
@@ -1062,7 +1066,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						sync_cout<<"LMR alpha "<<(alpha)/10000.0<<" beta "<<(alpha+1)/10000.0<<" red "<<(float)(reduction)/ONE_PLY<<sync_endl;
 					}
 #endif
-						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,d,-alpha-1,-alpha,NULL);
+						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,d,-alpha-1,-alpha,childPV);
 						if(val<=alpha){
 							doFullDepthSearch=false;
 						}
@@ -1078,9 +1082,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 					}
 #endif
 					if(newDepth<ONE_PLY){
-						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}else{
-						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}
 
 					if(val>alpha && val < beta ){
@@ -1089,17 +1093,17 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 							sync_cout<<"info currmove "<<pos.displayUci(m)<<" val "<<val/10000.0<<" nodes "<<visitedNodes<< sync_endl;
 						}
 #endif
-						childPV.lenght=0;
+						childPV.clear();
 #ifdef DEBUG1
 						if(type==search::nodeType::ROOT_NODE){
 							sync_cout<<"RESEARCH alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<sync_endl;
 						}
 #endif
 						if(newDepth<ONE_PLY){
-							val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
+							val=-qsearch<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,childPV);
 						}
 						else{
-							val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,&childPV);
+							val=-alphaBeta<search::nodeType::PV_NODE>(ply+1,pos,newDepth,-beta,-alpha,childPV);
 						}
 #ifdef PRINT_PV_CHANGES
 						sync_cout<<"OTHER ply "<<ply<<" alpha "<<alpha/10000.0<<" beta "<<beta/10000.0<<" res "<<val/10000.0<<" "<<pos.displayUci(m)<<sync_endl;
@@ -1130,7 +1134,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 					/*if(verbose){
 						sync_cout<<"LMR search depth "<<d<<sync_endl;
 					}*/
-					val=-alphaBeta<childNodesType>(ply+1,pos,d,-alpha-1,-alpha,NULL);
+					val=-alphaBeta<childNodesType>(ply+1,pos,d,-alpha-1,-alpha,childPV);
 					if(val<=alpha){
 						doFullDepthSearch=false;
 					}
@@ -1147,12 +1151,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						/*if(verbose){
 							sync_cout<<"qsearch depth "<<newDepth<<sync_endl;
 						}*/
-						val=-qsearch<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-qsearch<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}else{
 						/*if(verbose){
 							sync_cout<<"search depth "<<newDepth<<sync_endl;
 						}*/
-						val=-alphaBeta<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-alphaBeta<childNodesType>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}
 				}
 				else{
@@ -1160,12 +1164,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 						/*if(verbose){
 							sync_cout<<"qsearch depth "<<newDepth<<sync_endl;
 						}*/
-						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-qsearch<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}else{
 						/*if(verbose){
 							sync_cout<<"search depth "<<newDepth<<sync_endl;
 						}*/
-						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,NULL);
+						val=-alphaBeta<search::nodeType::CUT_NODE>(ply+1,pos,newDepth,-alpha-1,-alpha,childPV);
 					}
 
 				}
@@ -1191,10 +1195,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 				}
 				if(type ==search::nodeType::ROOT_NODE|| (PVnode &&!signals.stop)){
 					if(PVnode){
-
-						pvLine->lenght=std::min(childPV.lenght+1, (unsigned int)(MAX_PV_LENGTH));
-						pvLine->list[0]=bestMove;
-						memcpy(pvLine->list + 1, childPV.list,  std::min(childPV.lenght,(unsigned int)(MAX_PV_LENGTH-1)) * sizeof(Move));
+						pvLine.clear();
+						pvLine.push_back(bestMove);
+						pvLine.splice(pvLine.end(),childPV);
+						//std::copy(childPV.begin(),childPV.end(),back_inserter(pvLine));
 					}
 				}
 			}
@@ -1323,7 +1327,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,Positio
 }
 
 
-template<search::nodeType type> Score search::qsearch(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,PVline * pvLine){
+template<search::nodeType type> Score search::qsearch(unsigned int ply,Position & pos,int depth,Score alpha,Score beta,std::list<Move>& pvLine){
 
 #ifdef PRINT_STATISTICS
 	Score originalAlpha=alpha;
@@ -1348,7 +1352,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 	if(PVnode){
 		assert(pvLine);
-		pvLine->lenght=0;
+		pvLine.clear();
 	}
 
 	bool inCheck=pos.getActualState().checkers;
@@ -1359,7 +1363,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 	if(pos.isDraw(PVnode) || signals.stop){
 		if(PVnode){
-			pvLine->lenght=0;
+			pvLine.clear();
 		}
 #ifdef PRINT_STATISTICS
 		Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
@@ -1406,12 +1410,12 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 			Movegen mg(pos,history,ttMove);
 			if(ttMove.packed && mg.isMoveLegal(ttMove))
 			{
-				pvLine->lenght=1;
-				pvLine->list[0]=ttMove;
+				pvLine.clear();
+				pvLine.push_back(ttMove);
 			}
 			else
 			{
-				pvLine->lenght=0;
+				pvLine.clear();
 			}
 		}
 
@@ -1488,8 +1492,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 	Move m;
 	Move bestMove=ttMove;
 	//bestMove=0;
-	PVline childPV;
-	childPV.lenght=0;
+	std::list<Move> childPV;
 
 	while (bestScore <beta  &&  (m=mg.getNextMove()).packed) {
 		assert(alpha<beta);
@@ -1559,11 +1562,11 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 
 
 		if(PVnode){
-			childPV.lenght=0;
-			val=-qsearch<childNodesType>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,&childPV);
+			childPV.clear();
+			val=-qsearch<childNodesType>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
 		}
 		else{
-			val=-qsearch<childNodesType>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,NULL);
+			val=-qsearch<childNodesType>(ply+1,pos,depth-ONE_PLY,-beta,-alpha,childPV);
 		}
 
 		pos.undoMove(m);
@@ -1576,9 +1579,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,Position 
 				TTtype=typeExact;
 				alpha =val;
 				if(PVnode &&!signals.stop){
-					pvLine->lenght=std::min(childPV.lenght+1, (unsigned int)(MAX_PV_LENGTH));
-					pvLine->list[0]=bestMove;
-					memcpy((pvLine->list) + 1, childPV.list, std::min(childPV.lenght,(unsigned int)(MAX_PV_LENGTH-1)) * sizeof(Move));
+					pvLine.clear();
+					pvLine.push_back(bestMove);
+					pvLine.splice(pvLine.end(),childPV);
 
 				}
 			}

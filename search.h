@@ -27,12 +27,6 @@
 #include <cmath>
 
 
-typedef struct pvl{
-	unsigned int lenght;
-	Move list[MAX_PV_LENGTH];
-}PVline;
-
-
 class searchLimits{
 public:
 	volatile bool ponder,infinite;
@@ -59,7 +53,7 @@ class rootMove{
 public:
 	Score score;
 	Score previousScore;
-	PVline PV;
+	std::list<Move> PV;
 	Move firstMove;
 	unsigned int selDepth;
 	unsigned int depth;
@@ -94,7 +88,7 @@ class search{
 
 	unsigned int indexPV;
 	void printAllPV(Position & p,unsigned int count);
-	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,PVline * PV,unsigned long long nods);
+	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nods);
 public:
 	searchLimits limits;
 	History history;
@@ -130,9 +124,9 @@ public:
 	unsigned long long getVisitedNodes(){
 		return visitedNodes;
 	}
-	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,PVline * pvLine);
+	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::list<Move>& PV);
 private:
-	template<nodeType type>Score alphaBeta(unsigned int ply,Position & p,int depth,Score alpha,Score beta,PVline *  pvLine);
+	template<nodeType type>Score alphaBeta(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::list<Move>& PV);
 
 	unsigned long long visitedNodes;
 	unsigned int selDepth;
