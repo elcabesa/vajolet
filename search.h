@@ -87,8 +87,8 @@ class search{
 
 
 	unsigned int indexPV;
-	void printAllPV(Position & p,unsigned int count);
-	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nods);
+	void printPVs(unsigned int count);
+	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nods);
 public:
 	searchLimits limits;
 	History history;

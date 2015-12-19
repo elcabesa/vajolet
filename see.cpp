@@ -24,7 +24,7 @@
 #include "bitops.h"
 
 
-Score Position::seeSign(Move m) const {
+Score Position::seeSign(const Move& m) const {
 	assert(m.packed);
 	if (pieceValue[squares[m.from]%separationBitmap][0] <= pieceValue[squares[m.to]%separationBitmap][0])
 	{
@@ -38,7 +38,7 @@ Score Position::seeSign(Move m) const {
 
 
 
-Score Position::see(Move m) const {
+Score Position::see(const Move& m) const {
 
 	assert(m.packed);
 #ifdef DEBUG_SEE

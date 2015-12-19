@@ -86,6 +86,8 @@ simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 int Position::castleRightsMask[squareNumber];
 
+const char Position::PIECE_NAMES_FEN[lastBitboard]={' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
+
 void Position::initPstValues(void){
 	for(int piece=0;piece<lastBitboard;piece++){
 		for(tSquare s=(tSquare)0;s<squareNumber;s++){
@@ -1189,10 +1191,7 @@ unsigned long long Position::perft(unsigned int depth){
 #endif
 
 	unsigned long long tot = 0;
-	Move m;
-	m=0;
-	History h;
-	Movegen mg(*this,h,m);
+	Movegen mg(*this);
 #ifdef FAST_PERFT
 	if(depth==1){
 		mg.generateMoves<Movegen::allMg>();
@@ -1200,6 +1199,7 @@ unsigned long long Position::perft(unsigned int depth){
 	}
 #endif
 
+	Move m;
 	while ((m=mg.getNextMove()).packed) {
 		doMove(m);
 		tot += perft(depth - 1);
@@ -1216,12 +1216,11 @@ unsigned long long Position::perft(unsigned int depth){
 */
 unsigned long long Position::divide(unsigned int depth){
 
-	Move m;
-	m=0;
-	History h;
-	Movegen mg(*this,h,m);
+
+	Movegen mg(*this);
 	unsigned long long tot = 0;
 	unsigned int mn=0;
+	Move m;
 	while ((m=mg.getNextMove()).packed) {
 		mn++;
 		doMove(m);
@@ -1328,7 +1327,7 @@ bitMap Position::getAttackersTo(const tSquare to, const bitMap occupancy) const 
 	\version 1.0
 	\date 08/11/2013
 */
-bool Position::moveGivesCheck(Move& m)const {
+bool Position::moveGivesCheck(const Move& m)const {
 	assert(m.packed);
 	tSquare from = (tSquare)m.from;
 	tSquare to = (tSquare)m.to;
@@ -1397,7 +1396,7 @@ bool Position::moveGivesCheck(Move& m)const {
 	return false;
 }
 
-bool Position::moveGivesDoubleCheck(Move& m)const {
+bool Position::moveGivesDoubleCheck(const Move& m)const {
 	assert(m.packed);
 	tSquare from = (tSquare)m.from;
 	tSquare to = (tSquare)m.to;
@@ -1415,7 +1414,7 @@ bool Position::moveGivesDoubleCheck(Move& m)const {
 
 }
 
-bool Position::moveGivesSafeDoubleCheck(Move& m)const {
+bool Position::moveGivesSafeDoubleCheck(const Move& m)const {
 	assert(m.packed);
 	tSquare from = (tSquare)m.from;
 	tSquare to = (tSquare)m.to;
@@ -1446,10 +1445,8 @@ bool Position::isDraw(bool isPVline) const {
 		if(!getActualState().checkers){
 			return true;
 		}
-		Move m;
-		m=0;
-		History h;
-		Movegen mg(*this,h,m);
+
+		Movegen mg(*this);
 		mg.generateMoves<Movegen::genType::allMg>();
 		if(mg.getGeneratedMoveNumber()){
 			return true;

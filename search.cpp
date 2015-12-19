@@ -31,25 +31,29 @@
 #include "book.h"
 #include "thread.h"
 
-
+inline signed int razorMargin(unsigned int depth)__attribute__((const));
 inline signed int razorMargin(unsigned int depth){
 	return 20000+depth*78;
 }
 
-void search::printAllPV(Position & p, unsigned int count){
+void search::printPVs(unsigned int count){
 
-
-	for (unsigned int i=0; i<count; i++){
-		Score res=rootMoves[i].score;
-		if(rootMoves[i].nodes)
+	auto end = std::next(rootMoves.begin(), count);
+	int i= 0;
+	std::for_each(rootMoves.begin(),end, [&](rootMove& rm)
+	{
+		if(rm.nodes)
 		{
-			printPV(res,rootMoves[i].depth,rootMoves[i].selDepth,-SCORE_INFINITE,SCORE_INFINITE,p,rootMoves[i].time,i,rootMoves[i].PV,rootMoves[i].nodes);
+			printPV(rm.score,rm.depth,rm.selDepth,-SCORE_INFINITE,SCORE_INFINITE,rm.time,i,rm.PV,rm.nodes);
 		}
-	}
+		i++;
+	});
 }
 
-void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, Position & p, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes){
+void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes){
+
 	sync_cout<<"info multipv "<< count+1<< " depth "<<(depth)<<" seldepth "<<seldepth <<" score ";
+
 	if(abs(res) >SCORE_MATE_IN_MAX_PLY){
 		std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
 	}
@@ -58,8 +62,8 @@ void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score al
 		satRes= std::max(satRes,SCORE_MIN_OUTPUT_VALUE);
 		std::cout<< "cp "<<(int)((float)satRes/100.0);
 	}
-	std::cout<<(res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
 
+	std::cout<<(res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
 
 	std::cout<<" nodes "<<nodes;
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
@@ -67,7 +71,7 @@ void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score al
 #endif
 
 	std::cout<<" pv ";
-	for_each(PV.begin(), PV.end(), [&](Move &m){std::cout<<p.displayUci(m)<<" ";});
+	for_each(PV.begin(), PV.end(), [&](Move &m){std::cout<<Position::displayUci(m)<<" ";});
 	std::cout<<sync_endl;
 }
 
@@ -97,8 +101,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 	//	generate the list of root moves to be searched
 	//--------------------------------
 	if(limits.searchMoves.size()==0){
-		Move m;
-		m=0;
+		Move m(0);
 		Movegen mg(p,history,m);
 		while ((m=mg.getNextMove()).packed){
 			rootMove rm;
@@ -133,27 +136,27 @@ Score search::startThinking(Position & p,searchLimits & l){
 	}
 
 	//sync_cout<<"legal moves ="<<rootMoves.size()<<sync_endl;
-	unsigned int PVSize = search::multiPVLines;
+	unsigned int linesToBeSearched = search::multiPVLines;
 
 	if(limitStrength){
 		int lines= (-8.0/2000.0)*(eloStrenght-1000)+10.0;
-		unsigned int linesToBeSearched=std::max(lines,4);
-		PVSize=	std::max(PVSize,linesToBeSearched);
+		unsigned int s=std::max(lines,4);
+		linesToBeSearched=	std::max(linesToBeSearched,s);
 	}
-	PVSize = std::min(PVSize, (unsigned int)rootMoves.size());
-	//sync_cout<<"PV_SIZE ="<<PVSize<<sync_endl;
+	linesToBeSearched = std::min(linesToBeSearched, (unsigned int)rootMoves.size());
+	//sync_cout<<"linesToBeSearched ="<<linesToBeSearched<<sync_endl;
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
-	Move m,oldBestMove;
-	m=0;
-	oldBestMove=0;
+	Move m(0),oldBestMove(0);
+
 	Movegen mg(p,history,m);
 
 	Move lastLegalMove;
 	unsigned int legalMoves=0;
+
 	while((m=mg.getNextMove()).packed){
 		legalMoves++;
 		lastLegalMove=m;
@@ -222,9 +225,9 @@ Score search::startThinking(Position & p,searchLimits & l){
 		}
 
 
-		for (indexPV = 0; indexPV < PVSize; indexPV++)
+		for (indexPV = 0; indexPV < linesToBeSearched; indexPV++)
 		{
-			for (unsigned int x =indexPV; x<PVSize ; x++){
+			for (unsigned int x =indexPV; x<linesToBeSearched ; x++){
 				rootMoves[x].score=-SCORE_INFINITE;
 			}
 
@@ -342,7 +345,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 					//my_thread::timeMan.idLoopRequestToExtend=true;
 					newPV.clear();
 					newPV.push_back(rootMoves[indexPV].PV.front());
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,indexPV,newPV,visitedNodes);
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, now-startTime,indexPV,newPV,visitedNodes);
 					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 
 					reduction = 0;
@@ -356,7 +359,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 						//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 					}
 					//sync_cout<<"res>=beta "<<sync_endl;
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, p, now-startTime,indexPV,newPV,visitedNodes);
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, now-startTime,indexPV,newPV,visitedNodes);
 					beta = std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 					if(depth>1){
 						reduction=1;
@@ -377,13 +380,13 @@ Score search::startThinking(Position & p,searchLimits & l){
 				std::stable_sort(rootMoves.begin(), rootMoves.begin() + indexPV + 1);
 				//sync_cout<<"stable sort ok "<<sync_endl;
 /*				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-				if (PVIdx + 1 == PVSize
+				if (PVIdx + 1 == linesToBeSearched
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 					|| now - startTime > 3000
 #endif
 				)*/{
 					//sync_cout<<"print pv "<<sync_endl;
-					printAllPV(p, indexPV+1);
+					printPVs(indexPV+1);
 
 				}
 			}
@@ -393,7 +396,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 		//-----------------------
 		if (depth >= 12
 			&& !signals.stop
-			&&  PVSize == 1
+			&&  linesToBeSearched == 1
 			&&  res > SCORE_MATED_IN_MAX_PLY)
 		{
 
@@ -446,7 +449,7 @@ Score search::startThinking(Position & p,searchLimits & l){
 		double dres = uint_dist(rnd);
 
 		unsigned int pos=dres;
-		bestMoveLine =std::min(pos,PVSize-1);
+		bestMoveLine =std::min((unsigned int)dres,linesToBeSearched-1);
 	}
 	//sync_cout<<"bestMove index "<<bestMoveLine<<sync_endl;
 

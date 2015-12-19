@@ -78,11 +78,8 @@ void static printUciInfo(void){
 Move moveFromUci(Position& pos, std::string& str) {
 
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
-	Move m;
-	m=0;
-	History h;
-	Movegen mg(pos,h,m);
-
+	Move m(0);
+	Movegen mg(pos);
 	while( (m=mg.getNextMove()).packed){
 		if(str==pos.displayUci(m)){
 			return m;
@@ -140,29 +137,31 @@ void static doPerft(unsigned int n, Position & pos){
 void static go(std::istringstream& is, Position & pos, my_thread * thr) {
 	searchLimits limits;
 	std::string token;
+	bool searchMovesCommand = false;
 
 
     while (is >> token)
     {
-        if (token == "searchmoves")
-            while (is >> token){
-            	Move m;
-            	m=moveFromUci(pos,token);
-            	if(m.packed){
-            		limits.searchMoves.push_back(moveFromUci(pos,token));
-            	}
-            }
-        else if (token == "wtime")     is >> limits.wtime;
-        else if (token == "btime")     is >> limits.btime;
-        else if (token == "winc")      is >> limits.winc;
-        else if (token == "binc")      is >> limits.binc;
-        else if (token == "movestogo") is >> limits.movesToGo;
-        else if (token == "depth")     is >> limits.depth;
-        else if (token == "nodes")     is >> limits.nodes;
-        else if (token == "movetime")  is >> limits.moveTime;
-        else if (token == "mate")      is >> limits.mate;
-        else if (token == "infinite")  limits.infinite = true;
-        else if (token == "ponder")    limits.ponder = true;
+        if (token == "searchmoves"){searchMovesCommand = true;}
+        else if (token == "wtime")     {is >> limits.wtime;searchMovesCommand = false;}
+        else if (token == "btime")     {is >> limits.btime;searchMovesCommand = false;}
+        else if (token == "winc")      {is >> limits.winc;searchMovesCommand = false;}
+        else if (token == "binc")      {is >> limits.binc;searchMovesCommand = false;}
+        else if (token == "movestogo") {is >> limits.movesToGo;searchMovesCommand = false;}
+        else if (token == "depth")     {is >> limits.depth;searchMovesCommand = false;}
+        else if (token == "nodes")     {is >> limits.nodes;searchMovesCommand = false;}
+        else if (token == "movetime")  {is >> limits.moveTime;searchMovesCommand = false;}
+        else if (token == "mate")      {is >> limits.mate;searchMovesCommand = false;}
+        else if (token == "infinite")  {limits.infinite = true;searchMovesCommand = false;}
+        else if (token == "ponder")    {limits.ponder = true;searchMovesCommand = false;}
+        else if (searchMovesCommand == true){
+        	Move m;
+			m=moveFromUci(pos,token);
+			if(m.packed){
+				sync_cout<<"mossa "<<token<<sync_endl;
+				limits.searchMoves.push_back(moveFromUci(pos,token));
+			}
+        }
     }
 
     thr->startThinking(&pos,limits);

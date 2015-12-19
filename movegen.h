@@ -94,7 +94,7 @@ private:
 
 public:
 	Move killerMoves[2];
-	Movegen(const Position & p,const History & his, Move & ttm): pos(p), h(his)
+	Movegen(const Position & p,const History & his, const Move & ttm): pos(p), h(his)
 	{
 		ttMove=ttm;
 		Position::state &s =pos.getActualState();
@@ -110,6 +110,11 @@ public:
 		badCapturePosition=0;
 		killerPos=0;
 		captureThreshold=0;
+	}
+
+	Movegen(const Position & p): Movegen(p,History(), Move(0))
+	{
+
 	}
 
 	int setupQuiescentSearch(bool checkers,int depth){
