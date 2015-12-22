@@ -368,6 +368,19 @@ bool evalKQvsK(const Position& p, Score& res){
 
 }
 
+bool kingsDirectOppsition(const Position& p)
+{
+	if(
+			(p.pieceList[Position::whiteKing][0]+16 == p.pieceList[Position::blackKing][0] )
+			||
+			(p.pieceList[Position::whiteKing][0] == p.pieceList[Position::blackKing][0] +16 )
+	)
+		return true;
+
+	return false;
+
+}
+
 bool evalKPvsK(const Position& p, Score& res){
 	//p.display();
 	color color=p.bitBoard[Position::whitePawns]?white:black;
@@ -420,6 +433,19 @@ bool evalKPvsK(const Position& p, Score& res){
 					}
 
 				}
+
+				// 3 rules for winning, if  conditions are met -> it's won
+				unsigned int count =0;
+				if(kingSquare == pawnSquare + 8) count++;
+				if(p.getActualState().nextMove==Position::blackTurn && kingsDirectOppsition(p)) count++;
+				if(RANKS[kingSquare]==5) count++;
+
+				if(count>1)
+				{
+					res = SCORE_KNOWN_WIN + relativeRank;
+					return true;
+				}
+
 			}
 			//draw rule
 			if((enemySquare==pawnSquare+8) || (enemySquare==pawnSquare+16 && RANKS[enemySquare]!=7))
@@ -483,6 +509,17 @@ bool evalKPvsK(const Position& p, Score& res){
 						res = -SCORE_KNOWN_WIN - relativeRank;
 						return true;
 					}
+				}
+				// 3 rules for winning, if  conditions are met -> it's won
+				unsigned int count =0;
+				if(kingSquare == pawnSquare - 8) count++;
+				if(p.getActualState().nextMove==Position::whiteTurn && kingsDirectOppsition(p)) count++;
+				if(RANKS[kingSquare]==2) count++;
+
+				if(count>1)
+				{
+					res = SCORE_KNOWN_WIN + relativeRank;
+					return true;
 				}
 			}
 			//draw rule

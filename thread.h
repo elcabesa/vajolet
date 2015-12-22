@@ -56,7 +56,7 @@ class my_thread{
 	std::mutex searchMutex;
 	std::condition_variable searchCond;
 	std::condition_variable timerCond;
-	Position *pos;
+	//Position *pos;
 	search src;
 	searchLimits limits;
 
@@ -109,7 +109,7 @@ public :
 		if(!startThink){
 			std::lock_guard<std::mutex> lk(searchMutex);
 			limits=l;
-			pos=p;
+			src.pos = *p;
 			startThink=true;
 			searchCond.notify_one();
 

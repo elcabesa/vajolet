@@ -60,17 +60,44 @@ class Position{
 			}
 		}
 
-		/*if(stateIndex!=0){
-			actualState= &stateInfo[stateIndex];
-		}
-		else{
-			actualState=nullptr;
-		}*/
-
 
 		Us=&bitBoard[getActualState().nextMove];
 		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
 	};
+
+	Position& operator=(const Position& other)
+
+	{
+		if (this == &other)
+			return *this;
+
+
+		stateIndex = other.stateIndex;
+		for(int i=0;i<STATE_INFO_LENGTH;i++){
+			stateInfo[i]=other.stateInfo[i];
+		}
+		for(int i=0;i<squareNumber;i++){
+			squares[i]=other.squares[i];
+			index[i]=other.index[i];
+		}
+		for(int i=0;i<lastBitboard;i++){
+			bitBoard[i]=other.bitBoard[i];
+			pieceCount[i]=other.pieceCount[i];
+			for(int n=0;n<64;n++){
+				pieceList[i][n] =other.pieceList[i][n];
+			}
+		}
+
+
+
+
+		Us=&bitBoard[getActualState().nextMove];
+		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
+
+		return *this;
+	};
+
+
 
 
 	/*! \brief define the index of the bitboards
@@ -209,7 +236,6 @@ public:
 private:
 
 	unsigned int stateIndex;
-	//state * actualState;
 
 
 	/*! \brief piece values used to calculate scores
@@ -230,8 +256,8 @@ public:
 	std::string displayFen(void) const;
 	std::string getSymmetricFen() const;
 	void doNullMove(void);
-	void doMove(Move &m);
-	void undoMove(Move &m);
+	void doMove(const Move &m);
+	void undoMove(const Move &m);
 	static void initCastleRightsMask(void);
 	void setupFromFen(const std::string& fenStr);
 	template<bool trace>Score eval(void);
@@ -335,7 +361,6 @@ public:
 		//assert(stateIndex>=0);
 		assert(stateIndex<STATE_INFO_LENGTH);
 		return (state&) stateInfo[stateIndex];
-		//return (state&) *actualState;
 	}
 
 	inline state& getState(unsigned int n)const {
@@ -363,9 +388,6 @@ public:
 		//stateInfo[stateIndex].killers[0]=killer0;
 		//stateInfo[stateIndex].killers[1]=killer1;
 
-
-
-		//actualState= &stateInfo[stateIndex];
 	}
 
 	/*! \brief  remove the last state
@@ -379,7 +401,6 @@ public:
 
 		stateIndex--;
 		assert(stateIndex<STATE_INFO_LENGTH);
-		//actualState= &stateInfo[stateIndex];
 	}
 
 

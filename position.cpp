@@ -382,7 +382,6 @@ void Position::clear() {
 		}
 	}
 	stateIndex=0;
-	//actualState=nullptr;
 }
 
 
@@ -739,7 +738,7 @@ void Position::doNullMove(void){
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::doMove(Move & m){
+void Position::doMove(const Move & m){
 	//sync_cout<<displayUci(m)<<sync_endl;
 	assert(m.packed);
 
@@ -946,7 +945,7 @@ void Position::doMove(Move & m){
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::undoMove(Move & m){
+void Position::undoMove(const Move & m){
 
 	assert(m.packed);
 	state x=getActualState();

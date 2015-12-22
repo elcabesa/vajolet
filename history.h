@@ -91,6 +91,20 @@ public :
 			}
 		}
 	}
+	void printHistory()
+	{
+		sync_cout<< "history"<<std::endl;
+		for( int i = squareNumber-1;i>=0;i--)
+		{
+
+
+			std::cout<<" "<<table[Position::whiteKnights][i];
+			if(i%8==0)
+				std::cout<<std::endl;
+
+		}
+		std::cout<<sync_endl;
+	}
 
 	History(){}
 private:

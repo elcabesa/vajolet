@@ -61,10 +61,9 @@ void benchmark(void) {
 	{
 		 Position pos;
 		 search src;
-		 pos.setupFromFen(positions[i]);
-
+		 src.pos.setupFromFen(positions[i]);
 		 sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
-		 src.startThinking(pos,limits);
+		 src.startThinking(limits);
 		 nodes+=src.getVisitedNodes();
 	}
 

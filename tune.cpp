@@ -37,7 +37,6 @@ double Tuner::parseEpd(bool save=false){
 
 
 	std::string newGameString("new game");
-	Position pos;
 	search searcher;
 	searcher.history.clear();
 	double sum=0;
@@ -55,12 +54,13 @@ double Tuner::parseEpd(bool save=false){
 				//double modifiedScoreRes=std::min(std::max((0.5+(scoreRes-0.5)*0.005*positions),0.0),1.0);
 
 
+				searcher.pos.setupFromFen(clearFen);
 				std::list<Move> childPV;
-				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
+				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
 
 				double error=std::pow(scoreRes-(1.0/(1+std::pow(2.71828182846,-score/scaling))),2);
 				if(save && std::abs(error)>1.1){
-					sync_cout<<pos.displayFen()<<sync_endl;
+					sync_cout<<searcher.pos.displayFen()<<sync_endl;
 				}
 				sum+=error;
 				++positions;
@@ -112,7 +112,7 @@ void Tuner::drawSigmoid(void){
 
 				pos.setupFromFen(clearFen);
 				std::list<Move> childPV;
-				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
+				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
 				unsigned int index=0;
 
 				//sync_cout<<"fen "<<clearFen<<" result "<<scoreRes<< " score "<< score<<sync_endl;
@@ -181,7 +181,7 @@ void Tuner::drawAverageEvolution(void){
 
 				pos.setupFromFen(clearFen);
 				std::list<Move> childPV;
-				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,pos,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
+				Score score=searcher.qsearch<search::nodeType::PV_NODE>(0,0,-SCORE_INFINITE,SCORE_INFINITE,childPV);
 				if(scoreRes!=0.5){
 					double error=std::abs(scoreRes-(1.0/(1+std::pow(2.71828182846,-score/scaling))));
 					unsigned int index=std::min(positions,(unsigned long int)199);
@@ -249,7 +249,8 @@ void Tuner::createEpd(void){
 				Position pos;
 				pos.setupFromFen(clearTempFen);
 				sl.depth=10;
-				Score searchRes=searcher.startThinking(pos,sl);
+				searcher.pos= pos;
+				Score searchRes=searcher.startThinking(sl);
 				size_t res=lastFen.find('w');
 
 				if(abs(searchRes)<10000){
@@ -305,14 +306,15 @@ void Tuner::createEpd(void){
 					if((signed long)(line2-startLine)>=0 && (draw || (signed long)(line-line2)>=0)){
 						Position pos;
 						pos.setupFromFen(clearFen);
+						searcher.pos = pos;
 						Score searchRes;
 						if(result==0){
-							searchRes=searcher.startThinking(pos,sl);
+							searchRes=searcher.startThinking(sl);
 							searchRes-=5000.0+10000.0*(line2-startLine)/(line-startLine);
 						}
 						else if (result==1)
 						{
-							searchRes=searcher.startThinking(pos,sl);
+							searchRes=searcher.startThinking(sl);
 							searchRes+=5000.0+10000.0*(line2-startLine)/(line-startLine);
 						}
 						else{

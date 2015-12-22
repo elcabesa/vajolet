@@ -24,6 +24,7 @@
 #include "eval.h"
 #include <vector>
 #include <list>
+#include <atomic>
 #include <cmath>
 
 
@@ -86,13 +87,15 @@ class search{
 
 
 
-	unsigned int indexPV;
+	unsigned int indexPV= 0;
+
 	void printPVs(unsigned int count);
 	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nods);
 public:
 	searchLimits limits;
 	History history;
-	std::vector<rootMove> rootMoves;
+	Position pos;
+	static std::vector<rootMove> rootMoves;
 	static unsigned int multiPVLines;
 	static unsigned int limitStrength;
 	static unsigned int eloStrenght;
@@ -118,17 +121,19 @@ public:
 		ROOT_NODE,
 		PV_NODE,
 		ALL_NODE,
-		CUT_NODE
+		CUT_NODE,
+		HELPER_ROOT_NODE
 	} nodeType;
-	Score startThinking(Position & p,searchLimits & limits);
+
+	Score startThinking(searchLimits & limits);
 	unsigned long long getVisitedNodes(){
 		return visitedNodes;
 	}
-	template<nodeType type>Score qsearch(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::list<Move>& PV);
+	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
 private:
-	template<nodeType type>Score alphaBeta(unsigned int ply,Position & p,int depth,Score alpha,Score beta,std::list<Move>& PV);
+	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
 
-	unsigned long long visitedNodes;
+	static std::atomic<unsigned long long> visitedNodes;
 	unsigned int selDepth;
 	bool stop;
 };

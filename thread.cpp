@@ -152,11 +152,11 @@ void my_thread::searchThread() {
 		std::unique_lock<std::mutex> lk(mutex);
 		searchCond.wait(lk,[&]{return startThink||quit;});
 		if(!quit){
-			timeManagerInit(*pos, limits,timeMan);
+			timeManagerInit(src.pos, limits,timeMan);
 			startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 			src.signals.stop=false;
 			timerCond.notify_one();
-			src.startThinking(*pos,limits);
+			src.startThinking(limits);
 			//sync_cout<<"startThink=false"<<sync_endl;
 			startThink=false;
 			//sync_cout<<startThink<<sync_endl;
