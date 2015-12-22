@@ -96,6 +96,7 @@ public:
 	History history;
 	Position pos;
 	static std::vector<rootMove> rootMoves;
+	static unsigned int threads;
 	static unsigned int multiPVLines;
 	static unsigned int limitStrength;
 	static unsigned int eloStrenght;

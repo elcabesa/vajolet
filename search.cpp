@@ -86,6 +86,7 @@ Score search::futilityMargin[7]={0,10000,20000,30000,40000,50000,60000};
 unsigned int search::FutilityMoveCounts[11]={5,10,17,26,37,50,66,85,105,130,151};
 Score search::PVreduction[32*ONE_PLY][64];
 Score search::nonPVreduction[32*ONE_PLY][64];
+unsigned int search::threads=1;
 unsigned int search::multiPVLines=1;
 unsigned int search::limitStrength=0;
 unsigned int search::eloStrenght=3000;
@@ -99,7 +100,7 @@ Score search::startThinking(searchLimits & l){
 	TT.newSearch();
 	history.clear();
 	visitedNodes=0;
-	search helperSearch[3];
+	search helperSearch[threads];
 
 	limits=l;
 	rootMoves.clear();
@@ -296,10 +297,10 @@ Score search::startThinking(searchLimits & l){
 				selDepth=selDepthBase;
 				newPV.clear();
 				pos.cleanStateInfo();
-				std::list<Move> pvl2[3];
+				std::list<Move> pvl2[threads];
 				std::vector<std::thread> helperThread;
 
-				for(int i=0;i<3;i++)
+				for(int i=0;i<(threads-1);i++)
 				{
 					helperSearch[i].signals.stop =false;
 					helperSearch[i].pos=pos;
@@ -309,7 +310,7 @@ Score search::startThinking(searchLimits & l){
 
 				//std::thread helperThread(&alphaBelli<search::nodeType::ROOT_NODE>,&helperSearch,0,std::ref(pos2),(depth-reduction)*ONE_PLY,alpha,beta,&newPV);
 				res=alphaBeta<search::nodeType::ROOT_NODE>(0,(depth-reduction)*ONE_PLY,alpha,beta,newPV);
-				for(int i=0;i<3;i++)
+				for(int i=0;i<(threads-1);i++)
 				{
 					helperSearch[i].signals.stop =true;
 				}
