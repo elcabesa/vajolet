@@ -300,7 +300,7 @@ Score search::startThinking(searchLimits & l){
 				std::list<Move> pvl2[threads];
 				std::vector<std::thread> helperThread;
 
-				for(int i=0;i<(threads-1);i++)
+				for(unsigned int i=0;i<(threads-1);i++)
 				{
 					helperSearch[i].signals.stop =false;
 					helperSearch[i].pos=pos;
@@ -310,7 +310,7 @@ Score search::startThinking(searchLimits & l){
 
 				//std::thread helperThread(&alphaBelli<search::nodeType::ROOT_NODE>,&helperSearch,0,std::ref(pos2),(depth-reduction)*ONE_PLY,alpha,beta,&newPV);
 				res=alphaBeta<search::nodeType::ROOT_NODE>(0,(depth-reduction)*ONE_PLY,alpha,beta,newPV);
-				for(int i=0;i<(threads-1);i++)
+				for(unsigned int i=0;i<(threads-1);i++)
 				{
 					helperSearch[i].signals.stop =true;
 				}
@@ -573,7 +573,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 				pvLine.clear();
 			}
 			//if(signals.stop){sync_cout<<"alpha beta initial Stop"<<sync_endl;}
-			return 0;
+			return std::max((int)0,(int)(-5000 + pos.getActualState().ply*7));
 		}
 
 		//---------------------------------------
@@ -1247,7 +1247,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 #endif
 			return alpha;
 		}else if(!inCheck){
-			bestScore=0;
+			bestScore = std::max((int)0,(int)(-5000 + pos.getActualState().ply*7));
 		}
 		else{
 			bestScore=matedIn(ply);
@@ -1400,7 +1400,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 #ifdef PRINT_STATISTICS
 		Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
 #endif
-		return 0;
+		return std::max((int)0,(int)(-5000 + pos.getActualState().ply*7));
 	}
 
 
