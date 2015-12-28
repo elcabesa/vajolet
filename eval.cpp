@@ -277,7 +277,7 @@ bool evalKRPvsKr(const Position& p, Score& res){
 		pawnSquare = p.pieceList[Position::blackPawns][0];
 		if(	FILES[pawnSquare]== FILES[p.pieceList[Position::whiteKing][0]]
 			&& RANKS[pawnSquare]>=1
-			&& RANKS[pawnSquare]>RANKS[p.pieceList[Position::blackKing][0]]
+			&& RANKS[pawnSquare]>RANKS[p.pieceList[Position::whiteKing][0]]
 		){
 			res=128;
 			//p.display();
@@ -518,12 +518,12 @@ bool evalKPvsK(const Position& p, Score& res){
 
 				if(count>1)
 				{
-					res = SCORE_KNOWN_WIN + relativeRank;
+					res = -SCORE_KNOWN_WIN - relativeRank;
 					return true;
 				}
 			}
 			//draw rule
-			if((enemySquare==pawnSquare-8) || (enemySquare==pawnSquare-16 && RANKS[enemySquare]!=7))
+			if((enemySquare==pawnSquare-8) || (enemySquare==pawnSquare-16 && RANKS[enemySquare]!=0))
 			{
 				res = 0;
 				return true;
@@ -548,9 +548,10 @@ bool evalKPvsK(const Position& p, Score& res){
 
 
 bool evalOppositeBishopEndgame(const Position& p, Score& res){
-	if(SQUARE_COLOR[p.pieceList[Position::blackBishops][0]] !=SQUARE_COLOR[ p.pieceList[Position::whiteBishops][0]]){
+	if(SQUARE_COLOR[p.pieceList[Position::blackBishops][0]] !=SQUARE_COLOR[ p.pieceList[Position::whiteBishops][0]])
+	{
 		unsigned int pawnCount = 0;
-		unsigned int pawnDifference = 0;
+		int pawnDifference = 0;
 		unsigned int freePawn = 0;
 
 		bitMap pawns= p.bitBoard[Position::whitePawns];
@@ -2083,11 +2084,11 @@ Score Position::eval(void) {
 						passedPawnsBonus+=passedPawnDefendedBlockingSquare*rr;
 					}
 				}
-				if(backWardSquares & bitBoard[whiteRooks])
+				if(backWardSquares & bitBoard[blackRooks])
 				{
 					passedPawnsBonus+=rookBehindPassedPawn*rr;
 				}
-				if(backWardSquares & bitBoard[blackRooks])
+				if(backWardSquares & bitBoard[whiteRooks])
 				{
 					passedPawnsBonus-=EnemyRookBehindPassedPawn*rr;
 				}

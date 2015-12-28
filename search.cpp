@@ -32,6 +32,10 @@
 #include "book.h"
 #include "thread.h"
 
+#ifdef DEBUG_EVAL_SIMMETRY
+	Position ppp;
+#endif
+
 std::vector<rootMove> search::rootMoves;
 std::atomic<unsigned long long> search::visitedNodes;
 
@@ -546,7 +550,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 	if(PVnode)
 	{
-		assert(pvLine);
+		//assert(pvLine);
 		pvLine.clear();
 	}
 
@@ -652,10 +656,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		staticEval=pos.eval<false>();
 		eval=staticEval;
 #ifdef DEBUG_EVAL_SIMMETRY
-		Position ppp;
 		ppp.setupFromFen(pos.getSymmetricFen());
 		Score test=ppp.eval<false>();
 		if(test!=eval){
+			sync_cout<<1<<" "<<test<<" "<<eval<<sync_endl;
 			pos.display();
 			while(1);
 		}
@@ -684,10 +688,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			staticEval=pos.eval<false>();
 			eval=staticEval;
 #ifdef DEBUG_EVAL_SIMMETRY
-			Position ppp;
 			ppp.setupFromFen(pos.getSymmetricFen());
 			Score test=ppp.eval<false>();
 			if(test!=eval){
+				sync_cout<<2<<" "<<test<<" "<<eval<<sync_endl;
 				pos.display();
 				while(1);
 			}
@@ -1383,7 +1387,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	assert(PVnode || alpha+1==beta);
 
 	if(PVnode){
-		assert(pvLine);
+		//assert(pvLine);
 		pvLine.clear();
 	}
 
@@ -1475,10 +1479,10 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 
 	Score staticEval= tte?tte->getStaticValue():pos.eval<false>();
 #ifdef DEBUG_EVAL_SIMMETRY
-	Position ppp;
 	ppp.setupFromFen(pos.getSymmetricFen());
 	Score test=ppp.eval<false>();
 	if(test!=staticEval){
+		sync_cout<<3<<" "<<test<<" "<<staticEval<<sync_endl;
 		pos.display();
 
 		while(1);
