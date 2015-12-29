@@ -1482,8 +1482,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	ppp.setupFromFen(pos.getSymmetricFen());
 	Score test=ppp.eval<false>();
 	if(test!=staticEval){
-		sync_cout<<3<<" "<<test<<" "<<staticEval<<sync_endl;
+		sync_cout<<3<<" "<<test<<" "<<staticEval<<" "<<pos.eval<false>()<<sync_endl;
 		pos.display();
+		ppp.display();
 
 		while(1);
 	}

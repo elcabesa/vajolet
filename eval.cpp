@@ -368,12 +368,12 @@ bool evalKQvsK(const Position& p, Score& res){
 
 }
 
-bool kingsDirectOppsition(const Position& p)
+bool kingsDirectOpposition(const Position& p)
 {
 	if(
 			(p.pieceList[Position::whiteKing][0]+16 == p.pieceList[Position::blackKing][0] )
-			||
-			(p.pieceList[Position::whiteKing][0] == p.pieceList[Position::blackKing][0] +16 )
+			/*||
+			(p.pieceList[Position::whiteKing][0] == p.pieceList[Position::blackKing][0] +16 )*/
 	)
 		return true;
 
@@ -437,7 +437,7 @@ bool evalKPvsK(const Position& p, Score& res){
 				// 3 rules for winning, if  conditions are met -> it's won
 				unsigned int count =0;
 				if(kingSquare == pawnSquare + 8) count++;
-				if(p.getActualState().nextMove==Position::blackTurn && kingsDirectOppsition(p)) count++;
+				if(p.getActualState().nextMove==Position::blackTurn && kingsDirectOpposition(p)) count++;
 				if(RANKS[kingSquare]==5) count++;
 
 				if(count>1)
@@ -513,7 +513,7 @@ bool evalKPvsK(const Position& p, Score& res){
 				// 3 rules for winning, if  conditions are met -> it's won
 				unsigned int count =0;
 				if(kingSquare == pawnSquare - 8) count++;
-				if(p.getActualState().nextMove==Position::whiteTurn && kingsDirectOppsition(p)) count++;
+				if(p.getActualState().nextMove==Position::whiteTurn && kingsDirectOpposition(p)) count++;
 				if(RANKS[kingSquare]==2) count++;
 
 				if(count>1)
