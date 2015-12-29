@@ -104,7 +104,7 @@ Score search::startThinking(searchLimits & l){
 	TT.newSearch();
 	history.clear();
 	visitedNodes=0;
-	search helperSearch[threads];
+	std::vector<search> helperSearch(threads-1);
 
 	limits=l;
 	rootMoves.clear();
@@ -301,7 +301,7 @@ Score search::startThinking(searchLimits & l){
 				selDepth=selDepthBase;
 				newPV.clear();
 				pos.cleanStateInfo();
-				std::list<Move> pvl2[threads];
+				std::vector<std::list<Move>> pvl2(threads-1);
 				std::vector<std::thread> helperThread;
 
 				for(unsigned int i=0;i<(threads-1);i++)
@@ -381,7 +381,7 @@ Score search::startThinking(searchLimits & l){
 
 					reduction = 0;
 
-					//TT.store(p.getActualState().key, transpositionTable::scoreToTT(rootMoves[indexPV].previousScore, 0),typeExact,depth*ONE_PLY, (rootMoves[indexPV].PV[0]).packed, p.eval<false>(pawnHashTable, evalHashTable));
+					//TT.store(p.getActualState().key, transpositionTable::scoreToTT(rootMoves[indexPV].previousScore, 0),typeExact,depth*ONE_PLY, (rootMoves[indexPV].PV[0]).packed, p.eval<false>());
 					//sync_cout<<"new alpha "<<alpha<<sync_endl;
 				}
 				else if (res >= beta){

@@ -27,7 +27,7 @@ struct HashTable
 {
 public:
 	HashTable() : e(Size, Entry()) {}
-	Entry* operator[](U64 k) {return &e[(unsigned int)k % (Size)]; }
+	Entry& operator[](const U64 k) {return e[(unsigned int)k % (Size)]; }
 
 private:
   std::vector<Entry> e;
@@ -50,66 +50,28 @@ class pawnTable
 {
 public:
 	void insert(U64 key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
-		pawnEntry* x=pawnTable[key];
+		pawnEntry& x=pawnTable[key];
 
-		assert(x);
-		x->key=key;
-		x->res[0]=res[0];
-		x->res[1]=res[1];
+		x.key=key;
+		x.res[0]=res[0];
+		x.res[1]=res[1];
 
-		x->weakPawns=weak;
-		x->passedPawns=passed;
+		x.weakPawns=weak;
+		x.passedPawns=passed;
 
-		x->pawnAttacks[0]=whiteAttack;
-		x->pawnAttacks[1]=blackAttack;
-		x->weakSquares[0]=weakSquareWhite;
-		x->weakSquares[1]=weakSquareBlack;
-		x->holes[0]=whiteHoles ;
-		x->holes[1]=blackHoles;
+		x.pawnAttacks[0]=whiteAttack;
+		x.pawnAttacks[1]=blackAttack;
+		x.weakSquares[0]=weakSquareWhite;
+		x.weakSquares[1]=weakSquareBlack;
+		x.holes[0]=whiteHoles ;
+		x.holes[1]=blackHoles;
 	}
 
-	pawnEntry* probe(U64 key){
-		pawnEntry* x=pawnTable[key];
-		assert(x);
-		if(x->key==key){
-			return x;
-		}
-		return nullptr;
-
+	pawnEntry& probe(U64 key){
+		return pawnTable[key];
 	}
 private:
-	HashTable<pawnEntry, 65536> pawnTable;
-};
-
-
-class evalEntry
-{
-public:
-	U64 key;
-	Score res;
-};
-
-class evalTable
-{
-public:
-	void insert(U64 key,Score res){
-		evalEntry* x=evalTable[key];
-		assert(x);
-		x->key=key;
-		x->res=res;
-	}
-
-	evalEntry* probe(U64 key){
-		evalEntry* x=evalTable[key];
-		assert(x);
-		if(x->key==key){
-			return x;
-		}
-		return nullptr;
-
-	}
-private:
-	HashTable<evalEntry, 524288> evalTable;
+	HashTable<pawnEntry,8192> pawnTable;
 };
 
 #endif /* TABLES_H_ */

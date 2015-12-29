@@ -583,7 +583,6 @@ private:
 	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next);
 
 	pawnTable pawnHashTable;
-	evalTable evalHashTable;
 
 
 

@@ -1581,16 +1581,6 @@ Score Position::eval(void) {
 
 
 	state &st =getActualState();
-	evalEntry* probeEval= evalHashTable.probe(st.key);
-	if(probeEval!=nullptr){
-		if(st.nextMove)
-		{
-			return -probeEval->res;
-		}
-		else{
-			return probeEval->res;
-		}
-	}
 
 	//traceRes=0;
 	if(trace){
@@ -1760,17 +1750,19 @@ Score Position::eval(void) {
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
 	simdScore pawnResult;
-	pawnEntry* probePawn= pawnHashTable.probe(getActualState().pawnKey);
-	if(probePawn!=nullptr){
-		pawnResult=simdScore(probePawn->res[0],probePawn->res[1],0,0);
-		weakPawns=probePawn->weakPawns;
-		passedPawns=probePawn->passedPawns;
-		attackedSquares[whitePawns]=probePawn->pawnAttacks[0];
-		attackedSquares[blackPawns]=probePawn->pawnAttacks[1];
-		weakSquares[white]=probePawn->weakSquares[0];
-		weakSquares[black]=probePawn->weakSquares[1];
-		holes[white]=probePawn->holes[0];
-		holes[black]=probePawn->holes[1];
+	U64 pawnKey = getActualState().pawnKey;
+	pawnEntry& probePawn= pawnHashTable.probe(pawnKey);
+	if(probePawn.key==pawnKey){
+		//evalchacheHit++;
+		pawnResult=simdScore(probePawn.res[0],probePawn.res[1],0,0);
+		weakPawns=probePawn.weakPawns;
+		passedPawns=probePawn.passedPawns;
+		attackedSquares[whitePawns]=probePawn.pawnAttacks[0];
+		attackedSquares[blackPawns]=probePawn.pawnAttacks[1];
+		weakSquares[white]=probePawn.weakSquares[0];
+		weakSquares[black]=probePawn.weakSquares[1];
+		holes[white]=probePawn.holes[0];
+		holes[black]=probePawn.holes[1];
 
 
 	}
@@ -1838,6 +1830,7 @@ Score Position::eval(void) {
 		holes[black]= weakSquares[black]&temp;
 		pawnResult-=(bitCnt(holes[white])-bitCnt(holes[black]))*holesPenalty;
 
+		//evalchacheInsert++;
 		pawnHashTable.insert(st.pawnKey,pawnResult, weakPawns, passedPawns,attackedSquares[whitePawns],attackedSquares[blackPawns],weakSquares[white],weakSquares[black],holes[white],holes[black]);
 
 
@@ -2503,7 +2496,6 @@ Score Position::eval(void) {
 	score=std::min(highSat,score);
 	score=std::max(lowSat,score);
 
-	evalHashTable.insert(st.pawnKey,score);
 
 
 	if(st.nextMove)
