@@ -476,26 +476,26 @@ Move PolyglotBook::probe(const Position& pos, const std::string& fName, bool pic
 	// scambio from e to
 	Move tempMove;
 	tempMove.packed=m.packed;
-	m.to=tempMove.from;
-	m.from=tempMove.to;
+	m.bit.to=tempMove.bit.from;
+	m.bit.from=tempMove.bit.to;
 	int pt = (tempMove.packed >> 12) & 7;
 	if (pt){
-		m.flags = Move::fpromotion;
-		m.promotion=3-pt;
+		m.bit.flags = Move::fpromotion;
+		m.bit.promotion=3-pt;
 	}
 
 
 	Move mm(0);
 	Movegen mg(pos);
 	while((mm=mg.getNextMove()).packed){
-		if(m.from==mm.from && m.to==mm.to)
+		if(m.bit.from==mm.bit.from && m.bit.to==mm.bit.to)
 		{
-			if(m.flags!=Move::fpromotion)
+			if(m.bit.flags!=Move::fpromotion)
 			{
 				return mm;
 			}
 			else{
-				if(m.promotion==mm.promotion){
+				if(m.bit.promotion==mm.bit.promotion){
 					return mm;
 				}
 			}

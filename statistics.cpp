@@ -53,7 +53,9 @@ void Statistics::printNodeTypeStat(){
 }
 
 void Statistics::gatherNodeTypeStat(search::nodeType expectedNodeType,search::nodeType resultNodeType){
-	switch(expectedNodeType){
+	switch(expectedNodeType)
+	{
+	case search::nodeType::HELPER_ROOT_NODE:
 	case search::nodeType::ROOT_NODE:
 		testedNodeTypePv++;
 		break;
@@ -70,7 +72,9 @@ void Statistics::gatherNodeTypeStat(search::nodeType expectedNodeType,search::no
 	}
 
 
-	switch(resultNodeType){
+	switch(resultNodeType)
+	{
+	case search::nodeType::HELPER_ROOT_NODE:
 	case search::nodeType::ROOT_NODE:
 		resultNodeTypePv++;
 		break;

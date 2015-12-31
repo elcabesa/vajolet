@@ -39,7 +39,7 @@ struct Move
 			unsigned to			:6;
 			unsigned promotion	:2;
 			unsigned flags		:2;
-		};
+		}bit;
 		unsigned short packed;
 	};
 	enum eflags{

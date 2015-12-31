@@ -752,16 +752,16 @@ void Position::doMove(const Move & m){
 
 
 
-	tSquare from =(tSquare)m.from;
-	tSquare to =(tSquare)m.to;
-	tSquare captureSquare =(tSquare)m.to;
+	tSquare from =(tSquare)m.bit.from;
+	tSquare to =(tSquare)m.bit.to;
+	tSquare captureSquare =(tSquare)m.bit.to;
 	bitboardIndex piece= squares[from];
 	assert(piece!=occupiedSquares);
 	assert(piece!=separationBitmap);
 	assert(piece!=whitePieces);
 	assert(piece!=blackPieces);
 
-	bitboardIndex capture = (m.flags ==Move::fenpassant ? (x.nextMove?whitePawns:blackPawns) :squares[to]);
+	bitboardIndex capture = (m.bit.flags ==Move::fenpassant ? (x.nextMove?whitePawns:blackPawns) :squares[to]);
 	assert(capture!=separationBitmap);
 	assert(capture!=whitePieces);
 	assert(capture!=blackPieces);
@@ -789,7 +789,7 @@ void Position::doMove(const Move & m){
 	}
 
 	// do castle additional instruction
-	if(m.flags==Move::fcastle){
+	if(m.bit.flags==Move::fcastle){
 		bool kingSide=to > from;
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		assert(rFrom<squareNumber);
@@ -813,7 +813,7 @@ void Position::doMove(const Move & m){
 
 		if(isPawn(capture)){
 
-			if(m.flags==Move::fenpassant){
+			if(m.bit.flags==Move::fenpassant){
 				captureSquare-=pawnPush(x.nextMove);
 			}
 			assert(captureSquare<squareNumber);
@@ -869,8 +869,8 @@ void Position::doMove(const Move & m){
 			assert(x.epSquare<squareNumber);
 			x.key ^=HashKeys::ep[x.epSquare];
 		}
-		if(m.flags ==Move::fpromotion){
-			bitboardIndex promotedPiece=(bitboardIndex)(whiteQueens+x.nextMove+m.promotion);
+		if(m.bit.flags ==Move::fpromotion){
+			bitboardIndex promotedPiece=(bitboardIndex)(whiteQueens+x.nextMove+m.bit.promotion);
 			assert(promotedPiece<lastBitboard);
 			removePiece(piece,to);
 			putPiece(promotedPiece,to);
@@ -907,7 +907,7 @@ void Position::doMove(const Move & m){
 	x.checkers=0;
 	if(moveIsCheck){
 
-		if(m.flags !=Move::fnone){
+		if(m.bit.flags !=Move::fnone){
 			assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
 			x.checkers |= getAttackersTo(pieceList[whiteKing+x.nextMove][0]) & Them[Pieces];
 		}
@@ -948,24 +948,24 @@ void Position::doMove(const Move & m){
 */
 void Position::undoMove(const Move & m){
 
-	assert(m.packed);
+	assert(m.bit.packed);
 	state x=getActualState();
 
-	tSquare to = (tSquare)m.to;
-	tSquare from = (tSquare)m.from;
+	tSquare to = (tSquare)m.bit.to;
+	tSquare from = (tSquare)m.bit.from;
 	bitboardIndex piece= squares[to];
 	assert(piece!=occupiedSquares);
 	assert(piece!=separationBitmap);
 	assert(piece!=whitePieces);
 	assert(piece!=blackPieces);
 
-	if(m.flags == Move::fpromotion){
+	if(m.bit.flags == Move::fpromotion){
 		removePiece(piece,to);
 		piece = (bitboardIndex)(piece>separationBitmap?blackPawns:whitePawns);
 		putPiece(piece,to);
 	}
 
-	if(m.flags== Move::fcastle){
+	if(m.bit.flags== Move::fcastle){
 		bool kingSide=to > from;
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		tSquare rTo = kingSide? to+ovest: to+est;
@@ -986,7 +986,7 @@ void Position::undoMove(const Move & m){
 	assert(x.capturedPiece<lastBitboard);
 	if(x.capturedPiece){
 		tSquare capSq=to;
-		if(m.flags == Move::fenpassant){
+		if(m.bit.flags == Move::fenpassant){
 			capSq+=pawnPush(x.nextMove);
 		}
 		assert(capSq<squareNumber);
@@ -1329,8 +1329,8 @@ bitMap Position::getAttackersTo(const tSquare to, const bitMap occupancy) const 
 */
 bool Position::moveGivesCheck(const Move& m)const {
 	assert(m.packed);
-	tSquare from = (tSquare)m.from;
-	tSquare to = (tSquare)m.to;
+	tSquare from = (tSquare)m.bit.from;
+	tSquare to = (tSquare)m.bit.to;
 	bitboardIndex piece = squares[from];
 	assert(piece!=occupiedSquares);
 	assert(piece!=separationBitmap);
@@ -1351,18 +1351,18 @@ bool Position::moveGivesCheck(const Move& m)const {
 		if ( (!isPawn(piece)&& !isKing(piece)) || !squaresAligned(from, to, pieceList[blackKing-s.nextMove][0]))
 			return true;
 	}
-	if(m.flags == Move::fnone){
+	if(m.bit.flags == Move::fnone){
 		return false;
 	}
 
 	tSquare kingSquare =pieceList[blackKing-s.nextMove][0];
 	assert(kingSquare<squareNumber);
 
-	switch(m.flags){
+	switch(m.bit.flags){
 	case Move::fpromotion:{
 		bitMap occ= bitBoard[occupiedSquares] ^ bitSet(from);
-		assert((bitboardIndex)(whiteQueens+s.nextMove+m.promotion)<lastBitboard);
-		return Movegen::attackFrom((bitboardIndex)(whiteQueens+s.nextMove+m.promotion), to, occ) & bitSet(kingSquare);
+		assert((bitboardIndex)(whiteQueens+s.nextMove+m.bit.promotion)<lastBitboard);
+		return Movegen::attackFrom((bitboardIndex)(whiteQueens+s.nextMove+m.bit.promotion), to, occ) & bitSet(kingSquare);
 
 	}
 		break;
@@ -1382,8 +1382,8 @@ bool Position::moveGivesCheck(const Move& m)const {
 		break;
 	case Move::fenpassant:
 	{
-		bitMap captureSquare= FILEMASK[m.to] & RANKMASK[m.from];
-		bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.from)^bitSet((tSquare)m.to)^captureSquare;
+		bitMap captureSquare= FILEMASK[m.bit.to] & RANKMASK[m.bit.from];
+		bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet((tSquare)m.bit.to)^captureSquare;
 		return
 				(Movegen::attackFromRook(kingSquare, occ) & (Us[Queens] |Us[Rooks]))
 			   | (Movegen::attackFromBishop(kingSquare, occ) & (Us[Queens] |Us[Bishops]));
@@ -1398,8 +1398,8 @@ bool Position::moveGivesCheck(const Move& m)const {
 
 bool Position::moveGivesDoubleCheck(const Move& m)const {
 	assert(m.packed);
-	tSquare from = (tSquare)m.from;
-	tSquare to = (tSquare)m.to;
+	tSquare from = (tSquare)m.bit.from;
+	tSquare to = (tSquare)m.bit.to;
 	bitboardIndex piece = squares[from];
 	assert(piece!=occupiedSquares);
 	assert(piece!=separationBitmap);
@@ -1416,8 +1416,8 @@ bool Position::moveGivesDoubleCheck(const Move& m)const {
 
 bool Position::moveGivesSafeDoubleCheck(const Move& m)const {
 	assert(m.packed);
-	tSquare from = (tSquare)m.from;
-	tSquare to = (tSquare)m.to;
+	tSquare from = (tSquare)m.bit.from;
+	tSquare to = (tSquare)m.bit.to;
 	bitboardIndex piece = squares[from];
 	assert(piece!=occupiedSquares);
 	assert(piece!=separationBitmap);

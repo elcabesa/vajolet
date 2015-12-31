@@ -420,16 +420,16 @@ public:
 		}
 
 		//from
-		s+=char('a'+FILES[m.from]);
-		s+=char('1'+RANKS[m.from]);
+		s+=char('a'+FILES[m.bit.from]);
+		s+=char('1'+RANKS[m.bit.from]);
 
 
 		//to
-		s+=char('a'+FILES[m.to]);
-		s+=char('1'+RANKS[m.to]);
+		s+=char('a'+FILES[m.bit.to]);
+		s+=char('1'+RANKS[m.bit.to]);
 		//promotion
-		if(m.flags == Move::fpromotion){
-			s += Position::PIECE_NAMES_FEN[m.promotion+Position::blackQueens];
+		if(m.bit.flags == Move::fpromotion){
+			s += Position::PIECE_NAMES_FEN[m.bit.promotion+Position::blackQueens];
 		}
 		return s;
 
@@ -445,12 +445,12 @@ public:
 		std::string s;
 		//state st=getActualState();
 
-		bool capture = (bitSet((tSquare)m.to) & Them[Pieces]);
-		if(!isPawn(squares[m.from])){
-			s+=PIECE_NAMES_FEN[squares[m.from]%Position::separationBitmap];
+		bool capture = (bitSet((tSquare)m.bit.to) & Them[Pieces]);
+		if(!isPawn(squares[m.bit.from])){
+			s+=PIECE_NAMES_FEN[squares[m.bit.from]%Position::separationBitmap];
 		}
-		if(capture && isPawn(squares[m.from])){
-			s+=char('a'+FILES[m.from]);
+		if(capture && isPawn(squares[m.bit.from])){
+			s+=char('a'+FILES[m.bit.from]);
 		}
 		if(capture){
 			s+="x";
@@ -460,15 +460,15 @@ public:
 
 
 		//to
-		s+=char('a'+FILES[m.to]);
-		s+=char('1'+RANKS[m.to]);
+		s+=char('a'+FILES[m.bit.to]);
+		s+=char('1'+RANKS[m.bit.to]);
 		if(moveGivesCheck(m)){
 			s+="+";
 		}
 		//promotion
-		if(m.flags == Move::fpromotion){
+		if(m.bit.flags == Move::fpromotion){
 			s +="=";
-			s += Position::PIECE_NAMES_FEN[m.promotion+Position::whiteQueens];
+			s += Position::PIECE_NAMES_FEN[m.bit.promotion+Position::whiteQueens];
 		}
 		return s;
 
@@ -493,10 +493,10 @@ public:
 		\date 08/11/2013
 	*/
 	inline Score getMvvLvaScore(const Move & m) const {
-		Score s=pieceValue[squares[m.to]%separationBitmap][0]-(squares[m.from]%separationBitmap);
-		if (m.flags == Move::fpromotion){
-			s += (pieceValue[whiteQueens +m.promotion] - pieceValue[whitePawns])[0];
-		}else if(m.flags == Move::fenpassant){
+		Score s=pieceValue[squares[m.bit.to]%separationBitmap][0]-(squares[m.bit.from]%separationBitmap);
+		if (m.bit.flags == Move::fpromotion){
+			s += (pieceValue[whiteQueens +m.bit.promotion] - pieceValue[whitePawns])[0];
+		}else if(m.bit.flags == Move::fenpassant){
 			s +=pieceValue[whitePawns][0];
 		}
 		return s;
@@ -525,19 +525,19 @@ public:
 
 
 	inline bool isCaptureMove(const Move & m) const {
-		return squares[m.to]!=empty || m.flags==Move::fenpassant;
+		return squares[m.bit.to]!=empty || m.bit.flags==Move::fenpassant;
 	}
 	inline bool isCastleMove(const Move & m) const {
-		return  m.flags==Move::fcastle;
+		return  m.bit.flags==Move::fcastle;
 	}
 	inline bool isCaptureMoveOrPromotion(const Move & m) const {
-		return squares[m.to]!=empty || m.flags==Move::fenpassant || m.flags == Move::fpromotion;
+		return squares[m.bit.to]!=empty || m.bit.flags==Move::fenpassant || m.bit.flags == Move::fpromotion;
 	}
 	inline bool isPassedPawnMove(const Move & m) const {
-		if(isPawn(squares[m.to])){
-			bool color=squares[m.to]>=separationBitmap;
+		if(isPawn(squares[m.bit.to])){
+			bool color=squares[m.bit.to]>=separationBitmap;
 			bitMap theirPawns=color? bitBoard[whitePawns]:bitBoard[blackPawns];
-			return !(theirPawns & PASSED_PAWN[color][m.from]);
+			return !(theirPawns & PASSED_PAWN[color][m.bit.from]);
 		}
 		return false;
 	}

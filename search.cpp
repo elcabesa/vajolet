@@ -1290,13 +1290,13 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		// todo controllare se usare depth o qualche depth scalata
 		Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
 		//sync_cout<<bonus<<sync_endl;
-		history.update(pos.squares[bestMove.from],(tSquare) bestMove.to, bonus);
+		history.update(pos.squares[bestMove.bit.from],(tSquare) bestMove.bit.to, bonus);
 		//sync_cout<<"pezzo:"<<pos.PIECE_NAMES_FEN[pos.squares[bestMove.from]]<<sync_endl;
 		if(quietMoveCount>1){
 			for (unsigned int i = 0; i < quietMoveCount - 1; i++){
 				Move m;
 				m= quietMoveList[i];
-				history.update(pos.squares[m.from],(tSquare) m.to, -bonus);
+				history.update(pos.squares[m.bit.from],(tSquare) m.bit.to, -bonus);
 			}
 		}
 	}
@@ -1539,12 +1539,12 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 
 		assert(m.packed);
 
-		if(!inCheck && (TTdepth<-1* ONE_PLY) && m.flags==Move::fpromotion && m.promotion!= Move::promQueen){
+		if(!inCheck && (TTdepth<-1* ONE_PLY) && m.bit.flags==Move::fpromotion && m.bit.promotion!= Move::promQueen){
 			continue;
 		}
 
 		if(depth<-7*ONE_PLY && !inCheck){
-			if(pos.getActualState().currentMove.to!= m.to){
+			if(pos.getActualState().currentMove.bit.to!= m.bit.to){
 				continue;
 			}
 		}
@@ -1556,13 +1556,13 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 			!inCheck &&
 			!pos.moveGivesCheck(m) &&
 			m != ttMove &&
-			m.flags != Move::fpromotion &&
+			m.bit.flags != Move::fpromotion &&
 			!pos.isPassedPawnMove(m) &&
 			abs(staticEval)<SCORE_KNOWN_WIN
 		){
 			Score futilityValue=futilityBase
-                    + Position::pieceValue[pos.squares[m.to]%Position::separationBitmap][1]
-                    + (m.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
+                    + Position::pieceValue[pos.squares[m.bit.to]%Position::separationBitmap][1]
+                    + (m.bit.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
 
 			if (futilityValue < beta)
 			{
@@ -1587,7 +1587,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		// TODO testare se aggiungere o no !movegivesCheck() &&
 		if(!PVnode &&
 				!inCheck &&
-				m.flags != Move::fpromotion &&
+				m.bit.flags != Move::fpromotion &&
 				m != ttMove &&
 				//!pos.moveGivesCheck(m) && -50ELO
 				pos.seeSign(m)<0){

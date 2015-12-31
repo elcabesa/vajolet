@@ -26,7 +26,7 @@
 
 Score Position::seeSign(const Move& m) const {
 	assert(m.packed);
-	if (pieceValue[squares[m.from]%separationBitmap][0] <= pieceValue[squares[m.to]%separationBitmap][0])
+	if (pieceValue[squares[m.bit.from]%separationBitmap][0] <= pieceValue[squares[m.bit.to]%separationBitmap][0])
 	{
 		return 1;
 	}
@@ -48,7 +48,7 @@ Score Position::see(const Move& m) const {
 #endif
 
 
-	tSquare from=(tSquare)m.from, to=(tSquare)m.to;
+	tSquare from=(tSquare)m.bit.from, to=(tSquare)m.bit.to;
 	const int relativeRank =getActualState().nextMove?7-RANKS[to] :RANKS[to];
 	bitMap occupied=bitBoard[occupiedSquares]^bitSet(from);
 //	displayBitMap(occupied);
@@ -62,18 +62,18 @@ Score Position::see(const Move& m) const {
 	swapList[0] = pieceValue[squares[to]%separationBitmap][0];
 	captured = bitboardIndex(squares[from]%separationBitmap);
 
-	if(m.flags== Move::fenpassant){
+	if(m.bit.flags== Move::fenpassant){
 		occupied ^= to- pawnPush(color);
 		swapList[0] = pieceValue[whitePawns][0];
 	}
-	if(m.flags== Move::fcastle){
+	if(m.bit.flags== Move::fcastle){
 		return 0;
 	}
-	if(m.flags== Move::fpromotion){
+	if(m.bit.flags== Move::fpromotion){
 		//display();
 		//sync_cout<<displayUci(m) <<sync_endl;
-		captured=bitboardIndex(whiteQueens+m.promotion);
-		swapList[0] +=pieceValue[whiteQueens+m.promotion][0]-pieceValue[whitePawns][0];
+		captured=bitboardIndex(whiteQueens+m.bit.promotion);
+		swapList[0] +=pieceValue[whiteQueens+m.bit.promotion][0]-pieceValue[whitePawns][0];
 	}
 
 	// Find all attackers to the destination square, with the moving piece
