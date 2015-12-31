@@ -34,24 +34,24 @@ void timeManagerInit(Position& pos, searchLimits& lim, timeManagementStruct& tim
 	else{
 		if(pos.getActualState().nextMove){
 			if(lim.movesToGo>0){
-				timeMan.allocatedTime=std::min((lim.btime*4.0)/lim.movesToGo,lim.btime*0.8);
+				timeMan.allocatedTime= (long unsigned int)std::min((lim.btime*4.0)/lim.movesToGo,lim.btime*0.8);
 				timeMan.maxSearchTime=timeMan.allocatedTime;
 			}else{
-				timeMan.allocatedTime=(float)(lim.btime)/10.0;
+				timeMan.allocatedTime=(long unsigned int)((float)(lim.btime)/10.0);
 				timeMan.maxSearchTime=timeMan.allocatedTime;
 			}
 		}
 		else{
 			if(lim.movesToGo>0){
-				timeMan.allocatedTime=std::min((lim.wtime*4.0)/lim.movesToGo,lim.wtime*0.8);
+				timeMan.allocatedTime=(long unsigned int)std::min((lim.wtime*4.0)/lim.movesToGo,lim.wtime*0.8);
 				timeMan.maxSearchTime=timeMan.allocatedTime;
 			}else{
-				timeMan.allocatedTime=(float)(lim.wtime)/10.0;
+				timeMan.allocatedTime=(long unsigned int)((float)(lim.wtime)/10.0);
 				timeMan.maxSearchTime=timeMan.allocatedTime;
 			}
 		}
 
-		timeMan.minSearchTime=timeMan.allocatedTime*0.1;
+		timeMan.minSearchTime=(long unsigned int)(timeMan.allocatedTime*0.1);
 		timeMan.resolution=std::min((unsigned long int)100,timeMan.allocatedTime/100);
 	}
 
@@ -97,7 +97,7 @@ void my_thread::timerThread() {
 		timerCond.wait(lk,[&]{return (startThink && src.signals.stop==false )||quit;});
 		if (!quit){
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
-			unsigned long time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
+			long long int time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
 			if(time>=timeMan.allocatedTime && !(limits.infinite || limits.ponder)){
 				/*if(startThink){
 					sync_cout<<"STOPPPPE"<<sync_endl;

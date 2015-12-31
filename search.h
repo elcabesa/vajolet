@@ -59,7 +59,7 @@ public:
 	unsigned int selDepth;
 	unsigned int depth;
 	unsigned long long nodes;
-	unsigned long time;
+	long long int time;
 	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
 	bool operator==(const Move& m) const { return firstMove.packed == m.packed; }
 };
@@ -82,7 +82,7 @@ class search{
 	static unsigned int FutilityMoveCounts[11];
 	static Score PVreduction[32*ONE_PLY][64];
 	static Score nonPVreduction[32*ONE_PLY][64];
-	unsigned long startTime;
+	long long int startTime;
 
 
 
@@ -90,7 +90,7 @@ class search{
 	unsigned int indexPV= 0;
 
 	void printPVs(unsigned int count);
-	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nods);
+	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nods);
 public:
 	searchLimits limits;
 	History history;

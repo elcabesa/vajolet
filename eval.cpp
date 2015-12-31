@@ -1515,7 +1515,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		case Position::blackKnights:
 			if(enemyWeakSquares& BITSET[sq])
 			{
-				res+=knightOnOutpost*(5-std::abs(relativeRank-5));
+				res+=knightOnOutpost*(5-std::abs((int)relativeRank-5));
 				if(supportedSquares &BITSET[sq]){
 					res += knightOnOutpostSupported;
 				}
@@ -2486,7 +2486,7 @@ Score Position::eval(void) {
 	signed int gamePhase=getGamePhase();
 	signed long long r=((signed long long)res[0])*(65536-gamePhase)+((signed long long)res[1])*gamePhase;
 
-	Score score =(r)/65536;
+	Score score =(Score)((r)/65536);
 	if(mulCoeff!=256){
 		score*=mulCoeff;
 		score/=256;

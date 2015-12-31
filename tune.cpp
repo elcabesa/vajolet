@@ -308,20 +308,21 @@ void Tuner::createEpd(void){
 						pos.setupFromFen(clearFen);
 						searcher.pos = pos;
 						Score searchRes;
+						float res = 0;
 						if(result==0){
 							searchRes=searcher.startThinking(sl);
-							searchRes-=5000.0+10000.0*(line2-startLine)/(line-startLine);
+							res= searchRes - (5000.0+10000.0*(line2-startLine)/(line-startLine));
 						}
 						else if (result==1)
 						{
 							searchRes=searcher.startThinking(sl);
-							searchRes+=5000.0+10000.0*(line2-startLine)/(line-startLine);
+							res= searchRes + 5000.0+10000.0*(line2-startLine)/(line-startLine);
 						}
 						else{
-							searchRes=0.5;
+							res=0.5;
 						}
 
-						double sigmoid=1.0/(1+std::pow(2.71828182846,-searchRes/scaling));
+						double sigmoid=1.0/(1+std::pow(2.71828182846,-res/scaling));
 						ofs.write(clearFen.c_str(),clearFen.length());
 						ofs.write(" result ",8);
 						std::string strRes=std::to_string(sigmoid);

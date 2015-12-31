@@ -59,7 +59,7 @@ void search::printPVs(unsigned int count){
 	});
 }
 
-void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, unsigned long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes){
+void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes){
 
 	sync_cout<<"info multipv "<< (count+1) << " depth "<<(depth)<<" seldepth "<<seldepth <<" score ";
 
@@ -76,7 +76,7 @@ void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score al
 
 	std::cout<<" nodes "<<nodes;
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-	std::cout<<" nps "<<(unsigned int)((double)nodes*1000/(time))<<" time "<<(time);
+	std::cout<<" nps "<<(unsigned int)((double)nodes*1000/(double)time)<<" time "<<(long long int)(time);
 #endif
 
 	std::cout<<" pv ";
@@ -150,7 +150,7 @@ Score search::startThinking(searchLimits & l){
 	unsigned int linesToBeSearched = search::multiPVLines;
 
 	if(limitStrength){
-		int lines= (-8.0/2000.0)*(eloStrenght-1000)+10.0;
+		int lines= (int)((-8.0/2000.0)*(eloStrenght-1000)+10.0);
 		unsigned int s=std::max(lines,4);
 		linesToBeSearched=	std::max(linesToBeSearched,s);
 	}
@@ -248,8 +248,8 @@ Score search::startThinking(searchLimits & l){
 			if (depth >= 5)
 			{
 				delta = 800;
-				alpha = std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int)-SCORE_INFINITE);
-				beta  = std::min((signed long long int)(rootMoves[indexPV].previousScore) + delta,(signed long long int) SCORE_INFINITE);
+				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int)-SCORE_INFINITE);
+				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].previousScore) + delta,(signed long long int) SCORE_INFINITE);
 			}
 
 
@@ -337,7 +337,7 @@ Score search::startThinking(searchLimits & l){
 				if(newPV.size()!=0 &&  res <= alpha){
 					sync_cout<<"ERRORE NEWPV"<<sync_endl;
 				}
-				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+				long long int now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 
 
 
@@ -377,7 +377,7 @@ Score search::startThinking(searchLimits & l){
 					newPV.clear();
 					newPV.push_back(rootMoves[indexPV].PV.front());
 					printPV(res,depth,selDepth-selDepthBase,alpha,beta, now-startTime,indexPV,newPV,visitedNodes);
-					alpha = std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
+					alpha = (Score) std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 
 					reduction = 0;
 
@@ -391,7 +391,7 @@ Score search::startThinking(searchLimits & l){
 					}
 					//sync_cout<<"res>=beta "<<sync_endl;
 					printPV(res,depth,selDepth-selDepthBase,alpha,beta, now-startTime,indexPV,newPV,visitedNodes);
-					beta = std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
+					beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 					if(depth>1){
 						reduction=1;
 					}
@@ -478,7 +478,7 @@ Score search::startThinking(searchLimits & l){
 
 		std::mt19937_64 rnd;
 		std::exponential_distribution<> uint_dist(lambda);
-		unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+		long long int now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 		rnd.seed(now);
 		double dres = uint_dist(rnd);
 
@@ -1040,7 +1040,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		}
 
 		if(type==ROOT_NODE){
-			unsigned long elapsed=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
+			long long int elapsed=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
 			if(
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 				elapsed>3000 &&
@@ -1270,7 +1270,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta  ? typeScoreHigherThanBeta :
 					(PVnode && bestMove.packed) ? typeExact : typeScoreLowerThanAlpha,
-							depth, bestMove.packed/*?bestMove.packed:ttMove.packed*/, staticEval);
+							(short int)depth, bestMove.packed/*?bestMove.packed:ttMove.packed*/, staticEval);
 	}
 
 
@@ -1652,7 +1652,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	if(!signals.stop){
 		TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta ? typeScoreHigherThanBeta : TTtype,
-			TTdepth, bestMove.packed, staticEval);
+					(short int)TTdepth, bestMove.packed, staticEval);
 	}
 #ifdef PRINT_STATISTICS
 	if(type==ALL_NODE && bestScore>=beta){

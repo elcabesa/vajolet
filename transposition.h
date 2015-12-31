@@ -95,7 +95,7 @@ public:
 		}
 	}
 	void newSearch() { generation++; usedElements=0; }
-	void setSize(unsigned long long int mbSize);
+	void setSize(unsigned long int mbSize);
 	void clear();
 
 	inline ttCluster* findCluster(U64 key) const {

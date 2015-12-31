@@ -21,8 +21,8 @@
 
 transpositionTable TT;
 
-void transpositionTable::setSize(long long unsigned int mbSize){
-	long long unsigned int size =  (mbSize << 20) / sizeof(ttCluster);
+void transpositionTable::setSize(unsigned long int mbSize){
+	long unsigned int size = (long unsigned int)( (mbSize << 20) / sizeof(ttCluster));
 	elements=size;
 	if(table){
 		free(table);
