@@ -58,7 +58,7 @@ void static printUciInfo(void){
 	sync_cout<< "id name "<<PROGRAM_NAME<<" "<<VERSION<<std::endl;
 	std::cout<<"id author Belli Marco"<<std::endl;
 	std::cout<<"option name Hash type spin default 1 min 1 max 4096"<<sync_endl;
-	std::cout<<"option name Threads type spin default 1 min 1 max 8"<<sync_endl;
+	std::cout<<"option name Threads type spin default 1 min 1 max 128"<<sync_endl;
 	std::cout<<"option name MultiPV type spin default 1 min 1 max 500"<<sync_endl;
 	std::cout<<"option name Ponder type check default true"<<sync_endl;
 	std::cout<<"option name OwnBook type check default true"<<std::endl;
@@ -185,11 +185,13 @@ void setoption(std::istringstream& is) {
 	}
 
 	if(name =="Hash"){
-		TT.setSize(stoi(value));
+		int hash = stoi(value);
+		hash = std::min(hash,1048576);
+		TT.setSize(hash);
 	}
 	else if(name =="Threads"){
 		int i=stoi(value);
-		search::threads=(i<=8)?(i>0?i:1):8;
+		search::threads=(i<=128)?(i>0?i:1):128;
 	}
 	else if(name =="MultiPV"){
 		int i=stoi(value);
