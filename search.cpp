@@ -173,33 +173,33 @@ Score search::startThinking(searchLimits & l){
 		lastLegalMove=m;
 	}
 
-		if(legalMoves==0){
-			while((!signals.stop) || limits.ponder){}
-			sync_cout<<"info depth 0 score cp 0"<<sync_endl;
-			sync_cout<<"bestmove 0000"<<sync_endl;
-			return res;
-		}else if(legalMoves==1){
-			if(!limits.infinite)
-			{
-				sync_cout<<"info pv "<<pos.displayUci(lastLegalMove)<<sync_endl;
-				while((!signals.stop) || limits.ponder){}
-				sync_cout<<"bestmove "<<pos.displayUci(lastLegalMove);
+	if(legalMoves==0){
+		while((limits.infinite && !signals.stop) || limits.ponder){}
+		sync_cout<<"info depth 0 score cp 0"<<sync_endl;
+		sync_cout<<"bestmove 0000"<<sync_endl;
+		return res;
+	}else if(legalMoves==1){
+		if(!limits.infinite)
+		{
+			sync_cout<<"info pv "<<pos.displayUci(lastLegalMove)<<sync_endl;
+			while(limits.ponder){}
+			sync_cout<<"bestmove "<<pos.displayUci(lastLegalMove);
 
 
-				pos.doMove(lastLegalMove);
-				U64 posKey=pos.getKey();
-				ttEntry* tte = TT.probe(posKey);
-				pos.undoMove(lastLegalMove);
-				if(tte && tte->getPackedMove()){
-					Move m;
-					m.packed=tte->getPackedMove();
-					std::cout<<" ponder "<<pos.displayUci(m);
-				}
-
-				std::cout<<sync_endl;
-				return res;
+			pos.doMove(lastLegalMove);
+			U64 posKey=pos.getKey();
+			ttEntry* tte = TT.probe(posKey);
+			pos.undoMove(lastLegalMove);
+			if(tte && tte->getPackedMove()){
+				Move m;
+				m.packed=tte->getPackedMove();
+				std::cout<<" ponder "<<pos.displayUci(m);
 			}
+
+			std::cout<<sync_endl;
+			return res;
 		}
+	}
 
 	//----------------------------------------------
 	//	book probing
