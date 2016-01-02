@@ -28,9 +28,9 @@
 struct Move
 {
 	Move(){}
-	Move(const Move& m){packed = m.packed;}
-	Move(const Move&& m){packed = m.packed;}
-	Move(unsigned short i){packed=i;}
+	Move(const Move& m): packed(m.packed){}
+	Move(const Move&& m):packed(m.packed){}
+	Move(unsigned short i):packed(i){}
 	union
 	{
 		struct

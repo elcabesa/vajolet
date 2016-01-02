@@ -29,8 +29,9 @@
 #define KING_SIDE_CASTLE (0)
 #define QUEEN_SIDE_CASTLE (1)
 class Movegen{
-	static Move NOMOVE;
+
 public:
+	const static Move NOMOVE;
 	enum genType{
 		captureMg,			// generate capture moves
 		quietMg,			// generate quiet moves

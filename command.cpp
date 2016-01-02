@@ -87,7 +87,6 @@ Move moveFromUci(Position& pos, std::string& str) {
 		}
 	}
 	// move not found
-	m=0;
 	return m; // m è gia una NOMOVE
 }
 
@@ -114,7 +113,7 @@ void static position(std::istringstream& is, Position & pos){
 
 	Move m;
 	// Parse move list (if any)
-	while (is >> token && ((m = moveFromUci(pos, token)).packed != 0))
+	while (is >> token && ((m = moveFromUci(pos, token)) != Movegen::NOMOVE))
 	{
 		pos.doMove(m);
 	}

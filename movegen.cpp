@@ -24,7 +24,7 @@
 #include "history.h"
 
 
-Move Movegen::NOMOVE;
+const Move Movegen::NOMOVE(0);
 bitMap Movegen::MG_RANKMASK[squareNumber];
 bitMap Movegen::MG_FILEMASK[squareNumber];
 bitMap Movegen::MG_DIAGA8H1MASK[squareNumber];
@@ -45,10 +45,6 @@ bitMap Movegen::ROOK_PSEUDO_ATTACK[squareNumber];
 bitMap Movegen::BISHOP_PSEUDO_ATTACK[squareNumber];
 
 bitMap Movegen::castlePath[2][2];
-/*
-Move Movegen::moveListPool[1024][MAX_MOVE_PER_POSITION];
-unsigned int Movegen::moveListAllocated=0;
-*/
 
 
 const int Movegen::RANKSHIFT[squareNumber] = {
@@ -111,7 +107,6 @@ const bitMap Movegen::DIAGA1H8MAGICS[15] = {
 
 void Movegen::initMovegenConstant(void){
 
-	NOMOVE.packed=0;
 	castlePath[0][KING_SIDE_CASTLE]=bitSet(F1)|bitSet(G1);
 	castlePath[0][QUEEN_SIDE_CASTLE]=bitSet(D1)|bitSet(C1)|bitSet(B1);
 	castlePath[1][KING_SIDE_CASTLE]=bitSet(F8)|bitSet(G8);
@@ -539,8 +534,7 @@ void Movegen::generateMoves(){
 	const bitMap & occupiedSquares = pos.bitBoard[Position::occupiedSquares];
 
 	bitMap moves;
-	Move m;
-	m.packed=0;
+	Move m(0);
 
 	//------------------------------------------------------
 	// king
@@ -765,6 +759,7 @@ void Movegen::generateMoves(){
 	}
 
 	// PROMOTIONS
+	m.bit.flags=Move::fpromotion;
 	if(type!= Movegen::captureMg){
 		moves=(s.nextMove? (promotionPawns>>8):(promotionPawns<<8))&~occupiedSquares;
 
@@ -773,7 +768,7 @@ void Movegen::generateMoves(){
 			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
 			m.bit.to=firstOne(moves);
 			m.bit.from=m.bit.to-pawnPush(s.nextMove);
-			m.bit.flags=Move::fpromotion;
+
 			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
 				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
@@ -800,7 +795,7 @@ void Movegen::generateMoves(){
 			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
 			m.bit.to=firstOne(moves);
 			m.bit.from=m.bit.to-delta;
-			m.bit.flags=Move::fpromotion;
+			//m.bit.flags=Move::fpromotion;
 			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
 				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
@@ -821,7 +816,7 @@ void Movegen::generateMoves(){
 			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
 			m.bit.to=firstOne(moves);
 			m.bit.from=m.bit.to-delta;
-			m.bit.flags=Move::fpromotion;
+			//m.bit.flags=Move::fpromotion;
 			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
 				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
@@ -841,6 +836,7 @@ void Movegen::generateMoves(){
 
 		if(s.epSquare!=squareNone){
 
+			m.bit.flags=Move::fenpassant;
 			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
 			tSquare kingSquare =pos.pieceList[Position::whiteKing+s.nextMove][0];
 			bitMap epAttacker=pawns & attackFromPawn(s.epSquare,1-color);
@@ -855,7 +851,6 @@ void Movegen::generateMoves(){
 				){
 					m.bit.to=s.epSquare;
 					m.bit.from=from;
-					m.bit.flags=Move::fenpassant;
 					//moveList.push_back(m);
 					assert(moveListSize<MAX_MOVE_PER_POSITION);
 					moveList[moveListSize++].m=m;
@@ -866,7 +861,7 @@ void Movegen::generateMoves(){
 		}
 	}
 
-	m.bit.flags=Move::fnone;
+
 
 
 	//king castle
@@ -874,6 +869,7 @@ void Movegen::generateMoves(){
 
 		if(s.castleRights & ((Position::wCastleOO |Position::wCastleOOO)<<(2*color))){
 
+			m.bit.flags=Move::fcastle;
 
 			if((s.castleRights &((Position::wCastleOO)<<(2*color))) &&!s.checkers &&!(castlePath[color][KING_SIDE_CASTLE] & pos.bitBoard[Position::occupiedSquares])){
 				assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
@@ -887,7 +883,7 @@ void Movegen::generateMoves(){
 					}
 				}
 				if(!castleDenied){
-					m.bit.flags=Move::fcastle;
+
 					m.bit.from=kingSquare;
 					m.bit.to=kingSquare+2;
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
@@ -911,7 +907,6 @@ void Movegen::generateMoves(){
 					}
 				}
 				if(!castleDenied){
-					m.bit.flags=Move::fcastle;
 					m.bit.from=kingSquare;
 					m.bit.to=kingSquare-2;
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
