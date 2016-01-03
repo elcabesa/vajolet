@@ -1194,8 +1194,7 @@ unsigned long long Position::perft(unsigned int depth){
 	Movegen mg(*this);
 #ifdef FAST_PERFT
 	if(depth==1){
-		mg.generateMoves<Movegen::allMg>();
-		return mg.getGeneratedMoveNumber();
+		return mg.getNumberOfLegalMoves();
 	}
 #endif
 
@@ -1447,8 +1446,7 @@ bool Position::isDraw(bool isPVline) const {
 		}
 
 		Movegen mg(*this);
-		mg.generateMoves<Movegen::genType::allMg>();
-		if(mg.getGeneratedMoveNumber()){
+		if(mg.getNumberOfLegalMoves()){
 			return true;
 		}
 	}

@@ -71,6 +71,8 @@ struct Move
 struct extMove{
 	Move m;
 	Score score;
+
+	extMove(){};
 };
 
 /*!	\brief return the offset of a pawn push

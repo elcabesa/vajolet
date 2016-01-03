@@ -115,7 +115,7 @@ public:
 	void store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
 
 	unsigned int getFullness(void){
-		unsigned int ret = (unsigned int)((usedElements*250)/elements);
+		unsigned int ret = (unsigned int)(((unsigned long long int)usedElements*250)/elements);
 		return ret;
 	}
 

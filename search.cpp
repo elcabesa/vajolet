@@ -112,7 +112,7 @@ Score search::startThinking(searchLimits & l){
 	//	generate the list of root moves to be searched
 	//--------------------------------
 	if(limits.searchMoves.size()==0){
-		Move m(0);
+		Move m(Movegen::NOMOVE);
 		Movegen mg(pos,history,m);
 		while ((m=mg.getNextMove()).packed){
 			rootMove rm;
@@ -161,7 +161,7 @@ Score search::startThinking(searchLimits & l){
 	 *	if there is only 1 moves do it
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
-	Move m(0),oldBestMove(0);
+	Move m(Movegen::NOMOVE),oldBestMove(Movegen::NOMOVE);
 
 	Movegen mg(pos,history,m);
 
@@ -513,7 +513,6 @@ Score search::startThinking(searchLimits & l){
 #ifdef PRINT_STATISTICS
 	Statistics::instance().printNodeTypeStat();
 #endif
-
 	return res;
 
 
@@ -802,46 +801,37 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 		if (nullVal >= beta)
 		{
-//			Move mm;
-//			Movegen mg(pos,mm);
-//			mg.generateMoves<Movegen::allMg>();
-//			unsigned int legalMoves=mg.getGeneratedMoveNumber();
 
 
-//			if(legalMoves>1)
-			{
-				// Do not return unproven mate scores
-				if (nullVal >= SCORE_MATE_IN_MAX_PLY){
-					nullVal = beta;
-				}
-
-				if (depth < 12 * ONE_PLY){
-#ifdef PRINT_STATISTICS
-					Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-#endif
-					return nullVal;
-				}
-
-				// Do verification search at high depths
-				pos.getActualState().skipNullMove=true;
-				assert(depth - red>=ONE_PLY);
-				Score val;
-				if(depth-red<ONE_PLY){
-					val = qsearch<childNodesType>(ply, depth-red, beta-1, beta,childPV);
-				}
-				else{
-					val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
-				}
-				pos.getActualState().skipNullMove=false;
-				if (val >= beta){
-#ifdef PRINT_STATISTICS
-					Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-#endif
-					return nullVal;
-				}
+			// Do not return unproven mate scores
+			if (nullVal >= SCORE_MATE_IN_MAX_PLY){
+				nullVal = beta;
 			}
 
+			if (depth < 12 * ONE_PLY){
+#ifdef PRINT_STATISTICS
+				Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
+#endif
+				return nullVal;
+			}
 
+			// Do verification search at high depths
+			pos.getActualState().skipNullMove=true;
+			assert(depth - red>=ONE_PLY);
+			Score val;
+			if(depth-red<ONE_PLY){
+				val = qsearch<childNodesType>(ply, depth-red, beta-1, beta,childPV);
+			}
+			else{
+				val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
+			}
+			pos.getActualState().skipNullMove=false;
+			if (val >= beta){
+#ifdef PRINT_STATISTICS
+				Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
+#endif
+				return nullVal;
+			}
 		}
 		else
 		{
@@ -1086,9 +1076,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 				if(depth>=3*ONE_PLY
 					&& !captureOrPromotion
 					&& !isDangerous
-					&&  m != ttMove
-					&&  m != mg.killerMoves[0]
-					&&  m != mg.killerMoves[1]
+					&& m != ttMove
+					&& !mg.isKillerMove(m)
 				)
 				{
 					assert(moveNumber!=0);
@@ -1158,9 +1147,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			if(depth>=3*ONE_PLY
 				&& !captureOrPromotion
 				&& !isDangerous
-				&&  m != ttMove
-				&&  m != mg.killerMoves[0]
-				&&  m != mg.killerMoves[1]
+				&& m != ttMove
+				&& !mg.isKillerMove(m)
 			)
 			{
 				int reduction = nonPVreduction[std::min(depth,32*ONE_PLY-1)][std::min(moveNumber,(unsigned int)63)];
@@ -1454,12 +1442,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 				pvLine.clear();
 			}
 		}
-
-
-		/*if(ttMove.packed && Movegen::isMoveLegal(ttMove)){
-			PV.clear();
-			PV.push_back(ttMove);
-		}*/
 #ifdef PRINT_STATISTICS
 		if(ttValue>=beta){
 			Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
