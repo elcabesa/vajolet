@@ -772,12 +772,9 @@ void Movegen::generateMoves()
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.bit.promotion=prom;
-					//if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
-					{
-						//moveList.push_back(m);
-						assert(moveListSize<MAX_MOVE_PER_POSITION);
-						moveList[moveListSize++].m=m;
-					}
+					assert(moveListSize<MAX_MOVE_PER_POSITION);
+					moveList[moveListSize++].m=m;
+
 				}
 			}
 			moves &= moves-1;
@@ -793,13 +790,11 @@ void Movegen::generateMoves()
 			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
 			m.bit.to=firstOne(moves);
 			m.bit.from=m.bit.to-delta;
-			//m.bit.flags=Move::fpromotion;
 			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
 				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.bit.promotion=prom;
-					//moveList.push_back(m);
 					assert(moveListSize<MAX_MOVE_PER_POSITION);
 					moveList[moveListSize++].m=m;
 				}
@@ -814,13 +809,11 @@ void Movegen::generateMoves()
 			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
 			m.bit.to=firstOne(moves);
 			m.bit.from=m.bit.to-delta;
-			//m.bit.flags=Move::fpromotion;
 			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
 				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
 			{
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
 					m.bit.promotion=prom;
-					//moveList.push_back(m);
 					assert(moveListSize<MAX_MOVE_PER_POSITION);
 					moveList[moveListSize++].m=m;
 				}
@@ -849,7 +842,6 @@ void Movegen::generateMoves()
 				){
 					m.bit.to=s.epSquare;
 					m.bit.from=from;
-					//moveList.push_back(m);
 					assert(moveListSize<MAX_MOVE_PER_POSITION);
 					moveList[moveListSize++].m=m;
 				}
@@ -885,7 +877,6 @@ void Movegen::generateMoves()
 					m.bit.from=kingSquare;
 					m.bit.to=kingSquare+2;
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-						//moveList.push_back(m);
 						assert(moveListSize<MAX_MOVE_PER_POSITION);
 						moveList[moveListSize++].m=m;
 					}
@@ -908,7 +899,6 @@ void Movegen::generateMoves()
 					m.bit.from=kingSquare;
 					m.bit.to=kingSquare-2;
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-						//moveList.push_back(m);
 						assert(moveListSize<MAX_MOVE_PER_POSITION);
 						moveList[moveListSize++].m=m;
 					}
