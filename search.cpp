@@ -27,7 +27,6 @@
 #include "position.h"
 #include "movegen.h"
 #include "transposition.h"
-#include "statistics.h"
 #include "history.h"
 #include "book.h"
 #include "thread.h"
@@ -508,11 +507,6 @@ Score search::startThinking(searchLimits & l){
 	}
 	std::cout<<sync_endl;
 
-
-
-#ifdef PRINT_STATISTICS
-	Statistics::instance().printNodeTypeStat();
-#endif
 	return res;
 
 
@@ -522,9 +516,6 @@ Score search::startThinking(searchLimits & l){
 template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& pvLine){
 
 	//bool verbose=false;
-#ifdef PRINT_STATISTICS
-	Score originalAlpha=alpha;
-#endif
 	assert(alpha <beta);
 	assert(alpha>=-SCORE_INFINITE);
 	assert(beta<=SCORE_INFINITE);
@@ -585,9 +576,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		alpha = std::max(matedIn(ply), alpha);
 		beta = std::min(mateIn(ply+1), beta);
 		if (alpha >= beta){
-#ifdef PRINT_STATISTICS
-			Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-#endif
 			return alpha;
 		}
 
@@ -635,17 +623,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 				pvLine.clear();
 			}
 		}
-#ifdef PRINT_STATISTICS
-		if(ttValue>=beta){
-			Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-		}
-		else if(ttValue<=alpha){
-			Statistics::instance().gatherNodeTypeStat(type,ALL_NODE);
-		}
-		else{
-			Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
-		}
-#endif
 		return ttValue;
 	}
 
@@ -698,10 +675,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		}
 
 	}
-#ifdef PRINT_STATISTICS
-	Statistics::instance().testedAll=false;
-	Statistics::instance().testedCut=false;
-#endif
 	//------------------------
 	// razoring
 	//------------------------
@@ -725,17 +698,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		Score v = qsearch<CUT_NODE>(ply,0, ralpha, ralpha+1, childPV);
 		if (v <= ralpha)
 		{
-#ifdef PRINT_STATISTICS
-			if(type==ALL_NODE){
-				Statistics::instance().testedAll=true;
-				Statistics::instance().testedAllPruning++;
-			}
-			else{
-				Statistics::instance().testedCut=true;
-				Statistics::instance().testedCutPruning++;
-			}
-			Statistics::instance().gatherNodeTypeStat(type,ALL_NODE);
-#endif
 			return v;
 		}
 	}
@@ -756,9 +718,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		&&  ((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0])))
 	{
 		assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
-#ifdef PRINT_STATISTICS
-		Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-#endif
 		return eval - futility[depth>>ONE_PLY_SHIFT];
 	}
 
@@ -809,9 +768,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			}
 
 			if (depth < 12 * ONE_PLY){
-#ifdef PRINT_STATISTICS
-				Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-#endif
 				return nullVal;
 			}
 
@@ -827,9 +783,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			}
 			pos.getActualState().skipNullMove=false;
 			if (val >= beta){
-#ifdef PRINT_STATISTICS
-				Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-#endif
 				return nullVal;
 			}
 		}
@@ -869,9 +822,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			s=-alphaBeta<childNodesType>(ply+1,rDepth,-rBeta,-rBeta+1,childPV);
 			pos.undoMove(m);
 			if(s>=rBeta){
-#ifdef PRINT_STATISTICS
-				Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-#endif
+
 				return s;
 			}
 
@@ -1234,9 +1185,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 	if(!moveNumber){
 		if( excludedMove.packed){
-#ifdef PRINT_STATISTICS
-			Statistics::instance().gatherNodeTypeStat(type,ALL_NODE);
-#endif
 			return alpha;
 		}else if(!inCheck){
 			bestScore = std::max((int)0,(int)(-5000 + pos.getActualState().ply*7));
@@ -1288,65 +1236,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			}
 		}
 	}
-#ifdef PRINT_STATISTICS
-
-	if(type==ALL_NODE && bestScore>=beta){
-		sync_cout<<"------------------------------------------------------------"<<sync_endl;
-		pos.display();
-		sync_cout<<"depth: "<<float(depth)/ONE_PLY<<sync_endl;
-		sync_cout<<"alpha: "<<originalAlpha/100.0<<sync_endl;
-		sync_cout<<"beta: "<<beta/100.0<<sync_endl;
-		sync_cout<<"bestScore: "<<bestScore/100.0<<sync_endl;
-		sync_cout<<"bestMove: "<<pos.displayUci(bestMove)<<sync_endl;
-		sync_cout<<"moveNumber: "<<moveNumber<<sync_endl;
-
-
-
-	}
-	if(bestScore>=beta){
-		if( moveNumber>50){
-			sync_cout<<"------------------------------------------------------------"<<sync_endl;
-			pos.display();
-			sync_cout<<"depth: "<<float(depth)/ONE_PLY<<sync_endl;
-			sync_cout<<"alpha: "<<originalAlpha/100.0<<sync_endl;
-			sync_cout<<"beta: "<<beta/100.0<<sync_endl;
-			sync_cout<<"bestScore: "<<bestScore/100.0<<sync_endl;
-			sync_cout<<"bestMove: "<<pos.displayUci(bestMove)<<sync_endl;
-			sync_cout<<"moveNumber: "<<moveNumber<<sync_endl;
-
-		}
-		Statistics::instance().cutNodeOrderingArray[moveNumber]++;
-		Statistics::instance().cutNodeOrderingSum+=moveNumber;
-		Statistics::instance().cutNodeOrderingCounter++;
-		if(Statistics::instance().worstCutNodeOrdering<moveNumber){
-			Statistics::instance().worstCutNodeOrdering=moveNumber;
-		}
-	}else if(PVnode && bestMove.packed){
-		Statistics::instance().allNodeOrderingSum+=moveNumber;
-		Statistics::instance().allNodeOrderingCounter++;
-	}else{
-		Statistics::instance().pvNodeOrderingSum+=moveNumber;
-		Statistics::instance().pvNodeOrderingCounter++;
-	}
-
-
-	if(bestScore>=beta){
-
-		Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-	}else if(PVnode && bestMove.packed){
-
-		Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
-	}else{
-
-		if(Statistics::instance().testedAll==true){
-			Statistics::instance().correctAllPruning++;
-		}
-		if(Statistics::instance().testedCut==true){
-			Statistics::instance().correctCutPruning++;
-		}
-		Statistics::instance().gatherNodeTypeStat(type,ALL_NODE);
-	}
-#endif
 	return bestScore;
 
 }
@@ -1354,9 +1243,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& pvLine){
 
-#ifdef PRINT_STATISTICS
-	Score originalAlpha=alpha;
-#endif
 	assert(ply>0);
 	assert(depth<ONE_PLY);
 	assert(alpha<beta);
@@ -1389,9 +1275,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		if(PVnode){
 			pvLine.clear();
 		}
-#ifdef PRINT_STATISTICS
-		Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
-#endif
 		return std::max((int)0,(int)(-5000 + pos.getActualState().ply*7));
 	}
 
@@ -1442,17 +1325,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 				pvLine.clear();
 			}
 		}
-#ifdef PRINT_STATISTICS
-		if(ttValue>=beta){
-			Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-		}
-		else if(ttValue<=alpha){
-			Statistics::instance().gatherNodeTypeStat(type,ALL_NODE);
-		}
-		else{
-			Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
-		}
-#endif
 		return ttValue;
 	}
 
@@ -1636,46 +1508,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 			bestScore >= beta ? typeScoreHigherThanBeta : TTtype,
 					(short int)TTdepth, bestMove.packed, staticEval);
 	}
-#ifdef PRINT_STATISTICS
-	if(type==ALL_NODE && bestScore>=beta){
-		sync_cout<<"------------------------------------------------------------"<<sync_endl;
-		pos.display();
-		sync_cout<<"depth: "<<float(depth)/ONE_PLY<<sync_endl;
-		sync_cout<<"alpha: "<<originalAlpha/100.0<<sync_endl;
-		sync_cout<<"beta: "<<beta/100.0<<sync_endl;
-		sync_cout<<"bestScore: "<<bestScore/100.0<<sync_endl;
-		sync_cout<<"bestMove: "<<pos.displayUci(bestMove)<<sync_endl;
-		sync_cout<<"moveNumber: "<<moveNumber<<sync_endl;
-
-
-
-	}
-	if(bestScore>=beta){
-		Statistics::instance().cutNodeOrderingArray[moveNumber]++;
-		if(moveNumber){
-
-			Statistics::instance().cutNodeOrderingSum+=moveNumber;
-			Statistics::instance().cutNodeOrderingCounter++;
-			if(Statistics::instance().worstCutNodeOrdering<moveNumber){
-				Statistics::instance().worstCutNodeOrdering=moveNumber;
-			}
-		}
-	}else if(PVnode && bestMove.packed){
-		Statistics::instance().allNodeOrderingSum+=moveNumber;
-		Statistics::instance().allNodeOrderingCounter++;
-	}else{
-		Statistics::instance().pvNodeOrderingSum+=moveNumber;
-		Statistics::instance().pvNodeOrderingCounter++;
-	}
-
-	if(bestScore>beta){
-		Statistics::instance().gatherNodeTypeStat(type,CUT_NODE);
-	}else if(TTtype==typeExact){
-		Statistics::instance().gatherNodeTypeStat(type,PV_NODE);
-	}else{
-		Statistics::instance().gatherNodeTypeStat(type,ALL_NODE);
-	}
-#endif
 
 	return bestScore;
 

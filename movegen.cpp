@@ -1266,8 +1266,8 @@ Move  Movegen::getNextMove()
 			break;
 		case generateEvasionMoves:
 			generateMoves<Movegen::allEvasionMg>();
-			killerMoves[0]=(pos.getKillers())[0];
-			killerMoves[1]=(pos.getKillers())[1];
+			killerMoves[0]=(pos.getKillers(0));
+			killerMoves[1]=(pos.getKillers(1));
 			stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 		case generateQuiescentMoves:
@@ -1301,8 +1301,8 @@ Move  Movegen::getNextMove()
 					std::swap(moveList[moveListPosition],moveList[bestIndex]);
 				}
 				if(moveList[moveListPosition].m!=ttMove &&
-					moveList[moveListPosition].m!=pos.getKillers()[0] &&
-					moveList[moveListPosition].m!=pos.getKillers()[1] )
+					moveList[moveListPosition].m!=killerMoves[0] &&
+					moveList[moveListPosition].m!=killerMoves[1] )
 				{
 					return moveList[moveListPosition++].m;
 				}
@@ -1383,8 +1383,8 @@ Move  Movegen::getNextMove()
 
 			}
 			else{
-				killerMoves[0]=pos.getKillers()[0];
-				killerMoves[1]=pos.getKillers()[1];
+				killerMoves[0]=pos.getKillers(0);
+				killerMoves[1]=pos.getKillers(1);
 				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;

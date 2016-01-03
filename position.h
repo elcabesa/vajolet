@@ -551,7 +551,7 @@ public:
 		}
 	}
 
-	const  Move *  getKillers() const { return killers[stateIndex];}
+	const Move&  getKillers(const int n) const { return killers[stateIndex][n];}
 
 	void saveKillers(Move& m)
 	{

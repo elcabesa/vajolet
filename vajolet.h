@@ -43,7 +43,6 @@
 //---------------------------------------------
 //#define DEBUG_EVAL_SIMMETRY
 //#define DEBUG_SEE
-//#define PRINT_STATISTICS
 //#define PRINT_PV_CHANGES
 //#define DISABLE_TIME_DIPENDENT_OUTPUT
 
