@@ -500,352 +500,390 @@ template<Movegen::genType type>
 void Movegen::generateMoves()
 {
 
-	Position::state &s =pos.getActualState();
-	Position::bitboardIndex piece  =(Position::bitboardIndex)(s.nextMove+Position::whiteKing);
-	assert(pos.isKing(piece));
-	assert(piece<Position::lastBitboard);
+	// initialize constants
+	const Position::state &s =pos.getActualState();
+	const bitMap& enemy = pos.Them[Position::Pieces];
+	const bitMap& occupiedSquares = pos.bitBoard[Position::occupiedSquares];
 
+	//divide pawns
+	const bitMap& thirdRankMask = RANKMASK[ s.nextMove ? A6:A3];
+	const bitMap& seventhRankMask = RANKMASK[ s.nextMove ? A2:A7];
 
+	bitMap promotionPawns =  pos.Us[Position::Pawns] & seventhRankMask ;
+	bitMap nonPromotionPawns =  pos.Us[Position::Pawns]^ promotionPawns;
 
-	bitMap thirdRankMask = RANKMASK[!s.nextMove? A3:A6];
-	bitMap seventhRankMask = RANKMASK[!s.nextMove? A7:A2];
-	bitMap pawns =  pos.Us[Position::Pawns]&~seventhRankMask;
-	bitMap promotionPawns =  pos.Us[Position::Pawns] &seventhRankMask;
+	const tSquare kingSquare = pos.pieceList[Position::whiteKing+s.nextMove][0];
+	assert(kingSquare<squareNumber);
 
+	// populate the target squares bitmaps
 	bitMap kingTarget;
 	bitMap target;
-	if(type==Movegen::allEvasionMg){
+	if(type==Movegen::allEvasionMg)
+	{
 		assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNumber);
 		assert(s.checkers);
-		target=(s.checkers | SQUARES_BETWEEN[pos.pieceList[Position::whiteKing+s.nextMove][0]][firstOne(s.checkers)]) &~ pos.Us[Position::Pieces];
-		kingTarget= ~ pos.Us[Position::Pieces];
-	}else if(type== Movegen::allNonEvasionMg){
-		target= ~ pos.Us[Position::Pieces];
-		kingTarget= ~ pos.Us[Position::Pieces];
-	}else if(type== Movegen::captureMg){
-		target= pos.Them[Position::Pieces];
-		kingTarget = pos.Them[Position::Pieces];
-	}else if(type== Movegen::quietMg){
-		target= ~pos.bitBoard[Position::occupiedSquares];
-		kingTarget= ~ pos.bitBoard[Position::occupiedSquares];
-	}else if(type== Movegen::quietChecksMg){
-		target= ~pos.bitBoard[Position::occupiedSquares];
-		kingTarget= ~ pos.bitBoard[Position::occupiedSquares];
+		target = ( s.checkers | SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.Us[Position::Pieces];
+		kingTarget = ~pos.Us[Position::Pieces];
 	}
-	bitMap enemy = pos.Them[Position::Pieces];
-	const bitMap & occupiedSquares = pos.bitBoard[Position::occupiedSquares];
+	else if(type== Movegen::allNonEvasionMg)
+	{
+		target= ~pos.Us[Position::Pieces];
+		kingTarget= ~pos.Us[Position::Pieces];
+	}
+	else if(type== Movegen::captureMg)
+	{
+		target = pos.Them[Position::Pieces];
+		kingTarget = pos.Them[Position::Pieces];
+	}
+	else if(type== Movegen::quietMg)
+	{
+		target = ~pos.bitBoard[Position::occupiedSquares];
+		kingTarget = ~pos.bitBoard[Position::occupiedSquares];
+	}
+	else if(type== Movegen::quietChecksMg)
+	{
+		target = ~pos.bitBoard[Position::occupiedSquares];
+		kingTarget = ~pos.bitBoard[Position::occupiedSquares];
+	}
+
 
 	bitMap moves;
 	Move m(NOMOVE);
-
 	//------------------------------------------------------
 	// king
 	//------------------------------------------------------
+	Position::bitboardIndex piece = (Position::bitboardIndex)( s.nextMove + Position::whiteKing );
+	assert(pos.isKing(piece));
+	assert(piece<Position::lastBitboard);
+
 	{
-		tSquare from=pos.pieceList[piece][0];
-		assert(from<squareNumber);
-		m.bit.from=from;
-		moves= attackFromKing(from)& kingTarget;
-		while (moves)
+		m.bit.from = kingSquare;
+
+		moves = attackFromKing(kingSquare) & kingTarget;
+
+		while(moves)
 		{
-			m.bit.to=firstOne(moves);
-			if(!(pos.getAttackersTo((tSquare)m.bit.to , pos.bitBoard[Position::occupiedSquares] & ~pos.Us[Position::King]) & pos.Them[Position::Pieces]))
+			tSquare to = iterateBit(moves);
+			m.bit.to = to;
+
+			if( !(pos.getAttackersTo(to, pos.bitBoard[Position::occupiedSquares] & ~pos.Us[Position::King]) & enemy) )
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+					insertMove(m);
 				}
 			}
-			moves &= moves-1;
 		}
 	}
 	// if the king is in check from 2 enemy, it can only run away, we sohld not search any other move
-	if(type==Movegen::allEvasionMg)
+	if(type == Movegen::allEvasionMg && moreThanOneBit(s.checkers))
 	{
-		if(moreThanOneBit(s.checkers))
-		{
-			return;
-		}
+		return;
 	}
 
 
-	piece= (Position::bitboardIndex)(piece+1);
 	//------------------------------------------------------
 	// queen
 	//------------------------------------------------------
-	for(unsigned int i=0;i<pos.pieceCount[piece];i++){
-		tSquare from=pos.pieceList[piece][i];
-		assert(from<squareNumber);
-		m.bit.from=from;
-		moves= attackFromRook(from,occupiedSquares);
-		moves |= attackFromBishop(from,occupiedSquares);
-		moves &=target;
-		while (moves){
+	piece = (Position::bitboardIndex)( piece+1 );
 
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNumber);
-			m.bit.to=firstOne(moves);
-			if(!(s.pinnedPieces & bitSet(from)) ||
-					squaresAligned(from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+	for(unsigned int i = 0; i < pos.pieceCount[piece]; i++)
+	{
+
+		tSquare from = pos.pieceList[piece][i];
+		assert(from < squareNumber);
+		m.bit.from = from;
+
+		moves = attackFromRook(from,occupiedSquares);
+		moves |= attackFromBishop(from,occupiedSquares);
+		moves &= target;
+
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+
+			m.bit.to = to;
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from, to, kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				{
+					insertMove(m);
 				}
 			}
-			moves &= moves-1;
-
 		}
 	}
 
-
-	piece= (Position::bitboardIndex)(piece+1);
 	//------------------------------------------------------
 	// rook
 	//------------------------------------------------------
-	for(unsigned int i=0;i<pos.pieceCount[piece];i++){
-		tSquare from=pos.pieceList[piece][i];
-		m.bit.from=from;
-		assert(from<squareNumber);
-		moves= attackFromRook(from,occupiedSquares);
+	piece= (Position::bitboardIndex)(piece+1);
+
+	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
+	{
+		tSquare from = pos.pieceList[piece][i];
+		assert(from < squareNumber);
+		m.bit.from = from;
+
+		moves = attackFromRook(from,occupiedSquares);
 		moves &=target;
-		while (moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNumber);
-			m.bit.to=firstOne(moves);
-			if(!(s.pinnedPieces & bitSet(from)) ||
-					squaresAligned(from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+			m.bit.to = to;
+
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from, to, kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				{
+					insertMove(m);
 				}
 			}
-
-			moves &= moves-1;
 		}
-
 	}
 
-
-	piece= (Position::bitboardIndex)(piece+1);
 	//------------------------------------------------------
 	// bishop
 	//------------------------------------------------------
-	for(unsigned int i=0;i<pos.pieceCount[piece];i++){
-		tSquare from=pos.pieceList[piece][i];
-		assert(from<squareNumber);
-		m.bit.from=from;
-		moves= attackFromBishop(from,occupiedSquares);
-		moves &=target;
-		while (moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNumber);
-			m.bit.to=firstOne(moves);
-			if(!(s.pinnedPieces & bitSet(from)) ||
-				squaresAligned(from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+	piece = (Position::bitboardIndex)(piece+1);
+
+	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
+	{
+		tSquare from = pos.pieceList[piece][i];
+		assert(from < squareNumber);
+		m.bit.from = from;
+
+		moves = attackFromBishop(from,occupiedSquares);
+		moves &= target;
+
+		while (moves)
+		{
+			tSquare to = iterateBit(moves);
+			m.bit.to = to;
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from,to,kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				{
+					insertMove(m);
 				}
 			}
-			moves &= moves-1;
 		}
 	}
 
 
 
-	piece= (Position::bitboardIndex)(piece+1);
+
 	//------------------------------------------------------
 	// knight
 	//------------------------------------------------------
-	for(unsigned int i=0;i<pos.pieceCount[piece];i++){
-		tSquare from=pos.pieceList[piece][i];
-		assert(from<squareNumber);
-		m.bit.from=from;
-		if(!(s.pinnedPieces & bitSet(from))){
-			moves = attackFromKnight(from)& target;
-			while (moves){
-				m.bit.to=firstOne(moves);
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
-				}
-				moves &= moves-1;
+	piece = (Position::bitboardIndex)(piece+1);
 
+	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
+	{
+		tSquare from = pos.pieceList[piece][i];
+		assert(from<squareNumber);
+		m.bit.from = from;
+
+		if(!(s.pinnedPieces & bitSet(from)))
+		{
+			moves = attackFromKnight(from) & target;
+			while (moves)
+			{
+				m.bit.to=iterateBit(moves);
+
+				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				{
+					insertMove(m);
+				}
 			}
 		}
 	}
 
-
-
-	piece= (Position::bitboardIndex)(piece+1);
 	//------------------------------------------------------
 	// Pawns
 	//------------------------------------------------------
-
-	if(type!= Movegen::captureMg){
+	piece = (Position::bitboardIndex)(piece+1);
+	if(type != Movegen::captureMg)
+	{
 		bitMap pawnPushed;
 		//push
-		moves=(s.nextMove? (pawns>>8):(pawns<<8))&~occupiedSquares;
-		pawnPushed=moves;
-		moves &=target;
-		while(moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-			m.bit.to=firstOne(moves);
-			m.bit.from=m.bit.to-pawnPush(s.nextMove);
-			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
-				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+		moves = (s.nextMove? (nonPromotionPawns>>8):(nonPromotionPawns<<8)) & ~occupiedSquares;
+		pawnPushed = moves;
+		moves &= target;
+
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+			tSquare from = to - pawnPush(s.nextMove);
+
+			m.bit.to= to;
+			m.bit.from = from;
+
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from,to,kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				{
+					insertMove(m);
 				}
 			}
-			moves &= moves-1;
 		}
+
 		//double push
-		moves=(s.nextMove? ((pawnPushed&thirdRankMask)>>8):((pawnPushed&thirdRankMask)<<8))&~occupiedSquares& target;
-		while(moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-			m.bit.to=firstOne(moves);
-			m.bit.from=m.bit.to-2*pawnPush(s.nextMove);
-			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
-				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+		moves = (s.nextMove? ((pawnPushed & thirdRankMask)>>8):((pawnPushed & thirdRankMask)<<8)) & ~occupiedSquares & target;
+
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+			tSquare from = to - 2*pawnPush(s.nextMove);
+
+			m.bit.to = to;
+			m.bit.from = from;
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from ,to ,kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				{
+					insertMove(m);
 				}
 			}
-			moves &= moves-1;
 		}
 	}
 
 	int delta;
-	if(type!= Movegen::quietMg && type!=Movegen::quietChecksMg){
+
+	if(type!= Movegen::quietMg && type!=Movegen::quietChecksMg)
+	{
 		//left capture
-		delta=s.nextMove?-9:7;
-		moves = (s.nextMove?(pawns&(~FILEMASK[A1]))>>9:(pawns&(~FILEMASK[A1]))<<7)&enemy& target;
-		while(moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-			m.bit.to=firstOne(moves);
-			m.bit.from=m.bit.to-delta;
-			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
-				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+		delta = s.nextMove?-9:7;
+
+		moves = (s.nextMove?(nonPromotionPawns&(~FILEMASK[A1]))>>9:(nonPromotionPawns&(~FILEMASK[A1]))<<7) & enemy & target;
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+			tSquare from = (tSquare)(to - delta);
+
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from,to,kingSquare))
 			{
-				assert(moveListSize<MAX_MOVE_PER_POSITION);
-				moveList[moveListSize++].m=m;
+				m.bit.to = to;
+				m.bit.from = from;
+				insertMove(m);
 			}
-			moves &= moves-1;
 		}
 
 		//right capture
 		delta=s.nextMove?-7:9;
-		moves = (s.nextMove?(pawns&(~FILEMASK[H1]))>>7:(pawns&(~FILEMASK[H1]))<<9)&enemy& target;
-		while(moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-			m.bit.to=firstOne(moves);
-			m.bit.from=m.bit.to-delta;
-			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
-				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+
+		moves = (s.nextMove?(nonPromotionPawns&(~FILEMASK[H1]))>>7:(nonPromotionPawns&(~FILEMASK[H1]))<<9) & enemy & target;
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+			tSquare from = (tSquare)(to -delta);
+
+
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from,to,kingSquare))
 			{
-				assert(moveListSize<MAX_MOVE_PER_POSITION);
-				moveList[moveListSize++].m=m;
+				m.bit.to = to;
+				m.bit.from = from;
+				insertMove(m);
 			}
-			moves &= moves-1;
 		}
 	}
 
 	// PROMOTIONS
-	m.bit.flags=Move::fpromotion;
-	if(type!= Movegen::captureMg){
-		moves=(s.nextMove? (promotionPawns>>8):(promotionPawns<<8))&~occupiedSquares;
+	m.bit.flags = Move::fpromotion;
+	if(type != Movegen::captureMg)
+	{
+		moves = (s.nextMove? (promotionPawns>>8):(promotionPawns<<8))& ~occupiedSquares & target;
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+			tSquare from = to - pawnPush(s.nextMove);
 
-		moves &=target;
-		while(moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-			m.bit.to=firstOne(moves);
-			m.bit.from=m.bit.to-pawnPush(s.nextMove);
+			m.bit.to = to;
+			m.bit.from = from;
 
-			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
-				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+			if(!(s.pinnedPieces & bitSet(from)) ||	squaresAligned(from,to,kingSquare))
 			{
-				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
-					m.bit.promotion=prom;
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
-
+				for(Move::epromotion prom=Move::promQueen; prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
+				{
+					m.bit.promotion = prom;
+					insertMove(m);
 				}
 			}
-			moves &= moves-1;
 		}
 	}
 
 	int color = s.nextMove?1:0;
-	if(type!= Movegen::quietMg && type!= Movegen::quietChecksMg){
+
+	if( type!= Movegen::quietMg && type!= Movegen::quietChecksMg)
+	{
 		//left capture
-		delta=s.nextMove?-9:7;
-		moves = (s.nextMove?(promotionPawns&(~FILEMASK[A1]))>>9:(promotionPawns&(~FILEMASK[A1]))<<7)&enemy& target;
-		while(moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-			m.bit.to=firstOne(moves);
-			m.bit.from=m.bit.to-delta;
-			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
-				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+		delta = s.nextMove?-9:7;
+		moves = (s.nextMove?(promotionPawns&(~FILEMASK[A1]))>>9:(promotionPawns&(~FILEMASK[A1]))<<7) & enemy & target;
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+			tSquare from = (tSquare)(to -delta);
+
+			m.bit.to=to;
+			m.bit.from=from;
+
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from,to,kingSquare))
 			{
-				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
-					m.bit.promotion=prom;
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
+				{
+					m.bit.promotion = prom;
+					insertMove(m);
 				}
 			}
-			moves &= moves-1;
 		}
 
 		//right capture
 		delta=s.nextMove?-7:9;
-		moves = (s.nextMove?(promotionPawns&(~FILEMASK[H1]))>>7:(promotionPawns&(~FILEMASK[H1]))<<9)&enemy& target;
-		while(moves){
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-			m.bit.to=firstOne(moves);
-			m.bit.from=m.bit.to-delta;
-			if(!(s.pinnedPieces & bitSet((tSquare)m.bit.from)) ||
-				squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pos.pieceList[Position::whiteKing+s.nextMove][0]))
+		moves = (s.nextMove?(promotionPawns&(~FILEMASK[H1]))>>7:(promotionPawns&(~FILEMASK[H1]))<<9) & enemy & target;
+		while(moves)
+		{
+
+			tSquare to = iterateBit(moves);
+			tSquare from = (tSquare)(to -delta);
+
+			m.bit.to=to;
+			m.bit.from=from;
+
+			if(!(s.pinnedPieces & bitSet(from)) || squaresAligned(from,to,kingSquare))
 			{
-				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1)){
-					m.bit.promotion=prom;
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
+				{
+					m.bit.promotion = prom;
+					insertMove(m);
 				}
 			}
-			moves &= moves-1;
 		}
-		m.bit.promotion=0;
-		m.bit.flags=Move::fnone;
+
+		m.bit.promotion = 0;
+		m.bit.flags = Move::fnone;
 
 		// ep capture
 
-		if(s.epSquare!=squareNone){
+		if(s.epSquare != squareNone)
+		{
+			m.bit.flags = Move::fenpassant;
+			bitMap epAttacker = nonPromotionPawns & attackFromPawn(s.epSquare,1-color);
 
-			m.bit.flags=Move::fenpassant;
-			assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-			tSquare kingSquare =pos.pieceList[Position::whiteKing+s.nextMove][0];
-			bitMap epAttacker=pawns & attackFromPawn(s.epSquare,1-color);
-			while(epAttacker){
-				tSquare from=firstOne(epAttacker);
+			while(epAttacker)
+			{
+				tSquare from = iterateBit(epAttacker);
+
 				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[from];
-				bitMap occ= occupiedSquares^bitSet(from)^bitSet(s.epSquare)^captureSquare;
+				bitMap occ = occupiedSquares^bitSet(from)^bitSet(s.epSquare)^captureSquare;
 
-				assert(kingSquare<squareNumber);
-				if(	!((attackFromRook(kingSquare, occ) & (pos.Them[Position::Queens] |pos.Them[Position::Rooks]))|
-						(Movegen::attackFromBishop(kingSquare, occ) & (pos.Them[Position::Queens] |pos.Them[Position::Bishops])))
-				){
-					m.bit.to=s.epSquare;
-					m.bit.from=from;
-					assert(moveListSize<MAX_MOVE_PER_POSITION);
-					moveList[moveListSize++].m=m;
+				if(	!((attackFromRook(kingSquare, occ) & (pos.Them[Position::Queens] | pos.Them[Position::Rooks])) |
+						(Movegen::attackFromBishop(kingSquare, occ) & (pos.Them[Position::Queens] | pos.Them[Position::Bishops])))
+				)
+				{
+					m.bit.to = s.epSquare;
+					m.bit.from = from;
+					insertMove(m);
 				}
-				epAttacker &=epAttacker-1;
 			}
 
 		}
@@ -855,52 +893,58 @@ void Movegen::generateMoves()
 
 
 	//king castle
-	if(type !=Movegen::allEvasionMg && type!= Movegen::captureMg){
+	if(type !=Movegen::allEvasionMg && type!= Movegen::captureMg)
+	{
 
-		if(s.castleRights & ((Position::wCastleOO |Position::wCastleOOO)<<(2*color))){
+		if(s.castleRights & ((Position::wCastleOO |Position::wCastleOOO)<<(2*color)))
+		{
 
-			m.bit.flags=Move::fcastle;
+			if((s.castleRights &((Position::wCastleOO)<<(2*color))) &&!s.checkers &&!(castlePath[color][kingSideCastle] & pos.bitBoard[Position::occupiedSquares]))
+			{
 
-			if((s.castleRights &((Position::wCastleOO)<<(2*color))) &&!s.checkers &&!(castlePath[color][kingSideCastle] & pos.bitBoard[Position::occupiedSquares])){
-				assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-				tSquare kingSquare=pos.pieceList[Position::whiteKing+s.nextMove][0];
-				bool castleDenied=false;
-				for( tSquare x=(tSquare)1;x<3;x++){
+				bool castleDenied = false;
+				for( tSquare x = (tSquare)1; x<3; x++)
+				{
 					assert(kingSquare+x<squareNumber);
-					if(pos.getAttackersTo(kingSquare+x,pos.bitBoard[Position::occupiedSquares]) & pos.Them[Position::Pieces]){
-						castleDenied=true;
+					if(pos.getAttackersTo(kingSquare+x,pos.bitBoard[Position::occupiedSquares]) & pos.Them[Position::Pieces])
+					{
+						castleDenied = true;
 						break;
 					}
 				}
-				if(!castleDenied){
-
-					m.bit.from=kingSquare;
-					m.bit.to=kingSquare+2;
-					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-						assert(moveListSize<MAX_MOVE_PER_POSITION);
-						moveList[moveListSize++].m=m;
+				if(!castleDenied)
+				{
+					m.bit.flags = Move::fcastle;
+					m.bit.from = kingSquare;
+					m.bit.to = kingSquare + 2;
+					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+					{
+						insertMove(m);
 					}
 				}
 
 
 			}
-			if((s.castleRights &((Position::wCastleOOO)<<(2*color))) &&!s.checkers && !(castlePath[color][queenSideCastle] & pos.bitBoard[Position::occupiedSquares])){
-				assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNone);
-				tSquare kingSquare=pos.pieceList[Position::whiteKing+s.nextMove][0];
-				bool castleDenied=false;
-				for( tSquare x=(tSquare)1;x<3;x++){
+			if((s.castleRights &((Position::wCastleOOO)<<(2*color))) && !s.checkers && !(castlePath[color][queenSideCastle] & pos.bitBoard[Position::occupiedSquares]))
+			{
+				bool castleDenied = false;
+				for( tSquare x = (tSquare)1 ;x<3 ;x++)
+				{
 					assert(kingSquare-x<squareNumber);
-					if(pos.getAttackersTo(kingSquare-x,pos.bitBoard[Position::occupiedSquares]) & pos.Them[Position::Pieces]){
-						castleDenied=true;
+					if(pos.getAttackersTo(kingSquare-x, pos.bitBoard[Position::occupiedSquares]) & pos.Them[Position::Pieces])
+					{
+						castleDenied = true;
 						break;
 					}
 				}
-				if(!castleDenied){
-					m.bit.from=kingSquare;
-					m.bit.to=kingSquare-2;
-					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m)){
-						assert(moveListSize<MAX_MOVE_PER_POSITION);
-						moveList[moveListSize++].m=m;
+				if(!castleDenied)
+				{
+					m.bit.flags = Move::fcastle;
+					m.bit.from = kingSquare;
+					m.bit.to = kingSquare - 2;
+					if(type != Movegen::quietChecksMg || pos.moveGivesCheck(m))
+					{
+						insertMove(m);
 					}
 				}
 			}
@@ -937,7 +981,7 @@ unsigned int Movegen::getNumberOfLegalMoves()
 	return getGeneratedMoveNumber();
 }
 
-bool Movegen::isMoveLegal(Move &m){
+bool Movegen::isMoveLegal(Move &m)const {
 
 	if(m.packed==0){
 		return false;

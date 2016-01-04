@@ -1288,11 +1288,10 @@ bitMap Position::getHiddenCheckers(tSquare kingSquare,eNextMove next){
 	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteRooks+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
 
 	while(pinners){
-		bitMap b = SQUARES_BETWEEN[kingSquare][firstOne(pinners)] & bitBoard[occupiedSquares];
+		bitMap b = SQUARES_BETWEEN[kingSquare][iterateBit(pinners)] & bitBoard[occupiedSquares];
 		if (!moreThanOneBit(b)){
 			result |= b & bitBoard[(bitboardIndex)(whitePieces+getActualState().nextMove)];
 		}
-		pinners&= pinners-1;
 	}
 	return result;
 

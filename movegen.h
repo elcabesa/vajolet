@@ -102,21 +102,28 @@ private:
 
 	template<Movegen::genType type>	void generateMoves();
 
+	void insertMove(const Move& m)
+	{
+		assert(moveListSize<MAX_MOVE_PER_POSITION);
+		moveList[moveListSize++].m=m;
+	}
+
 
 public:
 	const static Move NOMOVE;
 	unsigned int getNumberOfLegalMoves();
-	inline unsigned int getGeneratedMoveNumber(void){ return moveListSize;}
+	inline unsigned int getGeneratedMoveNumber(void)const { return moveListSize;}
 
-	bool isKillerMove(Move &m)
+	bool isKillerMove(Move &m) const
 	{
 		return m == killerMoves[0] || m == killerMoves[1];
 	}
 
-	bool isMoveLegal(Move &m);
+	bool isMoveLegal(Move &m) const;
+
+
 
 	Move getNextMove(void);
-
 
 
 
@@ -137,7 +144,7 @@ public:
 		badCaptureSize = 0;
 		badCapturePosition = 0;
 		killerPos = 0;
-		captureThreshold = 0;
+		//captureThreshold = 0;
 	}
 
 	Movegen(const Position & p): Movegen(p,History(), Move(NOMOVE)){}

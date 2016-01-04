@@ -79,7 +79,7 @@ void static printUciInfo(void){
 Move moveFromUci(Position& pos, std::string& str) {
 
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
-	Move m(0);
+	Move m;
 	Movegen mg(pos);
 	while( (m=mg.getNextMove()).packed){
 		if(str==pos.displayUci(m)){

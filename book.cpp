@@ -322,8 +322,8 @@ U64 polyglotKey(const Position& pos) {
 
 	while (b)
 	{
-		unsigned int s=firstOne(b);
-		b &= b-1;
+
+		unsigned int s=iterateBit(b);
 		Position::bitboardIndex p=pos.squares[s];
 
 		// PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
@@ -333,8 +333,7 @@ U64 polyglotKey(const Position& pos) {
 	b = pos.getActualState().castleRights;
 
 	while(b){
-		k ^= PG.Zobrist.castle[firstOne(b)];
-		b &= b-1;
+		k ^= PG.Zobrist.castle[iterateBit(b)];
 	}
 	if (pos.getActualState().epSquare != squareNone){
 		k ^= PG.Zobrist.enpassant[FILES[pos.getActualState().epSquare]];
@@ -485,9 +484,9 @@ Move PolyglotBook::probe(const Position& pos, const std::string& fName, bool pic
 	}
 
 
-	Move mm(0);
+	Move mm;
 	Movegen mg(pos);
-	while((mm=mg.getNextMove()).packed){
+	while((mm = mg.getNextMove()).packed){
 		if(m.bit.from==mm.bit.from && m.bit.to==mm.bit.to)
 		{
 			if(m.bit.flags!=Move::fpromotion)

@@ -113,7 +113,7 @@ Score search::startThinking(searchLimits & l){
 	if(limits.searchMoves.size()==0){
 		Move m(Movegen::NOMOVE);
 		Movegen mg(pos,history,m);
-		while ((m=mg.getNextMove()).packed){
+		while ((m=mg.getNextMove())!= Movegen::NOMOVE){
 			rootMove rm;
 			rm.previousScore=-SCORE_INFINITE;
 			rm.score=-SCORE_INFINITE;
@@ -167,7 +167,7 @@ Score search::startThinking(searchLimits & l){
 	Move lastLegalMove;
 	unsigned int legalMoves=0;
 
-	while((m=mg.getNextMove()).packed){
+	while((m=mg.getNextMove())!=Movegen::NOMOVE){
 		legalMoves++;
 		lastLegalMove=m;
 	}
@@ -816,7 +816,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 		Move m;
 		std::list<Move> childPV;
-		while((m=mg.getNextMove()).packed){
+		while((m=mg.getNextMove())!=Movegen::NOMOVE){
 			pos.doMove(m);
 			assert(rDepth>=ONE_PLY);
 			s=-alphaBeta<childNodesType>(ply+1,rDepth,-rBeta,-rBeta+1,childPV);
@@ -876,7 +876,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		&&  tte->getDepth()>= depth - 3 * ONE_PLY;
 
 	//sync_cout<<"iterating moves"<<sync_endl;
-	while (bestScore <beta  && (m=mg.getNextMove()).packed) {
+	while (bestScore <beta  && (m=mg.getNextMove())!=Movegen::NOMOVE) {
 
 		/*if(verbose){
 			sync_cout<<"move "<<pos.displayUci(m)<<sync_endl;
@@ -1385,7 +1385,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	//bestMove=0;
 	std::list<Move> childPV;
 
-	while (bestScore <beta  &&  (m=mg.getNextMove()).packed) {
+	while (bestScore <beta  &&  (m=mg.getNextMove())!=Movegen::NOMOVE) {
 		assert(alpha<beta);
 		assert(beta<=SCORE_INFINITE);
 		assert(alpha>=-SCORE_INFINITE);

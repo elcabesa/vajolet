@@ -559,7 +559,7 @@ bool evalOppositeBishopEndgame(const Position& p, Score& res){
 		{
 			pawnCount ++;
 			pawnDifference++;
-			tSquare pawn =firstOne(pawns);
+			tSquare pawn =iterateBit(pawns);
 			if( !(PASSED_PAWN[0][pawn] & p.bitBoard[Position::blackPawns]))
 			{
 				if(!(Movegen::getBishopPseudoAttack(p.pieceList[Position::blackBishops][0]) & SQUARES_IN_FRONT_OF[0][pawn] ))
@@ -568,8 +568,6 @@ bool evalOppositeBishopEndgame(const Position& p, Score& res){
 					freePawn++;
 				}
 			}
-
-			pawns &= pawns -1;
 		}
 
 		pawns= p.bitBoard[Position::blackPawns];
@@ -578,7 +576,7 @@ bool evalOppositeBishopEndgame(const Position& p, Score& res){
 			pawnCount ++;
 			pawnDifference--;
 
-			tSquare pawn =firstOne(pawns);
+			tSquare pawn =iterateBit(pawns);
 			if(!( PASSED_PAWN[1][pawn] & p.bitBoard[Position::whitePawns]))
 			{
 				if(!(Movegen::getBishopPseudoAttack(p.pieceList[Position::whiteBishops][0]) & SQUARES_IN_FRONT_OF[1][pawn] ))
@@ -587,8 +585,6 @@ bool evalOppositeBishopEndgame(const Position& p, Score& res){
 					res = 256;
 				}
 			}
-
-			pawns &= pawns -1;
 		}
 
 		if(freePawn==0 && std::abs(pawnDifference)<=1  )
@@ -1325,8 +1321,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 	(void)theirPawns;
 
 	while(tempPieces){
-		tSquare sq=firstOne(tempPieces);
-		tempPieces&= tempPieces-1;
+		tSquare sq=iterateBit(tempPieces);
 		unsigned int relativeRank =(piece>Position::separationBitmap)? 7-RANKS[sq]:RANKS[sq];
 
 		//---------------------------
@@ -1563,9 +1558,8 @@ Score evalShieldStorm(const Position &pos, tSquare ksq){
 		ks+=bitCnt(pawnFarShield)*kingFarShieldBonus[0];
 	}
 	while(pawnStorm){
-		tSquare p=firstOne(pawnStorm);
+		tSquare p=iterateBit(pawnStorm);
 		ks-=(8-SQUARE_DISTANCE[p][ksq])*kingStormBonus[0];
-		pawnStorm&= pawnStorm-1;
 	}
 	return ks;
 }
@@ -1774,17 +1768,15 @@ Score Position::eval(void) {
 		bitMap pawns= bitBoard[whitePawns];
 
 		while(pawns){
-			tSquare sq=firstOne(pawns);
+			tSquare sq=iterateBit(pawns);
 			pawnResult+=evalPawn<white>(*this,sq, weakPawns, passedPawns);
-			pawns &= pawns-1;
 		}
 
 		pawns= bitBoard[blackPawns];
 
 		while(pawns){
-			tSquare sq=firstOne(pawns);
+			tSquare sq=iterateBit(pawns);
 			pawnResult-=evalPawn<black>(*this,sq, weakPawns, passedPawns);
-			pawns &= pawns-1;
 		}
 
 
@@ -1964,9 +1956,7 @@ Score Position::eval(void) {
 	wScore=0;
 	while(pp){
 		simdScore passedPawnsBonus;
-		tSquare ppSq=firstOne(pp);
-
-		pp &= pp-1;
+		tSquare ppSq=iterateBit(pp);
 
 		unsigned int relativeRank=RANKS[ppSq];
 
@@ -2041,8 +2031,7 @@ Score Position::eval(void) {
 	bScore=0;
 	while(pp){
 		simdScore passedPawnsBonus;
-		tSquare ppSq=firstOne(pp);
-		pp &= pp-1;
+		tSquare ppSq=iterateBit(pp);
 
 		unsigned int relativeRank=7-RANKS[ppSq];
 
@@ -2180,9 +2169,8 @@ Score Position::eval(void) {
 	bScore=0;
 	bitMap pawnAttackedPieces=bitBoard[whitePieces] & attackedSquares[blackPawns];
 	while(pawnAttackedPieces){
-		tSquare attacked=firstOne(pawnAttackedPieces);
+		tSquare attacked=iterateBit(pawnAttackedPieces);
 		wScore-=attackedByPawnPenalty[squares[attacked]%separationBitmap];
-		pawnAttackedPieces &=pawnAttackedPieces-1;
 	}
 
 
@@ -2194,7 +2182,7 @@ Score Position::eval(void) {
 		wScore-=undefendedMinorPenalty;
 	}
 	while(weakPieces){
-		tSquare p=firstOne(weakPieces);
+		tSquare p=iterateBit(weakPieces);
 
 		bitboardIndex attackedPiece= squares[p];
 		bitboardIndex attackingPiece=blackPawns;
@@ -2204,7 +2192,6 @@ Score Position::eval(void) {
 				break;
 			}
 		}
-		weakPieces&=weakPieces-1;
 	}
 
 
@@ -2213,9 +2200,8 @@ Score Position::eval(void) {
 
 	pawnAttackedPieces=bitBoard[blackPieces] & attackedSquares[whitePawns];
 	while(pawnAttackedPieces){
-		tSquare attacked=firstOne(pawnAttackedPieces);
+		tSquare attacked=iterateBit(pawnAttackedPieces);
 		bScore-=attackedByPawnPenalty[squares[attacked]%separationBitmap];
-		pawnAttackedPieces &=pawnAttackedPieces-1;
 	}
 	weakPieces=bitBoard[blackPieces] & attackedSquares[whitePieces] &~attackedSquares[blackPawns];
 	undefendedMinors =  (bitBoard[blackKnights] | bitBoard[blackBishops])  & ~attackedSquares[blackPieces];
@@ -2223,7 +2209,7 @@ Score Position::eval(void) {
 		bScore-=undefendedMinorPenalty;
 	}
 	while(weakPieces){
-		tSquare p=firstOne(weakPieces);
+		tSquare p=iterateBit(weakPieces);
 		bitboardIndex attackedPiece= squares[p];
 		bitboardIndex attackingPiece=whitePawns;
 		for(;attackingPiece>=occupiedSquares;attackingPiece=(bitboardIndex)(attackingPiece-1)){
@@ -2232,7 +2218,6 @@ Score Position::eval(void) {
 				break;
 			}
 		}
-		weakPieces&=weakPieces-1;
 	}
 
 	// trapped pieces

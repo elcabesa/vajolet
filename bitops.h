@@ -73,13 +73,28 @@ static inline tSquare firstOne(bitMap bitmap)
 #endif
 }
 
+static inline tSquare iterateBit(bitMap & b)
+{
+	assert(b);
+#if __x86_64__
+	const tSquare t = (tSquare)__builtin_ctzll(b);
+#else
+
+
+	const tSquare t =  ((unsigned long)b)?((tSquare)__builtin_ctzl((unsigned long) b)):((tSquare)__builtin_ctzl(b>>32))+(tSquare)32;
+#endif
+	b &= ( b - 1 );
+	return t;
+
+}
+
 
 /*	\brief return true if the bitmap has more than one bit set
 	\author Marco Belli
 	\version 1.0
 	\date 08/11/2013
 */
-inline bool moreThanOneBit(bitMap b) {
+inline bool moreThanOneBit(const bitMap b) {
   return b & (b - 1);
 }
 
