@@ -212,7 +212,8 @@ public:
 		assert(piece!=Position::blackPieces);
 		assert(piece!=Position::separationBitmap);
 		assert(from<squareNumber);
-		switch(piece){
+		switch(piece)
+		{
 		case Position::whiteKing:
 		case Position::blackKing:
 			return attackFromKing(from);
@@ -220,7 +221,7 @@ public:
 		case Position::whiteQueens:
 		case Position::blackQueens:
 			assert(from<squareNumber);
-			return attackFromRook(from,occupancy) | attackFromBishop(from,occupancy);
+			return attackFromQueen(from,occupancy);
 			break;
 		case Position::whiteRooks:
 		case Position::blackRooks:
@@ -264,6 +265,10 @@ public:
 		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
 		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
 		return res;
+	}
+	inline static bitMap attackFromQueen(tSquare from,const bitMap & occupancy)
+	{
+		return attackFromRook(from,occupancy) | attackFromBishop(from,occupancy);
 	}
 
 	inline static bitMap& attackFromKnight(const tSquare& from)

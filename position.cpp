@@ -1360,7 +1360,7 @@ bool Position::moveGivesCheck(const Move& m)const {
 	case Move::fpromotion:{
 		bitMap occ= bitBoard[occupiedSquares] ^ bitSet(from);
 		assert((bitboardIndex)(whiteQueens+s.nextMove+m.bit.promotion)<lastBitboard);
-		return Movegen::attackFrom((bitboardIndex)(whiteQueens+s.nextMove+m.bit.promotion), to, occ) & bitSet(kingSquare);
+		return Movegen::attackFrom((bitboardIndex)(whiteQueens+m.bit.promotion), to, occ) & bitSet(kingSquare);
 
 	}
 		break;
