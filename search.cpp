@@ -1410,12 +1410,12 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 			&& !inCheck
 			&& m != ttMove
 			&& m.bit.flags != Move::fpromotion
-			//&& !pos.moveGivesCheck(m)
+			&& !pos.moveGivesCheck(m)
 			)
 		{
 			if(
-					!pos.moveGivesCheck(m)
-					&& !pos.isPassedPawnMove(m)
+					//!pos.moveGivesCheck(m)
+					/*&& */!pos.isPassedPawnMove(m)
 					&& abs(staticEval)<SCORE_KNOWN_WIN
 			)
 			{
