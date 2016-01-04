@@ -1406,46 +1406,47 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		//----------------------------
 		//	futility pruning (delta pruning)
 		//----------------------------
-		if(!PVnode &&
-			!inCheck &&
-			!pos.moveGivesCheck(m) &&
-			m != ttMove &&
-			m.bit.flags != Move::fpromotion &&
-			!pos.isPassedPawnMove(m) &&
-			abs(staticEval)<SCORE_KNOWN_WIN
-		){
-			Score futilityValue=futilityBase
-                    + Position::pieceValue[pos.squares[m.bit.to]%Position::separationBitmap][1]
-                    + (m.bit.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
-
-			if (futilityValue < beta)
+		if(	!PVnode
+			&& !inCheck
+			&& m != ttMove
+			&& m.bit.flags != Move::fpromotion
+			&& !pos.moveGivesCheck(m)
+			)
+		{
+			if(	!pos.isPassedPawnMove(m)
+					&& abs(staticEval)<SCORE_KNOWN_WIN
+			)
 			{
+				Score futilityValue = futilityBase
+						+ Position::pieceValue[pos.squares[m.bit.to]%Position::separationBitmap][1]
+						+ (m.bit.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
 
-				bestScore = std::max(bestScore, futilityValue);
+				if (futilityValue < beta)
+				{
+					bestScore = std::max(bestScore, futilityValue);
+					continue;
+				}
+				if (futilityBase < beta && pos.seeSign(m)<=0)
+				{
+					bestScore = std::max(bestScore, futilityBase);
+					continue;
+				}
+
+			}
+
+
+			//----------------------------
+			//	don't check moves with negative see
+			//----------------------------
+
+			// TODO controllare se conviene fare o non fare la condizione type != search::nodeType::PV_NODE
+			// TODO testare se aggiungere o no !movegivesCheck() &&
+			if(
+					//!pos.moveGivesCheck(m) && -50ELO
+					pos.seeSign(m)<0)
+			{
 				continue;
 			}
-			if (futilityBase < beta && pos.seeSign(m)<=0)
-			{
-				bestScore = std::max(bestScore, futilityBase);
-				continue;
-			}
-
-		}
-
-
-		//----------------------------
-		//	don't check moves with negative see
-		//----------------------------
-
-		// TODO controllare se conviene fare o non fare la condizione type != search::nodeType::PV_NODE
-		// TODO testare se aggiungere o no !movegivesCheck() &&
-		if(!PVnode &&
-				!inCheck &&
-				m.bit.flags != Move::fpromotion &&
-				m != ttMove &&
-				//!pos.moveGivesCheck(m) && -50ELO
-				pos.seeSign(m)<0){
-			continue;
 		}
 
 		pos.doMove(m);
