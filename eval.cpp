@@ -1338,23 +1338,25 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		switch(piece){
 
 			case Position::whiteRooks:
-				attack = Movegen::attackFrom(piece,sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::whiteRooks]^p.bitBoard[Position::whiteQueens]);
+				attack = Movegen::attackFromRook(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::whiteRooks]^p.bitBoard[Position::whiteQueens]);
 				break;
 			case Position::blackRooks:
-				attack = Movegen::attackFrom(piece,sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::blackRooks]^p.bitBoard[Position::blackQueens]);
+				attack = Movegen::attackFromRook(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::blackRooks]^p.bitBoard[Position::blackQueens]);
 				break;
 			case Position::whiteBishops:
-				attack = Movegen::attackFrom(piece,sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::whiteQueens]);
+				attack = Movegen::attackFromBishop(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::whiteQueens]);
 				break;
 			case Position::blackBishops:
-				attack = Movegen::attackFrom(piece,sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::blackQueens]);
+				attack = Movegen::attackFromBishop(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::blackQueens]);
 				break;
 			case Position::whiteQueens:
 			case Position::blackQueens:
+				attack = Movegen::attackFromQueen(sq,p.bitBoard[Position::occupiedSquares]);
+				break;
 			case Position::whiteKnights:
 			case Position::blackKnights:
 
-				attack = Movegen::attackFrom(piece,sq,p.bitBoard[Position::occupiedSquares]);
+				attack = Movegen::attackFromKnight(sq);
 				break;
 			default:
 				break;
