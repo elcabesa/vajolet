@@ -1262,7 +1262,7 @@ inline void Position::calcCheckingSquares(void){
 	if(attackingPieces){
 		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFrom<Position::whitePawns>(kingSquare);
 	}else{
-		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFrom<Position::whitePawns>(kingSquare,1);
+		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFrom<Position::blackPawns>(kingSquare,1);
 	}
 
 	assert(blackPawns-attackingPieces>=0);

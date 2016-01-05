@@ -1932,7 +1932,7 @@ Score Position::eval(void) {
 
 	//sync_cout<<"pieces:"<<res[0]<<":"<<res[1]<<sync_endl;
 	attackedSquares[whiteKing]=Movegen::attackFrom<Position::whiteKing>(pieceList[whiteKing][0]);
-	attackedSquares[blackKing]=Movegen::attackFrom<Position::whiteKing>(pieceList[blackKing][0]);
+	attackedSquares[blackKing]=Movegen::attackFrom<Position::blackKing>(pieceList[blackKing][0]);
 
 	attackedSquares[whitePieces]=attackedSquares[whiteKing]
 								| attackedSquares[whiteKnights]
