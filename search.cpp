@@ -264,7 +264,7 @@ Score search::startThinking(searchLimits & l){
 					//sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
 					for (;it!=end(rootMoves[i].PV);it++)
 					{
-						if(!mg.isMoveLegal(*it))
+						if(!pos.isMoveLegal(*it))
 						{
 							//sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
 							break;
@@ -613,8 +613,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 		if(PVnode)
 		{
-			Movegen mg(pos,history,ttMove);
-			if(ttMove.packed && mg.isMoveLegal(ttMove)){
+			if(ttMove.packed && pos.isMoveLegal(ttMove))
+			{
 				pvLine.clear();
 				pvLine.push_back(ttMove);
 			}
@@ -1296,7 +1296,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	U64 posKey=pos.getActualState().key;
 	ttEntry* tte = TT.probe(posKey);
 	Move ttMove;
-	ttMove=tte ? tte->getPackedMove() : 0;
+	ttMove=tte ? tte->getPackedMove() : Movegen::NOMOVE;
 	Movegen mg(pos,history,ttMove);
 	int TTdepth=mg.setupQuiescentSearch(inCheck,depth);
 	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
@@ -1314,8 +1314,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 
 		if(PVnode)
 		{
-			Movegen mg(pos,history,ttMove);
-			if(ttMove.packed && mg.isMoveLegal(ttMove))
+			if(ttMove.packed && pos.isMoveLegal(ttMove))
 			{
 				pvLine.clear();
 				pvLine.push_back(ttMove);
@@ -1369,9 +1368,20 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		alpha=bestScore;
 		// TODO testare se la riga TTtype=typeExact; ha senso
 		TTtype=typeExact;
-		/*if(bestScore>=beta){
+
+		if(bestScore>=beta)
+		{
+			/*if(	!pos.isCaptureMoveOrPromotion(ttMove) )
+			{
+				pos.saveKillers(ttMove);
+			}
+			if(!signals.stop)
+			{
+				TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+						typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
+			}*/
 			return bestScore;
-		}*/
+		}
 	}
 	// todo trovare un valore buono per il futility
 	Score futilityBase=bestScore+5000;

@@ -1467,3 +1467,264 @@ bool Position::isDraw(bool isPVline) const {
 	}
 	return false;
 }
+
+bool Position::isMoveLegal(const Move &m)const {
+
+	if(m == Movegen::NOMOVE)
+	{
+		return false;
+	}
+
+	const state &s = getActualState();
+	const bitboardIndex piece = squares[m.bit.from];
+	assert(piece<Position::lastBitboard);
+
+	// pezzo inesistente
+	if(piece == empty)
+	{
+		return false;
+	}
+
+	// pezzo del colore sbagliato
+	if(s.nextMove? !isblack(piece) : isblack(piece) )
+	{
+		return false;
+	}
+
+	//casa di destinazione irraggiungibile
+	if(bitSet((tSquare)m.bit.to) & Us[Pieces])
+	{
+		return false;
+	}
+
+	//scacco
+	if(s.checkers)
+	{
+		if( moreThanOneBit(s.checkers))  //scacco doppio posso solo muovere il re
+		{
+			if(!isKing(piece))
+			{
+				return false;
+			}
+		}
+		else // scacco singolo i pezzi che non sono re possono catturare il pezzo attaccante oppure mettersi nel mezzo
+		{
+
+			if( !isKing(piece)
+				&& !(
+					((bitSet((tSquare)(m.bit.to-(m.bit.flags == Move::fenpassant?pawnPush(s.nextMove):0)))) & s.checkers)
+					|| ((bitSet((tSquare)m.bit.to) & SQUARES_BETWEEN[pieceList[Position::whiteKing+s.nextMove][0]][firstOne(s.checkers)]) & ~Us[Pieces])
+				)
+			)
+			{
+				return false;
+			}
+		}
+	}
+	if(((s.pinnedPieces & bitSet((tSquare)m.bit.from)) && !squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pieceList[Position::whiteKing+s.nextMove][0])))
+	{
+		return false;
+	}
+
+
+	// promozione impossibile!!
+	if(m.bit.flags==Move::fpromotion && ((RANKS[m.bit.from]!=(s.nextMove?1:6)) || !(isPawn(piece))))
+	{
+		return false;
+	}
+
+	// mossa mal formata
+	if(m.bit.flags!=Move::fpromotion && m.bit.promotion!=0)
+	{
+		return false;
+	}
+	//arrocco impossibile
+	if(m.bit.flags == Move::fcastle)
+	{
+		if(!isKing(piece) || (FILES[m.bit.from]!=FILES[E1]) || (abs(m.bit.from-m.bit.to)!=2 ) || (RANKS[m.bit.from]!=RANKS[A1] && RANKS[m.bit.from]!=RANKS[A8]))
+		{
+			return false;
+		}
+	}
+
+	//en passant impossibile
+	if(m.bit.flags == Move::fenpassant && (!isPawn(piece) || ((tSquare)m.bit.to) != s.epSquare))
+	{
+		return false;
+	}
+
+	//en passant impossibile
+	if(m.bit.flags != Move::fenpassant && isPawn(piece) && ((tSquare)m.bit.to == s.epSquare))
+	{
+		return false;
+	}
+
+
+
+
+	switch(piece)
+	{
+		case Position::whiteKing:
+		case Position::blackKing:
+		{
+			if(m.bit.flags == Move::fcastle)
+			{
+				int color = s.nextMove?1:0;
+				if(!(s.castleRights &  bitSet((tSquare)(((m.bit.from-m.bit.to)>0)+2*color)))
+					|| (Movegen::getCastlePath(color,(m.bit.from-m.bit.to)>0) & bitBoard[occupiedSquares])
+				)
+				{
+					return false;
+				}
+				if(m.bit.to>m.bit.from)
+				{
+					for(tSquare x=(tSquare)m.bit.from;x<=(tSquare)m.bit.to ;x++){
+						if(getAttackersTo(x,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
+						{
+							return false;
+						}
+					}
+				}else{
+					for(tSquare x=(tSquare)m.bit.to;x<=(tSquare)m.bit.from ;x++)
+					{
+						if(getAttackersTo(x,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
+						{
+							return false;
+						}
+					}
+				}
+			}
+			else{
+				if(!(Movegen::attackFromKing((tSquare)m.bit.from) &bitSet((tSquare)m.bit.to)) || (bitSet((tSquare)m.bit.to)&Us[Pieces]))
+				{
+					return false;
+				}
+				//king moves should not leave king in check
+				if((getAttackersTo((tSquare)m.bit.to,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces]))
+				{
+					return false;
+				}
+			}
+
+
+
+
+
+		}
+			break;
+
+		case Position::whiteRooks:
+		case Position::blackRooks:
+			assert(m.from<squareNumber);
+			if(!(Movegen::getRookPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFromRook((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
+			{
+				return false;
+			}
+			break;
+
+		case Position::whiteQueens:
+		case Position::blackQueens:
+			assert(m.from<squareNumber);
+			if(
+				!(
+					(Movegen::getBishopPseudoAttack((tSquare)m.bit.from) | Movegen::getRookPseudoAttack((tSquare)m.bit.from))
+					& bitSet((tSquare)m.bit.to)
+				)
+				||
+				!(
+					(
+
+						Movegen::attackFromBishop((tSquare)m.bit.from,bitBoard[occupiedSquares])
+						| Movegen::attackFromRook((tSquare)m.bit.from,bitBoard[occupiedSquares])
+					)
+					& bitSet((tSquare)m.bit.to)
+				)
+			)
+			{
+				return false;
+			}
+			break;
+
+		case Position::whiteBishops:
+		case Position::blackBishops:
+			if(!(Movegen::getBishopPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFromBishop((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
+			{
+				return false;
+			}
+			break;
+
+		case Position::whiteKnights:
+		case Position::blackKnights:
+			if(!(Movegen::attackFromKnight((tSquare)m.bit.from)& bitSet((tSquare)m.bit.to)))
+			{
+				return false;
+			}
+
+			break;
+
+		case Position::whitePawns:
+
+			if(
+				// not valid pawn push
+				(m.bit.from+pawnPush(s.nextMove)!= m.bit.to || (bitSet((tSquare)m.bit.to)&bitBoard[occupiedSquares]))
+				// not valid pawn double push
+				&& ((m.bit.from+2*pawnPush(s.nextMove)!= m.bit.to) || (RANKS[m.bit.from]!=1) || ((bitSet((tSquare)m.bit.to) | bitSet((tSquare)(m.bit.to-8)))&bitBoard[occupiedSquares]))
+				// not valid pawn attack
+				&& (!(Movegen::attackFromPawn((tSquare)m.bit.from,s.nextMove!=whiteTurn)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Pieces]|bitSet(s.epSquare))))
+			){
+				return false;
+			}
+			if(RANKS[m.bit.from]==6 && m.bit.flags!=Move::fpromotion){
+				return false;
+
+			}
+			if(m.bit.flags== Move::fenpassant){
+
+				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[m.bit.from];
+				bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
+				tSquare kingSquare=pieceList[Position::whiteKing+s.nextMove][0];
+				assert(kingSquare<squareNumber);
+				if((Movegen::attackFromRook(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Rooks]))|
+							(Movegen::attackFromBishop(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Bishops])))
+				{
+				return false;
+				}
+			}
+
+			break;
+		case Position::blackPawns:
+			if(
+				// not valid pawn push
+				(m.bit.from+pawnPush(s.nextMove)!= m.bit.to || (bitSet((tSquare)m.bit.to)&bitBoard[occupiedSquares]))
+				// not valid pawn double push
+				&& ((m.bit.from+2*pawnPush(s.nextMove)!= m.bit.to) || (RANKS[m.bit.from]!=6) || ((bitSet((tSquare)m.bit.to) | bitSet((tSquare)(m.bit.to+8)))&bitBoard[occupiedSquares]))
+				// not valid pawn attack
+				&& (!(Movegen::attackFromPawn((tSquare)m.bit.from,s.nextMove!=whiteTurn)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Position::Pieces]| bitSet(s.epSquare))))
+			){
+				return false;
+			}
+
+			if(RANKS[m.bit.from]==1 && m.bit.flags!=Move::fpromotion){
+				return false;
+
+			}
+			if(m.bit.flags== Move::fenpassant){
+				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[m.bit.from];
+				bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
+				tSquare kingSquare=pieceList[Position::whiteKing+s.nextMove][0];
+				assert(kingSquare<squareNumber);
+				if((Movegen::attackFromRook(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
+							(Movegen::attackFromBishop(kingSquare, occ) & (Them[Queens] | Them[Bishops])))
+				{
+				return false;
+				}
+			}
+			break;
+		default:
+			return false;
+
+	}
+
+
+	return true;
+}

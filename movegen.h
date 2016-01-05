@@ -112,16 +112,13 @@ private:
 public:
 	const static Move NOMOVE;
 	unsigned int getNumberOfLegalMoves();
+
 	inline unsigned int getGeneratedMoveNumber(void)const { return moveListSize;}
 
 	bool isKillerMove(Move &m) const
 	{
 		return m == killerMoves[0] || m == killerMoves[1];
 	}
-
-	bool isMoveLegal(Move &m) const;
-
-
 
 	Move getNextMove(void);
 
@@ -271,33 +268,37 @@ public:
 		return attackFromRook(from,occupancy) | attackFromBishop(from,occupancy);
 	}
 
-	inline static bitMap& attackFromKnight(const tSquare& from)
+	inline static const bitMap& attackFromKnight(const tSquare& from)
 	{
 		assert(from <squareNumber);
 		return KNIGHT_MOVE[from];
 	}
-	inline static bitMap& attackFromKing(const tSquare& from)
+	inline static const bitMap& attackFromKing(const tSquare& from)
 	{
 		assert(from <squareNumber);
 		return KING_MOVE[from];
 	}
-	inline static bitMap& attackFromPawn(const tSquare& from,const unsigned int& color )
+	inline static const bitMap& attackFromPawn(const tSquare& from,const unsigned int& color )
 	{
 		assert(color <=1);
 		assert(from <squareNumber);
 		return PAWN_ATTACK[color][from];
 	}
 
-	inline static bitMap& getRookPseudoAttack(const tSquare& from)
+	inline static const bitMap& getRookPseudoAttack(const tSquare& from)
 	{
 		assert(from<squareNumber);
 		return ROOK_PSEUDO_ATTACK[from];
 	}
 
-	inline static bitMap& getBishopPseudoAttack(const tSquare& from)
+	inline static const bitMap& getBishopPseudoAttack(const tSquare& from)
 	{
 		assert(from<squareNumber);
 		return BISHOP_PSEUDO_ATTACK[from];
+	}
+	inline static const bitMap& getCastlePath(const int x, const int y)
+	{
+		return castlePath[x][y];
 	}
 
 private:

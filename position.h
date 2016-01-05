@@ -672,6 +672,7 @@ private:
 
 
 public:
+	bool isMoveLegal(const Move &m) const;
 
 	/*! \brief board rapresentation
 		\author Marco Belli
