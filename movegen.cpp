@@ -489,8 +489,8 @@ void Movegen::initMovegenConstant(void){
 
 	for (unsigned int square = 0; square < squareNumber; square++){
 		bitMap x=0;
-		ROOK_PSEUDO_ATTACK[square]=attackFromRook((tSquare)square,x);
-		BISHOP_PSEUDO_ATTACK[square]=attackFromBishop((tSquare)square,x);
+		ROOK_PSEUDO_ATTACK[square] = attackFromRook((tSquare)square,x);
+		BISHOP_PSEUDO_ATTACK[square] = attackFromBishop((tSquare)square,x);
 	}
 }
 

@@ -1338,25 +1338,25 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		switch(piece){
 
 			case Position::whiteRooks:
-				attack = Movegen::attackFromRook(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::whiteRooks]^p.bitBoard[Position::whiteQueens]);
+				attack = Movegen::attackFrom<piece>(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::whiteRooks]^p.bitBoard[Position::whiteQueens]);
 				break;
 			case Position::blackRooks:
-				attack = Movegen::attackFromRook(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::blackRooks]^p.bitBoard[Position::blackQueens]);
+				attack = Movegen::attackFrom<piece>(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::blackRooks]^p.bitBoard[Position::blackQueens]);
 				break;
 			case Position::whiteBishops:
-				attack = Movegen::attackFromBishop(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::whiteQueens]);
+				attack = Movegen::attackFrom<piece>(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::whiteQueens]);
 				break;
 			case Position::blackBishops:
-				attack = Movegen::attackFromBishop(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::blackQueens]);
+				attack = Movegen::attackFrom<piece>(sq,p.bitBoard[Position::occupiedSquares]^p.bitBoard[Position::blackQueens]);
 				break;
 			case Position::whiteQueens:
 			case Position::blackQueens:
-				attack = Movegen::attackFromQueen(sq,p.bitBoard[Position::occupiedSquares]);
+				attack = Movegen::attackFrom<piece>(sq,p.bitBoard[Position::occupiedSquares]);
 				break;
 			case Position::whiteKnights:
 			case Position::blackKnights:
 
-				attack = Movegen::attackFromKnight(sq);
+				attack = Movegen::attackFrom<piece>(sq,p.bitBoard[Position::occupiedSquares]);
 				break;
 			default:
 				break;
@@ -1365,7 +1365,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		if(attack & enemyKingRing){
 			(*pKingAttackersCount)++;
 			(*pkingAttackersWeight)+=KingAttackWeights[piece%Position::separationBitmap];
-			bitMap adjacent=attack& Movegen::attackFromKing(enemyKingSquare);
+			bitMap adjacent=attack& Movegen::attackFrom<Position::whiteKing>(enemyKingSquare);
 			if(adjacent)
 			{
 				(*pkingAdjacentZoneAttacksCount)+=bitCnt(adjacent);
@@ -1542,11 +1542,11 @@ Score evalShieldStorm(const Position &pos, tSquare ksq){
 	const bitMap ourPawns =c?pos.bitBoard[Position::blackPawns]:pos.bitBoard[Position::whitePawns];
 	const bitMap theirPawns =c?pos.bitBoard[Position::whitePawns]:pos.bitBoard[Position::blackPawns];
 	const unsigned int disableRank= c? 0: 7;
-	bitMap localKingRing=Movegen::attackFromKing(ksq);
+	bitMap localKingRing=Movegen::attackFrom<Position::whiteKing>(ksq);
 	bitMap localKingShield=localKingRing;
 	if(RANKS[ksq]!=disableRank)
 	{
-	localKingRing|=Movegen::attackFromKing(ksq+pawnPush(c));
+	localKingRing|=Movegen::attackFrom<Position::whiteKing>(ksq+pawnPush(c));
 	}
 	bitMap localKingFarShield=localKingRing&~(localKingShield);
 
@@ -1601,16 +1601,16 @@ Score Position::eval(void) {
 	unsigned int kingAdjacentZoneAttacksCount[2]={0};
 
 	tSquare k=pieceList[whiteKing][0];
-	kingRing[white]=Movegen::attackFromKing(k);
+	kingRing[white]=Movegen::attackFrom<Position::whiteKing>(k);
 	kingShield[white]=kingRing[white];
-	if(RANKS[k]<7){kingRing[white]|=Movegen::attackFromKing(tSquare(k+8));}
+	if(RANKS[k]<7){kingRing[white]|=Movegen::attackFrom<Position::whiteKing>(tSquare(k+8));}
 	kingFarShield[white]=kingRing[white]&~(kingShield[white]|BITSET[k]);
 
 
 	k=pieceList[blackKing][0];
-	kingRing[black]=Movegen::attackFromKing(k);
+	kingRing[black]=Movegen::attackFrom<Position::whiteKing>(k);
 	kingShield[black]=kingRing[black];
-	if(RANKS[k]>0){kingRing[black]|=Movegen::attackFromKing(tSquare(k-8));}
+	if(RANKS[k]>0){kingRing[black]|=Movegen::attackFrom<Position::whiteKing>(tSquare(k-8));}
 	kingFarShield[black]=kingRing[black]&~(kingShield[black]|BITSET[k]);
 
 
@@ -1931,8 +1931,8 @@ Score Position::eval(void) {
 
 
 	//sync_cout<<"pieces:"<<res[0]<<":"<<res[1]<<sync_endl;
-	attackedSquares[whiteKing]=Movegen::attackFromKing(pieceList[whiteKing][0]);
-	attackedSquares[blackKing]=Movegen::attackFromKing(pieceList[blackKing][0]);
+	attackedSquares[whiteKing]=Movegen::attackFrom<Position::whiteKing>(pieceList[whiteKing][0]);
+	attackedSquares[blackKing]=Movegen::attackFrom<Position::whiteKing>(pieceList[blackKing][0]);
 
 	attackedSquares[whitePieces]=attackedSquares[whiteKing]
 								| attackedSquares[whiteKnights]
@@ -2327,8 +2327,8 @@ Score Position::eval(void) {
 		}
 
 		// long distance check
-		bitMap rMap=Movegen::attackFromRook(pieceList[blackKing][0],bitBoard[occupiedSquares]);
-		bitMap bMap=Movegen::attackFromBishop(pieceList[blackKing][0],bitBoard[occupiedSquares]);
+		bitMap rMap=Movegen::attackFrom<Position::whiteRooks>(pieceList[blackKing][0],bitBoard[occupiedSquares]);
+		bitMap bMap=Movegen::attackFrom<Position::whiteBishops>(pieceList[blackKing][0],bitBoard[occupiedSquares]);
 
 		// vertical check
 		bitMap longDistCheck=rMap & (attackedSquares[whiteRooks]| attackedSquares[whiteQueens]) & ~attackedSquares[blackPieces] & ~bitBoard[whitePieces];
@@ -2343,7 +2343,7 @@ Score Position::eval(void) {
 		}
 
 		///knight check;
-		longDistCheck=Movegen::attackFromKnight(pieceList[blackKing][0]) & (attackedSquares[whiteKnights]) & ~attackedSquares[blackPieces] & ~bitBoard[whitePieces];
+		longDistCheck=Movegen::attackFrom<whiteKnights>(pieceList[blackKing][0]) & (attackedSquares[whiteKnights]) & ~attackedSquares[blackPieces] & ~bitBoard[whitePieces];
 		if(longDistCheck){
 			attackUnits+=bitCnt(longDistCheck);
 		}
@@ -2397,8 +2397,8 @@ Score Position::eval(void) {
 		}
 
 		// long distance check
-		bitMap rMap=Movegen::attackFromRook(pieceList[whiteKing][0],bitBoard[occupiedSquares]);
-		bitMap bMap=Movegen::attackFromBishop(pieceList[whiteKing][0],bitBoard[occupiedSquares]);
+		bitMap rMap=Movegen::attackFrom<Position::whiteRooks>(pieceList[whiteKing][0],bitBoard[occupiedSquares]);
+		bitMap bMap=Movegen::attackFrom<Position::whiteBishops>(pieceList[whiteKing][0],bitBoard[occupiedSquares]);
 
 		// vertical check
 		bitMap longDistCheck=rMap & (attackedSquares[blackRooks]| attackedSquares[blackQueens]) & ~attackedSquares[whitePieces] & ~bitBoard[blackPieces];
@@ -2413,7 +2413,7 @@ Score Position::eval(void) {
 		}
 
 		///knight check;
-		longDistCheck=Movegen::attackFromKnight(pieceList[whiteKing][0]) & (attackedSquares[blackKnights]) & ~attackedSquares[whitePieces] & ~bitBoard[blackPieces];
+		longDistCheck=Movegen::attackFrom<Position::whiteKnights>(pieceList[whiteKing][0]) & (attackedSquares[blackKnights]) & ~attackedSquares[whitePieces] & ~bitBoard[blackPieces];
 		if(longDistCheck){
 			attackUnits+=bitCnt(longDistCheck);
 		}

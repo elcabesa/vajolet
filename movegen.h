@@ -200,7 +200,7 @@ public:
 
 	static void initMovegenConstant(void);
 
-	inline static bitMap attackFrom(const Position::bitboardIndex &piece,const tSquare& from,const bitMap & occupancy)
+	template<Position::bitboardIndex piece> inline static bitMap attackFrom(const tSquare& from,const bitMap & occupancy=0xffffffffffffffff)
 	{
 		assert(piece<Position::lastBitboard);
 		assert(piece!=Position::occupiedSquares);
@@ -243,47 +243,16 @@ public:
 			return 0;
 
 		}
+
 	}
 
-	inline static bitMap attackFromRook(const tSquare& from,const bitMap & occupancy)
-	{
-		assert(from <squareNumber);
-		assert((((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from]))<64);
-		assert((((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57)<64);
-		bitMap res = MG_RANK_ATTACK[from][((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from])];
-		res |= MG_FILE_ATTACK[from][((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
-		return res;
-	}
-	inline static bitMap attackFromBishop(tSquare from,const bitMap & occupancy)
-	{
-		assert(from <squareNumber);
-		assert((((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57)<64);
-		assert((((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >>57)<64);
-		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
-		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
-		return res;
-	}
-	inline static bitMap attackFromQueen(tSquare from,const bitMap & occupancy)
-	{
-		return attackFromRook(from,occupancy) | attackFromBishop(from,occupancy);
-	}
 
-	inline static const bitMap& attackFromKnight(const tSquare& from)
-	{
-		assert(from <squareNumber);
-		return KNIGHT_MOVE[from];
-	}
-	inline static const bitMap& attackFromKing(const tSquare& from)
-	{
-		assert(from <squareNumber);
-		return KING_MOVE[from];
-	}
-	inline static const bitMap& attackFromPawn(const tSquare& from,const unsigned int& color )
-	{
-		assert(color <=1);
-		assert(from <squareNumber);
-		return PAWN_ATTACK[color][from];
-	}
+
+
+
+
+
+
 
 	inline static const bitMap& getRookPseudoAttack(const tSquare& from)
 	{
@@ -302,6 +271,48 @@ public:
 	}
 
 private:
+
+
+	inline static bitMap attackFromRook(const tSquare& from,const bitMap & occupancy)
+	{
+		assert(from <squareNumber);
+		assert((((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from]))<64);
+		assert((((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57)<64);
+		bitMap res = MG_RANK_ATTACK[from][((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from])];
+		res |= MG_FILE_ATTACK[from][((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
+		return res;
+	}
+
+	inline static bitMap attackFromBishop(const tSquare from,const bitMap & occupancy)
+	{
+		assert(from <squareNumber);
+		assert((((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57)<64);
+		assert((((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >>57)<64);
+		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
+		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
+		return res;
+	}
+	inline static bitMap attackFromQueen(const tSquare from,const bitMap & occupancy)
+	{
+		return attackFromRook(from,occupancy) | attackFromBishop(from,occupancy);
+	}
+	inline static const bitMap& attackFromKnight(const tSquare& from)
+	{
+		assert(from <squareNumber);
+		return KNIGHT_MOVE[from];
+	}
+	inline static const bitMap& attackFromKing(const tSquare& from)
+	{
+		assert(from <squareNumber);
+		return KING_MOVE[from];
+	}
+	inline static const bitMap& attackFromPawn(const tSquare& from,const unsigned int& color )
+	{
+		assert(color <=1);
+		assert(from <squareNumber);
+		return PAWN_ATTACK[color][from];
+	}
+
 	// Move generator shift for ranks:
 	static const int RANKSHIFT[squareNumber];
 

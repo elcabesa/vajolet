@@ -126,12 +126,12 @@ Score Position::see(const Move& m) const {
 //				displayBitMap(attackers);
 
 				if (nextAttacker == Pawns || nextAttacker == Bishops || nextAttacker == Queens){
-					attackers |= Movegen::attackFromBishop(to,occupied)& (bitBoard[whiteBishops] |bitBoard[blackBishops] |bitBoard[whiteQueens] |bitBoard[blackQueens]);
+					attackers |= Movegen::attackFrom<Position::whiteBishops>(to,occupied)& (bitBoard[whiteBishops] |bitBoard[blackBishops] |bitBoard[whiteQueens] |bitBoard[blackQueens]);
 				}
 
 				if (nextAttacker == Rooks || nextAttacker == Queens){
 					assert(to<squareNumber);
-					attackers |= Movegen::attackFromRook(to,occupied)& (bitBoard[whiteRooks] |bitBoard[blackRooks] |bitBoard[whiteQueens] |bitBoard[blackQueens]);
+					attackers |= Movegen::attackFrom<Position::whiteRooks>(to,occupied)& (bitBoard[whiteRooks] |bitBoard[blackRooks] |bitBoard[whiteQueens] |bitBoard[blackQueens]);
 				}
 				attackers &= occupied;
 //				displayBitMap(attackers);

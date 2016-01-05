@@ -918,11 +918,11 @@ void Position::doMove(const Move & m){
 			if(n.hiddenCheckersCandidate && (n.hiddenCheckersCandidate & bitSet(from))){
 				if(!isRook(piece)){
 					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
-					x.checkers|=Movegen::attackFromRook(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
+					x.checkers|=Movegen::attackFrom<Position::whiteRooks>(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
 				}
 				if(!isBishop(piece)){
 					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
-					x.checkers|=Movegen::attackFromBishop(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]);
+					x.checkers|=Movegen::attackFrom<Position::whiteBishops>(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]);
 				}
 			}
 		}
@@ -1254,15 +1254,15 @@ inline void Position::calcCheckingSquares(void){
 	s.checkingSquares[whiteKing+attackingPieces]=0;
 	assert(kingSquare<squareNumber);
 	assert(whitePawns+attackingPieces<lastBitboard);
-	s.checkingSquares[whiteRooks+attackingPieces]=Movegen::attackFromRook(kingSquare,occupancy);
-	s.checkingSquares[whiteBishops+attackingPieces]=Movegen::attackFromBishop(kingSquare,occupancy);
+	s.checkingSquares[whiteRooks+attackingPieces]=Movegen::attackFrom<Position::whiteRooks>(kingSquare,occupancy);
+	s.checkingSquares[whiteBishops+attackingPieces]=Movegen::attackFrom<Position::whiteBishops>(kingSquare,occupancy);
 	s.checkingSquares[whiteQueens+attackingPieces]=s.checkingSquares[whiteRooks+attackingPieces]|s.checkingSquares[whiteBishops+attackingPieces];
-	s.checkingSquares[whiteKnights+attackingPieces]=Movegen::attackFromKnight(kingSquare);
+	s.checkingSquares[whiteKnights+attackingPieces]=Movegen::attackFrom<Position::whiteKnights>(kingSquare);
 
 	if(attackingPieces){
-		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFromPawn(kingSquare,0);
+		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFrom<Position::whitePawns>(kingSquare);
 	}else{
-		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFromPawn(kingSquare,1);
+		s.checkingSquares[whitePawns+attackingPieces]=Movegen::attackFrom<Position::whitePawns>(kingSquare,1);
 	}
 
 	assert(blackPawns-attackingPieces>=0);
@@ -1304,17 +1304,17 @@ bitMap Position::getHiddenCheckers(tSquare kingSquare,eNextMove next){
 */
 bitMap Position::getAttackersTo(const tSquare to, const bitMap occupancy) const {
 	assert(to<squareNumber);
-	bitMap res=(Movegen::attackFromPawn(to,1) & bitBoard[whitePawns])
-			|(Movegen::attackFromPawn(to,0) & bitBoard[blackPawns])
-			|(Movegen::attackFromKnight(to) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))
-			|(Movegen::attackFromKing(to) & (bitBoard[blackKing]|bitBoard[whiteKing]));
+	bitMap res=(Movegen::attackFrom<Position::blackPawns>(to) & bitBoard[whitePawns])
+			|(Movegen::attackFrom<Position::whitePawns>(to) & bitBoard[blackPawns])
+			|(Movegen::attackFrom<Position::whiteKnights>(to) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))
+			|(Movegen::attackFrom<Position::whiteKing>(to) & (bitBoard[blackKing]|bitBoard[whiteKing]));
 	bitMap mask=(bitBoard[blackBishops]|bitBoard[whiteBishops]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
 	if(mask & Movegen::getBishopPseudoAttack(to) ){
-		res |= Movegen::attackFromBishop(to,occupancy) & mask;
+		res |= Movegen::attackFrom<Position::whiteBishops>(to,occupancy) & mask;
 	}
 	mask= (bitBoard[blackRooks]|bitBoard[whiteRooks]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
 	if(mask & Movegen::getRookPseudoAttack(to)){
-		res |=Movegen::attackFromRook(to,occupancy) & mask;
+		res |=Movegen::attackFrom<Position::whiteRooks>(to,occupancy) & mask;
 	}
 	return res;
 }
@@ -1325,7 +1325,8 @@ bitMap Position::getAttackersTo(const tSquare to, const bitMap occupancy) const 
 	\version 1.0
 	\date 08/11/2013
 */
-bool Position::moveGivesCheck(const Move& m)const {
+bool Position::moveGivesCheck(const Move& m)const
+{
 	assert(m.packed);
 	tSquare from = (tSquare)m.bit.from;
 	tSquare to = (tSquare)m.bit.to;
@@ -1356,11 +1357,33 @@ bool Position::moveGivesCheck(const Move& m)const {
 	tSquare kingSquare =pieceList[blackKing-s.nextMove][0];
 	assert(kingSquare<squareNumber);
 
-	switch(m.bit.flags){
-	case Move::fpromotion:{
-		bitMap occ= bitBoard[occupiedSquares] ^ bitSet(from);
+	switch(m.bit.flags)
+	{
+	case Move::fpromotion:
+	{
 		assert((bitboardIndex)(whiteQueens+s.nextMove+m.bit.promotion)<lastBitboard);
-		return Movegen::attackFrom((bitboardIndex)(whiteQueens+m.bit.promotion), to, occ) & bitSet(kingSquare);
+		if (s.checkingSquares[whiteQueens+s.nextMove+m.bit.promotion] & bitSet(to))
+		{
+			return true;
+		}
+		bitMap occ= bitBoard[occupiedSquares] ^ bitSet(from);
+		assert((bitboardIndex)(whiteQueens+m.bit.promotion)<lastBitboard);
+		switch(m.bit.promotion)
+		{
+			case Move::promQueen:
+				return Movegen::attackFrom<whiteQueens>(to, occ) & bitSet(kingSquare);
+				break;
+			case Move::promRook:
+				return Movegen::attackFrom<whiteRooks>(to, occ) & bitSet(kingSquare);
+				break;
+			case Move::promBishop:
+				return Movegen::attackFrom<whiteBishops>(to, occ) & bitSet(kingSquare);
+				break;
+			/*case Move::promKnight:
+				return Movegen::attackFrom<whiteKnights>(to, occ) & bitSet(kingSquare);
+				break;*/
+
+		}
 
 	}
 		break;
@@ -1375,7 +1398,7 @@ bool Position::moveGivesCheck(const Move& m)const {
 
 		bitMap occ = (bitBoard[occupiedSquares] ^ bitSet(kFrom) ^ bitSet(rFrom)) | bitSet(rTo) | bitSet(kTo);
 		return   (Movegen::getRookPseudoAttack(rTo) & bitSet(kingSquare))
-			     && (Movegen::attackFromRook(rTo,occ) & bitSet(kingSquare));
+			     && (Movegen::attackFrom<Position::whiteRooks>(rTo,occ) & bitSet(kingSquare));
 	}
 		break;
 	case Move::fenpassant:
@@ -1383,8 +1406,8 @@ bool Position::moveGivesCheck(const Move& m)const {
 		bitMap captureSquare= FILEMASK[m.bit.to] & RANKMASK[m.bit.from];
 		bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet((tSquare)m.bit.to)^captureSquare;
 		return
-				(Movegen::attackFromRook(kingSquare, occ) & (Us[Queens] |Us[Rooks]))
-			   | (Movegen::attackFromBishop(kingSquare, occ) & (Us[Queens] |Us[Bishops]));
+				(Movegen::attackFrom<Position::whiteRooks>(kingSquare, occ) & (Us[Queens] |Us[Rooks]))
+			   | (Movegen::attackFrom<Position::whiteBishops>(kingSquare, occ) & (Us[Queens] |Us[Bishops]));
 
 	}
 		break;
@@ -1424,7 +1447,7 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const {
 	state & s=getActualState();
 
 	tSquare kingSquare =pieceList[blackKing-s.nextMove][0];
-	return (!(Movegen::attackFromKing(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from))));
+	return (!(Movegen::attackFrom<Position::whiteKing>(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from))));
 
 
 }
@@ -1595,7 +1618,7 @@ bool Position::isMoveLegal(const Move &m)const {
 				}
 			}
 			else{
-				if(!(Movegen::attackFromKing((tSquare)m.bit.from) &bitSet((tSquare)m.bit.to)) || (bitSet((tSquare)m.bit.to)&Us[Pieces]))
+				if(!(Movegen::attackFrom<Position::whiteKing>((tSquare)m.bit.from) &bitSet((tSquare)m.bit.to)) || (bitSet((tSquare)m.bit.to)&Us[Pieces]))
 				{
 					return false;
 				}
@@ -1616,7 +1639,7 @@ bool Position::isMoveLegal(const Move &m)const {
 		case Position::whiteRooks:
 		case Position::blackRooks:
 			assert(m.from<squareNumber);
-			if(!(Movegen::getRookPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFromRook((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
+			if(!(Movegen::getRookPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFrom<Position::whiteRooks>((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
 			{
 				return false;
 			}
@@ -1634,8 +1657,8 @@ bool Position::isMoveLegal(const Move &m)const {
 				!(
 					(
 
-						Movegen::attackFromBishop((tSquare)m.bit.from,bitBoard[occupiedSquares])
-						| Movegen::attackFromRook((tSquare)m.bit.from,bitBoard[occupiedSquares])
+						Movegen::attackFrom<Position::whiteBishops>((tSquare)m.bit.from,bitBoard[occupiedSquares])
+						| Movegen::attackFrom<Position::whiteRooks>((tSquare)m.bit.from,bitBoard[occupiedSquares])
 					)
 					& bitSet((tSquare)m.bit.to)
 				)
@@ -1647,7 +1670,7 @@ bool Position::isMoveLegal(const Move &m)const {
 
 		case Position::whiteBishops:
 		case Position::blackBishops:
-			if(!(Movegen::getBishopPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFromBishop((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
+			if(!(Movegen::getBishopPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFrom<Position::whiteBishops>((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
 			{
 				return false;
 			}
@@ -1655,7 +1678,7 @@ bool Position::isMoveLegal(const Move &m)const {
 
 		case Position::whiteKnights:
 		case Position::blackKnights:
-			if(!(Movegen::attackFromKnight((tSquare)m.bit.from)& bitSet((tSquare)m.bit.to)))
+			if(!(Movegen::attackFrom<Position::whiteKnights>((tSquare)m.bit.from)& bitSet((tSquare)m.bit.to)))
 			{
 				return false;
 			}
@@ -1670,7 +1693,7 @@ bool Position::isMoveLegal(const Move &m)const {
 				// not valid pawn double push
 				&& ((m.bit.from+2*pawnPush(s.nextMove)!= m.bit.to) || (RANKS[m.bit.from]!=1) || ((bitSet((tSquare)m.bit.to) | bitSet((tSquare)(m.bit.to-8)))&bitBoard[occupiedSquares]))
 				// not valid pawn attack
-				&& (!(Movegen::attackFromPawn((tSquare)m.bit.from,s.nextMove!=whiteTurn)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Pieces]|bitSet(s.epSquare))))
+				&& (!(Movegen::attackFrom<Position::whitePawns>((tSquare)m.bit.from)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Pieces]|bitSet(s.epSquare))))
 			){
 				return false;
 			}
@@ -1684,8 +1707,8 @@ bool Position::isMoveLegal(const Move &m)const {
 				bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
 				tSquare kingSquare=pieceList[Position::whiteKing+s.nextMove][0];
 				assert(kingSquare<squareNumber);
-				if((Movegen::attackFromRook(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Rooks]))|
-							(Movegen::attackFromBishop(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Bishops])))
+				if((Movegen::attackFrom<Position::whiteRooks>(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Rooks]))|
+							(Movegen::attackFrom<Position::whiteBishops>(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Bishops])))
 				{
 				return false;
 				}
@@ -1699,7 +1722,7 @@ bool Position::isMoveLegal(const Move &m)const {
 				// not valid pawn double push
 				&& ((m.bit.from+2*pawnPush(s.nextMove)!= m.bit.to) || (RANKS[m.bit.from]!=6) || ((bitSet((tSquare)m.bit.to) | bitSet((tSquare)(m.bit.to+8)))&bitBoard[occupiedSquares]))
 				// not valid pawn attack
-				&& (!(Movegen::attackFromPawn((tSquare)m.bit.from,s.nextMove!=whiteTurn)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Position::Pieces]| bitSet(s.epSquare))))
+				&& (!(Movegen::attackFrom<Position::blackPawns>((tSquare)m.bit.from)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Position::Pieces]| bitSet(s.epSquare))))
 			){
 				return false;
 			}
@@ -1713,8 +1736,8 @@ bool Position::isMoveLegal(const Move &m)const {
 				bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
 				tSquare kingSquare=pieceList[Position::whiteKing+s.nextMove][0];
 				assert(kingSquare<squareNumber);
-				if((Movegen::attackFromRook(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
-							(Movegen::attackFromBishop(kingSquare, occ) & (Them[Queens] | Them[Bishops])))
+				if((Movegen::attackFrom<Position::whiteRooks>(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
+							(Movegen::attackFrom<Position::whiteBishops>(kingSquare, occ) & (Them[Queens] | Them[Bishops])))
 				{
 				return false;
 				}
