@@ -108,6 +108,47 @@ private:
 		moveList[moveListSize++].m=m;
 	}
 
+	inline void scoreCaptureMoves()
+	{
+		for(unsigned int i = moveListPosition; i < moveListSize; i++)
+		{
+			moveList[i].score = pos.getMvvLvaScore(moveList[i].m);
+		}
+	}
+
+	inline void scoreQuietMoves()
+	{
+		for(unsigned int i = moveListPosition; i < moveListSize; i++)
+		{
+			moveList[i].score = h.getValue(pos.squares[moveList[i].m.bit.from],(tSquare)moveList[i].m.bit.to);
+		}
+	}
+	inline void resetMoveList()
+	{
+		moveListPosition = 0;
+		moveListSize = 0;
+	}
+
+
+	inline void FindNextBestMove()
+	{
+		Score bestScore = -SCORE_INFINITE;
+		unsigned int bestIndex = moveListPosition;
+		for(unsigned int i = moveListPosition; i < moveListSize; i++) // itera sulle mosse rimanenti
+		{
+			Score res = moveList[i].score;
+			if(res > bestScore)
+			{
+				bestScore = res;
+				bestIndex = i;
+			}
+		}
+		if(bestIndex != moveListPosition)
+		{
+			std::swap(moveList[moveListPosition], moveList[bestIndex]);
+		}
+	}
+
 
 public:
 	const static Move NOMOVE;
@@ -140,7 +181,7 @@ public:
 		moveListSize = 0;
 		badCaptureSize = 0;
 		badCapturePosition = 0;
-		killerPos = 0;
+		//killerPos = 0;
 		//captureThreshold = 0;
 	}
 

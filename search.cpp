@@ -1369,19 +1369,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		// TODO testare se la riga TTtype=typeExact; ha senso
 		TTtype=typeExact;
 
-		if(bestScore>=beta)
-		{
-			/*if(	!pos.isCaptureMoveOrPromotion(ttMove) )
-			{
-				pos.saveKillers(ttMove);
-			}
-			if(!signals.stop)
-			{
-				TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
-						typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
-			}*/
-			return bestScore;
-		}
 	}
 	// todo trovare un valore buono per il futility
 	Score futilityBase=bestScore+5000;
