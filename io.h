@@ -37,7 +37,5 @@ enum SyncCout { io_lock, io_unlock };
 //--------------------------------------------------------------------
 
 std::ostream& operator<<(std::ostream&, SyncCout);
-extern void start_logger(bool b);
-
 
 #endif /* IO_H_ */
