@@ -1385,7 +1385,7 @@ simdScore evalPieces(const Position & p, const bitMap * const weakSquares,  bitM
 		res+=mobilityBonus[piece%Position::separationBitmap][mobility];
 		if(piece!=Position::whiteKnights && piece!=Position::blackKnights)
 		if(!(attack&~(threatenSquares|ourPieces)) && (threatenSquares&bitSet(sq))){ // zero mobility && attacked by pawn
-			res-=(Position::pieceValue[piece%Position::separationBitmap]/4);
+			res-=(Position::pieceValue[piece]/4);
 		}
 		/////////////////////////////////////////
 		// center control

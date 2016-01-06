@@ -493,7 +493,7 @@ public:
 		\date 08/11/2013
 	*/
 	inline Score getMvvLvaScore(const Move & m) const {
-		Score s=pieceValue[squares[m.bit.to]%separationBitmap][0]-(squares[m.bit.from]%separationBitmap);
+		Score s=pieceValue[squares[m.bit.to]][0]-(squares[m.bit.from]);
 		if (m.bit.flags == Move::fpromotion){
 			s += (pieceValue[whiteQueens +m.bit.promotion] - pieceValue[whitePawns])[0];
 		}else if(m.bit.flags == Move::fenpassant){

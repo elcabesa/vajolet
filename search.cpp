@@ -1417,7 +1417,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 			)
 			{
 				Score futilityValue = futilityBase
-						+ Position::pieceValue[pos.squares[m.bit.to]%Position::separationBitmap][1]
+						+ Position::pieceValue[pos.squares[m.bit.to]][1]
 						+ (m.bit.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
 
 				if (futilityValue < beta)

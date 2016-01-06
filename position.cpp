@@ -173,8 +173,8 @@ void Position::initPstValues(void){
 				pstValue[piece][s]=-pstValue[piece-separationBitmap][BOARDINDEX[f][r]];
 
 				if(!isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece)){
-					nonPawnValue[piece].insert(2,-pieceValue[piece][0]);
-					nonPawnValue[piece].insert(3,-pieceValue[piece][1]);
+					nonPawnValue[piece].insert(2,pieceValue[piece][0]);
+					nonPawnValue[piece].insert(3,pieceValue[piece][1]);
 				}
 			}
 			else{
@@ -352,12 +352,12 @@ void Position::initScoreValues(void){
 	pieceValue[whiteQueens]=initialPieceValue[whiteQueens];
 	pieceValue[whiteKing]=initialPieceValue[whiteKing];
 
-	pieceValue[blackPawns]=-pieceValue[whitePawns];
-	pieceValue[blackKnights]=-pieceValue[whiteKnights];
-	pieceValue[blackBishops]=-pieceValue[whiteBishops];
-	pieceValue[blackRooks]=-pieceValue[whiteRooks];
-	pieceValue[blackQueens]=-pieceValue[whiteQueens];
-	pieceValue[blackKing]=-pieceValue[whiteKing];
+	pieceValue[blackPawns]=pieceValue[whitePawns];
+	pieceValue[blackKnights]=pieceValue[whiteKnights];
+	pieceValue[blackBishops]=pieceValue[whiteBishops];
+	pieceValue[blackRooks]=pieceValue[whiteRooks];
+	pieceValue[blackQueens]=pieceValue[whiteQueens];
+	pieceValue[blackKing]=pieceValue[whiteKing];
 
 	initPstValues();
 
@@ -678,7 +678,7 @@ void Position::calcNonPawnMaterialValue(Score* s){
 		bitboardIndex val=squares[n];
 		if(!isPawn(val) && !isKing(val)){
 			if(val>separationBitmap){
-				t[1]-=pieceValue[val];
+				t[1]+=pieceValue[val];
 			}
 			else{
 				t[0]+=pieceValue[val];

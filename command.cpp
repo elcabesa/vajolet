@@ -251,39 +251,39 @@ void setvalue(std::istringstream& is) {
 
 	if(name =="queenMG"){
 		Position::pieceValue[Position::whiteQueens].insert(0,stoi(value));
-		Position::pieceValue[Position::blackQueens]=-Position::pieceValue[Position::whiteQueens];
+		Position::pieceValue[Position::blackQueens].insert(0,stoi(value));
 		Position::initPstValues();
 	}else if(name =="queenEG"){
 		Position::pieceValue[Position::whiteQueens].insert(1,stoi(value));
-		Position::pieceValue[Position::blackQueens]=-Position::pieceValue[Position::whiteQueens];
+		Position::pieceValue[Position::blackQueens].insert(1,stoi(value));
 		Position::initPstValues();
 	}else if(name =="rookMG"){
 		Position::pieceValue[Position::whiteRooks].insert(0,stoi(value));
-		Position::pieceValue[Position::blackRooks]=-Position::pieceValue[Position::whiteRooks];
+		Position::pieceValue[Position::blackRooks].insert(0,stoi(value));
 		Position::initPstValues();
 	}else if(name =="rookEG"){
 		Position::pieceValue[Position::whiteRooks].insert(1,stoi(value));
-		Position::pieceValue[Position::blackRooks]=-Position::pieceValue[Position::whiteRooks];
+		Position::pieceValue[Position::blackRooks].insert(1,stoi(value));
 		Position::initPstValues();
 	}else if(name =="bishopMG"){
 		Position::pieceValue[Position::whiteBishops].insert(0,stoi(value));
-		Position::pieceValue[Position::blackBishops]=-Position::pieceValue[Position::whiteBishops];
+		Position::pieceValue[Position::blackBishops].insert(0,stoi(value));
 		Position::initPstValues();
 	}else if(name =="bishopEG"){
 		Position::pieceValue[Position::whiteBishops].insert(1,stoi(value));
-		Position::pieceValue[Position::blackBishops]=-Position::pieceValue[Position::whiteBishops];
+		Position::pieceValue[Position::blackBishops].insert(1,stoi(value));
 		Position::initPstValues();
 	}else if(name =="knightMG"){
 		Position::pieceValue[Position::whiteKnights].insert(0,stoi(value));
-		Position::pieceValue[Position::blackKnights]=-Position::pieceValue[Position::whiteKnights];
+		Position::pieceValue[Position::blackKnights].insert(0,stoi(value));
 		Position::initPstValues();
 	}else if(name =="knightEG"){
 		Position::pieceValue[Position::whiteKnights].insert(1,stoi(value));
-		Position::pieceValue[Position::blackKnights]=-Position::pieceValue[Position::whiteKnights];
+		Position::pieceValue[Position::blackKnights].insert(1,stoi(value));
 		Position::initPstValues();
 	}else if(name =="pawnsEG"){
 		Position::pieceValue[Position::whitePawns].insert(1,stoi(value));
-		Position::pieceValue[Position::blackPawns]=-Position::pieceValue[Position::whitePawns];
+		Position::pieceValue[Position::blackPawns].insert(1,stoi(value));
 		Position::initPstValues();
 	}
 }

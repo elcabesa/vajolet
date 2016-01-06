@@ -26,7 +26,7 @@
 
 Score Position::seeSign(const Move& m) const {
 	assert(m.packed);
-	if (pieceValue[squares[m.bit.from]%separationBitmap][0] <= pieceValue[squares[m.bit.to]%separationBitmap][0])
+	if (pieceValue[squares[m.bit.from]][0] <= pieceValue[squares[m.bit.to]][0])
 	{
 		return 1;
 	}
@@ -59,7 +59,7 @@ Score Position::see(const Move& m) const {
 	bitMap colorAttackers;
 	bitboardIndex captured;
 
-	swapList[0] = pieceValue[squares[to]%separationBitmap][0];
+	swapList[0] = pieceValue[squares[to]][0];
 	captured = bitboardIndex(squares[from]%separationBitmap);
 
 	if(m.bit.flags== Move::fenpassant){
