@@ -47,6 +47,8 @@ private:
 
 	Move killerMoves[2];
 
+	static History defaultHistory;
+
 
 	enum CastleSide
 	{
@@ -171,7 +173,8 @@ public:
 	Movegen(const Position & p,const History & his, const Move & ttm): pos(p), h(his), ttMove(ttm)
 	{
 		Position::state &s = pos.getActualState();
-		if(s.checkers){
+		if(s.checkers)
+		{
 			stagedGeneratorState = getTTevasion;
 		}
 		else{
@@ -185,7 +188,9 @@ public:
 		//captureThreshold = 0;
 	}
 
-	Movegen(const Position & p): Movegen(p,History(), Move(NOMOVE)){}
+	Movegen(const Position & p): Movegen(p,defaultHistory, NOMOVE)
+	{
+	}
 
 
 	int setupQuiescentSearch(const bool checkers,const int depth)

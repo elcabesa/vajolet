@@ -26,6 +26,7 @@
 
 
 const Move Movegen::NOMOVE(0);
+History Movegen::defaultHistory;
 
 bitMap Movegen::MG_RANKMASK[squareNumber];
 bitMap Movegen::MG_FILEMASK[squareNumber];
