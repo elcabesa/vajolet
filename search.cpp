@@ -395,8 +395,8 @@ Score search::startThinking(searchLimits & l){
 						reduction=1;
 					}
 					//sync_cout<<"new beta "<<beta<<sync_endl;
-				}else{
-					//history.printHistory();
+				}else
+				{
 					break;
 				}
 
