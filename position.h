@@ -38,24 +38,29 @@
 //---------------------------------------------------
 
 
-class Position{
-	public:
+class Position
+{
+private:
+	static const int maxNumberOfPieces = 10;
+public:
 	//static unsigned long testPointCounter;
-	Position(const Position& other)
-	    : stateIndex(other.stateIndex) // calls the copy constructor of the age
-
+	Position(const Position& other) : stateIndex(other.stateIndex) // calls the copy constructor of the age
 	{
-		for(int i=0;i<STATE_INFO_LENGTH;i++){
-			stateInfo[i]=other.stateInfo[i];
+		for(int i = 0; i < STATE_INFO_LENGTH; i++)
+		{
+			stateInfo[i] = other.stateInfo[i];
 		}
-		for(int i=0;i<squareNumber;i++){
-			squares[i]=other.squares[i];
-			index[i]=other.index[i];
+		for(int i=0;i<squareNumber;i++)
+		{
+			squares[i] = other.squares[i];
+			index[i] = other.index[i];
 		}
-		for(int i=0;i<lastBitboard;i++){
-			bitBoard[i]=other.bitBoard[i];
-			pieceCount[i]=other.pieceCount[i];
-			for(int n=0;n<64;n++){
+		for(int i = 0; i < lastBitboard; i++)
+		{
+			bitBoard[i] = other.bitBoard[i];
+			pieceCount[i] = other.pieceCount[i];
+			for(int n = 0; n < maxNumberOfPieces; n++)
+			{
 				pieceList[i][n] =other.pieceList[i][n];
 			}
 		}
@@ -83,7 +88,8 @@ class Position{
 		for(int i=0;i<lastBitboard;i++){
 			bitBoard[i]=other.bitBoard[i];
 			pieceCount[i]=other.pieceCount[i];
-			for(int n=0;n<64;n++){
+			for(int n=0;n<10;n++)
+			{
 				pieceList[i][n] =other.pieceList[i][n];
 			}
 		}
@@ -682,7 +688,7 @@ public:
 	bitboardIndex squares[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
 	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
 	unsigned int pieceCount[lastBitboard];	// number of pieces indexed by bitboardIndex enum
-	tSquare pieceList[lastBitboard][64];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 64 pezzi di ogni tipo)
+	tSquare pieceList[lastBitboard][maxNumberOfPieces];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 64 pezzi di ogni tipo)
 	unsigned int index[squareNumber];		// indice del pezzo all'interno della sua lista
 	bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 

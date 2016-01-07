@@ -378,7 +378,7 @@ void Position::clear() {
 	for (int i = 0; i < lastBitboard; i++) {
 		pieceCount[i] = 0;
 		bitBoard[i] = 0;
-		for (int n = 0; n < 16; n++) {
+		for (int n = 0; n < maxNumberOfPieces; n++) {
 			pieceList[i][n] = square0;
 		}
 	}
