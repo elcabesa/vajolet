@@ -172,20 +172,19 @@ public:
 
 	Movegen(const Position & p,const History & his, const Move & ttm): pos(p), h(his), ttMove(ttm)
 	{
-		Position::state &s = pos.getActualState();
-		if(s.checkers)
+		if(pos.isInCheck())
 		{
 			stagedGeneratorState = getTTevasion;
 		}
-		else{
+		else
+		{
 			stagedGeneratorState = getTT;
 		}
 		moveListPosition = 0;
 		moveListSize = 0;
 		badCaptureSize = 0;
 		badCapturePosition = 0;
-		//killerPos = 0;
-		//captureThreshold = 0;
+
 	}
 
 	Movegen(const Position & p): Movegen(p,defaultHistory, NOMOVE)
@@ -221,8 +220,7 @@ public:
 
 	void setupProbCutSearch(Position::bitboardIndex capturePiece)
 	{
-		/*Position::state &s = pos.getActualState();
-		if(s.checkers)
+		/*if(pos.isInCheck())
 		{
 			stagedGeneratorState = getTTevasion;
 		}

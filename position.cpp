@@ -29,6 +29,7 @@
 #include "transposition.h"
 
 
+
 simdScore initialPieceValue[Position::lastBitboard]={
 		simdScore(0,0,0,0),
 /*		simdScore(3000000,3000000,0,0),//king
@@ -395,7 +396,7 @@ void Position::display()const {
 	sync_cout<<displayFen()<<sync_endl;
 
 	int rank, file;
-	state& st =getActualState();
+	const state& st =getActualState();
 	sync_cout;
 	{
 		for (rank = 7; rank >= 0; rank--)
@@ -747,6 +748,7 @@ void Position::doMove(const Move & m){
 	bool moveIsCheck=moveGivesCheck(m);
 	insertState(n);
 	state &x=getActualState();
+
 	x.currentMove=m;
 
 

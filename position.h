@@ -38,6 +38,13 @@ class Position
 {
 private:
 
+	/*! \brief helper mask used to speedup castle right management
+		\author STOCKFISH
+		\version 1.0
+		\date 27/10/2013
+	*/
+	static int castleRightsMask[squareNumber];
+
 
 public:
 	static const int maxNumberOfPieces = 10;
@@ -206,12 +213,10 @@ public:
 
 	};
 
-	/*! \brief helper mask used to speedup castle right management
-		\author STOCKFISH
-		\version 1.0
-		\date 27/10/2013
-	*/
-	static int castleRightsMask[squareNumber];
+private:
+	state * actualState;
+
+
 public:
 	unsigned int getStateIndex(void){ return stateIndex;}
 	/*! \brief array of char to create the fen string
@@ -407,19 +412,12 @@ public:
 		\version 1.1 get rid of continuos malloc/free
 		\date 21/11/2013
 	*/
-	inline void insertState(state & s){
-
-
+	inline void insertState(state & s)
+	{
 		stateIndex++;
 		assert(stateIndex<STATE_INFO_LENGTH);
-		//Move killer0;
-		//Move killer1;
-		//killer0=stateInfo[stateIndex].killers[0];
-		//killer1=stateInfo[stateIndex].killers[1];
-		stateInfo[stateIndex]=s;
-		//stateInfo[stateIndex].killers[0]=killer0;
-		//stateInfo[stateIndex].killers[1]=killer1;
 
+		stateInfo[stateIndex]=s;
 	}
 
 	/*! \brief  remove the last state
@@ -472,10 +470,10 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	std::string displayMove(Move & m)const {
+	std::string displayMove(Move & m)const
+	{
 
 		std::string s;
-		//state st=getActualState();
 
 		bool capture = (bitSet((tSquare)m.bit.to) & Them[Pieces]);
 		if(!isPawn(squares[m.bit.from])){

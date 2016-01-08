@@ -272,9 +272,8 @@ Score search::startThinking(searchLimits & l){
 						}
 						tte = TT.probe(pos.getKey());
 
-						if (!tte || tte->getPackedMove() != (*it).packed){// Don't overwrite correct entries
-							//sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
-							//TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
+						if (!tte || tte->getPackedMove() != (*it).packed)
+						{// Don't overwrite correct entries
 							TT.store(pos.getKey(), SCORE_NONE,typeExact,-1000, (*it).packed, pos.eval<false>());
 						}
 
@@ -381,8 +380,6 @@ Score search::startThinking(searchLimits & l){
 
 					reduction = 0;
 
-					//TT.store(p.getActualState().key, transpositionTable::scoreToTT(rootMoves[indexPV].previousScore, 0),typeExact,depth*ONE_PLY, (rootMoves[indexPV].PV[0]).packed, p.eval<false>());
-					//sync_cout<<"new alpha "<<alpha<<sync_endl;
 				}
 				else if (res >= beta){
 					if(oldBestMove.packed && oldBestMove!=newPV.front()){
