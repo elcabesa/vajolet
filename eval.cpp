@@ -396,7 +396,7 @@ bool evalKPvsK(const Position& p, Score& res){
 		tSquare promotionSquare=BOARDINDEX[FILES[pawnSquare]][7];
 		const int relativeRank =RANKS[pawnSquare];
 		// Rule of the square
-		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (p.getActualState().nextMove==Position::whiteTurn?0:1),0) )
+		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (p.getNextTurn() == Position::whiteTurn?0:1),0) )
 		{
 			res = SCORE_KNOWN_WIN + relativeRank;
 			return true;
@@ -404,7 +404,7 @@ bool evalKPvsK(const Position& p, Score& res){
 		if(FILES[pawnSquare]!=0 && FILES[pawnSquare]!= 7)
 		{
 
-			if(SQUARE_DISTANCE[enemySquare][pawnSquare]>=2 || p.getActualState().nextMove==Position::whiteTurn)
+			if(SQUARE_DISTANCE[enemySquare][pawnSquare]>=2 || p.getNextTurn()==Position::whiteTurn)
 			{
 				//winning king on a key square
 				if(relativeRank < 4)
@@ -436,7 +436,7 @@ bool evalKPvsK(const Position& p, Score& res){
 				// 3 rules for winning, if  conditions are met -> it's won
 				unsigned int count =0;
 				if(kingSquare == pawnSquare + 8) count++;
-				if(p.getActualState().nextMove==Position::blackTurn && kingsDirectOpposition(p)) count++;
+				if(p.getNextTurn() == Position::blackTurn && kingsDirectOpposition(p)) count++;
 				if(RANKS[kingSquare]==5) count++;
 
 				if(count>1)
@@ -475,14 +475,14 @@ bool evalKPvsK(const Position& p, Score& res){
 		tSquare promotionSquare=BOARDINDEX[FILES[pawnSquare]][0];
 		const int relativeRank =7-RANKS[pawnSquare];
 		// Rule of the square
-		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (p.getActualState().nextMove==Position::blackTurn?0:1),0) )
+		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (p.getNextTurn() == Position::blackTurn?0:1),0) )
 		{
 			res = -SCORE_KNOWN_WIN -relativeRank;
 			return true;
 		}
 		if(FILES[pawnSquare]!=0 && FILES[pawnSquare]!= 7)
 		{
-			if(SQUARE_DISTANCE[enemySquare][pawnSquare]>=2 || p.getActualState().nextMove==Position::blackTurn)
+			if(SQUARE_DISTANCE[enemySquare][pawnSquare]>=2 || p.getNextTurn() == Position::blackTurn)
 			{
 				//winning king on a key square
 				if(relativeRank < 4)
@@ -512,7 +512,7 @@ bool evalKPvsK(const Position& p, Score& res){
 				// 3 rules for winning, if  conditions are met -> it's won
 				unsigned int count =0;
 				if(kingSquare == pawnSquare - 8) count++;
-				if(p.getActualState().nextMove==Position::whiteTurn && kingsDirectOpposition(p)) count++;
+				if(p.getNextTurn() == Position::whiteTurn && kingsDirectOpposition(p)) count++;
 				if(RANKS[kingSquare]==2) count++;
 
 				if(count>1)
@@ -669,7 +669,7 @@ void initMaterialKeys(void){
 	//	k vs K
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialStruct t;
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
@@ -679,7 +679,7 @@ void initMaterialKeys(void){
 	//	kb vs K
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -688,7 +688,7 @@ void initMaterialKeys(void){
 	//	kn vs K
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -697,7 +697,7 @@ void initMaterialKeys(void){
 	//	k vs KB
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -706,7 +706,7 @@ void initMaterialKeys(void){
 	//	k vs KN
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -717,7 +717,7 @@ void initMaterialKeys(void){
 	//	kn vs KB
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -726,7 +726,7 @@ void initMaterialKeys(void){
 	//	kn vs KN
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -736,7 +736,7 @@ void initMaterialKeys(void){
 	//	kb vs KB
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -745,7 +745,7 @@ void initMaterialKeys(void){
 	//	kb vs KN
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -754,7 +754,7 @@ void initMaterialKeys(void){
 	//	kbb vs KN
 	//------------------------------------------
 	p.setupFromFen("kbb5/8/8/8/8/8/8/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -763,7 +763,7 @@ void initMaterialKeys(void){
 	//	kbb vs KB
 	//------------------------------------------
 	p.setupFromFen("kbb5/8/8/8/8/8/8/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -772,7 +772,7 @@ void initMaterialKeys(void){
 	//	kbn vs KN
 	//------------------------------------------
 	p.setupFromFen("kbn5/8/8/8/8/8/8/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -781,7 +781,7 @@ void initMaterialKeys(void){
 	//	kbn vs KB
 	//------------------------------------------
 	p.setupFromFen("kbn5/8/8/8/8/8/8/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -790,7 +790,7 @@ void initMaterialKeys(void){
 	//	knn vs KN
 	//------------------------------------------
 	p.setupFromFen("knn5/8/8/8/8/8/8/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -799,7 +799,7 @@ void initMaterialKeys(void){
 	//	knn vs KB
 	//------------------------------------------
 	p.setupFromFen("knn5/8/8/8/8/8/8/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -809,7 +809,7 @@ void initMaterialKeys(void){
 	//	kb vs KBB
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/5BBK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -818,7 +818,7 @@ void initMaterialKeys(void){
 	//	kn vs KBB
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/5BBK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -827,7 +827,7 @@ void initMaterialKeys(void){
 	//	kb vs KBN
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/5BNK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -836,7 +836,7 @@ void initMaterialKeys(void){
 	//	kn vs KBN
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/5BNK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -845,7 +845,7 @@ void initMaterialKeys(void){
 	//	kb vs KNN
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/5NNK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -854,7 +854,7 @@ void initMaterialKeys(void){
 	//	kn vs KNN
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/5NNK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exact;
 	t.pointer=nullptr;
 	t.val=0;
@@ -867,56 +867,56 @@ void initMaterialKeys(void){
 	t.pointer=nullptr;
 	t.val=0;
 	p.setupFromFen("kb6/8/8/8/8/8/7P/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kb6/8/8/8/8/8/6PP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kb6/8/8/8/8/8/5PPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kb6/8/8/8/8/8/4PPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kb6/8/8/8/8/8/3PPPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kb6/8/8/8/8/8/2PPPPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kb6/8/8/8/8/8/1PPPPPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kb6/8/8/8/8/8/PPPPPPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 
 	t.type=materialStruct::saturationH;
 	t.pointer=nullptr;
 	t.val=0;
 	p.setupFromFen("k7/8/8/8/8/8/7p/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/6pp/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/5ppp/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/4pppp/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/3ppppp/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/2pppppp/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/1ppppppp/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/ppppppp/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 
 
@@ -927,56 +927,56 @@ void initMaterialKeys(void){
 	t.pointer=nullptr;
 	t.val=0;
 	p.setupFromFen("kn6/8/8/8/8/8/7P/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kn6/8/8/8/8/8/6PP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kn6/8/8/8/8/8/5PPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kn6/8/8/8/8/8/4PPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kn6/8/8/8/8/8/3PPPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kn6/8/8/8/8/8/2PPPPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kn6/8/8/8/8/8/1PPPPPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("kn6/8/8/8/8/8/PPPPPPPP/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 
 	t.type=materialStruct::saturationH;
 	t.pointer=nullptr;
 	t.val=0;
 	p.setupFromFen("k7/8/8/8/8/8/7p/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/6pp/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/5ppp/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/4pppp/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/3ppppp/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/2pppppp/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/1ppppppp/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 	p.setupFromFen("k7/8/8/8/8/8/ppppppp/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	materialKeyMap.insert({key,t});
 
 
@@ -989,7 +989,7 @@ void initMaterialKeys(void){
 	//	k vs KBP
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/5BPK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKBPvsK;
 	t.val=0;
@@ -998,7 +998,7 @@ void initMaterialKeys(void){
 	//	kbp vs K
 	//------------------------------------------
 	p.setupFromFen("kbp5/8/8/8/8/8/8/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKBPvsK;
 	t.val=0;
@@ -1008,7 +1008,7 @@ void initMaterialKeys(void){
 	//	k vs KBN
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/5BNK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKBNvsK;
 	t.val=0;
@@ -1017,7 +1017,7 @@ void initMaterialKeys(void){
 	//	kbn vs K
 	//------------------------------------------
 	p.setupFromFen("kbn5/8/8/8/8/8/8/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKBNvsK;
 	t.val=0;
@@ -1027,7 +1027,7 @@ void initMaterialKeys(void){
 	//	k vs KQ
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/6QK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKQvsK;
 	t.val=0;
@@ -1036,7 +1036,7 @@ void initMaterialKeys(void){
 	//	kq vs K
 	//------------------------------------------
 	p.setupFromFen("kq6/8/8/8/8/8/8/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKQvsK;
 	t.val=0;
@@ -1046,7 +1046,7 @@ void initMaterialKeys(void){
 	//	k vs KP
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/6PK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKPvsK;
 	t.val=0;
@@ -1055,7 +1055,7 @@ void initMaterialKeys(void){
 	//	kp vs K
 	//------------------------------------------
 	p.setupFromFen("kp6/8/8/8/8/8/8/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKPvsK;
 	t.val=0;
@@ -1081,7 +1081,7 @@ void initMaterialKeys(void){
 				s+="/6BK w - -";
 				//sync_cout<<s<<sync_endl;
 				p.setupFromFen(s);
-				key=p.getActualState().materialKey;
+				key = p.getMaterialKey();
 				t.type=materialStruct::multiplicativeFunction;
 				t.pointer=&evalOppositeBishopEndgame;
 				t.val=0;
@@ -1094,7 +1094,7 @@ void initMaterialKeys(void){
 	//	kr vs KN
 	//------------------------------------------
 	p.setupFromFen("kr6/8/8/8/8/8/8/6NK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKRvsKm;
 	t.val=0;
@@ -1103,7 +1103,7 @@ void initMaterialKeys(void){
 	//	kr vs KB
 	//------------------------------------------
 	p.setupFromFen("kr6/8/8/8/8/8/8/6BK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKRvsKm;
 	t.val=0;
@@ -1113,7 +1113,7 @@ void initMaterialKeys(void){
 	//	kb vs KR
 	//------------------------------------------
 	p.setupFromFen("kb6/8/8/8/8/8/8/6RK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKRvsKm;
 	t.val=0;
@@ -1122,7 +1122,7 @@ void initMaterialKeys(void){
 	//	kn vs KR
 	//------------------------------------------
 	p.setupFromFen("kn6/8/8/8/8/8/8/6RK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKRvsKm;
 	t.val=0;
@@ -1132,7 +1132,7 @@ void initMaterialKeys(void){
 	//	knn vs K
 	//------------------------------------------
 	p.setupFromFen("knn5/8/8/8/8/8/8/7K w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKNNvsK;
 	t.val=0;
@@ -1142,7 +1142,7 @@ void initMaterialKeys(void){
 	//	k vs KNN
 	//------------------------------------------
 	p.setupFromFen("k7/8/8/8/8/8/8/5NNK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKNNvsK;
 	t.val=0;
@@ -1153,7 +1153,7 @@ void initMaterialKeys(void){
 	//	kr vs KRP
 	//------------------------------------------
 	p.setupFromFen("kr6/8/8/8/8/8/8/5PRK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKRPvsKr;
 	t.val=0;
@@ -1163,7 +1163,7 @@ void initMaterialKeys(void){
 	//	krp vs KR
 	//------------------------------------------
 	p.setupFromFen("krp5/8/8/8/8/8/8/6RK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
 	t.pointer=&evalKRPvsKr;
 	t.val=0;
@@ -1173,7 +1173,7 @@ void initMaterialKeys(void){
 	//	kq vs KP
 	//------------------------------------------
 	p.setupFromFen("kq6/8/8/8/8/8/8/6PK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKQvsKP;
 	t.val=0;
@@ -1183,7 +1183,7 @@ void initMaterialKeys(void){
 	//	kp vs KQ
 	//------------------------------------------
 	p.setupFromFen("kp6/8/8/8/8/8/8/6QK w - -");
-	key=p.getActualState().materialKey;
+	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
 	t.pointer=&evalKQvsKP;
 	t.val=0;
@@ -1192,11 +1192,13 @@ void initMaterialKeys(void){
 
 
 //---------------------------------------------
-const materialStruct* getMaterialData(const Position& p){
-	U64 key=p.getActualState().materialKey;
+const materialStruct* getMaterialData(const Position& p)
+{
+	U64 key = p.getMaterialKey();
 
-	std::unordered_map<U64,materialStruct>::const_iterator got= materialKeyMap.find(key);
-	if(got == materialKeyMap.end())
+	auto got= materialKeyMap.find(key);
+
+	if( got == materialKeyMap.end())
 	{
 		return nullptr;
 	}
@@ -1745,7 +1747,7 @@ Score Position::eval(void) {
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
 	simdScore pawnResult;
-	U64 pawnKey = getActualState().pawnKey;
+	U64 pawnKey = getPawnKey();
 	pawnEntry& probePawn= pawnHashTable.probe(pawnKey);
 	if(probePawn.key==pawnKey){
 		//evalchacheHit++;
@@ -1824,7 +1826,7 @@ Score Position::eval(void) {
 		pawnResult-=(bitCnt(holes[white])-bitCnt(holes[black]))*holesPenalty;
 
 		//evalchacheInsert++;
-		pawnHashTable.insert(st.pawnKey,pawnResult, weakPawns, passedPawns,attackedSquares[whitePawns],attackedSquares[blackPawns],weakSquares[white],weakSquares[black],holes[white],holes[black]);
+		pawnHashTable.insert(pawnKey,pawnResult, weakPawns, passedPawns,attackedSquares[whitePawns],attackedSquares[blackPawns],weakSquares[white],weakSquares[black],holes[white],holes[black]);
 
 
 

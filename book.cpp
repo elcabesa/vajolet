@@ -330,16 +330,16 @@ U64 polyglotKey(const Position& pos) {
 		k ^= PG.Zobrist.psq[pieceMapping[p]][s];
 	}
 
-	b = pos.getActualState().castleRights;
+	b = pos.getCastleRights();
 
 	while(b){
 		k ^= PG.Zobrist.castle[iterateBit(b)];
 	}
-	if (pos.getActualState().epSquare != squareNone){
-		k ^= PG.Zobrist.enpassant[FILES[pos.getActualState().epSquare]];
+	if (pos.getEpSquare() != squareNone){
+		k ^= PG.Zobrist.enpassant[FILES[pos.getEpSquare()]];
 	}
 
-	if (pos.getActualState().nextMove==Position::whiteTurn){
+	if (pos.getNextTurn() == Position::whiteTurn){
 		k ^= PG.Zobrist.turn;
 	}
 

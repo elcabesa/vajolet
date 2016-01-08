@@ -32,7 +32,7 @@ void timeManagerInit(Position& pos, searchLimits& lim, timeManagementStruct& tim
 		timeMan.resolution=std::min((unsigned long int)100,timeMan.allocatedTime/100);
 	}
 	else{
-		if(pos.getActualState().nextMove){
+		if(pos.getNextTurn()){
 			if(lim.movesToGo>0){
 				timeMan.allocatedTime= (long unsigned int)std::min((lim.btime*4.0)/lim.movesToGo,lim.btime*0.8);
 				timeMan.maxSearchTime=timeMan.allocatedTime;

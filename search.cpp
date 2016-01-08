@@ -219,7 +219,7 @@ Score search::startThinking(searchLimits & l){
 
 
 
-	unsigned int selDepthBase=pos.getActualState().ply;
+	unsigned int selDepthBase=pos.getPly();
 
 	startTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 	std::list<Move> newPV;
@@ -534,7 +534,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	//if(verbose){sync_cout<<"eccomi"<<sync_endl;}
 	visitedNodes++;
 	const bool PVnode=(type==search::nodeType::PV_NODE || type==search::nodeType::ROOT_NODE  || type==search::nodeType::HELPER_ROOT_NODE);
-	const bool inCheck = pos.getActualState().checkers;
+	const bool inCheck = pos.isInCheck();
 	Move threatMove;
 	threatMove=0;
 
@@ -567,7 +567,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 				pvLine.clear();
 			}
 			//if(signals.stop){sync_cout<<"alpha beta initial Stop"<<sync_endl;}
-			return std::max((int)0,(int)(-5000 + pos.getActualState().ply*7));
+			return std::max((int)0,(int)(-5000 + pos.getPly()*7));
 		}
 
 		//---------------------------------------
@@ -688,7 +688,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		//&&  abs(alpha) < SCORE_MATE_IN_MAX_PLY // implicito nell riga precedente
 		&&  ((!ttMove.packed ) || type==ALL_NODE)
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
-		&& !((pos.getActualState().nextMove && (pos.bitBoard[Position::blackPawns] & RANKMASK[A2])) || (!pos.getActualState().nextMove && (pos.bitBoard[Position::whitePawns] & RANKMASK[A7]) ) )
+		&& !((pos.getNextTurn() && (pos.bitBoard[Position::blackPawns] & RANKMASK[A2])) || (!pos.getNextTurn() && (pos.bitBoard[Position::whitePawns] & RANKMASK[A7]) ) )
 	)
 	{
 		Score ralpha = alpha - razorMargin(depth);
@@ -715,7 +715,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		&&  eval - futility[depth>>ONE_PLY_SHIFT] >= beta
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&&  abs(eval) < SCORE_KNOWN_WIN
-		&&  ((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0])))
+		&&  ((pos.getNextTurn() && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0])))
 	{
 		assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
 		return eval - futility[depth>>ONE_PLY_SHIFT];
@@ -735,7 +735,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		&& eval>=beta
 		&& !pos.getActualState().skipNullMove
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
-		&&((pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getActualState().nextMove && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0]))
+		&&((pos.getNextTurn() && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0]))
 	){
 		// Null move dynamic reduction based on depth
 		int red = 3 * ONE_PLY + depth / 4;
@@ -812,7 +812,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		Score rBeta=beta+8000;
 		int rDepth=depth -ONE_PLY- 3*ONE_PLY;
 		Movegen mg(pos,history,ttMove);
-		mg.setupProbCutSearch(pos.getActualState().capturedPiece);
+		mg.setupProbCutSearch(pos.getCapturedPiece());
 
 		Move m;
 		std::list<Move> childPV;
@@ -1187,7 +1187,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		if( excludedMove.packed){
 			return alpha;
 		}else if(!inCheck){
-			bestScore = std::max((int)0,(int)(-5000 + pos.getActualState().ply*7));
+			bestScore = std::max((int)0,(int)(-5000 + pos.getPly()*7));
 		}
 		else{
 			bestScore=matedIn(ply);
@@ -1265,9 +1265,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		pvLine.clear();
 	}
 
-	bool inCheck=pos.getActualState().checkers;
+	bool inCheck=pos.isInCheck();
 
-	selDepth=std::max(pos.getActualState().ply,selDepth);
+	selDepth=std::max(pos.getPly(),selDepth);
 	visitedNodes++;
 
 
@@ -1275,7 +1275,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		if(PVnode){
 			pvLine.clear();
 		}
-		return std::max((int)0,(int)(-5000 + pos.getActualState().ply*7));
+		return std::max((int)0,(int)(-5000 + pos.getPly()*7));
 	}
 
 

@@ -193,9 +193,9 @@ public:
 	}
 
 
-	int setupQuiescentSearch(const bool checkers,const int depth)
+	int setupQuiescentSearch(const bool inCheck,const int depth)
 	{
-		if(checkers)
+		if(inCheck)
 		{
 			stagedGeneratorState = getTTevasion;
 			return (-1*ONE_PLY);

@@ -964,13 +964,16 @@ template void Movegen::generateMoves<Movegen::quietChecksMg>();
 
 
 template<>
-void Movegen::generateMoves<Movegen::allMg>(){
+void Movegen::generateMoves<Movegen::allMg>()
+{
 
 	Position::state &s =pos.getActualState();
-	if(s.checkers){
+	if(s.checkers)
+	{
 		generateMoves<Movegen::allEvasionMg>();
 	}
-	else{
+	else
+	{
 		generateMoves<Movegen::genType::captureMg>();
 		generateMoves<Movegen::genType::quietMg>();
 	}

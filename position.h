@@ -123,8 +123,8 @@ public:
 		}
 
 
-		Us=&bitBoard[getActualState().nextMove];
-		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
+		Us=&bitBoard[ getNextTurn() ];
+		Them=&bitBoard[(blackTurn - getNextTurn())];
 	};
 
 	Position& operator=(const Position& other)
@@ -152,10 +152,8 @@ public:
 		}
 
 
-
-
-		Us=&bitBoard[getActualState().nextMove];
-		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
+		Us=&bitBoard[getNextTurn()];
+		Them=&bitBoard[blackTurn-getNextTurn()];
 
 		return *this;
 	};
@@ -175,17 +173,22 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	struct state{
+	struct state
+	{
 		U64 key,		/*!<  hashkey identifying the position*/
 			pawnKey,	/*!<  hashkey identifying the pawn formation*/
 			materialKey;/*!<  hashkey identifying the material signature*/
+
 		Score nonPawnMaterial[4]; /*!< four score used for white/black opening/endgame non pawn material sum*/
+
 		eNextMove nextMove; /*!< who is the active player*/
 		eCastle castleRights; /*!<  actual castle rights*/
 		tSquare epSquare;	/*!<  en passant square*/
+
 		unsigned int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
 			pliesFromNull,	/*!<  plies from null move*/
 			ply;			/*!<  ply from the start*/
+
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
 		Score material[2];	/*!<  two values for opening/endgame score*/
 
@@ -314,13 +317,58 @@ public:
 	}
 
 
-	U64 getKey(void){
+	U64 getKey(void) const
+	{
 		return getActualState().key;
 	}
 
-	U64 getExclusionKey(void){
+	U64 getExclusionKey(void) const
+	{
 		return getActualState().key^HashKeys::exclusion;
 	}
+
+	U64 getPawnKey(void) const
+	{
+		return getActualState().pawnKey;
+	}
+
+	U64 getMaterialKey(void) const
+	{
+		return getActualState().materialKey;
+	}
+
+	eNextMove getNextTurn(void) const
+	{
+		return getActualState().nextMove;
+	}
+
+	tSquare getEpSquare(void) const
+	{
+		return getActualState().epSquare;
+	}
+
+	eCastle getCastleRights(void) const
+	{
+		return getActualState().castleRights;
+	}
+
+	unsigned int getPly(void) const
+	{
+		return getActualState().ply;
+	}
+
+	bitboardIndex getCapturedPiece(void) const
+	{
+		return getActualState().capturedPiece;
+	}
+
+	bool isInCheck(void) const
+	{
+		return getActualState().checkers;
+	}
+
+
+
 
 	/*! \brief undo a null move
 		\author Marco Belli
@@ -526,9 +574,10 @@ public:
 		return false;
 	}
 	void cleanStateInfo(){
-		for( auto& s:stateInfo){
-			s.skipNullMove=true;
-			s.excludedMove=0;
+		for( auto& s:stateInfo)
+		{
+			s.skipNullMove = false;
+			s.excludedMove = 0;
 			//s.currentMove=0;
 		}
 	}

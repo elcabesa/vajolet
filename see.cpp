@@ -49,7 +49,7 @@ Score Position::see(const Move& m) const {
 
 
 	tSquare from=(tSquare)m.bit.from, to=(tSquare)m.bit.to;
-	const int relativeRank =getActualState().nextMove?7-RANKS[to] :RANKS[to];
+	const int relativeRank =getNextTurn() ?7-RANKS[to] :RANKS[to];
 	bitMap occupied=bitBoard[occupiedSquares]^bitSet(from);
 //	displayBitMap(occupied);
 	eNextMove color=squares[from]>separationBitmap?blackTurn:whiteTurn;

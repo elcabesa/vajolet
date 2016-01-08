@@ -259,8 +259,8 @@ void Position::setupFromFen(const std::string& fenStr){
 
 	ss >> token;
 	x.nextMove = (token == 'w' ? whiteTurn : blackTurn);
-	//x.Us=&bitBoard[x.nextMove];
-	//x.Them=&bitBoard[(blackTurn-x.nextMove)];
+
+
 
 	Us=&bitBoard[x.nextMove];
 	Them=&bitBoard[(blackTurn-x.nextMove)];
@@ -307,7 +307,7 @@ void Position::setupFromFen(const std::string& fenStr){
 		x.ply = std::max(2 * (x.ply - 1), (unsigned int)0) + int(x.nextMove == blackTurn);
 	}
 
-	x.pliesFromNull=0;
+	x.pliesFromNull = 0;
 	x.skipNullMove=true;
 	x.excludedMove=0;
 	x.currentMove=0;
@@ -713,8 +713,8 @@ void Position::doNullMove(void){
 	x.pliesFromNull = 0;
 	x.skipNullMove=true;
 	x.nextMove= (eNextMove)(blackTurn-x.nextMove);
-	//x.Us=&bitBoard[x.nextMove];
-	//x.Them=&bitBoard[(blackTurn-x.nextMove)];
+
+
 	x.ply++;
 	x.capturedPiece=empty;
 	x.excludedMove=0;
@@ -898,8 +898,8 @@ void Position::doMove(const Move & m){
 
 
 	x.nextMove= (eNextMove)(blackTurn-x.nextMove);
-	//x.Us=&bitBoard[x.nextMove];
-	//x.Them=&bitBoard[(blackTurn-x.nextMove)];
+
+
 
 	std::swap(Us,Them);
 
@@ -1291,7 +1291,7 @@ bitMap Position::getHiddenCheckers(tSquare kingSquare,eNextMove next){
 	while(pinners){
 		bitMap b = SQUARES_BETWEEN[kingSquare][iterateBit(pinners)] & bitBoard[occupiedSquares];
 		if (!moreThanOneBit(b)){
-			result |= b & bitBoard[(bitboardIndex)(whitePieces+getActualState().nextMove)];
+			result |= b & bitBoard[(bitboardIndex)(whitePieces+ getNextTurn())];
 		}
 	}
 	return result;
@@ -1464,7 +1464,8 @@ bool Position::isDraw(bool isPVline) const {
 
 	// Draw by the 50 moves rule?
 	if (getActualState().fiftyMoveCnt>  99){
-		if(!getActualState().checkers){
+		if(!isInCheck())
+		{
 			return true;
 		}
 
