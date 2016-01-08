@@ -546,7 +546,7 @@ public:
 	inline unsigned int getGamePhase() const{
 		const int opening = 570000;
 		const int endgame = 150000;
-		Score tot=getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
+		Score tot = getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
 		if(tot>opening){ //opening
 			return 0;
 
@@ -580,7 +580,7 @@ public:
 	void cleanStateInfo(){
 		for( auto& s:stateInfo)
 		{
-			s.skipNullMove = false;
+			s.skipNullMove = true;
 			s.excludedMove = 0;
 			//s.currentMove=0;
 		}
