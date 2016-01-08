@@ -384,6 +384,7 @@ void Position::clear() {
 		}
 	}
 	stateIndex=0;
+	actualState = &stateInfo[stateIndex];
 }
 
 

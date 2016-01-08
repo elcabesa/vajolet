@@ -130,8 +130,10 @@ public:
 		}
 
 
+		actualState = &stateInfo[stateIndex];
 		Us=&bitBoard[ getNextTurn() ];
 		Them=&bitBoard[(blackTurn - getNextTurn())];
+
 	};
 
 	Position& operator=(const Position& other)
@@ -159,6 +161,7 @@ public:
 		}
 
 
+		actualState = &stateInfo[stateIndex];
 		Us=&bitBoard[getNextTurn()];
 		Them=&bitBoard[blackTurn-getNextTurn()];
 
@@ -270,6 +273,7 @@ public:
 	Position()
 	{
 		stateIndex=0;
+		actualState = &stateInfo[stateIndex];
 	}
 
 	/*! \brief tell if the piece is a pawn
@@ -398,7 +402,7 @@ public:
 	{
 		//assert(stateIndex>=0);
 		assert(stateIndex<STATE_INFO_LENGTH);
-		return (state&) stateInfo[stateIndex];
+		return (state&) *actualState;/*stateInfo[stateIndex];*/
 	}
 
 	inline state& getState(unsigned int n)const {
@@ -419,6 +423,7 @@ public:
 		assert(stateIndex<STATE_INFO_LENGTH);
 
 		stateInfo[stateIndex]=s;
+		actualState = &stateInfo[stateIndex];
 	}
 
 	/*! \brief  remove the last state
@@ -432,6 +437,7 @@ public:
 
 		stateIndex--;
 		assert(stateIndex<STATE_INFO_LENGTH);
+		actualState = &stateInfo[stateIndex];
 	}
 
 
