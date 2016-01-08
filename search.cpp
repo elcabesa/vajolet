@@ -186,8 +186,9 @@ Score search::startThinking(searchLimits & l){
 
 
 			pos.doMove(lastLegalMove);
-			U64 posKey=pos.getKey();
-			ttEntry* tte = TT.probe(posKey);
+
+			ttEntry* tte = TT.probe(pos.getKey());
+
 			pos.undoMove(lastLegalMove);
 			if(tte && tte->getPackedMove()){
 				Move m;
@@ -269,12 +270,12 @@ Score search::startThinking(searchLimits & l){
 							//sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
 							break;
 						}
-						tte = TT.probe(pos.getActualState().key);
+						tte = TT.probe(pos.getKey());
 
 						if (!tte || tte->getPackedMove() != (*it).packed){// Don't overwrite correct entries
 							//sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
 							//TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
-							TT.store(pos.getActualState().key, SCORE_NONE,typeExact,-1000, (*it).packed, pos.eval<false>());
+							TT.store(pos.getKey(), SCORE_NONE,typeExact,-1000, (*it).packed, pos.eval<false>());
 						}
 
 						//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
@@ -495,8 +496,7 @@ Score search::startThinking(searchLimits & l){
 	}
 	else{
 		pos.doMove(rootMoves[bestMoveLine].PV.front());
-		U64 posKey=pos.getKey();
-		ttEntry* tte = TT.probe(posKey);
+		ttEntry* tte = TT.probe(pos.getKey());
 		pos.undoMove(rootMoves[bestMoveLine].PV.front());
 		if(tte && tte->getPackedMove()){
 			Move m;
@@ -745,7 +745,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			red += ONE_PLY;
 		}
 		pos.doNullMove();
-		U64 nullKey= pos.getActualState().key;
+		U64 nullKey= pos.getKey();
 
 
 		Score nullVal;
@@ -1292,9 +1292,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 				search::nodeType::PV_NODE;
 
 
-
-	U64 posKey=pos.getActualState().key;
-	ttEntry* tte = TT.probe(posKey);
+	ttEntry* tte = TT.probe(pos.getKey());
 	Move ttMove;
 	ttMove=tte ? tte->getPackedMove() : Movegen::NOMOVE;
 	Movegen mg(pos,history,ttMove);
@@ -1504,7 +1502,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 
 
 	if(!signals.stop){
-		TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+		TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta ? typeScoreHigherThanBeta : TTtype,
 					(short int)TTdepth, bestMove.packed, staticEval);
 	}

@@ -522,7 +522,6 @@ void Movegen::generateMoves()
 	bitMap target;
 	if(type==Movegen::allEvasionMg)
 	{
-		assert(pos.pieceList[Position::whiteKing+s.nextMove][0]<squareNumber);
 		assert(s.checkers);
 		target = ( s.checkers | SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.Us[Position::Pieces];
 		kingTarget = ~pos.Us[Position::Pieces];
@@ -592,6 +591,7 @@ void Movegen::generateMoves()
 	for(unsigned int i = 0; i < pos.pieceCount[piece]; i++)
 	{
 
+		assert(i<Position::maxNumberOfPieces);
 		tSquare from = pos.pieceList[piece][i];
 		assert(from < squareNumber);
 		m.bit.from = from;
@@ -620,6 +620,7 @@ void Movegen::generateMoves()
 
 	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
 	{
+		assert(i<Position::maxNumberOfPieces);
 		tSquare from = pos.pieceList[piece][i];
 		assert(from < squareNumber);
 		m.bit.from = from;
@@ -648,6 +649,7 @@ void Movegen::generateMoves()
 
 	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
 	{
+		assert(i<Position::maxNumberOfPieces);
 		tSquare from = pos.pieceList[piece][i];
 		assert(from < squareNumber);
 		m.bit.from = from;
@@ -679,6 +681,7 @@ void Movegen::generateMoves()
 
 	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
 	{
+		assert(i<Position::maxNumberOfPieces);
 		tSquare from = pos.pieceList[piece][i];
 		assert(from<squareNumber);
 		m.bit.from = from;

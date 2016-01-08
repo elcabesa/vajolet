@@ -25,7 +25,6 @@
 #include "movegen.h"
 #include "eval.h"
 
-//unsigned long Position::testPointCounter=0;
 
 enum color{
 	white=0,

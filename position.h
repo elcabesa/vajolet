@@ -17,10 +17,6 @@
 #ifndef POSITION_H_
 #define POSITION_H_
 
-#include <exception>
-#include <vector>
-#include <list>
-#include <string>
 #include "vajolet.h"
 #include "data.h"
 #include "vectorclass/vectorclass.h"
@@ -41,70 +37,10 @@
 class Position
 {
 private:
-	static const int maxNumberOfPieces = 10;
+
+
 public:
-	//static unsigned long testPointCounter;
-	Position(const Position& other) : stateIndex(other.stateIndex) // calls the copy constructor of the age
-	{
-		for(int i = 0; i < STATE_INFO_LENGTH; i++)
-		{
-			stateInfo[i] = other.stateInfo[i];
-		}
-		for(int i=0;i<squareNumber;i++)
-		{
-			squares[i] = other.squares[i];
-			index[i] = other.index[i];
-		}
-		for(int i = 0; i < lastBitboard; i++)
-		{
-			bitBoard[i] = other.bitBoard[i];
-			pieceCount[i] = other.pieceCount[i];
-			for(int n = 0; n < maxNumberOfPieces; n++)
-			{
-				pieceList[i][n] =other.pieceList[i][n];
-			}
-		}
-
-
-		Us=&bitBoard[getActualState().nextMove];
-		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
-	};
-
-	Position& operator=(const Position& other)
-
-	{
-		if (this == &other)
-			return *this;
-
-
-		stateIndex = other.stateIndex;
-		for(int i=0;i<STATE_INFO_LENGTH;i++){
-			stateInfo[i]=other.stateInfo[i];
-		}
-		for(int i=0;i<squareNumber;i++){
-			squares[i]=other.squares[i];
-			index[i]=other.index[i];
-		}
-		for(int i=0;i<lastBitboard;i++){
-			bitBoard[i]=other.bitBoard[i];
-			pieceCount[i]=other.pieceCount[i];
-			for(int n=0;n<10;n++)
-			{
-				pieceList[i][n] =other.pieceList[i][n];
-			}
-		}
-
-
-
-
-		Us=&bitBoard[getActualState().nextMove];
-		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
-
-		return *this;
-	};
-
-
-
+	static const int maxNumberOfPieces = 10;
 
 	/*! \brief define the index of the bitboards
 		\author Marco Belli
@@ -147,19 +83,91 @@ public:
 
 	};
 
-
-
-	enum eNextMove{					// color turn. ( it's also used as offset to access bitmaps by index)
-		whiteTurn,
+	enum eNextMove	// color turn. ( it's also used as offset to access bitmaps by index)
+	{
+		whiteTurn = 0,
 		blackTurn=blackKing-whiteKing
 	};
 
-	enum eCastle{
+	enum eCastle	// castleRights
+	{
 		wCastleOO=1,
 		wCastleOOO=2,
 		bCastleOO=4,
 		bCastleOOO=8,
-	};					// castleRights
+	};
+
+
+
+
+	Position(const Position& other) : stateIndex(other.stateIndex) // calls the copy constructor of the age
+	{
+
+		for(int i = 0; i < STATE_INFO_LENGTH; i++)
+		{
+			stateInfo[i] = other.stateInfo[i];
+		}
+		for(int i=0;i<squareNumber;i++)
+		{
+			squares[i] = other.squares[i];
+			index[i] = other.index[i];
+		}
+		for(int i = 0; i < lastBitboard; i++)
+		{
+			bitBoard[i] = other.bitBoard[i];
+			pieceCount[i] = other.pieceCount[i];
+			for(int n = 0; n < maxNumberOfPieces; n++)
+			{
+				pieceList[i][n] =other.pieceList[i][n];
+			}
+		}
+
+
+		Us=&bitBoard[getActualState().nextMove];
+		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
+	};
+
+	Position& operator=(const Position& other)
+
+	{
+		if (this == &other)
+			return *this;
+
+		stateIndex = other.stateIndex;
+
+		for(int i=0;i<STATE_INFO_LENGTH;i++){
+			stateInfo[i]=other.stateInfo[i];
+		}
+		for(int i=0;i<squareNumber;i++){
+			squares[i]=other.squares[i];
+			index[i]=other.index[i];
+		}
+		for(int i=0;i<lastBitboard;i++){
+			bitBoard[i]=other.bitBoard[i];
+			pieceCount[i]=other.pieceCount[i];
+			for(int n=0;n<maxNumberOfPieces;n++)
+			{
+				pieceList[i][n] =other.pieceList[i][n];
+			}
+		}
+
+
+
+
+		Us=&bitBoard[getActualState().nextMove];
+		Them=&bitBoard[(blackTurn-getActualState().nextMove)];
+
+		return *this;
+	};
+
+
+
+
+
+
+
+
+
 
 
 	/*! \brief define the state of the board
@@ -185,43 +193,13 @@ public:
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
 		bitMap checkers;	/*!< checking pieces*/
-		//bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
-		//Move killers[2];	/*!< killer move at ply x*/
 		bool skipNullMove;
 		Move excludedMove;
 		Move currentMove;
 
-		/*state(){}
-		state(const state& other){
-			key=other.key;
-			pawnKey=other.pawnKey;
-			materialKey=other.materialKey;
-			nonPawnMaterial[0]=other.nonPawnMaterial[0];
-			nonPawnMaterial[1]=other.nonPawnMaterial[1];
-			nonPawnMaterial[2]=other.nonPawnMaterial[2];
-			nonPawnMaterial[3]=other.nonPawnMaterial[3];
-			nextMove=other.nextMove;
-			castleRights=other.castleRights;
-			epSquare=other.epSquare;
-			fiftyMoveCnt=other.fiftyMoveCnt;
-			pliesFromNull=other.fiftyMoveCnt;
-			ply=other.ply;
-			capturedPiece=other.capturedPiece;
-			material[0]=other.material[0];
-			material[1]=other.material[1];
+		state(){
+		}
 
-			for(int i=0;i<lastBitboard;i++){
-				checkingSquares[i]=other.checkingSquares[i];
-			}
-			hiddenCheckersCandidate=other.hiddenCheckersCandidate;
-			pinnedPieces=other.pinnedPieces;
-			checkers=other.checkers;
-			killers[0]=other.killers[0];
-			killers[1]=other.killers[1];
-			skipNullMove=other.skipNullMove;
-			excludedMove=other.excludedMove;
-			currentMove=other.currentMove;
-		}*/
 
 	};
 
@@ -549,8 +527,6 @@ public:
 	}
 	void cleanStateInfo(){
 		for( auto& s:stateInfo){
-			//s.killers[0].packed=0;
-			//s.killers[1].packed=0;
 			s.skipNullMove=true;
 			s.excludedMove=0;
 			//s.currentMove=0;
@@ -619,6 +595,7 @@ private:
 		bitBoard[occupiedSquares] |= b;
 		bitBoard[color]|= b;
 		index[s] = pieceCount[piece]++;
+		assert(index[s]<maxNumberOfPieces);
 		pieceList[piece][index[s]] = s;
 	}
 
@@ -643,6 +620,7 @@ private:
 		squares[from] = empty;
 		squares[to] = piece;
 		index[to] = index[from];
+		assert(index[s]<maxNumberOfPieces);
 		pieceList[piece][index[to]] = to;
 
 

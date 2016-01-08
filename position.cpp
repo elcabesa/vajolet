@@ -1087,6 +1087,7 @@ bool Position::checkPosConsistency(int nn){
 
 	for (int i = empty; i < lastBitboard; i++){
 		for (unsigned int n=0;n<pieceCount[i];n++){
+			assert(n<maxNumberOfPieces);
 			if((bitBoard[i] & bitSet(pieceList[i][n]))==0){
 				sync_cout<<"pieceList Error"<<sync_endl;
 				sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
