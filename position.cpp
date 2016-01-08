@@ -980,11 +980,11 @@ void Position::undoMove(const Move & m){
 		assert(rook<lastBitboard);
 		assert(isRook(rook));
 		movePiece(rook,rTo,rFrom);
-		movePiece(piece,to,from);
 
-	}else{
-		movePiece(piece,to,from);
 	}
+
+	movePiece(piece,to,from);
+
 
 	assert(x.capturedPiece<lastBitboard);
 	if(x.capturedPiece){
