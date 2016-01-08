@@ -967,8 +967,7 @@ template<>
 void Movegen::generateMoves<Movegen::allMg>()
 {
 
-	Position::state &s =pos.getActualState();
-	if(s.checkers)
+	if(pos.isInCheck())
 	{
 		generateMoves<Movegen::allEvasionMg>();
 	}

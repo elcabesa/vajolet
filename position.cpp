@@ -29,6 +29,7 @@
 #include "transposition.h"
 
 
+
 simdScore initialPieceValue[Position::lastBitboard]={
 		simdScore(0,0,0,0),
 /*		simdScore(3000000,3000000,0,0),//king
@@ -383,6 +384,7 @@ void Position::clear() {
 		}
 	}
 	stateIndex=0;
+	actualState = &stateInfo[stateIndex];
 }
 
 
@@ -395,7 +397,7 @@ void Position::display()const {
 	sync_cout<<displayFen()<<sync_endl;
 
 	int rank, file;
-	state& st =getActualState();
+	const state& st =getActualState();
 	sync_cout;
 	{
 		for (rank = 7; rank >= 0; rank--)
@@ -695,9 +697,10 @@ void Position::calcNonPawnMaterialValue(Score* s){
 	\date 27/10/2013
 */
 void Position::doNullMove(void){
-	state n=getActualState();
-	insertState(n);
-	state &x=getActualState();
+
+	insertState(getActualState());
+	state &x = getActualState();
+
 	x.currentMove=0;
 	if(x.epSquare!=squareNone){
 		assert(x.epSquare<squareNumber);
@@ -743,10 +746,11 @@ void Position::doMove(const Move & m){
 	//sync_cout<<displayUci(m)<<sync_endl;
 	assert(m.packed);
 
-	state n=getActualState();
-	bool moveIsCheck=moveGivesCheck(m);
-	insertState(n);
+	bool moveIsCheck = moveGivesCheck(m);
+
+	insertState(getActualState());
 	state &x=getActualState();
+
 	x.currentMove=m;
 
 
@@ -912,10 +916,11 @@ void Position::doMove(const Move & m){
 			x.checkers |= getAttackersTo(pieceList[whiteKing+x.nextMove][0]) & Them[Pieces];
 		}
 		else{
-			if(n.checkingSquares[piece] & bitSet(to)){
+			if(x.checkingSquares[piece] & bitSet(to)){ // should be old state, but checkingSquares has not been changed so far
 				x.checkers |=bitSet(to);
 			}
-			if(n.hiddenCheckersCandidate && (n.hiddenCheckersCandidate & bitSet(from))){
+			if(x.hiddenCheckersCandidate && (x.hiddenCheckersCandidate & bitSet(from)))	// should be old state, but hiddenCheckersCandidate has not been changed so far
+			{
 				if(!isRook(piece)){
 					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
 					x.checkers|=Movegen::attackFrom<Position::whiteRooks>(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
@@ -965,7 +970,8 @@ void Position::undoMove(const Move & m){
 		putPiece(piece,to);
 	}
 
-	if(m.bit.flags== Move::fcastle){
+	if(m.bit.flags== Move::fcastle)
+	{
 		bool kingSide=to > from;
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		tSquare rTo = kingSide? to+ovest: to+est;
@@ -974,14 +980,12 @@ void Position::undoMove(const Move & m){
 		bitboardIndex rook = squares[rTo];
 		assert(rook<lastBitboard);
 		assert(isRook(rook));
-
-
 		movePiece(rook,rTo,rFrom);
-		movePiece(piece,to,from);
 
-	}else{
-		movePiece(piece,to,from);
 	}
+
+	movePiece(piece,to,from);
+
 
 	assert(x.capturedPiece<lastBitboard);
 	if(x.capturedPiece){
@@ -1477,13 +1481,17 @@ bool Position::isDraw(bool isPVline) const {
 
 	// Draw by repetition?
 	unsigned int counter=1;
-	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2){
+	U64 actualkey = getActualState().key;
+	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2)
+	{
 		unsigned int stateIndexPointer=stateIndex-i;
 		assert(stateIndex>=i);
 		assert(stateIndexPointer<STATE_INFO_LENGTH);
 		const state* stp=&stateInfo[stateIndexPointer];
 		assert(stp);
-		if(stp->key==getActualState().key){
+
+		if(stp->key==actualkey)
+		{
 			counter++;
 			if(!isPVline || counter>=3){
 				return true;

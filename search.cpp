@@ -272,9 +272,8 @@ Score search::startThinking(searchLimits & l){
 						}
 						tte = TT.probe(pos.getKey());
 
-						if (!tte || tte->getPackedMove() != (*it).packed){// Don't overwrite correct entries
-							//sync_cout<<"WARNING MOSSA MANCANTE "<<z<<" "<<p.displayUci(rootMoves[i].PV.list[z])<<sync_endl;
-							//TT.store(p.getActualState().key, transpositionTable::scoreToTT((n%2)?-rootMoves[i].score:rootMoves[i].score, n),typeExact,depth-n*ONE_PLY, (rootMoves[i].PV.list[z]).packed, p.eval<false>());
+						if (!tte || tte->getPackedMove() != (*it).packed)
+						{// Don't overwrite correct entries
 							TT.store(pos.getKey(), SCORE_NONE,typeExact,-1000, (*it).packed, pos.eval<false>());
 						}
 
@@ -381,8 +380,6 @@ Score search::startThinking(searchLimits & l){
 
 					reduction = 0;
 
-					//TT.store(p.getActualState().key, transpositionTable::scoreToTT(rootMoves[indexPV].previousScore, 0),typeExact,depth*ONE_PLY, (rootMoves[indexPV].PV[0]).packed, p.eval<false>());
-					//sync_cout<<"new alpha "<<alpha<<sync_endl;
 				}
 				else if (res >= beta){
 					if(oldBestMove.packed && oldBestMove!=newPV.front()){
@@ -521,6 +518,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 
+	Position::state& st = pos.getActualState();
+
 
 	/*if(visitedNodes>709000 && visitedNodes<710000){
 		sync_cout<<visitedNodes<<" AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
@@ -581,7 +580,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 	}
 
-	Move excludedMove=pos.getActualState().excludedMove;
+	Move excludedMove=st.excludedMove;
 
 	U64 posKey=excludedMove.packed?pos.getExclusionKey() :pos.getKey();
 	ttEntry* tte = TT.probe(posKey);
@@ -709,13 +708,13 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	//---------------------------
 	if (!PVnode
 		&& !inCheck
-		&& !pos.getActualState().skipNullMove
+		&& !st.skipNullMove
 		&&  depth < 4 * ONE_PLY
 		&& eval >-SCORE_INFINITE + futility[depth>>ONE_PLY_SHIFT]
 		&&  eval - futility[depth>>ONE_PLY_SHIFT] >= beta
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&&  abs(eval) < SCORE_KNOWN_WIN
-		&&  ((pos.getNextTurn() && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0])))
+		&&  ((pos.getNextTurn() && st.nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0])))
 	{
 		assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
 		return eval - futility[depth>>ONE_PLY_SHIFT];
@@ -733,9 +732,9 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		&& !inCheck
 		&& depth>=ONE_PLY
 		&& eval>=beta
-		&& !pos.getActualState().skipNullMove
+		&& !st.skipNullMove
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
-		&&((pos.getNextTurn() && pos.getActualState().nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && pos.getActualState().nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0]))
+		&&((pos.getNextTurn() && st.nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0]))
 	){
 		// Null move dynamic reduction based on depth
 		int red = 3 * ONE_PLY + depth / 4;
@@ -772,7 +771,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			}
 
 			// Do verification search at high depths
-			pos.getActualState().skipNullMove=true;
+			st.skipNullMove=true;
 			assert(depth - red>=ONE_PLY);
 			Score val;
 			if(depth-red<ONE_PLY){
@@ -781,7 +780,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			else{
 				val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
 			}
-			pos.getActualState().skipNullMove=false;
+			st.skipNullMove=false;
 			if (val >= beta){
 				return nullVal;
 			}
@@ -803,7 +802,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	if(!PVnode &&
 		!inCheck &&
 		depth>=5*ONE_PLY &&
-		!pos.getActualState().skipNullMove &&
+		!st.skipNullMove &&
 		//abs(beta)<SCORE_KNOWN_WIN
 		//eval> beta-40000
 		abs(beta)<SCORE_MATE_IN_MAX_PLY
@@ -838,15 +837,15 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	{
 		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
 
-		bool skipBackup=pos.getActualState().skipNullMove;
-		pos.getActualState().skipNullMove=true;
+		bool skipBackup = st.skipNullMove;
+		st.skipNullMove = true;
 
 		std::list<Move> childPV;
 		const search::nodeType iidType=type;
 		assert(d>=ONE_PLY);
 		alphaBeta<iidType>(ply, d, alpha, beta, childPV);
 
-		pos.getActualState().skipNullMove=skipBackup;
+		st.skipNullMove = skipBackup;
 
 		tte = TT.probe(posKey);
 		ttMove= tte!=nullptr ? tte->getPackedMove():0;
@@ -924,12 +923,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 			std::list<Move> childPv;
 			Score rBeta = ttValue - int(depth*20);
-			pos.getActualState().excludedMove=m;
-			bool backup=pos.getActualState().skipNullMove;
-			pos.getActualState().skipNullMove=true;
+			st.excludedMove=m;
+			bool backup=st.skipNullMove;
+			st.skipNullMove=true;
 			Score temp = alphaBeta<ALL_NODE>(ply,depth/2,rBeta-1,rBeta,childPv);
-			pos.getActualState().skipNullMove=backup;
-			pos.getActualState().excludedMove.packed=0;
+			st.skipNullMove=backup;
+			st.excludedMove = Movegen::NOMOVE;
 
 			if(temp < rBeta){
 				ext = ONE_PLY;
@@ -1380,6 +1379,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	//bestMove=0;
 	std::list<Move> childPV;
 
+	Position::state &st = pos.getActualState();
 	while (bestScore <beta  &&  (m=mg.getNextMove())!=Movegen::NOMOVE) {
 		assert(alpha<beta);
 		assert(beta<=SCORE_INFINITE);
@@ -1393,7 +1393,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		}
 
 		if(depth<-7*ONE_PLY && !inCheck){
-			if(pos.getActualState().currentMove.bit.to!= m.bit.to){
+			if(st.currentMove.bit.to!= m.bit.to){
 				continue;
 			}
 		}

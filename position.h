@@ -38,6 +38,13 @@ class Position
 {
 private:
 
+	/*! \brief helper mask used to speedup castle right management
+		\author STOCKFISH
+		\version 1.0
+		\date 27/10/2013
+	*/
+	static int castleRightsMask[squareNumber];
+
 
 public:
 	static const int maxNumberOfPieces = 10;
@@ -125,6 +132,7 @@ public:
 
 		Us=&bitBoard[ getNextTurn() ];
 		Them=&bitBoard[(blackTurn - getNextTurn())];
+		actualState = &stateInfo[stateIndex];
 	};
 
 	Position& operator=(const Position& other)
@@ -154,6 +162,7 @@ public:
 
 		Us=&bitBoard[getNextTurn()];
 		Them=&bitBoard[blackTurn-getNextTurn()];
+		actualState = &stateInfo[stateIndex];
 
 		return *this;
 	};
@@ -206,12 +215,10 @@ public:
 
 	};
 
-	/*! \brief helper mask used to speedup castle right management
-		\author STOCKFISH
-		\version 1.0
-		\date 27/10/2013
-	*/
-	static int castleRightsMask[squareNumber];
+private:
+	state * actualState;
+
+
 public:
 	unsigned int getStateIndex(void){ return stateIndex;}
 	/*! \brief array of char to create the fen string
@@ -265,6 +272,7 @@ public:
 	Position()
 	{
 		stateIndex=0;
+		actualState = &stateInfo[stateIndex];
 	}
 
 	/*! \brief tell if the piece is a pawn
@@ -389,10 +397,11 @@ public:
 		\version 1.1 get rid of continuos malloc/free
 		\date 21/11/2013
 	*/
-	inline state& getActualState(void)const {
+	inline state& getActualState(void)const
+	{
 		//assert(stateIndex>=0);
 		assert(stateIndex<STATE_INFO_LENGTH);
-		return (state&) stateInfo[stateIndex];
+		return (state&) *actualState;/*stateInfo[stateIndex];*/
 	}
 
 	inline state& getState(unsigned int n)const {
@@ -407,19 +416,13 @@ public:
 		\version 1.1 get rid of continuos malloc/free
 		\date 21/11/2013
 	*/
-	inline void insertState(state & s){
-
-
+	inline void insertState(state & s)
+	{
 		stateIndex++;
 		assert(stateIndex<STATE_INFO_LENGTH);
-		//Move killer0;
-		//Move killer1;
-		//killer0=stateInfo[stateIndex].killers[0];
-		//killer1=stateInfo[stateIndex].killers[1];
-		stateInfo[stateIndex]=s;
-		//stateInfo[stateIndex].killers[0]=killer0;
-		//stateInfo[stateIndex].killers[1]=killer1;
 
+		stateInfo[stateIndex]=s;
+		actualState = &stateInfo[stateIndex];
 	}
 
 	/*! \brief  remove the last state
@@ -433,6 +436,7 @@ public:
 
 		stateIndex--;
 		assert(stateIndex<STATE_INFO_LENGTH);
+		actualState = &stateInfo[stateIndex];
 	}
 
 
@@ -472,10 +476,10 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	std::string displayMove(Move & m)const {
+	std::string displayMove(Move & m)const
+	{
 
 		std::string s;
-		//state st=getActualState();
 
 		bool capture = (bitSet((tSquare)m.bit.to) & Them[Pieces]);
 		if(!isPawn(squares[m.bit.from])){
