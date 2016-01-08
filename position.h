@@ -394,7 +394,8 @@ public:
 		\version 1.1 get rid of continuos malloc/free
 		\date 21/11/2013
 	*/
-	inline state& getActualState(void)const {
+	inline state& getActualState(void)const
+	{
 		//assert(stateIndex>=0);
 		assert(stateIndex<STATE_INFO_LENGTH);
 		return (state&) stateInfo[stateIndex];

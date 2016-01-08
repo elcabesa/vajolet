@@ -696,9 +696,10 @@ void Position::calcNonPawnMaterialValue(Score* s){
 	\date 27/10/2013
 */
 void Position::doNullMove(void){
-	state n=getActualState();
-	insertState(n);
-	state &x=getActualState();
+
+	insertState(getActualState());
+	state &x = getActualState();
+
 	x.currentMove=0;
 	if(x.epSquare!=squareNone){
 		assert(x.epSquare<squareNumber);
@@ -967,7 +968,8 @@ void Position::undoMove(const Move & m){
 		putPiece(piece,to);
 	}
 
-	if(m.bit.flags== Move::fcastle){
+	if(m.bit.flags== Move::fcastle)
+	{
 		bool kingSide=to > from;
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		tSquare rTo = kingSide? to+ovest: to+est;
@@ -976,8 +978,6 @@ void Position::undoMove(const Move & m){
 		bitboardIndex rook = squares[rTo];
 		assert(rook<lastBitboard);
 		assert(isRook(rook));
-
-
 		movePiece(rook,rTo,rFrom);
 		movePiece(piece,to,from);
 
@@ -1479,13 +1479,17 @@ bool Position::isDraw(bool isPVline) const {
 
 	// Draw by repetition?
 	unsigned int counter=1;
-	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2){
+	U64 actualkey = getActualState().key;
+	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2)
+	{
 		unsigned int stateIndexPointer=stateIndex-i;
 		assert(stateIndex>=i);
 		assert(stateIndexPointer<STATE_INFO_LENGTH);
 		const state* stp=&stateInfo[stateIndexPointer];
 		assert(stp);
-		if(stp->key==getActualState().key){
+
+		if(stp->key==actualkey)
+		{
 			counter++;
 			if(!isPVline || counter>=3){
 				return true;
