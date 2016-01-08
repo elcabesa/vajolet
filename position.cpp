@@ -745,9 +745,9 @@ void Position::doMove(const Move & m){
 	//sync_cout<<displayUci(m)<<sync_endl;
 	assert(m.packed);
 
-	state n=getActualState();
-	bool moveIsCheck=moveGivesCheck(m);
-	insertState(n);
+	bool moveIsCheck = moveGivesCheck(m);
+
+	insertState(getActualState());
 	state &x=getActualState();
 
 	x.currentMove=m;
@@ -915,10 +915,11 @@ void Position::doMove(const Move & m){
 			x.checkers |= getAttackersTo(pieceList[whiteKing+x.nextMove][0]) & Them[Pieces];
 		}
 		else{
-			if(n.checkingSquares[piece] & bitSet(to)){
+			if(x.checkingSquares[piece] & bitSet(to)){ // should be old state, but checkingSquares has not been changed so far
 				x.checkers |=bitSet(to);
 			}
-			if(n.hiddenCheckersCandidate && (n.hiddenCheckersCandidate & bitSet(from))){
+			if(x.hiddenCheckersCandidate && (x.hiddenCheckersCandidate & bitSet(from)))	// should be old state, but hiddenCheckersCandidate has not been changed so far
+			{
 				if(!isRook(piece)){
 					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
 					x.checkers|=Movegen::attackFrom<Position::whiteRooks>(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
