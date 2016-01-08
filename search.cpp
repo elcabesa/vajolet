@@ -762,11 +762,14 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 
 			// Do not return unproven mate scores
-			if (nullVal >= SCORE_MATE_IN_MAX_PLY){
+			if (nullVal >= SCORE_MATE_IN_MAX_PLY)
+			{
 				nullVal = beta;
 			}
+			//return nullVal;
 
-			if (depth < 12 * ONE_PLY){
+			if (depth < 12 * ONE_PLY)
+			{
 				return nullVal;
 			}
 
@@ -781,9 +784,11 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 				val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
 			}
 			st.skipNullMove=false;
-			if (val >= beta){
+			if (val >= beta)
+			{
 				return nullVal;
 			}
+
 		}
 		else
 		{

@@ -133,7 +133,6 @@ public:
 		actualState = &stateInfo[stateIndex];
 		Us=&bitBoard[ getNextTurn() ];
 		Them=&bitBoard[(blackTurn - getNextTurn())];
-
 	};
 
 	Position& operator=(const Position& other)
@@ -547,7 +546,7 @@ public:
 	inline unsigned int getGamePhase() const{
 		const int opening = 570000;
 		const int endgame = 150000;
-		Score tot=getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
+		Score tot = getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
 		if(tot>opening){ //opening
 			return 0;
 
