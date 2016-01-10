@@ -26,7 +26,7 @@
 
 Score Position::seeSign(const Move& m) const {
 	assert(m.packed);
-	if (pieceValue[squares[m.bit.from]][0] <= pieceValue[squares[m.bit.to]][0])
+	if (pieceValue[getPieceAt((tSquare)m.bit.from)][0] <= pieceValue[getPieceAt((tSquare)m.bit.to)][0])
 	{
 		return 1;
 	}
@@ -50,17 +50,17 @@ Score Position::see(const Move& m) const {
 
 	tSquare from=(tSquare)m.bit.from, to=(tSquare)m.bit.to;
 	const int relativeRank =getNextTurn() ?7-RANKS[to] :RANKS[to];
-	bitMap occupied=bitBoard[occupiedSquares]^bitSet(from);
+	bitMap occupied=getOccupationBitmap()^bitSet(from);
 //	displayBitMap(occupied);
-	eNextMove color=squares[from]>separationBitmap?blackTurn:whiteTurn;
+	eNextMove color=getPieceAt(from)>separationBitmap?blackTurn:whiteTurn;
 
 	Score swapList[64];
 	unsigned int slIndex = 1;
 	bitMap colorAttackers;
 	bitboardIndex captured;
 
-	swapList[0] = pieceValue[squares[to]][0];
-	captured = bitboardIndex(squares[from]%separationBitmap);
+	swapList[0] = pieceValue[getPieceAt(to)][0];
+	captured = bitboardIndex(getPieceAt(from)%separationBitmap);
 
 	if(m.bit.flags== Move::fenpassant){
 		occupied ^= to- pawnPush(color);
@@ -84,7 +84,7 @@ Score Position::see(const Move& m) const {
 	// If the opponent has no attackers we are finished
 	color = (eNextMove)(blackTurn-color);
 	assert(Pieces+color<lastBitboard);
-	colorAttackers = attackers & bitBoard[Pieces+color];
+	colorAttackers = attackers & getBitmap((bitboardIndex)(Pieces+color));
 
 //	displayBitMap(colorAttackers);
 
@@ -104,7 +104,7 @@ Score Position::see(const Move& m) const {
 	// new X-ray attacks from behind the capturing piece.
 
 	assert(captured<lastBitboard);
-	assert(squares[from]!=empty);
+	assert(getPieceAt(from)!=empty);
 	do {
 		assert(slIndex < 64);
 
@@ -115,7 +115,7 @@ Score Position::see(const Move& m) const {
 		// Locate and remove the next least valuable attacker
 		bitboardIndex nextAttacker= (bitboardIndex)(Pawns);
 		while(nextAttacker>=King){
-			bitMap att=bitBoard[nextAttacker+color] &colorAttackers;
+			bitMap att=getBitmap(bitboardIndex(nextAttacker+color)) &colorAttackers;
 //			displayBitMap(att);
 			if(att){
 				att= att & ~(att - 1); // find only one attacker
@@ -126,12 +126,12 @@ Score Position::see(const Move& m) const {
 //				displayBitMap(attackers);
 
 				if (nextAttacker == Pawns || nextAttacker == Bishops || nextAttacker == Queens){
-					attackers |= Movegen::attackFrom<Position::whiteBishops>(to,occupied)& (bitBoard[whiteBishops] |bitBoard[blackBishops] |bitBoard[whiteQueens] |bitBoard[blackQueens]);
+					attackers |= Movegen::attackFrom<Position::whiteBishops>(to,occupied)& (getBitmap(whiteBishops) |getBitmap(blackBishops) |getBitmap(whiteQueens) |getBitmap(blackQueens));
 				}
 
 				if (nextAttacker == Rooks || nextAttacker == Queens){
 					assert(to<squareNumber);
-					attackers |= Movegen::attackFrom<Position::whiteRooks>(to,occupied)& (bitBoard[whiteRooks] |bitBoard[blackRooks] |bitBoard[whiteQueens] |bitBoard[blackQueens]);
+					attackers |= Movegen::attackFrom<Position::whiteRooks>(to,occupied)& (getBitmap(whiteRooks) |getBitmap(blackRooks) |getBitmap(whiteQueens) |getBitmap(blackQueens));
 				}
 				attackers &= occupied;
 //				displayBitMap(attackers);
@@ -147,7 +147,7 @@ Score Position::see(const Move& m) const {
 
 
 		color = (eNextMove)(blackTurn-color);
-		colorAttackers = attackers & bitBoard[Pieces+color];
+		colorAttackers = attackers & getBitmap((bitboardIndex)(Pieces+color));
 //		displayBitMap(colorAttackers);
 
 		// Stop before processing a king capture

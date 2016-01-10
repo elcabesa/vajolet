@@ -318,13 +318,13 @@ const union {
 U64 polyglotKey(const Position& pos) {
 
 	U64 k = 0;
-	bitMap b = pos.bitBoard[Position::occupiedSquares];
+	bitMap b = pos.getOccupationBitmap();
 
 	while (b)
 	{
 
-		unsigned int s=iterateBit(b);
-		Position::bitboardIndex p=pos.squares[s];
+		tSquare s=iterateBit(b);
+		Position::bitboardIndex p=pos.getPieceAt(s);
 
 		// PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
 		k ^= PG.Zobrist.psq[pieceMapping[p]][s];

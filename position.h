@@ -36,16 +36,6 @@
 
 class Position
 {
-private:
-
-	/*! \brief helper mask used to speedup castle right management
-		\author STOCKFISH
-		\version 1.0
-		\date 27/10/2013
-	*/
-	static int castleRightsMask[squareNumber];
-
-
 public:
 	static const int maxNumberOfPieces = 10;
 
@@ -105,16 +95,26 @@ public:
 	};
 
 
+	/*! \brief constructor
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	Position()
+	{
+		stateIndex=0;
+		actualState = &stateInfo[stateIndex];
+	}
 
 
 	Position(const Position& other) : stateIndex(other.stateIndex) // calls the copy constructor of the age
 	{
 
-		for(int i = 0; i < STATE_INFO_LENGTH; i++)
+		for(unsigned int i = 0; i <= stateIndex; i++)
 		{
 			stateInfo[i] = other.stateInfo[i];
 		}
-		for(int i=0;i<squareNumber;i++)
+		for(int i=0; i<squareNumber; i++)
 		{
 			squares[i] = other.squares[i];
 			index[i] = other.index[i];
@@ -131,50 +131,46 @@ public:
 
 
 		actualState = &stateInfo[stateIndex];
+
 		Us=&bitBoard[ getNextTurn() ];
-		Them=&bitBoard[(blackTurn - getNextTurn())];
+		Them=&bitBoard[blackTurn - getNextTurn()];
 	};
 
 	Position& operator=(const Position& other)
-
 	{
 		if (this == &other)
 			return *this;
 
 		stateIndex = other.stateIndex;
 
-		for(int i=0;i<STATE_INFO_LENGTH;i++){
-			stateInfo[i]=other.stateInfo[i];
+		for(unsigned int i=0; i<=stateIndex; i++)
+		{
+			stateInfo[i] = other.stateInfo[i];
 		}
-		for(int i=0;i<squareNumber;i++){
-			squares[i]=other.squares[i];
-			index[i]=other.index[i];
+
+		for(int i = 0; i < squareNumber; i++)
+		{
+			squares[i] = other.squares[i];
+			index[i] = other.index[i];
 		}
-		for(int i=0;i<lastBitboard;i++){
-			bitBoard[i]=other.bitBoard[i];
-			pieceCount[i]=other.pieceCount[i];
-			for(int n=0;n<maxNumberOfPieces;n++)
+		for(int i=0;i<lastBitboard;i++)
+		{
+			bitBoard[i] = other.bitBoard[i];
+			pieceCount[i] = other.pieceCount[i];
+			for(int n = 0; n < maxNumberOfPieces; n++)
 			{
-				pieceList[i][n] =other.pieceList[i][n];
+				pieceList[i][n] = other.pieceList[i][n];
 			}
 		}
 
 
 		actualState = &stateInfo[stateIndex];
-		Us=&bitBoard[getNextTurn()];
-		Them=&bitBoard[blackTurn-getNextTurn()];
+
+		Us = &bitBoard[ getNextTurn() ];
+		Them = &bitBoard[blackTurn-getNextTurn()];
 
 		return *this;
 	};
-
-
-
-
-
-
-
-
-
 
 
 	/*! \brief define the state of the board
@@ -216,32 +212,104 @@ public:
 	};
 
 private:
-	state * actualState;
 
-
-public:
-	unsigned int getStateIndex(void){ return stateIndex;}
 	/*! \brief array of char to create the fen string
 		\author Marco Belli
 		\version 1.0
 		\date 27/10/2013
 	*/
 	static const char PIECE_NAMES_FEN[lastBitboard];
-private:
 
+	/*! \brief helper mask used to speedup castle right management
+		\author STOCKFISH
+		\version 1.0
+		\date 27/10/2013
+	*/
+	static int castleRightsMask[squareNumber];
+
+	static simdScore pstValue[lastBitboard][squareNumber];
+	static simdScore nonPawnValue[lastBitboard];
+
+
+	/*used for search*/
+	pawnTable pawnHashTable;
+	Move killers[STATE_INFO_LENGTH][2];
+
+	/*data defining the position*/
+	state * actualState;
 	unsigned int stateIndex;
+	/*! \brief list of the past states, this is the history of the position
+		the last element is the actual state
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	state stateInfo[STATE_INFO_LENGTH];
 
+	/*! \brief board rapresentation
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	bitboardIndex squares[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
+	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
+	unsigned int pieceCount[lastBitboard];	// number of pieces indexed by bitboardIndex enum
+	tSquare pieceList[lastBitboard][maxNumberOfPieces];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 64 pezzi di ogni tipo)
+	unsigned int index[squareNumber];		// indice del pezzo all'interno della sua lista
+	bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
+
+
+
+
+
+
+
+
+public:
+	inline bitMap getOccupationBitmap() const
+	{
+		return bitBoard[occupiedSquares];
+	}
+	inline bitMap getBitmap(const bitboardIndex index) const
+	{
+		return bitBoard[index];
+	}
+	inline unsigned int getpieceCount(const bitboardIndex index) const
+	{
+		return pieceCount[index];
+	}
+
+	inline bitboardIndex getPieceAt(const tSquare sq) const
+	{
+		return squares[sq];
+	}
+	inline tSquare getSquareOfThePiece(const bitboardIndex piece,const unsigned int n = 0) const
+	{
+		return pieceList[piece][n];
+	}
+	inline bitMap getOurBitmap(const bitboardIndex piece)const { return Us[piece];}
+	inline bitMap getTheirBitmap(const bitboardIndex piece)const { return Them[piece];}
+
+
+	unsigned int getStateIndex(void){ return stateIndex;}
 
 	/*! \brief piece values used to calculate scores
 		\author Marco Belli
 		\version 1.0
 		\date 27/10/2013
 	*/
-public:
+
 	static simdScore pieceValue[lastBitboard];
-	static simdScore pstValue[lastBitboard][squareNumber];
-	static simdScore nonPawnValue[lastBitboard];
-public:
+
+
+
+
+
+
+
+
+
+
 
 
 	static void initScoreValues(void);
@@ -264,16 +332,7 @@ public:
 	Score seeSign(const Move& m) const;
 	bool isDraw(bool isPVline) const;
 
-	/*! \brief constructor
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	Position()
-	{
-		stateIndex=0;
-		actualState = &stateInfo[stateIndex];
-	}
+
 
 	/*! \brief tell if the piece is a pawn
 		\author Marco Belli
@@ -617,19 +676,11 @@ private:
 	inline void calcCheckingSquares(void);
 	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next);
 
-	pawnTable pawnHashTable;
 
 
 
-	/*! \brief list of the past states, this is the history of the position
-	  	the last element is the actual state
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	state stateInfo[STATE_INFO_LENGTH];
 
-	Move killers[STATE_INFO_LENGTH][2];
+
 
 	/*! \brief put a piece on the board
 		\author STOCKFISH
@@ -711,39 +762,8 @@ private:
 public:
 	bool isMoveLegal(const Move &m) const;
 
-	/*! \brief board rapresentation
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	bitboardIndex squares[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
-	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
-	unsigned int pieceCount[lastBitboard];	// number of pieces indexed by bitboardIndex enum
-	tSquare pieceList[lastBitboard][maxNumberOfPieces];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 64 pezzi di ogni tipo)
-	unsigned int index[squareNumber];		// indice del pezzo all'interno della sua lista
-	bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
+
 
 };
-
-extern simdScore initialPieceValue[Position::lastBitboard];
-extern simdScore PawnD3;
-extern simdScore PawnD4;
-extern simdScore PawnD5;
-extern simdScore PawnE3;
-extern simdScore PawnE4;
-extern simdScore PawnE5;
-extern simdScore PawnCentering;
-extern simdScore PawnRankBonus;
-extern simdScore KnightPST;
-extern simdScore BishopPST;
-extern simdScore RookPST;
-extern simdScore QueenPST;
-extern simdScore KingPST;
-
-extern simdScore BishopBackRankOpening;
-extern simdScore KnightBackRankOpening;
-extern simdScore RookBackRankOpening;
-extern simdScore QueenBackRankOpening;
-extern simdScore BishopOnBigDiagonals;
 
 #endif /* POSITION_H_ */

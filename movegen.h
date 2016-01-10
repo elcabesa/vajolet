@@ -122,7 +122,7 @@ private:
 	{
 		for(unsigned int i = moveListPosition; i < moveListSize; i++)
 		{
-			moveList[i].score = h.getValue(pos.squares[moveList[i].m.bit.from],(tSquare)moveList[i].m.bit.to);
+			moveList[i].score = h.getValue(pos.getPieceAt((tSquare)moveList[i].m.bit.from),(tSquare)moveList[i].m.bit.to);
 		}
 	}
 	inline void resetMoveList()

@@ -504,17 +504,17 @@ void Movegen::generateMoves()
 
 	// initialize constants
 	const Position::state &s =pos.getActualState();
-	const bitMap& enemy = pos.Them[Position::Pieces];
-	const bitMap& occupiedSquares = pos.bitBoard[Position::occupiedSquares];
+	const bitMap& enemy = pos.getTheirBitmap(Position::Pieces);
+	const bitMap& occupiedSquares = pos.getOccupationBitmap();
 
 	//divide pawns
 	const bitMap& thirdRankMask = RANKMASK[ s.nextMove ? A6:A3];
 	const bitMap& seventhRankMask = RANKMASK[ s.nextMove ? A2:A7];
 
-	bitMap promotionPawns =  pos.Us[Position::Pawns] & seventhRankMask ;
-	bitMap nonPromotionPawns =  pos.Us[Position::Pawns]^ promotionPawns;
+	bitMap promotionPawns =  pos.getOurBitmap(Position::Pawns) & seventhRankMask ;
+	bitMap nonPromotionPawns =  pos.getOurBitmap(Position::Pawns)^ promotionPawns;
 
-	const tSquare kingSquare = pos.pieceList[Position::whiteKing+s.nextMove][0];
+	const tSquare kingSquare = pos.getSquareOfThePiece((Position::bitboardIndex)(Position::whiteKing+s.nextMove),0);
 	assert(kingSquare<squareNumber);
 
 	// populate the target squares bitmaps
@@ -523,28 +523,28 @@ void Movegen::generateMoves()
 	if(type==Movegen::allEvasionMg)
 	{
 		assert(s.checkers);
-		target = ( s.checkers | SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.Us[Position::Pieces];
-		kingTarget = ~pos.Us[Position::Pieces];
+		target = ( s.checkers | SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.getOurBitmap(Position::Pieces);
+		kingTarget = ~pos.getOurBitmap(Position::Pieces);
 	}
 	else if(type== Movegen::allNonEvasionMg)
 	{
-		target= ~pos.Us[Position::Pieces];
-		kingTarget= ~pos.Us[Position::Pieces];
+		target= ~pos.getOurBitmap(Position::Pieces);
+		kingTarget= ~pos.getOurBitmap(Position::Pieces);
 	}
 	else if(type== Movegen::captureMg)
 	{
-		target = pos.Them[Position::Pieces];
-		kingTarget = pos.Them[Position::Pieces];
+		target = pos.getTheirBitmap(Position::Pieces);
+		kingTarget = pos.getTheirBitmap(Position::Pieces);
 	}
 	else if(type== Movegen::quietMg)
 	{
-		target = ~pos.bitBoard[Position::occupiedSquares];
-		kingTarget = ~pos.bitBoard[Position::occupiedSquares];
+		target = ~pos.getOccupationBitmap();
+		kingTarget = ~pos.getOccupationBitmap();
 	}
 	else if(type== Movegen::quietChecksMg)
 	{
-		target = ~pos.bitBoard[Position::occupiedSquares];
-		kingTarget = ~pos.bitBoard[Position::occupiedSquares];
+		target = ~pos.getOccupationBitmap();
+		kingTarget = ~pos.getOccupationBitmap();
 	}
 
 
@@ -567,7 +567,7 @@ void Movegen::generateMoves()
 			tSquare to = iterateBit(moves);
 			m.bit.to = to;
 
-			if( !(pos.getAttackersTo(to, pos.bitBoard[Position::occupiedSquares] & ~pos.Us[Position::King]) & enemy) )
+			if( !(pos.getAttackersTo(to, pos.getOccupationBitmap() & ~pos.getOurBitmap(Position::King)) & enemy) )
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
@@ -588,11 +588,11 @@ void Movegen::generateMoves()
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)( piece+1 );
 
-	for(unsigned int i = 0; i < pos.pieceCount[piece]; i++)
+	for(unsigned int i = 0; i < pos.getpieceCount(piece); i++)
 	{
 
 		assert(i<Position::maxNumberOfPieces);
-		tSquare from = pos.pieceList[piece][i];
+		tSquare from = pos.getSquareOfThePiece(piece,i);
 		assert(from < squareNumber);
 		m.bit.from = from;
 
@@ -618,10 +618,10 @@ void Movegen::generateMoves()
 	//------------------------------------------------------
 	piece= (Position::bitboardIndex)(piece+1);
 
-	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
+	for(unsigned int i=0; i<pos.getpieceCount(piece); i++)
 	{
 		assert(i<Position::maxNumberOfPieces);
-		tSquare from = pos.pieceList[piece][i];
+		tSquare from = pos.getSquareOfThePiece(piece,i);
 		assert(from < squareNumber);
 		m.bit.from = from;
 
@@ -647,10 +647,10 @@ void Movegen::generateMoves()
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)(piece+1);
 
-	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
+	for(unsigned int i=0; i<pos.getpieceCount(piece); i++)
 	{
 		assert(i<Position::maxNumberOfPieces);
-		tSquare from = pos.pieceList[piece][i];
+		tSquare from = pos.getSquareOfThePiece(piece,i);
 		assert(from < squareNumber);
 		m.bit.from = from;
 
@@ -679,10 +679,10 @@ void Movegen::generateMoves()
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)(piece+1);
 
-	for(unsigned int i=0; i<pos.pieceCount[piece]; i++)
+	for(unsigned int i=0; i<pos.getpieceCount(piece); i++)
 	{
 		assert(i<Position::maxNumberOfPieces);
-		tSquare from = pos.pieceList[piece][i];
+		tSquare from = pos.getSquareOfThePiece(piece,i);
 		assert(from<squareNumber);
 		m.bit.from = from;
 
@@ -878,8 +878,8 @@ void Movegen::generateMoves()
 				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[from];
 				bitMap occ = occupiedSquares^bitSet(from)^bitSet(s.epSquare)^captureSquare;
 
-				if(	!((attackFromRook(kingSquare, occ) & (pos.Them[Position::Queens] | pos.Them[Position::Rooks])) |
-						(Movegen::attackFromBishop(kingSquare, occ) & (pos.Them[Position::Queens] | pos.Them[Position::Bishops])))
+				if(	!((attackFromRook(kingSquare, occ) & (pos.getTheirBitmap(Position::Queens) | pos.getTheirBitmap(Position::Rooks))) |
+						(Movegen::attackFromBishop(kingSquare, occ) & (pos.getTheirBitmap(Position::Queens) | pos.getTheirBitmap(Position::Bishops))))
 				)
 				{
 					m.bit.to = s.epSquare;
@@ -901,14 +901,14 @@ void Movegen::generateMoves()
 		if(s.castleRights & ((Position::wCastleOO |Position::wCastleOOO)<<(2*color)))
 		{
 
-			if((s.castleRights &((Position::wCastleOO)<<(2*color))) &&!s.checkers &&!(castlePath[color][kingSideCastle] & pos.bitBoard[Position::occupiedSquares]))
+			if((s.castleRights &((Position::wCastleOO)<<(2*color))) &&!s.checkers &&!(castlePath[color][kingSideCastle] & pos.getOccupationBitmap()))
 			{
 
 				bool castleDenied = false;
 				for( tSquare x = (tSquare)1; x<3; x++)
 				{
 					assert(kingSquare+x<squareNumber);
-					if(pos.getAttackersTo(kingSquare+x,pos.bitBoard[Position::occupiedSquares]) & pos.Them[Position::Pieces])
+					if(pos.getAttackersTo(kingSquare+x,pos.getOccupationBitmap()) & pos.getTheirBitmap(Position::Pieces))
 					{
 						castleDenied = true;
 						break;
@@ -927,13 +927,13 @@ void Movegen::generateMoves()
 
 
 			}
-			if((s.castleRights &((Position::wCastleOOO)<<(2*color))) && !s.checkers && !(castlePath[color][queenSideCastle] & pos.bitBoard[Position::occupiedSquares]))
+			if((s.castleRights &((Position::wCastleOOO)<<(2*color))) && !s.checkers && !(castlePath[color][queenSideCastle] & pos.getOccupationBitmap()))
 			{
 				bool castleDenied = false;
 				for( tSquare x = (tSquare)1 ;x<3 ;x++)
 				{
 					assert(kingSquare-x<squareNumber);
-					if(pos.getAttackersTo(kingSquare-x, pos.bitBoard[Position::occupiedSquares]) & pos.Them[Position::Pieces])
+					if(pos.getAttackersTo(kingSquare-x, pos.getOccupationBitmap()) & pos.getTheirBitmap(Position::Pieces))
 					{
 						castleDenied = true;
 						break;

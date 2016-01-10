@@ -543,10 +543,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		pvLine.clear();
 	}
 
-	if( showLine && depth <=ONE_PLY){
+	if( showLine && depth <=ONE_PLY)
+	{
+		// TODO questo mostra la linea dallo startpoosition.... errore  va modificato
 		showLine=false;
 		sync_cout<<"info currline";
-		for (unsigned int i =1; i<= pos.getStateIndex()/2;i++){ // show only half of
+		for (unsigned int i = 1; i<= pos.getStateIndex()/2;i++){ // show only half of
 			std::cout<<" "<<pos.displayUci(pos.getState(i).currentMove);
 
 		}
@@ -687,7 +689,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		//&&  abs(alpha) < SCORE_MATE_IN_MAX_PLY // implicito nell riga precedente
 		&&  ((!ttMove.packed ) || type==ALL_NODE)
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
-		&& !((pos.getNextTurn() && (pos.bitBoard[Position::blackPawns] & RANKMASK[A2])) || (!pos.getNextTurn() && (pos.bitBoard[Position::whitePawns] & RANKMASK[A7]) ) )
+		&& !((pos.getNextTurn() && (pos.getBitmap(Position::blackPawns) & RANKMASK[A2])) || (!pos.getNextTurn() && (pos.getBitmap(Position::whitePawns) & RANKMASK[A7]) ) )
 	)
 	{
 		Score ralpha = alpha - razorMargin(depth);
@@ -766,7 +768,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			{
 				nullVal = beta;
 			}
-			//return nullVal;
+			//return nullVal; TODO da testare se da vantaggi o no, semplifica il codice
 
 			if (depth < 12 * ONE_PLY)
 			{
@@ -1230,13 +1232,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		// todo controllare se usare depth o qualche depth scalata
 		Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
 		//sync_cout<<bonus<<sync_endl;
-		history.update(pos.squares[bestMove.bit.from],(tSquare) bestMove.bit.to, bonus);
-		//sync_cout<<"pezzo:"<<pos.PIECE_NAMES_FEN[pos.squares[bestMove.from]]<<sync_endl;
+		history.update(pos.getPieceAt((tSquare)bestMove.bit.from),(tSquare) bestMove.bit.to, bonus);
 		if(quietMoveCount>1){
 			for (unsigned int i = 0; i < quietMoveCount - 1; i++){
 				Move m;
 				m= quietMoveList[i];
-				history.update(pos.squares[m.bit.from],(tSquare) m.bit.to, -bonus);
+				history.update(pos.getPieceAt((tSquare)m.bit.from),(tSquare) m.bit.to, -bonus);
 			}
 		}
 	}
@@ -1420,7 +1421,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 			)
 			{
 				Score futilityValue = futilityBase
-						+ Position::pieceValue[pos.squares[m.bit.to]][1]
+						+ Position::pieceValue[pos.getPieceAt((tSquare)m.bit.to)][1]
 						+ (m.bit.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
 
 				if (futilityValue < beta)
