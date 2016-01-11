@@ -29,7 +29,7 @@ void displayBitmap(bitMap b){
 
 	for ( int i = 0 ; i < squareNumber ; i++)
 	{
-		if (b & bitSet((enSquare)i)) boardc[i] = '1';
+		if (b & bitSet((tSquare)i)) boardc[i] = '1';
 		else boardc[i] = '.';
 	}
 	sync_cout;

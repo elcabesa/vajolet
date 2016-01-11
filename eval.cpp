@@ -158,18 +158,20 @@ simdScore queenVsRook2MinorsImbalance=simdScore(20000,20000,0,0);
 //---------------------------------------------
 
 
-typedef struct{
-	enum {
+struct materialStruct
+{
+	enum
+	{
 		exact,
 		multiplicativeFunction,
 		exactFunction,
 		saturationH,
 		saturationL
-	}type ;
+	} type ;
 	bool (*pointer)(const Position & ,Score &);
 	Score val;
 
-}materialStruct;
+};
 
 std::unordered_map<U64, materialStruct> materialKeyMap;
 

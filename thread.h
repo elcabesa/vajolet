@@ -28,7 +28,8 @@
 
 
 
-typedef struct timeManagement{
+struct timeManagementStruct
+{
 	volatile unsigned long allocatedTime;
 	volatile unsigned long minSearchTime;
 	volatile unsigned long maxSearchTime;
@@ -36,7 +37,8 @@ typedef struct timeManagement{
 	volatile unsigned int singularRootMoveCount;
 	volatile unsigned int resolution;
 	volatile bool idLoopIterationFinished;
-} timeManagementStruct;
+
+};
 
 
 

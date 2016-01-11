@@ -118,13 +118,14 @@ public:
 		volatile bool stop=false;
 	}signals;
 
-	typedef enum eNodeType{
+	enum nodeType
+	{
 		ROOT_NODE,
 		PV_NODE,
 		ALL_NODE,
 		CUT_NODE,
 		HELPER_ROOT_NODE
-	} nodeType;
+	} ;
 
 	Score startThinking(searchLimits & limits);
 	unsigned long long getVisitedNodes(){
