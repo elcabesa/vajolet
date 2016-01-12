@@ -44,7 +44,8 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	enum bitboardIndex{
+	enum bitboardIndex
+	{
 		occupiedSquares=0,				//0		00000000
 		whiteKing=1,					//1		00000001
 		whiteQueens=2,					//2		00000010
@@ -299,38 +300,51 @@ public:
 		\date 27/10/2013
 	*/
 
+
+	static void initCastleRightsMask(void);
+	static void initScoreValues(void);
+	static void initPstValues(void);
 	static simdScore pieceValue[lastBitboard];
 
 
 
-
-
-
-
-
-
-
-
-
-	static void initScoreValues(void);
-	static void initPstValues(void);
 	void display(void) const;
-	std::string displayFen(void) const;
+	std::string getFen(void) const;
 	std::string getSymmetricFen() const;
+
+	void setupFromFen(const std::string& fenStr);
+
+	unsigned long long perft(unsigned int depth);
+	unsigned long long divide(unsigned int depth);
+
 	void doNullMove(void);
 	void doMove(const Move &m);
 	void undoMove(const Move &m);
-	static void initCastleRightsMask(void);
-	void setupFromFen(const std::string& fenStr);
+	/*! \brief undo a null move
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline void undoNullMove(void){
+		removeState();
+		std::swap(Us,Them);
+
+#ifdef ENABLE_CHECK_CONSISTENCY
+		checkPosConsistency(0);
+#endif
+	}
+
+
 	template<bool trace>Score eval(void);
-	unsigned long long perft(unsigned int depth);
-	unsigned long long divide(unsigned int depth);
+	bool isDraw(bool isPVline) const;
+
+
 	bool moveGivesCheck(const Move& m)const ;
 	bool moveGivesDoubleCheck(const Move& m)const;
 	bool moveGivesSafeDoubleCheck(const Move& m)const;
 	Score see(const Move& m) const;
 	Score seeSign(const Move& m) const;
-	bool isDraw(bool isPVline) const;
+
 
 
 
@@ -340,7 +354,7 @@ public:
 		\date 27/10/2013
 	*/
 	inline static char isPawn(bitboardIndex piece) {
-		return (piece&7)==6;
+		return (piece&7)==Pawns;
 	}
 	/*! \brief tell if the piece is a king
 		\author Marco Belli
@@ -348,7 +362,7 @@ public:
 		\date 27/10/2013
 	*/
 	inline static char isKing(bitboardIndex piece){
-		return (piece&7)==1;
+		return (piece&7)==King;
 	}
 	/*! \brief tell if the piece is a queen
 		\author Marco Belli
@@ -356,7 +370,7 @@ public:
 		\date 04/11/2013
 	*/
 	inline static char isQueen(bitboardIndex piece){
-		return (piece&7)==2;
+		return (piece&7)==Queens;
 	}
 	/*! \brief tell if the piece is a rook
 		\author Marco Belli
@@ -364,7 +378,7 @@ public:
 		\date 04/11/2013
 	*/
 	inline static char isRook(bitboardIndex piece){
-		return (piece&7)==3;
+		return (piece&7)==Rooks;
 	}
 	/*! \brief tell if the piece is a bishop
 		\author Marco Belli
@@ -372,7 +386,7 @@ public:
 		\date 04/11/2013
 	*/
 	inline static char isBishop(bitboardIndex piece){
-		return (piece&7)==4;
+		return (piece&7)==Bishops;
 	}
 	/*! \brief tell the color of a piece
 		\author Marco Belli
@@ -437,19 +451,7 @@ public:
 
 
 
-	/*! \brief undo a null move
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	inline void undoNullMove(void){
-		removeState();
-		std::swap(Us,Them);
 
-#ifdef ENABLE_CHECK_CONSISTENCY
-		checkPosConsistency(0);
-#endif
-	}
 	/*! \brief return a reference to the actual state
 		\author Marco Belli
 		\version 1.0
@@ -463,41 +465,12 @@ public:
 		return (state&) *actualState;/*stateInfo[stateIndex];*/
 	}
 
-	inline state& getState(unsigned int n)const {
-			//assert(stateIndex>=0);
-			assert(stateIndex<STATE_INFO_LENGTH);
-			return (state&) stateInfo[n];
-		}
-
-	/*! \brief insert a new state in memory
-		\author Marco Belli
-		\version 1.0
-		\version 1.1 get rid of continuos malloc/free
-		\date 21/11/2013
-	*/
-	inline void insertState(state & s)
+	inline state& getState(unsigned int n)const
 	{
-		stateIndex++;
-		assert(stateIndex<STATE_INFO_LENGTH);
-
-		stateInfo[stateIndex]=s;
-		actualState = &stateInfo[stateIndex];
-	}
-
-	/*! \brief  remove the last state
-		\author Marco Belli
-		\version 1.0
-		\version 1.1 get rid of continuos malloc/free
-		\date 21/11/2013
-	*/
-	inline void removeState(){
 		//assert(stateIndex>=0);
-
-		stateIndex--;
 		assert(stateIndex<STATE_INFO_LENGTH);
-		actualState = &stateInfo[stateIndex];
+		return (state&) stateInfo[n];
 	}
-
 
 	/*! \brief return the uci string for a given move
 		\author Marco Belli
@@ -529,6 +502,40 @@ public:
 		return s;
 
 	}
+private:
+
+	/*! \brief insert a new state in memory
+		\author Marco Belli
+		\version 1.0
+		\version 1.1 get rid of continuos malloc/free
+		\date 21/11/2013
+	*/
+	inline void insertState(state & s)
+	{
+		stateIndex++;
+		assert(stateIndex<STATE_INFO_LENGTH);
+
+		stateInfo[stateIndex]=s;
+		actualState = &stateInfo[stateIndex];
+	}
+
+	/*! \brief  remove the last state
+		\author Marco Belli
+		\version 1.0
+		\version 1.1 get rid of continuos malloc/free
+		\date 21/11/2013
+	*/
+	inline void removeState()
+	{
+		//assert(stateIndex>=0);
+
+		stateIndex--;
+		assert(stateIndex<STATE_INFO_LENGTH);
+		actualState = &stateInfo[stateIndex];
+	}
+
+
+
 
 	/*! \brief return the uci string for a given move
 		\author Marco Belli
@@ -569,13 +576,14 @@ public:
 
 	}
 
-
+public:
 	/*! \brief return a bitmap with all the attacker/defender of a given square
 		\author Marco Belli
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline bitMap getAttackersTo(const tSquare to) const {
+	inline bitMap getAttackersTo(const tSquare to) const
+	{
 		return getAttackersTo(to, bitBoard[occupiedSquares]);
 	}
 
@@ -587,7 +595,8 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline Score getMvvLvaScore(const Move & m) const {
+	inline Score getMvvLvaScore(const Move & m) const
+	{
 		Score s=pieceValue[squares[m.bit.to]][0]-(squares[m.bit.from]);
 		if (m.bit.flags == Move::fpromotion){
 			s += (pieceValue[whiteQueens +m.bit.promotion] - pieceValue[whitePawns])[0];
@@ -602,41 +611,50 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline unsigned int getGamePhase() const{
+	inline unsigned int getGamePhase() const
+	{
 		const int opening = 570000;
 		const int endgame = 150000;
 		Score tot = getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
-		if(tot>opening){ //opening
+		if(tot>opening) //opening
+		{
 			return 0;
 
 		}
-		if(tot<endgame){	//endgame
+		if(tot<endgame)	//endgame
+		{
 			return 65536;
-
 		}
 		return (unsigned int)((float)(opening-tot)*(65536.0f/(float)(opening-endgame)));
 	}
 
 
 
-	inline bool isCaptureMove(const Move & m) const {
+	inline bool isCaptureMove(const Move & m) const
+	{
 		return squares[m.bit.to]!=empty || m.bit.flags==Move::fenpassant;
 	}
-	inline bool isCastleMove(const Move & m) const {
+	inline bool isCastleMove(const Move & m) const
+	{
 		return  m.bit.flags==Move::fcastle;
 	}
-	inline bool isCaptureMoveOrPromotion(const Move & m) const {
+	inline bool isCaptureMoveOrPromotion(const Move & m) const
+	{
 		return squares[m.bit.to]!=empty || m.bit.flags==Move::fenpassant || m.bit.flags == Move::fpromotion;
 	}
-	inline bool isPassedPawnMove(const Move & m) const {
-		if(isPawn(squares[m.bit.to])){
+	inline bool isPassedPawnMove(const Move & m) const
+	{
+		if(isPawn(squares[m.bit.to]))
+		{
 			bool color=squares[m.bit.to]>=separationBitmap;
 			bitMap theirPawns=color? bitBoard[whitePawns]:bitBoard[blackPawns];
 			return !(theirPawns & PASSED_PAWN[color][m.bit.from]);
 		}
 		return false;
 	}
-	void cleanStateInfo(){
+
+	void cleanStateInfo()
+	{
 		for( auto& s:stateInfo)
 		{
 			s.skipNullMove = false;
@@ -746,8 +764,8 @@ private:
 		// the list and not in its original place, it means index[] and pieceList[]
 		// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
 		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
-		bitMap b=bitSet(s);
-		bitBoard[occupiedSquares]^= b;
+		bitMap b = bitSet(s);
+		bitBoard[occupiedSquares] ^= b;
 		bitBoard[piece] ^= b;
 		bitBoard[color] ^= b;
 		squares[s] = empty;
@@ -756,6 +774,7 @@ private:
 		pieceList[piece][index[lastSquare]] = lastSquare;
 		pieceList[piece][pieceCount[piece]] = squareNone;
 	}
+
 
 
 

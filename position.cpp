@@ -393,8 +393,9 @@ void Position::clear() {
 	\version 1.0
 	\date 22/10/2013
 */
-void Position::display()const {
-	sync_cout<<displayFen()<<sync_endl;
+void Position::display()const
+{
+	sync_cout<<getFen()<<sync_endl;
 
 	int rank, file;
 	const state& st =getActualState();
@@ -446,7 +447,7 @@ void Position::display()const {
 	\version 1.0
 	\date 22/10/2013
 */
-std::string  Position::displayFen() const {
+std::string  Position::getFen() const {
 
 	std::string s;
 

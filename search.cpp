@@ -522,10 +522,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 
 	/*if(visitedNodes>709000 && visitedNodes<710000){
-		sync_cout<<visitedNodes<<" AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
+		sync_cout<<visitedNodes<<" AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.getFen()<<sync_endl;
 	}*/
-	//sync_cout<<"AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
-	/*if(pos.displayFen()=="rn1qkb1r/ppp2ppp/4bn2/1B6/8/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 5"){
+	//sync_cout<<"AB "<<"ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.getFen()<<sync_endl;
+	/*if(pos.getFen()=="rn1qkb1r/ppp2ppp/4bn2/1B6/8/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 5"){
 		sync_cout<<"eccomi"<<sync_endl;
 		verbose=true;
 		pos.display();
@@ -1258,9 +1258,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 
 
 	/*if(visitedNodes>599000 && visitedNodes<800000){
-		sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
+		sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.getFen()<<sync_endl;
 	}*/
-	//sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.displayFen()<<sync_endl;
+	//sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.getFen()<<sync_endl;
 
 	const bool PVnode=(type==search::nodeType::PV_NODE);
 	assert(PVnode || alpha+1==beta);

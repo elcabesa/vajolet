@@ -529,22 +529,22 @@ void Movegen::generateMoves()
 	else if(type== Movegen::allNonEvasionMg)
 	{
 		target= ~pos.getOurBitmap(Position::Pieces);
-		kingTarget= ~pos.getOurBitmap(Position::Pieces);
+		kingTarget= target;
 	}
 	else if(type== Movegen::captureMg)
 	{
 		target = pos.getTheirBitmap(Position::Pieces);
-		kingTarget = pos.getTheirBitmap(Position::Pieces);
+		kingTarget = target;
 	}
 	else if(type== Movegen::quietMg)
 	{
 		target = ~pos.getOccupationBitmap();
-		kingTarget = ~pos.getOccupationBitmap();
+		kingTarget = target;
 	}
 	else if(type== Movegen::quietChecksMg)
 	{
 		target = ~pos.getOccupationBitmap();
-		kingTarget = ~pos.getOccupationBitmap();
+		kingTarget = target;
 	}
 
 

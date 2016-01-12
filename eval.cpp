@@ -1221,12 +1221,12 @@ simdScore evalPawn(const Position & p,tSquare sq, bitMap & weakPawns, bitMap & p
 	bool passed, isolated, doubled, opposed, chain, backward;
 	const bitMap ourPawns =c?p.getBitmap(Position::blackPawns):p.getBitmap(Position::whitePawns);
 	const bitMap theirPawns =c?p.getBitmap(Position::whitePawns):p.getBitmap(Position::blackPawns);
-	bitMap b;
+
 	const int relativeRank =c?7-RANKS[sq] :RANKS[sq];
 	//const int file =FILES[sq];
 
 	// Our rank plus previous one. Used for chain detection
-    b = RANKMASK[sq] | RANKMASK[sq-pawnPush(c)];
+	bitMap b = RANKMASK[sq] | RANKMASK[sq-pawnPush(c)];
     // Flag the pawn as passed, isolated, doubled or member of a pawn
     // chain (but not the backward one).
     chain    = (ourPawns   & ISOLATED_PAWN[sq] & b);
