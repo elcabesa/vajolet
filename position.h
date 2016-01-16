@@ -325,9 +325,10 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline void undoNullMove(void){
+	inline void undoNullMove(void)
+	{
 		removeState();
-		std::swap(Us,Them);
+		std::swap( Us , Them );
 
 #ifdef ENABLE_CHECK_CONSISTENCY
 		checkPosConsistency(0);
@@ -353,48 +354,53 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline static char isPawn(bitboardIndex piece) {
-		return (piece&7)==Pawns;
+	inline static bool isPawn(bitboardIndex piece)
+	{
+		return (piece&7) == Pawns;
 	}
 	/*! \brief tell if the piece is a king
 		\author Marco Belli
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline static char isKing(bitboardIndex piece){
-		return (piece&7)==King;
+	inline static bool isKing(bitboardIndex piece)
+	{
+		return (piece&7) == King;
 	}
 	/*! \brief tell if the piece is a queen
 		\author Marco Belli
 		\version 1.0
 		\date 04/11/2013
 	*/
-	inline static char isQueen(bitboardIndex piece){
-		return (piece&7)==Queens;
+	inline static bool isQueen(bitboardIndex piece)
+	{
+		return (piece&7) == Queens;
 	}
 	/*! \brief tell if the piece is a rook
 		\author Marco Belli
 		\version 1.0
 		\date 04/11/2013
 	*/
-	inline static char isRook(bitboardIndex piece){
-		return (piece&7)==Rooks;
+	inline static bool isRook(bitboardIndex piece)
+	{
+		return (piece&7) == Rooks;
 	}
 	/*! \brief tell if the piece is a bishop
 		\author Marco Belli
 		\version 1.0
 		\date 04/11/2013
 	*/
-	inline static char isBishop(bitboardIndex piece){
-		return (piece&7)==Bishops;
+	inline static bool isBishop(bitboardIndex piece){
+		return (piece&7) == Bishops;
 	}
 	/*! \brief tell the color of a piece
 		\author Marco Belli
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline static char isblack(bitboardIndex piece){
-		return piece&8;
+	inline static bool isblack(bitboardIndex piece)
+	{
+		return piece & 8;
 	}
 
 
@@ -482,21 +488,23 @@ public:
 
 		std::string s;
 
-		if(m.packed==0){
-			s="0000";
+		if(m.packed==0)
+		{
+			s = "0000";
 			return s;
 		}
 
 		//from
-		s+=char('a'+FILES[m.bit.from]);
-		s+=char('1'+RANKS[m.bit.from]);
+		s += char('a'+FILES[m.bit.from]);
+		s += char('1'+RANKS[m.bit.from]);
 
 
 		//to
-		s+=char('a'+FILES[m.bit.to]);
-		s+=char('1'+RANKS[m.bit.to]);
+		s += char('a'+FILES[m.bit.to]);
+		s += char('1'+RANKS[m.bit.to]);
 		//promotion
-		if(m.bit.flags == Move::fpromotion){
+		if(m.bit.flags == Move::fpromotion)
+		{
 			s += Position::PIECE_NAMES_FEN[m.bit.promotion+Position::blackQueens];
 		}
 		return s;
@@ -512,10 +520,9 @@ private:
 	*/
 	inline void insertState(state & s)
 	{
-		stateIndex++;
-		assert(stateIndex<STATE_INFO_LENGTH);
+		assert(stateIndex+1<STATE_INFO_LENGTH);
 
-		stateInfo[stateIndex]=s;
+		stateInfo[++stateIndex] = s;
 		actualState = &stateInfo[stateIndex];
 	}
 
@@ -529,9 +536,8 @@ private:
 	{
 		//assert(stateIndex>=0);
 
-		stateIndex--;
 		assert(stateIndex<STATE_INFO_LENGTH);
-		actualState = &stateInfo[stateIndex];
+		actualState = &stateInfo[--stateIndex];
 	}
 
 
@@ -548,13 +554,16 @@ private:
 		std::string s;
 
 		bool capture = (bitSet((tSquare)m.bit.to) & Them[Pieces]);
-		if(!isPawn(squares[m.bit.from])){
+		if( !isPawn(squares[m.bit.from]) )
+		{
 			s+=PIECE_NAMES_FEN[squares[m.bit.from]%Position::separationBitmap];
 		}
-		if(capture && isPawn(squares[m.bit.from])){
+		if(capture && isPawn(squares[m.bit.from]))
+		{
 			s+=char('a'+FILES[m.bit.from]);
 		}
-		if(capture){
+		if(capture)
+		{
 			s+="x";
 		}
 
@@ -562,14 +571,16 @@ private:
 
 
 		//to
-		s+=char('a'+FILES[m.bit.to]);
-		s+=char('1'+RANKS[m.bit.to]);
-		if(moveGivesCheck(m)){
+		s += char('a'+FILES[ m.bit.to ]);
+		s += char('1'+RANKS[ m.bit.to ]);
+		if( moveGivesCheck(m) )
+		{
 			s+="+";
 		}
 		//promotion
-		if(m.bit.flags == Move::fpromotion){
-			s +="=";
+		if(m.bit.flags == Move::fpromotion)
+		{
+			s += "=";
 			s += Position::PIECE_NAMES_FEN[m.bit.promotion+Position::whiteQueens];
 		}
 		return s;
@@ -577,6 +588,9 @@ private:
 	}
 
 public:
+
+	bool isMoveLegal(const Move &m) const;
+
 	/*! \brief return a bitmap with all the attacker/defender of a given square
 		\author Marco Belli
 		\version 1.0
@@ -597,11 +611,14 @@ public:
 	*/
 	inline Score getMvvLvaScore(const Move & m) const
 	{
-		Score s=pieceValue[squares[m.bit.to]][0]-(squares[m.bit.from]);
-		if (m.bit.flags == Move::fpromotion){
-			s += (pieceValue[whiteQueens +m.bit.promotion] - pieceValue[whitePawns])[0];
-		}else if(m.bit.flags == Move::fenpassant){
-			s +=pieceValue[whitePawns][0];
+		Score s = pieceValue[ squares[m.bit.to] ][0] - (squares[m.bit.from]);
+		if (m.bit.flags == Move::fpromotion)
+		{
+			s += (pieceValue[ whiteQueens +m.bit.promotion ] - pieceValue[whitePawns])[0];
+		}
+		else if(m.bit.flags == Move::fenpassant)
+		{
+			s += pieceValue[ whitePawns ][0];
 		}
 		return s;
 	}
@@ -632,22 +649,22 @@ public:
 
 	inline bool isCaptureMove(const Move & m) const
 	{
-		return squares[m.bit.to]!=empty || m.bit.flags==Move::fenpassant;
+		return squares[m.bit.to] !=empty || m.bit.flags == Move::fenpassant;
 	}
 	inline bool isCastleMove(const Move & m) const
 	{
-		return  m.bit.flags==Move::fcastle;
+		return  m.bit.flags == Move::fcastle;
 	}
 	inline bool isCaptureMoveOrPromotion(const Move & m) const
 	{
-		return squares[m.bit.to]!=empty || m.bit.flags==Move::fenpassant || m.bit.flags == Move::fpromotion;
+		return squares[m.bit.to] != empty || m.bit.flags == Move::fenpassant || m.bit.flags == Move::fpromotion;
 	}
 	inline bool isPassedPawnMove(const Move & m) const
 	{
 		if(isPawn(squares[m.bit.to]))
 		{
-			bool color=squares[m.bit.to]>=separationBitmap;
-			bitMap theirPawns=color? bitBoard[whitePawns]:bitBoard[blackPawns];
+			bool color = squares[m.bit.to] >= separationBitmap;
+			bitMap theirPawns = color? bitBoard[whitePawns]:bitBoard[blackPawns];
 			return !(theirPawns & PASSED_PAWN[color][m.bit.from]);
 		}
 		return false;
@@ -667,10 +684,11 @@ public:
 
 	void saveKillers(Move& m)
 	{
-		if(killers[stateIndex][0] != m)
+		Move * const tempKillers =  killers[stateIndex];
+		if(tempKillers[0] != m)
 		{
-			killers[stateIndex][1] = killers[stateIndex][0];
-			killers[stateIndex][0] = m;
+			tempKillers[1] = tempKillers[0];
+			tempKillers[0] = m;
 		}
 
 	}
@@ -692,7 +710,7 @@ private:
 	bool checkPosConsistency(int nn);
 	void clear();
 	inline void calcCheckingSquares(void);
-	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next);
+	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next) const;
 
 
 
@@ -705,20 +723,22 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline void putPiece(bitboardIndex piece,tSquare s) {
+	inline void putPiece(const bitboardIndex piece,const tSquare s)
+	{
 		assert(s<squareNumber);
 		assert(piece<lastBitboard);
-		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
+		bitboardIndex color = piece > separationBitmap ? blackPieces : whitePieces;
 		bitMap b=bitSet(s);
 
 		assert(squares[s]==empty);
+
 		squares[s] = piece;
 		bitBoard[piece] |= b;
 		bitBoard[occupiedSquares] |= b;
-		bitBoard[color]|= b;
-		index[s] = pieceCount[piece]++;
+		bitBoard[color] |= b;
+		unsigned int temp = index[s] = pieceCount[piece]++;
 		assert(index[s]<maxNumberOfPieces);
-		pieceList[piece][index[s]] = s;
+		pieceList[piece][temp] = s;
 	}
 
 	/*! \brief move a piece on the board
@@ -726,7 +746,8 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline void movePiece(bitboardIndex piece, tSquare from, tSquare to) {
+	inline void movePiece(const bitboardIndex piece,const tSquare from,const tSquare to)
+	{
 		assert(from<squareNumber);
 		assert(to<squareNumber);
 		assert(piece<lastBitboard);
@@ -735,7 +756,7 @@ private:
 		assert(squares[from]!=empty);
 		assert(squares[to]==empty);
 		bitMap fromTo = bitSet(from) ^ bitSet(to);
-		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
+		bitboardIndex color = piece > separationBitmap ? blackPieces : whitePieces;
 		bitBoard[occupiedSquares] ^= fromTo;
 		bitBoard[piece] ^= fromTo;
 		bitBoard[color] ^= fromTo;
@@ -752,7 +773,8 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	inline void removePiece( bitboardIndex piece, tSquare s) {
+	inline void removePiece(const bitboardIndex piece,const tSquare s)
+	{
 
 		assert(!isKing(piece));
 		assert(s<squareNumber);
@@ -763,23 +785,24 @@ private:
 		// do_move() and then replace it in undo_move() we will put it at the end of
 		// the list and not in its original place, it means index[] and pieceList[]
 		// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
-		bitboardIndex color=piece>separationBitmap? blackPieces:whitePieces;
+		bitboardIndex color = piece  > separationBitmap ? blackPieces : whitePieces;
 		bitMap b = bitSet(s);
 		bitBoard[occupiedSquares] ^= b;
 		bitBoard[piece] ^= b;
 		bitBoard[color] ^= b;
+
 		squares[s] = empty;
-		tSquare lastSquare = pieceList[piece][--pieceCount[piece]];
-		index[lastSquare] = index[s];
-		pieceList[piece][index[lastSquare]] = lastSquare;
+
+		const tSquare lastSquare = pieceList[piece][--pieceCount[piece]];
+		unsigned int temp = index[lastSquare] = index[s];
+		pieceList[piece][temp] = lastSquare;
 		pieceList[piece][pieceCount[piece]] = squareNone;
 	}
 
 
 
 
-public:
-	bool isMoveLegal(const Move &m) const;
+
 
 
 
