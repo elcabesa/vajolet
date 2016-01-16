@@ -187,12 +187,12 @@ Score search::startThinking(searchLimits & l){
 
 			pos.doMove(lastLegalMove);
 
-			ttEntry* tte = TT.probe(pos.getKey());
+			const ttEntry* const tte = TT.probe(pos.getKey());
 
 			pos.undoMove(lastLegalMove);
-			if(tte && tte->getPackedMove()){
-				Move m;
-				m.packed=tte->getPackedMove();
+			Move m;
+			if(tte && ( m.packed = (tte->getPackedMove())))
+			{
 				std::cout<<" ponder "<<pos.displayUci(m);
 			}
 
@@ -259,7 +259,7 @@ Score search::startThinking(searchLimits & l){
 			for(unsigned int i =0; i<=indexPV; i++){
 				//sync_cout<<"LENGHT "<<rootMoves[i].PV.lenght<<sync_endl;
 				if(rootMoves[i].PV.size()>0){
-					const ttEntry* tte;
+
 
 					auto it = begin(rootMoves[i].PV);
 					//sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
@@ -270,7 +270,7 @@ Score search::startThinking(searchLimits & l){
 							//sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
 							break;
 						}
-						tte = TT.probe(pos.getKey());
+						const ttEntry* const tte = TT.probe(pos.getKey());
 
 						if (!tte || tte->getPackedMove() != (*it).packed)
 						{// Don't overwrite correct entries
@@ -493,11 +493,11 @@ Score search::startThinking(searchLimits & l){
 	}
 	else{
 		pos.doMove(rootMoves[bestMoveLine].PV.front());
-		ttEntry* tte = TT.probe(pos.getKey());
+		const ttEntry* const tte = TT.probe(pos.getKey());
 		pos.undoMove(rootMoves[bestMoveLine].PV.front());
-		if(tte && tte->getPackedMove()){
-			Move m;
-			m.packed=tte->getPackedMove();
+		Move m;
+		if(tte && ( m.packed = tte->getPackedMove()))
+		{
 			std::cout<<" ponder "<<pos.displayUci(m);
 		}
 
@@ -794,8 +794,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		}
 		else
 		{
-			ttEntry * tte=TT.probe(nullKey);
-			threatMove=tte!=nullptr? tte->getPackedMove(): 0;
+			const ttEntry * const tteNull = TT.probe(nullKey);
+			threatMove = tteNull != nullptr ? tteNull->getPackedMove() : 0;
 		}
 
 	}
@@ -855,7 +855,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		st.skipNullMove = skipBackup;
 
 		tte = TT.probe(posKey);
-		ttMove= tte!=nullptr ? tte->getPackedMove():0;
+		ttMove= tte != nullptr ? tte->getPackedMove() : 0;
 	}
 
 
@@ -1207,9 +1207,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 
 
-	if(!signals.stop){
+	if(!signals.stop)
+	{
 	//Statistics::instance().gatherNodeTypeStat(type,bestScore >= beta?CUT_NODE:PVnode && bestMove.packed? PV_NODE:ALL_NODE );
-	TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+		TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta  ? typeScoreHigherThanBeta :
 					(PVnode && bestMove.packed) ? typeExact : typeScoreLowerThanAlpha,
 							(short int)depth, bestMove.packed/*?bestMove.packed:ttMove.packed*/, staticEval);
@@ -1297,7 +1298,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 				search::nodeType::PV_NODE;
 
 
-	ttEntry* tte = TT.probe(pos.getKey());
+	ttEntry* const tte = TT.probe(pos.getKey());
 	Move ttMove;
 	ttMove=tte ? tte->getPackedMove() : Movegen::NOMOVE;
 	Movegen mg(pos,history,ttMove);
@@ -1507,7 +1508,8 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 
 
 
-	if(!signals.stop){
+	if(!signals.stop)
+	{
 		TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta ? typeScoreHigherThanBeta : TTtype,
 					(short int)TTdepth, bestMove.packed, staticEval);

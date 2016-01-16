@@ -21,48 +21,52 @@
 
 transpositionTable TT;
 
-void transpositionTable::setSize(unsigned long int mbSize){
+void transpositionTable::setSize(unsigned long int mbSize)
+{
 	long long unsigned int size = (long unsigned int)( ((unsigned long long int)mbSize << 20) / sizeof(ttCluster));
-	elements=size;
-	if(table){
+	elements = size;
+	if(table)
+	{
 		free(table);
 	}
-	table =(ttCluster*)calloc(elements,sizeof(ttCluster));
-	if (table==nullptr)
+	table = (ttCluster*)calloc(elements,sizeof(ttCluster));
+	if (table == nullptr)
 	{
 		std::cerr << "Failed to allocate " << mbSize<< "MB for transposition table." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
 
-void transpositionTable::clear(){
+void transpositionTable::clear()
+{
 	std::memset(table, 0, elements * sizeof(ttCluster));
 }
 
-ttEntry* transpositionTable::probe(const U64 key) const {
+ttEntry* transpositionTable::probe(const U64 key) const
+{
 
-	ttCluster * ttc=findCluster(key);
-	assert(ttc!=nullptr);
+	ttCluster& ttc = findCluster(key);
 	unsigned int keyH = (unsigned int)(key >> 32);
 
 
-	for (unsigned i = 0; i < 4; i++){
-		if (ttc->data[i].getKey() == keyH)
-			return &ttc->data[i];
+	for (unsigned i = 0; i < 4; i++)
+	{
+		if ( ttc.data[i].getKey() == keyH )
+			return &(ttc.data[i]);
 	}
 
 	return nullptr;
 }
 
-void transpositionTable::store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue) {
+void transpositionTable::store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
+{
 
 	int c1, c2, c3;
 	ttEntry *tte, *replace;
 	unsigned int key32 = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
 
-	ttCluster * ttc=findCluster(key);
-	assert(ttc!=nullptr);
-	tte = replace = (*ttc).data;
+	ttCluster& ttc = findCluster(key);
+	tte = replace = ttc.data;
 
 	assert(tte!=nullptr);
 	assert(replace!=nullptr);
@@ -71,29 +75,33 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 	{
 		if(!tte->getKey() || tte->getKey() == key32) // Empty or overwrite old
 		{
-			if (!move){
-				move = tte->getPackedMove(); // Preserve any existing ttMove
-			}
 
-			replace = tte;
-			break;
+			refresh(tte);
+			tte->save(key32, value, type, depth, move, statValue);
+			return;
 		}
+	}
+	tte = replace = ttc.data;
+
+	for (unsigned i = 0; i < 4; i++, tte++)
+	{
 
 		// Implement replace strategy
 		c1 = (replace->getGeneration() == generation ?  2 : 0);
 		c2 = (tte->getGeneration() == generation || tte->getType() == typeExact ? -2 : 0);
 		c3 = (tte->getDepth() < replace->getDepth() ?  1 : 0);
 
-		if (c1 + c2 + c3 > 0){
+		if (c1 + c2 + c3 > 0)
+		{
 			replace = tte;
 		}
 	}
+
 	assert(replace!=nullptr);
-	if(replace->getSearchId()!=generation){
-		usedElements++;
-	}
+
+	refresh(replace);
 	replace->save(key32, value, type, depth, move, statValue);
-	replace->setGeneration(generation);
+
 
 
 
