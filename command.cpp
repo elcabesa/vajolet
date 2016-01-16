@@ -357,7 +357,8 @@ void uciLoop(){
 		else if (token =="go"){
 			go(is,pos,thr);
 		}
-		else if (token =="bench"){
+		else if (token =="bench")
+		{
 			benchmark();
 		}
 		else if (token == "ponderhit"){

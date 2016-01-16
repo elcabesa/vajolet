@@ -19,20 +19,8 @@
 #ifndef TABLES_H_
 #define TABLES_H_
 
-#include <vector>
 
-
-template<class Entry, int Size>
-struct HashTable
-{
-public:
-	HashTable() : e(Size, Entry()) {}
-	Entry& operator[](const U64 k) {return e[(unsigned int)k % (Size)]; }
-
-private:
-  std::vector<Entry> e;
-};
-
+#include <array>
 
 class pawnEntry
 {
@@ -48,9 +36,10 @@ public:
 
 class pawnTable
 {
+static const int size = 8192;
 public:
 	void insert(U64 key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
-		pawnEntry& x=pawnTable[key];
+		pawnEntry& x=pawnTable[((unsigned int)key) %size];
 
 		x.key=key;
 		x.res[0]=res[0];
@@ -67,11 +56,12 @@ public:
 		x.holes[1]=blackHoles;
 	}
 
-	pawnEntry& probe(U64 key){
-		return pawnTable[key];
+	pawnEntry& probe(U64 key)
+	{
+		return pawnTable[((unsigned int)key) %size];
 	}
 private:
-	HashTable<pawnEntry,8192> pawnTable;
+	std::array<pawnEntry,8192> pawnTable;
 };
 
 #endif /* TABLES_H_ */

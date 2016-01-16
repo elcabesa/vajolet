@@ -59,12 +59,11 @@ void benchmark(void) {
 	long long int elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 	for (unsigned int i = 0; i < positions.size(); i++)
 	{
-		 Position pos;
-		 search src;
-		 src.pos.setupFromFen(positions[i]);
-		 sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
-		 src.startThinking(limits);
-		 nodes+=src.getVisitedNodes();
+		search src;
+		src.pos.setupFromFen(positions[i]);
+		sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
+		src.startThinking(limits);
+		nodes+=src.getVisitedNodes();
 	}
 
 	elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-elapsed+1;
@@ -73,4 +72,5 @@ void benchmark(void) {
        << "\nTotal time (ms) : " << elapsed
        << "\nNodes searched  : " << nodes
        << "\nNodes/second    : " << 1000 * nodes / elapsed << sync_endl;
+
 }
