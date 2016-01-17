@@ -81,7 +81,7 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 			tte->save(key32, value, type, depth, move, statValue);
 			return;
 		}
-	}
+
 
 		// Implement replace strategy
 		c1 = (replace->getGeneration() == generation ?  2 : 0);
