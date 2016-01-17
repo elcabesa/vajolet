@@ -54,7 +54,7 @@ public:
 		key = Key;
 		value = Value;
 		staticValue = StaticValue;
-		if(Move) packedMove = Move;
+		packedMove = Move;
 		depth = Depth;
 		type = Type;
 	}
