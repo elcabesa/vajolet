@@ -77,14 +77,11 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 		{
 
 			refresh(tte);
+			if(!move){move = tte->getPackedMove();}
 			tte->save(key32, value, type, depth, move, statValue);
 			return;
 		}
 	}
-	tte = replace = ttc.data;
-
-	for (unsigned i = 0; i < 4; i++, tte++)
-	{
 
 		// Implement replace strategy
 		c1 = (replace->getGeneration() == generation ?  2 : 0);
