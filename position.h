@@ -292,7 +292,7 @@ public:
 	inline bitMap getTheirBitmap(const bitboardIndex piece)const { return Them[piece];}
 
 
-	unsigned int getStateIndex(void){ return stateIndex;}
+	unsigned int getStateIndex(void)const { return stateIndex;}
 
 	/*! \brief piece values used to calculate scores
 		\author Marco Belli

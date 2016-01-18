@@ -60,6 +60,40 @@ public :
 
 };
 
+class CounterMove
+{
+private:
+	Move table[Position::lastBitboard][squareNumber][2];
+public :
+
+	inline void clear() { std::memset(table, 0, sizeof(table)); }
+
+
+	inline void update(Position::bitboardIndex p, tSquare to, Move m)
+	{
+
+		assert(p<Position::lastBitboard);
+		assert(to<squareNumber);
+		Move * const mm =  table[p][to];
+		if(mm[0] != m)
+		{
+			mm[1] = mm[0];
+			mm[0] = m;
+		}
+
+	}
+	inline const Move& getMove(Position::bitboardIndex p, tSquare to, unsigned int pos) const
+	{
+		assert(p<Position::lastBitboard);
+		assert(to<squareNumber);
+		return table[p][to][pos];
+	}
+
+
+	CounterMove(){}
+
+};
+
 
 
 #endif /* HISTORY_H_ */

@@ -102,6 +102,7 @@ Score search::startThinking(searchLimits & l){
 	signals.stop=false;
 	TT.newSearch();
 	history.clear();
+	counterMoves.clear();
 	visitedNodes=0;
 	std::vector<search> helperSearch(threads-1);
 
@@ -112,7 +113,7 @@ Score search::startThinking(searchLimits & l){
 	//--------------------------------
 	if(limits.searchMoves.size()==0){
 		Move m(Movegen::NOMOVE);
-		Movegen mg(pos,history,m);
+		Movegen mg(pos,history,counterMoves,m);
 		while ((m=mg.getNextMove())!= Movegen::NOMOVE){
 			rootMove rm;
 			rm.previousScore=-SCORE_INFINITE;
@@ -162,7 +163,7 @@ Score search::startThinking(searchLimits & l){
 	 *************************************************/
 	Move m(Movegen::NOMOVE),oldBestMove(Movegen::NOMOVE);
 
-	Movegen mg(pos,history,m);
+	Movegen mg(pos,history,counterMoves,m);
 
 	Move lastLegalMove;
 	unsigned int legalMoves=0;
@@ -817,7 +818,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		Score s;
 		Score rBeta=beta+8000;
 		int rDepth=depth -ONE_PLY- 3*ONE_PLY;
-		Movegen mg(pos,history,ttMove);
+		Movegen mg(pos,history,counterMoves,ttMove);
 		mg.setupProbCutSearch(pos.getCapturedPiece());
 
 		Move m;
@@ -866,7 +867,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	Move bestMove;
 	bestMove=0;
 	Move m;
-	Movegen mg(pos,history,ttMove);
+	Movegen mg(pos,history,counterMoves,ttMove);
 	unsigned int moveNumber=0;
 	unsigned int quietMoveCount =0;
 	Move quietMoveList[64];
@@ -1241,6 +1242,16 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 				history.update(pos.getPieceAt((tSquare)m.bit.from),(tSquare) m.bit.to, -bonus);
 			}
 		}
+
+		unsigned int index = pos.getStateIndex();
+		if( index > 1 )
+		{
+			Move previousMove = pos.getState(index-1).currentMove;
+			if(previousMove.packed)
+			{
+				counterMoves.update(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, bestMove);
+			}
+		}
 	}
 	return bestScore;
 
@@ -1301,7 +1312,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	ttEntry* const tte = TT.probe(pos.getKey());
 	Move ttMove;
 	ttMove=tte ? tte->getPackedMove() : Movegen::NOMOVE;
-	Movegen mg(pos,history,ttMove);
+	Movegen mg(pos,history,counterMoves,ttMove);
 	int TTdepth=mg.setupQuiescentSearch(inCheck,depth);
 	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
 

@@ -94,6 +94,7 @@ class search{
 public:
 	searchLimits limits;
 	History history;
+	CounterMove counterMoves;
 	Position pos;
 	static std::vector<rootMove> rootMoves;
 	static unsigned int threads;

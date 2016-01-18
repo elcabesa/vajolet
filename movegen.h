@@ -43,11 +43,14 @@ private:
 
 	const Position &pos;
 	const History &h;
+	const CounterMove &cm;
 	Move ttMove;
 
 	Move killerMoves[2];
+	Move counterMoves[2];
 
 	static History defaultHistory;
+	static CounterMove defaultCounterMove;
 
 
 	enum CastleSide
@@ -73,6 +76,7 @@ private:
 		generateCaptureMoves,
 		iterateGoodCaptureMoves,
 		getKillers,
+		getCounters,
 		generateQuietMoves,
 		iterateQuietMoves,
 		iterateBadCaptureMoves,
@@ -170,7 +174,7 @@ public:
 
 
 
-	Movegen(const Position & p,const History & his, const Move & ttm): pos(p), h(his), ttMove(ttm)
+	Movegen(const Position & p,const History & his,const CounterMove &c, const Move & ttm): pos(p), h(his), cm(c), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{
@@ -187,7 +191,7 @@ public:
 
 	}
 
-	Movegen(const Position & p): Movegen(p,defaultHistory, NOMOVE)
+	Movegen(const Position & p): Movegen(p, defaultHistory, defaultCounterMove, NOMOVE)
 	{
 	}
 
