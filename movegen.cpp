@@ -1025,16 +1025,14 @@ Move Movegen::getNextMove()
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
 			killerMoves[0] = (pos.getKillers(0));
 			killerMoves[1] = (pos.getKillers(1));
-			unsigned int in = pos.getStateIndex();
-			if( in > 1 )
+
+			Move previousMove = pos.getActualState().currentMove;
+			if(previousMove.packed)
 			{
-				Move previousMove = pos.getState(in-1).currentMove;
-				if(previousMove.packed)
-				{
-					counterMoves[0] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
-					counterMoves[1] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
-				}
+				counterMoves[0] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
+				counterMoves[1] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
 			}
+
 
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 		}
@@ -1058,7 +1056,15 @@ Move Movegen::getNextMove()
 
 				if(moveList[moveListPosition].m != ttMove && !isKillerMove(moveList[moveListPosition].m) && moveList[moveListPosition].m!= counterMoves[0] &&  moveList[moveListPosition].m!= counterMoves[1])
 				{
-					return moveList[moveListPosition++].m;
+					//if(moveList[moveListPosition].score > 0 || this->depth > 3* ONE_PLY )
+					//{
+						return moveList[moveListPosition++].m;
+					//}
+					//else
+					//{
+					//	moveListPosition++;
+					//	// TODO qui posso pasa allo stage successivo
+					//}
 				}
 				else
 				{
@@ -1132,16 +1138,14 @@ Move Movegen::getNextMove()
 			{
 				killerMoves[0] = pos.getKillers(0);
 				killerMoves[1] = pos.getKillers(1);
-				unsigned int in = pos.getStateIndex();
-				if( in > 1 )
+
+				Move previousMove = pos.getActualState().currentMove;
+				if(previousMove.packed)
 				{
-					Move previousMove = pos.getState(in-1).currentMove;
-					if(previousMove.packed)
-					{
-						counterMoves[0] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
-						counterMoves[1] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
-					}
+					counterMoves[0] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
+					counterMoves[1] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
 				}
+
 				killerPos = 0;
 				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			}

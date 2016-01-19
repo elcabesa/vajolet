@@ -41,13 +41,16 @@ private:
 	unsigned int killerPos;
 	Score captureThreshold;
 
+
 	const Position &pos;
+	const int depth;
 	const History &h;
 	const CounterMove &cm;
 	Move ttMove;
 
 	Move killerMoves[2];
 	Move counterMoves[2];
+
 
 	static History defaultHistory;
 	static CounterMove defaultCounterMove;
@@ -174,7 +177,7 @@ public:
 
 
 
-	Movegen(const Position & p,const History & his,const CounterMove &c, const Move & ttm): pos(p), h(his), cm(c), ttMove(ttm)
+	Movegen(const Position & p, int d, const History & his,const CounterMove &c, const Move & ttm): pos(p),depth(d), h(his), cm(c), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{
@@ -191,7 +194,7 @@ public:
 
 	}
 
-	Movegen(const Position & p): Movegen(p, defaultHistory, defaultCounterMove, NOMOVE)
+	Movegen(const Position & p): Movegen(p,100*ONE_PLY, defaultHistory, defaultCounterMove, NOMOVE)
 	{
 	}
 
