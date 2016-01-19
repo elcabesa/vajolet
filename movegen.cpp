@@ -1056,7 +1056,7 @@ Move Movegen::getNextMove()
 
 				if(moveList[moveListPosition].m != ttMove && !isKillerMove(moveList[moveListPosition].m) && moveList[moveListPosition].m!= counterMoves[0] &&  moveList[moveListPosition].m!= counterMoves[1])
 				{
-					//if(moveList[moveListPosition].score > 0 || this->depth > 3* ONE_PLY )
+					//if(moveList[moveListPosition].score > 0 || this->depth >= 3* ONE_PLY )
 					//{
 						return moveList[moveListPosition++].m;
 					//}

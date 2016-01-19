@@ -114,7 +114,8 @@ Score search::startThinking(searchLimits & l){
 	if(limits.searchMoves.size()==0){
 		Move m(Movegen::NOMOVE);
 		Movegen mg(pos);
-		while ((m = mg.getNextMove())!= Movegen::NOMOVE){
+		while ((m = mg.getNextMove())!= Movegen::NOMOVE)
+		{
 			rootMove rm;
 			rm.previousScore=-SCORE_INFINITE;
 			rm.score=-SCORE_INFINITE;
@@ -128,7 +129,8 @@ Score search::startThinking(searchLimits & l){
 			rootMoves.push_back(rm);
 		}
 	}
-	else{
+	else
+	{
 		for_each(limits.searchMoves.begin(), limits.searchMoves.end(),
 			[&](Move &m)
 			{
