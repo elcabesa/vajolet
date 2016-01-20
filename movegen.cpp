@@ -1026,12 +1026,12 @@ Move Movegen::getNextMove()
 			killerMoves[0] = (pos.getKillers(0));
 			killerMoves[1] = (pos.getKillers(1));
 
-			Move previousMove = pos.getActualState().currentMove;
+			/*Move previousMove = pos.getActualState().currentMove;
 			if(previousMove.packed)
 			{
 				counterMoves[0] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
 				counterMoves[1] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
-			}
+			}*/
 
 
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
@@ -1144,6 +1144,11 @@ Move Movegen::getNextMove()
 				{
 					counterMoves[0] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
 					counterMoves[1] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
+				}
+				else
+				{
+					counterMoves[0] = NOMOVE;
+					counterMoves[1] = NOMOVE;
 				}
 
 				killerPos = 0;
