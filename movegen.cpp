@@ -26,8 +26,7 @@
 
 
 const Move Movegen::NOMOVE(0);
-History Movegen::defaultHistory;
-CounterMove Movegen::defaultCounterMove;
+
 
 bitMap Movegen::MG_RANKMASK[squareNumber];
 bitMap Movegen::MG_FILEMASK[squareNumber];
@@ -1023,8 +1022,8 @@ Move Movegen::getNextMove()
 			generateMoves<Movegen::allEvasionMg>();
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
-			killerMoves[0] = (pos.getKillers(0));
-			killerMoves[1] = (pos.getKillers(1));
+			killerMoves[0] = (src.getKillers(ply,0));
+			killerMoves[1] = (src.getKillers(ply,1));
 
 			/*Move previousMove = pos.getActualState().currentMove;
 			if(previousMove.packed)
@@ -1136,14 +1135,14 @@ Move Movegen::getNextMove()
 			}
 			else
 			{
-				killerMoves[0] = pos.getKillers(0);
-				killerMoves[1] = pos.getKillers(1);
+				killerMoves[0] = src.getKillers(ply,0);
+				killerMoves[1] = src.getKillers(ply,1);
 
 				Move previousMove = pos.getActualState().currentMove;
 				if(previousMove.packed)
 				{
-					counterMoves[0] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
-					counterMoves[1] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
+					counterMoves[0] = src.counterMoves.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
+					counterMoves[1] = src.counterMoves.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
 				}
 				else
 				{

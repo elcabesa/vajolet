@@ -202,8 +202,6 @@ public:
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
 		bitMap checkers;	/*!< checking pieces*/
-		bool skipNullMove;
-		Move excludedMove;
 		Move currentMove;
 
 		state(){
@@ -234,7 +232,7 @@ private:
 
 	/*used for search*/
 	pawnTable pawnHashTable;
-	Move killers[STATE_INFO_LENGTH][2];
+	//Move killers[STATE_INFO_LENGTH][2];
 
 	/*data defining the position*/
 	state * actualState;
@@ -670,17 +668,23 @@ public:
 		return false;
 	}
 
-	void cleanStateInfo()
+	/*void cleanStateInfo()
 	{
 		for( auto& s:stateInfo)
 		{
 			s.skipNullMove = false;
-			s.excludedMove = 0;
-			//s.currentMove=0;
-		}
-	}
 
-	const Move&  getKillers(const int n) const { return killers[stateIndex][n];}
+		}
+	}*/
+
+	/*void cleanKillers()
+	{
+		for (auto & x :killers){
+			x[0] = 0;
+			x[1] = 0;
+		}
+	}*/
+	/*const Move&  getKillers(const int n) const { return killers[stateIndex][n];}
 
 	void saveKillers(Move& m)
 	{
@@ -691,7 +695,7 @@ public:
 			tempKillers[0] = m;
 		}
 
-	}
+	}*/
 
 
 

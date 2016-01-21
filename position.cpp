@@ -335,8 +335,6 @@ void Position::setupFromFen(const std::string& fenStr)
 	}
 
 	x.pliesFromNull = 0;
-	x.skipNullMove=true;
-	x.excludedMove=0;
 	x.currentMove=0;
 	x.capturedPiece=empty;
 
@@ -793,13 +791,11 @@ void Position::doNullMove(void)
 #endif
 	x.fiftyMoveCnt++;
 	x.pliesFromNull = 0;
-	x.skipNullMove = true;
 	x.nextMove = (eNextMove)(blackTurn-x.nextMove);
 
 
 	x.ply++;
 	x.capturedPiece = empty;
-	x.excludedMove = 0;
 
 	std::swap(Us,Them);
 
@@ -861,8 +857,6 @@ void Position::doMove(const Move & m){
 	// update counter
 	x.fiftyMoveCnt++;
 	x.pliesFromNull++;
-	x.skipNullMove = false;
-	x.excludedMove = 0;
 
 	// reset ep square
 	if(x.epSquare!=squareNone)

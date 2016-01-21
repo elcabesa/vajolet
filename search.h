@@ -28,13 +28,15 @@
 #include <cmath>
 
 
-class searchLimits{
+class searchLimits
+{
 public:
 	volatile bool ponder,infinite;
 	unsigned int wtime,btime,winc,binc,movesToGo,depth,nodes,mate,moveTime;
 
 	std::list<Move> searchMoves;
-	searchLimits(){
+	searchLimits()
+	{
 		ponder=false;
 		infinite =false;
 		wtime=0;
@@ -50,7 +52,8 @@ public:
 
 };
 
-class rootMove{
+class rootMove
+{
 public:
 	Score score;
 	Score previousScore;
@@ -73,6 +76,14 @@ inline Score matedIn(int ply) {
   return SCORE_MATED + ply;
 }
 
+class searchData
+{
+public:
+	Move excludeMove;
+	bool skipNullMove;
+	Move killers[2];
+};
+
 
 class search{
 
@@ -84,6 +95,28 @@ class search{
 	static Score nonPVreduction[32*ONE_PLY][64];
 	long long int startTime;
 
+	searchData sd[STATE_INFO_LENGTH];
+	void cleanData(void)
+	{
+		for (auto & x: sd)
+		{
+			x.excludeMove = 0;
+			x.skipNullMove = false;
+		}
+	}
+public:
+	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n];}
+private:
+	void saveKillers(unsigned int ply, Move& m)
+	{
+		Move * const tempKillers =  sd[ply].killers;
+		if(tempKillers[0] != m)
+		{
+			tempKillers[1] = tempKillers[0];
+			tempKillers[0] = m;
+		}
+
+	}
 
 
 
@@ -115,8 +148,9 @@ public:
 				nonPVreduction[d][mc]=(Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
 			}
 	};
-	volatile struct sSignal{
-		volatile bool stop=false;
+	volatile struct sSignal
+	{
+		volatile bool stop = false;
 	}signals;
 
 	enum nodeType
@@ -138,7 +172,9 @@ private:
 
 	static std::atomic<unsigned long long> visitedNodes;
 	unsigned int selDepth;
-	bool stop;
+	//bool stop;
 };
+
+extern search defaultSearch;
 
 #endif /* SEARCH_H_ */

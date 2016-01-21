@@ -35,6 +35,7 @@
 	Position ppp;
 #endif
 
+search defaultSearch;
 std::vector<rootMove> search::rootMoves;
 std::atomic<unsigned long long> search::visitedNodes;
 
@@ -103,6 +104,8 @@ Score search::startThinking(searchLimits & l){
 	TT.newSearch();
 	history.clear();
 	counterMoves.clear();
+	cleanData();
+	//pos.cleanKillers();
 	visitedNodes=0;
 	std::vector<search> helperSearch(threads-1);
 
@@ -302,7 +305,7 @@ Score search::startThinking(searchLimits & l){
 				//sync_cout<<"SEARCH"<<sync_endl;
 				selDepth=selDepthBase;
 				newPV.clear();
-				pos.cleanStateInfo();
+				//pos.cleanStateInfo();
 				std::vector<std::list<Move>> pvl2(threads-1);
 				std::vector<std::thread> helperThread;
 
@@ -435,12 +438,12 @@ Score search::startThinking(searchLimits & l){
 		{
 
 			Score rBeta = res - 20000;
-			pos.getActualState().excludedMove=newPV.front();
-			pos.getActualState().skipNullMove=true;
+			sd[0].excludeMove=newPV.front();
+			sd[0].skipNullMove=true;
 			std::list<Move> locChildPV;
 			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0,(depth-3)*ONE_PLY,rBeta-1,rBeta,locChildPV);
-			pos.getActualState().skipNullMove=false;
-			pos.getActualState().excludedMove.packed=0;
+			sd[0].skipNullMove=false;
+			sd[0].excludeMove = Movegen::NOMOVE;
 
 			if(temp < rBeta){
 				my_thread::timeMan.singularRootMoveCount++;
@@ -585,7 +588,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 	}
 
-	Move excludedMove=st.excludedMove;
+	Move excludedMove=sd[ply].excludeMove;
 
 	U64 posKey=excludedMove.packed?pos.getExclusionKey() :pos.getKey();
 	ttEntry* tte = TT.probe(posKey);
@@ -610,7 +613,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			!pos.isCaptureMoveOrPromotion(ttMove) &&
 			!inCheck)
 		{
-			pos.saveKillers(ttMove);
+			saveKillers(ply,ttMove);
 		}
 
 
@@ -713,7 +716,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	//---------------------------
 	if (!PVnode
 		&& !inCheck
-		&& !st.skipNullMove
+		&& !sd[ply].skipNullMove
 		&&  depth < 4 * ONE_PLY
 		&& eval >-SCORE_INFINITE + futility[depth>>ONE_PLY_SHIFT]
 		&&  eval - futility[depth>>ONE_PLY_SHIFT] >= beta
@@ -737,7 +740,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		&& !inCheck
 		&& depth>=ONE_PLY
 		&& eval>=beta
-		&& !st.skipNullMove
+		&& !sd[ply].skipNullMove
 		&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 		&&((pos.getNextTurn() && st.nonPawnMaterial[2]>= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0]>= Position::pieceValue[Position::whiteKnights][0]))
 	){
@@ -749,6 +752,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			red += ONE_PLY;
 		}
 		pos.doNullMove();
+		sd[ply+1].skipNullMove = true;
 		U64 nullKey= pos.getKey();
 
 
@@ -761,6 +765,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			nullVal = -alphaBeta<childNodesType>(ply+1, depth - red, -beta, -beta+1,childPV);
 		}
 		pos.undoNullMove();
+		sd[ply+1].skipNullMove = false;
 
 		if (nullVal >= beta)
 		{
@@ -779,7 +784,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			}
 
 			// Do verification search at high depths
-			st.skipNullMove=true;
+			sd[ply].skipNullMove=true;
 			assert(depth - red>=ONE_PLY);
 			Score val;
 			if(depth-red<ONE_PLY){
@@ -788,7 +793,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			else{
 				val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
 			}
-			st.skipNullMove=false;
+			sd[ply].skipNullMove=false;
 			if (val >= beta)
 			{
 				return nullVal;
@@ -812,7 +817,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	if(!PVnode &&
 		!inCheck &&
 		depth>=5*ONE_PLY &&
-		!st.skipNullMove &&
+		!sd[ply].skipNullMove &&
 		//abs(beta)<SCORE_KNOWN_WIN
 		//eval> beta-40000
 		abs(beta)<SCORE_MATE_IN_MAX_PLY
@@ -820,7 +825,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		Score s;
 		Score rBeta=beta+8000;
 		int rDepth=depth -ONE_PLY- 3*ONE_PLY;
-		Movegen mg(pos,rDepth,history,counterMoves,ttMove);
+		Movegen mg(pos,*this,ply,rDepth,ttMove);
 		mg.setupProbCutSearch(pos.getCapturedPiece());
 
 		Move m;
@@ -847,15 +852,15 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	{
 		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
 
-		bool skipBackup = st.skipNullMove;
-		st.skipNullMove = true;
+		bool skipBackup = sd[ply].skipNullMove;
+		sd[ply].skipNullMove = true;
 
 		std::list<Move> childPV;
 		const search::nodeType iidType=type;
 		assert(d>=ONE_PLY);
 		alphaBeta<iidType>(ply, d, alpha, beta, childPV);
 
-		st.skipNullMove = skipBackup;
+		sd[ply].skipNullMove = skipBackup;
 
 		tte = TT.probe(posKey);
 		ttMove= tte != nullptr ? tte->getPackedMove() : 0;
@@ -869,7 +874,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	Move bestMove;
 	bestMove=0;
 	Move m;
-	Movegen mg(pos,depth,history,counterMoves,ttMove);
+	Movegen mg(pos,*this,ply,depth,ttMove);
 	unsigned int moveNumber=0;
 	unsigned int quietMoveCount =0;
 	Move quietMoveList[64];
@@ -892,7 +897,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		}*/
 
 		assert(m.packed);
-		if(m== excludedMove){
+		if(m== excludedMove)
+		{
 			continue;
 		}
 
@@ -933,12 +939,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 			std::list<Move> childPv;
 			Score rBeta = ttValue - int(depth*20);
-			st.excludedMove=m;
-			bool backup=st.skipNullMove;
-			st.skipNullMove=true;
+			sd[ply].excludeMove=m;
+			bool backup=sd[ply].skipNullMove;
+			sd[ply].skipNullMove=true;
 			Score temp = alphaBeta<ALL_NODE>(ply,depth/2,rBeta-1,rBeta,childPv);
-			st.skipNullMove=backup;
-			st.excludedMove = Movegen::NOMOVE;
+			sd[ply].skipNullMove=backup;
+			sd[ply].excludeMove = Movegen::NOMOVE;
 
 			if(temp < rBeta){
 				ext = ONE_PLY;
@@ -1193,7 +1199,8 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 	// draw
 
 	if(!moveNumber){
-		if( excludedMove.packed){
+		if( excludedMove.packed)
+		{
 			return alpha;
 		}else if(!inCheck){
 			bestScore = std::max((int)0,(int)(-5000 + pos.getPly()*7));
@@ -1227,7 +1234,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		!pos.isCaptureMoveOrPromotion(bestMove) &&
 		!inCheck)
 	{
-		pos.saveKillers(bestMove);
+		saveKillers(ply,bestMove);
 
 
 
@@ -1264,9 +1271,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	assert(alpha<beta);
 	assert(beta<=SCORE_INFINITE);
 	assert(alpha>=-SCORE_INFINITE);
-
-
-
 
 	/*if(visitedNodes>599000 && visitedNodes<800000){
 		sync_cout<<"Q ply:"<<ply<<" depth: "<<depth<<" alpha:"<<alpha<<" beta:"<<beta<<" "<<pos.getFen()<<sync_endl;
@@ -1311,7 +1315,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	ttEntry* const tte = TT.probe(pos.getKey());
 	Move ttMove;
 	ttMove=tte ? tte->getPackedMove() : Movegen::NOMOVE;
-	Movegen mg(pos,depth,history,counterMoves,ttMove);
+	Movegen mg(pos,*this,ply,depth,ttMove);
 	int TTdepth=mg.setupQuiescentSearch(inCheck,depth);
 	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
 
@@ -1501,7 +1505,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 		!inCheck)
 	{
 		//sync_cout<<pos.displayUci(bestMove)<<sync_endl;
-		pos.saveKillers(bestMove);
+		saveKillers(ply,bestMove);
 
 
 	}

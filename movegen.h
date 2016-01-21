@@ -24,6 +24,7 @@
 #include "vajolet.h"
 #include "move.h"
 #include "position.h"
+#include "search.h"
 #include "history.h"
 
 
@@ -43,9 +44,9 @@ private:
 
 
 	const Position &pos;
+	const search &src;
+	unsigned int ply;
 	const int depth;
-	const History &h;
-	const CounterMove &cm;
 	Move ttMove;
 
 	Move killerMoves[2];
@@ -129,7 +130,7 @@ private:
 	{
 		for(unsigned int i = moveListPosition; i < moveListSize; i++)
 		{
-			moveList[i].score = h.getValue(pos.getPieceAt((tSquare)moveList[i].m.bit.from),(tSquare)moveList[i].m.bit.to);
+			moveList[i].score = src.history.getValue(pos.getPieceAt((tSquare)moveList[i].m.bit.from),(tSquare)moveList[i].m.bit.to);
 		}
 	}
 	inline void resetMoveList()
@@ -177,7 +178,7 @@ public:
 
 
 
-	Movegen(const Position & p, int d, const History & his,const CounterMove &c, const Move & ttm): pos(p),depth(d), h(his), cm(c), ttMove(ttm)
+	Movegen(const Position & p, const search& s,unsigned int ply, int d, const Move & ttm): pos(p),src(s),ply(ply),depth(d), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{
@@ -194,7 +195,7 @@ public:
 
 	}
 
-	Movegen(const Position & p): Movegen(p,100*ONE_PLY, defaultHistory, defaultCounterMove, NOMOVE)
+	Movegen(const Position & p): Movegen(p,defaultSearch,0,100*ONE_PLY, NOMOVE)
 	{
 	}
 
