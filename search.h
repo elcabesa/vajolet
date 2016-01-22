@@ -37,17 +37,17 @@ public:
 	std::list<Move> searchMoves;
 	searchLimits()
 	{
-		ponder=false;
-		infinite =false;
-		wtime=0;
-		btime=0;
-		winc=0;
-		binc=0;
-		movesToGo=0;
-		depth=0;
-		nodes=0;
-		mate=0;
-		moveTime=0;
+		ponder = false;
+		infinite = false;
+		wtime = 0;
+		btime = 0;
+		winc = 0;
+		binc = 0;
+		movesToGo = 0;
+		depth = 0;
+		nodes = 0;
+		mate = 0;
+		moveTime = 0;
 	}
 
 };
@@ -56,7 +56,6 @@ class rootMove
 {
 public:
 	Score score;
-	Score previousScore;
 	std::list<Move> PV;
 	Move firstMove;
 	unsigned int selDepth;
@@ -65,6 +64,16 @@ public:
 	long long int time;
 	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
 	bool operator==(const Move& m) const { return firstMove.packed == m.packed; }
+	void init(Move & m)
+	{
+		score = -SCORE_INFINITE;
+		firstMove = m;
+		selDepth = 0;
+		depth = 0;
+		nodes = 0;
+		time = 0;
+		PV.clear();
+	}
 };
 
 

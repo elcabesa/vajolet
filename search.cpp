@@ -98,37 +98,34 @@ bool search::useOwnBook=true;
 bool search::bestMoveBook=false;
 bool search::showCurrentLine=false;
 
-Score search::startThinking(searchLimits & l){
-	Score res=0;
-	signals.stop=false;
+Score search::startThinking(searchLimits & l)
+{
+	Score res = 0;
+	signals.stop = false;
+
 	TT.newSearch();
 	history.clear();
 	counterMoves.clear();
 	cleanData();
-	//pos.cleanKillers();
-	visitedNodes=0;
+	visitedNodes = 0;
+
 	std::vector<search> helperSearch(threads-1);
 
-	limits=l;
+	limits = l;
 	rootMoves.clear();
+
+
 	//--------------------------------
 	//	generate the list of root moves to be searched
 	//--------------------------------
-	if(limits.searchMoves.size()==0){
+	if(limits.searchMoves.size()==0)
+	{
 		Move m(Movegen::NOMOVE);
 		Movegen mg(pos);
 		while ((m = mg.getNextMove())!= Movegen::NOMOVE)
 		{
 			rootMove rm;
-			rm.previousScore=-SCORE_INFINITE;
-			rm.score=-SCORE_INFINITE;
-			rm.firstMove=m;
-			rm.selDepth=0;
-			rm.depth=0;
-			rm.nodes=0;
-			rm.time=0;
-			rm.PV.clear();
-
+			rm.init(m);
 			rootMoves.push_back(rm);
 		}
 	}
@@ -138,29 +135,26 @@ Score search::startThinking(searchLimits & l){
 			[&](Move &m)
 			{
 			rootMove rm;
-			rm.previousScore=-SCORE_INFINITE;
-			rm.score=-SCORE_INFINITE;
-			rm.firstMove=m;
-			rm.selDepth=0;
-			rm.depth=0;
-			rm.nodes=0;
-			rm.time=0;
-			rm.PV.clear();
+			rm.init(m);
 			rootMoves.push_back(rm);
 			}
 		);
 	}
 
-	//sync_cout<<"legal moves ="<<rootMoves.size()<<sync_endl;
-	unsigned int linesToBeSearched = search::multiPVLines;
 
-	if(limitStrength){
-		int lines= (int)((-8.0/2000.0)*(eloStrenght-1000)+10.0);
-		unsigned int s=std::max(lines,4);
-		linesToBeSearched=	std::max(linesToBeSearched,s);
+
+	//-----------------------------
+	// manage multi PV moves &&v limit strenght
+	//-----------------------------
+	unsigned int linesToBeSearched = search::multiPVLines;
+	if(limitStrength)
+	{
+		int lines = (int)((-8.0/2000.0)*( eloStrenght - 1000 ) + 10.0 );
+		unsigned int s = std::max(lines, 4);
+		linesToBeSearched = std::max(linesToBeSearched, s);
 	}
 	linesToBeSearched = std::min(linesToBeSearched, (unsigned int)rootMoves.size());
-	//sync_cout<<"linesToBeSearched ="<<linesToBeSearched<<sync_endl;
+
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
@@ -178,12 +172,15 @@ Score search::startThinking(searchLimits & l){
 		lastLegalMove=m;
 	}
 
-	if(legalMoves==0){
+	if(legalMoves==0)
+	{
 		while((limits.infinite && !signals.stop) || limits.ponder){}
 		sync_cout<<"info depth 0 score cp 0"<<sync_endl;
 		sync_cout<<"bestmove 0000"<<sync_endl;
-		return res;
-	}else if(legalMoves==1){
+		return 0;
+	}
+	else if(legalMoves==1)
+	{
 		if(!limits.infinite)
 		{
 			sync_cout<<"info pv "<<pos.displayUci(lastLegalMove)<<sync_endl;
@@ -203,7 +200,7 @@ Score search::startThinking(searchLimits & l){
 			}
 
 			std::cout<<sync_endl;
-			return res;
+			return 0;
 		}
 	}
 
@@ -219,7 +216,7 @@ Score search::startThinking(searchLimits & l){
 			sync_cout<<"info pv "<<pos.displayUci(bookM)<<sync_endl;
 			while((limits.infinite && !signals.stop) || limits.ponder){}
 			sync_cout<<"bestmove "<<pos.displayUci(bookM)<<sync_endl;
-			return res;
+			return 0;
 		}
 	}
 
@@ -232,34 +229,26 @@ Score search::startThinking(searchLimits & l){
 	unsigned int depth=1;
 
 	Score alpha=-SCORE_INFINITE,beta =SCORE_INFINITE;
-	Score delta=1600;
+	Score delta = 800;;
 	selDepth=selDepthBase;
 
-	do{
-
-		for (rootMove& rm : rootMoves){
-			rm.previousScore = rm.score;
-		}
-
-
+	do
+	{
 		for (indexPV = 0; indexPV < linesToBeSearched; indexPV++)
 		{
-			for (unsigned int x =indexPV; x<linesToBeSearched ; x++){
-				rootMoves[x].score=-SCORE_INFINITE;
-			}
-
-			//sync_cout<<"PVIdx="<<PVIdx<<sync_endl;
-
 
 			if (depth >= 5)
 			{
 				delta = 800;
-				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int)-SCORE_INFINITE);
-				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].previousScore) + delta,(signed long long int) SCORE_INFINITE);
+				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].score) - delta,(signed long long int)-SCORE_INFINITE);
+				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].score) + delta,(signed long long int) SCORE_INFINITE);
+			}
+			for (unsigned int x =indexPV; x<linesToBeSearched ; x++){
+				rootMoves[x].score=-SCORE_INFINITE;
 			}
 
 
-			unsigned int reduction=0;
+			unsigned int reduction = 0;
 
 			// reload the last PV in the transposition table
 			for(unsigned int i =0; i<=indexPV; i++){
@@ -335,17 +324,17 @@ Score search::startThinking(searchLimits & l){
 				//sync_cout<<"FINISHED SEARCH"<<sync_endl;
 				//sync_cout<<"PVsize "<<newPV.size()<<sync_endl;
 
-				if(depth!=1 && signals.stop){
+				if(depth != 1 && signals.stop)
+				{
 					//sync_cout<<"iterative deepening Stop"<<sync_endl;
 					break;
 				}
-				if(newPV.size()!=0 &&  res <= alpha){
-					sync_cout<<"ERRORE NEWPV"<<sync_endl;
-				}
+
+
 				long long int now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
 
 
-
+				assert(newPV.size()==0 || res >alpha);
 				if(newPV.size()!=0 && res > alpha /*&& res < beta*/){
 					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+indexPV,rootMoves.end(),newPV.front());
 					if(it->firstMove==newPV.front()){
@@ -395,7 +384,8 @@ Score search::startThinking(searchLimits & l){
 					//sync_cout<<"res>=beta "<<sync_endl;
 					printPV(res,depth,selDepth-selDepthBase,alpha,beta, now-startTime,indexPV,newPV,visitedNodes);
 					beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
-					if(depth>1){
+					if(depth>1)
+					{
 						reduction=1;
 					}
 					//sync_cout<<"new beta "<<beta<<sync_endl;
@@ -510,7 +500,7 @@ Score search::startThinking(searchLimits & l){
 	}
 	std::cout<<sync_endl;
 
-	return res;
+	return rootMoves[bestMoveLine].score;
 
 
 
