@@ -152,6 +152,7 @@ void my_thread::searchThread() {
 		searchCond.wait(lk,[&]{return startThink||quit;});
 		if(!quit){
 			timeManagerInit(src.pos, src.limits,timeMan);
+			src.stop=false;
 			timerCond.notify_one();
 			src.startThinking();
 			//sync_cout<<"startThink=false"<<sync_endl;
