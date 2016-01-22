@@ -232,7 +232,6 @@ private:
 
 	/*used for search*/
 	pawnTable pawnHashTable;
-	//Move killers[STATE_INFO_LENGTH][2];
 
 	/*data defining the position*/
 	state * actualState;
@@ -667,42 +666,6 @@ public:
 		}
 		return false;
 	}
-
-	/*void cleanStateInfo()
-	{
-		for( auto& s:stateInfo)
-		{
-			s.skipNullMove = false;
-
-		}
-	}*/
-
-	/*void cleanKillers()
-	{
-		for (auto & x :killers){
-			x[0] = 0;
-			x[1] = 0;
-		}
-	}*/
-	/*const Move&  getKillers(const int n) const { return killers[stateIndex][n];}
-
-	void saveKillers(Move& m)
-	{
-		Move * const tempKillers =  killers[stateIndex];
-		if(tempKillers[0] != m)
-		{
-			tempKillers[1] = tempKillers[0];
-			tempKillers[0] = m;
-		}
-
-	}*/
-
-
-
-
-
-
-
 
 private:
 
