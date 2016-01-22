@@ -17,7 +17,7 @@
 
 #include <random>
 #include <ctime>
-#include <chrono>
+
 #include <vector>
 #include <list>
 #include <algorithm>    // std::copy
@@ -45,21 +45,21 @@ inline signed int razorMargin(unsigned int depth){
 	return 20000+depth*78;
 }
 
-void search::printPVs(unsigned int count){
+void search::printPVs(unsigned int count) const
+{
 
-	auto end = std::next(rootMoves.begin(), count);
 	int i= 0;
-	std::for_each(rootMoves.begin(),end, [&](rootMove& rm)
+	std::for_each(rootMoves.begin(),std::next(rootMoves.begin(), count), [&](rootMove& rm)
 	{
 		if(rm.nodes)
 		{
-			printPV(rm.score,rm.depth,rm.selDepth,-SCORE_INFINITE,SCORE_INFINITE,rm.time,i,rm.PV,rm.nodes);
+			printPV(rm.score, rm.depth, rm.selDepth, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes);
 		}
 		i++;
 	});
 }
 
-void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes){
+void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes) const {
 
 	sync_cout<<"info multipv "<< (count+1) << " depth "<<(depth)<<" seldepth "<<seldepth <<" score ";
 
@@ -98,10 +98,11 @@ bool search::useOwnBook=true;
 bool search::bestMoveBook=false;
 bool search::showCurrentLine=false;
 
-Score search::startThinking(searchLimits & l)
+Score search::startThinking()
 {
 	Score res = 0;
-	signals.stop = false;
+	resetStartTime();
+	stop = false;
 
 	TT.newSearch();
 	history.clear();
@@ -111,7 +112,6 @@ Score search::startThinking(searchLimits & l)
 
 	std::vector<search> helperSearch(threads-1);
 
-	limits = l;
 	rootMoves.clear();
 
 
@@ -174,7 +174,7 @@ Score search::startThinking(searchLimits & l)
 
 	if(legalMoves==0)
 	{
-		while((limits.infinite && !signals.stop) || limits.ponder){}
+		while((limits.infinite && !stop) || limits.ponder){}
 		sync_cout<<"info depth 0 score cp 0"<<sync_endl;
 		sync_cout<<"bestmove 0000"<<sync_endl;
 		return 0;
@@ -214,7 +214,7 @@ Score search::startThinking(searchLimits & l)
 		Move bookM=pol.probe(pos,"book.bin",bestMoveBook);
 		if(bookM.packed){
 			sync_cout<<"info pv "<<pos.displayUci(bookM)<<sync_endl;
-			while((limits.infinite && !signals.stop) || limits.ponder){}
+			while((limits.infinite && !stop) || limits.ponder){}
 			sync_cout<<"bestmove "<<pos.displayUci(bookM)<<sync_endl;
 			return 0;
 		}
@@ -224,7 +224,7 @@ Score search::startThinking(searchLimits & l)
 
 	unsigned int selDepthBase=pos.getPly();
 
-	startTime = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+
 	std::list<Move> newPV;
 	unsigned int depth=1;
 
@@ -300,7 +300,7 @@ Score search::startThinking(searchLimits & l)
 
 				for(unsigned int i=0;i<(threads-1);i++)
 				{
-					helperSearch[i].signals.stop =false;
+					helperSearch[i].stop =false;
 					helperSearch[i].pos=pos;
 					helperThread.push_back(std::thread(alphaBeta<search::nodeType::HELPER_ROOT_NODE>,&helperSearch[i],0,(depth-reduction+((i+1)%2))*ONE_PLY,alpha,beta,std::ref(pvl2[i])));
 				}
@@ -310,7 +310,7 @@ Score search::startThinking(searchLimits & l)
 				res=alphaBeta<search::nodeType::ROOT_NODE>(0,(depth-reduction)*ONE_PLY,alpha,beta,newPV);
 				for(unsigned int i=0;i<(threads-1);i++)
 				{
-					helperSearch[i].signals.stop =true;
+					helperSearch[i].stop =true;
 				}
 				for(auto &t : helperThread)
 				{
@@ -324,18 +324,19 @@ Score search::startThinking(searchLimits & l)
 				//sync_cout<<"FINISHED SEARCH"<<sync_endl;
 				//sync_cout<<"PVsize "<<newPV.size()<<sync_endl;
 
-				if(depth != 1 && signals.stop)
+				if(depth != 1 && stop)
 				{
 					//sync_cout<<"iterative deepening Stop"<<sync_endl;
 					break;
 				}
 
 
-				long long int now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+				long long int elapsedTime  = getElapsedTime();
 
 
 				assert(newPV.size()==0 || res >alpha);
-				if(newPV.size()!=0 && res > alpha /*&& res < beta*/){
+				if(newPV.size()!=0 && res > alpha /*&& res < beta*/)
+				{
 					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+indexPV,rootMoves.end(),newPV.front());
 					if(it->firstMove==newPV.front()){
 
@@ -348,7 +349,7 @@ Score search::startThinking(searchLimits & l)
 						it->selDepth=selDepth-selDepthBase;
 						it->depth=depth;
 						it->nodes=visitedNodes;
-						it->time= now-startTime;
+						it->time= elapsedTime;
 						std::iter_swap( it, rootMoves.begin()+indexPV);
 
 					}
@@ -370,7 +371,7 @@ Score search::startThinking(searchLimits & l)
 					//my_thread::timeMan.idLoopRequestToExtend=true;
 					newPV.clear();
 					newPV.push_back(rootMoves[indexPV].PV.front());
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, now-startTime,indexPV,newPV,visitedNodes);
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, elapsedTime, indexPV,newPV,visitedNodes);
 					alpha = (Score) std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 
 					reduction = 0;
@@ -382,7 +383,7 @@ Score search::startThinking(searchLimits & l)
 						//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 					}
 					//sync_cout<<"res>=beta "<<sync_endl;
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, now-startTime,indexPV,newPV,visitedNodes);
+					printPV(res,depth,selDepth-selDepthBase,alpha,beta, elapsedTime, indexPV,newPV,visitedNodes);
 					beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 					if(depth>1)
 					{
@@ -401,28 +402,19 @@ Score search::startThinking(searchLimits & l)
 
 			}while(1);
 			//sync_cout<<"aspiration window ok "<<sync_endl;
-			if(!signals.stop){
+			if(!stop)
+			{
 
 				// Sort the PV lines searched so far and update the GUI
 				std::stable_sort(rootMoves.begin(), rootMoves.begin() + indexPV + 1);
-				//sync_cout<<"stable sort ok "<<sync_endl;
-/*				unsigned long now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-				if (PVIdx + 1 == linesToBeSearched
-#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-					|| now - startTime > 3000
-#endif
-				)*/{
-					//sync_cout<<"print pv "<<sync_endl;
-					printPVs(indexPV+1);
-
-				}
+				printPVs(indexPV+1);
 			}
 		}
 		//-----------------------
 		//	single good move at root
 		//-----------------------
 		if (depth >= 12
-			&& !signals.stop
+			&& !stop
 			&&  linesToBeSearched == 1
 			&&  res > SCORE_MATED_IN_MAX_PLY)
 		{
@@ -458,7 +450,7 @@ Score search::startThinking(searchLimits & l)
 
 		depth+=1;
 
-	}while(depth<=(limits.depth? limits.depth:100) && !signals.stop);
+	}while(depth<=(limits.depth? limits.depth:100) && !stop);
 
 	//sync_cout<<"print final bestMove "<<sync_endl;
 
@@ -559,7 +551,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 							search::nodeType::PV_NODE;
 
 	if(type !=search::nodeType::ROOT_NODE  && type !=search::nodeType::HELPER_ROOT_NODE){
-		if(pos.isDraw(PVnode) || signals.stop){
+		if(pos.isDraw(PVnode) || stop){
 			if(PVnode){
 				pvLine.clear();
 			}
@@ -986,12 +978,12 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 		}
 
 		if(type==ROOT_NODE){
-			long long int elapsed=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
+			long long int elapsed = getElapsedTime();
 			if(
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 				elapsed>3000 &&
 #endif
-				!signals.stop
+				!stop
 				){
 				sync_cout<<"info currmovenumber "<<moveNumber<<" currmove "<<pos.displayUci(m)<<" nodes "<<visitedNodes<<
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
@@ -1173,7 +1165,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 				{
 					alpha =val;
 				}
-				if(type ==search::nodeType::ROOT_NODE || type ==search::nodeType::HELPER_ROOT_NODE|| (PVnode &&!signals.stop)){
+				if(type ==search::nodeType::ROOT_NODE || type ==search::nodeType::HELPER_ROOT_NODE|| (PVnode &&!stop)){
 					if(PVnode){
 						pvLine.clear();
 						pvLine.push_back(bestMove);
@@ -1207,7 +1199,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 
 
-	if(!signals.stop)
+	if(!stop)
 	{
 	//Statistics::instance().gatherNodeTypeStat(type,bestScore >= beta?CUT_NODE:PVnode && bestMove.packed? PV_NODE:ALL_NODE );
 		TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
@@ -1281,7 +1273,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 	visitedNodes++;
 
 
-	if(pos.isDraw(PVnode) || signals.stop){
+	if(pos.isDraw(PVnode) || stop){
 		if(PVnode){
 			pvLine.clear();
 		}
@@ -1478,7 +1470,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 				bestMove=m;
 				TTtype=typeExact;
 				alpha =val;
-				if(PVnode &&!signals.stop){
+				if(PVnode &&!stop){
 					pvLine.clear();
 					pvLine.push_back(bestMove);
 					pvLine.splice(pvLine.end(),childPV);
@@ -1512,7 +1504,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 
 
 
-	if(!signals.stop)
+	if(!stop)
 	{
 		TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta ? typeScoreHigherThanBeta : TTtype,

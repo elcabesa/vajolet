@@ -49,8 +49,7 @@ static const std::vector<std::string>positions = {
 
 void benchmark(void) {
 
-	searchLimits limits;
-	limits.depth=15;
+
 	TT.setSize(32);
 	TT.clear();
 
@@ -60,9 +59,10 @@ void benchmark(void) {
 	for (unsigned int i = 0; i < positions.size(); i++)
 	{
 		search src;
+		src.limits.depth=15;
 		src.pos.setupFromFen(positions[i]);
 		sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
-		src.startThinking(limits);
+		src.startThinking();
 		nodes+=src.getVisitedNodes();
 	}
 

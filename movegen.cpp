@@ -1141,8 +1141,8 @@ Move Movegen::getNextMove()
 				Move previousMove = pos.getActualState().currentMove;
 				if(previousMove.packed)
 				{
-					counterMoves[0] = src.counterMoves.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
-					counterMoves[1] = src.counterMoves.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
+					counterMoves[0] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
+					counterMoves[1] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
 				}
 				else
 				{

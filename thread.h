@@ -60,9 +60,7 @@ class my_thread{
 	std::condition_variable timerCond;
 	//Position *pos;
 	search src;
-	searchLimits limits;
 
-	static long long startTime;
 	static long long lastHasfullMessage;
 
 	void initThreads();
@@ -98,7 +96,7 @@ public :
 	}
 	void startThinking(Position * p,searchLimits& l){
 
-		src.signals.stop=true;
+		src.stop=true;
 		lastHasfullMessage=0;
 
 
@@ -110,7 +108,7 @@ public :
 
 		if(!startThink){
 			std::lock_guard<std::mutex> lk(searchMutex);
-			limits=l;
+			src.limits = l;
 			src.pos = *p;
 			startThink=true;
 			searchCond.notify_one();
@@ -121,15 +119,13 @@ public :
 
 	void stopThinking(){
 		//sync_cout<<"received stop"<<sync_endl;
-		src.signals.stop=true;
-		src.limits.ponder=false;
-		limits.ponder=false;
+		src.stop=true;
+		src.stopPonder();
 	}
 
-	void ponderHit(){
-		startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-		limits.ponder=false;
-		src.limits.ponder=false;
+	void ponderHit()
+	{
+		src.stopPonder();
 	}
 
 

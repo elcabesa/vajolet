@@ -17,15 +17,17 @@
 #ifndef SEARCH_H_
 #define SEARCH_H_
 
+#include <chrono>
+#include <vector>
+#include <list>
+#include <atomic>
+#include <cmath>
 #include "vajolet.h"
 #include "position.h"
 #include "move.h"
 #include "history.h"
 #include "eval.h"
-#include <vector>
-#include <list>
-#include <atomic>
-#include <cmath>
+
 
 
 class searchLimits
@@ -77,13 +79,7 @@ public:
 };
 
 
-inline Score mateIn(int ply) {
-  return SCORE_MATE - ply;
-}
 
-inline Score matedIn(int ply) {
-  return SCORE_MATED + ply;
-}
 
 class searchData
 {
@@ -94,15 +90,21 @@ public:
 };
 
 
-class search{
-
-
+class search
+{
+private:
 	static Score futility[5];
 	static Score futilityMargin[7];
 	static unsigned int FutilityMoveCounts[11];
 	static Score PVreduction[32*ONE_PLY][64];
 	static Score nonPVreduction[32*ONE_PLY][64];
-	long long int startTime;
+
+	static Score mateIn(int ply) { return SCORE_MATE - ply; }
+	static Score matedIn(int ply) { return SCORE_MATED + ply; }
+
+	unsigned int indexPV = 0;
+	History history;
+	CounterMove counterMoves;
 
 	searchData sd[STATE_INFO_LENGTH];
 	void cleanData(void)
@@ -113,9 +115,7 @@ class search{
 			x.skipNullMove = false;
 		}
 	}
-public:
-	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n];}
-private:
+
 	void saveKillers(unsigned int ply, Move& m)
 	{
 		Move * const tempKillers =  sd[ply].killers;
@@ -128,15 +128,34 @@ private:
 	}
 
 
+	// gestione timer
+	long long int startTime;
+public:
+	long long int getTime() const { return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
+	long long int getElapsedTime() const { return getTime() - startTime; }
+	void resetStartTime(){ startTime = getTime(); }
 
-	unsigned int indexPV= 0;
 
-	void printPVs(unsigned int count);
-	void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nods);
+	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
+	void stopPonder(){ limits.ponder = false;}
+private:
+
+
+
+
+
+
+
+	void printPVs(unsigned int count) const ;
+	void printPV(Score res, unsigned int depth, unsigned int seldepth, Score alpha, Score beta, long long time, unsigned int count, std::list<Move>& PV, unsigned long long nodes) const;
 public:
 	searchLimits limits;
-	History history;
-	CounterMove counterMoves;
+
+	const History& getHistory()const {return history;}
+	const CounterMove& getCounterMove()const {return  counterMoves;}
+
+
+
 	Position pos;
 	static std::vector<rootMove> rootMoves;
 	static unsigned int threads;
@@ -147,20 +166,21 @@ public:
 	static bool bestMoveBook;
 	static bool showCurrentLine;
 	volatile bool showLine = false;
-	static void initLMRreduction(void){
+
+	static void initLMRreduction(void)
+	{
 		for (int d = 1; d < 32*ONE_PLY; d++)
 			for (int mc = 1; mc < 64; mc++)
 			{
 				double    PVRed = -1.5 + 0.33*log(double(d)) * log(double(mc));
 				double nonPVRed = -1.2 + 0.4*log(double(d)) * log(double(mc));
-				PVreduction[d][mc]=(Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
-				nonPVreduction[d][mc]=(Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
+				PVreduction[d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
+				nonPVreduction[d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
 			}
 	};
-	volatile struct sSignal
-	{
-		volatile bool stop = false;
-	}signals;
+
+	volatile bool stop = false;
+
 
 	enum nodeType
 	{
@@ -171,7 +191,7 @@ public:
 		HELPER_ROOT_NODE
 	} ;
 
-	Score startThinking(searchLimits & limits);
+	Score startThinking();
 	unsigned long long getVisitedNodes(){
 		return visitedNodes;
 	}

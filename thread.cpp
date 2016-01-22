@@ -73,7 +73,6 @@ volatile bool my_thread::startThink=false;
 timeManagementStruct my_thread::timeMan;
 
 
-long long int my_thread::startTime;
 long long my_thread::lastHasfullMessage;
 
 
@@ -94,15 +93,15 @@ void my_thread::timerThread() {
 
 		std::unique_lock<std::mutex> lk(mutex);
 
-		timerCond.wait(lk,[&]{return (startThink && src.signals.stop==false )||quit;});
+		timerCond.wait(lk,[&]{return (startThink && src.stop==false )||quit;});
 		if (!quit){
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
-			long long int time =std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-startTime;
-			if(time>=timeMan.allocatedTime && !(limits.infinite || limits.ponder)){
+			long long int time = src.getElapsedTime();
+			if(time>=timeMan.allocatedTime && !(src.limits.infinite || src.limits.ponder)){
 				/*if(startThink){
 					sync_cout<<"STOPPPPE"<<sync_endl;
 				}*/
-				src.signals.stop=true;
+				src.stop=true;
 			}
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			if(time - lastHasfullMessage>1000){
@@ -118,22 +117,22 @@ void my_thread::timerThread() {
 			}
 #endif
 
-			if(timeMan.idLoopIterationFinished && time>=timeMan.allocatedTime*0.7 && !(limits.infinite || limits.ponder)){
-				src.signals.stop=true;
+			if(timeMan.idLoopIterationFinished && time>=timeMan.allocatedTime*0.7 && !(src.limits.infinite || src.limits.ponder)){
+				src.stop=true;
 			}
 
-			if(timeMan.idLoopIterationFinished && time>=timeMan.minSearchTime && !(limits.infinite || limits.ponder)){
+			if(timeMan.idLoopIterationFinished && time>=timeMan.minSearchTime && !(src.limits.infinite || src.limits.ponder)){
 				if(timeMan.singularRootMoveCount >=1){
-					src.signals.stop=true;
+					src.stop=true;
 				}
 			}
 
 
-			if(limits.nodes && src.getVisitedNodes()>limits.nodes){
-				src.signals.stop=true;
+			if(src.limits.nodes && src.getVisitedNodes()>src.limits.nodes){
+				src.stop=true;
 			}
-			if(limits.moveTime && time>=limits.moveTime){
-				src.signals.stop=true;
+			if(src.limits.moveTime && time>=src.limits.moveTime){
+				src.stop=true;
 			}
 			timeMan.idLoopIterationFinished=false;
 
@@ -152,11 +151,9 @@ void my_thread::searchThread() {
 		std::unique_lock<std::mutex> lk(mutex);
 		searchCond.wait(lk,[&]{return startThink||quit;});
 		if(!quit){
-			timeManagerInit(src.pos, limits,timeMan);
-			startTime=std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
-			src.signals.stop=false;
+			timeManagerInit(src.pos, src.limits,timeMan);
 			timerCond.notify_one();
-			src.startThinking(limits);
+			src.startThinking();
 			//sync_cout<<"startThink=false"<<sync_endl;
 			startThink=false;
 			//sync_cout<<startThink<<sync_endl;
@@ -172,7 +169,7 @@ void my_thread::searchThread() {
 void my_thread::initThreads(){
 	timer=std::thread(&my_thread::timerThread,this);
 	searcher=std::thread(&my_thread::searchThread,this);
-	src.signals.stop=true;
+	src.stop=true;
 }
 
 void my_thread::quitThreads(){
