@@ -240,7 +240,7 @@ Score search::startThinking()
 	if(useOwnBook && !limits.infinite )
 	{
 		PolyglotBook pol;
-		Move bookM = pol.probe(pos, "book.bin", bestMoveBook);
+		Move bookM = pol.probe(pos, bestMoveBook);
 		if(bookM.packed)
 		{
 			sync_cout << "info pv " << pos.displayUci(bookM) << sync_endl;
