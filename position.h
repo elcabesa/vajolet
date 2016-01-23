@@ -316,7 +316,7 @@ public:
 
 	void doNullMove(void);
 	void doMove(const Move &m);
-	void undoMove(const Move &m);
+	void undoMove();
 	/*! \brief undo a null move
 		\author Marco Belli
 		\version 1.0

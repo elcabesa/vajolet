@@ -60,7 +60,7 @@ public:
 	Score score;
 	std::list<Move> PV;
 	Move firstMove;
-	unsigned int selDepth;
+	unsigned int maxPlyReached;
 	unsigned int depth;
 	unsigned long long nodes;
 	long long int time;
@@ -70,7 +70,7 @@ public:
 	{
 		score = -SCORE_INFINITE;
 		firstMove = m;
-		selDepth = 0;
+		maxPlyReached = 0;
 		depth = 0;
 		nodes = 0;
 		time = 0;
@@ -98,6 +98,8 @@ private:
 	static unsigned int FutilityMoveCounts[11];
 	static Score PVreduction[32*ONE_PLY][64];
 	static Score nonPVreduction[32*ONE_PLY][64];
+
+	static std::vector<rootMove> rootMoves;
 
 	static Score mateIn(int ply) { return SCORE_MATE - ply; }
 	static Score matedIn(int ply) { return SCORE_MATED + ply; }
@@ -127,37 +129,37 @@ private:
 
 	}
 
-
-	// gestione timer
-	long long int startTime;
-public:
-	long long int getTime() const { return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
-	long long int getElapsedTime() const { return getTime() - startTime; }
-	void resetStartTime(){ startTime = getTime(); }
+	signed int razorMargin(unsigned int depth) const { return 20000+depth*78; }
 
 
-	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
-	void stopPonder(){ limits.ponder = false;}
-private:
+	enum nodeType
+	{
+		ROOT_NODE,
+		HELPER_ROOT_NODE,
+		PV_NODE,
+		ALL_NODE,
+		CUT_NODE
+	} ;
 
+	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
+	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
 
-
-
-
-
+	static std::atomic<unsigned long long> visitedNodes;
+	unsigned int maxPlyReached;
 
 	void printPVs(unsigned int count) const ;
 	void printPV(Score res, unsigned int depth, unsigned int seldepth, Score alpha, Score beta, long long time, unsigned int count, std::list<Move>& PV, unsigned long long nodes) const;
+	void reloadPv(unsigned int i);
+
 public:
 	searchLimits limits;
+	Position pos;
 
 	const History& getHistory()const {return history;}
 	const CounterMove& getCounterMove()const {return  counterMoves;}
 
 
 
-	Position pos;
-	static std::vector<rootMove> rootMoves;
 	static unsigned int threads;
 	static unsigned int multiPVLines;
 	static unsigned int limitStrength;
@@ -179,29 +181,24 @@ public:
 			}
 	};
 
+	void stopPonder(){ limits.ponder = false;}
 	volatile bool stop = false;
 
 
-	enum nodeType
-	{
-		ROOT_NODE,
-		PV_NODE,
-		ALL_NODE,
-		CUT_NODE,
-		HELPER_ROOT_NODE
-	} ;
+	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
+
 
 	Score startThinking();
-	unsigned long long getVisitedNodes(){
-		return visitedNodes;
-	}
-	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
-private:
-	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
+	unsigned long long getVisitedNodes() const { return visitedNodes; }
 
-	static std::atomic<unsigned long long> visitedNodes;
-	unsigned int selDepth;
-	//bool stop;
+private:
+	// gestione timer
+	long long int startTime;
+public:
+	long long int getTime() const { return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
+	long long int getElapsedTime() const { return getTime() - startTime; }
+	void resetStartTime(){ startTime = getTime(); }
+
 };
 
 extern search defaultSearch;

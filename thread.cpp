@@ -167,7 +167,8 @@ void my_thread::searchThread() {
 
 
 
-void my_thread::initThreads(){
+void my_thread::initThreads()
+{
 	timer=std::thread(&my_thread::timerThread,this);
 	searcher=std::thread(&my_thread::searchThread,this);
 	src.stop=true;

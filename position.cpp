@@ -1035,11 +1035,12 @@ void Position::doMove(const Move & m){
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::undoMove(const Move & m)
+void Position::undoMove()
 {
 
 	assert(m.bit.packed);
 	state x = getActualState();
+	Move &m = x.currentMove;
 
 	tSquare to = (tSquare)m.bit.to;
 	tSquare from = (tSquare)m.bit.from;
@@ -1321,7 +1322,7 @@ unsigned long long Position::perft(unsigned int depth)
 	{
 		doMove(m);
 		tot += perft(depth - 1);
-		undoMove(m);
+		undoMove();
 	}
 	return tot;
 
@@ -1346,7 +1347,7 @@ unsigned long long Position::divide(unsigned int depth)
 		doMove(m);
 		unsigned long long n= perft(depth - 1);
 		tot += n;
-		undoMove(m);
+		undoMove();
 		sync_cout<<mn<<") "<<displayMove(m)<<": "<<n<<sync_endl;
 
 	}

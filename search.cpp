@@ -35,15 +35,11 @@
 	Position ppp;
 #endif
 
+
 search defaultSearch;
 std::vector<rootMove> search::rootMoves;
 std::atomic<unsigned long long> search::visitedNodes;
 
-
-inline signed int razorMargin(unsigned int depth)__attribute__((const));
-inline signed int razorMargin(unsigned int depth){
-	return 20000+depth*78;
-}
 
 void search::printPVs(unsigned int count) const
 {
@@ -53,7 +49,7 @@ void search::printPVs(unsigned int count) const
 	{
 		if(rm.nodes)
 		{
-			printPV(rm.score, rm.depth, rm.selDepth, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes);
+			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes);
 		}
 		i++;
 	});
@@ -61,45 +57,84 @@ void search::printPVs(unsigned int count) const
 
 void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes) const {
 
-	sync_cout<<"info multipv "<< (count+1) << " depth "<<(depth)<<" seldepth "<<seldepth <<" score ";
+	sync_cout<<"info multipv "<< (count+1) << " depth "<< (depth) <<" seldepth "<< seldepth <<" score ";
 
-	if(abs(res) >SCORE_MATE_IN_MAX_PLY){
+	if(abs(res) >SCORE_MATE_IN_MAX_PLY)
+	{
 		std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
 	}
-	else{
-		int satRes= std::min(res,SCORE_MAX_OUTPUT_VALUE);
-		satRes= std::max(satRes,SCORE_MIN_OUTPUT_VALUE);
-		std::cout<< "cp "<<(int)((float)satRes/100.0);
+	else
+	{
+		int satRes = std::min(res,SCORE_MAX_OUTPUT_VALUE);
+		satRes = std::max(satRes,SCORE_MIN_OUTPUT_VALUE);
+		std::cout << "cp "<< (int)((float)satRes/100.0);
 	}
 
-	std::cout<<(res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
+	std::cout << (res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
 
-	std::cout<<" nodes "<<nodes;
+	std::cout << " nodes " << nodes;
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-	std::cout<<" nps "<<(unsigned int)((double)nodes*1000/(double)time)<<" time "<<(long long int)(time);
+	std::cout << " nps " << (unsigned int)((double)nodes*1000/(double)time) << " time " << (long long int)(time);
 #endif
 
-	std::cout<<" pv ";
-	for_each(PV.begin(), PV.end(), [&](Move &m){std::cout<<Position::displayUci(m)<<" ";});
+	std::cout << " pv ";
+	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<Position::displayUci(m)<<" ";});
 	std::cout<<sync_endl;
 }
 
 
-Score search::futility[5]={0,6000,20000,30000,40000};
-Score search::futilityMargin[7]={0,10000,20000,30000,40000,50000,60000};
-unsigned int search::FutilityMoveCounts[11]={5,10,17,26,37,50,66,85,105,130,151};
+Score search::futility[5] = {0,6000,20000,30000,40000};
+Score search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
+unsigned int search::FutilityMoveCounts[11] = {5,10,17,26,37,50,66,85,105,130,151};
 Score search::PVreduction[32*ONE_PLY][64];
 Score search::nonPVreduction[32*ONE_PLY][64];
-unsigned int search::threads=1;
-unsigned int search::multiPVLines=1;
-unsigned int search::limitStrength=0;
-unsigned int search::eloStrenght=3000;
-bool search::useOwnBook=true;
-bool search::bestMoveBook=false;
-bool search::showCurrentLine=false;
+unsigned int search::threads = 1;
+unsigned int search::multiPVLines = 1;
+unsigned int search::limitStrength = 0;
+unsigned int search::eloStrenght = 3000;
+bool search::useOwnBook = true;
+bool search::bestMoveBook = false;
+bool search::showCurrentLine = false;
+
+void search::reloadPv( unsigned int i )
+{
+	if( rootMoves[i].PV.size() > 0)
+	{
+		auto PV = rootMoves[i].PV;
+		unsigned int n = 0;
+
+		for(const Move& m : PV)
+		{
+			if (!pos.isMoveLegal(m))
+			{
+				break;
+			}
+
+			const ttEntry* const tte = TT.probe(pos.getKey());
+
+			if (!tte || tte->getPackedMove() != m.packed)
+			{
+				// Don't overwrite correct entries
+				TT.store(pos.getKey(), SCORE_NONE, typeExact, -1000, m.packed, pos.eval<false>());
+			}
+
+			pos.doMove(m);
+			n++;
+		}
+
+		for(unsigned int i = 0; i< n; i++)
+		{
+			pos.undoMove();
+		}
+	}
+}
 
 Score search::startThinking()
 {
+	//------------------------------------
+	//init the new search
+	//------------------------------------
+
 	Score res = 0;
 	resetStartTime();
 	stop = false;
@@ -118,7 +153,7 @@ Score search::startThinking()
 	//--------------------------------
 	//	generate the list of root moves to be searched
 	//--------------------------------
-	if(limits.searchMoves.size()==0)
+	if(limits.searchMoves.size() == 0)	// all the legal moves
 	{
 		Move m(Movegen::NOMOVE);
 		Movegen mg(pos);
@@ -130,7 +165,7 @@ Score search::startThinking()
 		}
 	}
 	else
-	{
+	{	//only selected moves
 		for_each(limits.searchMoves.begin(), limits.searchMoves.end(),
 			[&](Move &m)
 			{
@@ -144,7 +179,7 @@ Score search::startThinking()
 
 
 	//-----------------------------
-	// manage multi PV moves &&v limit strenght
+	// manage multi PV moves && limit strenght
 	//-----------------------------
 	unsigned int linesToBeSearched = search::multiPVLines;
 	if(limitStrength)
@@ -155,51 +190,46 @@ Score search::startThinking()
 	}
 	linesToBeSearched = std::min(linesToBeSearched, (unsigned int)rootMoves.size());
 
+
+
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
-	Move m(Movegen::NOMOVE),oldBestMove(Movegen::NOMOVE);
+	Move m(Movegen::NOMOVE);
 
 	Movegen mg(pos);
+	unsigned int legalMoves = mg.getNumberOfLegalMoves();
 
-	Move lastLegalMove;
-	unsigned int legalMoves=0;
-
-	while((m=mg.getNextMove())!=Movegen::NOMOVE){
-		legalMoves++;
-		lastLegalMove=m;
-	}
-
-	if(legalMoves==0)
+	if(legalMoves == 0)
 	{
 		while((limits.infinite && !stop) || limits.ponder){}
+
 		sync_cout<<"info depth 0 score cp 0"<<sync_endl;
 		sync_cout<<"bestmove 0000"<<sync_endl;
+
 		return 0;
 	}
-	else if(legalMoves==1)
+	else if( legalMoves == 1 )
 	{
 		if(!limits.infinite)
 		{
-			sync_cout<<"info pv "<<pos.displayUci(lastLegalMove)<<sync_endl;
+			m = mg.getFirstMove();
+			sync_cout << "info pv " << pos.displayUci(m) << sync_endl;
 			while(limits.ponder){}
-			sync_cout<<"bestmove "<<pos.displayUci(lastLegalMove);
+			sync_cout << "bestmove " << pos.displayUci(m);
 
-
-			pos.doMove(lastLegalMove);
-
+			pos.doMove(m);
 			const ttEntry* const tte = TT.probe(pos.getKey());
+			pos.undoMove();
 
-			pos.undoMove(lastLegalMove);
-			Move m;
 			if(tte && ( m.packed = (tte->getPackedMove())))
 			{
 				std::cout<<" ponder "<<pos.displayUci(m);
 			}
-
 			std::cout<<sync_endl;
+
 			return 0;
 		}
 	}
@@ -207,92 +237,71 @@ Score search::startThinking()
 	//----------------------------------------------
 	//	book probing
 	//----------------------------------------------
-
-	PolyglotBook pol;
-	//std::cout<<"polyglot testing"<<std::endl;
-	if(useOwnBook && !limits.infinite ){
-		Move bookM=pol.probe(pos,"book.bin",bestMoveBook);
-		if(bookM.packed){
-			sync_cout<<"info pv "<<pos.displayUci(bookM)<<sync_endl;
-			while((limits.infinite && !stop) || limits.ponder){}
-			sync_cout<<"bestmove "<<pos.displayUci(bookM)<<sync_endl;
+	if(useOwnBook && !limits.infinite )
+	{
+		PolyglotBook pol;
+		Move bookM = pol.probe(pos, "book.bin", bestMoveBook);
+		if(bookM.packed)
+		{
+			sync_cout << "info pv " << pos.displayUci(bookM) << sync_endl;
+			while( (limits.infinite && !stop) || limits.ponder){}
+			sync_cout<<"bestmove "<< pos.displayUci(bookM) << sync_endl;
 			return 0;
 		}
 	}
 
 
+	//----------------------------------
+	// we can start the real search
+	//----------------------------------
 
-	unsigned int selDepthBase=pos.getPly();
 
 
 	std::list<Move> newPV;
-	unsigned int depth=1;
+	unsigned int depth = 1;
 
-	Score alpha=-SCORE_INFINITE,beta =SCORE_INFINITE;
-	Score delta = 800;;
-	selDepth=selDepthBase;
+	Score alpha = -SCORE_INFINITE, beta = SCORE_INFINITE;
+	Score delta = 800;
+	Move oldBestMove(Movegen::NOMOVE);
 
 	do
 	{
+
 		for (indexPV = 0; indexPV < linesToBeSearched; indexPV++)
 		{
 
+			//----------------------------------
+			// prepare alpha & beta
+			//----------------------------------
 			if (depth >= 5)
 			{
 				delta = 800;
 				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].score) - delta,(signed long long int)-SCORE_INFINITE);
 				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].score) + delta,(signed long long int) SCORE_INFINITE);
 			}
-			for (unsigned int x =indexPV; x<linesToBeSearched ; x++){
-				rootMoves[x].score=-SCORE_INFINITE;
+
+			for (unsigned int x = indexPV; x < rootMoves.size() ; x++)
+			{
+				rootMoves[x].score = -SCORE_INFINITE;
+			}
+
+			//----------------------------------
+			// reload the last PV in the transposition table
+			//----------------------------------
+			for(unsigned int i = 0; i<=indexPV; i++)
+			{
+				reloadPv(i);
 			}
 
 
 			unsigned int reduction = 0;
-
-			// reload the last PV in the transposition table
-			for(unsigned int i =0; i<=indexPV; i++){
-				//sync_cout<<"LENGHT "<<rootMoves[i].PV.lenght<<sync_endl;
-				if(rootMoves[i].PV.size()>0){
-
-
-					auto it = begin(rootMoves[i].PV);
-					//sync_cout<<"SCORE "<<rootMoves[i].score<<sync_endl;
-					for (;it!=end(rootMoves[i].PV);it++)
-					{
-						if(!pos.isMoveLegal(*it))
-						{
-							//sync_cout<<"ERRORE ILLLEGAL MOVE IN PV"<<sync_endl;
-							break;
-						}
-						const ttEntry* const tte = TT.probe(pos.getKey());
-
-						if (!tte || tte->getPackedMove() != (*it).packed)
-						{// Don't overwrite correct entries
-							TT.store(pos.getKey(), SCORE_NONE,typeExact,-1000, (*it).packed, pos.eval<false>());
-						}
-
-						//sync_cout<<"insert in TT "<<p.displayUci(*it)<<sync_endl;
-						pos.doMove(*it);
-
-					}
-					for (;it!=begin(rootMoves[i].PV);)
-					{
-						--it;
-						//sync_cout<<"undo move "<<p.displayUci(rootMoves[i].PV[n])<<sync_endl;
-						pos.undoMove(*it);
-					}
-				}
-			}
-
-
 
 			do{
 
 
 
 				//sync_cout<<"SEARCH"<<sync_endl;
-				selDepth=selDepthBase;
+				maxPlyReached = 0;
 				newPV.clear();
 				//pos.cleanStateInfo();
 				std::vector<std::list<Move>> pvl2(threads-1);
@@ -346,7 +355,7 @@ Score search::startThinking()
 						}
 
 						it->score=res;
-						it->selDepth=selDepth-selDepthBase;
+						it->maxPlyReached = maxPlyReached;
 						it->depth=depth;
 						it->nodes=visitedNodes;
 						it->time= elapsedTime;
@@ -371,7 +380,7 @@ Score search::startThinking()
 					//my_thread::timeMan.idLoopRequestToExtend=true;
 					newPV.clear();
 					newPV.push_back(rootMoves[indexPV].PV.front());
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, elapsedTime, indexPV,newPV,visitedNodes);
+					printPV(res,depth,maxPlyReached,alpha,beta, elapsedTime, indexPV,newPV,visitedNodes);
 					alpha = (Score) std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
 
 					reduction = 0;
@@ -383,7 +392,7 @@ Score search::startThinking()
 						//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 					}
 					//sync_cout<<"res>=beta "<<sync_endl;
-					printPV(res,depth,selDepth-selDepthBase,alpha,beta, elapsedTime, indexPV,newPV,visitedNodes);
+					printPV(res,depth,maxPlyReached,alpha,beta, elapsedTime, indexPV,newPV,visitedNodes);
 					beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 					if(depth>1)
 					{
@@ -482,7 +491,7 @@ Score search::startThinking()
 	else{
 		pos.doMove(rootMoves[bestMoveLine].PV.front());
 		const ttEntry* const tte = TT.probe(pos.getKey());
-		pos.undoMove(rootMoves[bestMoveLine].PV.front());
+		pos.undoMove();
 		Move m;
 		if(tte && ( m.packed = tte->getPackedMove()))
 		{
@@ -533,12 +542,14 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 	if( showLine && depth <=ONE_PLY)
 	{
-		// TODO questo mostra la linea dallo startpoosition.... errore  va modificato
-		showLine=false;
-		sync_cout<<"info currline";
-		for (unsigned int i = 1; i<= pos.getStateIndex()/2;i++){ // show only half of
-			std::cout<<" "<<pos.displayUci(pos.getState(i).currentMove);
 
+		showLine = false;
+		sync_cout<<"info currline";
+		unsigned int start = pos.getStateIndex()-ply + 1;
+
+		for (unsigned int i = start; i<= start+ply/2;i++) // show only half of the search line
+		{
+			std::cout<<" "<<pos.displayUci(pos.getState(i).currentMove);
 		}
 		std::cout<<sync_endl;
 	}
@@ -816,7 +827,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 			pos.doMove(m);
 			assert(rDepth>=ONE_PLY);
 			s=-alphaBeta<childNodesType>(ply+1,rDepth,-rBeta,-rBeta+1,childPV);
-			pos.undoMove(m);
+			pos.undoMove();
 			if(s>=rBeta){
 
 				return s;
@@ -1151,7 +1162,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply,int dep
 
 
 
-		pos.undoMove(m);
+		pos.undoMove();
 
 
 
@@ -1269,7 +1280,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 
 	bool inCheck=pos.isInCheck();
 
-	selDepth=std::max(pos.getPly(),selDepth);
+	maxPlyReached = std::max(ply, maxPlyReached);
 	visitedNodes++;
 
 
@@ -1461,7 +1472,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply,int depth
 			val=-qsearch<childNodesType>(ply+1,depth-ONE_PLY,-beta,-alpha,childPV);
 		}
 
-		pos.undoMove(m);
+		pos.undoMove();
 
 
 		if(val>bestScore){
