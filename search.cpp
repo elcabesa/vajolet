@@ -266,6 +266,9 @@ Score search::startThinking()
 
 	do
 	{
+		//----------------------------
+		// iterative loop
+		//----------------------------
 
 		for (indexPV = 0; indexPV < linesToBeSearched; indexPV++)
 		{
@@ -296,75 +299,71 @@ Score search::startThinking()
 
 			unsigned int reduction = 0;
 
-			do{
+			do
+			{
+				//----------------------------
+				// search at depth d with aspiration window
+				//----------------------------
 
-
-
-				//sync_cout<<"SEARCH"<<sync_endl;
 				maxPlyReached = 0;
 				newPV.clear();
-				//pos.cleanStateInfo();
+
+
+				//----------------------------
+				// multithread : lazy smp threads
+				//----------------------------
+
 				std::vector<std::list<Move>> pvl2(threads-1);
 				std::vector<std::thread> helperThread;
 
-				for(unsigned int i=0;i<(threads-1);i++)
+				// launch helper threads
+				for(unsigned int i = 0; i < (threads - 1); i++)
 				{
-					helperSearch[i].stop =false;
-					helperSearch[i].pos=pos;
-					helperThread.push_back(std::thread(alphaBeta<search::nodeType::HELPER_ROOT_NODE>,&helperSearch[i],0,(depth-reduction+((i+1)%2))*ONE_PLY,alpha,beta,std::ref(pvl2[i])));
+					helperSearch[i].stop = false;
+					helperSearch[i].pos = pos;
+					helperThread.push_back( std::thread(alphaBeta<search::nodeType::HELPER_ROOT_NODE>, &helperSearch[i], 0, (depth-reduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
 				}
 
+				// main thread
+				res = alphaBeta<search::nodeType::ROOT_NODE>(0, (depth-reduction) * ONE_PLY, alpha, beta, newPV);
 
-				//std::thread helperThread(&alphaBelli<search::nodeType::ROOT_NODE>,&helperSearch,0,std::ref(pos2),(depth-reduction)*ONE_PLY,alpha,beta,&newPV);
-				res=alphaBeta<search::nodeType::ROOT_NODE>(0,(depth-reduction)*ONE_PLY,alpha,beta,newPV);
-				for(unsigned int i=0;i<(threads-1);i++)
+				// stop helper threads
+				for(unsigned int i = 0; i< (threads - 1); i++)
 				{
-					helperSearch[i].stop =true;
+					helperSearch[i].stop = true;
 				}
 				for(auto &t : helperThread)
 				{
 					t.join();
 				}
 
-
-
-
-
-				//sync_cout<<"FINISHED SEARCH"<<sync_endl;
-				//sync_cout<<"PVsize "<<newPV.size()<<sync_endl;
-
+				// don't stop befor having finished at least one iteration
 				if(depth != 1 && stop)
 				{
-					//sync_cout<<"iterative deepening Stop"<<sync_endl;
 					break;
 				}
 
 
 				long long int elapsedTime  = getElapsedTime();
 
-
 				assert(newPV.size()==0 || res >alpha);
-				if(newPV.size()!=0 && res > alpha /*&& res < beta*/)
+				if( newPV.size() !=0 && res > alpha)
 				{
-					std::vector<rootMove>::iterator it=std::find(rootMoves.begin()+indexPV,rootMoves.end(),newPV.front());
-					if(it->firstMove==newPV.front()){
+					auto it = std::find(rootMoves.begin()+indexPV, rootMoves.end(), newPV.front() );
 
-						//if(res<beta)
-						{
-							it->PV = newPV;
-						}
+					assert( it->firstMove == newPV.front());
 
-						it->score=res;
+					//if(it->firstMove == newPV.front())
+					//{
+						it->PV = newPV;
+						it->score = res;
 						it->maxPlyReached = maxPlyReached;
-						it->depth=depth;
-						it->nodes=visitedNodes;
-						it->time= elapsedTime;
+						it->depth = depth;
+						it->nodes = visitedNodes;
+						it->time = elapsedTime;
 						std::iter_swap( it, rootMoves.begin()+indexPV);
 
-					}
-					else{
-						sync_cout<<"ERRORE NOT FOUND NEW_PV"<<sync_endl;
-					}
+					//}
 
 				}
 
@@ -375,31 +374,32 @@ Score search::startThinking()
 
 				if (res <= alpha)
 				{
-					//sync_cout<<"res<=alpha "<<sync_endl;
-
-					//my_thread::timeMan.idLoopRequestToExtend=true;
 					newPV.clear();
-					newPV.push_back(rootMoves[indexPV].PV.front());
-					printPV(res,depth,maxPlyReached,alpha,beta, elapsedTime, indexPV,newPV,visitedNodes);
-					alpha = (Score) std::max((signed long long int)(res) - delta,(signed long long int)-SCORE_INFINITE);
+					newPV.push_back( rootMoves[indexPV].PV.front() );
+
+					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes);
+
+					alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
 					reduction = 0;
 
 				}
-				else if (res >= beta){
-					if(oldBestMove.packed && oldBestMove!=newPV.front()){
-						my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
-						//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
-					}
-					//sync_cout<<"res>=beta "<<sync_endl;
-					printPV(res,depth,maxPlyReached,alpha,beta, elapsedTime, indexPV,newPV,visitedNodes);
-					beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
-					if(depth>1)
+				else if (res >= beta)
+				{
+					if(oldBestMove.packed && oldBestMove != newPV.front())
 					{
-						reduction=1;
+						my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
 					}
-					//sync_cout<<"new beta "<<beta<<sync_endl;
-				}else
+
+					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes);
+
+					beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
+					if(depth > 1)
+					{
+						reduction = 1;
+					}
+				}
+				else
 				{
 					break;
 				}
@@ -410,15 +410,17 @@ Score search::startThinking()
 
 
 			}while(1);
-			//sync_cout<<"aspiration window ok "<<sync_endl;
+
 			if(!stop)
 			{
 
 				// Sort the PV lines searched so far and update the GUI
 				std::stable_sort(rootMoves.begin(), rootMoves.begin() + indexPV + 1);
-				printPVs(indexPV+1);
+				printPVs( indexPV + 1 );
 			}
 		}
+
+
 		//-----------------------
 		//	single good move at root
 		//-----------------------
@@ -429,69 +431,79 @@ Score search::startThinking()
 		{
 
 			Score rBeta = res - 20000;
-			sd[0].excludeMove=newPV.front();
-			sd[0].skipNullMove=true;
+			sd[0].excludeMove = newPV.front();
+			sd[0].skipNullMove = true;
 			std::list<Move> locChildPV;
-			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0,(depth-3)*ONE_PLY,rBeta-1,rBeta,locChildPV);
-			sd[0].skipNullMove=false;
+			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0, (depth-3) * ONE_PLY, rBeta - 1, rBeta, locChildPV);
+			sd[0].skipNullMove = false;
 			sd[0].excludeMove = Movegen::NOMOVE;
 
-			if(temp < rBeta){
+			if(temp < rBeta)
+			{
 				my_thread::timeMan.singularRootMoveCount++;
 			}
 		}
 
-		if(oldBestMove.packed && oldBestMove!=newPV.front()){
+		//------------------------------------------------
+		// check wheter or not the new best move has changed
+		//------------------------------------------------
+		if(oldBestMove.packed && oldBestMove != newPV.front()) // in the case increase the allocated time
+		{
 			my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
-			//sync_cout<<"estesa ricerca="<<my_thread::timeMan.allocatedTime<<sync_endl;
 		}
-		oldBestMove=newPV.front();
+		oldBestMove = newPV.front();
 
-		my_thread::timeMan.depth=depth;
-		unsigned long time=my_thread::timeMan.minSearchTime;
-		my_thread::timeMan.allocatedTime=std::max(time,(unsigned long int)(my_thread::timeMan.allocatedTime*0.90));
-		//sync_cout<<"nuovo tempo allocato="<<my_thread::timeMan.allocatedTime<<sync_endl;
 
-		my_thread::timeMan.idLoopIterationFinished=true;
-
+		my_thread::timeMan.depth = depth;
+		unsigned long time = my_thread::timeMan.minSearchTime;
+		my_thread::timeMan.allocatedTime = std::max(time, (unsigned long int)(my_thread::timeMan.allocatedTime * 0.90) ); // otherwise decrease the allocated time
+		my_thread::timeMan.idLoopIterationFinished = true;
 
 
 
-		depth+=1;
 
-	}while(depth<=(limits.depth? limits.depth:100) && !stop);
+		depth += 1;
 
-	//sync_cout<<"print final bestMove "<<sync_endl;
+	}
+	while( depth <= (limits.depth ? limits.depth : 100) && !stop);
 
-	while(limits.ponder){
+
+	while(limits.ponder)
+	{
 	}
 
-	unsigned int bestMoveLine=0;
-	if(limitStrength){
-		double lambda=(eloStrenght-1000.0)*(0.8/2000)+0.2;
-
+	unsigned int bestMoveLine = 0;
+	if( limitStrength )
+	{
+		double lambda = (eloStrenght - 1000.0) * (0.8/2000) + 0.2;
 		std::mt19937_64 rnd;
 		std::exponential_distribution<> uint_dist(lambda);
-		long long int now = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+
+		long long int now = getTime();
 		rnd.seed(now);
 		double dres = uint_dist(rnd);
 
-		bestMoveLine =std::min((unsigned int)dres,linesToBeSearched-1);
+		bestMoveLine = std::min((unsigned int)dres, linesToBeSearched-1);
 	}
-	//sync_cout<<"bestMove index "<<bestMoveLine<<sync_endl;
 
 
-	sync_cout<<"bestmove "<<pos.displayUci(rootMoves[bestMoveLine].PV.front());
-	if(rootMoves[bestMoveLine].PV.size()>1)
+	//-----------------------------
+	// print out the choosen line
+	//-----------------------------
+	sync_cout << "bestmove " << pos.displayUci( rootMoves[bestMoveLine].PV.front() );
+
+	if(rootMoves[bestMoveLine].PV.size() > 1)
 	{
 		std::list<Move>::iterator it = rootMoves[bestMoveLine].PV.begin();
 		std::advance(it, 1);
 		std::cout<<" ponder "<<pos.displayUci(*it);
 	}
-	else{
-		pos.doMove(rootMoves[bestMoveLine].PV.front());
+	else
+	{
+		pos.doMove( rootMoves[bestMoveLine].PV.front() );
 		const ttEntry* const tte = TT.probe(pos.getKey());
 		pos.undoMove();
+
 		Move m;
 		if(tte && ( m.packed = tte->getPackedMove()))
 		{
@@ -502,8 +514,6 @@ Score search::startThinking()
 	std::cout<<sync_endl;
 
 	return rootMoves[bestMoveLine].score;
-
-
 
 }
 
