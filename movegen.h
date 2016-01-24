@@ -53,9 +53,6 @@ private:
 	Move counterMoves[2];
 
 
-	static History defaultHistory;
-	static CounterMove defaultCounterMove;
-
 
 	enum CastleSide
 	{
@@ -180,7 +177,7 @@ public:
 
 
 
-	Movegen(const Position & p, const search& s,unsigned int ply, int d, const Move & ttm): pos(p),src(s),ply(ply),depth(d), ttMove(ttm)
+	Movegen(const Position & p, const search& s, unsigned int ply, int d, const Move & ttm): pos(p),src(s),ply(ply),depth(d), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{
@@ -197,7 +194,7 @@ public:
 
 	}
 
-	Movegen(const Position & p): Movegen(p,defaultSearch,0,100*ONE_PLY, NOMOVE)
+	Movegen(const Position & p): Movegen(p, defaultSearch, 0, 100*ONE_PLY, NOMOVE)
 	{
 	}
 
