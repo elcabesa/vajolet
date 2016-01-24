@@ -1028,8 +1028,13 @@ Move Movegen::getNextMove()
 			/*Move previousMove = pos.getActualState().currentMove;
 			if(previousMove.packed)
 			{
-				counterMoves[0] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
-				counterMoves[1] = cm.getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
+				counterMoves[0] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
+				counterMoves[1] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
+			}
+			else
+			{
+				counterMoves[0] = NOMOVE;
+				counterMoves[1] = NOMOVE;
 			}*/
 
 
@@ -1053,7 +1058,7 @@ Move Movegen::getNextMove()
 			{
 				FindNextBestMove();
 
-				if(moveList[moveListPosition].m != ttMove && !isKillerMove(moveList[moveListPosition].m) && moveList[moveListPosition].m!= counterMoves[0] &&  moveList[moveListPosition].m!= counterMoves[1])
+				if(moveList[moveListPosition].m != ttMove && !isKillerMove(moveList[moveListPosition].m) && moveList[moveListPosition].m != counterMoves[0] &&  moveList[moveListPosition].m != counterMoves[1])
 				{
 					//if(moveList[moveListPosition].score > 0 || this->depth >= 3* ONE_PLY )
 					//{
@@ -1072,13 +1077,13 @@ Move Movegen::getNextMove()
 			}
 			else
 			{
-				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
 		case iterateEvasionMoves:
-			if(moveListPosition<moveListSize)
+			if(moveListPosition < moveListSize)
 			{
-				if(moveList[moveListPosition].m!=ttMove)
+				if(moveList[moveListPosition].m != ttMove)
 				{
 					return moveList[moveListPosition++].m;
 				}
@@ -1111,7 +1116,7 @@ Move Movegen::getNextMove()
 
 			break;
 		case iterateGoodCaptureMoves:
-			if(moveListPosition<moveListSize)
+			if(moveListPosition < moveListSize)
 			{
 				FindNextBestMove();
 
@@ -1135,8 +1140,8 @@ Move Movegen::getNextMove()
 			}
 			else
 			{
-				killerMoves[0] = src.getKillers(ply,0);
-				killerMoves[1] = src.getKillers(ply,1);
+				killerMoves[0] = src.getKillers(ply, 0);
+				killerMoves[1] = src.getKillers(ply, 1);
 
 				Move previousMove = pos.getActualState().currentMove;
 				if(previousMove.packed)

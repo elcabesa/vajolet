@@ -111,11 +111,7 @@ private:
 	searchData sd[STATE_INFO_LENGTH];
 	void cleanData(void)
 	{
-		for (auto & x: sd)
-		{
-			x.excludeMove = 0;
-			x.skipNullMove = false;
-		}
+		std::memset(sd, 0, sizeof(sd));
 	}
 
 	void saveKillers(unsigned int ply, Move& m)
