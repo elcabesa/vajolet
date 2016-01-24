@@ -82,10 +82,6 @@ std::mutex  my_thread::_mutex;
 
 void my_thread::timerThread() {
 	// TODO change time based on PV changing during the search.
-	/*
-	 * provare, usando la statistica e la define PRINT_PV_CHANGES a capire quante volte cambia la PV durante la ricerca,
-	 * dargli uun peso in base al depth^2 e decidere in base a soglie o rapporti con i nodi etc se la posizione � calma o problematica
-	*/
 	unsigned int oldFullness=0;
 	std::mutex mutex;
 	while (!quit)
