@@ -785,10 +785,6 @@ void Position::doNullMove(void)
 		x.epSquare = squareNone;
 	}
 	x.key ^= HashKeys::side;
-
-#ifndef DISABLE_PREFETCH
-	__builtin_prefetch (TT.findCluster(x.key));
-#endif
 	x.fiftyMoveCnt++;
 	x.pliesFromNull = 0;
 	x.nextMove = (eNextMove)(blackTurn-x.nextMove);
@@ -968,10 +964,6 @@ void Position::doMove(const Move & m){
 		x.pawnKey ^= HashKeys::keys[from][piece] ^ HashKeys::keys[to][piece];
 		x.fiftyMoveCnt = 0;
 	}
-#ifndef DISABLE_PREFETCH
-	__builtin_prefetch (TT.findCluster(x.key));
-#endif
-
 
 	mv.store_partial(2,x.material);
 	npm.store(x.nonPawnMaterial);

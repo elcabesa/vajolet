@@ -42,10 +42,7 @@
 //	define
 //---------------------------------------------
 //#define DEBUG_EVAL_SIMMETRY
-//#define DEBUG_SEE
 //#define DISABLE_TIME_DIPENDENT_OUTPUT
-
-#define DISABLE_PREFETCH
 //#define ENABLE_CHECK_CONSISTENCY
 
 

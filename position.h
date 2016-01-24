@@ -103,7 +103,7 @@ public:
 	*/
 	Position()
 	{
-		stateIndex=0;
+		stateIndex = 0;
 		actualState = &stateInfo[stateIndex];
 	}
 
@@ -204,7 +204,8 @@ public:
 		bitMap checkers;	/*!< checking pieces*/
 		Move currentMove;
 
-		state(){
+		state()
+		{
 		}
 
 

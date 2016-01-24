@@ -195,7 +195,7 @@ private:
 	// gestione timer
 	long long int startTime;
 public:
-	long long int getTime() const { return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
+	static long long int getTime(){ return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
 	long long int getElapsedTime() const { return getTime() - startTime; }
 	void resetStartTime(){ startTime = getTime(); }
 

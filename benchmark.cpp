@@ -47,30 +47,30 @@ static const std::vector<std::string>positions = {
 };
 
 
-void benchmark(void) {
-
-
+void benchmark(void)
+{
 	TT.setSize(32);
 	TT.clear();
 
-
 	unsigned long long nodes = 0;
-	long long int elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count();
+	long long int totalTime = search::getTime();
+
+
 	for (unsigned int i = 0; i < positions.size(); i++)
 	{
 		search src;
-		src.limits.depth=15;
+		src.limits.depth = 15;
 		src.pos.setupFromFen(positions[i]);
 		sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
 		src.startThinking();
-		nodes+=src.getVisitedNodes();
+		nodes += src.getVisitedNodes();
 	}
 
-	elapsed = std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count()-elapsed+1;
+	totalTime =search::getTime() - totalTime + 1;
 
 	sync_cout << "\n==========================="
-       << "\nTotal time (ms) : " << elapsed
+       << "\nTotal time (ms) : " << totalTime
        << "\nNodes searched  : " << nodes
-       << "\nNodes/second    : " << 1000 * nodes / elapsed << sync_endl;
+       << "\nNodes/second    : " << 1000 * nodes / totalTime << sync_endl;
 
 }
