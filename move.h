@@ -57,11 +57,11 @@ struct Move
 	};
 
 
-	inline bool operator == (const Move& d1) const { return packed==d1.packed;}
-	inline bool operator != (const Move& d1) const { return packed!=d1.packed;}
-	inline Move& operator = (unsigned short b) { packed=b; return *this;}
-	inline Move& operator = (const Move&m){ packed=m.packed; return *this;}
-	inline Move& operator = (const Move&&m){ packed=m.packed; return *this;}
+	inline bool operator == (const Move& d1) const { return packed == d1.packed;}
+	inline bool operator != (const Move& d1) const { return packed != d1.packed;}
+	inline Move& operator = (unsigned short b) { packed = b; return *this;}
+	inline Move& operator = (const Move&m){ packed = m.packed; return *this;}
+	inline Move& operator = (const Move&&m){ packed = m.packed; return *this;}
 	inline Move( Move && m){packed = m.packed;};
 
 
