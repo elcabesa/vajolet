@@ -33,9 +33,7 @@
 //------------------------------------------------
 //	extern variables
 //------------------------------------------------
-#ifdef PRECALCULATED_BITSET
 extern bitMap BITSET[squareNumber+1];
-#endif
 extern tSquare BOARDINDEX[8][8];
 extern const int FILES[squareNumber];
 extern const int RANKS[squareNumber];
@@ -65,13 +63,9 @@ extern bitMap bigCenterBitmap;
 	\version 1.0
 	\date 08/11/2013
 */
-inline bitMap bitSet(tSquare n){
-#ifdef PRECALCULATED_BITSET
+inline bitMap bitSet(tSquare n)
+{
 	return BITSET[n];
-#else
-	//return (Vec2uq(1,0)<<n)[0];
-	return (1ull)<<n;
-#endif
 }
 
 /*	\brief return true if the 3 squares are aligned
@@ -79,7 +73,8 @@ inline bitMap bitSet(tSquare n){
 	\version 1.0
 	\date 08/11/2013
 */
-inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3){
+inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3)
+{
 	return LINES[s1][s2] & bitSet(s3);
 	/*return  (SQUARES_BETWEEN[s1][s2] | SQUARES_BETWEEN[s1][s3] | SQUARES_BETWEEN[s2][s3])
 			& (     bitSet(s1) |        bitSet(s2) |        bitSet(s3));*/

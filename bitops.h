@@ -94,7 +94,8 @@ static inline tSquare iterateBit(bitMap & b)
 	\version 1.0
 	\date 08/11/2013
 */
-inline bool moreThanOneBit(const bitMap b) {
+inline bool moreThanOneBit(const bitMap b)
+{
   return b & (b - 1);
 }
 

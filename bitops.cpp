@@ -24,14 +24,22 @@
 	\version 1.0
 	\date 21/10/2013
 */
-void displayBitmap(bitMap b){
+void displayBitmap(bitMap b)
+{
 	char boardc[squareNumber];
 
-	for ( int i = 0 ; i < squareNumber ; i++)
+	for ( int i = 0; i < squareNumber; i++)
 	{
-		if (b & bitSet((tSquare)i)) boardc[i] = '1';
-		else boardc[i] = '.';
+		if (b & bitSet((tSquare)i))
+		{
+			boardc[i] = '1';
+		}
+		else
+		{
+			boardc[i] = '.';
+		}
 	}
+
 	sync_cout;
 	for (int rank = 7 ; rank >= 0; rank--)
 	{
@@ -43,7 +51,6 @@ void displayBitmap(bitMap b){
 		std::cout << std::endl;
 	}
 	std::cout << std::endl << "  abcdefgh" << sync_endl;
-	return;
 }
 
 

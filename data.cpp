@@ -22,9 +22,7 @@
 //--------------------------------------------------------------
 //	global variables
 //--------------------------------------------------------------
-#ifdef PRECALCULATED_BITSET
-bitMap BITSET[squareNumber+1];
-#endif
+bitMap BITSET[squareNumber + 1];
 tSquare BOARDINDEX[8][8];	//<! precalculated index of a square given file and rank
 
 const int FILES[squareNumber] = {		//!< precalculated file from square number
@@ -49,7 +47,8 @@ const int RANKS[squareNumber] = {		//!< precalculated rank from square number
 	7, 7, 7, 7, 7, 7, 7, 7,
 };
 
-const int SQUARE_COLOR[squareNumber]={
+const int SQUARE_COLOR[squareNumber]=
+{
 	0,1,0,1,0,1,0,1,
 	1,0,1,0,1,0,1,0,
 	0,1,0,1,0,1,0,1,
@@ -59,6 +58,7 @@ const int SQUARE_COLOR[squareNumber]={
 	0,1,0,1,0,1,0,1,
 	1,0,1,0,1,0,1,0
 };
+
 bitMap BITMAP_COLOR[2];
 
 bitMap RANKMASK[squareNumber];			//!< bitmask of a rank given a square on the rank
@@ -87,21 +87,24 @@ bitMap bigCenterBitmap;
 	\version 1.0
 	\date 08/11/2013
 */
-void initData(void){
-#ifdef PRECALCULATED_BITSET
-	for(tSquare i=(tSquare)0;i<squareNumber;i++){
-		BITSET[i]=(1ull)<<i;
+void initData(void)
+{
+	for(tSquare i=(tSquare)0; i<squareNumber; i++)
+	{
+		BITSET[i] = (1ull) << i;
 	}
 	BITSET[squareNone]=0;
-#endif
-	for(tSquare i=(tSquare)0; i<squareNumber;i++){
+
+	for(tSquare i = (tSquare)0; i<squareNumber; i++)
+	{
 		BOARDINDEX[i%8][i/8] = i;
-		DIAGA1H8MASK[i]=0;
-		DIAGA8H1MASK[i]=0;
+		DIAGA1H8MASK[i] = 0;
+		DIAGA8H1MASK[i] = 0;
 	}
 
-	centerBitmap= bitSet(E4)|bitSet(E5)|bitSet(D4)|bitSet(D5);
-	bigCenterBitmap= bitSet(C6)|bitSet(D6)|bitSet(E6)|bitSet(F6)|
+	centerBitmap = bitSet(E4)|bitSet(E5)|bitSet(D4)|bitSet(D5);
+	bigCenterBitmap =
+			bitSet(C6)|bitSet(D6)|bitSet(E6)|bitSet(F6)|
 			bitSet(C5)|bitSet(C4)|bitSet(F5)|bitSet(F4)|
 			bitSet(C3)|bitSet(D3)|bitSet(E3)|bitSet(F3);
 
@@ -165,94 +168,119 @@ void initData(void){
 		}
 	}
 
-	for(int square=0;square<squareNumber;square++){
-		for(int i=0;i<squareNumber;i++){
-			SQUARES_BETWEEN[square][i]=0;
+	for(int square=0; square<squareNumber; square++)
+	{
+		for(int i=0; i<squareNumber; i++)
+		{
+			SQUARES_BETWEEN[square][i] = 0;
 		}
 	}
 
-	for(int square=0;square<squareNumber;square++){
-		for(int i=0;i<squareNumber;i++){
-			LINES[square][i]=0;
-			SQUARES_BETWEEN[square][i]=0;
+	for(int square=0; square<squareNumber; square++)
+	{
+		for(int i=0; i<squareNumber; i++)
+		{
+			LINES[square][i] =0;
+			SQUARES_BETWEEN[square][i] = 0;
 
-			if(i==square){
+			if(i == square)
+			{
 				continue;
 			}
 
-			if(FILES[square]==FILES[i]){
+			if(FILES[square] == FILES[i])
+			{
 				// stessa colonna
 
-				LINES[square][i]=FILEMASK[square];
-				if(RANKS[i]>RANKS[square]){ // in salita
-					int temp=RANKS[square]+1;
-					while(temp<RANKS[i]){
-						SQUARES_BETWEEN[square][i]|=bitSet(BOARDINDEX[FILES[square]][temp]);
+				LINES[square][i] = FILEMASK[square];
+				if(RANKS[i] > RANKS[square]) // in salita
+				{
+					int temp = RANKS[square] + 1;
+					while(temp < RANKS[i])
+					{
+						SQUARES_BETWEEN[square][i] |= bitSet(BOARDINDEX[FILES[square]][temp]);
 						temp++;
 					}
 				}
-				if(RANKS[i]<RANKS[square]){ // in discesa
-					int temp=RANKS[square]-1;
-					while(temp>RANKS[i]){
-						SQUARES_BETWEEN[square][i]|=bitSet(BOARDINDEX[FILES[square]][temp]);
+				if(RANKS[i] < RANKS[square]) // in discesa
+				{
+					int temp = RANKS[square] - 1;
+					while(temp > RANKS[i])
+					{
+						SQUARES_BETWEEN[square][i] |= bitSet(BOARDINDEX[FILES[square]][temp]);
 						temp--;
 					}
 				}
 			}
-			if(RANKS[square]==RANKS[i]){/// stessa riga
-				LINES[square][i]=RANKMASK[square];
-				if(FILES[i]>FILES[square]){ // in salita
-					int temp=FILES[square]+1;
-					while(temp<FILES[i]){
-						SQUARES_BETWEEN[square][i]|=bitSet(BOARDINDEX[temp][RANKS[square]]);
+			if(RANKS[square] == RANKS[i]) // stessa riga
+			{
+				LINES[square][i] = RANKMASK[square];
+				if(FILES[i] > FILES[square]) // in salita
+				{
+					int temp = FILES[square] + 1;
+					while(temp < FILES[i])
+					{
+						SQUARES_BETWEEN[square][i] |= bitSet(BOARDINDEX[temp][RANKS[square]]);
 						temp++;
 					}
 				}
-				if(FILES[i]<FILES[square]){ // in discesa
-					int temp=FILES[square]-1;
-					while(temp>FILES[i]){
-						SQUARES_BETWEEN[square][i]|=bitSet(BOARDINDEX[temp][RANKS[square]]);
+				if(FILES[i] < FILES[square]) // in discesa
+				{
+					int temp = FILES[square] - 1;
+					while(temp > FILES[i])
+					{
+						SQUARES_BETWEEN[square][i] |= bitSet(BOARDINDEX[temp][RANKS[square]]);
 						temp--;
 					}
 				}
 			}
-			if(DIAGA1H8MASK[square]& BITSET[i]){
-				LINES[square][i]=DIAGA1H8MASK[square];
-				if(FILES[i]>FILES[square]){ // in salita
-					int temp=FILES[square]+1;
-					int temp2=RANKS[square]+1;
-					while(temp<FILES[i]){
-						SQUARES_BETWEEN[square][i]|=bitSet(BOARDINDEX[temp][temp2]);
+			if(DIAGA1H8MASK[square] & BITSET[i])
+			{
+				LINES[square][i] = DIAGA1H8MASK[square];
+				if(FILES[i] > FILES[square]) // in salita
+				{
+					int temp = FILES[square] + 1;
+					int temp2 = RANKS[square] + 1;
+					while(temp < FILES[i])
+					{
+						SQUARES_BETWEEN[square][i] |= bitSet(BOARDINDEX[temp][temp2]);
 						temp++;
 						temp2++;
 					}
 				}
-				if(FILES[i]<FILES[square]){ // in discesa
-					int temp=FILES[square]-1;
-					int temp2=RANKS[square]-1;
-					while(temp>FILES[i]){
-						SQUARES_BETWEEN[square][i]|=bitSet(BOARDINDEX[temp][temp2]);
+				if(FILES[i] < FILES[square]) // in discesa
+				{
+					int temp = FILES[square] - 1;
+					int temp2 = RANKS[square] - 1;
+					while(temp > FILES[i])
+					{
+						SQUARES_BETWEEN[square][i] |= bitSet(BOARDINDEX[temp][temp2]);
 						temp--;
 						temp2--;
 					}
 				}
 			}
-			if(DIAGA8H1MASK[square]& BITSET[i]){
-				LINES[square][i]=DIAGA8H1MASK[square];
-				if(FILES[i]>FILES[square]){ // in salita
-					int temp=FILES[square]+1;
-					int temp2=RANKS[square]-1;
-					while(temp<FILES[i]){
-						SQUARES_BETWEEN[square][i]|=bitSet(BOARDINDEX[temp][temp2]);
+			if(DIAGA8H1MASK[square] & BITSET[i])
+			{
+				LINES[square][i] = DIAGA8H1MASK[square];
+				if(FILES[i] > FILES[square]) // in salita
+				{
+					int temp = FILES[square] + 1;
+					int temp2 = RANKS[square] - 1;
+					while(temp < FILES[i])
+					{
+						SQUARES_BETWEEN[square][i] |= bitSet(BOARDINDEX[temp][temp2]);
 						temp++;
 						temp2--;
 					}
 				}
-				if(FILES[i]<FILES[square]){ // in discesa
-					int temp=FILES[square]-1;
-					int temp2=RANKS[square]+1;
-					while(temp>FILES[i]){
-						SQUARES_BETWEEN[square][i]|=bitSet(BOARDINDEX[temp][temp2]);
+				if(FILES[i] < FILES[square]) // in discesa
+				{
+					int temp = FILES[square]-1;
+					int temp2 = RANKS[square]+1;
+					while(temp > FILES[i])
+					{
+						SQUARES_BETWEEN[square][i] |= bitSet(BOARDINDEX[temp][temp2]);
 						temp--;
 						temp2++;
 					}
@@ -266,68 +294,80 @@ void initData(void){
 	//	PAWN STRUCTURE DATA
 	//
 	//////////////////////////////////////////////////
-	for(int square=0;square<squareNumber;square++){
-		ISOLATED_PAWN[square]=0;
-		int file= FILES[square];
+	for(int square = 0; square < squareNumber; square++)
+	{
+		ISOLATED_PAWN[square] = 0;
+		int file = FILES[square];
 
-		if(file>0){
-			ISOLATED_PAWN[square]|= FILEMASK[BOARDINDEX[file-1][0]];
+		if(file>0)
+		{
+			ISOLATED_PAWN[square] |= FILEMASK[BOARDINDEX[file-1][0]];
 		}
-		if(file<7){
-			ISOLATED_PAWN[square]|= FILEMASK[BOARDINDEX[file+1][0]];
+		if(file<7)
+		{
+			ISOLATED_PAWN[square] |= FILEMASK[BOARDINDEX[file+1][0]];
 		}
 	}
 
-	for(int square=0;square<squareNumber;square++){
-		PASSED_PAWN[0][square]=0;
-		PASSED_PAWN[1][square]=0;
-		SQUARES_IN_FRONT_OF[0][square]=0;
-		SQUARES_IN_FRONT_OF[1][square]=0;
-		int file= FILES[square];
-		int rank= RANKS[square];
+	for(int square = 0; square < squareNumber; square++)
+	{
+		PASSED_PAWN[0][square] = 0;
+		PASSED_PAWN[1][square] = 0;
+		SQUARES_IN_FRONT_OF[0][square] = 0;
+		SQUARES_IN_FRONT_OF[1][square] = 0;
+		int file = FILES[square];
+		int rank = RANKS[square];
 
-		for(int i=rank+1;i<8;i++){
-			if(file>0){
+		for(int i=rank+1; i<8; i++)
+		{
+			if(file>0)
+			{
 				PASSED_PAWN[0][square] |= BITSET[BOARDINDEX[file-1][i]];
 			}
 			PASSED_PAWN[0][square] |= BITSET[BOARDINDEX[file][i]];
 			SQUARES_IN_FRONT_OF[0][square] |= BITSET[BOARDINDEX[file][i]];
-			if(file<7){
+			if(file<7)
+			{
 				PASSED_PAWN[0][square] |= BITSET[BOARDINDEX[file+1][i]];
 			}
 		}
 
-		for(int i=rank-1;i>=0;i--){
-			if(file>0){
+		for(int i=rank-1; i>=0; i--)
+		{
+			if(file>0)
+			{
 				PASSED_PAWN[1][square] |= BITSET[BOARDINDEX[file-1][i]];
 			}
 			PASSED_PAWN[1][square] |= BITSET[BOARDINDEX[file][i]];
 			SQUARES_IN_FRONT_OF[1][square] |= BITSET[BOARDINDEX[file][i]];
-			if(file<7){
+			if(file<7)
+			{
 				PASSED_PAWN[1][square] |= BITSET[BOARDINDEX[file+1][i]];
 			}
 		}
 	}
 
-	for(int square=0;square<squareNumber;square++){
-		for(int square2=0;square2<squareNumber;square2++){
+	for(int square = 0; square < squareNumber; square++)
+	{
+		for(int square2 = 0; square2 < squareNumber; square2++){
 
-			SQUARE_DISTANCE[square][square2]=std::max(std::abs(FILES[square]-FILES[square2]),std::abs(RANKS[square]-RANKS[square2]));
+			SQUARE_DISTANCE[square][square2] = std::max(std::abs(FILES[square]-FILES[square2]), std::abs(RANKS[square]-RANKS[square2]));
 		}
 	}
 
-	BITMAP_COLOR[0]=0;
-	BITMAP_COLOR[1]=0;
+	BITMAP_COLOR[0] = 0;
+	BITMAP_COLOR[1] = 0;
 
-	for(int square=0;square<squareNumber;square++){
-		if(SQUARE_COLOR[square]){
-			BITMAP_COLOR[1] |=BITSET[square];
+	for(int square = 0; square < squareNumber; square++)
+	{
+		if(SQUARE_COLOR[square])
+		{
+			BITMAP_COLOR[1] |= BITSET[square];
 		}
-		else{
-			BITMAP_COLOR[0] |=BITSET[square];
+		else
+		{
+			BITMAP_COLOR[0] |= BITSET[square];
 		}
 	}
-
-
 }
 

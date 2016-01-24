@@ -42,9 +42,11 @@ struct timeManagementStruct
 
 
 
-class my_thread{
+class my_thread
+{
 
-	my_thread(){
+	my_thread()
+	{
 		initThreads();
 	};
 
@@ -58,7 +60,6 @@ class my_thread{
 	std::mutex searchMutex;
 	std::condition_variable searchCond;
 	std::condition_variable timerCond;
-	//Position *pos;
 	search src;
 
 	static long long lastHasfullMessage;
@@ -87,39 +88,33 @@ public :
 
 		return pInstance;
 	}
-	unsigned long long getVisitedNodes(){
-		return src.getVisitedNodes();
-	}
+
 	static timeManagementStruct timeMan;
-	~my_thread(){
+
+	~my_thread()
+	{
 		quitThreads();
 	}
-	void startThinking(Position * p,searchLimits& l){
+	void startThinking(Position * p, searchLimits& l)
+	{
+		src.stop = true;
+		lastHasfullMessage = 0;
 
-		src.stop=true;
-		lastHasfullMessage=0;
+		while(startThink){}
 
-
-		//sync_cout<<"STOOOOOOPPPPE"<<sync_endl;
-		while(startThink){
-			//sync_cout<<"attesa"<<sync_endl;
-		}
-		//sync_cout<<"fine attesa"<<sync_endl;
-
-		if(!startThink){
+		if(!startThink)
+		{
 			std::lock_guard<std::mutex> lk(searchMutex);
 			src.limits = l;
 			src.pos = *p;
-			startThink=true;
+			startThink = true;
 			searchCond.notify_one();
-
 		}
-
 	}
 
-	void stopThinking(){
-		//sync_cout<<"received stop"<<sync_endl;
-		src.stop=true;
+	void stopThinking()
+	{
+		src.stop = true;
 		src.stopPonder();
 	}
 
@@ -127,7 +122,6 @@ public :
 	{
 		src.stopPonder();
 	}
-
 
 };
 
