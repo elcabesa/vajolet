@@ -134,7 +134,6 @@ Score search::startThinking()
 	//------------------------------------
 	//init the new search
 	//------------------------------------
-
 	Score res = 0;
 	resetStartTime();
 	stop = false;

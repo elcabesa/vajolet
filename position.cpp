@@ -335,8 +335,8 @@ void Position::setupFromFen(const std::string& fenStr)
 	}
 
 	x.pliesFromNull = 0;
-	x.currentMove=0;
-	x.capturedPiece=empty;
+	x.currentMove = Movegen::NOMOVE;
+	x.capturedPiece = empty;
 
 
 
