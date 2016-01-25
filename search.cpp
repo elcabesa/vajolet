@@ -129,14 +129,14 @@ void search::reloadPv( unsigned int i )
 	}
 }
 
-Score search::startThinking()
+std::list<Move> search::startThinking()
 {
 	//------------------------------------
 	//init the new search
 	//------------------------------------
 	Score res = 0;
 	resetStartTime();
-	stop = false;
+
 
 	TT.newSearch();
 	history.clear();
@@ -188,67 +188,6 @@ Score search::startThinking()
 		linesToBeSearched = std::max(linesToBeSearched, s);
 	}
 	linesToBeSearched = std::min(linesToBeSearched, (unsigned int)rootMoves.size());
-
-
-
-	/*************************************************
-	 *	first of all check the number of legal moves
-	 *	if there is only 1 moves do it
-	 *	if there is 0 legal moves return null move
-	 *************************************************/
-	Move m(Movegen::NOMOVE);
-
-	Movegen mg(pos);
-	unsigned int legalMoves = mg.getNumberOfLegalMoves();
-
-	if(legalMoves == 0)
-	{
-		while((limits.infinite && !stop) || limits.ponder){}
-
-		sync_cout<<"info depth 0 score cp 0"<<sync_endl;
-		sync_cout<<"bestmove 0000"<<sync_endl;
-
-		return 0;
-	}
-	else if( legalMoves == 1 )
-	{
-		if(!limits.infinite)
-		{
-			m = mg.getFirstMove();
-			sync_cout << "info pv " << pos.displayUci(m) << sync_endl;
-			while(limits.ponder){}
-			sync_cout << "bestmove " << pos.displayUci(m);
-
-			pos.doMove(m);
-			const ttEntry* const tte = TT.probe(pos.getKey());
-			pos.undoMove();
-
-			if(tte && ( m.packed = (tte->getPackedMove())))
-			{
-				std::cout<<" ponder "<<pos.displayUci(m);
-			}
-			std::cout<<sync_endl;
-
-			return 0;
-		}
-	}
-
-	//----------------------------------------------
-	//	book probing
-	//----------------------------------------------
-	if(useOwnBook && !limits.infinite )
-	{
-		PolyglotBook pol;
-		Move bookM = pol.probe(pos, bestMoveBook);
-		if(bookM.packed)
-		{
-			sync_cout << "info pv " << pos.displayUci(bookM) << sync_endl;
-			while( (limits.infinite && !stop) || limits.ponder){}
-			sync_cout<<"bestmove "<< pos.displayUci(bookM) << sync_endl;
-			return 0;
-		}
-	}
-
 
 	//----------------------------------
 	// we can start the real search
@@ -464,11 +403,6 @@ Score search::startThinking()
 	}
 	while( depth <= (limits.depth ? limits.depth : 100) && !stop);
 
-
-	while(limits.ponder)
-	{
-	}
-
 	unsigned int bestMoveLine = 0;
 	if( limitStrength )
 	{
@@ -484,33 +418,9 @@ Score search::startThinking()
 	}
 
 
-	//-----------------------------
-	// print out the choosen line
-	//-----------------------------
-	sync_cout << "bestmove " << pos.displayUci( rootMoves[bestMoveLine].PV.front() );
 
-	if(rootMoves[bestMoveLine].PV.size() > 1)
-	{
-		std::list<Move>::iterator it = rootMoves[bestMoveLine].PV.begin();
-		std::advance(it, 1);
-		std::cout<<" ponder "<<pos.displayUci(*it);
-	}
-	else
-	{
-		pos.doMove( rootMoves[bestMoveLine].PV.front() );
-		const ttEntry* const tte = TT.probe(pos.getKey());
-		pos.undoMove();
 
-		Move m;
-		if(tte && ( m.packed = tte->getPackedMove()))
-		{
-			std::cout<<" ponder "<<pos.displayUci(m);
-		}
-
-	}
-	std::cout<<sync_endl;
-
-	return rootMoves[bestMoveLine].score;
+	return rootMoves[bestMoveLine].PV;
 
 }
 
@@ -997,7 +907,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 
 		}
 
-		if(type==ROOT_NODE)
+		if(type == ROOT_NODE)
 		{
 			long long int elapsed = getElapsedTime();
 			if(

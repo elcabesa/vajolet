@@ -18,6 +18,9 @@
 #include "thread.h"
 #include "io.h"
 #include "search.h"
+#include "movegen.h"
+#include "book.h"
+
 
 
 
@@ -165,11 +168,105 @@ void my_thread::searchThread()
 			timeManagerInit(src.pos, src.limits, timeMan);
 			src.stop = false;
 			timerCond.notify_one();
-			src.startThinking();
+			src.stop = false;
+			manageNewSearch();
 			startThink = false;
 		}
 		lk.unlock();
 	}
+}
+
+void my_thread::manageNewSearch()
+{
+	/*************************************************
+	 *	first of all check the number of legal moves
+	 *	if there is only 1 moves do it
+	 *	if there is 0 legal moves return null move
+	 *************************************************/
+
+	Movegen mg(src.pos);
+	unsigned int legalMoves = mg.getNumberOfLegalMoves();
+
+	if(legalMoves == 0)
+	{
+		while((src.limits.infinite && !src.stop) || src.limits.ponder){}
+
+		sync_cout<<"info depth 0 score cp 0"<<sync_endl;
+		sync_cout<<"bestmove 0000"<<sync_endl;
+
+		return;
+	}
+	else if( legalMoves == 1 )
+	{
+		if(!src.limits.infinite)
+		{
+			Move m = mg.getFirstMove();
+			sync_cout << "info pv " << src.pos.displayUci(m) << sync_endl;
+			while(src.limits.ponder){}
+			sync_cout << "bestmove " << src.pos.displayUci(m);
+
+			src.pos.doMove(m);
+			const ttEntry* const tte = TT.probe(src.pos.getKey());
+			src.pos.undoMove();
+
+			if(tte && ( m.packed = (tte->getPackedMove())))
+			{
+				std::cout<<" ponder "<<src.pos.displayUci(m);
+			}
+			std::cout<<sync_endl;
+
+			return;
+		}
+	}
+
+	//----------------------------------------------
+	//	book probing
+	//----------------------------------------------
+	if(search::useOwnBook && !src.limits.infinite )
+	{
+		PolyglotBook pol;
+		Move bookM = pol.probe(src.pos, search::bestMoveBook);
+		if(bookM.packed)
+		{
+			sync_cout << "info pv " << src.pos.displayUci(bookM) << sync_endl;
+			while( (src.limits.infinite && !src.stop) || src.limits.ponder){}
+			sync_cout<<"bestmove "<< src.pos.displayUci(bookM) << sync_endl;
+			return;
+		}
+	}
+	std::list<Move> PV = src.startThinking();
+
+	while(src.limits.ponder)
+	{
+	}
+
+	//-----------------------------
+	// print out the choosen line
+	//-----------------------------
+	sync_cout << "bestmove " << src.pos.displayUci( PV.front() );
+
+	if(PV.size() > 1)
+	{
+		std::list<Move>::iterator it = PV.begin();
+		std::advance(it, 1);
+		std::cout<<" ponder "<<src.pos.displayUci(*it);
+	}
+	else
+	{
+		src.pos.doMove( PV.front() );
+		const ttEntry* const tte = TT.probe(src.pos.getKey());
+		src.pos.undoMove();
+
+		Move m;
+		if(tte && ( m.packed = tte->getPackedMove()))
+		{
+			std::cout << " ponder " << src.pos.displayUci(m);
+		}
+
+	}
+	std::cout<<sync_endl;
+
+
 }
 
 

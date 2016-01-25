@@ -68,6 +68,7 @@ class my_thread
 
 	void timerThread();
 	void searchThread();
+	void manageNewSearch();
 public :
 	void quitThreads();
 

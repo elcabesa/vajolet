@@ -184,7 +184,7 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	Score startThinking();
+	std::list<Move> startThinking();
 	unsigned long long getVisitedNodes() const { return visitedNodes; }
 
 private:
