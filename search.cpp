@@ -30,6 +30,7 @@
 #include "history.h"
 #include "book.h"
 #include "thread.h"
+#include "command.h"
 
 #ifdef DEBUG_EVAL_SIMMETRY
 	Position ppp;
@@ -39,48 +40,6 @@
 search defaultSearch;
 std::vector<rootMove> search::rootMoves;
 std::atomic<unsigned long long> search::visitedNodes;
-
-
-void search::printPVs(unsigned int count) const
-{
-
-	int i= 0;
-	std::for_each(rootMoves.begin(),std::next(rootMoves.begin(), count), [&](rootMove& rm)
-	{
-		if(rm.nodes)
-		{
-			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes);
-		}
-		i++;
-	});
-}
-
-void search::printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes) const {
-
-	sync_cout<<"info multipv "<< (count+1) << " depth "<< (depth) <<" seldepth "<< seldepth <<" score ";
-
-	if(abs(res) >SCORE_MATE_IN_MAX_PLY)
-	{
-		std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
-	}
-	else
-	{
-		int satRes = std::min(res,SCORE_MAX_OUTPUT_VALUE);
-		satRes = std::max(satRes,SCORE_MIN_OUTPUT_VALUE);
-		std::cout << "cp "<< (int)((float)satRes/100.0);
-	}
-
-	std::cout << (res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
-
-	std::cout << " nodes " << nodes;
-#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-	std::cout << " nps " << (unsigned int)((double)nodes*1000/(double)time) << " time " << (long long int)(time);
-#endif
-
-	std::cout << " pv ";
-	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<Position::displayUci(m)<<" ";});
-	std::cout<<sync_endl;
-}
 
 
 Score search::futility[5] = {0,6000,20000,30000,40000};
@@ -447,14 +406,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 	if( showLine && depth <= ONE_PLY)
 	{
 		showLine = false;
-		sync_cout << "info currline";
-		unsigned int start = pos.getStateIndex()-ply + 1;
-
-		for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
-		{
-			std::cout << " " << pos.displayUci(pos.getState(i).currentMove);
-		}
-		std::cout << sync_endl;
+		showCurrLine(pos,ply);
 	}
 
 	//--------------------------------------
@@ -917,11 +869,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 				!stop
 				)
 			{
-				sync_cout << "info currmovenumber " << moveNumber << " currmove " << pos.displayUci(m) << " nodes " << visitedNodes <<
-#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-						" time " << elapsed <<
-#endif
-						sync_endl;
+				printCurrMoveNumber(moveNumber, m, visitedNodes, elapsed);
 			}
 		}
 

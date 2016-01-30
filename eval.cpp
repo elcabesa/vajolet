@@ -1568,7 +1568,84 @@ Score evalShieldStorm(const Position &pos, tSquare ksq){
 	}
 	return ks;
 }
+/*
+template<color c>
+Score evalKingSafety(const Position &pos, Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares)
+{
+	//bitMap * OurPieces = c ? &pos.getBitmap(Position::separationBitmap) : &pos.getBitmap(Position::occupiedSquares);
+	bitMap TheirPieces = c ? pos.getBitmap(Position::whitePieces) : pos.getBitmap(Position::blackPieces);
+	bitMap * TheirPieces = c ? &attackedSquares[Position::separationBitmap] : &attackedSquares[Position::occupiedSquares];
+	bitMap * AttackedByTheirPieces = c ? &attackedSquares[Position::occupiedSquares] : &attackedSquares[Position::separationBitmap];
+	Position::bitboardIndex kingSquare = c ? pos.getSquareOfThePiece(Position::blackKing) : pos.getSquareOfThePiece(Position::whiteKing);
 
+	if( kingAttackersCount )// se il re e' attaccato
+	{
+
+		bitMap undefendedSquares = AttackedByTheirPieces[Position::Pieces] & AttackedByOurPieces[Position::King];
+		undefendedSquares &=
+			~(AttackedByOurPieces[Position::Pawns]
+			| AttackedByOurPieces[Position::Knights]
+			| AttackedByOurPieces[Position::Bishops]
+			| AttackedByOurPieces[Position::Rooks]
+			| AttackedByOurPieces[Position::Queens]);
+
+		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount * kingAttackersWeight) / 2)
+							 + 3 * (kingAdjacentZoneAttacksCount + bitCnt( undefendedSquares ) )
+							 + KingExposed[ kingSquare ]
+							 - kingSafety / kingSafetyScaling[0];
+
+		// safe contact queen check
+		bitMap safeContactSquare = undefendedSquares & AttackedByTheirPieces[Position::Queens]  & ~TheirPieces;
+		safeContactSquare &= (AttackedByTheirPieces[Position::Rooks]| AttackedByTheirPieces[Position::Bishops] | AttackedByTheirPieces[Position::Knights]| AttackedByTheirPieces[Position::Pawns]);
+		if(safeContactSquare)
+		{
+			attackUnits += 20 * bitCnt(safeContactSquare);
+		}
+		// safe contact rook check
+
+		safeContactSquare=undefendedSquares & attackedSquares[blackRooks] & ~getBitmap(blackPieces);
+		safeContactSquare &= (attackedSquares[blackRooks]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
+
+		safeContactSquare &=Movegen::getRookPseudoAttack(getSquareOfThePiece(whiteKing));
+
+		if(safeContactSquare){
+			attackUnits+=15*bitCnt(safeContactSquare);
+		}
+
+		// long distance check
+		bitMap rMap=Movegen::attackFrom<Position::whiteRooks>(getSquareOfThePiece(whiteKing),getOccupationBitmap());
+		bitMap bMap=Movegen::attackFrom<Position::whiteBishops>(getSquareOfThePiece(whiteKing),getOccupationBitmap());
+
+		// vertical check
+		bitMap longDistCheck=rMap & (attackedSquares[blackRooks]| attackedSquares[blackQueens]) & ~attackedSquares[whitePieces] & ~getBitmap(blackPieces);
+		if(longDistCheck){
+			attackUnits+=8*bitCnt(longDistCheck);
+		}
+
+		// diagonal check
+		longDistCheck=bMap & (attackedSquares[blackBishops]| attackedSquares[blackQueens]) & ~attackedSquares[whitePieces] & ~getBitmap(blackPieces);
+		if(longDistCheck){
+			attackUnits+=3*bitCnt(longDistCheck);
+		}
+
+		///knight check;
+		longDistCheck=Movegen::attackFrom<Position::whiteKnights>(getSquareOfThePiece(whiteKing)) & (attackedSquares[blackKnights]) & ~attackedSquares[whitePieces] & ~getBitmap(blackPieces);
+		if(longDistCheck){
+			attackUnits+=bitCnt(longDistCheck);
+		}
+
+		attackUnits = std::max(attackUnits,0);
+		attackUnits = std::min(KingSafetyMaxAttack[0], std::max(0, attackUnits));
+		attackUnits*=std::min(KingSafetyLinearCoefficent[0], attackUnits);
+		attackUnits=std::min(KingSafetyMaxResult[0], attackUnits);
+		res-=(kingSafetyBonus*attackUnits);
+		if(trace){
+			bScore +=(kingSafetyBonus*attackUnits);
+		}
+
+
+	}
+}*/
 
 /*! \brief do a pretty simple evalutation
 	\author Marco Belli
@@ -2321,7 +2398,7 @@ Score Position::eval(void) {
 
 		// safe contact rook check
 		safeContactSquare=undefendedSquares & attackedSquares[whiteRooks] & ~getBitmap(whitePieces);
-		safeContactSquare &= (attackedSquares[whiteRooks]| attackedSquares[whiteBishops] | attackedSquares[whiteKnights]| attackedSquares[whitePawns]);
+		safeContactSquare &= (attackedSquares[whiteQueens]| attackedSquares[whiteBishops] | attackedSquares[whiteKnights]| attackedSquares[whitePawns]);
 
 		safeContactSquare &=Movegen::getRookPseudoAttack(getSquareOfThePiece(blackKing));
 
@@ -2391,7 +2468,7 @@ Score Position::eval(void) {
 		// safe contact rook check
 
 		safeContactSquare=undefendedSquares & attackedSquares[blackRooks] & ~getBitmap(blackPieces);
-		safeContactSquare &= (attackedSquares[blackRooks]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
+		safeContactSquare &= (attackedSquares[blackQueens]| attackedSquares[blackBishops] | attackedSquares[blackKnights]| attackedSquares[blackPawns]);
 
 		safeContactSquare &=Movegen::getRookPseudoAttack(getSquareOfThePiece(whiteKing));
 
@@ -2434,35 +2511,36 @@ Score Position::eval(void) {
 	}
 
 
-	if(trace){
+	if(trace)
+	{
 		sync_cout << std::setw(20) << "king safety" << " |"
 				  << std::setw(6)  << (wScore[0])/10000.0 << " "
 				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
 				  << std::setw(6)  << (bScore[0])/10000.0 << " "
 				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
 				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
-				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
-		sync_cout <<"---------------------+--------------+--------------+-----------------"<<sync_endl;
+				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<< sync_endl;
+		sync_cout << "---------------------+--------------+--------------+-----------------" << sync_endl;
 		sync_cout << std::setw(20) << "result" << " |"
 				  << std::setw(6)  << " " << " "
 				  << std::setw(6)  << " "<< " |"
 				  << std::setw(6)  << " "<< " "
 				  << std::setw(6)  << " " << " | "
 				  << std::setw(6)  << (res[0])/10000.0 << " "
-				  << std::setw(6)  << (res[1])/10000.0 << " "<<sync_endl;
-		traceRes=res;
+				  << std::setw(6)  << (res[1])/10000.0 << " "<< sync_endl;
+		traceRes = res;
 	}
 
 	//todo scaling
-	if(mulCoeff==256 && (getpieceCount(whitePawns)+getpieceCount(blackPawns)==0) && abs(st.material[0])<40000 && st.nonPawnMaterial[0]<90000 && st.nonPawnMaterial[2]<90000 ){
+	if(mulCoeff == 256 && (getpieceCount(whitePawns) + getpieceCount(blackPawns) == 0 ) && (abs( st.material[0] )< 40000) && (st.nonPawnMaterial[0]< 90000) && (st.nonPawnMaterial[2] < 90000) )
+	{
 		mulCoeff=40;
 	}
-	if(mulCoeff==256  && st.nonPawnMaterial[0]+ st.nonPawnMaterial[2]<40000  &&  st.nonPawnMaterial[0]+ st.nonPawnMaterial[2]!=0 && getpieceCount(whitePawns)== getpieceCount(blackPawns) && !passedPawns ){
-		mulCoeff = std::min((unsigned int)256,getpieceCount(whitePawns)*80);
-		//display();
+	if(mulCoeff == 256  && st.nonPawnMaterial[0] + st.nonPawnMaterial[2] < 40000  &&  (st.nonPawnMaterial[0] + st.nonPawnMaterial[2] !=0) && (getpieceCount(whitePawns) == getpieceCount(blackPawns)) && !passedPawns )
+	{
+		mulCoeff = std::min((unsigned int)256, getpieceCount(whitePawns) * 80);
 	}
 
-	//sync_cout<<mulCoeff<<sync_endl;
 
 
 
@@ -2471,20 +2549,19 @@ Score Position::eval(void) {
 	//--------------------------------------
 	//	finalizing
 	//--------------------------------------
+	signed int gamePhase = getGamePhase();
+	signed long long r = ( (signed long long)res[0] ) * ( 65536 - gamePhase ) + ( (signed long long)res[1] ) * gamePhase;
 
-
-	signed int gamePhase=getGamePhase();
-	signed long long r=((signed long long)res[0])*(65536-gamePhase)+((signed long long)res[1])*gamePhase;
-
-	Score score =(Score)((r)/65536);
-	if(mulCoeff!=256){
-		score*=mulCoeff;
-		score/=256;
+	Score score = (Score)( (r) / 65536 );
+	if(mulCoeff != 256)
+	{
+		score *= mulCoeff;
+		score /= 256;
 	}
 
 	// final value saturation
-	score=std::min(highSat,score);
-	score=std::max(lowSat,score);
+	score = std::min(highSat,score);
+	score = std::max(lowSat,score);
 
 
 

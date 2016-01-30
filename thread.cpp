@@ -20,6 +20,7 @@
 #include "search.h"
 #include "movegen.h"
 #include "book.h"
+#include "command.h"
 
 
 
@@ -201,9 +202,9 @@ void my_thread::manageNewSearch()
 		if(!src.limits.infinite)
 		{
 			Move m = mg.getFirstMove();
-			sync_cout << "info pv " << src.pos.displayUci(m) << sync_endl;
+			sync_cout << "info pv " << displayUci(m) << sync_endl;
 			while(src.limits.ponder){}
-			sync_cout << "bestmove " << src.pos.displayUci(m);
+			sync_cout << "bestmove " << displayUci(m);
 
 			src.pos.doMove(m);
 			const ttEntry* const tte = TT.probe(src.pos.getKey());
@@ -211,7 +212,7 @@ void my_thread::manageNewSearch()
 
 			if(tte && ( m.packed = (tte->getPackedMove())))
 			{
-				std::cout<<" ponder "<<src.pos.displayUci(m);
+				std::cout<<" ponder "<<displayUci(m);
 			}
 			std::cout<<sync_endl;
 
@@ -228,9 +229,9 @@ void my_thread::manageNewSearch()
 		Move bookM = pol.probe(src.pos, search::bestMoveBook);
 		if(bookM.packed)
 		{
-			sync_cout << "info pv " << src.pos.displayUci(bookM) << sync_endl;
+			sync_cout << "info pv " << displayUci(bookM) << sync_endl;
 			while( (src.limits.infinite && !src.stop) || src.limits.ponder){}
-			sync_cout<<"bestmove "<< src.pos.displayUci(bookM) << sync_endl;
+			sync_cout<<"bestmove "<< displayUci(bookM) << sync_endl;
 			return;
 		}
 	}
@@ -243,13 +244,13 @@ void my_thread::manageNewSearch()
 	//-----------------------------
 	// print out the choosen line
 	//-----------------------------
-	sync_cout << "bestmove " << src.pos.displayUci( PV.front() );
+	sync_cout << "bestmove " << displayUci( PV.front() );
 
 	if(PV.size() > 1)
 	{
 		std::list<Move>::iterator it = PV.begin();
 		std::advance(it, 1);
-		std::cout<<" ponder "<<src.pos.displayUci(*it);
+		std::cout<<" ponder "<<displayUci(*it);
 	}
 	else
 	{
@@ -260,7 +261,7 @@ void my_thread::manageNewSearch()
 		Move m;
 		if(tte && ( m.packed = tte->getPackedMove()))
 		{
-			std::cout << " ponder " << src.pos.displayUci(m);
+			std::cout << " ponder " << displayUci(m);
 		}
 
 	}

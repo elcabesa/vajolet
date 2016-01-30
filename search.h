@@ -99,8 +99,6 @@ private:
 	static Score PVreduction[32*ONE_PLY][64];
 	static Score nonPVreduction[32*ONE_PLY][64];
 
-	static std::vector<rootMove> rootMoves;
-
 	static Score mateIn(int ply) { return SCORE_MATE - ply; }
 	static Score matedIn(int ply) { return SCORE_MATED + ply; }
 
@@ -143,11 +141,10 @@ private:
 	static std::atomic<unsigned long long> visitedNodes;
 	unsigned int maxPlyReached;
 
-	void printPVs(unsigned int count) const ;
-	void printPV(Score res, unsigned int depth, unsigned int seldepth, Score alpha, Score beta, long long time, unsigned int count, std::list<Move>& PV, unsigned long long nodes) const;
 	void reloadPv(unsigned int i);
 
 public:
+	static std::vector<rootMove> rootMoves;
 	searchLimits limits;
 	Position pos;
 

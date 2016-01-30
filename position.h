@@ -213,13 +213,6 @@ public:
 
 private:
 
-	/*! \brief array of char to create the fen string
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	static const char PIECE_NAMES_FEN[lastBitboard];
-
 	/*! \brief helper mask used to speedup castle right management
 		\author STOCKFISH
 		\version 1.0
@@ -476,38 +469,6 @@ public:
 		return (state&) stateInfo[n];
 	}
 
-	/*! \brief return the uci string for a given move
-		\author Marco Belli
-		\version 1.0
-		\date 08/11/2013
-	*/
-	static std::string displayUci(const Move & m){
-
-
-		std::string s;
-
-		if(m.packed==0)
-		{
-			s = "0000";
-			return s;
-		}
-
-		//from
-		s += char('a'+FILES[m.bit.from]);
-		s += char('1'+RANKS[m.bit.from]);
-
-
-		//to
-		s += char('a'+FILES[m.bit.to]);
-		s += char('1'+RANKS[m.bit.to]);
-		//promotion
-		if(m.bit.flags == Move::fpromotion)
-		{
-			s += Position::PIECE_NAMES_FEN[m.bit.promotion+Position::blackQueens];
-		}
-		return s;
-
-	}
 private:
 
 	/*! \brief insert a new state in memory
@@ -541,49 +502,7 @@ private:
 
 
 
-	/*! \brief return the uci string for a given move
-		\author Marco Belli
-		\version 1.0
-		\date 08/11/2013
-	*/
-	std::string displayMove(Move & m)const
-	{
 
-		std::string s;
-
-		bool capture = (bitSet((tSquare)m.bit.to) & Them[Pieces]);
-		if( !isPawn(squares[m.bit.from]) )
-		{
-			s+=PIECE_NAMES_FEN[squares[m.bit.from]%Position::separationBitmap];
-		}
-		if(capture && isPawn(squares[m.bit.from]))
-		{
-			s+=char('a'+FILES[m.bit.from]);
-		}
-		if(capture)
-		{
-			s+="x";
-		}
-
-
-
-
-		//to
-		s += char('a'+FILES[ m.bit.to ]);
-		s += char('1'+RANKS[ m.bit.to ]);
-		if( moveGivesCheck(m) )
-		{
-			s+="+";
-		}
-		//promotion
-		if(m.bit.flags == Move::fpromotion)
-		{
-			s += "=";
-			s += Position::PIECE_NAMES_FEN[m.bit.promotion+Position::whiteQueens];
-		}
-		return s;
-
-	}
 
 public:
 

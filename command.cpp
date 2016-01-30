@@ -43,6 +43,12 @@
 //---------------------------------------------
 
 const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+/*! \brief array of char to create the fen string
+	\author Marco Belli
+	\version 1.0
+	\date 27/10/2013
+*/
+
 
 
 //---------------------------------------------
@@ -85,7 +91,7 @@ Move moveFromUci(const Position& pos,const  std::string& str)
 	Movegen mg(pos);
 	while( (m = mg.getNextMove()).packed)
 	{
-		if(str == pos.displayUci(m))
+		if(str == displayUci(m))
 		{
 			return m;
 		}
@@ -429,4 +435,147 @@ void uciLoop()
 	}while(token!="quit");
 
 	thr->quitThreads();
+}
+
+/*! \brief return the uci string for a given move
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
+std::string displayUci(const Move & m){
+
+
+	std::string s;
+
+	if(m.packed==0)
+	{
+		s = "0000";
+		return s;
+	}
+
+	//from
+	s += char('a'+FILES[m.bit.from]);
+	s += char('1'+RANKS[m.bit.from]);
+
+
+	//to
+	s += char('a'+FILES[m.bit.to]);
+	s += char('1'+RANKS[m.bit.to]);
+	//promotion
+	if(m.bit.flags == Move::fpromotion)
+	{
+		s += PIECE_NAMES_FEN[m.bit.promotion+Position::blackQueens];
+	}
+	return s;
+
+}
+
+/*! \brief return the uci string for a given move
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
+std::string displayMove(const Position& pos, const Move & m)
+{
+
+	std::string s;
+
+	bool capture = (bitSet((tSquare)m.bit.to) & pos.getTheirBitmap(Position::Pieces));
+
+	if( !pos.isPawn(pos.getPieceAt( (tSquare)m.bit.from)) )
+	{
+		s+=PIECE_NAMES_FEN[pos.getPieceAt((tSquare)m.bit.from) % Position::separationBitmap];
+	}
+	if(capture && pos.isPawn(pos.getPieceAt((tSquare)m.bit.from)))
+	{
+		s+=char('a'+FILES[m.bit.from]);
+	}
+	if(capture)
+	{
+		s+="x";
+	}
+
+
+
+
+	//to
+	s += char('a'+FILES[ m.bit.to ]);
+	s += char('1'+RANKS[ m.bit.to ]);
+	if( pos.moveGivesCheck(m) )
+	{
+		s+="+";
+	}
+	//promotion
+	if(m.bit.flags == Move::fpromotion)
+	{
+		s += "=";
+		s += PIECE_NAMES_FEN[m.bit.promotion + Position::whiteQueens];
+	}
+	return s;
+
+}
+
+void printCurrMoveNumber(unsigned int moveNumber, const Move &m, unsigned long long visitedNodes, long long int time)
+{
+	sync_cout << "info currmovenumber " << moveNumber << " currmove " << displayUci(m) << " nodes " << visitedNodes <<
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+			" time " << time <<
+#endif
+	sync_endl;
+}
+
+void showCurrLine(const Position & pos, unsigned int ply)
+{
+	sync_cout << "info currline";
+	unsigned int start = pos.getStateIndex()-ply + 1;
+
+	for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
+	{
+		std::cout << " " << displayUci(pos.getState(i).currentMove);
+	}
+	std::cout << sync_endl;
+
+}
+
+
+void printPVs(unsigned int count)
+{
+
+	int i= 0;
+	std::for_each(search::rootMoves.begin(),std::next(search::rootMoves.begin(), count), [&](rootMove& rm)
+	{
+		if(rm.nodes)
+		{
+			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes);
+		}
+		i++;
+	});
+}
+
+void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes)
+{
+
+	sync_cout<<"info multipv "<< (count+1) << " depth "<< (depth) <<" seldepth "<< seldepth <<" score ";
+
+	if(abs(res) >SCORE_MATE_IN_MAX_PLY)
+	{
+		std::cout << "mate " << (res > 0 ? SCORE_MATE - res + 1 : -SCORE_MATE - res) / 2;
+	}
+	else
+	{
+		int satRes = std::min(res,SCORE_MAX_OUTPUT_VALUE);
+		satRes = std::max(satRes,SCORE_MIN_OUTPUT_VALUE);
+		std::cout << "cp "<< (int)((float)satRes/100.0);
+	}
+
+	std::cout << (res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
+
+	std::cout << " nodes " << nodes;
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+	std::cout << " nps " << (unsigned int)((double)nodes*1000/(double)time) << " time " << (long long int)(time);
+#endif
+
+	std::cout << " pv ";
+	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<displayUci(m)<<" ";});
+	std::cout<<sync_endl;
 }

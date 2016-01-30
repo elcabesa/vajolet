@@ -15,6 +15,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <functional>
 #include <sstream>
 #include <string>
 #include <cstdlib>
@@ -27,6 +28,7 @@
 #include "move.h"
 #include "movegen.h"
 #include "transposition.h"
+#include "command.h"
 
 
 
@@ -87,7 +89,6 @@ simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 int Position::castleRightsMask[squareNumber];
 
-const char Position::PIECE_NAMES_FEN[lastBitboard]={' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
 
 void Position::initPstValues(void)
 {
@@ -1340,7 +1341,7 @@ unsigned long long Position::divide(unsigned int depth)
 		unsigned long long n= perft(depth - 1);
 		tot += n;
 		undoMove();
-		sync_cout<<mn<<") "<<displayMove(m)<<": "<<n<<sync_endl;
+		sync_cout<<mn<<") "<<displayMove(*this,m)<<": "<<n<<sync_endl;
 
 	}
 	return tot;
