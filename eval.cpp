@@ -2187,21 +2187,19 @@ Score Position::eval(void) {
 		bScore+=passedPawnsBonus;
 
 	}
-	res+=wScore-bScore;
+	res += wScore - bScore;
 
-	if(trace){
+	if(trace)
+	{
 		sync_cout << std::setw(20) << "passed pawns" << " |"
 				  << std::setw(6)  << (wScore[0])/10000.0 << " "
 				  << std::setw(6)  << (wScore[1])/10000.0 << " |"
 				  << std::setw(6)  << (bScore[0])/10000.0 << " "
 				  << std::setw(6)  << (bScore[1])/10000.0 << " | "
-				  << std::setw(6)  << (res[0]-traceRes[0])/10000.0 << " "
-				  << std::setw(6)  << (res[1]-traceRes[1])/10000.0 << " "<<sync_endl;
+				  << std::setw(6)  << (res[0] - traceRes[0]) / 10000.0 << " "
+				  << std::setw(6)  << (res[1] - traceRes[1]) / 10000.0 << " " << sync_endl;
 		traceRes=res;
 	}
-
-	//sync_cout<<"passedPawns:"<<res[0]<<":"<<res[1]<<sync_endl;
-
 	//todo attacked squares
 
 	//---------------------------------------
