@@ -28,6 +28,11 @@
 
 
 
+enum color
+{
+	white = 0,
+	black = 1
+};
 
 //---------------------------------------------------
 //	class
@@ -686,7 +691,10 @@ private:
 		pieceList[piece][pieceCount[piece]] = squareNone;
 	}
 
+	template<Position::bitboardIndex piece>
+	simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
 
+	template<color c> Score evalShieldStorm(tSquare ksq) const;
 
 
 
