@@ -57,7 +57,7 @@ int main()
 	Movegen::initMovegenConstant();
 	search::initLMRreduction();
 	TT.setSize(1);
-	initMaterialKeys();
+	Position::initMaterialKeys();
 	initMobilityBonus();
 
 	//----------------------------------

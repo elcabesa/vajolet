@@ -17,6 +17,8 @@
 #ifndef POSITION_H_
 #define POSITION_H_
 
+#include <unordered_map>
+#include <map>
 #include "vajolet.h"
 #include "data.h"
 #include "vectorclass/vectorclass.h"
@@ -39,9 +41,25 @@ enum color
 //---------------------------------------------------
 
 
+
 class Position
 {
+	struct materialStruct
+	{
+		enum
+		{
+			exact,
+			multiplicativeFunction,
+			exactFunction,
+			saturationH,
+			saturationL
+		} type ;
+		bool (Position::*pointer)(Score &);
+		Score val;
+
+	};
 public:
+	void static initMaterialKeys(void);
 	static const int maxNumberOfPieces = 10;
 
 	/*! \brief define the index of the bitboards
@@ -691,10 +709,26 @@ private:
 		pieceList[piece][pieceCount[piece]] = squareNone;
 	}
 
-	template<Position::bitboardIndex piece>
-	simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
+	template<color c> simdScore evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const;
+	template<color c> simdScore evalPassedPawn(bitMap pp, bitMap * attackedSquares) const;
+	template<Position::bitboardIndex piece>	simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
 
 	template<color c> Score evalShieldStorm(tSquare ksq) const;
+	template<color c> simdScore evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
+
+	std::unordered_map<U64, materialStruct> static materialKeyMap;
+
+	const materialStruct  * getMaterialData();
+	bool evalKBPvsK(Score& res);
+	bool evalKQvsKP(Score& res);
+	bool evalKRPvsKr(Score& res);
+	bool evalKBNvsK(Score& res);
+	bool evalKQvsK(Score& res);
+	bool kingsDirectOpposition();
+	bool evalKPvsK(Score& res);
+	bool evalOppositeBishopEndgame(Score& res);
+	bool evalKRvsKm(Score& res);
+	bool evalKNNvsK(Score& res);
 
 
 

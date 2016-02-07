@@ -24,7 +24,7 @@
 #include "position.h"
 #include "tables.h"
 
-void initMaterialKeys();
+
 void initMobilityBonus();
 
 
