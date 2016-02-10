@@ -1178,10 +1178,15 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 	//----------------------------
 	//	stand pat score
 	//----------------------------
-	Score bestScore = -SCORE_INFINITE;
+	Score bestScore;
+	Score futilityBase;
 	if(!inCheck)
 	{
-		bestScore=staticEval;
+		bestScore = staticEval;
+		// todo trovare un valore buono per il futility
+		futilityBase = bestScore + 5000;
+
+
 
 		/*if (ttValue != SCORE_NONE)
 		{
@@ -1194,22 +1199,43 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 			}
 		}*/
 	}
+	else
+	{
+		bestScore = -SCORE_INFINITE;
+		futilityBase = -SCORE_INFINITE;
+
+	}
 
 
 	if(bestScore > alpha)
 	{
 		assert(!inCheck);
-		alpha = bestScore;
+
 		// TODO testare se la riga TTtype=typeExact; ha senso
 		if(PVnode)
 		{
 			pvLine.clear();
 		}
+
+		if( bestScore >= beta)
+		{
+			if( !pos.isCaptureMoveOrPromotion(ttMove) )
+			{
+				saveKillers(ply,ttMove);
+			}
+			if(!stop)
+			{
+				TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
+			}
+			return bestScore;
+		}
+		alpha = bestScore;
 		TTtype = typeExact;
+		
+
 
 	}
-	// todo trovare un valore buono per il futility
-	Score futilityBase = bestScore + 5000;
+
 
 	//----------------------------
 	//	try the captures
@@ -1235,7 +1261,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 		}
 
 		// at very deep search allow only recapture
-		if(depth < -7*ONE_PLY && !inCheck)
+		if(depth < -7 * ONE_PLY && !inCheck)
 		{
 			if(st.currentMove.bit.to != m.bit.to)
 			{
@@ -1253,8 +1279,9 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 			//&& !pos.moveGivesCheck(m)
 			)
 		{
+			bool moveGiveCheck = pos.moveGivesCheck(m);
 			if(
-					!pos.moveGivesCheck(m)
+					!moveGiveCheck
 					&& !pos.isPassedPawnMove(m)
 					&& abs(staticEval)<SCORE_KNOWN_WIN
 			)
@@ -1284,7 +1311,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 			// TODO controllare se conviene fare o non fare la condizione type != search::nodeType::PV_NODE
 			// TODO testare se aggiungere o no !movegivesCheck() &&
 			if(
-					//!pos.moveGivesCheck(m) && -50ELO
+					!moveGiveCheck &&
 					pos.seeSign(m) < 0)
 			{
 				continue;
@@ -1323,19 +1350,21 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 					pvLine.splice( pvLine.end(), childPV );
 
 				}
+				if( bestScore >= beta)
+				{
+					if( !pos.isCaptureMoveOrPromotion(bestMove) && !inCheck )
+					{
+						saveKillers(ply,bestMove);
+					}
+					if(!stop)
+					{
+						TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove.packed, staticEval);
+					}
+					return bestScore;
+				}
 			}
 		}
 	}
-
-	if (bestScore >= beta
-			// TODO provare a fare solamente pos.isCaptureMove
-		&& !pos.isCaptureMoveOrPromotion(bestMove)
-		&& !inCheck)
-	{
-		saveKillers(ply,bestMove);
-	}
-
-
 
 	if(bestScore == -SCORE_INFINITE)
 	{
@@ -1354,9 +1383,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 
 	if( !stop )
 	{
-		TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply),
-			bestScore >= beta ? typeScoreHigherThanBeta : TTtype,
-					(short int)TTdepth, bestMove.packed, staticEval);
+		TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove.packed, staticEval);
 	}
 	return bestScore;
 

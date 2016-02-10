@@ -65,4 +65,5 @@ int main()
 	//----------------------------------
 	printStartInfo();
 	uciLoop();
+	return 0;
 }
