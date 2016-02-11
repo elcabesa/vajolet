@@ -1311,7 +1311,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 			// TODO controllare se conviene fare o non fare la condizione type != search::nodeType::PV_NODE
 			// TODO testare se aggiungere o no !movegivesCheck() &&
 			if(
-					!moveGiveCheck &&
+					//!moveGiveCheck &&
 					pos.seeSign(m) < 0)
 			{
 				continue;
@@ -1319,17 +1319,8 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 		}
 
 		pos.doMove(m);
-		Score val;
+		Score val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
 
-
-		if(PVnode)
-		{
-			//childPV.clear();
-			val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
-		}
-		else{
-			val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
-		}
 
 		pos.undoMove();
 
