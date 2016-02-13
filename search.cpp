@@ -535,7 +535,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 	//-----------------------------
 	// reduction && pruning
 	//-----------------------------
-	if(!PVnode && !inCheck)
+	if(!PVnode && !inCheck && abs(beta) < SCORE_MATE_IN_MAX_PLY)
 	{
 
 		//------------------------
@@ -548,7 +548,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 			&&  alpha >= -SCORE_INFINITE+razorMargin(depth)
 			//&&  abs(alpha) < SCORE_MATE_IN_MAX_PLY // implicito nell riga precedente
 			&&  ((!ttMove.packed ) || type == ALL_NODE)
-			&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 			&& !((pos.getNextTurn() && (pos.getBitmap(Position::blackPawns) & RANKMASK[A2])) || (!pos.getNextTurn() && (pos.getBitmap(Position::whitePawns) & RANKMASK[A7]) ) )
 		)
 		{
@@ -572,7 +571,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 			&& depth < 4 * ONE_PLY
 			&& eval > -SCORE_INFINITE + futility[ depth>>ONE_PLY_SHIFT ]
 			&& eval - futility[depth>>ONE_PLY_SHIFT] >= beta
-			&& abs(beta) < SCORE_MATE_IN_MAX_PLY
 			&& abs(eval) < SCORE_KNOWN_WIN
 			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[Position::whiteKnights][0])))
 		{
@@ -591,7 +589,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 		if( depth >= ONE_PLY
 			&& eval >= beta
 			&& !sd[ply].skipNullMove
-			&&  abs(beta) < SCORE_MATE_IN_MAX_PLY
 			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[Position::whiteKnights][0]))
 		){
 			// Null move dynamic reduction based on depth
@@ -674,7 +671,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 			&&  !sd[ply].skipNullMove
 			// && abs(beta)<SCORE_KNOWN_WIN
 			// && eval> beta-40000
-			&&abs(beta)<SCORE_MATE_IN_MAX_PLY
 		){
 			Score s;
 			Score rBeta = beta + 8000;
@@ -794,6 +790,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 			&& !ext
 			&&  m == ttMove
 			&&  abs(ttValue) < SCORE_KNOWN_WIN
+//			&& abs(beta) < SCORE_MATE_IN_MAX_PLY
 		)
 		{
 
@@ -1115,6 +1112,19 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 		}
 		return std::max((int)0,(int)(-5000 + pos.getPly()*7));
 	}
+/*	//---------------------------------------
+	//	MATE DISTANCE PRUNING
+	//---------------------------------------
+
+	alpha = std::max(matedIn(ply), alpha);
+	beta = std::min(mateIn(ply+1), beta);
+
+	if(ply>20)
+	{sync_cout<<ply<<"    "<< alpha<<":"<< beta<<sync_endl;}
+	if (alpha >= beta)
+	{
+		return alpha;
+	}*/
 
 	//----------------------------
 	//	next node type
