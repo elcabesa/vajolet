@@ -284,10 +284,10 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 				}
 				else if (res >= beta)
 				{
-					if(oldBestMove.packed && oldBestMove != newPV.front())
+					/*if(oldBestMove.packed && oldBestMove != newPV.front())
 					{
 						my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
-					}
+					}*/
 
 					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes);
 
@@ -322,7 +322,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 		//-----------------------
 		//	single good move at root
 		//-----------------------
-		if (depth >= 12
+		/*if (depth >= 12
 			&& !stop
 			&&  linesToBeSearched == 1
 			&&  res > SCORE_MATED_IN_MAX_PLY)
@@ -340,21 +340,21 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 			{
 				my_thread::timeMan.singularRootMoveCount++;
 			}
-		}
+		}*/
 
 		//------------------------------------------------
 		// check wheter or not the new best move has changed
 		//------------------------------------------------
-		if(oldBestMove.packed && oldBestMove != newPV.front()) // in the case increase the allocated time
+		/*if(oldBestMove.packed && oldBestMove != newPV.front()) // in the case increase the allocated time
 		{
 			my_thread::timeMan.allocatedTime=my_thread::timeMan.maxSearchTime;
-		}
+		}*/
 		oldBestMove = newPV.front();
 
 
-		my_thread::timeMan.depth = depth;
+		/*my_thread::timeMan.depth = depth;
 		unsigned long time = my_thread::timeMan.minSearchTime;
-		my_thread::timeMan.allocatedTime = std::max(time, (unsigned long int)(my_thread::timeMan.allocatedTime * 0.90) ); // otherwise decrease the allocated time
+		my_thread::timeMan.allocatedTime = std::max(time, (unsigned long int)(my_thread::timeMan.allocatedTime * 0.90) ); // otherwise decrease the allocated time*/
 		my_thread::timeMan.idLoopIterationFinished = true;
 
 

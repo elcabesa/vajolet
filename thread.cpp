@@ -34,8 +34,8 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	if(lim.moveTime)
 	{
 		timeMan.allocatedTime = lim.moveTime;
-		timeMan.maxSearchTime = lim.moveTime;
-		timeMan.minSearchTime = lim.moveTime;
+		//timeMan.maxSearchTime = lim.moveTime;
+		//timeMan.minSearchTime = lim.moveTime;
 		timeMan.resolution = std::min((unsigned long int)100, timeMan.allocatedTime/100);
 	}
 	else
@@ -44,28 +44,28 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 		{
 			if(lim.movesToGo > 0)
 			{
-				timeMan.allocatedTime = (long unsigned int)std::min((lim.btime*4.0)/lim.movesToGo, lim.btime*0.8);
-				timeMan.maxSearchTime = timeMan.allocatedTime;
+				timeMan.allocatedTime = lim.btime/(lim.movesToGo);
+				//timeMan.maxSearchTime = timeMan.allocatedTime;
 			}else
 			{
-				timeMan.allocatedTime = (long unsigned int)((float)(lim.btime)/10.0);
-				timeMan.maxSearchTime = timeMan.allocatedTime;
+				timeMan.allocatedTime = lim.btime/40.0;
+				//timeMan.maxSearchTime = timeMan.allocatedTime;
 			}
 		}
 		else
 		{
 			if(lim.movesToGo > 0)
 			{
-				timeMan.allocatedTime = (long unsigned int)std::min((lim.wtime*4.0)/lim.movesToGo, lim.wtime*0.8);
-				timeMan.maxSearchTime = timeMan.allocatedTime;
+				timeMan.allocatedTime = lim.wtime/lim.movesToGo;
+				//timeMan.maxSearchTime = timeMan.allocatedTime;
 			}else
 			{
-				timeMan.allocatedTime = (long unsigned int)((float)(lim.wtime)/10.0);
-				timeMan.maxSearchTime = timeMan.allocatedTime;
+				timeMan.allocatedTime = lim.wtime/40.0;
+				//timeMan.maxSearchTime = timeMan.allocatedTime;
 			}
 		}
 
-		timeMan.minSearchTime = (long unsigned int)(timeMan.allocatedTime*0.1);
+		//timeMan.minSearchTime = (long unsigned int)(timeMan.allocatedTime*0.1);
 		timeMan.resolution = std::min((unsigned long int)100, timeMan.allocatedTime/100);
 	}
 
@@ -73,7 +73,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	{
 		timeMan.resolution = 100;
 	}
-	timeMan.singularRootMoveCount = 0;
+	//timeMan.singularRootMoveCount = 0;
 	timeMan.idLoopIterationFinished = false;
 
 }
@@ -133,13 +133,13 @@ void my_thread::timerThread()
 				src.stop = true;
 			}
 
-			if(timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && !(src.limits.infinite || src.limits.ponder))
+			/*if(timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && !(src.limits.infinite || src.limits.ponder))
 			{
 				if(timeMan.singularRootMoveCount >=1)
 				{
 					src.stop = true;
 				}
-			}
+			}*/
 
 
 			if(src.limits.nodes && src.getVisitedNodes() > src.limits.nodes)
