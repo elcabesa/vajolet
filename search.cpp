@@ -88,13 +88,14 @@ void search::reloadPv( unsigned int i )
 	}
 }
 
-std::list<Move> search::startThinking()
+startThinkResult search::startThinking(unsigned int depth, Score alpha, Score beta)
 {
 	//------------------------------------
 	//init the new search
 	//------------------------------------
 	Score res = 0;
 	resetStartTime();
+	//bool firstRun = true;
 
 
 	TT.newSearch();
@@ -155,9 +156,9 @@ std::list<Move> search::startThinking()
 
 
 	std::list<Move> newPV;
-	unsigned int depth = 1;
+	//unsigned int depth = 1;
 
-	Score alpha = -SCORE_INFINITE, beta = SCORE_INFINITE;
+	//Score alpha = -SCORE_INFINITE, beta = SCORE_INFINITE;
 	Score delta = 800;
 	Move oldBestMove(Movegen::NOMOVE);
 
@@ -173,7 +174,7 @@ std::list<Move> search::startThinking()
 			//----------------------------------
 			// prepare alpha & beta
 			//----------------------------------
-			if (depth >= 5)
+			if (/*!firstRun && */depth >= 5)
 			{
 				delta = 800;
 				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].score) - delta,(signed long long int)-SCORE_INFINITE);
@@ -192,6 +193,7 @@ std::list<Move> search::startThinking()
 			{
 				reloadPv(i);
 			}
+			//firstRun = false;
 
 
 			unsigned int reduction = 0;
@@ -250,13 +252,14 @@ std::list<Move> search::startThinking()
 
 					//if(it->firstMove == newPV.front())
 					//{
-						it->PV = newPV;
-						it->score = res;
-						it->maxPlyReached = maxPlyReached;
-						it->depth = depth;
-						it->nodes = visitedNodes;
-						it->time = elapsedTime;
-						std::iter_swap( it, rootMoves.begin()+indexPV);
+					it->PV = newPV;
+					it->score = res;
+					it->maxPlyReached = maxPlyReached;
+					it->depth = depth;
+					it->nodes = visitedNodes;
+					it->time = elapsedTime;
+
+					std::iter_swap( it, rootMoves.begin()+indexPV);
 
 					//}
 
@@ -377,9 +380,14 @@ std::list<Move> search::startThinking()
 	}
 
 
+	startThinkResult ret;
+	ret.PV = rootMoves[bestMoveLine].PV;
+	ret.depth = depth-1;
+	ret.alpha = alpha;
+	ret.beta = beta;
 
 
-	return rootMoves[bestMoveLine].PV;
+	return ret;
 
 }
 

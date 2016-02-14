@@ -179,11 +179,20 @@ void my_thread::searchThread()
 
 void my_thread::manageNewSearch()
 {
+
 	/*************************************************
 	 *	first of all check the number of legal moves
 	 *	if there is only 1 moves do it
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
+
+	if( game.isNewGame(src.pos))
+	{
+		game.CreateNewGame();
+
+	}
+	game.insertNewMoves(src.pos);
+
 
 	Movegen mg(src.pos);
 	unsigned int legalMoves = mg.getNumberOfLegalMoves();
@@ -235,7 +244,32 @@ void my_thread::manageNewSearch()
 			return;
 		}
 	}
-	std::list<Move> PV = src.startThinking();
+	startThinkResult res;
+	/*if(game.isPonderRight())
+	{
+		Game::GamePosition gp = game.getNewSearchParameters();
+
+		unsigned int d = 1;
+		if( gp.depth > 6)
+			d = gp.depth -6;
+
+		if(gp.beta-gp.alpha == 1600)
+		{
+			sync_cout<< d<<" "<< gp.alpha<<" "<< gp.beta<<sync_endl;
+			res = src.startThinking(d, gp.alpha, gp.beta);
+		}
+		else
+		{
+			res = src.startThinking();
+		}
+	}
+	else*/
+	{
+		res = src.startThinking();
+	}
+
+
+	std::list<Move> PV = res.PV;
 
 	while(src.limits.ponder)
 	{
@@ -265,7 +299,9 @@ void my_thread::manageNewSearch()
 		}
 
 	}
+
 	std::cout<<sync_endl;
+	game.savePV(PV, res.depth, res.alpha, res.beta);
 
 
 }

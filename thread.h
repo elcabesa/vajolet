@@ -25,6 +25,8 @@
 #include "position.h"
 #include "search.h"
 #include "transposition.h"
+#include "command.h"
+#include "movegen.h"
 
 
 
@@ -41,6 +43,119 @@ struct timeManagementStruct
 };
 
 
+class Game
+{
+public:
+	struct GamePosition
+	{
+		U64 key;
+		Move m;
+		std::vector<Move> PV;
+		Score alpha;
+		Score beta;
+		unsigned int depth;
+	};
+private:
+	std::vector<GamePosition> positions;
+public:
+
+	void CreateNewGame(void)
+	{
+		positions.clear();
+	}
+
+	void insertNewMoves(Position &pos)
+	{
+		unsigned int actualPosition = positions.size();
+		for(unsigned int i = actualPosition; i <= pos.getStateIndex(); i++)
+		{
+			//sync_cout<<"inserita pos:"<<pos.getState(i).key<<sync_endl;
+			GamePosition p;
+			p.key = pos.getState(i).key;
+			p.m =  pos.getState(i).currentMove;
+			positions.push_back(p);
+		}
+	}
+
+	void savePV(std::list<Move> PV,unsigned int depth, Score alpha, Score beta)
+	{
+		std::copy(std::begin(PV), std::end(PV), std::back_inserter(positions.back().PV));
+		positions.back().depth = depth;
+		positions.back().alpha = alpha;
+		positions.back().beta = beta;
+	}
+
+
+	void printGamesInfo()
+	{
+		for(auto p : positions)
+		{
+			if( p.m != Movegen::NOMOVE)
+			{
+				std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
+				for( auto m : p.PV )
+				{
+					std::cout<<displayUci(m)<<" ";
+				}
+
+			}
+			std::cout<<std::endl;
+		}
+
+	}
+
+	~Game()
+	{
+		//printGamesInfo();
+	}
+	bool isNewGame(Position &pos)
+	{
+		if( positions.size() == 0 || pos.getStateIndex()+1 < positions.size())
+		{
+			//printGamesInfo();
+			//sync_cout<<"NEW GAME"<<sync_endl;
+			return true;
+		}
+
+		unsigned int n = 0;
+		for(auto p : positions)
+		{
+			if(pos.getState(n).key != p.key)
+			{
+				//printGamesInfo();
+				//sync_cout<<"NEW GAME"<<sync_endl;
+				return true;
+			}
+			n++;
+
+		}
+		return false;
+	}
+
+	bool isPonderRight(void)
+	{
+		if( positions.size() > 2)
+		{
+			GamePosition previous =*(positions.end()-3);
+			if(previous.PV.size()>=1 && previous.PV[1] == positions.back().m)
+			{
+				//sync_cout<<"PONDER HIT"<<sync_endl;
+				return true;
+			}
+
+		}
+		//sync_cout<<"PONDER FAIL"<<sync_endl;
+		return false;
+	}
+
+	GamePosition getNewSearchParameters(void)
+	{
+		GamePosition previous =*(positions.end()-3);
+		return previous;
+	}
+
+
+};
 
 class my_thread
 {
@@ -48,6 +163,7 @@ class my_thread
 	my_thread()
 	{
 		initThreads();
+		game.CreateNewGame();
 	};
 
 	static my_thread * pInstance;
@@ -64,6 +180,7 @@ class my_thread
 
 	static long long lastHasfullMessage;
 
+	Game game;
 	void initThreads();
 
 	void timerThread();

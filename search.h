@@ -29,6 +29,13 @@
 #include "eval.h"
 
 
+struct startThinkResult
+{
+	Score alpha;
+	Score beta;
+	unsigned int depth;
+	std::list<Move> PV;
+};
 
 class searchLimits
 {
@@ -181,7 +188,7 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	std::list<Move> startThinking();
+	startThinkResult startThinking(unsigned int depth = 1, Score alpha = 0, Score beta = 0);
 	unsigned long long getVisitedNodes() const { return visitedNodes; }
 
 private:
