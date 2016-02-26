@@ -167,6 +167,10 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 		//----------------------------
 		// iterative loop
 		//----------------------------
+		for (rootMove& rm : rootMoves)
+		{
+			rm.previousScore = rm.score;
+		}
 
 		for (indexPV = 0; indexPV < linesToBeSearched; indexPV++)
 		{
@@ -177,8 +181,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 			if (/*!firstRun && */depth >= 5)
 			{
 				delta = 800;
-				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].score) - delta,(signed long long int)-SCORE_INFINITE);
-				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].score) + delta,(signed long long int) SCORE_INFINITE);
+				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int)-SCORE_INFINITE);
+				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].previousScore) + delta,(signed long long int) SCORE_INFINITE);
 			}
 
 			for (unsigned int x = indexPV; x < rootMoves.size() ; x++)

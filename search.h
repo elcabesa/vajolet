@@ -65,6 +65,7 @@ class rootMove
 {
 public:
 	Score score;
+	Score previousScore;
 	std::list<Move> PV;
 	Move firstMove;
 	unsigned int maxPlyReached;
@@ -75,6 +76,7 @@ public:
 	bool operator==(const Move& m) const { return firstMove.packed == m.packed; }
 	void init(Move & m)
 	{
+		previousScore = -SCORE_INFINITE;
 		score = -SCORE_INFINITE;
 		firstMove = m;
 		maxPlyReached = 0;
