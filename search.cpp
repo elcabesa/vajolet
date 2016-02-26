@@ -325,7 +325,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 		/*if (depth >= 12
 			&& !stop
 			&&  linesToBeSearched == 1
-			&&  res > SCORE_MATED_IN_MAX_PLY)
+			&&  res > - SCORE_KNOWN_WIN)
 		{
 
 			Score rBeta = res - 20000;
