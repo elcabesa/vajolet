@@ -1730,7 +1730,8 @@ template<color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount * kingAttackersWeight) / 2)
 							 + 3 * (kingAdjacentZoneAttacksCount + bitCnt( undefendedSquares ) )
 							 + KingExposed[c? 63 - kingSquare : kingSquare ]
-							 - kingSafety / kingSafetyScaling[0];
+							 - kingSafety / kingSafetyScaling[0]
+							 - (getpieceCount(c? whiteQueens: blackQueens)==0)*40;
 
 		// safe contact queen check
 		bitMap safeContactSquare = undefendedSquares & AttackedByTheirPieces[Queens]  & ~TheirPieces;
@@ -1777,7 +1778,6 @@ template<color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 			attackUnits += bitCnt( longDistCheck );
 		}
 
-		attackUnits = std::max(attackUnits,0);
 		attackUnits = std::min(KingSafetyMaxAttack[0], std::max(0, attackUnits));
 		attackUnits *= std::min(KingSafetyLinearCoefficent[0], attackUnits);
 		attackUnits = std::min(KingSafetyMaxResult[0], attackUnits);
