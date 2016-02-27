@@ -1918,20 +1918,22 @@ Score Position::eval(void)
 			res -= bishopPair;
 		}
 	}
-
-	if((int)getpieceCount(whiteQueens) - (int)getpieceCount(blackQueens) == 1
-			&& (int)getpieceCount(blackRooks) - (int)getpieceCount(whiteRooks) == 1
-			&& (int)getpieceCount(blackBishops) + (int)getpieceCount(blackKnights) - (int)getpieceCount(whiteBishops) - (int)getpieceCount(whiteKnights) == 2)
+	if( getpieceCount(blackPawns) + getpieceCount(whitePawns) == 0 )
 	{
-		res -= queenVsRook2MinorsImbalance;
+		if((int)getpieceCount(whiteQueens) - (int)getpieceCount(blackQueens) == 1
+				&& (int)getpieceCount(blackRooks) - (int)getpieceCount(whiteRooks) == 1
+				&& (int)getpieceCount(blackBishops) + (int)getpieceCount(blackKnights) - (int)getpieceCount(whiteBishops) - (int)getpieceCount(whiteKnights) == 2)
+		{
+			res += queenVsRook2MinorsImbalance;
 
-	}
-	else if((int)getpieceCount(whiteQueens) - (int)getpieceCount(blackQueens) == -1
-			&& (int)getpieceCount(blackRooks) - (int)getpieceCount(whiteRooks) == -1
-			&& (int)getpieceCount(blackBishops) + (int)getpieceCount(blackKnights) - (int)getpieceCount(whiteBishops) -(int)getpieceCount(whiteKnights) == -2)
-	{
-		res += queenVsRook2MinorsImbalance;
+		}
+		else if((int)getpieceCount(whiteQueens) - (int)getpieceCount(blackQueens) == -1
+				&& (int)getpieceCount(blackRooks) - (int)getpieceCount(whiteRooks) == -1
+				&& (int)getpieceCount(blackBishops) + (int)getpieceCount(blackKnights) - (int)getpieceCount(whiteBishops) -(int)getpieceCount(whiteKnights) == -2)
+		{
+			res -= queenVsRook2MinorsImbalance;
 
+		}
 	}
 
 	if(trace)
