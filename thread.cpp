@@ -179,6 +179,7 @@ void my_thread::searchThread()
 
 void my_thread::manageNewSearch()
 {
+	src.resetStartTime();
 
 	/*************************************************
 	 *	first of all check the number of legal moves

@@ -190,7 +190,7 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	startThinkResult startThinking(unsigned int depth = 1, Score alpha = 0, Score beta = 0);
+	startThinkResult startThinking(unsigned int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE);
 	unsigned long long getVisitedNodes() const { return visitedNodes; }
 
 private:

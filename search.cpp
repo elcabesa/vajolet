@@ -44,7 +44,7 @@ std::atomic<unsigned long long> search::visitedNodes;
 
 Score search::futility[5] = {0,6000,20000,30000,40000};
 Score search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
-unsigned int search::FutilityMoveCounts[11] = {5,10,17,26,37,50,66,85,105,130,151};
+unsigned int search::FutilityMoveCounts[11] = {3,5,8,12,18,25,33,42,52,62,74};
 Score search::PVreduction[32*ONE_PLY][64];
 Score search::nonPVreduction[32*ONE_PLY][64];
 unsigned int search::threads = 1;
@@ -94,7 +94,6 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 	//init the new search
 	//------------------------------------
 	Score res = 0;
-	resetStartTime();
 	//bool firstRun = true;
 
 
@@ -843,6 +842,10 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 				&& (!threatMove.packed)
 				)
 			{
+				/*if( (newDepth>> ONE_PLY_SHIFT)> 4)
+				{
+					sync_cout<<"CACCHIO "<<(newDepth>> ONE_PLY_SHIFT)<<sync_endl;
+				}*/
 				assert((newDepth>>ONE_PLY_SHIFT)<11);
 				continue;
 			}
