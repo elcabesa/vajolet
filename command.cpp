@@ -64,7 +64,7 @@ void static printUciInfo(void)
 {
 	sync_cout << "id name " << PROGRAM_NAME << " " << VERSION << sync_endl;
 	sync_cout << "id author Belli Marco" << sync_endl;
-	sync_cout << "option name Hash type spin default 1 min 1 max 4096" << sync_endl;
+	sync_cout << "option name Hash type spin default 1 min 1 max 65535" << sync_endl;
 	sync_cout << "option name Threads type spin default 1 min 1 max 128" << sync_endl;
 	sync_cout << "option name MultiPV type spin default 1 min 1 max 500" << sync_endl;
 	sync_cout << "option name Ponder type check default true" << sync_endl;
@@ -211,7 +211,7 @@ void setoption(std::istringstream& is)
 	if(name == "Hash")
 	{
 		int hash = stoi(value);
-		hash = std::min(hash,1048576);
+		hash = std::min(hash,65536);
 		TT.setSize(hash);
 	}
 	else if(name == "Threads")
