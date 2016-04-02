@@ -44,7 +44,7 @@ std::atomic<unsigned long long> search::visitedNodes;
 
 Score search::futility[5] = {0,6000,20000,30000,40000};
 Score search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
-unsigned int search::FutilityMoveCounts[11] = {3,5,8,12,18,25,33,42,52,62,74};
+unsigned int search::FutilityMoveCounts[11] = {5,10,17,26,37,50,66,85,105,130,151};
 Score search::PVreduction[32*ONE_PLY][64];
 Score search::nonPVreduction[32*ONE_PLY][64];
 unsigned int search::threads = 1;
