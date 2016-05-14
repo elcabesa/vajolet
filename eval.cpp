@@ -1003,7 +1003,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("k7/8/8/8/8/8/8/5BPK w - -");
 	key = p.getMaterialKey();
 	t.type = materialStruct::exactFunction;
-	t.pointer = &evalKBPvsK;
+	t.pointer = &Position::evalKBPvsK;
 	t.val = 0;
 	materialKeyMap.insert({key,t});
 	//------------------------------------------
@@ -1012,7 +1012,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kbp5/8/8/8/8/8/8/7K w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKBPvsK;
+	t.pointer=&Position::evalKBPvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1022,7 +1022,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("k7/8/8/8/8/8/8/5BNK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKBNvsK;
+	t.pointer=&Position::evalKBNvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 	//------------------------------------------
@@ -1031,7 +1031,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kbn5/8/8/8/8/8/8/7K w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKBNvsK;
+	t.pointer=&Position::evalKBNvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1041,7 +1041,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("k7/8/8/8/8/8/8/6QK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKQvsK;
+	t.pointer=&Position::evalKQvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 	//------------------------------------------
@@ -1050,7 +1050,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kq6/8/8/8/8/8/8/7K w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKQvsK;
+	t.pointer=&Position::evalKQvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1060,7 +1060,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("k7/8/8/8/8/8/8/6PK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKPvsK;
+	t.pointer=&Position::evalKPvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 	//------------------------------------------
@@ -1069,7 +1069,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kp6/8/8/8/8/8/8/7K w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKPvsK;
+	t.pointer=&Position::evalKPvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1095,7 +1095,7 @@ void Position::initMaterialKeys(void)
 				p.setupFromFen(s);
 				key = p.getMaterialKey();
 				t.type=materialStruct::multiplicativeFunction;
-				t.pointer=&evalOppositeBishopEndgame;
+				t.pointer=&Position::evalOppositeBishopEndgame;
 				t.val=0;
 				materialKeyMap.insert({key,t});
 			}
@@ -1108,7 +1108,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kr6/8/8/8/8/8/8/6NK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&evalKRvsKm;
+	t.pointer=&Position::evalKRvsKm;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 	//------------------------------------------
@@ -1117,7 +1117,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kr6/8/8/8/8/8/8/6BK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&evalKRvsKm;
+	t.pointer=&Position::evalKRvsKm;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1127,7 +1127,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kb6/8/8/8/8/8/8/6RK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&evalKRvsKm;
+	t.pointer=&Position::evalKRvsKm;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 	//------------------------------------------
@@ -1136,7 +1136,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kn6/8/8/8/8/8/8/6RK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&evalKRvsKm;
+	t.pointer=&Position::evalKRvsKm;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1146,7 +1146,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("knn5/8/8/8/8/8/8/7K w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&evalKNNvsK;
+	t.pointer=&Position::evalKNNvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1156,7 +1156,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("k7/8/8/8/8/8/8/5NNK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&evalKNNvsK;
+	t.pointer=&Position::evalKNNvsK;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1167,7 +1167,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kr6/8/8/8/8/8/8/5PRK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&evalKRPvsKr;
+	t.pointer=&Position::evalKRPvsKr;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1177,7 +1177,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("krp5/8/8/8/8/8/8/6RK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&evalKRPvsKr;
+	t.pointer=&Position::evalKRPvsKr;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1187,7 +1187,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kq6/8/8/8/8/8/8/6PK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKQvsKP;
+	t.pointer=&Position::evalKQvsKP;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 
@@ -1197,7 +1197,7 @@ void Position::initMaterialKeys(void)
 	p.setupFromFen("kp6/8/8/8/8/8/8/6QK w - -");
 	key = p.getMaterialKey();
 	t.type=materialStruct::exactFunction;
-	t.pointer=&evalKQvsKP;
+	t.pointer=&Position::evalKQvsKP;
 	t.val=0;
 	materialKeyMap.insert({key,t});
 }
