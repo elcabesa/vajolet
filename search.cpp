@@ -818,7 +818,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 		//---------------------------------------
 		//	FUTILITY PRUNING
 		//---------------------------------------
-		if( type != search::nodeType::ROOT_NODE
+		if( !PVnode/*type != search::nodeType::ROOT_NODE*/
 			&& !captureOrPromotion
 			&& !inCheck
 			&& m != ttMove
@@ -832,10 +832,6 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 				&& (!threatMove.packed)
 				)
 			{
-				/*if( (newDepth>> ONE_PLY_SHIFT)> 4)
-				{
-					sync_cout<<"CACCHIO "<<(newDepth>> ONE_PLY_SHIFT)<<sync_endl;
-				}*/
 				assert((newDepth>>ONE_PLY_SHIFT)<11);
 				continue;
 			}
