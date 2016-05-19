@@ -1031,10 +1031,10 @@ void Position::doMove(const Move & m){
 void Position::undoMove()
 {
 
-	assert(m.bit.packed);
+
 	state x = getActualState();
 	Move &m = x.currentMove;
-
+	assert(m.packed);
 	tSquare to = (tSquare)m.bit.to;
 	tSquare from = (tSquare)m.bit.from;
 	bitboardIndex piece = squares[to];
@@ -1775,7 +1775,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 		case Position::whiteRooks:
 		case Position::blackRooks:
-			assert(m.from<squareNumber);
+			assert(m.bit.from<squareNumber);
 			if(!(Movegen::getRookPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFrom<Position::whiteRooks>((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
 			{
 				return false;
@@ -1784,7 +1784,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 		case Position::whiteQueens:
 		case Position::blackQueens:
-			assert(m.from<squareNumber);
+			assert(m.bit.from<squareNumber);
 			if(
 				!(
 					(Movegen::getBishopPseudoAttack((tSquare)m.bit.from) | Movegen::getRookPseudoAttack((tSquare)m.bit.from))

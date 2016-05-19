@@ -673,7 +673,7 @@ private:
 		squares[from] = empty;
 		squares[to] = piece;
 		index[to] = index[from];
-		assert(index[s]<maxNumberOfPieces);
+		assert(index[to]<maxNumberOfPieces);
 		pieceList[piece][index[to]] = to;
 
 

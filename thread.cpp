@@ -38,7 +38,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	}
 	else
 	{
-		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
+
 		if(pos.getNextTurn())
 		{
 			if(lim.movesToGo > 0)
@@ -49,6 +49,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 				timeMan.allocatedTime = lim.btime/40.0+lim.binc*0.8;
 			}
 
+			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
 			timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(lim.btime - 2 * timeMan.resolution));
 		}
 		else
@@ -60,6 +61,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 			{
 				timeMan.allocatedTime = lim.wtime/40.0+lim.winc*0.8;
 			}
+			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
 			timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(lim.wtime - 2 * timeMan.resolution));
 		}
 
@@ -73,6 +75,9 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	}
 	//timeMan.singularRootMoveCount = 0;
 	timeMan.idLoopIterationFinished = false;
+
+	//sync_cout<<"info debug resolution "<<timeMan.resolution<<sync_endl;
+	//sync_cout<<"info debug allocatedTime "<<timeMan.allocatedTime<<sync_endl;
 
 }
 
@@ -107,6 +112,7 @@ void my_thread::timerThread()
 			long long int time = src.getElapsedTime();
 			if(time >= timeMan.allocatedTime && !(src.limits.infinite || src.limits.ponder))
 			{
+				//sync_cout<<"info debug TIME EXPIRED "<<time<< " >= "<<timeMan.allocatedTime<<sync_endl;
 				src.stop = true;
 			}
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
@@ -128,6 +134,7 @@ void my_thread::timerThread()
 
 			if(timeMan.idLoopIterationFinished && time >= timeMan.allocatedTime*0.7 && !(src.limits.infinite || src.limits.ponder))
 			{
+				//sync_cout<<"info debug STOP BECAUSE WE WILL PROBABLY NOT BE ABLE TO FINISH THE NEXT ITERATION "<<time<<":"<<timeMan.allocatedTime<<sync_endl;
 				src.stop = true;
 			}
 

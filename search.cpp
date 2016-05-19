@@ -224,6 +224,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 					helperThread.push_back( std::thread(alphaBeta<search::nodeType::HELPER_ROOT_NODE>, &helperSearch[i], 0, (depth-reduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
 				}
 
+				newPV.clear();
 				// main thread
 				res = alphaBeta<search::nodeType::ROOT_NODE>(0, (depth-reduction) * ONE_PLY, alpha, beta, newPV);
 
@@ -817,7 +818,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 		//---------------------------------------
 		//	FUTILITY PRUNING
 		//---------------------------------------
-		if( !PVnode
+		if( type != search::nodeType::ROOT_NODE
 			&& !captureOrPromotion
 			&& !inCheck
 			&& m != ttMove

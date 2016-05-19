@@ -148,7 +148,7 @@ public:
 		assert(ply>=0);
 		assert(v+ply<=SCORE_MATE);
 		assert(v-ply>=SCORE_MATED);
-		assert(score != SCORE_NONE);
+		assert(v != SCORE_NONE);
 		return  v >= SCORE_MATE_IN_MAX_PLY  ? v + ply
 				: v <= SCORE_MATED_IN_MAX_PLY ? v - ply : v;
 	}
