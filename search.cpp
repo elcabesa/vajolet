@@ -31,15 +31,22 @@
 #include "book.h"
 #include "thread.h"
 #include "command.h"
+#include "syzygy/tbprobe.h"
+#include "bitops.h"
+
 
 #ifdef DEBUG_EVAL_SIMMETRY
 	Position ppp;
 #endif
 
+static const int valueMap[5] = {SCORE_MATED_IN_MAX_PLY, -100,0, 100, SCORE_MATE_IN_MAX_PLY};
+
+static const int valueMapNo50[5] = {SCORE_MATED_IN_MAX_PLY, SCORE_MATED_IN_MAX_PLY, 0, SCORE_MATE_IN_MAX_PLY, SCORE_MATE_IN_MAX_PLY};
 
 search defaultSearch;
 std::vector<rootMove> search::rootMoves;
 std::atomic<unsigned long long> search::visitedNodes;
+std::atomic<unsigned long long> search::tbHits;
 
 
 Score search::futility[5] = {0,6000,20000,30000,40000};
@@ -54,6 +61,11 @@ unsigned int search::eloStrenght = 3000;
 bool search::useOwnBook = true;
 bool search::bestMoveBook = false;
 bool search::showCurrentLine = false;
+std::string search::SyzygyPath ="empty";
+unsigned int search::SyzygyProbeDepth = 1;
+bool search::Syzygy50MoveRule= true;
+
+
 
 void search::reloadPv( unsigned int i )
 {
@@ -102,6 +114,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 	counterMoves.clear();
 	cleanData();
 	visitedNodes = 0;
+	tbHits = 0;
 
 	std::vector<search> helperSearch(threads-1);
 
@@ -279,7 +292,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 					newPV.clear();
 					newPV.push_back( rootMoves[indexPV].PV.front() );
 
-					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes);
+					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
 
 					alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
@@ -289,7 +302,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 				else if (res >= beta)
 				{
 
-					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes);
+					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
 
 					beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 					if(depth > 1)
@@ -353,6 +366,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 
 
+
 		depth += 1;
 
 	}
@@ -391,6 +405,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 	assert(alpha>=-SCORE_INFINITE);
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
+
 
 
 	Position::state& st = pos.getActualState();
@@ -488,6 +503,58 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 			}
 		}
 		return ttValue;
+	}
+
+
+	//Tablebase probe
+	if (type != search::nodeType::ROOT_NODE  && type != search::nodeType::HELPER_ROOT_NODE && TB_LARGEST)
+	{
+		unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
+
+		if (    piecesCnt <= TB_LARGEST
+			&& (piecesCnt <  TB_LARGEST || depth >= (int)(SyzygyProbeDepth*ONE_PLY))
+			&&  pos.getActualState().fiftyMoveCnt == 0)
+		{
+			unsigned result = tb_probe_wdl(pos.getBitmap(Position::whitePieces),
+				pos.getBitmap(Position::blackPieces),
+				pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
+				pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
+				pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
+				pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
+				pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
+				pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
+				pos.getActualState().fiftyMoveCnt,
+				pos.getActualState().castleRights,
+				pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
+				pos.getActualState().nextMove== Position::whiteTurn);
+
+			if (result != TB_RESULT_FAILED) {
+				//sync_cout<<"FOUND"<<sync_endl;
+
+
+
+				tbHits++;
+
+				Score value;
+				unsigned wdl = TB_GET_WDL(result);
+				assert(wdl<5);
+				if (Syzygy50MoveRule)
+					value = valueMap[wdl];
+				else
+					value = valueMapNo50[wdl];
+
+				/*tte->save(posKey, value_to_tt(value, ss->ply), BOUND_EXACT,
+						  std::min(DEPTH_MAX - ONE_PLY, depth + 6 * ONE_PLY),
+						  MOVE_NONE, VALUE_NONE, TT.generation());
+				TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+			bestScore >= beta  ? typeScoreHigherThanBeta :
+					(PVnode && bestMove.packed) ? typeExact : typeScoreLowerThanAlpha,
+							(short int)depth, bestMove.packed, staticEval);
+						  */
+
+				return value;
+			}
+		}
 	}
 
 

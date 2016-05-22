@@ -34,6 +34,7 @@
 #include "thread.h"
 #include "transposition.h"
 #include "benchmark.h"
+#include "syzygy/tbprobe.h"
 
 
 
@@ -74,6 +75,9 @@ void static printUciInfo(void)
 	sync_cout << "option name UCI_ShowCurrLine type check default false" << sync_endl;
 	sync_cout << "option name UCI_LimitStrength type check default false" << sync_endl;
 	sync_cout << "option name UCI_Elo type spin default 3000 min 1000 max 3000" << sync_endl;
+	sync_cout << "option name SyzygyPath type string default <empty>" << sync_endl;
+	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
+
 	sync_cout << "uciok" << sync_endl;
 }
 
@@ -273,6 +277,27 @@ void setoption(std::istringstream& is)
 	}
 	else if(name == "Ponder")
 	{
+	}
+	else if(name == "SyzygyPath")
+	{
+		search::SyzygyPath = value;
+		tb_init(search::SyzygyPath.c_str());
+		sync_cout<<"info string TB_LARGEST = "<<TB_LARGEST<<sync_endl;
+	}
+	else if(name == "SyzygyProbeDepth")
+	{
+		search::SyzygyProbeDepth = stoi(value);
+	}
+	else if(name == "Syzygy50MoveRule")
+	{
+		if(value == "true")
+		{
+			search::Syzygy50MoveRule = true;
+		}
+		else
+		{
+			search::Syzygy50MoveRule = false;
+		}
 	}
 	else
 	{
@@ -546,13 +571,13 @@ void printPVs(unsigned int count)
 	{
 		if(rm.nodes)
 		{
-			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes);
+			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes,search::tbHits);
 		}
 		i++;
 	});
 }
 
-void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes)
+void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes, unsigned long long tbHits)
 {
 
 	sync_cout<<"info multipv "<< (count+1) << " depth "<< (depth) <<" seldepth "<< seldepth <<" score ";
@@ -570,7 +595,7 @@ void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Sco
 
 	std::cout << (res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
 
-	std::cout << " nodes " << nodes;
+	std::cout << " nodes " << nodes <<" tbhits "<<tbHits;
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 	std::cout << " nps " << (unsigned int)((double)nodes*1000/(double)time) << " time " << (long long int)(time);
 #endif

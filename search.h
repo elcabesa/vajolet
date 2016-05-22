@@ -22,6 +22,7 @@
 #include <list>
 #include <atomic>
 #include <cmath>
+#include <string>
 #include "vajolet.h"
 #include "position.h"
 #include "move.h"
@@ -148,11 +149,13 @@ private:
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
 
 	static std::atomic<unsigned long long> visitedNodes;
+
 	unsigned int maxPlyReached;
 
 	void reloadPv(unsigned int i);
 
 public:
+	static std::atomic<unsigned long long> tbHits;
 	static std::vector<rootMove> rootMoves;
 	searchLimits limits;
 	Position pos;
@@ -169,6 +172,9 @@ public:
 	static bool useOwnBook;
 	static bool bestMoveBook;
 	static bool showCurrentLine;
+	static std::string SyzygyPath;
+	static unsigned int SyzygyProbeDepth;
+	static bool Syzygy50MoveRule;
 	volatile bool showLine = false;
 
 	static void initLMRreduction(void)

@@ -26,6 +26,7 @@
 #include "transposition.h"
 #include "search.h"
 #include "eval.h"
+#include "syzygy/tbprobe.h"
 
 
 /*!	\brief	print the startup information
@@ -59,6 +60,7 @@ int main()
 	TT.setSize(1);
 	Position::initMaterialKeys();
 	initMobilityBonus();
+	tb_init(search::SyzygyPath.c_str());
 
 	//----------------------------------
 	//	main loop
