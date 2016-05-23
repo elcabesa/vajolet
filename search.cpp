@@ -130,6 +130,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 			rm.init(m);
 			rootMoves.push_back(rm);
 		}
+
 	}
 	else
 	{	//only selected moves
@@ -145,6 +146,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 
 
+
+
 	//-----------------------------
 	// manage multi PV moves && limit strenght
 	//-----------------------------
@@ -157,6 +160,130 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 	}
 	linesToBeSearched = std::min(linesToBeSearched, (unsigned int)rootMoves.size());
 
+	//--------------------------------
+	//	tablebase probing
+	//--------------------------------
+	if(limits.searchMoves.size() == 0 && !limitStrength && search::multiPVLines==1)
+	{
+		//sync_cout<<"ROOT PROBE"<<sync_endl;
+
+		unsigned results[TB_MAX_MOVES];
+
+		unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
+
+		if (    piecesCnt <= TB_LARGEST)
+		{
+			unsigned result = tb_probe_root(pos.getBitmap(Position::whitePieces),
+				pos.getBitmap(Position::blackPieces),
+				pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
+				pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
+				pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
+				pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
+				pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
+				pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
+				pos.getActualState().fiftyMoveCnt,
+				pos.getActualState().castleRights,
+				pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
+				pos.getActualState().nextMove== Position::whiteTurn,
+				results);
+
+			if (result != TB_RESULT_FAILED)
+			{
+
+				sync_cout<<"endgame found"<<sync_endl;
+				const unsigned wdl = TB_GET_WDL(result);
+				assert(wdl<5);
+				switch(wdl)
+				{
+				case 0:
+					res = SCORE_MATED +100;
+					sync_cout<<"lost"<<sync_endl;
+					break;
+				case 1:
+					res = -100;
+					sync_cout<<"blessed lost"<<sync_endl;
+					break;
+				case 2:
+					res = 0;
+					sync_cout<<"draw"<<sync_endl;
+					break;
+				case 3:
+					res = 100;
+					sync_cout<<"cursed won"<<sync_endl;
+					break;
+				case 4:
+					res = SCORE_MATE -100;
+					sync_cout<<"won"<<sync_endl;
+					break;
+				default:
+					res = 0;
+				}
+				unsigned r;
+				for (int i = 0; (r = results[i]) != TB_RESULT_FAILED; i++)
+				{
+					//sync_cout<<"MOSSA "<< i<<sync_endl;
+					const unsigned moveWdl = TB_GET_WDL(r);
+
+					unsigned ep = TB_GET_EP(r);
+					Move m(0);
+					m.bit.from = TB_GET_FROM(r);
+					m.bit.to = TB_GET_TO(r);
+					if (ep)
+					{
+						m.bit.flags = Move::fenpassant;
+					}
+					switch (TB_GET_PROMOTES(r))
+					{
+					case TB_PROMOTES_QUEEN:
+						m.bit.flags = Move::fpromotion;
+						m.bit.promotion = Move::promQueen;
+						break;
+					case TB_PROMOTES_ROOK:
+						m.bit.flags = Move::fpromotion;
+						m.bit.promotion = Move::promRook;
+						break;
+					case TB_PROMOTES_BISHOP:
+						m.bit.flags = Move::fpromotion;
+						m.bit.promotion = Move::promBishop;
+						break;
+					case TB_PROMOTES_KNIGHT:
+						m.bit.flags = Move::fpromotion;
+						m.bit.promotion = Move::promKnight;
+						break;
+					default:
+						break;
+					}
+
+
+
+					auto position = std::find(rootMoves.begin(), rootMoves.end(), m);
+					if (position != rootMoves.end()) // == myVector.end() means the element was not found
+					{
+						if (moveWdl >= wdl)
+						{
+							// preserve move
+							//sync_cout<<displayUci(m)<<sync_endl;
+						}
+						else
+						{
+							//sync_cout<<"erase "<<displayUci(m)<<sync_endl;
+							rootMoves.erase(position);
+						}
+
+					}
+					else
+					{
+						sync_cout<<"ERRRRORE "<<displayUci(m)<<sync_endl;
+						sync_cout<<m.packed<<sync_endl;
+						sync_cout<<rootMoves.size()<<sync_endl;
+
+					}
+
+				}
+			}
+		}
+
+	}
 	//----------------------------------
 	// we can start the real search
 	//----------------------------------
@@ -578,14 +705,13 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 					}
 				}
 
-				/*tte->save(posKey, value_to_tt(value, ss->ply), BOUND_EXACT,
-						  std::min(DEPTH_MAX - ONE_PLY, depth + 6 * ONE_PLY),
-						  MOVE_NONE, VALUE_NONE, TT.generation());
-				TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
-			bestScore >= beta  ? typeScoreHigherThanBeta :
-					(PVnode && bestMove.packed) ? typeExact : typeScoreLowerThanAlpha,
-							(short int)depth, bestMove.packed, staticEval);
-						  */
+				
+				TT.store(posKey,
+						transpositionTable::scoreToTT(value, ply),
+						typeExact,
+						std::min(90, depth + 6 * ONE_PLY),
+						ttMove.packed,
+						pos.eval<false>());
 
 				return value;
 			}
