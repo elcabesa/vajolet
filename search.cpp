@@ -39,10 +39,6 @@
 	Position ppp;
 #endif
 
-static const int valueMap[5] = {SCORE_MATED_IN_MAX_PLY, -100,0, 100, SCORE_MATE_IN_MAX_PLY};
-
-static const int valueMapNo50[5] = {SCORE_MATED_IN_MAX_PLY, SCORE_MATED_IN_MAX_PLY, 0, SCORE_MATE_IN_MAX_PLY, SCORE_MATE_IN_MAX_PLY};
-
 search defaultSearch;
 std::vector<rootMove> search::rootMoves;
 std::atomic<unsigned long long> search::visitedNodes;
@@ -539,9 +535,48 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 				unsigned wdl = TB_GET_WDL(result);
 				assert(wdl<5);
 				if (Syzygy50MoveRule)
-					value = valueMap[wdl];
+				{
+					switch(wdl)
+					{
+					case 0:
+						value = SCORE_MATED +100 +ply;
+						break;
+					case 1:
+						value = -100;
+						break;
+					case 2:
+						value = 0;
+						break;
+					case 3:
+						value = 100;
+						break;
+					case 4:
+						value = SCORE_MATE -100 -ply;
+						break;
+					default:
+						value = 0;
+					}
+
+				}
 				else
-					value = valueMapNo50[wdl];
+				{
+					switch(wdl)
+					{
+					case 0:
+					case 1:
+						value = SCORE_MATED +100 +ply;
+						break;
+					case 2:
+						value = 0;
+						break;
+					case 3:
+					case 4:
+						value = SCORE_MATE -100 -ply;
+						break;
+					default:
+						value = 0;
+					}
+				}
 
 				/*tte->save(posKey, value_to_tt(value, ss->ply), BOUND_EXACT,
 						  std::min(DEPTH_MAX - ONE_PLY, depth + 6 * ONE_PLY),
