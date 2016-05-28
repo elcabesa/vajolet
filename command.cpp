@@ -259,22 +259,6 @@ void setoption(std::istringstream& is)
 			search::showCurrentLine = false;
 		}
 	}
-	else if(name == "UCI_LimitStrength")
-	{
-		if(value == "true")
-		{
-			search::limitStrength = 1;
-		}
-		else
-		{
-			search::limitStrength = 0;
-		}
-	}
-	else if(name == "UCI_Elo")
-	{
-		int i = stoi(value);
-		search::eloStrenght = i<3000 ?( i>1000 ? i : 1000) : 3000;
-	}
 	else if(name == "Ponder")
 	{
 	}

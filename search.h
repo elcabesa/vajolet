@@ -103,6 +103,7 @@ public:
 class search
 {
 private:
+	bool useTBresult;
 	static Score futility[5];
 	static Score futilityMargin[7];
 	static unsigned int FutilityMoveCounts[11];
@@ -111,6 +112,7 @@ private:
 
 	static Score mateIn(int ply) { return SCORE_MATE - ply; }
 	static Score matedIn(int ply) { return SCORE_MATED + ply; }
+	bool validIteration =false;
 
 	unsigned int indexPV = 0;
 	History history;
@@ -167,8 +169,6 @@ public:
 
 	static unsigned int threads;
 	static unsigned int multiPVLines;
-	static unsigned int limitStrength;
-	static unsigned int eloStrenght;
 	static bool useOwnBook;
 	static bool bestMoveBook;
 	static bool showCurrentLine;

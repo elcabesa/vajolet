@@ -53,6 +53,7 @@ void benchmark(void)
 	TT.clear();
 
 	unsigned long long nodes = 0;
+
 	long long int totalTime = search::getTime();
 
 
@@ -60,6 +61,7 @@ void benchmark(void)
 	{
 		search src;
 		src.limits.depth = 15;
+		src.resetStartTime();
 		src.pos.setupFromFen(positions[i]);
 		sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
 		src.startThinking();

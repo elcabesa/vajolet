@@ -27,6 +27,7 @@
 
 void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruct& timeMan)
 {
+	timeMan.FirstIterationFinished = false;
 	if((!lim.btime && !lim.wtime) && !lim.moveTime)
 	{
 		lim.infinite = true;
@@ -99,6 +100,7 @@ std::mutex  my_thread::_mutex;
 void my_thread::timerThread()
 {
 	unsigned int oldFullness = 0;
+	unsigned long long oldThbits = 0;
 	std::mutex mutex;
 	while (!quit)
 	{
@@ -110,7 +112,13 @@ void my_thread::timerThread()
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
 			long long int time = src.getElapsedTime();
-			if(time >= timeMan.allocatedTime && !(src.limits.infinite || src.limits.ponder))
+
+			if(timeMan.idLoopIterationFinished)
+			{
+				timeMan.FirstIterationFinished = true;
+			}
+
+			if(time >= timeMan.allocatedTime && timeMan.FirstIterationFinished && !(src.limits.infinite || src.limits.ponder))
 			{
 				//sync_cout<<"info debug TIME EXPIRED "<<time<< " >= "<<timeMan.allocatedTime<<sync_endl;
 				src.stop = true;
@@ -118,8 +126,9 @@ void my_thread::timerThread()
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			if(time - lastHasfullMessage > 1000)
 			{
-				unsigned int fullness = TT.getFullness();
+
 				lastHasfullMessage = time;
+				unsigned int fullness = TT.getFullness();
 				if( fullness != oldFullness)
 				{
 					sync_cout<<"info hashfull " << fullness << sync_endl;
@@ -129,7 +138,16 @@ void my_thread::timerThread()
 					src.showLine = true;
 				}
 				oldFullness = fullness;
+
+				unsigned long long int thbits = src.tbHits;
+				if( thbits != oldThbits)
+				{
+					sync_cout<<"info tbhits " << thbits << sync_endl;
+				}
+				oldThbits = thbits;
+
 			}
+
 #endif
 
 			if(timeMan.idLoopIterationFinished && time >= timeMan.allocatedTime*0.7 && !(src.limits.infinite || src.limits.ponder))
@@ -147,13 +165,18 @@ void my_thread::timerThread()
 			}*/
 
 
-			if(src.limits.nodes && src.getVisitedNodes() > src.limits.nodes)
+			if(src.limits.nodes && timeMan.FirstIterationFinished && src.getVisitedNodes() > src.limits.nodes)
 			{
 				src.stop = true;
 			}
-			if(src.limits.moveTime && time>=src.limits.moveTime)
+			if(src.limits.moveTime && timeMan.FirstIterationFinished && time>=src.limits.moveTime)
 			{
 				src.stop = true;
+			}
+			if(src.stop)
+			{
+				sync_cout<<"info hashfull " << TT.getFullness() << sync_endl;
+				sync_cout<<"info tbhits " << src.tbHits << sync_endl;
 			}
 			timeMan.idLoopIterationFinished = false;
 		}
@@ -173,6 +196,7 @@ void my_thread::searchThread()
 		{
 			timeManagerInit(src.pos, src.limits, timeMan);
 			src.stop = false;
+			src.resetStartTime();
 			timerCond.notify_one();
 			src.stop = false;
 			manageNewSearch();
@@ -184,7 +208,7 @@ void my_thread::searchThread()
 
 void my_thread::manageNewSearch()
 {
-	src.resetStartTime();
+
 
 	/*************************************************
 	 *	first of all check the number of legal moves

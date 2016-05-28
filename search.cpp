@@ -52,8 +52,6 @@ Score search::PVreduction[32*ONE_PLY][64];
 Score search::nonPVreduction[32*ONE_PLY][64];
 unsigned int search::threads = 1;
 unsigned int search::multiPVLines = 1;
-unsigned int search::limitStrength = 0;
-unsigned int search::eloStrenght = 3000;
 bool search::useOwnBook = true;
 bool search::bestMoveBook = false;
 bool search::showCurrentLine = false;
@@ -98,10 +96,12 @@ void search::reloadPv( unsigned int i )
 
 startThinkResult search::startThinking(unsigned int depth, Score alpha, Score beta)
 {
+	useTBresult = false;
 	//------------------------------------
 	//init the new search
 	//------------------------------------
 	Score res = 0;
+	Score TBres = 0;
 	//bool firstRun = true;
 
 
@@ -149,21 +149,14 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 
 	//-----------------------------
-	// manage multi PV moves && limit strenght
+	// manage multi PV moves
 	//-----------------------------
-	unsigned int linesToBeSearched = search::multiPVLines;
-	if(limitStrength)
-	{
-		int lines = (int)((-8.0/2000.0)*( eloStrenght - 1000 ) + 10.0 );
-		unsigned int s = std::max(lines, 4);
-		linesToBeSearched = std::max(linesToBeSearched, s);
-	}
-	linesToBeSearched = std::min(linesToBeSearched, (unsigned int)rootMoves.size());
+	unsigned int linesToBeSearched = std::min(search::multiPVLines, (unsigned int)rootMoves.size());
 
 	//--------------------------------
 	//	tablebase probing
 	//--------------------------------
-	if(limits.searchMoves.size() == 0 && !limitStrength && search::multiPVLines==1)
+	if(limits.searchMoves.size() == 0 && search::multiPVLines==1)
 	{
 		//sync_cout<<"ROOT PROBE"<<sync_endl;
 
@@ -189,34 +182,35 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 			if (result != TB_RESULT_FAILED)
 			{
+				useTBresult= true;
 
-				sync_cout<<"endgame found"<<sync_endl;
+				//sync_cout<<"endgame found"<<sync_endl;
 				const unsigned wdl = TB_GET_WDL(result);
 				assert(wdl<5);
 				switch(wdl)
 				{
 				case 0:
-					res = SCORE_MATED +100;
-					sync_cout<<"lost"<<sync_endl;
+					TBres = SCORE_MATED +100;
+					//sync_cout<<"lost"<<sync_endl;
 					break;
 				case 1:
-					res = -100;
-					sync_cout<<"blessed lost"<<sync_endl;
+					TBres = -100;
+					//sync_cout<<"blessed lost"<<sync_endl;
 					break;
 				case 2:
-					res = 0;
-					sync_cout<<"draw"<<sync_endl;
+					TBres = 0;
+					//sync_cout<<"draw"<<sync_endl;
 					break;
 				case 3:
-					res = 100;
+					TBres = 100;
 					sync_cout<<"cursed won"<<sync_endl;
 					break;
 				case 4:
-					res = SCORE_MATE -100;
-					sync_cout<<"won"<<sync_endl;
+					TBres = SCORE_MATE -100;
+					//sync_cout<<"won"<<sync_endl;
 					break;
 				default:
-					res = 0;
+					TBres = 0;
 				}
 				unsigned r;
 				for (int i = 0; (r = results[i]) != TB_RESULT_FAILED; i++)
@@ -299,6 +293,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 	do
 	{
+		sync_cout<<"info depth "<<depth<<sync_endl;
 		//----------------------------
 		// iterative loop
 		//----------------------------
@@ -339,11 +334,13 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 			do
 			{
+
 				//----------------------------
 				// search at depth d with aspiration window
 				//----------------------------
 
 				maxPlyReached = 0;
+				validIteration = false;
 
 				//----------------------------
 				// multithread : lazy smp threads
@@ -364,6 +361,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 				// main thread
 				res = alphaBeta<search::nodeType::ROOT_NODE>(0, (depth-reduction) * ONE_PLY, alpha, beta, newPV);
 
+
+				res = useTBresult ? TBres : res;
 				// stop helper threads
 				for(unsigned int i = 0; i< (threads - 1); i++)
 				{
@@ -375,77 +374,81 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 				}
 
 				// don't stop befor having finished at least one iteration
-				if(depth != 1 && stop)
+				/*if(depth != 1 && stop)
 				{
 					break;
-				}
+				}*/
 
-
-				long long int elapsedTime  = getElapsedTime();
-
-				assert(newPV.size()==0 || res >alpha);
-				if( newPV.size() !=0 && res > alpha)
-				{
-					auto it = std::find(rootMoves.begin()+indexPV, rootMoves.end(), newPV.front() );
-
-					assert( it->firstMove == newPV.front());
-
-					//if(it->firstMove == newPV.front())
-					//{
-					it->PV = newPV;
-					it->score = res;
-					it->maxPlyReached = maxPlyReached;
-					it->depth = depth;
-					it->nodes = visitedNodes;
-					it->time = elapsedTime;
-
-					std::iter_swap( it, rootMoves.begin()+indexPV);
-
-					//}
-
-				}
-
-
-
-
-
-
-				if (res <= alpha)
-				{
-					newPV.clear();
-					newPV.push_back( rootMoves[indexPV].PV.front() );
-
-					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
-
-					alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
-
-					reduction = 0;
-
-				}
-				else if (res >= beta)
+				if(validIteration ||!stop)
 				{
 
-					printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
 
-					beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
-					if(depth > 1)
+					long long int elapsedTime  = getElapsedTime();
+
+					assert(newPV.size()==0 || res >alpha);
+					if( newPV.size() !=0 && res > alpha)
 					{
-						reduction = 1;
+						auto it = std::find(rootMoves.begin()+indexPV, rootMoves.end(), newPV.front() );
+
+						assert( it->firstMove == newPV.front());
+
+						//if(it->firstMove == newPV.front())
+						//{
+						it->PV = newPV;
+						it->score = res;
+						it->maxPlyReached = maxPlyReached;
+						it->depth = depth;
+						it->nodes = visitedNodes;
+						it->time = elapsedTime;
+
+						std::iter_swap( it, rootMoves.begin()+indexPV);
+
+						//}
+
 					}
+
+
+
+
+
+
+					if (res <= alpha)
+					{
+						newPV.clear();
+						newPV.push_back( rootMoves[indexPV].PV.front() );
+
+						printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
+
+						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
+
+						reduction = 0;
+
+					}
+					else if (res >= beta)
+					{
+
+						printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
+
+						beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
+						if(depth > 1)
+						{
+							reduction = 1;
+						}
+					}
+					else
+					{
+						break;
+					}
+
+
+					delta += delta / 2;
 				}
-				else
-				{
-					break;
-				}
-
-
-				delta += delta / 2;
 
 
 
-			}while(1);
+			}while(!stop);
 
-			if(!stop)
+			if((!stop || validIteration) && linesToBeSearched>1)
 			{
 
 				// Sort the PV lines searched so far and update the GUI
@@ -485,33 +488,14 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 
 		my_thread::timeMan.idLoopIterationFinished = true;
-
-
-
-
-
 		depth += 1;
 
 	}
 	while( depth <= (limits.depth ? limits.depth : 100) && !stop);
 
-	unsigned int bestMoveLine = 0;
-	if( limitStrength )
-	{
-		double lambda = (eloStrenght - 1000.0) * (0.8/2000) + 0.2;
-		std::mt19937_64 rnd;
-		std::exponential_distribution<> uint_dist(lambda);
-
-		long long int now = getTime();
-		rnd.seed(now);
-		double dres = uint_dist(rnd);
-
-		bestMoveLine = std::min((unsigned int)dres, linesToBeSearched-1);
-	}
-
 
 	startThinkResult ret;
-	ret.PV = rootMoves[bestMoveLine].PV;
+	ret.PV = rootMoves[0].PV;
 	ret.depth = depth-1;
 	ret.alpha = alpha;
 	ret.beta = beta;
@@ -1230,7 +1214,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 
 		pos.undoMove();
 
-		if(val > bestScore)
+		if(!stop && val > bestScore)
 		{
 			bestScore = val;
 
@@ -1241,14 +1225,29 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 				{
 					alpha = val;
 				}
-				if(type == search::nodeType::ROOT_NODE || type ==search::nodeType::HELPER_ROOT_NODE || (PVnode && !stop))
+				if(type == search::nodeType::ROOT_NODE || type ==search::nodeType::HELPER_ROOT_NODE || (PVnode))
 				{
 					if(PVnode)
 					{
 						pvLine.clear();
 						pvLine.push_back(bestMove);
 						pvLine.splice(pvLine.end(),childPV);
+						if(type == search::nodeType::ROOT_NODE && search::multiPVLines==1)
+						{
+							/*if(moveNumber!=1)
+							{
+								sync_cout<<"info string NUOVA MOSSA"<<sync_endl;
+							}*/
+							if(val <beta)
+							{
+								printPV(val, depth/ONE_PLY, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, visitedNodes,tbHits);
+							}
+							validIteration = true;
+						}
 					}
+					/*else{
+						sync_cout<<"impossibile"<<sync_endl;
+					}*/
 				}
 			}
 		}

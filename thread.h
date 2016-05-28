@@ -37,6 +37,7 @@ struct timeManagementStruct
 	volatile unsigned int singularRootMoveCount;
 	volatile unsigned int resolution;
 	volatile bool idLoopIterationFinished;
+	bool FirstIterationFinished;
 
 };
 
