@@ -1334,6 +1334,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 
 	if(pos.isDraw(PVnode) || stop)
 	{
+
 		if(PVnode)
 		{
 			pvLine.clear();
@@ -1484,7 +1485,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 	std::list<Move> childPV;
 
 	Position::state &st = pos.getActualState();
-	while (bestScore < beta  &&  (m = mg.getNextMove()) != Movegen::NOMOVE)
+	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != Movegen::NOMOVE)
 	{
 		assert(alpha < beta);
 		assert(beta <= SCORE_INFINITE);
@@ -1492,70 +1493,69 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 		assert(m.packed);
 
 
-		// allow only queen promotion at deeper search
-		if( !inCheck && (TTdepth <- 1*ONE_PLY) && (m.bit.flags == Move::fpromotion) && (m.bit.promotion != Move::promQueen))
+		if(!inCheck)
 		{
-			continue;
-		}
-
-		// at very deep search allow only recapture
-		if(depth < -7 * ONE_PLY && !inCheck)
-		{
-			if(st.currentMove.bit.to != m.bit.to)
+			// allow only queen promotion at deeper search
+			if( (TTdepth <- 1*ONE_PLY) && (m.bit.flags == Move::fpromotion) && (m.bit.promotion != Move::promQueen))
 			{
 				continue;
 			}
-		}
 
-		//----------------------------
-		//	futility pruning (delta pruning)
-		//----------------------------
-		if(	!PVnode
-			&& !inCheck
-			&& m != ttMove
-			&& m.bit.flags != Move::fpromotion
-			//&& !pos.moveGivesCheck(m)
-			)
-		{
-			bool moveGiveCheck = pos.moveGivesCheck(m);
-			if(
-					!moveGiveCheck
-					&& !pos.isPassedPawnMove(m)
-					&& abs(staticEval)<SCORE_KNOWN_WIN
-			)
+			// at very deep search allow only recapture
+			if(depth < -7 * ONE_PLY && st.currentMove.bit.to != m.bit.to)
 			{
-				Score futilityValue = futilityBase
-						+ Position::pieceValue[pos.getPieceAt((tSquare)m.bit.to)][1]
-						+ (m.bit.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
-
-				if (futilityValue < beta)
-				{
-					bestScore = std::max(bestScore, futilityValue);
 					continue;
-				}
-				if (futilityBase < beta && pos.seeSign(m) <= 0)
-				{
-					bestScore = std::max(bestScore, futilityBase);
-					continue;
-				}
-
 			}
 
-
 			//----------------------------
-			//	don't check moves with negative see
+			//	futility pruning (delta pruning)
 			//----------------------------
-
-			// TODO controllare se conviene fare o non fare la condizione type != search::nodeType::PV_NODE
-			// TODO testare se aggiungere o no !movegivesCheck() &&
-			if(
-					//!moveGiveCheck &&
-					pos.seeSign(m) < 0)
+			if(	!PVnode
+				&& m != ttMove
+				&& m.bit.flags != Move::fpromotion
+				//&& !pos.moveGivesCheck(m)
+				)
 			{
-				continue;
-			}
-		}
+				bool moveGiveCheck = pos.moveGivesCheck(m);
+				if(
+						!moveGiveCheck
+						&& !pos.isPassedPawnMove(m)
+						&& abs(staticEval)<SCORE_KNOWN_WIN
+				)
+				{
+					Score futilityValue = futilityBase
+							+ Position::pieceValue[pos.getPieceAt((tSquare)m.bit.to)][1]
+							+ (m.bit.flags == Move::fenpassant ? Position::pieceValue[Position::whitePawns][1] : 0);
 
+					if (futilityValue < beta)
+					{
+						bestScore = std::max(bestScore, futilityValue);
+						continue;
+					}
+					if (futilityBase < beta && pos.seeSign(m) <= 0)
+					{
+						bestScore = std::max(bestScore, futilityBase);
+						continue;
+					}
+
+				}
+
+
+				//----------------------------
+				//	don't check moves with negative see
+				//----------------------------
+
+				// TODO controllare se conviene fare o non fare la condizione type != search::nodeType::PV_NODE
+				// TODO testare se aggiungere o no !movegivesCheck() &&
+				if(
+						//!moveGiveCheck &&
+						pos.seeSign(m) < 0)
+				{
+					continue;
+				}
+			}
+
+		}
 		pos.doMove(m);
 		Score val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
 
