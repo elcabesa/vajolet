@@ -549,7 +549,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 			{
 				pvLine.clear();
 			}
-			return std::max( (int)0, (int)(-5000 + pos.getPly()*7) );
+			return std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
 		}
 
 		//---------------------------------------
@@ -1264,7 +1264,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 		}
 		else if(!inCheck)
 		{
-			bestScore = std::max( (int)0, (int)(-5000 + pos.getPly()*7) );
+			bestScore = std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
 		}
 		else
 		{
@@ -1338,7 +1338,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 		{
 			pvLine.clear();
 		}
-		return std::max((int)0,(int)(-5000 + pos.getPly()*7));
+		return std::min((int)0,(int)(-5000 + pos.getPly()*250));
 	}
 /*	//---------------------------------------
 	//	MATE DISTANCE PRUNING
