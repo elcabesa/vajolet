@@ -91,16 +91,6 @@ extern const unsigned int magicmoves_r_shift[64];
 extern const U64* magicmoves_b_indices[64];
 //extern U64 magicmovesrdb[102400];
 extern const U64* magicmoves_r_indices[64];
-
-/*static inline U64 Bmagic(const unsigned int square,const U64 occupancy)
-{
-	return *(magicmoves_b_indices[square]+(((occupancy&magicmoves_b_mask[square])*magicmoves_b_magics[square])>>magicmoves_b_shift[square]));
-}
-static inline U64 Rmagic(const unsigned int square,const U64 occupancy)
-{
-	return *(magicmoves_r_indices[square]+(((occupancy&magicmoves_r_mask[square])*magicmoves_r_magics[square])>>magicmoves_r_shift[square]));
-}
-*/
 void initmagicmoves(void);
 
 #endif //_magicmoveshvesh
