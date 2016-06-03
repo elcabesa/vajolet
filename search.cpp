@@ -466,19 +466,30 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 			&&  linesToBeSearched == 1
 			&&  res > - SCORE_KNOWN_WIN)
 		{
-
-			Score rBeta = res - 20000;
-			sd[0].excludeMove = newPV.front();
-			sd[0].skipNullMove = true;
-			std::list<Move> locChildPV;
-			Score temp = alphaBeta<search::nodeType::ALL_NODE>(0, (depth-3) * ONE_PLY, rBeta - 1, rBeta, locChildPV);
-			sd[0].skipNullMove = false;
-			sd[0].excludeMove = Movegen::NOMOVE;
-
-			if(temp < rBeta)
+			for(int i = 0; i<10;i++)
 			{
-				my_thread::timeMan.singularRootMoveCount++;
+
+				unsigned long long pippo = visitedNodes;
+				//sync_cout<<"SINGULAR MOVE SEARCH"<<sync_endl;
+				Score rBeta = res - 20000+2000*i;
+				sd[0].excludeMove = newPV.front();
+				sd[0].skipNullMove = true;
+				std::list<Move> locChildPV;
+				Score temp = alphaBeta<search::nodeType::ALL_NODE>(0, (depth-3) * ONE_PLY, rBeta - 1, rBeta, locChildPV);
+				sd[0].skipNullMove = false;
+				sd[0].excludeMove = Movegen::NOMOVE;
+
+				if(temp < rBeta)
+				{
+					my_thread::timeMan.singularRootMoveCount++;
+					sync_cout<<"SINGULAR MOVE "<<rBeta<<" "<<temp<<" "<<visitedNodes-pippo<<sync_endl;
+				}
+				else
+				{
+					sync_cout<<"NO SINGULAR MOVE "<<rBeta<<" "<<temp<<" "<<visitedNodes-pippo<<sync_endl;
+				}
 			}
+
 		}*/
 
 		//------------------------------------------------

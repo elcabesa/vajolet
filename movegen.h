@@ -26,6 +26,8 @@
 #include "position.h"
 #include "search.h"
 #include "history.h"
+#include "bitops.h"
+#include "magicmoves.h"
 
 
 class Movegen{
@@ -327,21 +329,17 @@ private:
 	inline static bitMap attackFromRook(const tSquare& from,const bitMap & occupancy)
 	{
 		assert(from <squareNumber);
-		assert((((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from]))<64);
-		assert((((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57)<64);
-		bitMap res = MG_RANK_ATTACK[from][((occupancy & MG_RANKMASK[from]) >> RANKSHIFT[from])];
-		res |= MG_FILE_ATTACK[from][((occupancy & MG_FILEMASK[from])*MG_FILEMAGIC[from]) >> 57];
-		return res;
+		//return Rmagic(from,occupancy);
+		return *(magicmoves_r_indices[from]+(((occupancy&magicmoves_r_mask[from])*magicmoves_r_magics[from])>>magicmoves_r_shift[from]));
+
 	}
 
 	inline static bitMap attackFromBishop(const tSquare from,const bitMap & occupancy)
 	{
 		assert(from <squareNumber);
-		assert((((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57)<64);
-		assert((((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >>57)<64);
-		bitMap res= MG_DIAGA8H1_ATTACK[from][((occupancy & MG_DIAGA8H1MASK[from])* MG_DIAGA8H1MAGIC[from])>>57];
-		res |= MG_DIAGA1H8_ATTACK[from][((occupancy & MG_DIAGA1H8MASK[from])*MG_DIAGA1H8MAGIC[from]) >> 57];
-		return res;
+		return *(magicmoves_b_indices[from]+(((occupancy&magicmoves_b_mask[from])*magicmoves_b_magics[from])>>magicmoves_b_shift[from]));
+		//return Bmagic(from,occupancy);
+
 	}
 	inline static bitMap attackFromQueen(const tSquare from,const bitMap & occupancy)
 	{
@@ -364,25 +362,8 @@ private:
 		return PAWN_ATTACK[color][from];
 	}
 
-	// Move generator shift for ranks:
-	static const int RANKSHIFT[squareNumber];
-
-	static bitMap MG_RANKMASK[squareNumber];
-	static bitMap MG_FILEMASK[squareNumber];
-	static bitMap MG_DIAGA8H1MASK[squareNumber];
-	static bitMap MG_DIAGA1H8MASK[squareNumber];
-	static bitMap MG_RANK_ATTACK[squareNumber][64];
-	static bitMap MG_FILE_ATTACK[squareNumber][64];
-	static bitMap MG_DIAGA8H1_ATTACK[squareNumber][64];
-	static bitMap MG_DIAGA1H8_ATTACK[squareNumber][64];
-	static bitMap MG_FILEMAGIC[64];
-	static bitMap MG_DIAGA8H1MAGIC[64];
-	static bitMap MG_DIAGA1H8MAGIC[64];
 
 	// Move generator magic multiplication numbers for files:
-	static const bitMap FILEMAGICS[8];
-	static const bitMap DIAGA8H1MAGICS[15];
-	static const bitMap DIAGA1H8MAGICS[15];
 	static bitMap KNIGHT_MOVE[squareNumber];
 	static bitMap KING_MOVE[squareNumber];
 	static bitMap PAWN_ATTACK[2][squareNumber];

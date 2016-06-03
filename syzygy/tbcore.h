@@ -5,6 +5,7 @@
 #ifndef TBCORE_H
 #define TBCORE_H
 
+
 #ifndef _WIN32
 #include <pthread.h>
 #define SEP_CHAR ':'
@@ -17,6 +18,7 @@
 #define FD_ERR INVALID_HANDLE_VALUE
 #endif
 
+#define TB_HAVE_THREADS
 #ifdef TB_HAVE_THREADS
 #ifndef _WIN32
 #define LOCK_T pthread_mutex_t

@@ -56,6 +56,7 @@ int main()
 	Position::initScoreValues();
 	Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();
+
 	search::initLMRreduction();
 	TT.setSize(1);
 	Position::initMaterialKeys();
