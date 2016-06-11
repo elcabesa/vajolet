@@ -422,6 +422,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
 						reduction = 0;
+						//my_thread::timeMan.idLoopAlpha = true;
+						//my_thread::	timeMan.idLoopBeta = false;
 
 					}
 					else if (res >= beta)
@@ -434,6 +436,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 						{
 							reduction = 1;
 						}
+						//my_thread::timeMan.idLoopAlpha = false;
+						//my_thread::	timeMan.idLoopBeta = true;
 					}
 					else
 					{
@@ -499,6 +503,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 
 		my_thread::timeMan.idLoopIterationFinished = true;
+		//my_thread::timeMan.idLoopAlpha = false;
+		//my_thread::	timeMan.idLoopBeta = false;
 		depth += 1;
 
 	}

@@ -34,6 +34,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	}
 	if(lim.moveTime)
 	{
+		//timeMan.maxAllocatedTime = lim.moveTime;
 		timeMan.allocatedTime = lim.moveTime;
 		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
 	}
@@ -45,25 +46,31 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 			if(lim.movesToGo > 0)
 			{
 				timeMan.allocatedTime = lim.btime/lim.movesToGo;
+				//timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
 			}else
 			{
 				timeMan.allocatedTime = lim.btime/40.0+lim.binc*0.8;
+				//timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
 			}
 
 			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
 			timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(lim.btime - 2 * timeMan.resolution));
+			//timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(lim.btime - 2 * timeMan.resolution));
 		}
 		else
 		{
 			if(lim.movesToGo > 0)
 			{
 				timeMan.allocatedTime = lim.wtime/lim.movesToGo;
+				//timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
 			}else
 			{
 				timeMan.allocatedTime = lim.wtime/40.0+lim.winc*0.8;
+				//timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
 			}
 			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
 			timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(lim.wtime - 2 * timeMan.resolution));
+			//timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(lim.wtime - 2 * timeMan.resolution));
 		}
 
 
@@ -76,6 +83,8 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	}
 	//timeMan.singularRootMoveCount = 0;
 	timeMan.idLoopIterationFinished = false;
+	//timeMan.idLoopAlpha = false;
+	//timeMan.idLoopBeta = false;
 
 	//sync_cout<<"info debug resolution "<<timeMan.resolution<<sync_endl;
 	//sync_cout<<"info debug allocatedTime "<<timeMan.allocatedTime<<sync_endl;
@@ -117,6 +126,11 @@ void my_thread::timerThread()
 			{
 				timeMan.FirstIterationFinished = true;
 			}
+			/*if(time >= timeMan.allocatedTime && ( timeMan.idLoopAlpha || timeMan.idLoopAlpha ) )
+			{
+				timeMan.allocatedTime = timeMan.maxAllocatedTime;
+				//sync_cout<<"info debug EXTEND TIME: "<<timeMan.allocatedTime<<sync_endl;
+			}*/
 
 			if(time >= timeMan.allocatedTime && timeMan.FirstIterationFinished && !(src.limits.infinite || src.limits.ponder))
 			{

@@ -1172,7 +1172,7 @@ static bool is_en_passant(const struct pos *pos, uint16_t move)
         return false;
     if (to != pos->ep)
         return false;
-    if ((board(from) & us & pos->pawns) != 0)
+    if ((board(from) & us & pos->pawns) == 0)
         return false;
     return true;
 }
@@ -1347,7 +1347,7 @@ static bool do_move(struct pos *pos, const struct pos *pos0, uint16_t move)
             pos->ep = from-8;
         else if (to == pos0->ep)
         {
-            unsigned ep_to = (pos0->turn? to+8: to-8);
+            unsigned ep_to = (pos0->turn? to-8: to+8);
             uint64_t ep_mask = ~board(ep_to);
             pos->white &= ep_mask;
             pos->black &= ep_mask;
@@ -1426,7 +1426,7 @@ static int probe_wdl(const struct pos *pos, int *success)
         struct pos pos1;
         if (!do_move(&pos1, pos, *moves))
             continue;
-        int v0 = -probe_ab(pos, -2, 2, success);
+        int v0 = -probe_ab(&pos1, -2, 2, success);
         if (*success == 0)
             return 0;
         if (v0 > v1)
@@ -1484,7 +1484,9 @@ static int probe_dtz_no_ep(const struct pos *pos, int *success)
             struct pos pos1;
             if (!do_move(&pos1, pos, *moves))
                 continue;
-            int v = -probe_ab(&pos1, -2, -wdl + 1, success);
+            int v = (pos1.ep == 0?
+                -probe_ab(&pos1, -2, -wdl + 1, success):
+                -probe_wdl(&pos1, success));
             if (*success == 0)
                 return 0;
             if (v == wdl)
@@ -1603,7 +1605,7 @@ static int probe_dtz(const struct pos *pos, int *success)
         struct pos pos1;
         if (!do_move(&pos1, pos, *moves))
             continue;
-        int v0 = -probe_ab(pos, -2, 2, success);
+        int v0 = -probe_ab(&pos1, -2, 2, success);
         if (*success == 0)
             return 0;
         if (v0 > v1)

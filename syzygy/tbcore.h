@@ -5,7 +5,6 @@
 #ifndef TBCORE_H
 #define TBCORE_H
 
-
 #ifndef _WIN32
 #include <pthread.h>
 #define SEP_CHAR ':'
