@@ -185,6 +185,21 @@ void Movegen::generateMoves()
 		target = ( s.checkers | SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.getOurBitmap(Position::Pieces);
 		kingTarget = ~pos.getOurBitmap(Position::Pieces);
 	}
+	else if(type==Movegen::captureEvasionMg)
+	{
+		assert(s.checkers);
+		target = ( s.checkers ) &~ pos.getOurBitmap(Position::Pieces);
+		kingTarget = target | pos.getTheirBitmap(Position::Pieces);
+		//displayBitmap(target);
+	}
+	else if(type==Movegen::quietEvasionMg)
+	{
+		assert(s.checkers);
+		target = ( SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.getOurBitmap(Position::Pieces);
+		kingTarget = ~pos.getOccupationBitmap();
+		//displayBitmap(target);
+		//displayBitmap(kingTarget);
+	}
 	else if(type== Movegen::allNonEvasionMg)
 	{
 		target= ~pos.getOurBitmap(Position::Pieces);
@@ -236,7 +251,7 @@ void Movegen::generateMoves()
 		}
 	}
 	// if the king is in check from 2 enemy, it can only run away, we sohld not search any other move
-	if(type == Movegen::allEvasionMg && moreThanOneBit(s.checkers))
+	if((type == Movegen::allEvasionMg || type == Movegen::captureEvasionMg || type == Movegen::quietEvasionMg) && moreThanOneBit(s.checkers))
 	{
 		return;
 	}
@@ -364,13 +379,14 @@ void Movegen::generateMoves()
 	// Pawns
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)(piece+1);
-	if(type != Movegen::captureMg)
+	if(type != Movegen::captureMg && type != Movegen::captureEvasionMg)
 	{
 		bitMap pawnPushed;
 		//push
 		moves = (s.nextMove? (nonPromotionPawns>>8):(nonPromotionPawns<<8)) & ~occupiedSquares;
 		pawnPushed = moves;
 		moves &= target;
+		//displayBitmap(moves);
 
 		while(moves)
 		{
@@ -392,6 +408,7 @@ void Movegen::generateMoves()
 		//double push
 		moves = (s.nextMove? ((pawnPushed & thirdRankMask)>>8):((pawnPushed & thirdRankMask)<<8)) & ~occupiedSquares & target;
 
+		//displayBitmap(moves);
 		while(moves)
 		{
 			tSquare to = iterateBit(moves);
@@ -411,7 +428,7 @@ void Movegen::generateMoves()
 
 	int delta;
 
-	if(type!= Movegen::quietMg && type!=Movegen::quietChecksMg)
+	if(type!= Movegen::quietMg && type!=Movegen::quietChecksMg && type != Movegen::quietEvasionMg)
 	{
 		//left capture
 		delta = s.nextMove?-9:7;
@@ -451,7 +468,7 @@ void Movegen::generateMoves()
 
 	// PROMOTIONS
 	m.bit.flags = Move::fpromotion;
-	if(type != Movegen::captureMg)
+	if(type != Movegen::captureMg && type != Movegen::captureEvasionMg)
 	{
 		moves = (s.nextMove? (promotionPawns>>8):(promotionPawns<<8))& ~occupiedSquares & target;
 		while(moves)
@@ -475,7 +492,7 @@ void Movegen::generateMoves()
 
 	int color = s.nextMove?1:0;
 
-	if( type!= Movegen::quietMg && type!= Movegen::quietChecksMg)
+	if( type!= Movegen::quietMg && type!= Movegen::quietChecksMg && type!= Movegen::quietEvasionMg)
 	{
 		//left capture
 		delta = s.nextMove?-9:7;
@@ -554,7 +571,7 @@ void Movegen::generateMoves()
 
 
 	//king castle
-	if(type !=Movegen::allEvasionMg && type!= Movegen::captureMg)
+	if(type !=Movegen::allEvasionMg && type!=Movegen::captureEvasionMg && type!=Movegen::quietEvasionMg && type!= Movegen::captureMg)
 	{
 
 		if(s.castleRights & ((Position::wCastleOO |Position::wCastleOOO)<<(2*color)))
@@ -628,7 +645,9 @@ void Movegen::generateMoves<Movegen::allMg>()
 
 	if(pos.isInCheck())
 	{
-		generateMoves<Movegen::allEvasionMg>();
+		//generateMoves<Movegen::allEvasionMg>();
+		generateMoves<Movegen::captureEvasionMg>();
+		generateMoves<Movegen::quietEvasionMg>();
 	}
 	else
 	{
@@ -675,14 +694,43 @@ Move Movegen::getNextMove()
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 
-		case generateEvasionMoves:
+		case generateCaptureEvasionMoves:
 		{
 
-			generateMoves<Movegen::allEvasionMg>();
+			//generateMoves<Movegen::allEvasionMg>();
+			generateMoves<Movegen::captureEvasionMg>();
+			//generateMoves<Movegen::quietEvasionMg>();
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
 			killerMoves[0] = (src.getKillers(ply,0));
 			killerMoves[1] = (src.getKillers(ply,1));
+
+			/*Move previousMove = pos.getActualState().currentMove;
+			if(previousMove.packed)
+			{
+				counterMoves[0] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
+				counterMoves[1] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
+			}
+			else
+			{
+				counterMoves[0] = NOMOVE;
+				counterMoves[1] = NOMOVE;
+			}*/
+
+
+			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
+		}
+			break;
+		case generateQuietEvasionMoves:
+		{
+
+			//generateMoves<Movegen::allEvasionMg>();
+			//generateMoves<Movegen::captureEvasionMg>();
+			generateMoves<Movegen::quietEvasionMg>();
+
+			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
+			//killerMoves[0] = (src.getKillers(ply,0));
+			//killerMoves[1] = (src.getKillers(ply,1));
 
 			/*Move previousMove = pos.getActualState().currentMove;
 			if(previousMove.packed)
@@ -739,7 +787,7 @@ Move Movegen::getNextMove()
 				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
-		case iterateEvasionMoves:
+		case iterateCaptureEvasionMoves:
 			if(moveListPosition < moveListSize)
 			{
 				if(moveList[moveListPosition].m != ttMove)
@@ -753,6 +801,20 @@ Move Movegen::getNextMove()
 				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
+		case iterateQuietEvasionMoves:
+		if(moveListPosition < moveListSize)
+		{
+			if(moveList[moveListPosition].m != ttMove)
+			{
+				return moveList[moveListPosition++].m;
+			}
+			moveListPosition++;
+		}
+		else
+		{
+			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
+		}
+		break;
 		case iterateQuietChecks:
 			if(moveListPosition < moveListSize)
 			{

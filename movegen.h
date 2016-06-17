@@ -69,7 +69,10 @@ private:
 		quietChecksMg,		// generate quiet moves giving check
 		allNonEvasionMg,	// generate all moves while not in check
 		allEvasionMg,		// generate all moves while in check
-		allMg				// general generate all move
+		allMg,				// general generate all move
+		captureEvasionMg,	// generate capture while in check
+		quietEvasionMg		// generate quiet moves while in check
+
 
 	};
 
@@ -86,8 +89,10 @@ private:
 		finishedNormalStage,
 
 		getTTevasion,
-		generateEvasionMoves,
-		iterateEvasionMoves,
+		generateCaptureEvasionMoves,
+		iterateCaptureEvasionMoves,
+		generateQuietEvasionMoves,
+		iterateQuietEvasionMoves,
 		finishedEvasionStage,
 
 		getQsearchTT,
