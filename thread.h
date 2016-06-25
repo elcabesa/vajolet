@@ -33,12 +33,14 @@
 struct timeManagementStruct
 {
 	volatile long long allocatedTime;
-//	volatile long long maxAllocatedTime;
+	volatile long long minSearchTime;
+	volatile long long maxAllocatedTime;
 	volatile unsigned int depth;
 	volatile unsigned int singularRootMoveCount;
 	volatile unsigned int resolution;
 	volatile bool idLoopIterationFinished;
-//	volatile bool idLoopBeta;
+	volatile bool idLoopAlpha;
+	volatile bool idLoopBeta;
 //
 	bool FirstIterationFinished;
 

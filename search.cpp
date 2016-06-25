@@ -422,8 +422,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
 						reduction = 0;
-						//my_thread::timeMan.idLoopAlpha = true;
-						//my_thread::	timeMan.idLoopBeta = false;
+						my_thread::timeMan.idLoopAlpha = true;
+						my_thread::	timeMan.idLoopBeta = false;
 
 					}
 					else if (res >= beta)
@@ -436,8 +436,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 						{
 							reduction = 1;
 						}
-						//my_thread::timeMan.idLoopAlpha = false;
-						//my_thread::	timeMan.idLoopBeta = true;
+						my_thread::timeMan.idLoopAlpha = false;
+						my_thread::	timeMan.idLoopBeta = true;
 					}
 					else
 					{
@@ -462,18 +462,19 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 		}
 
 
+
 		//-----------------------
 		//	single good move at root
 		//-----------------------
-		/*if (depth >= 12
+		if (alpha > -11000 && beta <11000 && depth >= 12
 			&& !stop
 			&&  linesToBeSearched == 1
 			&&  res > - SCORE_KNOWN_WIN)
 		{
-			for(int i = 0; i<10;i++)
+			for(int i = 9; i>=0;i--)
 			{
 
-				unsigned long long pippo = visitedNodes;
+				//unsigned long long v = visitedNodes;
 				//sync_cout<<"SINGULAR MOVE SEARCH"<<sync_endl;
 				Score rBeta = res - 20000+2000*i;
 				sd[0].excludeMove = newPV.front();
@@ -486,15 +487,21 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 				if(temp < rBeta)
 				{
 					my_thread::timeMan.singularRootMoveCount++;
-					sync_cout<<"SINGULAR MOVE "<<rBeta<<" "<<temp<<" "<<visitedNodes-pippo<<sync_endl;
+					//sync_cout<<"info debug SINGULAR MOVE "<<rBeta/100<<" "<<100.0*(visitedNodes-v)/float(visitedNodes)<<"% "<<my_thread::timeMan.singularRootMoveCount<<sync_endl;
 				}
 				else
 				{
-					sync_cout<<"NO SINGULAR MOVE "<<rBeta<<" "<<temp<<" "<<visitedNodes-pippo<<sync_endl;
+					if(i==9)
+					{
+						my_thread::timeMan.singularRootMoveCount = 0;
+					}
+
+					//sync_cout<<"info debug NO SINGULAR MOVE "<<rBeta/100<<" "<<100.0*(visitedNodes-v)/float(visitedNodes)<<"%"<<sync_endl;
+					break;
 				}
 			}
 
-		}*/
+		}
 
 		//------------------------------------------------
 		// check wheter or not the new best move has changed
@@ -503,8 +510,8 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 
 		my_thread::timeMan.idLoopIterationFinished = true;
-		//my_thread::timeMan.idLoopAlpha = false;
-		//my_thread::	timeMan.idLoopBeta = false;
+		my_thread::timeMan.idLoopAlpha = false;
+		my_thread::	timeMan.idLoopBeta = false;
 		depth += 1;
 
 	}
