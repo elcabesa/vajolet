@@ -705,6 +705,8 @@ Move Movegen::getNextMove()
 			killerMoves[0] = (src.getKillers(ply,0));
 			killerMoves[1] = (src.getKillers(ply,1));
 
+			scoreCaptureMoves();
+
 			/*Move previousMove = pos.getActualState().currentMove;
 			if(previousMove.packed)
 			{
@@ -727,6 +729,7 @@ Move Movegen::getNextMove()
 			//generateMoves<Movegen::allEvasionMg>();
 			//generateMoves<Movegen::captureEvasionMg>();
 			generateMoves<Movegen::quietEvasionMg>();
+			scoreQuietMoves();
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
 			//killerMoves[0] = (src.getKillers(ply,0));
@@ -790,6 +793,7 @@ Move Movegen::getNextMove()
 		case iterateCaptureEvasionMoves:
 			if(moveListPosition < moveListSize)
 			{
+				FindNextBestMove();
 				if(moveList[moveListPosition].m != ttMove)
 				{
 					return moveList[moveListPosition++].m;
@@ -804,6 +808,7 @@ Move Movegen::getNextMove()
 		case iterateQuietEvasionMoves:
 		if(moveListPosition < moveListSize)
 		{
+			FindNextBestMove();
 			if(moveList[moveListPosition].m != ttMove)
 			{
 				return moveList[moveListPosition++].m;

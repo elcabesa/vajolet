@@ -1509,6 +1509,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 	std::list<Move> childPV;
 
 	Position::state &st = pos.getActualState();
+	unsigned int moveNumber = 0;
 	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != Movegen::NOMOVE)
 	{
 		assert(alpha < beta);
@@ -1580,6 +1581,7 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 			}
 
 		}
+		moveNumber++;
 		pos.doMove(m);
 		Score val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
 
@@ -1605,6 +1607,14 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 				}
 				if( bestScore >= beta)
 				{
+					if(moveNumber>10)
+					{
+						sync_cout<<"----------------------------------------"<<sync_endl;
+						pos.display();
+						sync_cout<<"mossa numero "<<moveNumber<<sync_endl;
+						sync_cout<<displayUci(m)<<sync_endl;
+
+					}
 					if( !pos.isCaptureMoveOrPromotion(bestMove) && !inCheck )
 					{
 						saveKillers(ply,bestMove);
