@@ -135,7 +135,7 @@ private:
 
 	}
 
-	signed int razorMargin(unsigned int depth) const { return 20000+depth*78; }
+	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*78+cut*20000; }
 
 
 	enum nodeType

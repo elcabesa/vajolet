@@ -774,14 +774,14 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 		// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
 		//------------------------
 		if (depth < 4 * ONE_PLY
-			&&  eval + razorMargin(depth) <= alpha
-			&&  alpha >= -SCORE_INFINITE+razorMargin(depth)
+			&&  eval + razorMargin(depth,type==CUT_NODE) <= alpha
+			&&  alpha >= -SCORE_INFINITE+razorMargin(depth,type==CUT_NODE)
 			//&&  abs(alpha) < SCORE_MATE_IN_MAX_PLY // implicito nell riga precedente
 			&&  ((!ttMove.packed ) || type == ALL_NODE)
 			&& !((pos.getNextTurn() && (pos.getBitmap(Position::blackPawns) & RANKMASK[A2])) || (!pos.getNextTurn() && (pos.getBitmap(Position::whitePawns) & RANKMASK[A7]) ) )
 		)
 		{
-			Score ralpha = alpha - razorMargin(depth);
+			Score ralpha = alpha - razorMargin(depth,type==CUT_NODE);
 			assert(ralpha>=-SCORE_INFINITE);
 
 			std::list<Move> childPV;
