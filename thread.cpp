@@ -301,26 +301,13 @@ void my_thread::manageNewSearch()
 	startThinkResult res;
 	/*if(game.isPonderRight())
 	{
-		Game::GamePosition gp = game.getNewSearchParameters();
-
-		unsigned int d = 1;
-		if( gp.depth > 6)
-			d = gp.depth -6;
-
-		if(gp.beta-gp.alpha == 1600)
-		{
-			sync_cout<< d<<" "<< gp.alpha<<" "<< gp.beta<<sync_endl;
-			res = src.startThinking(d, gp.alpha, gp.beta);
-		}
-		else
-		{
-			res = src.startThinking();
-		}
-	}
-	else*/
+		sync_cout<<"info debug PONDER RIGHT"<<sync_endl;
+	}else
 	{
-		res = src.startThinking();
-	}
+		sync_cout<<"info debug PONDER WRONG"<<sync_endl;
+	}*/
+	res = src.startThinking();
+
 
 
 	std::list<Move> PV = res.PV;

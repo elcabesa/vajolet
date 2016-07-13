@@ -103,6 +103,7 @@ public:
 class search
 {
 private:
+	static int globalReduction;
 	bool useTBresult;
 	static Score futility[5];
 	static Score futilityMargin[7];

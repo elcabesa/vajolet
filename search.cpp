@@ -43,6 +43,7 @@ search defaultSearch;
 std::vector<rootMove> search::rootMoves;
 std::atomic<unsigned long long> search::visitedNodes;
 std::atomic<unsigned long long> search::tbHits;
+int search::globalReduction =0;
 
 
 Score search::futility[5] = {0,6000,20000,30000,40000};
@@ -330,7 +331,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 			//firstRun = false;
 
 
-			unsigned int reduction = 0;
+			globalReduction = 0;
 
 			do
 			{
@@ -354,12 +355,12 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 				{
 					helperSearch[i].stop = false;
 					helperSearch[i].pos = pos;
-					helperThread.push_back( std::thread(alphaBeta<search::nodeType::HELPER_ROOT_NODE>, &helperSearch[i], 0, (depth-reduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
+					helperThread.push_back( std::thread(alphaBeta<search::nodeType::HELPER_ROOT_NODE>, &helperSearch[i], 0, (depth-globalReduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
 				}
 
 				newPV.clear();
 				// main thread
-				res = alphaBeta<search::nodeType::ROOT_NODE>(0, (depth-reduction) * ONE_PLY, alpha, beta, newPV);
+				res = alphaBeta<search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
 
 				res = useTBresult ? TBres : res;
@@ -421,7 +422,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 
 						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
-						reduction = 0;
+						globalReduction = 0;
 						my_thread::timeMan.idLoopAlpha = true;
 						my_thread::	timeMan.idLoopBeta = false;
 
@@ -434,7 +435,7 @@ startThinkResult search::startThinking(unsigned int depth, Score alpha, Score be
 						beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 						if(depth > 1)
 						{
-							reduction = 1;
+							globalReduction = 1;
 						}
 						my_thread::timeMan.idLoopAlpha = false;
 						my_thread::	timeMan.idLoopBeta = true;
@@ -1264,7 +1265,7 @@ template<search::nodeType type> Score search::alphaBeta(unsigned int ply, int de
 							}*/
 							if(val <beta)
 							{
-								printPV(val, depth/ONE_PLY, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, visitedNodes,tbHits);
+								printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, visitedNodes,tbHits);
 							}
 							validIteration = true;
 						}
@@ -1509,7 +1510,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 	std::list<Move> childPV;
 
 	Position::state &st = pos.getActualState();
-	unsigned int moveNumber = 0;
 	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != Movegen::NOMOVE)
 	{
 		assert(alpha < beta);
@@ -1581,7 +1581,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 			}
 
 		}
-		moveNumber++;
 		pos.doMove(m);
 		Score val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
 
@@ -1607,14 +1606,6 @@ template<search::nodeType type> Score search::qsearch(unsigned int ply, int dept
 				}
 				if( bestScore >= beta)
 				{
-					if(moveNumber>10)
-					{
-						sync_cout<<"----------------------------------------"<<sync_endl;
-						pos.display();
-						sync_cout<<"mossa numero "<<moveNumber<<sync_endl;
-						sync_cout<<displayUci(m)<<sync_endl;
-
-					}
 					if( !pos.isCaptureMoveOrPromotion(bestMove) && !inCheck )
 					{
 						saveKillers(ply,bestMove);

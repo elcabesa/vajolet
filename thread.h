@@ -65,6 +65,7 @@ public:
 
 	void CreateNewGame(void)
 	{
+		//sync_cout<<"info debug NEW GAME DETECTED"<<sync_endl;
 		positions.clear();
 	}
 
@@ -73,7 +74,7 @@ public:
 		unsigned int actualPosition = positions.size();
 		for(unsigned int i = actualPosition; i <= pos.getStateIndex(); i++)
 		{
-			//sync_cout<<"inserita pos:"<<pos.getState(i).key<<sync_endl;
+			//sync_cout<<"info debug new position inserted in game:"<<displayUci(pos.getState(i).currentMove)<<sync_endl;
 			GamePosition p;
 			p.key = pos.getState(i).key;
 			p.m =  pos.getState(i).currentMove;

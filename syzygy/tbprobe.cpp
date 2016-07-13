@@ -788,7 +788,7 @@ static int probe_dtz_table(const struct pos *pos, int wdl, int *success)
     {
         for (i = 1; i < DTZ_ENTRIES; i++)
         {
-            if (DTZ_table[i].key1 == key)
+            if (DTZ_table[i].key1 == key || DTZ_table[i].key2 == key)
                 break;
         }
         if (i < DTZ_ENTRIES)
