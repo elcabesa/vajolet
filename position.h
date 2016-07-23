@@ -21,7 +21,6 @@
 #include <map>
 #include "vajolet.h"
 #include "data.h"
-//#include "vectorclass/vectorclass.h"
 #include "hashKeys.h"
 #include "move.h"
 #include "io.h"
@@ -208,7 +207,7 @@ public:
 			pawnKey,	/*!<  hashkey identifying the pawn formation*/
 			materialKey;/*!<  hashkey identifying the material signature*/
 
-		Score nonPawnMaterial[4]; /*!< four score used for white/black opening/endgame non pawn material sum*/
+		simdScore nonPawnMaterial; /*!< four score used for white/black opening/endgame non pawn material sum*/
 
 		eNextMove nextMove; /*!< who is the active player*/
 		eCastle castleRights; /*!<  actual castle rights*/
@@ -219,8 +218,8 @@ public:
 			ply;			/*!<  ply from the start*/
 
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
-		Score material[2];	/*!<  two values for opening/endgame score*/
-
+		//Score material[2];	/*!<  two values for opening/endgame score*/
+		simdScore material;
 		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
@@ -616,7 +615,7 @@ private:
 	U64 calcPawnKey(void) const;
 	U64 calcMaterialKey(void) const;
 	simdScore calcMaterialValue(void) const;
-	void calcNonPawnMaterialValue(Score* s);
+	simdScore calcNonPawnMaterialValue(void) const;
 	bool checkPosConsistency(int nn);
 	void clear();
 	inline void calcCheckingSquares(void);

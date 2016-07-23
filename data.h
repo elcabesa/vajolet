@@ -18,7 +18,6 @@
 #ifndef DATA_H_
 #define DATA_H_
 #include "vajolet.h"
-//#include "vectorclass/vectorclass.h"
 
 //------------------------------------------------
 //enum

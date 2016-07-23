@@ -2319,8 +2319,6 @@ Score Position::eval(void)
 	//--------------------------------------
 	//	king safety
 	//--------------------------------------
-	wScore = zero;
-	bScore = zero;
 	Score kingSafety[2] = {0, 0};
 
 	kingSafety[white] = evalShieldStorm<white>(getSquareOfThePiece(whiteKing));
@@ -2368,7 +2366,8 @@ Score Position::eval(void)
 		bScore = temp;
 	}
 
-	res += wScore - bScore;
+	simdScore temp ={kingSafety[white] - kingSafety[black],0,0,0};
+	res += temp;
 
 
 

@@ -343,11 +343,9 @@ void Position::setupFromFen(const std::string& fenStr)
 
 
 
-	calcNonPawnMaterialValue(x.nonPawnMaterial);
+	x.nonPawnMaterial = calcNonPawnMaterialValue();
 
-	simdScore t= calcMaterialValue();
-	x.material[0] =t[0];
-	x.material[1] =t[1];
+	x.material=  calcMaterialValue();
 
 	x.key=calcKey();
 	x.pawnKey=calcPawnKey();
@@ -748,11 +746,11 @@ simdScore Position::calcMaterialValue(void) const{
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::calcNonPawnMaterialValue(Score* s)
+simdScore Position::calcNonPawnMaterialValue() const
 {
 
 	simdScore t[2] ={{0,0,0,0},{0,0,0,0}};
-
+	simdScore res;
 
 	for (tSquare n = (tSquare)0; n < squareNumber; n++)
 	{
@@ -768,10 +766,11 @@ void Position::calcNonPawnMaterialValue(Score* s)
 			}
 		}
 	}
-	s[0] = t[0][0];
-	s[1] = t[0][1];
-	s[2] = t[1][0];
-	s[3] = t[1][1];
+	res[0] = t[0][0];
+	res[1] = t[0][1];
+	res[2] = t[1][0];
+	res[3] = t[1][1];
+	return res;
 
 }
 /*! \brief do a null move
@@ -849,16 +848,16 @@ void Position::doMove(const Move & m){
 	assert(capture!=whitePieces);
 	assert(capture!=blackPieces);
 
-	simdScore mv;
+	//simdScore mv;
 	//mv.load_partial(2,x.material);
-	mv[0]= x.material[0];
-	mv[1]= x.material[1];
-	simdScore npm;
+	//mv[0]= x.material[0];
+	//mv[1]= x.material[1];
+	//simdScore npm;
 	//npm.load(x.nonPawnMaterial);
-	npm[0]= x.nonPawnMaterial[0];
-	npm[1]= x.nonPawnMaterial[1];
-	npm[2]= x.nonPawnMaterial[2];
-	npm[3]= x.nonPawnMaterial[3];
+	//npm[0]= x.nonPawnMaterial[0];
+	//npm[1]= x.nonPawnMaterial[1];
+	//npm[2]= x.nonPawnMaterial[2];
+	//npm[3]= x.nonPawnMaterial[3];
 
 	// change side
 	x.key ^= HashKeys::side;
@@ -888,7 +887,7 @@ void Position::doMove(const Move & m){
 		tSquare rTo = kingSide? to+ovest: to+est;
 		assert(rTo<squareNumber);
 		movePiece(rook,rFrom,rTo);
-		mv += pstValue[rook][rTo] - pstValue[rook][rFrom];
+		x.material += pstValue[rook][rTo] - pstValue[rook][rFrom];
 
 		//npm+=nonPawnValue[rook][rTo]-nonPawnValue[rook][rFrom];
 
@@ -910,13 +909,13 @@ void Position::doMove(const Move & m){
 			assert(captureSquare<squareNumber);
 			x.pawnKey ^= HashKeys::keys[captureSquare][capture];
 		}
-		npm -= nonPawnValue[capture]/*[captureSquare]*/;
+		x.nonPawnMaterial -= nonPawnValue[capture]/*[captureSquare]*/;
 
 
 		// remove piece
 		removePiece(capture,captureSquare);
 		// update material
-		mv -= pstValue[capture][captureSquare];
+		x.material -= pstValue[capture][captureSquare];
 
 		// update keys
 		x.key ^= HashKeys::keys[captureSquare][capture];
@@ -931,7 +930,7 @@ void Position::doMove(const Move & m){
 	x.key ^= HashKeys::keys[from][piece] ^ HashKeys::keys[to][piece];
 	movePiece(piece,from,to);
 
-	mv += pstValue[piece][to] - pstValue[piece][from];
+	x.material += pstValue[piece][to] - pstValue[piece][from];
 	//npm+=nonPawnValue[piece][to]-nonPawnValue[piece][from];
 	// update non pawn material
 
@@ -967,8 +966,8 @@ void Position::doMove(const Move & m){
 			removePiece(piece,to);
 			putPiece(promotedPiece,to);
 
-			mv += pstValue[promotedPiece][to]-pstValue[piece][to];
-			npm += nonPawnValue[promotedPiece]/*[to]*/;
+			x.material += pstValue[promotedPiece][to]-pstValue[piece][to];
+			x.nonPawnMaterial += nonPawnValue[promotedPiece]/*[to]*/;
 
 
 			x.key ^= HashKeys::keys[to][piece]^ HashKeys::keys[to][promotedPiece];
@@ -978,15 +977,11 @@ void Position::doMove(const Move & m){
 		x.pawnKey ^= HashKeys::keys[from][piece] ^ HashKeys::keys[to][piece];
 		x.fiftyMoveCnt = 0;
 	}
-
-	//mv.store_partial(2,x.material);
-	x.material[0] = mv[0];
-	x.material[1] = mv[1];
 	//npm.store(x.nonPawnMaterial);
-	x.nonPawnMaterial[0] = npm[0];
-	x.nonPawnMaterial[1] = npm[1];
-	x.nonPawnMaterial[2] = npm[2];
-	x.nonPawnMaterial[3] = npm[3];
+	//x.nonPawnMaterial[0] = npm[0];
+	//x.nonPawnMaterial[1] = npm[1];
+	//x.nonPawnMaterial[2] = npm[2];
+	//x.nonPawnMaterial[3] = npm[3];
 
 	x.capturedPiece = capture;
 
@@ -1279,8 +1274,7 @@ bool Position::checkPosConsistency(int nn)
 		while(1){}
 		return false;
 	}
-	Score score[4];
-	calcNonPawnMaterialValue(score);
+	simdScore score = calcNonPawnMaterialValue();
 	if(score[0]!= x.nonPawnMaterial[0] ||
 		score[1]!= x.nonPawnMaterial[1] ||
 		score[2]!= x.nonPawnMaterial[2] ||

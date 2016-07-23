@@ -26,7 +26,6 @@
 //---------------------------------------------
 //	include
 //---------------------------------------------
-//#include "vectorclass/vectorclass.h"
 
 //---------------------------------------------
 //	configuration defines
@@ -118,7 +117,6 @@ enum tSquare								/*!< square name and directions*/
 ENABLE_OPERATORS_ON(tSquare)
 
 typedef int simdScore __attribute__ ((vector_size (16)));
-//typedef Vec4i  simdScore;					/*!< score saved as a vector of 4 signed int scores*/
 typedef signed int Score;					/*!< score saved as a single signed int value*/
 
 
