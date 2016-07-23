@@ -28,7 +28,7 @@
 
 
 
-simdScore traceRes=simdScore(0,0,0,0);
+simdScore traceRes={0,0,0,0};
 
 const int KingExposed[] = {
      2,  0,  2,  5,  5,  2,  0,  2,
@@ -44,91 +44,91 @@ const int KingExposed[] = {
 //------------------------------------------------
 //	MOBILITY BONUS
 //------------------------------------------------
-simdScore queenMobilityPars=simdScore(5,5,20,335);
-simdScore rookMobilityPars=simdScore(5,5,215,230);
-simdScore bishopMobilityPars=simdScore(4,4,283,318);
-simdScore knightMobilityPars=simdScore(3,3,280,220);
+simdScore queenMobilityPars={5,5,20,335};
+simdScore rookMobilityPars={5,5,215,230};
+simdScore bishopMobilityPars={4,4,283,318};
+simdScore knightMobilityPars={3,3,280,220};
 simdScore mobilityBonus[Position::separationBitmap][32];
 
 
 //------------------------------------------------
 //	PAWN Bonus/Penalties
 //------------------------------------------------
-simdScore isolatedPawnPenalty=simdScore(520,2410,0,0);
-simdScore isolatedPawnPenaltyOpp=simdScore(-250,-380,0,0);
-simdScore doubledPawnPenalty=simdScore(290,1950,0,0);
-simdScore backwardPawnPenalty=simdScore(1120,2680,0,0);
-simdScore chainedPawnBonus=simdScore(540,180,0,0);
-simdScore passedPawnFileAHPenalty = simdScore(-1030,720,0,0);
-simdScore passedPawnSupportedBonus = simdScore(1060,-450,0,0);
-simdScore candidateBonus = simdScore(110,1330,0,0);
-simdScore passedPawnBonus = simdScore(460,840,0,0);
-simdScore passedPawnUnsafeSquares =simdScore(-10,70,0,0);
-simdScore passedPawnBlockedSquares =simdScore(150,370,0,0);
-simdScore passedPawnDefendedSquares = simdScore(150,240,0,0);
-simdScore passedPawnDefendedBlockingSquare = simdScore(260,170,0,0);
-simdScore unstoppablePassed = simdScore(0,2000,0,0);
-simdScore rookBehindPassedPawn = simdScore(0,10,0,0);
-simdScore EnemyRookBehindPassedPawn = simdScore(0,10,0,0);
+simdScore isolatedPawnPenalty={520,2410,0,0};
+simdScore isolatedPawnPenaltyOpp={-250,-380,0,0};
+simdScore doubledPawnPenalty={290,1950,0,0};
+simdScore backwardPawnPenalty={1120,2680,0,0};
+simdScore chainedPawnBonus={540,180,0,0};
+simdScore passedPawnFileAHPenalty = {-1030,720,0,0};
+simdScore passedPawnSupportedBonus = {1060,-450,0,0};
+simdScore candidateBonus = {110,1330,0,0};
+simdScore passedPawnBonus = {460,840,0,0};
+simdScore passedPawnUnsafeSquares ={-10,70,0,0};
+simdScore passedPawnBlockedSquares ={150,370,0,0};
+simdScore passedPawnDefendedSquares = {150,240,0,0};
+simdScore passedPawnDefendedBlockingSquare = {260,170,0,0};
+simdScore unstoppablePassed = {0,2000,0,0};
+simdScore rookBehindPassedPawn = {0,10,0,0};
+simdScore EnemyRookBehindPassedPawn = {0,10,0,0};
 
-simdScore holesPenalty=simdScore(100,260,0,0);
-simdScore pawnCenterControl=simdScore(70,120,0,0);
-simdScore pawnBigCenterControl=simdScore(360,-670,0,0);
+simdScore holesPenalty={100,260,0,0};
+simdScore pawnCenterControl={70,120,0,0};
+simdScore pawnBigCenterControl={360,-670,0,0};
 
 
-simdScore pieceCoordination=simdScore(280,160,0,0);
+simdScore pieceCoordination={280,160,0,0};
 
-simdScore piecesCenterControl=simdScore(170,160,0,0);
-simdScore piecesBigCenterControl=simdScore(120,50,0,0);
+simdScore piecesCenterControl={170,160,0,0};
+simdScore piecesBigCenterControl={120,50,0,0};
 
-simdScore rookOn7Bonus=simdScore(3700,1800,0,0);
-simdScore rookOnPawns=simdScore(-600,1300,0,0);
-simdScore queenOn7Bonus=simdScore(-3200,7000,0,0);
-simdScore queenOnPawns=simdScore(-1000,3000,0,0);
-simdScore rookOnOpen=simdScore(2000,500,0,0);
-simdScore rookOnSemi=simdScore(500,1100,0,0);
-simdScore rookTrapped = simdScore(300,0,0,0);
-simdScore rookTrappedKingWithoutCastling = simdScore(300,0,0,0);
+simdScore rookOn7Bonus={3700,1800,0,0};
+simdScore rookOnPawns={-600,1300,0,0};
+simdScore queenOn7Bonus={-3200,7000,0,0};
+simdScore queenOnPawns={-1000,3000,0,0};
+simdScore rookOnOpen={2000,500,0,0};
+simdScore rookOnSemi={500,1100,0,0};
+simdScore rookTrapped = {300,0,0,0};
+simdScore rookTrappedKingWithoutCastling = {300,0,0,0};
 
-simdScore knightOnOutpost= simdScore(380,0,0,0);
-simdScore knightOnOutpostSupported= simdScore(100,1290,0,0);
-simdScore knightOnHole= simdScore(1610,1190,0,0);
-simdScore KnightAttackingWeakPawn= simdScore(300,300,0,0);
+simdScore knightOnOutpost= {380,0,0,0};
+simdScore knightOnOutpostSupported= {100,1290,0,0};
+simdScore knightOnHole= {1610,1190,0,0};
+simdScore KnightAttackingWeakPawn= {300,300,0,0};
 
-simdScore bishopOnOutpost= simdScore(-1020,810,0,0);
-simdScore bishopOnOutpostSupported= simdScore(3600,270,0,0);
-simdScore bishopOnHole= simdScore(590,-730,0,0);
-simdScore badBishop= simdScore(-200,1530,0,0);
+simdScore bishopOnOutpost= {-1020,810,0,0};
+simdScore bishopOnOutpostSupported= {3600,270,0,0};
+simdScore bishopOnHole= {590,-730,0,0};
+simdScore badBishop= {-200,1530,0,0};
 
-simdScore tempo= simdScore(530,480,0,0);
-simdScore bishopPair =simdScore(3260,4690,0,0);
+simdScore tempo= {530,480,0,0};
+simdScore bishopPair ={3260,4690,0,0};
 
-simdScore ownKingNearPassedPawn=simdScore(0,150,0,0);
-simdScore enemyKingNearPassedPawn=simdScore(10,240,0,0);
+simdScore ownKingNearPassedPawn={0,150,0,0};
+simdScore enemyKingNearPassedPawn={10,240,0,0};
 
-simdScore spaceBonus=simdScore(600,200,0,0);
-simdScore undefendedMinorPenalty = simdScore(756,354,0,0);
+simdScore spaceBonus={600,200,0,0};
+simdScore undefendedMinorPenalty = {756,354,0,0};
 
 simdScore attackedByPawnPenalty[Position::separationBitmap]=
-{	simdScore(0,0,0,0),
-	simdScore(0,0,0,0),//king
-	simdScore(1000,-7800,0,0),//queen
-	simdScore(2225,1627,0,0),//rook
-	simdScore(3200,350,0,0),//bishop
-	simdScore(2900,2750,0,0),//knight
-	simdScore(0,0,0,0),//pawn
-	simdScore(0,0,0,0),
+{	{0,0,0,0},
+	{0,0,0,0},//king
+	{1000,-7800,0,0},//queen
+	{2225,1627,0,0},//rook
+	{3200,350,0,0},//bishop
+	{2900,2750,0,0},//knight
+	{0,0,0,0},//pawn
+	{0,0,0,0},
 };
 
 simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitmap]=
-{	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(0,0,0,0),			simdScore(0,0,0,0),		simdScore(0,0,0,0),		simdScore(0,0,0,0),		simdScore(0,0,0,0),	simdScore(0,0,0,0)},
-	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(0,0,0,0),			simdScore(0,0,0,0),		simdScore(0,0,0,0),		simdScore(0,0,0,0),		simdScore(0,0,0,0),	simdScore(0,0,0,0)},//king
-	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(-460,300,0,0),	simdScore(3812,120,0,0),simdScore(3580,600,0,0),simdScore(1420,-4400,0,0),simdScore(1400,2700,0,0),	simdScore(0,0,0,0)},//queen
-	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(1200,3200,0,0),	simdScore(3220,2420,0,0),simdScore(4900,3100,0,0),simdScore(3400,1700,0,0),simdScore(1000,100,0,0),	simdScore(0,0,0,0)},//rook
-	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(2400,4000,0,0),	simdScore(2820,1850,0,0),simdScore(400,2800,0,0),simdScore(3100,4400,0,0),simdScore(-900,4690,0,0),	simdScore(0,0,0,0)},//bishop
-	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(1300,400,0,0),	simdScore(3121,3147,0,0),simdScore(1723,2917,0,0),simdScore(2223,1117,0,0),simdScore(-810,554,0,0),	simdScore(0,0,0,0)},//knight
-	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(50,40,0,0),		simdScore(60,50,0,0),	simdScore(100,80,0,0),	simdScore(150,90,0,0),	simdScore(200,170,0,0),	simdScore(0,0,0,0)},//pawn
-	{simdScore(0,0,0,0),simdScore(0,0,0,0),	simdScore(0,0,0,0),			simdScore(0,0,0,0),		simdScore(0,0,0,0),		simdScore(0,0,0,0),		simdScore(0,0,0,0),	simdScore(0,0,0,0)}
+{	{{0,0,0,0},{0,0,0,0},	{0,0,0,0},			{0,0,0,0},		{0,0,0,0},		{0,0,0,0},		{0,0,0,0},	{0,0,0,0}},
+	{{0,0,0,0},{0,0,0,0},	{0,0,0,0},			{0,0,0,0},		{0,0,0,0},		{0,0,0,0},		{0,0,0,0},	{0,0,0,0}},//king
+	{{0,0,0,0},{0,0,0,0},	{-460,300,0,0},	{3812,120,0,0},{3580,600,0,0},{1420,-4400,0,0},{1400,2700,0,0},	{0,0,0,0}},//queen
+	{{0,0,0,0},{0,0,0,0},	{1200,3200,0,0},	{3220,2420,0,0},{4900,3100,0,0},{3400,1700,0,0},{1000,100,0,0},	{0,0,0,0}},//rook
+	{{0,0,0,0},{0,0,0,0},	{2400,4000,0,0},	{2820,1850,0,0},{400,2800,0,0},{3100,4400,0,0},{-900,4690,0,0},	{0,0,0,0}},//bishop
+	{{0,0,0,0},{0,0,0,0},	{1300,400,0,0},	{3121,3147,0,0},{1723,2917,0,0},{2223,1117,0,0},{-810,554,0,0},	{0,0,0,0}},//knight
+	{{0,0,0,0},{0,0,0,0},	{50,40,0,0},		{60,50,0,0},	{100,80,0,0},	{150,90,0,0},	{200,170,0,0},	{0,0,0,0}},//pawn
+	{{0,0,0,0},{0,0,0,0},	{0,0,0,0},			{0,0,0,0},		{0,0,0,0},		{0,0,0,0},		{0,0,0,0},	{0,0,0,0}}
 //						king				queen						rook					bishop					knight					pawn
 };
 //------------------------------------------------
@@ -138,15 +138,15 @@ const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
 Score kingShieldBonus= 2400;
 Score kingFarShieldBonus= 1800;
 Score kingStormBonus= 80;
-simdScore kingSafetyBonus=simdScore(93,-5,0,0);
-simdScore kingSafetyScaling=simdScore(310,0,0,0);
-simdScore KingSafetyMaxAttack=simdScore(93,0,0,0);
-simdScore KingSafetyLinearCoefficent=simdScore(5,0,0,0);
-simdScore KingSafetyMaxResult=simdScore(1000,0,0,0);
+simdScore kingSafetyBonus={93,-5,0,0};
+simdScore kingSafetyScaling={310,0,0,0};
+simdScore KingSafetyMaxAttack={93,0,0,0};
+simdScore KingSafetyLinearCoefficent={5,0,0,0};
+simdScore KingSafetyMaxResult={1000,0,0,0};
 //------------------------------------------------
 
 
-simdScore queenVsRook2MinorsImbalance=simdScore(20000,20000,0,0);
+simdScore queenVsRook2MinorsImbalance={20000,20000,0,0};
 
 
 //---------------------------------------------
@@ -615,40 +615,44 @@ bool Position::evalKNNvsK(Score& res)
 
 void initMobilityBonus(void)
 {
+	simdScore zero = {0,0,0,0};
 	for(int i=0;i<Position::separationBitmap;i++)
 	{
 		for(int n=0;n<32;n++)
 		{
-			mobilityBonus[i][n] = 0;
+			mobilityBonus[i][n] = zero;
 		}
 	}
 	for(int n=0;n<32;n++)
 	{
-		mobilityBonus[Position::Queens][n] =simdScore(queenMobilityPars[2]*(n-queenMobilityPars[0]),queenMobilityPars[3]*(n-queenMobilityPars[1]),0,0);
+		simdScore mob = {queenMobilityPars[2]*(n-queenMobilityPars[0]),queenMobilityPars[3]*(n-queenMobilityPars[1]),0,0};
+		mobilityBonus[Position::Queens][n] = mob;
 	}
 	for(int n=0;n<32;n++)
 	{
-		mobilityBonus[Position::Rooks][n] =simdScore(rookMobilityPars[2]*(n-rookMobilityPars[0]),rookMobilityPars[3]*(n-rookMobilityPars[1]),0,0);
+		simdScore mob = {rookMobilityPars[2]*(n-rookMobilityPars[0]),rookMobilityPars[3]*(n-rookMobilityPars[1]),0,0};
+		mobilityBonus[Position::Rooks][n] = mob;
 	}
 	for(int n=0;n<32;n++)
 	{
-		mobilityBonus[Position::Bishops][n] =simdScore(bishopMobilityPars[2]*(n-bishopMobilityPars[0]),bishopMobilityPars[3]*(n-bishopMobilityPars[1]),0,0);
+		simdScore mob = {bishopMobilityPars[2]*(n-bishopMobilityPars[0]),bishopMobilityPars[3]*(n-bishopMobilityPars[1]),0,0};
+		mobilityBonus[Position::Bishops][n] = mob;
 	}
 	for(int n=0;n<32;n++)
 	{
-		mobilityBonus[Position::Knights][n] =simdScore(knightMobilityPars[2]*(n-knightMobilityPars[0]),knightMobilityPars[3]*(n-knightMobilityPars[1]),0,0);
+		simdScore mob = {knightMobilityPars[2]*(n-knightMobilityPars[0]),knightMobilityPars[3]*(n-knightMobilityPars[1]),0,0};
+		mobilityBonus[Position::Knights][n] = mob;
 	}
 
-	mobilityBonus[Position::Knights][0].insert(0,-4000.0);
-	mobilityBonus[Position::Knights][1].insert(0,-1000.0);
-	mobilityBonus[Position::Knights][2].insert(0,-500.0);
-	mobilityBonus[Position::Knights][3].insert(0,0.0);
-	mobilityBonus[Position::Knights][4].insert(0,280.0);
-	mobilityBonus[Position::Knights][5].insert(0,600.0);
-	mobilityBonus[Position::Knights][6].insert(0,900.0);
-	mobilityBonus[Position::Knights][7].insert(0,1300.0);
-	mobilityBonus[Position::Knights][8].insert(0,1400.0);
-
+	mobilityBonus[Position::Knights][0][0] = -4000;
+	mobilityBonus[Position::Knights][1][0] = -1000;
+	mobilityBonus[Position::Knights][2][0] = -500;
+	mobilityBonus[Position::Knights][3][0] = 0;
+	mobilityBonus[Position::Knights][4][0] = 280;
+	mobilityBonus[Position::Knights][5][0] = 600;
+	mobilityBonus[Position::Knights][6][0] = 900;
+	mobilityBonus[Position::Knights][7][0] = 1300;
+	mobilityBonus[Position::Knights][8][0] = 1400;
 
 
 }
@@ -1227,7 +1231,7 @@ const Position::materialStruct * Position::getMaterialData()
 template<color c>
 simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const
 {
-	simdScore res = 0;
+	simdScore res = {0,0,0,0};
 
 	bool passed, isolated, doubled, opposed, chain, backward;
 	const bitMap ourPawns = c ? getBitmap(blackPawns) : getBitmap(whitePawns);
@@ -1323,7 +1327,7 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 template<Position::bitboardIndex piece>
 simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes,bitMap const blockedPawns, bitMap * const kingRing,unsigned int * const kingAttackersCount,unsigned int * const kingAttackersWeight,unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const
 {
-	simdScore res = 0;
+	simdScore res = {0,0,0,0};
 	bitMap tempPieces = getBitmap(piece);
 	bitMap enemyKing = (piece > separationBitmap)? getBitmap(whiteKing) : getBitmap(blackKing);
 	tSquare enemyKingSquare = (piece > separationBitmap)? getSquareOfThePiece(whiteKing) : getSquareOfThePiece(blackKing);
@@ -1617,7 +1621,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 	bitboardIndex ourPawns = c ? blackPawns : whitePawns;
 	state st = getActualState();
 
-	simdScore score = 0;
+	simdScore score = {0,0,0,0};
 	while(pp)
 	{
 		simdScore passedPawnsBonus;
@@ -1628,7 +1632,8 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 		int r = relativeRank - 1;
 		int rr =  r * ( r - 1 );
 
-		passedPawnsBonus = simdScore( passedPawnBonus[0] * rr, passedPawnBonus[1] * ( rr + r + 1 ), 0, 0);
+		simdScore temp = {passedPawnBonus[0] * rr, passedPawnBonus[1] * ( rr + r + 1 ), 0, 0};
+		passedPawnsBonus = temp;
 
 		if(rr)
 		{
@@ -1708,7 +1713,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 
 template<color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const
 {
-	simdScore res = 0;
+	simdScore res = {0,0,0,0};
 	//bitMap * OurPieces = c ? &getBitmap(separationBitmap) : &getBitmap(occupiedSquares);
 	bitMap TheirPieces = c ? getBitmap(whitePieces) : getBitmap(blackPieces);
 	bitMap * AttackedByOurPieces = c ? &attackedSquares[separationBitmap] : &attackedSquares[occupiedSquares];
@@ -1842,7 +1847,7 @@ Score Position::eval(void)
 	// todo modificare valori material value & pst
 	// material + pst
 
-	simdScore res = simdScore(st.material[0], st.material[1], 0, 0);
+	simdScore res = {st.material[0], st.material[1], 0, 0};
 
 
 	//-----------------------------------------------------
@@ -1961,7 +1966,8 @@ Score Position::eval(void)
 	pawnEntry& probePawn = pawnHashTable.probe(pawnKey);
 	if( probePawn.key == pawnKey)
 	{
-		pawnResult = simdScore(probePawn.res[0], probePawn.res[1], 0, 0);
+		simdScore temp = {probePawn.res[0], probePawn.res[1], 0, 0};
+		pawnResult = temp;
 		weakPawns = probePawn.weakPawns;
 		passedPawns = probePawn.passedPawns;
 		attackedSquares[whitePawns] = probePawn.pawnAttacks[0];
@@ -1973,9 +1979,8 @@ Score Position::eval(void)
 	}
 	else
 	{
-
-
-		pawnResult = 0;
+		simdScore zero = {0,0,0,0};
+		pawnResult = zero;
 		bitMap pawns = getBitmap(whitePawns);
 
 		while(pawns)
@@ -2228,8 +2233,9 @@ Score Position::eval(void)
 	//--------------------------------------
 	//	weak pieces
 	//--------------------------------------
-	wScore = 0;
-	bScore = 0;
+	simdScore zero = {0,0,0,0};
+	wScore = zero;
+	bScore = zero;
 
 	bitMap pawnAttackedPieces = getBitmap( whitePieces ) & attackedSquares[ blackPawns ];
 	while(pawnAttackedPieces)
@@ -2334,7 +2340,8 @@ Score Position::eval(void)
 	}
 	if(trace)
 	{
-		wScore = simdScore( kingSafety[white], 0, 0, 0);
+		simdScore temp = {kingSafety[white], 0, 0, 0};
+		wScore = temp;
 	}
 
 	kingSafety[black] = evalShieldStorm<black>(getSquareOfThePiece(blackKing));
@@ -2355,10 +2362,11 @@ Score Position::eval(void)
 	}
 	if(trace)
 	{
-		bScore = simdScore( kingSafety[black], 0, 0, 0);
+		simdScore temp = {kingSafety[black], 0, 0, 0};
+		bScore = temp;
 	}
 
-	res+=simdScore(kingSafety[white]-kingSafety[black],0,0,0);
+	res += wScore - bScore;
 
 
 
@@ -2407,11 +2415,11 @@ Score Position::eval(void)
 		if( (st.nonPawnMaterial[0]< 90000) && (st.nonPawnMaterial[2] < 90000) )
 		{
 			mulCoeff = 40;
-		}/*
-		else
-		{
-			mulCoeff = 65;
-		}*/
+		}
+		//else
+		//{
+		//	mulCoeff = 65;
+		//}
 
 	}
 

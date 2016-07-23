@@ -33,49 +33,49 @@
 
 
 simdScore initialPieceValue[Position::lastBitboard] = {
-		simdScore(0,0,0,0),
+		{0,0,0,0},
 /*		simdScore(3000000,3000000,0,0),//king
 		simdScore(130000,100000,0,0),//queen
 		simdScore(48000,61000,0,0),//rook
 		simdScore(34500,36400,0,0),//bishop
 		simdScore(34500,35400,0,0),//knight
 		simdScore(4100,10000,0,0),//panws*/
-		simdScore(3000000,3000000,0,0),//king
-		simdScore(137000,100000,0,0),//queen
-		simdScore(52000,61000,0,0),//rook
-		simdScore(35300,36100,0,0),//bishop
-		simdScore(34500,34900,0,0),//knight
-		simdScore(5700,10000,0,0),//panws
-		simdScore(0,0,0,0),
-		simdScore(0,0,0,0),
-		simdScore(0,0,0,0),
-		simdScore(0,0,0,0),
-		simdScore(0,0,0,0),
-		simdScore(0,0,0,0),
-		simdScore(0,0,0,0),
-		simdScore(0,0,0,0),
-		simdScore(0,0,0,0)
+		{3000000,3000000,0,0},//king
+		{137000,100000,0,0},//queen
+		{52000,61000,0,0},//rook
+		{35300,36100,0,0},//bishop
+		{34500,34900,0,0},//knight
+		{5700,10000,0,0},//panws
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0}
 };
 
-simdScore PawnD3 = simdScore(1755,0,0,0);
-simdScore PawnD4 = simdScore(2100,0,0,0);
-simdScore PawnD5 = simdScore(85,0,0,0);
-simdScore PawnE3 = simdScore(185,0,0,0);
-simdScore PawnE4 = simdScore(620,0,0,0);
-simdScore PawnE5 = simdScore(-5,0,0,0);
-simdScore PawnCentering = simdScore(141,-119,0,0);
-simdScore PawnRankBonus = simdScore(450,30,0,0);
-simdScore KnightPST = simdScore(545,462,0,0);
-simdScore BishopPST = simdScore(22,273,0,0);
-simdScore RookPST = simdScore(418,-290,0,0);
-simdScore QueenPST = simdScore(-170,342,0,0);
-simdScore KingPST = simdScore(700,787,0,0);
+simdScore PawnD3 = {1755,0,0,0};
+simdScore PawnD4 = {2100,0,0,0};
+simdScore PawnD5 = {85,0,0,0};
+simdScore PawnE3 = {185,0,0,0};
+simdScore PawnE4 = {620,0,0,0};
+simdScore PawnE5 = {-5,0,0,0};
+simdScore PawnCentering = {141,-119,0,0};
+simdScore PawnRankBonus = {450,30,0,0};
+simdScore KnightPST = {545,462,0,0};
+simdScore BishopPST = {22,273,0,0};
+simdScore RookPST = {418,-290,0,0};
+simdScore QueenPST = {-170,342,0,0};
+simdScore KingPST = {700,787,0,0};
 
-simdScore BishopBackRankOpening = simdScore(400,-200,0,0);
-simdScore KnightBackRankOpening = simdScore(-800,-300,0,0);
-simdScore RookBackRankOpening = simdScore(-400,400,0,0);
-simdScore QueenBackRankOpening = simdScore(200,3900,0,0);
-simdScore BishopOnBigDiagonals = simdScore(1400,600,0,0);
+simdScore BishopBackRankOpening = {400,-200,0,0};
+simdScore KnightBackRankOpening = {-800,-300,0,0};
+simdScore RookBackRankOpening = {-400,400,0,0};
+simdScore QueenBackRankOpening = {200,3900,0,0};
+simdScore BishopOnBigDiagonals = {1400,600,0,0};
 
 
 
@@ -92,14 +92,15 @@ int Position::castleRightsMask[squareNumber];
 
 void Position::initPstValues(void)
 {
+	simdScore zero = {0,0,0,0};
 	for(int piece = 0; piece < lastBitboard; piece++)
 	{
 		for(tSquare s = (tSquare)0; s < squareNumber; s++)
 		{
 			assert(piece<lastBitboard);
 			assert(s<squareNumber);
-			nonPawnValue[piece] = 0;
-			pstValue[piece][s] = 0;
+			nonPawnValue[piece] = zero;
+			pstValue[piece][s] = zero;
 			int rank = RANKS[s];
 			int file = FILES[s];
 
@@ -108,7 +109,7 @@ void Position::initPstValues(void)
 
 				if(piece == Pawns)
 				{
-					pstValue[piece][s]=0;
+					pstValue[piece][s] = zero;
 					if(s==D3)
 					{
 						pstValue[piece][s] = PawnD3;
@@ -174,10 +175,11 @@ void Position::initPstValues(void)
 				}
 				if(piece == King)
 				{
-					pstValue[piece][s] = simdScore(
-						(KFile[file]+KRank[rank]) * KingPST[0],
-						(Center[file]+Center[rank]) * KingPST[1],
-						0,0);
+					simdScore temp = {
+							(KFile[file]+KRank[rank]) * KingPST[0],
+							(Center[file]+Center[rank]) * KingPST[1],
+							0,0};
+					pstValue[piece][s] = temp;
 				}
 				if(!isKing((bitboardIndex)piece))
 				{
@@ -186,8 +188,8 @@ void Position::initPstValues(void)
 
 				if( !isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece))
 				{
-					nonPawnValue[piece].insert(0,pieceValue[piece][0]);
-					nonPawnValue[piece].insert(1,pieceValue[piece][1]);
+					nonPawnValue[piece][0]=pieceValue[piece][0];
+					nonPawnValue[piece][1]=pieceValue[piece][1];
 				}
 
 			}
@@ -200,12 +202,12 @@ void Position::initPstValues(void)
 
 				if( !isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece))
 				{
-					nonPawnValue[piece].insert(2,pieceValue[piece][0]);
-					nonPawnValue[piece].insert(3,pieceValue[piece][1]);
+					nonPawnValue[piece][2] = pieceValue[piece][0];
+					nonPawnValue[piece][3] = pieceValue[piece][1];
 				}
 			}
 			else{
-				pstValue[piece][s] = 0;
+				pstValue[piece][s] = zero;
 			}
 		}
 	}
@@ -342,7 +344,10 @@ void Position::setupFromFen(const std::string& fenStr)
 
 
 	calcNonPawnMaterialValue(x.nonPawnMaterial);
-	calcMaterialValue().store_partial(2,x.material);
+
+	simdScore t= calcMaterialValue();
+	x.material[0] =t[0];
+	x.material[1] =t[1];
 
 	x.key=calcKey();
 	x.pawnKey=calcPawnKey();
@@ -369,9 +374,10 @@ void Position::setupFromFen(const std::string& fenStr)
 */
 void Position::initScoreValues(void)
 {
+	simdScore zero = {0,0,0,0};
 	for(auto &val :pieceValue)
 	{
-		val=0;
+		val = zero;
 	}
 	pieceValue[whitePawns] = initialPieceValue[whitePawns];
 	pieceValue[whiteKnights] = initialPieceValue[whiteKnights];
@@ -725,7 +731,7 @@ U64 Position::calcMaterialKey(void) const
 	\date 27/10/2013
 */
 simdScore Position::calcMaterialValue(void) const{
-	simdScore score = 0;
+	simdScore score = {0,0,0,0};
 	for (tSquare s = (tSquare)0; s<squareNumber; s++)
 	{
 
@@ -745,9 +751,8 @@ simdScore Position::calcMaterialValue(void) const{
 void Position::calcNonPawnMaterialValue(Score* s)
 {
 
-	simdScore t[2];
-	t[0]=0;
-	t[1]=0;
+	simdScore t[2] ={{0,0,0,0},{0,0,0,0}};
+
 
 	for (tSquare n = (tSquare)0; n < squareNumber; n++)
 	{
@@ -763,8 +768,10 @@ void Position::calcNonPawnMaterialValue(Score* s)
 			}
 		}
 	}
-	t[0].store_partial(2,s);
-	t[1].store_partial(2,&s[2]);
+	s[0] = t[0][0];
+	s[1] = t[0][1];
+	s[2] = t[1][0];
+	s[3] = t[1][1];
 
 }
 /*! \brief do a null move
@@ -843,9 +850,15 @@ void Position::doMove(const Move & m){
 	assert(capture!=blackPieces);
 
 	simdScore mv;
-	mv.load_partial(2,x.material);
+	//mv.load_partial(2,x.material);
+	mv[0]= x.material[0];
+	mv[1]= x.material[1];
 	simdScore npm;
-	npm.load(x.nonPawnMaterial);
+	//npm.load(x.nonPawnMaterial);
+	npm[0]= x.nonPawnMaterial[0];
+	npm[1]= x.nonPawnMaterial[1];
+	npm[2]= x.nonPawnMaterial[2];
+	npm[3]= x.nonPawnMaterial[3];
 
 	// change side
 	x.key ^= HashKeys::side;
@@ -966,8 +979,14 @@ void Position::doMove(const Move & m){
 		x.fiftyMoveCnt = 0;
 	}
 
-	mv.store_partial(2,x.material);
-	npm.store(x.nonPawnMaterial);
+	//mv.store_partial(2,x.material);
+	x.material[0] = mv[0];
+	x.material[1] = mv[1];
+	//npm.store(x.nonPawnMaterial);
+	x.nonPawnMaterial[0] = npm[0];
+	x.nonPawnMaterial[1] = npm[1];
+	x.nonPawnMaterial[2] = npm[2];
+	x.nonPawnMaterial[3] = npm[3];
 
 	x.capturedPiece = capture;
 

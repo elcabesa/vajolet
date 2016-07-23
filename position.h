@@ -21,7 +21,7 @@
 #include <map>
 #include "vajolet.h"
 #include "data.h"
-#include "vectorclass/vectorclass.h"
+//#include "vectorclass/vectorclass.h"
 #include "hashKeys.h"
 #include "move.h"
 #include "io.h"
