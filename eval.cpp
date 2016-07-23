@@ -2319,6 +2319,8 @@ Score Position::eval(void)
 	//--------------------------------------
 	//	king safety
 	//--------------------------------------
+	wScore = zero;
+	bScore = zero;
 	Score kingSafety[2] = {0, 0};
 
 	kingSafety[white] = evalShieldStorm<white>(getSquareOfThePiece(whiteKing));
