@@ -615,33 +615,29 @@ bool Position::evalKNNvsK(Score& res)
 
 void initMobilityBonus(void)
 {
-	simdScore zero = {0,0,0,0};
+
 	for(int i=0;i<Position::separationBitmap;i++)
 	{
 		for(int n=0;n<32;n++)
 		{
-			mobilityBonus[i][n] = zero;
+			mobilityBonus[i][n] = simdScore{0,0,0,0};
 		}
 	}
 	for(int n=0;n<32;n++)
 	{
-		simdScore mob = {queenMobilityPars[2]*(n-queenMobilityPars[0]),queenMobilityPars[3]*(n-queenMobilityPars[1]),0,0};
-		mobilityBonus[Position::Queens][n] = mob;
+		mobilityBonus[Position::Queens][n] =simdScore{queenMobilityPars[2]*(n-queenMobilityPars[0]),queenMobilityPars[3]*(n-queenMobilityPars[1]),0,0};
 	}
 	for(int n=0;n<32;n++)
 	{
-		simdScore mob = {rookMobilityPars[2]*(n-rookMobilityPars[0]),rookMobilityPars[3]*(n-rookMobilityPars[1]),0,0};
-		mobilityBonus[Position::Rooks][n] = mob;
+		mobilityBonus[Position::Rooks][n] =simdScore{rookMobilityPars[2]*(n-rookMobilityPars[0]),rookMobilityPars[3]*(n-rookMobilityPars[1]),0,0};
 	}
 	for(int n=0;n<32;n++)
 	{
-		simdScore mob = {bishopMobilityPars[2]*(n-bishopMobilityPars[0]),bishopMobilityPars[3]*(n-bishopMobilityPars[1]),0,0};
-		mobilityBonus[Position::Bishops][n] = mob;
+		mobilityBonus[Position::Bishops][n] =simdScore{bishopMobilityPars[2]*(n-bishopMobilityPars[0]),bishopMobilityPars[3]*(n-bishopMobilityPars[1]),0,0};
 	}
 	for(int n=0;n<32;n++)
 	{
-		simdScore mob = {knightMobilityPars[2]*(n-knightMobilityPars[0]),knightMobilityPars[3]*(n-knightMobilityPars[1]),0,0};
-		mobilityBonus[Position::Knights][n] = mob;
+		mobilityBonus[Position::Knights][n] =simdScore{knightMobilityPars[2]*(n-knightMobilityPars[0]),knightMobilityPars[3]*(n-knightMobilityPars[1]),0,0};
 	}
 
 	mobilityBonus[Position::Knights][0][0] = -4000;
@@ -1632,8 +1628,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 		int r = relativeRank - 1;
 		int rr =  r * ( r - 1 );
 
-		simdScore temp = {passedPawnBonus[0] * rr, passedPawnBonus[1] * ( rr + r + 1 ), 0, 0};
-		passedPawnsBonus = temp;
+		passedPawnsBonus = simdScore{ passedPawnBonus[0] * rr, passedPawnBonus[1] * ( rr + r + 1 ), 0, 0};
 
 		if(rr)
 		{
@@ -1847,7 +1842,7 @@ Score Position::eval(void)
 	// todo modificare valori material value & pst
 	// material + pst
 
-	simdScore res = {st.material[0], st.material[1], 0, 0};
+	simdScore res = st.material;
 
 
 	//-----------------------------------------------------
@@ -1966,8 +1961,7 @@ Score Position::eval(void)
 	pawnEntry& probePawn = pawnHashTable.probe(pawnKey);
 	if( probePawn.key == pawnKey)
 	{
-		simdScore temp = {probePawn.res[0], probePawn.res[1], 0, 0};
-		pawnResult = temp;
+		pawnResult = simdScore{probePawn.res[0], probePawn.res[1], 0, 0};
 		weakPawns = probePawn.weakPawns;
 		passedPawns = probePawn.passedPawns;
 		attackedSquares[whitePawns] = probePawn.pawnAttacks[0];
@@ -1979,8 +1973,9 @@ Score Position::eval(void)
 	}
 	else
 	{
-		simdScore zero = {0,0,0,0};
-		pawnResult = zero;
+
+
+		pawnResult = simdScore{0,0,0,0};
 		bitMap pawns = getBitmap(whitePawns);
 
 		while(pawns)
@@ -2233,9 +2228,8 @@ Score Position::eval(void)
 	//--------------------------------------
 	//	weak pieces
 	//--------------------------------------
-	simdScore zero = {0,0,0,0};
-	wScore = zero;
-	bScore = zero;
+	wScore = simdScore{0,0,0,0};
+	bScore = simdScore{0,0,0,0};
 
 	bitMap pawnAttackedPieces = getBitmap( whitePieces ) & attackedSquares[ blackPawns ];
 	while(pawnAttackedPieces)
@@ -2340,8 +2334,7 @@ Score Position::eval(void)
 	}
 	if(trace)
 	{
-		simdScore temp = {kingSafety[white], 0, 0, 0};
-		wScore = temp;
+		wScore = simdScore{ kingSafety[white], 0, 0, 0};
 	}
 
 	kingSafety[black] = evalShieldStorm<black>(getSquareOfThePiece(blackKing));
@@ -2362,12 +2355,10 @@ Score Position::eval(void)
 	}
 	if(trace)
 	{
-		simdScore temp = {kingSafety[black], 0, 0, 0};
-		bScore = temp;
+		bScore = simdScore{ kingSafety[black], 0, 0, 0};
 	}
 
-	simdScore temp ={kingSafety[white] - kingSafety[black],0,0,0};
-	res += temp;
+	res+=simdScore{kingSafety[white]-kingSafety[black],0,0,0};
 
 
 
