@@ -57,11 +57,11 @@ int main()
 	Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();
 
-	search::initLMRreduction();
+	Search::initLMRreduction();
 	TT.setSize(1);
 	Position::initMaterialKeys();
 	initMobilityBonus();
-	tb_init(search::SyzygyPath.c_str());
+	tb_init(Search::SyzygyPath.c_str());
 
 	//----------------------------------
 	//	main loop

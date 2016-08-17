@@ -46,7 +46,7 @@ private:
 
 
 	const Position &pos;
-	const search &src;
+	const Search &src;
 	unsigned int ply;
 	const int depth;
 	Move ttMove;
@@ -184,7 +184,7 @@ public:
 
 
 
-	Movegen(const Position & p, const search& s, unsigned int ply, int d, const Move & ttm): pos(p),src(s),ply(ply),depth(d), ttMove(ttm)
+	Movegen(const Position & p, const Search& s, unsigned int ply, int d, const Move & ttm): pos(p),src(s),ply(ply),depth(d), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{

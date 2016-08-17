@@ -54,12 +54,12 @@ void benchmark(void)
 
 	unsigned long long nodes = 0;
 
-	long long int totalTime = search::getTime();
+	long long int totalTime = Search::getTime();
 
 
 	for (unsigned int i = 0; i < positions.size(); i++)
 	{
-		search src;
+		Search src;
 		src.limits.depth = 15;
 		src.resetStartTime();
 		src.pos.setupFromFen(positions[i]);
@@ -68,7 +68,7 @@ void benchmark(void)
 		nodes += src.getVisitedNodes();
 	}
 
-	totalTime =search::getTime() - totalTime + 1;
+	totalTime =Search::getTime() - totalTime + 1;
 
 	sync_cout << "\n==========================="
        << "\nTotal time (ms) : " << totalTime

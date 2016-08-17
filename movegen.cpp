@@ -262,7 +262,7 @@ void Movegen::generateMoves()
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)( piece+1 );
 
-	for(unsigned int i = 0; i < pos.getpieceCount(piece); i++)
+	for(unsigned int i = 0; i < pos.getPieceCount(piece); i++)
 	{
 
 		assert(i<Position::maxNumberOfPieces);
@@ -292,7 +292,7 @@ void Movegen::generateMoves()
 	//------------------------------------------------------
 	piece= (Position::bitboardIndex)(piece+1);
 
-	for(unsigned int i=0; i<pos.getpieceCount(piece); i++)
+	for(unsigned int i=0; i<pos.getPieceCount(piece); i++)
 	{
 		assert(i<Position::maxNumberOfPieces);
 		tSquare from = pos.getSquareOfThePiece(piece,i);
@@ -321,7 +321,7 @@ void Movegen::generateMoves()
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)(piece+1);
 
-	for(unsigned int i=0; i<pos.getpieceCount(piece); i++)
+	for(unsigned int i=0; i<pos.getPieceCount(piece); i++)
 	{
 		assert(i<Position::maxNumberOfPieces);
 		tSquare from = pos.getSquareOfThePiece(piece,i);
@@ -353,7 +353,7 @@ void Movegen::generateMoves()
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)(piece+1);
 
-	for(unsigned int i=0; i<pos.getpieceCount(piece); i++)
+	for(unsigned int i=0; i<pos.getPieceCount(piece); i++)
 	{
 		assert(i<Position::maxNumberOfPieces);
 		tSquare from = pos.getSquareOfThePiece(piece,i);

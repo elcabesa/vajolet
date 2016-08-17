@@ -286,10 +286,10 @@ void my_thread::manageNewSearch()
 	//----------------------------------------------
 	//	book probing
 	//----------------------------------------------
-	if(search::useOwnBook && !src.limits.infinite )
+	if(Search::useOwnBook && !src.limits.infinite )
 	{
 		PolyglotBook pol;
-		Move bookM = pol.probe(src.pos, search::bestMoveBook);
+		Move bookM = pol.probe(src.pos, Search::bestMoveBook);
 		if(bookM.packed)
 		{
 			sync_cout << "info pv " << displayUci(bookM) << sync_endl;

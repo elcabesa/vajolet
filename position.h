@@ -288,7 +288,7 @@ public:
 	{
 		return bitBoard[index];
 	}
-	inline unsigned int getpieceCount(const bitboardIndex index) const
+	inline unsigned int getPieceCount(const bitboardIndex index) const
 	{
 		return pieceCount[index];
 	}
@@ -326,6 +326,7 @@ public:
 	std::string getSymmetricFen() const;
 
 	void setupFromFen(const std::string& fenStr);
+	void setup(const std::string& code, color c);
 
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);

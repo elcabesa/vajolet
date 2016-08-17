@@ -181,7 +181,7 @@ class my_thread
 	std::mutex searchMutex;
 	std::condition_variable searchCond;
 	std::condition_variable timerCond;
-	search src;
+	Search src;
 
 	static long long lastHasfullMessage;
 

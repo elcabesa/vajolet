@@ -149,9 +149,9 @@ void static position(std::istringstream& is, Position & pos)
 void static doPerft(const unsigned int n, Position & pos)
 {
 
-	unsigned long long elapsed = search::getTime();
+	unsigned long long elapsed = Search::getTime();
 	unsigned long long res = pos.perft(n);
-	elapsed = search::getTime() - elapsed;
+	elapsed = Search::getTime() - elapsed;
 
 	sync_cout << "Perft " << n << " leaf nodes: " << res << sync_endl;
 	sync_cout << elapsed << "ms " << ((double)res) / (double)elapsed << " kN/s" << sync_endl;
@@ -221,42 +221,42 @@ void setoption(std::istringstream& is)
 	else if(name == "Threads")
 	{
 		int i = stoi(value);
-		search::threads = (i<=128)?(i>0?i:1):128;
+		Search::threads = (i<=128)?(i>0?i:1):128;
 	}
 	else if(name == "MultiPV")
 	{
 		int i = stoi(value);
-		search::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
+		Search::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
 	}
 	else if(name == "OwnBook")
 	{
 		if(value=="true")
 		{
-			search::useOwnBook = true;
+			Search::useOwnBook = true;
 		}
 		else{
-			search::useOwnBook = false;
+			Search::useOwnBook = false;
 		}
 	}
 	else if(name == "BestMoveBook")
 	{
 		if(value == "true")
 		{
-			search::bestMoveBook = true;
+			Search::bestMoveBook = true;
 		}
 		else
 		{
-			search::bestMoveBook = false;
+			Search::bestMoveBook = false;
 		}
 	}
 	else if(name == "UCI_ShowCurrLine")
 	{
 		if(value == "true"){
-			search::showCurrentLine = true;
+			Search::showCurrentLine = true;
 		}
 		else
 		{
-			search::showCurrentLine = false;
+			Search::showCurrentLine = false;
 		}
 	}
 	else if(name == "Ponder")
@@ -264,23 +264,23 @@ void setoption(std::istringstream& is)
 	}
 	else if(name == "SyzygyPath")
 	{
-		search::SyzygyPath = value;
-		tb_init(search::SyzygyPath.c_str());
+		Search::SyzygyPath = value;
+		tb_init(Search::SyzygyPath.c_str());
 		sync_cout<<"info string TB_LARGEST = "<<TB_LARGEST<<sync_endl;
 	}
 	else if(name == "SyzygyProbeDepth")
 	{
-		search::SyzygyProbeDepth = stoi(value);
+		Search::SyzygyProbeDepth = stoi(value);
 	}
 	else if(name == "Syzygy50MoveRule")
 	{
 		if(value == "true")
 		{
-			search::Syzygy50MoveRule = true;
+			Search::Syzygy50MoveRule = true;
 		}
 		else
 		{
-			search::Syzygy50MoveRule = false;
+			Search::Syzygy50MoveRule = false;
 		}
 	}
 	else
@@ -551,11 +551,11 @@ void printPVs(unsigned int count)
 {
 
 	int i= 0;
-	std::for_each(search::rootMoves.begin(),std::next(search::rootMoves.begin(), count), [&](rootMove& rm)
+	std::for_each(Search::rootMoves.begin(),std::next(Search::rootMoves.begin(), count), [&](rootMove& rm)
 	{
 		if(rm.nodes)
 		{
-			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes,search::tbHits);
+			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes,Search::tbHits);
 		}
 		i++;
 	});

@@ -1731,7 +1731,7 @@ template<color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 							 + 3 * (kingAdjacentZoneAttacksCount + bitCnt( undefendedSquares ) )
 							 + KingExposed[c? 63 - kingSquare : kingSquare ]
 							 - kingSafety / kingSafetyScaling[0]
-							 - (getpieceCount(c? whiteQueens: blackQueens)==0)*40;
+							 - (getPieceCount(c? whiteQueens: blackQueens)==0)*40;
 
 		// safe contact queen check
 		bitMap safeContactSquare = undefendedSquares & AttackedByTheirPieces[Queens]  & ~TheirPieces;
@@ -1903,33 +1903,33 @@ Score Position::eval(void)
 	//---------------------------------------------
 	//	bishop pair
 
-	if( getpieceCount(whiteBishops) >= 2 )
+	if( getPieceCount(whiteBishops) >= 2 )
 	{
-		if(getpieceCount(whiteBishops) != 2 || SQUARE_COLOR[ getSquareOfThePiece(whiteBishops) ] != SQUARE_COLOR[ getSquareOfThePiece(whiteBishops, 1) ] )
+		if(getPieceCount(whiteBishops) != 2 || SQUARE_COLOR[ getSquareOfThePiece(whiteBishops) ] != SQUARE_COLOR[ getSquareOfThePiece(whiteBishops, 1) ] )
 		{
 			res += bishopPair;
 		}
 	}
 
-	if( getpieceCount(blackBishops) >= 2 )
+	if( getPieceCount(blackBishops) >= 2 )
 	{
-		if(getpieceCount(blackBishops) != 2 || SQUARE_COLOR[ getSquareOfThePiece(blackBishops) ] != SQUARE_COLOR[ getSquareOfThePiece(blackBishops, 1) ] )
+		if(getPieceCount(blackBishops) != 2 || SQUARE_COLOR[ getSquareOfThePiece(blackBishops) ] != SQUARE_COLOR[ getSquareOfThePiece(blackBishops, 1) ] )
 		{
 			res -= bishopPair;
 		}
 	}
-	if( getpieceCount(blackPawns) + getpieceCount(whitePawns) == 0 )
+	if( getPieceCount(blackPawns) + getPieceCount(whitePawns) == 0 )
 	{
-		if((int)getpieceCount(whiteQueens) - (int)getpieceCount(blackQueens) == 1
-				&& (int)getpieceCount(blackRooks) - (int)getpieceCount(whiteRooks) == 1
-				&& (int)getpieceCount(blackBishops) + (int)getpieceCount(blackKnights) - (int)getpieceCount(whiteBishops) - (int)getpieceCount(whiteKnights) == 2)
+		if((int)getPieceCount(whiteQueens) - (int)getPieceCount(blackQueens) == 1
+				&& (int)getPieceCount(blackRooks) - (int)getPieceCount(whiteRooks) == 1
+				&& (int)getPieceCount(blackBishops) + (int)getPieceCount(blackKnights) - (int)getPieceCount(whiteBishops) - (int)getPieceCount(whiteKnights) == 2)
 		{
 			res += queenVsRook2MinorsImbalance;
 
 		}
-		else if((int)getpieceCount(whiteQueens) - (int)getpieceCount(blackQueens) == -1
-				&& (int)getpieceCount(blackRooks) - (int)getpieceCount(whiteRooks) == -1
-				&& (int)getpieceCount(blackBishops) + (int)getpieceCount(blackKnights) - (int)getpieceCount(whiteBishops) -(int)getpieceCount(whiteKnights) == -2)
+		else if((int)getPieceCount(whiteQueens) - (int)getPieceCount(blackQueens) == -1
+				&& (int)getPieceCount(blackRooks) - (int)getPieceCount(whiteRooks) == -1
+				&& (int)getPieceCount(blackBishops) + (int)getPieceCount(blackKnights) - (int)getPieceCount(whiteBishops) -(int)getPieceCount(whiteKnights) == -2)
 		{
 			res -= queenVsRook2MinorsImbalance;
 
@@ -2400,7 +2400,7 @@ Score Position::eval(void)
 	}
 
 	//todo scaling
-	if(mulCoeff == 256 && (getpieceCount(whitePawns) + getpieceCount(blackPawns) == 0 ) && (abs( st.material[0] )< 40000) )
+	if(mulCoeff == 256 && (getPieceCount(whitePawns) + getPieceCount(blackPawns) == 0 ) && (abs( st.material[0] )< 40000) )
 	{
 		//Score sumMaterial = st.nonPawnMaterial[0] + st.nonPawnMaterial[2];
 		//mulCoeff = std::max(std::min((Score) (sumMaterial* 0.0003 - 14), 256), 40);
@@ -2415,9 +2415,9 @@ Score Position::eval(void)
 
 	}
 
-	if(mulCoeff == 256  && st.nonPawnMaterial[0] + st.nonPawnMaterial[2] < 40000  &&  (st.nonPawnMaterial[0] + st.nonPawnMaterial[2] !=0) && (getpieceCount(whitePawns) == getpieceCount(blackPawns)) && !passedPawns )
+	if(mulCoeff == 256  && st.nonPawnMaterial[0] + st.nonPawnMaterial[2] < 40000  &&  (st.nonPawnMaterial[0] + st.nonPawnMaterial[2] !=0) && (getPieceCount(whitePawns) == getPieceCount(blackPawns)) && !passedPawns )
 	{
-		mulCoeff = std::min((unsigned int)256, getpieceCount(whitePawns) * 80);
+		mulCoeff = std::min((unsigned int)256, getPieceCount(whitePawns) * 80);
 	}
 
 

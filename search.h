@@ -100,7 +100,7 @@ public:
 };
 
 
-class search
+class Search
 {
 private:
 	static int globalReduction;
@@ -210,6 +210,6 @@ public:
 
 };
 
-extern search defaultSearch;
+extern Search defaultSearch;
 
 #endif /* SEARCH_H_ */
