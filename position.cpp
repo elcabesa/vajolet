@@ -360,7 +360,7 @@ void Position::setupFromFen(const std::string& fenStr)
 	checkPosConsistency(1);
 }
 
-void Position::setup(const std::string& code, color c)
+void Position::setup(const std::string& code, Color c)
 {
 
   assert(code.length() > 0 && code.length() < 8);
@@ -374,6 +374,7 @@ void Position::setup(const std::string& code, color c)
   std::string fenStr =  sides[0] + char(8 - sides[0].length() + '0') + "/8/8/8/8/8/8/"
                  + sides[1] + char(8 - sides[1].length() + '0') + " w - - 0 10";
 
+  sync_cout<<fenStr<<sync_endl;
   return setupFromFen(fenStr);
 }
 

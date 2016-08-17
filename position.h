@@ -29,11 +29,11 @@
 
 
 
-enum color
+typedef enum
 {
 	white = 0,
 	black = 1
-};
+}Color;
 
 //---------------------------------------------------
 //	class
@@ -45,14 +45,15 @@ class Position
 {
 	struct materialStruct
 	{
-		enum
+		typedef enum
 		{
 			exact,
 			multiplicativeFunction,
 			exactFunction,
 			saturationH,
-			saturationL
-		} type ;
+			saturationL,
+		} tType ;
+		tType type;
 		bool (Position::*pointer)(Score &);
 		Score val;
 
@@ -326,7 +327,7 @@ public:
 	std::string getSymmetricFen() const;
 
 	void setupFromFen(const std::string& fenStr);
-	void setup(const std::string& code, color c);
+	void setup(const std::string& code, Color c);
 
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
@@ -709,12 +710,12 @@ private:
 		pieceList[piece][pieceCount[piece]] = squareNone;
 	}
 
-	template<color c> simdScore evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const;
-	template<color c> simdScore evalPassedPawn(bitMap pp, bitMap * attackedSquares) const;
+	template<Color c> simdScore evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const;
+	template<Color c> simdScore evalPassedPawn(bitMap pp, bitMap * attackedSquares) const;
 	template<Position::bitboardIndex piece>	simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
 
-	template<color c> Score evalShieldStorm(tSquare ksq) const;
-	template<color c> simdScore evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
+	template<Color c> Score evalShieldStorm(tSquare ksq) const;
+	template<Color c> simdScore evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
 
 	std::unordered_map<U64, materialStruct> static materialKeyMap;
 

@@ -160,7 +160,7 @@ std::unordered_map<U64, Position::materialStruct> Position::materialKeyMap;
 
 bool Position::evalKBPvsK(Score& res)
 {
-	color Pcolor = getBitmap(whitePawns) ? white : black;
+	Color Pcolor = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
 	tSquare bishopSquare;
 	if(Pcolor == white)
@@ -205,7 +205,7 @@ bool Position::evalKBPvsK(Score& res)
 
 bool Position::evalKQvsKP(Score& res)
 {
-	color Pcolor = getBitmap(whitePawns) ? white  :black;
+	Color Pcolor = getBitmap(whitePawns) ? white  :black;
 	tSquare pawnSquare;
 	tSquare winningKingSquare;
 	tSquare losingKingSquare;
@@ -258,7 +258,7 @@ bool Position::evalKQvsKP(Score& res)
 
 bool Position::evalKRPvsKr(Score& res)
 {
-	color Pcolor = getBitmap(whitePawns) ? white : black;
+	Color Pcolor = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
 	if( Pcolor == white )
 	{
@@ -291,7 +291,7 @@ bool Position::evalKRPvsKr(Score& res)
 
 bool Position::evalKBNvsK( Score& res)
 {
-	color color = getBitmap(whiteBishops) ? white : black;
+	Color color = getBitmap(whiteBishops) ? white : black;
 	tSquare bishopSquare;
 	tSquare kingSquare;
 	tSquare enemySquare;
@@ -336,7 +336,7 @@ bool Position::evalKBNvsK( Score& res)
 
 bool Position::evalKQvsK(Score& res)
 {
-	color color = getBitmap(whiteQueens) ? white : black;
+	Color color = getBitmap(whiteQueens) ? white : black;
 	tSquare queenSquare;
 	tSquare kingSquare;
 	tSquare enemySquare;
@@ -382,7 +382,7 @@ bool Position::kingsDirectOpposition()
 
 bool Position::evalKPvsK(Score& res)
 {
-	color color = getBitmap(whitePawns) ? white : black;
+	Color color = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
 	tSquare kingSquare;
 	tSquare enemySquare;
@@ -677,402 +677,115 @@ void Position::initMaterialKeys(void)
 
 	Position p;
 	U64 key;
-	//------------------------------------------
-	//	k vs K
-	//------------------------------------------
-	p.setupFromFen("k7/8/8/8/8/8/8/7K w - -");
-	key = p.getMaterialKey();
+
+	static const struct{
+		std::string fen;
+		materialStruct::tType type;
+		bool (Position::*pointer)(Score &);
+		Score val;
+	} Endgames[] = {
+			// DRAWN
+			{"k7/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },
+
+			{"kb6/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },
+			{"k7/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+
+			{"kn6/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },
+			{"k7/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
+
+			{"kn6/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+
+			{"knn5/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
+			{"knn5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+			{"kbn5/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
+			{"kbn5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+			{"kbb5/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
+			{"kbb5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+
+			{"kn6/8/8/8/8/8/8/5NNK w - -",materialStruct::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/5NNK w - -",materialStruct::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/5BNK w - -",materialStruct::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/5BNK w - -",materialStruct::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/5BBK w - -",materialStruct::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/5BBK w - -",materialStruct::exact, nullptr, 0 },
+
+			{"kb6/8/8/8/8/8/7P/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/6PP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/5PPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/4PPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/3PPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/2PPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/1PPPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/PPPPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+
+			{"k7/7p/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/6pp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/5ppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/4pppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/3ppppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/2pppppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/1ppppppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/pppppppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+
+			{"kn6/8/8/8/8/8/7P/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/6PP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/5PPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/4PPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/3PPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/2PPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/1PPPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/PPPPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+
+			{"k7/7p/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/6pp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/5ppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/4pppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/3ppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/2pppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/1ppppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/pppppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+
+			{"k7/8/8/8/8/8/8/5BPK w - -",materialStruct::exactFunction, &Position::evalKBPvsK, 0 },
+			{"kbp5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBPvsK, 0 },
+			{"k7/8/8/8/8/8/8/5BNK w - -",materialStruct::exactFunction, &Position::evalKBNvsK, 0 },
+			{"kbn5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBNvsK, 0 },
+
+			{"k7/8/8/8/8/8/8/6QK w - -",materialStruct::exactFunction, &Position::evalKQvsK, 0 },
+			{"kq6/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKQvsK, 0 },
+
+			{"k7/8/8/8/8/8/8/6PK w - -",materialStruct::exactFunction, &Position::evalKPvsK, 0 },
+			{"kp6/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPvsK, 0 },
+
+			{"kr6/8/8/8/8/8/8/6NK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"kr6/8/8/8/8/8/8/6BK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"kb6/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"kn6/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+
+			{"knn5/8/8/8/8/8/8/7K w - -",materialStruct::multiplicativeFunction, &Position::evalKNNvsK, 0 },
+			{"k7/8/8/8/8/8/8/5NNK w - -",materialStruct::multiplicativeFunction, &Position::evalKNNvsK, 0 },
+
+			{"kr6/8/8/8/8/8/8/5PRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
+			{"krp5/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
+
+			{"kq6/8/8/8/8/8/8/6PK w - -",materialStruct::exactFunction, &Position::evalKQvsKP, 0 },
+			{"kp6/8/8/8/8/8/8/6QK w - -",materialStruct::exactFunction, &Position::evalKQvsKP, 0 }
+
+	};
+
 	materialStruct t;
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kb vs K
-	//------------------------------------------
-	p.setupFromFen("kb6/8/8/8/8/8/8/7K w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kn vs K
-	//------------------------------------------
-	p.setupFromFen("kn6/8/8/8/8/8/8/7K w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	k vs KB
-	//------------------------------------------
-	p.setupFromFen("k7/8/8/8/8/8/8/6BK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	k vs KN
-	//------------------------------------------
-	p.setupFromFen("k7/8/8/8/8/8/8/6NK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
 
-
-	//------------------------------------------
-	//	kn vs KB
-	//------------------------------------------
-	p.setupFromFen("kn6/8/8/8/8/8/8/6BK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kn vs KN
-	//------------------------------------------
-	p.setupFromFen("kn6/8/8/8/8/8/8/6NK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	kb vs KB
-	//------------------------------------------
-	p.setupFromFen("kb6/8/8/8/8/8/8/6BK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kb vs KN
-	//------------------------------------------
-	p.setupFromFen("kb6/8/8/8/8/8/8/6NK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kbb vs KN
-	//------------------------------------------
-	p.setupFromFen("kbb5/8/8/8/8/8/8/6NK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kbb vs KB
-	//------------------------------------------
-	p.setupFromFen("kbb5/8/8/8/8/8/8/6BK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kbn vs KN
-	//------------------------------------------
-	p.setupFromFen("kbn5/8/8/8/8/8/8/6NK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kbn vs KB
-	//------------------------------------------
-	p.setupFromFen("kbn5/8/8/8/8/8/8/6BK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	knn vs KN
-	//------------------------------------------
-	p.setupFromFen("knn5/8/8/8/8/8/8/6NK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	knn vs KB
-	//------------------------------------------
-	p.setupFromFen("knn5/8/8/8/8/8/8/6BK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	kb vs KBB
-	//------------------------------------------
-	p.setupFromFen("kb6/8/8/8/8/8/8/5BBK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kn vs KBB
-	//------------------------------------------
-	p.setupFromFen("kn6/8/8/8/8/8/8/5BBK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kb vs KBN
-	//------------------------------------------
-	p.setupFromFen("kb6/8/8/8/8/8/8/5BNK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kn vs KBN
-	//------------------------------------------
-	p.setupFromFen("kn6/8/8/8/8/8/8/5BNK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kb vs KNN
-	//------------------------------------------
-	p.setupFromFen("kb6/8/8/8/8/8/8/5NNK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kn vs KNN
-	//------------------------------------------
-	p.setupFromFen("kn6/8/8/8/8/8/8/5NNK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exact;
-	t.pointer = nullptr;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	kb vs Kpawns
-	//------------------------------------------
-	t.type = materialStruct::saturationL;
-	t.pointer = nullptr;
-	t.val = 0;
-	p.setupFromFen("kb6/8/8/8/8/8/7P/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kb6/8/8/8/8/8/6PP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kb6/8/8/8/8/8/5PPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kb6/8/8/8/8/8/4PPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kb6/8/8/8/8/8/3PPPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kb6/8/8/8/8/8/2PPPPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kb6/8/8/8/8/8/1PPPPPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kb6/8/8/8/8/8/PPPPPPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-
-	t.type = materialStruct::saturationH;
-	t.pointer = nullptr;
-	t.val = 0;
-	p.setupFromFen("k7/8/8/8/8/8/7p/6BK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/6pp/6BK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/5ppp/6BK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/4pppp/6BK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/3ppppp/6BK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/2pppppp/6BK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/1ppppppp/6BK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/ppppppp/6BK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-
-
-	//------------------------------------------
-	//	kn vs Kpawns
-	//------------------------------------------
-	t.type = materialStruct::saturationL;
-	t.pointer = nullptr;
-	t.val = 0;
-	p.setupFromFen("kn6/8/8/8/8/8/7P/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kn6/8/8/8/8/8/6PP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kn6/8/8/8/8/8/5PPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kn6/8/8/8/8/8/4PPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kn6/8/8/8/8/8/3PPPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kn6/8/8/8/8/8/2PPPPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kn6/8/8/8/8/8/1PPPPPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("kn6/8/8/8/8/8/PPPPPPPP/7K w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-
-	t.type = materialStruct::saturationH;
-	t.pointer = nullptr;
-	t.val = 0;
-	p.setupFromFen("k7/8/8/8/8/8/7p/6NK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/6pp/6NK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/5ppp/6NK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/4pppp/6NK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/3ppppp/6NK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/2pppppp/6NK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/1ppppppp/6NK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-	p.setupFromFen("k7/8/8/8/8/8/ppppppp/6NK w - -");
-	key = p.getMaterialKey();
-	materialKeyMap.insert({key,t});
-
-
-
-
-
-
-
-	//------------------------------------------
-	//	k vs KBP
-	//------------------------------------------
-	p.setupFromFen("k7/8/8/8/8/8/8/5BPK w - -");
-	key = p.getMaterialKey();
-	t.type = materialStruct::exactFunction;
-	t.pointer = &Position::evalKBPvsK;
-	t.val = 0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kbp vs K
-	//------------------------------------------
-	p.setupFromFen("kbp5/8/8/8/8/8/8/7K w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKBPvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	k vs KBN
-	//------------------------------------------
-	p.setupFromFen("k7/8/8/8/8/8/8/5BNK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKBNvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kbn vs K
-	//------------------------------------------
-	p.setupFromFen("kbn5/8/8/8/8/8/8/7K w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKBNvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	k vs KQ
-	//------------------------------------------
-	p.setupFromFen("k7/8/8/8/8/8/8/6QK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKQvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kq vs K
-	//------------------------------------------
-	p.setupFromFen("kq6/8/8/8/8/8/8/7K w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKQvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	k vs KP
-	//------------------------------------------
-	p.setupFromFen("k7/8/8/8/8/8/8/6PK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKPvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kp vs K
-	//------------------------------------------
-	p.setupFromFen("kp6/8/8/8/8/8/8/7K w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKPvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
+	for (auto& eg : Endgames)
+	{
+		p.setupFromFen(eg.fen);
+		key = p.getMaterialKey();
+		t.type = eg.type;
+		t.pointer = eg.pointer;
+		t.val = eg.val;
+		materialKeyMap.insert({key,t});
+	}
 
 	//------------------------------------------
 	//	opposite bishop endgame
@@ -1101,105 +814,6 @@ void Position::initMaterialKeys(void)
 			}
 		}
 	}
-
-	//------------------------------------------
-	//	kr vs KN
-	//------------------------------------------
-	p.setupFromFen("kr6/8/8/8/8/8/8/6NK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&Position::evalKRvsKm;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kr vs KB
-	//------------------------------------------
-	p.setupFromFen("kr6/8/8/8/8/8/8/6BK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&Position::evalKRvsKm;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	kb vs KR
-	//------------------------------------------
-	p.setupFromFen("kb6/8/8/8/8/8/8/6RK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&Position::evalKRvsKm;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-	//------------------------------------------
-	//	kn vs KR
-	//------------------------------------------
-	p.setupFromFen("kn6/8/8/8/8/8/8/6RK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&Position::evalKRvsKm;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	knn vs K
-	//------------------------------------------
-	p.setupFromFen("knn5/8/8/8/8/8/8/7K w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&Position::evalKNNvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	k vs KNN
-	//------------------------------------------
-	p.setupFromFen("k7/8/8/8/8/8/8/5NNK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&Position::evalKNNvsK;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-
-	//------------------------------------------
-	//	kr vs KRP
-	//------------------------------------------
-	p.setupFromFen("kr6/8/8/8/8/8/8/5PRK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&Position::evalKRPvsKr;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	krp vs KR
-	//------------------------------------------
-	p.setupFromFen("krp5/8/8/8/8/8/8/6RK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::multiplicativeFunction;
-	t.pointer=&Position::evalKRPvsKr;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	kq vs KP
-	//------------------------------------------
-	p.setupFromFen("kq6/8/8/8/8/8/8/6PK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKQvsKP;
-	t.val=0;
-	materialKeyMap.insert({key,t});
-
-	//------------------------------------------
-	//	kp vs KQ
-	//------------------------------------------
-	p.setupFromFen("kp6/8/8/8/8/8/8/6QK w - -");
-	key = p.getMaterialKey();
-	t.type=materialStruct::exactFunction;
-	t.pointer=&Position::evalKQvsKP;
-	t.val=0;
-	materialKeyMap.insert({key,t});
 }
 
 
@@ -1224,7 +838,7 @@ const Position::materialStruct * Position::getMaterialData()
 
 
 
-template<color c>
+template<Color c>
 simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const
 {
 	simdScore res = {0,0,0,0};
@@ -1570,7 +1184,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 	return res;
 }
 
-template<color c>
+template<Color c>
 Score Position::evalShieldStorm(tSquare ksq) const
 {
 	Score ks = 0;
@@ -1605,7 +1219,7 @@ Score Position::evalShieldStorm(tSquare ksq) const
 	return ks;
 }
 
-template<color c>
+template<Color c>
 simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 {
 	tSquare kingSquare = c ? getSquareOfThePiece( blackKing ) : getSquareOfThePiece( whiteKing );
@@ -1706,7 +1320,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 }
 
 
-template<color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const
+template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const
 {
 	simdScore res = {0,0,0,0};
 	//bitMap * OurPieces = c ? &getBitmap(separationBitmap) : &getBitmap(occupiedSquares);
