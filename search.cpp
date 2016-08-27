@@ -944,7 +944,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//------------------------
 	if(depth >= (PVnode ? 5 * ONE_PLY : 8 * ONE_PLY)
 		&& ttMove.packed == 0
-		&& (PVnode || staticEval + 10000 >= beta))
+		&& (PVnode || (type == Search::nodeType::CUT_NODE && */staticEval + 10000 >= beta)))
 	{
 		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
 
