@@ -283,6 +283,23 @@ startThinkResult Search::startThinking(unsigned int depth, Score alpha, Score be
 	// we can start the real search
 	//----------------------------------
 
+	if(limits.depth == 0)
+	{
+
+		std::list<Move> newPV;
+		Score res =qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, newPV);
+		sync_cout<<"info score cp "<<int(res/100)<<sync_endl;
+
+		startThinkResult ret;
+		ret.PV = newPV;
+		ret.depth = 0;
+		ret.alpha = -SCORE_INFINITE;
+		ret.beta = SCORE_INFINITE;
+
+
+		return ret;
+
+	}
 
 
 	std::list<Move> newPV;

@@ -54,7 +54,7 @@ public:
 		winc = 0;
 		binc = 0;
 		movesToGo = 0;
-		depth = 0;
+		depth = -1;
 		nodes = 0;
 		mate = 0;
 		moveTime = 0;
