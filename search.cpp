@@ -533,7 +533,7 @@ startThinkResult Search::startThinking(unsigned int depth, Score alpha, Score be
 		depth += 1;
 
 	}
-	while( depth <= (limits.depth ? limits.depth : 100) && !stop);
+	while( depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
 
 
 	startThinkResult ret;
