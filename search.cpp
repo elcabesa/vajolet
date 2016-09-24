@@ -95,7 +95,7 @@ void Search::reloadPv( unsigned int i )
 	}
 }
 
-startThinkResult Search::startThinking(unsigned int depth, Score alpha, Score beta)
+startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 {
 	useTBresult = false;
 	//------------------------------------

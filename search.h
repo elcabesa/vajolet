@@ -42,8 +42,8 @@ class searchLimits
 {
 public:
 	volatile bool ponder,infinite;
-	unsigned int wtime,btime,winc,binc,movesToGo,depth,nodes,mate,moveTime;
-
+	unsigned int wtime,btime,winc,binc,movesToGo,nodes,mate,moveTime;
+	int depth;
 	std::list<Move> searchMoves;
 	searchLimits()
 	{
@@ -197,7 +197,7 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	startThinkResult startThinking(unsigned int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE);
+	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE);
 	unsigned long long getVisitedNodes() const { return visitedNodes; }
 
 private:
