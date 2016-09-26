@@ -130,7 +130,7 @@ all: vajolet2.exe
 vajolet2.exe: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -s -static -o "vajolet2.exe" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -s -static -pthread -o "vajolet2.exe" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
