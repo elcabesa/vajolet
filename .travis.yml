@@ -1,7 +1,5 @@
 language: cpp
 
-compiler:
-  - gcc
+compiler: gcc
 
- script:
-  - make clean && make all
+script: make clean && make all
