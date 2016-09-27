@@ -13,6 +13,7 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <sys/stat.h>
 #include <fcntl.h>
 #ifndef _WIN32
@@ -86,17 +87,15 @@ static FD open_tb(const char *str, const char *suffix)
 {
   int i;
   FD fd;
-  char file[256];
+  std::string file;
 
   for (i = 0; i < num_paths; i++) {
-    strcpy(file, paths[i]);
-    strcat(file, "/");
-    strcat(file, str);
-    strcat(file, suffix);
+    file = std::string(paths[i]) + std::string("/") + std::string(str) + std::string(suffix);
+
 #ifndef _WIN32
-    fd = open(file, O_RDONLY);
+    fd = open(file.c_str(), O_RDONLY);
 #else
-    fd = CreateFile(file, GENERIC_READ, FILE_SHARE_READ, NULL,
+    fd = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
 			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
     if (fd != FD_ERR) return fd;

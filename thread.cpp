@@ -50,7 +50,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
 			}else
 			{
-				timeMan.allocatedTime = lim.btime/40.0+lim.binc*0.8;
+				timeMan.allocatedTime = lim.btime/40.0+lim.binc*0.98;
 				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
 			}
 
@@ -67,7 +67,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
 			}else
 			{
-				timeMan.allocatedTime = lim.wtime/40.0+lim.winc*0.8;
+				timeMan.allocatedTime = lim.wtime/40.0+lim.winc*0.98;
 				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
 			}
 			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);

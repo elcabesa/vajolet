@@ -596,7 +596,7 @@ std::string Position::getSymmetricFen() const {
 				}
 				emptyFiles = 0;
 				bitboardIndex xx = squares[BOARDINDEX[file][rank]];
-				if(xx > separationBitmap)
+				if(xx >= separationBitmap)
 				{
 					xx = (bitboardIndex)(xx - separationBitmap);
 				}
@@ -1369,7 +1369,7 @@ inline void Position::calcCheckingSquares(void)
 	state &s = getActualState();
 	bitboardIndex opponentKing = (bitboardIndex)(blackKing-s.nextMove);
 	assert(opponentKing<lastBitboard);
-	bitboardIndex attackingPieces = (bitboardIndex)s.nextMove;
+	bitboardIndex attackingPieces = (bitboardIndex)(s.nextMove);
 	assert(attackingPieces<lastBitboard);
 
 

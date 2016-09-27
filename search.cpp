@@ -408,18 +408,25 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					{
 						auto it = std::find(rootMoves.begin()+indexPV, rootMoves.end(), newPV.front() );
 
-						assert( it->firstMove == newPV.front());
+						if (it != rootMoves.end())
+						{
+							assert( it->firstMove == newPV.front());
 
-						//if(it->firstMove == newPV.front())
-						//{
-						it->PV = newPV;
-						it->score = res;
-						it->maxPlyReached = maxPlyReached;
-						it->depth = depth;
-						it->nodes = visitedNodes;
-						it->time = elapsedTime;
+							//if(it->firstMove == newPV.front())
+							//{
+							it->PV = newPV;
+							it->score = res;
+							it->maxPlyReached = maxPlyReached;
+							it->depth = depth;
+							it->nodes = visitedNodes;
+							it->time = elapsedTime;
 
-						std::iter_swap( it, rootMoves.begin()+indexPV);
+							std::iter_swap( it, rootMoves.begin()+indexPV);
+						}
+						else
+						{
+							//std::cout<<"info ERROR"<<sync_endl;
+						}
 
 						//}
 
