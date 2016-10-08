@@ -46,7 +46,7 @@ std::atomic<unsigned long long> Search::tbHits;
 int Search::globalReduction =0;
 
 
-Score Search::futility[5] = {0,6000,20000,30000,40000};
+Score Search::futility[8] = {0,6000,12000,18000,24000,30000,36000,42000};
 Score Search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
 unsigned int Search::FutilityMoveCounts[11] = {5,10,17,26,37,50,66,85,105,130,151};
 Score Search::PVreduction[32*ONE_PLY][64];
@@ -810,7 +810,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&&  alpha >= -SCORE_INFINITE+razorMargin(depth,type==CUT_NODE)
 			//&&  abs(alpha) < SCORE_MATE_IN_MAX_PLY // implicito nell riga precedente
 			&&  ((!ttMove.packed ) || type == ALL_NODE)
-			&& !((pos.getNextTurn() && (pos.getBitmap(Position::blackPawns) & RANKMASK[A2])) || (!pos.getNextTurn() && (pos.getBitmap(Position::whitePawns) & RANKMASK[A7]) ) )
+			//&& !((pos.getNextTurn() && (pos.getBitmap(Position::blackPawns) & RANKMASK[A2])) || (!pos.getNextTurn() && (pos.getBitmap(Position::whitePawns) & RANKMASK[A7]) ) )
 		)
 		{
 			Score ralpha = alpha - razorMargin(depth,type==CUT_NODE);
@@ -830,12 +830,13 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		//	at very low deep and with an evaluation well above beta, bet that we can found a move with a result above beta
 		//---------------------------
 		if (!sd[ply].skipNullMove
-			&& depth < 4 * ONE_PLY
+			&& depth < 8 * ONE_PLY
 			&& eval > -SCORE_INFINITE + futility[ depth>>ONE_PLY_SHIFT ]
 			&& eval - futility[depth>>ONE_PLY_SHIFT] >= beta
 			&& abs(eval) < SCORE_KNOWN_WIN
 			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[Position::whiteKnights][0])))
 		{
+			assert((depth>>ONE_PLY_SHIFT)<8);
 			assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
 			return eval - futility[depth>>ONE_PLY_SHIFT];
 		}
@@ -848,9 +849,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		// this search let us know about threat move by the opponent.
 		//---------------------------
 
-		if( /*depth >= ONE_PLY
-			&& */eval >= beta
-			&& (staticEval >=beta || depth >= 13 * ONE_PLY)
+		if( depth >= ONE_PLY
+			&& eval >= beta
 			&& !sd[ply].skipNullMove
 			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[Position::whiteKnights][0]))
 		){
@@ -936,7 +936,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			// && eval> beta-40000
 		){
 			Score s;
-			Score rBeta = beta + 8000;
+			Score rBeta = std::min(beta + 8000,SCORE_INFINITE);
 			int rDepth = depth -ONE_PLY- 3*ONE_PLY;
 
 			Movegen mg(pos, *this, ply, rDepth, ttMove);
@@ -968,7 +968,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//------------------------
 	if(depth >= (PVnode ? 5 * ONE_PLY : 8 * ONE_PLY)
 		&& ttMove.packed == 0
-		&& (PVnode || (type == Search::nodeType::ALL_NODE && staticEval + 100>=beta) || (type == Search::nodeType::CUT_NODE && staticEval + 10000>=beta)))
+		&& (PVnode || staticEval + 10000 >= beta))
 	{
 		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
 

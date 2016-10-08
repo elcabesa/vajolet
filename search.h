@@ -105,7 +105,7 @@ class Search
 private:
 	static int globalReduction;
 	bool useTBresult;
-	static Score futility[5];
+	static Score futility[8];
 	static Score futilityMargin[7];
 	static unsigned int FutilityMoveCounts[11];
 	static Score PVreduction[32*ONE_PLY][64];
