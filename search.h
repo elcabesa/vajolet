@@ -156,6 +156,7 @@ private:
 	unsigned int maxPlyReached;
 
 	void reloadPv(unsigned int i);
+	void verifyPv(std::list<Move> &newPV, Score res);
 
 public:
 	static std::atomic<unsigned long long> tbHits;

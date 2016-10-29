@@ -573,8 +573,8 @@ public:
 	*/
 	inline unsigned int getGamePhase() const
 	{
-		const int opening = 570000;
-		const int endgame = 150000;
+		const int opening = 700000;
+		const int endgame = 100000;
 		Score tot = getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
 		if(tot>opening) //opening
 		{

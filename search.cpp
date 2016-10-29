@@ -95,6 +95,37 @@ void Search::reloadPv( unsigned int i )
 	}
 }
 
+void Search::verifyPv(std::list<Move> &newPV, Score res)
+{
+
+	unsigned int n = 0;
+
+	for(const Move& m : newPV)
+	{
+		if (!pos.isMoveLegal(m))
+		{
+			break;
+		}
+		pos.doMove(m);
+		n++;
+	}
+	pos.display();
+	Score temp = pos.eval<true>();
+	sync_cout<<"EVAL:" <<temp/10000.0<<sync_endl;
+	sync_cout<<"gamePhase:" <<pos.getGamePhase()/65536.0*100<<sync_endl;
+	if( n %2 )
+	{
+		temp = -temp;
+	}
+	sync_cout<< temp << " " <<res<<sync_endl;
+
+	for(unsigned int i = 0; i< n; i++)
+	{
+		pos.undoMove();
+	}
+
+}
+
 startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 {
 	useTBresult = false;
@@ -103,7 +134,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	//------------------------------------
 	Score res = 0;
 	Score TBres = 0;
-	//bool firstRun = true;
 
 
 	TT.newSearch();
@@ -326,7 +356,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			//----------------------------------
 			// prepare alpha & beta
 			//----------------------------------
-			if (/*!firstRun && */depth >= 5)
+			if (depth >= 5)
 			{
 				delta = 800;
 				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int)-SCORE_INFINITE);
@@ -345,7 +375,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			{
 				reloadPv(i);
 			}
-			//firstRun = false;
 
 
 			globalReduction = 0;
@@ -378,7 +407,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 				newPV.clear();
 				// main thread
 				res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
-
 
 				res = useTBresult ? TBres : res;
 				// stop helper threads
@@ -466,6 +494,12 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					}
 					else
 					{
+						//verify search result
+						// print PV
+						/*sync_cout<<"PV ";
+						for_each( newPV.begin(), newPV.end(), [&](Move &m){std::cout<<displayUci(m)<<" ";});
+						std::cout<<sync_endl;
+						verifyPv(newPV,res);*/
 						break;
 					}
 
