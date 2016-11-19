@@ -973,7 +973,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score rBeta = std::min(beta + 8000,SCORE_INFINITE);
 			int rDepth = depth -ONE_PLY- 3*ONE_PLY;
 
-			Movegen mg(pos, *this, ply, rDepth, ttMove);
+			Movegen mg(pos, *this, ply, ttMove);
 			mg.setupProbCutSearch(pos.getCapturedPiece());
 
 			Move m;
@@ -1028,7 +1028,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Move bestMove(Movegen::NOMOVE);
 
 	Move m;
-	Movegen mg(pos, *this, ply, depth, ttMove);
+	Movegen mg(pos, *this, ply, ttMove);
 	unsigned int moveNumber = 0;
 	unsigned int quietMoveCount = 0;
 	Move quietMoveList[64];
@@ -1308,31 +1308,23 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				if(PVnode)
 				{
 					alpha = val;
-				}
-				if(type == Search::nodeType::ROOT_NODE || type ==Search::nodeType::HELPER_ROOT_NODE || (PVnode))
-				{
-					if(PVnode)
+					pvLine.clear();
+					pvLine.push_back(bestMove);
+					pvLine.splice(pvLine.end(),childPV);
+					if(type == Search::nodeType::ROOT_NODE && Search::multiPVLines==1)
 					{
-						pvLine.clear();
-						pvLine.push_back(bestMove);
-						pvLine.splice(pvLine.end(),childPV);
-						if(type == Search::nodeType::ROOT_NODE && Search::multiPVLines==1)
+						/*if(moveNumber!=1)
 						{
-							/*if(moveNumber!=1)
-							{
-								sync_cout<<"info string NUOVA MOSSA"<<sync_endl;
-							}*/
-							if(val <beta)
-							{
-								printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, visitedNodes,tbHits);
-							}
-							validIteration = true;
+							sync_cout<<"info string NUOVA MOSSA"<<sync_endl;
+						}*/
+						if(val <beta)
+						{
+							printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, visitedNodes,tbHits);
 						}
+						validIteration = true;
 					}
-					/*else{
-						sync_cout<<"impossibile"<<sync_endl;
-					}*/
 				}
+
 			}
 		}
 	}
@@ -1453,7 +1445,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	Move ttMove;
 	ttMove = tte ? tte->getPackedMove() : Movegen::NOMOVE;
 
-	Movegen mg(pos, *this, ply, depth, ttMove);
+	Movegen mg(pos, *this, ply, ttMove);
 	int TTdepth = mg.setupQuiescentSearch(inCheck, depth);
 	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
 

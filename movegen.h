@@ -48,7 +48,6 @@ private:
 	const Position &pos;
 	const Search &src;
 	unsigned int ply;
-	const int depth;
 	Move ttMove;
 
 	Move killerMoves[2];
@@ -184,7 +183,7 @@ public:
 
 
 
-	Movegen(const Position & p, const Search& s, unsigned int ply, int d, const Move & ttm): pos(p),src(s),ply(ply),depth(d), ttMove(ttm)
+	Movegen(const Position & p, const Search& s, unsigned int ply, const Move & ttm): pos(p),src(s),ply(ply), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{
@@ -201,7 +200,7 @@ public:
 
 	}
 
-	Movegen(const Position & p): Movegen(p, defaultSearch, 0, 100*ONE_PLY, NOMOVE)
+	Movegen(const Position & p): Movegen(p, defaultSearch, 0, NOMOVE)
 	{
 	}
 
