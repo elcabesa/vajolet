@@ -953,7 +953,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			else
 			{
 				const ttEntry * const tteNull = TT.probe(nullKey);
-				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : 0;
+				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : Movegen::NOMOVE;
 			}
 
 		}
@@ -1302,12 +1302,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		{
 			bestScore = val;
 
-			if(val > alpha)
+			if(bestScore > alpha)
 			{
 				bestMove = m;
 				if(PVnode)
 				{
-					alpha = val;
+					alpha = bestScore;
 					pvLine.clear();
 					pvLine.push_back(bestMove);
 					pvLine.splice(pvLine.end(),childPV);
@@ -1317,7 +1317,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 						{
 							sync_cout<<"info string NUOVA MOSSA"<<sync_endl;
 						}*/
-						if(val <beta)
+						if(val < beta)
 						{
 							printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, visitedNodes,tbHits);
 						}
@@ -1642,11 +1642,11 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		if( val > bestScore)
 		{
 			bestScore = val;
-			if( val > alpha )
+			if( bestScore > alpha )
 			{
 				bestMove = m;
 				TTtype = typeExact;
-				alpha = val;
+				alpha = bestScore;
 
 				if(PVnode && !stop)
 				{
