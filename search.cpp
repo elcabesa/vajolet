@@ -582,6 +582,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	ret.depth = depth-1;
 	ret.alpha = alpha;
 	ret.beta = beta;
+	ret.Res = rootMoves[0].score;
 
 
 	return ret;

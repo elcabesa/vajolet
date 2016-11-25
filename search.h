@@ -36,6 +36,7 @@ struct startThinkResult
 	Score beta;
 	unsigned int depth;
 	std::list<Move> PV;
+	Score Res;
 };
 
 class searchLimits

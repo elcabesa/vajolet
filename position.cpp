@@ -707,7 +707,7 @@ U64 Position::calcKey(void) const
 */
 U64 Position::calcPawnKey(void) const
 {
-	U64 hash = 0;
+	U64 hash = 1;
 	for (int i = 0; i < squareNumber; i++)
 	{
 		if(squares[i] == whitePawns || squares[i] == blackPawns)
