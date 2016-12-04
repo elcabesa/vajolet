@@ -61,7 +61,7 @@ public:
 		return pawnTable[((unsigned int)key) %size];
 	}
 private:
-	std::array<pawnEntry,8192> pawnTable;
+	std::array<pawnEntry,size> pawnTable;
 };
 
 #endif /* TABLES_H_ */
