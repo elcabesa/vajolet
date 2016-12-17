@@ -73,8 +73,6 @@ void static printUciInfo(void)
 	sync_cout << "option name BestMoveBook type check default false"<<sync_endl;
 	sync_cout << "option name UCI_EngineAbout type string default VajoletII by Marco Belli" << sync_endl;
 	sync_cout << "option name UCI_ShowCurrLine type check default false" << sync_endl;
-	sync_cout << "option name UCI_LimitStrength type check default false" << sync_endl;
-	sync_cout << "option name UCI_Elo type spin default 3000 min 1000 max 3000" << sync_endl;
 	sync_cout << "option name SyzygyPath type string default <empty>" << sync_endl;
 	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
 
