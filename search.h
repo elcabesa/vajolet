@@ -205,10 +205,13 @@ public:
 private:
 	// gestione timer
 	long long int startTime;
+	long long int ponderTime;
 public:
 	static long long int getTime(){ return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
 	long long int getElapsedTime() const { return getTime() - startTime; }
+	long long int getClockTime() const { return getTime() - ponderTime; }
 	void resetStartTime(){ startTime = getTime(); }
+	void resetPonderTime(){ ponderTime = getTime(); }
 
 };
 

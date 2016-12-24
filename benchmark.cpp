@@ -62,6 +62,7 @@ void benchmark(void)
 		Search src;
 		src.limits.depth = 15;
 		src.resetStartTime();
+		src.resetPonderTime();
 		src.pos.setupFromFen(positions[i]);
 		sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
 		src.startThinking();

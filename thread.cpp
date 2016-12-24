@@ -123,7 +123,7 @@ void my_thread::timerThread()
 		if (!quit)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
-			long long int time = src.getElapsedTime();
+			long long int time = src.getClockTime();
 
 			if(timeMan.idLoopIterationFinished)
 			{
@@ -221,6 +221,7 @@ void my_thread::searchThread()
 			timeManagerInit(src.pos, src.limits, timeMan);
 			src.stop = false;
 			src.resetStartTime();
+			src.resetPonderTime();
 			timerCond.notify_one();
 			src.stop = false;
 			manageNewSearch();

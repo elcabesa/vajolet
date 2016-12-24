@@ -243,6 +243,7 @@ public :
 
 	void ponderHit()
 	{
+		src.resetPonderTime();
 		src.stopPonder();
 	}
 
