@@ -18,7 +18,6 @@
 #ifndef BITOPS_H_
 #define BITOPS_H_
 
-#include <cpuid.h>
 #include "vajolet.h"
 
 

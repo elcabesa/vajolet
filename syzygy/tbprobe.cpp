@@ -73,7 +73,7 @@
 #define popcount(x) TB_CUSTOM_POP_COUNT(x)
 #else
 #include <popcntintrin.h>
-#define popcount(x)             _mm_popcnt_u64((x))
+#define popcount(x)            __builtin_popcountll((x))
 #endif
 #else
 static inline unsigned popcount(uint64_t x)

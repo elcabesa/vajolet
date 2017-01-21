@@ -40,7 +40,7 @@
  * implementation. To do this supply a macro or function definition
  * here:
  */
-/* #define TB_CUSTOM_LSB(x) <DEFINITION> */
+#define TB_CUSTOM_LSB(x) __builtin_ctzll((x))
 
 /*
  * Define TB_CUSTOM_BSWAP32 to override the internal bswap32
