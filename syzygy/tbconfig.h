@@ -33,7 +33,7 @@
  * implementation. To do this supply a macro or function definition
  * here:
  */
-/* #define TB_CUSTOM_POP_COUNT(x) <DEFINITION> */
+#define TB_CUSTOM_POP_COUNT(x) __builtin_popcountll((x))
 
 /*
  * Define TB_CUSTOM_LSB to override the internal lsb
