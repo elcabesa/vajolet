@@ -30,30 +30,10 @@
 	\version 1.0
 	\date 21/10/2013
 */
-#ifdef HW_BITCOUNT
 static inline unsigned int bitCnt(bitMap bitmap)
 {
-#if __x86_64__
 	return __builtin_popcountll(bitmap);
-#else
-	return __builtin_popcountl((unsigned int)bitmap)+__builtin_popcountl(bitmap>>32);
-#endif
 }
-
-#else
-
-static inline unsigned int bitCnt(bitMap bitmap)
-{
-	int n=0;
-	while(bitmap){
-		n++;
-		bitmap &= bitmap - 1; // reset LS1B
-
-	}
-	return n;
-}
-
-#endif
 
 
 /*	\brief get the index of the rightmost one bit
@@ -63,25 +43,12 @@ static inline unsigned int bitCnt(bitMap bitmap)
 */
 static inline tSquare firstOne(bitMap bitmap)
 {
-#if __x86_64__
 	return (tSquare)__builtin_ctzll(bitmap);
-#else
-	assert(bitmap);
-
-	return ((unsigned long)bitmap)?((tSquare)__builtin_ctzl((unsigned long) bitmap)):((tSquare)__builtin_ctzl(bitmap>>32))+(tSquare)32;
-#endif
 }
 
 static inline tSquare iterateBit(bitMap & b)
 {
-	assert(b);
-#if __x86_64__
-	const tSquare t = (tSquare)__builtin_ctzll(b);
-#else
-
-
-	const tSquare t =  ((unsigned long)b)?((tSquare)__builtin_ctzl((unsigned long) b)):((tSquare)__builtin_ctzl(b>>32))+(tSquare)32;
-#endif
+	const tSquare t = firstOne(b);
 	b &= ( b - 1 );
 	return t;
 
