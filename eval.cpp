@@ -54,8 +54,8 @@ simdScore mobilityBonus[Position::separationBitmap][32];
 //------------------------------------------------
 //	PAWN Bonus/Penalties
 //------------------------------------------------
-simdScore isolatedPawnPenalty={520,2410,0,0};
-simdScore isolatedPawnPenaltyOpp={-250,-380,0,0};
+simdScore isolatedPawnPenalty={533,2410,0,0};
+simdScore isolatedPawnPenaltyOpp={100,300,0,0};
 simdScore doubledPawnPenalty={290,1950,0,0};
 simdScore backwardPawnPenalty={1120,2680,0,0};
 simdScore chainedPawnBonus={540,180,0,0};
