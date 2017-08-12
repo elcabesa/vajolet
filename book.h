@@ -25,7 +25,7 @@
 
 
 
-class PolyglotBook : private std::ifstream
+class PolyglotBook : public std::ifstream
 {
 public:
 	PolyglotBook();

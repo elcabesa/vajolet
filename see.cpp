@@ -57,16 +57,16 @@ Score Position::see(const Move& m) const
 	swapList[0] = pieceValue[getPieceAt(to)][0];
 	captured = bitboardIndex(getPieceAt(from) % separationBitmap);
 
-	if(m.bit.flags == Move::fenpassant)
+	if( isEnPassantMove(m) )
 	{
-		occupied ^= to - pawnPush(color);
+		occupied ^= bitSet(to - pawnPush(color));
 		swapList[0] = pieceValue[whitePawns][0];
 	}
-	if(m.bit.flags == Move::fcastle)
+	if( isCastleMove(m) )
 	{
 		return 0;
 	}
-	if(m.bit.flags == Move::fpromotion)
+	if( isPromotionMove(m) )
 	{
 		captured = bitboardIndex(whiteQueens + m.bit.promotion);
 		swapList[0] += pieceValue[whiteQueens + m.bit.promotion][0] - pieceValue[whitePawns][0];

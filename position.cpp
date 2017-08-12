@@ -855,7 +855,7 @@ void Position::doMove(const Move & m){
 	assert(piece!=whitePieces);
 	assert(piece!=blackPieces);
 
-	bitboardIndex capture = (m.bit.flags ==Move::fenpassant ? (x.nextMove?whitePawns:blackPawns) :squares[to]);
+	bitboardIndex capture = ( isEnPassantMove(m) ? (x.nextMove?whitePawns:blackPawns) :squares[to]);
 	assert(capture!=separationBitmap);
 	assert(capture!=whitePieces);
 	assert(capture!=blackPieces);
@@ -878,7 +878,7 @@ void Position::doMove(const Move & m){
 	}
 
 	// do castle additional instruction
-	if(m.bit.flags==Move::fcastle)
+	if( isCastleMove(m) )
 	{
 		bool kingSide = to > from;
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
@@ -904,7 +904,7 @@ void Position::doMove(const Move & m){
 		if(isPawn(capture))
 		{
 
-			if(m.bit.flags==Move::fenpassant)
+			if( isEnPassantMove(m) )
 			{
 				captureSquare-=pawnPush(x.nextMove);
 			}
@@ -961,7 +961,7 @@ void Position::doMove(const Move & m){
 			assert(x.epSquare<squareNumber);
 			x.key ^= HashKeys::ep[x.epSquare];
 		}
-		if(m.bit.flags == Move::fpromotion)
+		if( isPromotionMove(m) )
 		{
 			bitboardIndex promotedPiece = (bitboardIndex)(whiteQueens + x.nextMove + m.bit.promotion);
 			assert(promotedPiece<lastBitboard);
@@ -1054,13 +1054,13 @@ void Position::undoMove()
 	assert(piece!=whitePieces);
 	assert(piece!=blackPieces);
 
-	if(m.bit.flags == Move::fpromotion){
+	if( isPromotionMove(m) ){
 		removePiece(piece,to);
 		piece = (bitboardIndex)(piece > separationBitmap ? blackPawns : whitePawns);
 		putPiece(piece,to);
 	}
 
-	if(m.bit.flags == Move::fcastle)
+	if( isCastleMove(m) )
 	{
 		bool kingSide = to > from;
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
@@ -1081,7 +1081,7 @@ void Position::undoMove()
 	if(x.capturedPiece)
 	{
 		tSquare capSq = to;
-		if(m.bit.flags == Move::fenpassant){
+		if( isEnPassantMove(m) ){
 			capSq += pawnPush(x.nextMove);
 		}
 		assert(capSq<squareNumber);
@@ -1348,7 +1348,15 @@ unsigned long long Position::divide(unsigned int depth)
 	{
 		mn++;
 		doMove(m);
-		unsigned long long n= perft(depth - 1);
+		unsigned long long n= 1;
+		if( depth>1)
+		{
+			n= perft(depth - 1);
+		}
+		else
+		{
+			n= 1;
+		}
 		tot += n;
 		undoMove();
 		sync_cout<<mn<<") "<<displayMove(*this,m)<<": "<<n<<sync_endl;
@@ -1684,7 +1692,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 			if( !isKing(piece)
 				&& !(
-					((bitSet((tSquare)(m.bit.to-(m.bit.flags == Move::fenpassant?pawnPush(s.nextMove):0)))) & s.checkers)
+					((bitSet((tSquare)(m.bit.to-( isEnPassantMove(m) ? pawnPush(s.nextMove) : 0)))) & s.checkers)
 					|| ((bitSet((tSquare)m.bit.to) & SQUARES_BETWEEN[pieceList[Position::whiteKing+s.nextMove][0]][firstOne(s.checkers)]) & ~Us[Pieces])
 				)
 			)
@@ -1711,7 +1719,7 @@ bool Position::isMoveLegal(const Move &m)const
 		return false;
 	}
 	//arrocco impossibile
-	if(m.bit.flags == Move::fcastle)
+	if( isCastleMove(m) )
 	{
 		if(!isKing(piece) || (FILES[m.bit.from]!=FILES[E1]) || (abs(m.bit.from-m.bit.to)!=2 ) || (RANKS[m.bit.from]!=RANKS[A1] && RANKS[m.bit.from]!=RANKS[A8]))
 		{
@@ -1720,13 +1728,13 @@ bool Position::isMoveLegal(const Move &m)const
 	}
 
 	//en passant impossibile
-	if(m.bit.flags == Move::fenpassant && (!isPawn(piece) || ((tSquare)m.bit.to) != s.epSquare))
+	if( isEnPassantMove(m)  && (!isPawn(piece) || ((tSquare)m.bit.to) != s.epSquare))
 	{
 		return false;
 	}
 
 	//en passant impossibile
-	if(m.bit.flags != Move::fenpassant && isPawn(piece) && ((tSquare)m.bit.to == s.epSquare))
+	if( !isEnPassantMove(m)  && isPawn(piece) && ((tSquare)m.bit.to == s.epSquare))
 	{
 		return false;
 	}
@@ -1739,7 +1747,7 @@ bool Position::isMoveLegal(const Move &m)const
 		case Position::whiteKing:
 		case Position::blackKing:
 		{
-			if(m.bit.flags == Move::fcastle)
+			if( isCastleMove(m) )
 			{
 				int color = s.nextMove?1:0;
 				if(!(s.castleRights &  bitSet((tSquare)(((m.bit.from-m.bit.to)>0)+2*color)))
@@ -1850,7 +1858,7 @@ bool Position::isMoveLegal(const Move &m)const
 				return false;
 
 			}
-			if(m.bit.flags== Move::fenpassant){
+			if( isEnPassantMove(m) ){
 
 				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[m.bit.from];
 				bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
@@ -1880,7 +1888,7 @@ bool Position::isMoveLegal(const Move &m)const
 				return false;
 
 			}
-			if(m.bit.flags== Move::fenpassant){
+			if( isEnPassantMove(m) ){
 				bitMap captureSquare = FILEMASK[s.epSquare] & RANKMASK[m.bit.from];
 				bitMap occ = bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
 				tSquare kingSquare = pieceList[Position::whiteKing+s.nextMove][0];

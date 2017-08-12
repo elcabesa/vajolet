@@ -56,7 +56,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 
 			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
 			timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(lim.btime - 2 * timeMan.resolution));
-			timeMan.minSearchTime =timeMan.allocatedTime*0.3;
+			timeMan.minSearchTime =timeMan.allocatedTime*0.1;
 			timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(lim.btime - 2 * timeMan.resolution));
 		}
 		else
@@ -72,7 +72,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 			}
 			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
 			timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(lim.wtime - 2 * timeMan.resolution));
-			timeMan.minSearchTime =timeMan.allocatedTime*0.3;
+			timeMan.minSearchTime =timeMan.allocatedTime*0.1;
 			timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(lim.wtime - 2 * timeMan.resolution));
 		}
 
@@ -129,12 +129,12 @@ void my_thread::timerThread()
 			{
 				timeMan.FirstIterationFinished = true;
 			}
-			if(!src.stop &&time >= timeMan.allocatedTime && ( timeMan.idLoopAlpha || timeMan.idLoopBeta ) )
+			if(!src.stop && time >= timeMan.allocatedTime && ( timeMan.idLoopAlpha || timeMan.idLoopBeta ) )
 			{
 				timeMan.allocatedTime = timeMan.maxAllocatedTime;
 				//sync_cout<<"info debug EXTEND TIME: "<<timeMan.allocatedTime<<sync_endl;
 			}
-			if(!src.stop && timeMan.maxAllocatedTime == timeMan.allocatedTime && ( timeMan.idLoopIterationFinished ) && !(src.limits.infinite || src.limits.ponder) )
+			if(!src.stop && timeMan.maxAllocatedTime == timeMan.allocatedTime && time >= timeMan.allocatedTime && ( timeMan.idLoopIterationFinished ) && !(src.limits.infinite || src.limits.ponder) )
 			{
 				src.stop = true;
 				//sync_cout<<"info debug FINISHED ITERATION IN EXTEND TIME "<<time<<sync_endl;
@@ -265,7 +265,7 @@ void my_thread::manageNewSearch()
 	{
 		if(!src.limits.infinite)
 		{
-			Move m = mg.getFirstMove();
+			Move m = mg.getMoveFromMoveList(0);
 			sync_cout << "info pv " << displayUci(m) << sync_endl;
 			while(src.limits.ponder){}
 			sync_cout << "bestmove " << displayUci(m);

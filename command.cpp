@@ -416,7 +416,9 @@ void uciLoop()
 		}
 		else if (token == "perft" && (is>>token))
 		{
-			doPerft(stoi(token), pos);
+			int n = stoi(token);
+			n = std::max(n,1);
+			doPerft(n, pos);
 		}
 		else if (token == "divide" && (is>>token))
 		{
@@ -487,36 +489,135 @@ std::string displayMove(const Position& pos, const Move & m)
 
 	std::string s;
 
-	bool capture = (bitSet((tSquare)m.bit.to) & pos.getTheirBitmap(Position::Pieces));
+	bool capture = pos.isCaptureMove(m);
+	bool check = pos.moveGivesCheck(m);
+	bool doubleCheck = pos.moveGivesDoubleCheck(m);
+	unsigned int legalMoves;
+	Position::bitboardIndex piece = pos.getPieceAt((tSquare)m.bit.from);
+	bool pawnMove = pos.isPawn(piece);
+	bool isPromotion = pos.isPromotionMove(m);
+	bool isEnPassant = pos.isEnPassantMove(m);
+	bool isCastle = pos.isCastleMove(m);
 
-	if( !pos.isPawn(pos.getPieceAt( (tSquare)m.bit.from)) )
+	bool disambigusFlag = false;
+	bool fileFlag = false;
+	bool rankFlag = false;
+
+
+	// calc legalmoves
 	{
-		s+=PIECE_NAMES_FEN[pos.getPieceAt((tSquare)m.bit.from) % Position::separationBitmap];
+		Position p = pos;
+		p.doMove(m);
+		Movegen mg(p);
+		legalMoves = mg.getNumberOfLegalMoves();
+		p.undoMove();
 	}
-	if(capture && pos.isPawn(pos.getPieceAt((tSquare)m.bit.from)))
+
+
 	{
-		s+=char('a'+FILES[m.bit.from]);
+		Movegen mg(pos);
+		unsigned int lm = mg.getNumberOfLegalMoves();
+
+		// calc disambigus data
+		for (unsigned int i = 0; i < lm; i++)
+		{
+			Move mm = mg.getMoveFromMoveList(i);
+			if( pos.getPieceAt((tSquare)mm.bit.from) == piece && (mm.bit.to == m.bit.to) && (mm.bit.from != m.bit.from))
+			{
+				disambigusFlag = true;
+				if(FILES[mm.bit.from] == FILES[m.bit.from])
+				{
+					rankFlag = true;
+				}
+				if(RANKS[mm.bit.from] == RANKS[m.bit.from])
+				{
+					fileFlag = true;
+				}
+
+			}
+
+		}
+		if( disambigusFlag && !rankFlag && !fileFlag)
+		{
+			fileFlag = true;
+		}
 	}
-	if(capture)
+
+
+	// castle move
+	if (isCastle)
 	{
+		bool kingSide = m.bit.to > m.bit.from;
+		if( kingSide)
+		{
+			s = "O-O";
+		}
+		else
+		{
+			s = "O-O-O";
+		}
+		return s;
+
+	}
+
+
+	// 1 ) use the name of the piece if it's not a pawn move
+	if( !pawnMove )
+	{
+		s+=PIECE_NAMES_FEN[piece % Position::separationBitmap];
+	}
+	if( fileFlag )
+	{
+		s += char('a'+FILES[ m.bit.from ]);
+	}
+	if( rankFlag )
+	{
+		s += char('1'+RANKS[ m.bit.from ]);
+	}
+
+
+	//capture motation
+	if (capture)
+	{
+		if(pawnMove)
+		{
+			s+=char('a'+FILES[m.bit.from]);
+		}
+		// capture add x before to square
 		s+="x";
 	}
-
-
-
-
-	//to
+	// to square
 	s += char('a'+FILES[ m.bit.to ]);
 	s += char('1'+RANKS[ m.bit.to ]);
-	if( pos.moveGivesCheck(m) )
+	// add en passant info
+	if ( isEnPassant )
 	{
-		s+="+";
+		s+="e.p.";
 	}
-	//promotion
-	if(m.bit.flags == Move::fpromotion)
+	//promotion add promotion to
+	if(isPromotion)
 	{
 		s += "=";
 		s += PIECE_NAMES_FEN[m.bit.promotion + Position::whiteQueens];
+	}
+	// add check information
+	if( check  )
+	{
+		if( legalMoves > 0 )
+		{
+			if( doubleCheck )
+			{
+				s+="++";
+			}
+			else
+			{
+				s+="+";
+			}
+		}
+		else
+		{
+			s+="#";
+		}
 	}
 	return s;
 

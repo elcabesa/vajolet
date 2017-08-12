@@ -128,6 +128,7 @@ public:
 	{
 		stateIndex = 0;
 		actualState = &stateInfo[stateIndex];
+		actualState->nextMove = whiteTurn;
 		Us=&bitBoard[ getNextTurn() ];
 		Them=&bitBoard[blackTurn - getNextTurn()];
 	}
@@ -555,11 +556,11 @@ public:
 	inline Score getMvvLvaScore(const Move & m) const
 	{
 		Score s = pieceValue[ squares[m.bit.to] ][0] - (squares[m.bit.from]);
-		if (m.bit.flags == Move::fpromotion)
+		if ( isPromotionMove(m) )
 		{
 			s += (pieceValue[ whiteQueens +m.bit.promotion ] - pieceValue[whitePawns])[0];
 		}
-		else if(m.bit.flags == Move::fenpassant)
+		else if( isEnPassantMove(m) )
 		{
 			s += pieceValue[ whitePawns ][0];
 		}
@@ -590,25 +591,35 @@ public:
 
 
 
-	inline bool isCaptureMove(const Move & m) const
+
+	inline bool isPromotionMove(const Move & m) const
 	{
-		return squares[m.bit.to] !=empty || m.bit.flags == Move::fenpassant;
+		return m.bit.flags == Move::fpromotion;
 	}
 	inline bool isCastleMove(const Move & m) const
 	{
 		return  m.bit.flags == Move::fcastle;
 	}
+	inline bool isEnPassantMove(const Move & m) const
+	{
+		return  m.bit.flags == Move::fenpassant;
+	}
+	inline bool isCaptureMove(const Move & m) const
+	{
+		return squares[m.bit.to] !=empty || isEnPassantMove(m) ;
+	}
 	inline bool isCaptureMoveOrPromotion(const Move & m) const
 	{
-		return squares[m.bit.to] != empty || m.bit.flags == Move::fenpassant || m.bit.flags == Move::fpromotion;
+		return isCaptureMove(m) || isPromotionMove(m);
 	}
 	inline bool isPassedPawnMove(const Move & m) const
 	{
-		if(isPawn(squares[m.bit.to]))
+		if(isPawn(getPieceAt((tSquare)m.bit.from)))
 		{
-			bool color = squares[m.bit.to] >= separationBitmap;
+			bool color = squares[m.bit.from] >= separationBitmap;
 			bitMap theirPawns = color? bitBoard[whitePawns]:bitBoard[blackPawns];
-			return !(theirPawns & PASSED_PAWN[color][m.bit.from]);
+			bitMap ourPawns = color? bitBoard[blackPawns]:bitBoard[whitePawns];
+			return !(theirPawns & PASSED_PAWN[color][m.bit.from]) && !(ourPawns & SQUARES_IN_FRONT_OF[color][m.bit.from]);
 		}
 		return false;
 	}
@@ -727,6 +738,7 @@ private:
 	bool evalKRPvsKr(Score& res);
 	bool evalKBNvsK(Score& res);
 	bool evalKQvsK(Score& res);
+	bool evalKRvsK(Score& res);
 	bool kingsDirectOpposition();
 	bool evalKPvsK(Score& res);
 	bool evalOppositeBishopEndgame(Score& res);

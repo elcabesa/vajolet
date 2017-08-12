@@ -729,7 +729,7 @@ Move Movegen::getNextMove()
 			//generateMoves<Movegen::allEvasionMg>();
 			//generateMoves<Movegen::captureEvasionMg>();
 			generateMoves<Movegen::quietEvasionMg>();
-			scoreQuietMoves();
+			scoreQuietEvasion();
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
 			//killerMoves[0] = (src.getKillers(ply,0));
