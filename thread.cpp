@@ -44,10 +44,14 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 
 		if(pos.getNextTurn())
 		{
-			if(lim.movesToGo > 0)
+			if(lim.movesToGo > 2)
 			{
 				timeMan.allocatedTime = lim.btime/lim.movesToGo;
 				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
+			}else if(lim.movesToGo > 0)
+			{
+				timeMan.allocatedTime = lim.btime/lim.movesToGo;
+				timeMan.maxAllocatedTime= timeMan.allocatedTime;
 			}else
 			{
 				timeMan.allocatedTime = lim.btime/40.0+lim.binc*0.98;
@@ -61,10 +65,14 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 		}
 		else
 		{
-			if(lim.movesToGo > 0)
+			if(lim.movesToGo > 2)
 			{
 				timeMan.allocatedTime = lim.wtime/lim.movesToGo;
 				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
+			}else if(lim.movesToGo > 0)
+			{
+				timeMan.allocatedTime = lim.wtime/lim.movesToGo;
+				timeMan.maxAllocatedTime= timeMan.allocatedTime;
 			}else
 			{
 				timeMan.allocatedTime = lim.wtime/40.0+lim.winc*0.98;
