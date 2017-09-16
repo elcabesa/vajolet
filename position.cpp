@@ -1604,10 +1604,10 @@ bool Position::isDraw(bool isPVline) const
 
 	// Draw by material?
 
-	if (   !bitBoard[whitePawns] && !bitBoard[blackPawns] && (getActualState().nonPawnMaterial[0]<= pieceValue[whiteBishops][0]) && (getActualState().nonPawnMaterial[2]<= pieceValue[whiteBishops][0]) )
+	/*if (   !bitBoard[whitePawns] && !bitBoard[blackPawns] && (getActualState().nonPawnMaterial[0]<= pieceValue[whiteBishops][0]) && (getActualState().nonPawnMaterial[2]<= pieceValue[whiteBishops][0]) )
 	{
 		return true;
-	}
+	}*/
 
 	// Draw by the 50 moves rule?
 	if (getActualState().fiftyMoveCnt>  99)

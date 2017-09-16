@@ -692,6 +692,7 @@ void Position::initMaterialKeys(void)
 	 * K vs K		->	draw
 	 * km vs k		->	draw
 	 * km vs km		->	draw
+	 * knn vs k		->	draw
 	 * kmm vs km	->	draw
 	 *
 	 * kbp vs k		->	probable draw on the rook file
@@ -717,18 +718,21 @@ void Position::initMaterialKeys(void)
 		Score val;
 	} Endgames[] = {
 			// DRAWN
-			{"k7/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },
+			{"k7/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },		//k vs k
 
-			{"kb6/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },	//kb vs k
 			{"k7/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
 
-			{"kn6/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },	//kn vs k
 			{"k7/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
 
-			{"kn6/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
-			{"kn6/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },	//kn vs kn
+			{"kn6/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },	//kn vs kb
 			{"kb6/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
-			{"kb6/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },	//kb vs kb
+
+			{"knn5/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },	//knn vs k
+			{"k7/8/8/8/8/8/8/5NNK w - -",materialStruct::exact, nullptr, 0 },
 
 			{"knn5/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
 			{"knn5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },

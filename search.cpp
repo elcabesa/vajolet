@@ -950,30 +950,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				{
 					nullVal = beta;
 				}
-				//return nullVal; TODO da testare se da vantaggi o no, semplifica il codice
+				return nullVal;
 
-				if (depth < 12 * ONE_PLY)
-				{
-					return nullVal;
-				}
-
-				// Do verification search at high depths
-				sd[ply].skipNullMove = true;
-				assert(depth - red >= ONE_PLY);
-				Score val;
-				/*if(depth-red < ONE_PLY)
-				{
-					val = qsearch<childNodesType>(ply, depth-red, beta-1, beta,childPV);
-				}
-				else
-				{*/
-					val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
-				/*}*/
-				sd[ply].skipNullMove = false;
-				if (val >= beta)
-				{
-					return nullVal;
-				}
 
 			}
 			else
@@ -996,7 +974,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			// && eval> beta-40000
 		){
 			Score s;
-			Score rBeta = std::min(beta + 8000,SCORE_INFINITE);
+			Score rBeta = std::min(beta + 8000, SCORE_INFINITE);
 			int rDepth = depth -ONE_PLY- 3*ONE_PLY;
 
 			Movegen mg(pos, *this, ply, ttMove);
@@ -1548,7 +1526,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	{
 		bestScore = staticEval;
 		// todo trovare un valore buono per il futility
-		futilityBase = bestScore + 5000;
+		futilityBase = bestScore + 5050;
 
 
 
