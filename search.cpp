@@ -589,7 +589,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	ret.depth = depth-1;
 	ret.alpha = alpha;
 	ret.beta = beta;
-	ret.Res = rootMoves[0].score;
+	ret.Res = rootMoves[0].previousScore;
 
 
 	return ret;
@@ -612,7 +612,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE  || type == Search::nodeType::HELPER_ROOT_NODE);
 	const bool inCheck = pos.isInCheck();
-	Move threatMove(Movegen::NOMOVE);
+	//Move threatMove(Movegen::NOMOVE);
 
 
 	//--------------------------------------
@@ -926,7 +926,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			pos.doNullMove();
 			sd[ply+1].skipNullMove = true;
 
-			U64 nullKey = pos.getKey();
+			//U64 nullKey = pos.getKey();
 			Score nullVal;
 			std::list<Move> childPV;
 			if( depth-red < ONE_PLY )
@@ -954,11 +954,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 
 			}
-			else
+			/*else
 			{
 				const ttEntry * const tteNull = TT.probe(nullKey);
 				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : Movegen::NOMOVE;
-			}
+			}*/
 
 		}
 
@@ -1129,7 +1129,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			if(newDepth < 11*ONE_PLY
 				&& moveNumber >= FutilityMoveCounts[newDepth >> ONE_PLY_SHIFT]
-				&& (!threatMove.packed)
+				//&& (!threatMove.packed)
 				)
 			{
 				assert((newDepth>>ONE_PLY_SHIFT)<11);
