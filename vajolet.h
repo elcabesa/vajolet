@@ -32,7 +32,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.3.3"
+#define VERSION			"2.3.4"
 #define HW_BITCOUNT
 
 
@@ -54,12 +54,12 @@
 //SCORE DEFINITION
 //---------------------------------------------
 
-#define SCORE_NONE				(2000000001)
-#define SCORE_INFINITE			(2000000000)
-#define SCORE_MATE				(1999999990)
+#define SCORE_NONE				(3000001)//(2000000001)
+#define SCORE_INFINITE			(3000000)//(2000000000)
+#define SCORE_MATE				(2999990)//(1999999990)
 #define SCORE_MATED				(-SCORE_MATE)
-#define SCORE_MATE_IN_MAX_PLY	(1999990000)
-#define SCORE_KNOWN_WIN			(1000000000)
+#define SCORE_MATE_IN_MAX_PLY	(2990000)//(1999990000)
+#define SCORE_KNOWN_WIN			(2000000)//(1000000000)
 #define SCORE_MATED_IN_MAX_PLY	(-SCORE_MATE_IN_MAX_PLY)
 #define SCORE_MAX_OUTPUT_VALUE	(360000)
 #define SCORE_MIN_OUTPUT_VALUE	(-SCORE_MAX_OUTPUT_VALUE)

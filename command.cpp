@@ -397,7 +397,8 @@ void uciLoop()
 		}*/
 		else if (token == "eval")
 		{
-			sync_cout << "Eval:" << pos.eval<true>() / 10000.0 << sync_endl;
+			Score s = pos.eval<true>();
+			sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
 			sync_cout << "gamePhase:"  << pos.getGamePhase()/65536.0*100 << "%" << sync_endl;
 #ifdef DEBUG_EVAL_SIMMETRY
 

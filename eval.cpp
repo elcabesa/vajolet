@@ -68,7 +68,7 @@ simdScore passedPawnBlockedSquares ={150,370,0,0};
 simdScore passedPawnDefendedSquares = {150,240,0,0};
 simdScore passedPawnDefendedBlockingSquare = {260,170,0,0};
 simdScore unstoppablePassed = {0,2000,0,0};
-simdScore rookBehindPassedPawn = {0,10,0,0};
+simdScore rookBehindPassedPawn = {0,20,0,0};
 simdScore EnemyRookBehindPassedPawn = {0,10,0,0};
 
 simdScore holesPenalty={100,260,0,0};
@@ -131,6 +131,7 @@ simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitma
 	{{0,0,0,0},{0,0,0,0},	{0,0,0,0},			{0,0,0,0},		{0,0,0,0},		{0,0,0,0},		{0,0,0,0},	{0,0,0,0}}
 //						king				queen						rook					bishop					knight					pawn
 };
+simdScore weakPawnAttackedByKing={100,5000,0,0};
 //------------------------------------------------
 //king safety
 //------------------------------------------------
@@ -1915,6 +1916,14 @@ Score Position::eval(void)
 		}
 
 	}
+	weakPieces =   getBitmap(whitePawns)
+		& ~attackedSquares[whitePieces]
+		& attackedSquares[blackKing];
+
+	if(weakPieces)
+	{
+		wScore -= weakPawnAttackedByKing;
+	}
 
 	pawnAttackedPieces = getBitmap( blackPieces ) & attackedSquares[ whitePawns ];
 	while(pawnAttackedPieces)
@@ -1944,6 +1953,18 @@ Score Position::eval(void)
 			}
 		}
 	}
+
+	weakPieces =   getBitmap(blackPawns)
+		& ~attackedSquares[blackPieces]
+		& attackedSquares[whiteKing];
+
+	if(weakPieces)
+	{
+		bScore -= weakPawnAttackedByKing;
+	}
+
+
+
 
 	// trapped pieces
 	// rook trapped on first rank by own king

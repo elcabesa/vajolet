@@ -672,7 +672,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	if (	type != Search::nodeType::ROOT_NODE
 			&& type != Search::nodeType::HELPER_ROOT_NODE
 			&& tte != nullptr
-			&& tte->getDepth() >= depth
+			&& tte->getDepth() >= (depth +1 - ONE_PLY)
 		    && ttValue != SCORE_NONE // Only in case of TT access race
 		    && (	PVnode ?  false
 		            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
