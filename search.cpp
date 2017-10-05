@@ -857,7 +857,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//-----------------------------
 	// reduction && pruning
 	//-----------------------------
-	if(!PVnode && !inCheck && abs(beta) < SCORE_MATE_IN_MAX_PLY)
+	if(!PVnode && !inCheck )
 	{
 
 		//------------------------
