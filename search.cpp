@@ -406,7 +406,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					helperSearch[i].stop = false;
 					helperSearch[i].pos = pos;
 					helperSearch[i].PV = PV;
-					helperSearch[i].followPV = followPV;
+					helperSearch[i].followPV = true;
 					helperThread.push_back( std::thread(&Search::alphaBeta<Search::nodeType::HELPER_ROOT_NODE>, &helperSearch[i], 0, (depth-globalReduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
 				}
 

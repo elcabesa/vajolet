@@ -25,11 +25,11 @@ void transpositionTable::setSize(unsigned long int mbSize)
 {
 	long long unsigned int size = (long unsigned int)( ((unsigned long long int)mbSize << 20) / sizeof(ttCluster));
 	elements = size;
-	if(table)
-	{
+	//if(table)
+	//{
 		free(table);
-	}
-	table = (ttCluster*)calloc(elements,sizeof(ttCluster));
+	//}
+	table = (ttCluster*)calloc((size_t)elements,sizeof(ttCluster));
 	if (table == nullptr)
 	{
 		std::cerr << "Failed to allocate " << mbSize<< "MB for transposition table." << std::endl;
@@ -39,7 +39,7 @@ void transpositionTable::setSize(unsigned long int mbSize)
 
 void transpositionTable::clear()
 {
-	std::memset(table, 0, elements * sizeof(ttCluster));
+	std::memset(table, 0, (size_t) elements * sizeof(ttCluster));
 }
 
 ttEntry* transpositionTable::probe(const U64 key) const
@@ -49,7 +49,7 @@ ttEntry* transpositionTable::probe(const U64 key) const
 	unsigned int keyH = (unsigned int)(key >> 32);
 
 
-	for (unsigned i = 0; i < 4; i++)
+	for (unsigned i = 0; i < ttCluster::clusterSize; i++)
 	{
 		if ( ttc.data[i].getKey() == keyH )
 			return &(ttc.data[i]);
@@ -71,7 +71,7 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 	assert(tte!=nullptr);
 	assert(replace!=nullptr);
 
-	for (unsigned i = 0; i < 4; i++, tte++)
+	for (unsigned i = 0; i < ttCluster::clusterSize; i++, tte++)
 	{
 		if(!tte->getKey() || tte->getKey() == key32) // Empty or overwrite old
 		{

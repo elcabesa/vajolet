@@ -141,11 +141,14 @@ private:
 	{
 		for(unsigned int i = moveListPosition; i < moveListSize; i++)
 		{
-			moveList[i].score = - (pos.getPieceAt((tSquare)moveList[i].m.bit.from));
-			if(pos.getPieceAt((tSquare)moveList[i].m.bit.from)== Position::King)
+			moveList[i].score = (pos.getPieceAt((tSquare)moveList[i].m.bit.from));
+			if(pos.getPieceAt((tSquare)moveList[i].m.bit.from) % Position::separationBitmap == Position::King)
 			{
-				moveList[i].score = 10;
+				moveList[i].score = 20;
 			}
+			moveList[i].score *=500000;
+
+			moveList[i].score += src.getHistory().getValue(pos.getPieceAt((tSquare)moveList[i].m.bit.from),(tSquare)moveList[i].m.bit.to);
 		}
 	}
 

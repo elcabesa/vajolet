@@ -288,13 +288,13 @@ public:
 	{
 		return bitBoard[occupiedSquares];
 	}
-	inline bitMap getBitmap(const bitboardIndex index) const
+	inline bitMap getBitmap(const bitboardIndex in) const
 	{
-		return bitBoard[index];
+		return bitBoard[in];
 	}
-	inline unsigned int getPieceCount(const bitboardIndex index) const
+	inline unsigned int getPieceCount(const bitboardIndex in) const
 	{
-		return pieceCount[index];
+		return pieceCount[in];
 	}
 
 	inline bitboardIndex getPieceAt(const tSquare sq) const

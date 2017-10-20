@@ -77,7 +77,8 @@ public:
 
 struct ttCluster
 {
-	ttEntry data[4];
+	static const unsigned int clusterSize =4;
+	ttEntry data[clusterSize];
 };
 
 
@@ -99,10 +100,10 @@ public:
 	}
 	~transpositionTable()
 	{
-		if(table)
-		{
+		//if(table)
+		//{
 			free(table);
-		}
+		//}
 	}
 
 	void newSearch() { generation++; usedElements=0; }
@@ -111,7 +112,7 @@ public:
 
 	inline ttCluster& findCluster(U64 key) const
 	{
-		return table[((unsigned int)key) % elements];
+		return table[static_cast<size_t>(((unsigned int)key) % elements)];
 	}
 
 	inline void refresh(ttEntry* const tte)

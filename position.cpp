@@ -196,7 +196,7 @@ void Position::initPstValues(void)
 				int r=7-rank;
 				int f =7-file;
 				//int f =file;
-				pstValue[piece][s] =- pstValue[ piece - separationBitmap ][BOARDINDEX[f][r]];
+				pstValue[piece][s] = -pstValue[ piece - separationBitmap ][BOARDINDEX[f][r]];
 
 				if( !isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece))
 				{
@@ -1604,11 +1604,10 @@ bool Position::isDraw(bool isPVline) const
 
 	// Draw by material?
 
-	/*if (   !bitBoard[whitePawns] && !bitBoard[blackPawns] && (getActualState().nonPawnMaterial[0]<= pieceValue[whiteBishops][0]) && (getActualState().nonPawnMaterial[2]<= pieceValue[whiteBishops][0]) )
-	{
-		return true;
-	}*/
-	if (  !bitBoard[whitePawns] && !bitBoard[blackPawns] && (getActualState().nonPawnMaterial[0] == 0) && (getActualState().nonPawnMaterial[2] == 0 ) )
+	if (  !bitBoard[whitePawns] && !bitBoard[blackPawns]
+		&&( ( (getActualState().nonPawnMaterial[0]<= pieceValue[whiteBishops][0]) && getActualState().nonPawnMaterial[2] == 0)
+		|| ( (getActualState().nonPawnMaterial[2]<= pieceValue[whiteBishops][0]) && getActualState().nonPawnMaterial[0] == 0) )
+	)
 	{
 		return true;
 	}
@@ -1754,8 +1753,8 @@ bool Position::isMoveLegal(const Move &m)const
 			if( isCastleMove(m) )
 			{
 				int color = s.nextMove?1:0;
-				if(!(s.castleRights &  bitSet((tSquare)(((m.bit.from-m.bit.to)>0)+2*color)))
-					|| (Movegen::getCastlePath(color,(m.bit.from-m.bit.to)>0) & bitBoard[occupiedSquares])
+				if(!(s.castleRights &  bitSet((tSquare)((((int)m.bit.from-(int)m.bit.to)>0)+2*color)))
+					|| (Movegen::getCastlePath(color,((int)m.bit.from-(int)m.bit.to)>0) & bitBoard[occupiedSquares])
 				)
 				{
 					return false;

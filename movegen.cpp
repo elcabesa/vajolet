@@ -219,6 +219,13 @@ void Movegen::generateMoves()
 	{
 		target = ~pos.getOccupationBitmap();
 		kingTarget = target;
+	}else
+	{
+		assert(false);
+		//sync_cout<<"ERRORE"<<sync_endl;
+		assert(s.checkers);
+		target = ( s.checkers | SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.getOurBitmap(Position::Pieces);
+		kingTarget = ~pos.getOurBitmap(Position::Pieces);
 	}
 
 
