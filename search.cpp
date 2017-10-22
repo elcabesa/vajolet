@@ -157,22 +157,13 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 		Movegen mg(pos);
 		while ((m = mg.getNextMove())!= Movegen::NOMOVE)
 		{
-			rootMove rm;
-			rm.init(m);
-			rootMoves.push_back(rm);
+			rootMoves.emplace_back(rootMove(m));
 		}
 
 	}
 	else
 	{	//only selected moves
-		for_each(limits.searchMoves.begin(), limits.searchMoves.end(),
-			[&](Move &m)
-			{
-			rootMove rm;
-			rm.init(m);
-			rootMoves.push_back(rm);
-			}
-		);
+		for_each(limits.searchMoves.begin(), limits.searchMoves.end(), [&](Move &m){rootMoves.emplace_back(rootMove(m));});
 	}
 
 
@@ -407,7 +398,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					helperSearch[i].pos = pos;
 					helperSearch[i].PV = PV;
 					helperSearch[i].followPV = true;
-					helperThread.push_back( std::thread(&Search::alphaBeta<Search::nodeType::HELPER_ROOT_NODE>, &helperSearch[i], 0, (depth-globalReduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
+ 					helperThread.emplace_back( std::thread(&Search::alphaBeta<Search::nodeType::HELPER_ROOT_NODE>, &helperSearch[i], 0, (depth-globalReduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
 				}
 
 				newPV.clear();
@@ -474,7 +465,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					if (res <= alpha)
 					{
 						newPV.clear();
-						newPV.push_back( rootMoves[indexPV].PV.front() );
+						newPV.emplace_back( rootMoves[indexPV].PV.front() );
 
 						printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
 
@@ -694,7 +685,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			if(ttMove.packed && pos.isMoveLegal(ttMove))
 			{
 				pvLine.clear();
-				pvLine.push_back(ttMove);
+				pvLine.emplace_back(ttMove);
 			}
 			else
 			{
@@ -1313,7 +1304,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				{
 					alpha = bestScore;
 					pvLine.clear();
-					pvLine.push_back(bestMove);
+					pvLine.emplace_back(bestMove);
 					pvLine.splice(pvLine.end(),childPV);
 					if(type == Search::nodeType::ROOT_NODE && Search::multiPVLines==1)
 					{
@@ -1470,7 +1461,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			if(ttMove.packed && pos.isMoveLegal(ttMove))
 			{
 				pvLine.clear();
-				pvLine.push_back(ttMove);
+				pvLine.emplace_back(ttMove);
 			}
 			else
 			{
@@ -1678,7 +1669,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				if(PVnode && !stop)
 				{
 					pvLine.clear();
-					pvLine.push_back(bestMove);
+					pvLine.emplace_back(bestMove);
 					pvLine.splice( pvLine.end(), childPV );
 
 				}

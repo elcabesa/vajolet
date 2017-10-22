@@ -66,25 +66,19 @@ public:
 class rootMove
 {
 public:
-	Score score;
-	Score previousScore;
+	Score score = -SCORE_INFINITE;
+	Score previousScore = -SCORE_INFINITE;
 	std::list<Move> PV;
 	Move firstMove;
-	unsigned int maxPlyReached;
-	unsigned int depth;
-	unsigned long long nodes;
-	long long int time;
+	unsigned int maxPlyReached = 0u;
+	unsigned int depth = 0u;
+	unsigned long long nodes = 0u;
+	long long int time = 0ll;
 	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
 	bool operator==(const Move& m) const { return firstMove.packed == m.packed; }
-	void init(Move & m)
+
+	rootMove(Move & m) : firstMove{m}
 	{
-		previousScore = -SCORE_INFINITE;
-		score = -SCORE_INFINITE;
-		firstMove = m;
-		maxPlyReached = 0;
-		depth = 0;
-		nodes = 0;
-		time = 0;
 		PV.clear();
 	}
 };

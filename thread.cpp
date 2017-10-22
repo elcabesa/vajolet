@@ -153,7 +153,7 @@ void my_thread::timerThread()
 				//sync_cout<<"info debug TIME EXPIRED "<<time<< " >= "<<timeMan.allocatedTime<<sync_endl;
 				src.stop = true;
 			}
-			if(!src.stop && timeMan.idLoopIterationFinished && time >= timeMan.allocatedTime*0.7 && !(src.limits.infinite || src.limits.ponder))
+			if(!src.stop && timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(src.limits.infinite || src.limits.ponder))
 			{
 				//sync_cout<<"info debug STOP BECAUSE WE WILL PROBABLY NOT BE ABLE TO FINISH THE NEXT ITERATION "<<time<<":"<<timeMan.allocatedTime<<sync_endl;
 				src.stop = true;
