@@ -3,9 +3,6 @@
 /.project
 /.settings/
 /Debug/
-/vectorclass/vectorclass.pdf
-/vectorclass/special
-/vectorclass/changelog.txt
 *.exe
 /.Release/
 /.release64/
