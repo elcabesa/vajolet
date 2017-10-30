@@ -1517,56 +1517,56 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	{
 		bestScore = staticEval;
 		// todo trovare un valore buono per il futility
-		futilityBase = bestScore + 5050;
 
 
 
-		/*if (ttValue != SCORE_NONE)
+
+		if (ttValue != SCORE_NONE)
 		{
 			if (
 					((tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact) && (ttValue > staticEval) )
 					|| ((tte->getType() == typeScoreLowerThanAlpha || tte->getType() == typeExact ) && (ttValue < staticEval) )
-				)
+			)
 			{
 				bestScore = ttValue;
 			}
-		}*/
+		}
+
+		if(bestScore > alpha)
+		{
+			assert(!inCheck);
+
+			// TODO testare se la riga TTtype=typeExact; ha senso
+			if(PVnode)
+			{
+				pvLine.clear();
+			}
+
+			if( bestScore >= beta)
+			{
+				if( !pos.isCaptureMoveOrPromotion(ttMove) )
+				{
+					saveKillers(ply,ttMove);
+				}
+				if(!stop)
+				{
+					TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
+				}
+				return bestScore;
+			}
+			alpha = bestScore;
+			TTtype = typeExact;
+
+		}
+		
+		futilityBase = bestScore + 5050;
+
+
 	}
 	else
 	{
 		bestScore = -SCORE_INFINITE;
 		futilityBase = -SCORE_INFINITE;
-
-	}
-
-
-	if(bestScore > alpha)
-	{
-		assert(!inCheck);
-
-		// TODO testare se la riga TTtype=typeExact; ha senso
-		if(PVnode)
-		{
-			pvLine.clear();
-		}
-
-		if( bestScore >= beta)
-		{
-			if( !pos.isCaptureMoveOrPromotion(ttMove) )
-			{
-				saveKillers(ply,ttMove);
-			}
-			if(!stop)
-			{
-				TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
-			}
-			return bestScore;
-		}
-		alpha = bestScore;
-		TTtype = typeExact;
-		
-
-
 	}
 
 
@@ -1620,6 +1620,12 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 					Score futilityValue = futilityBase
 							+ Position::pieceValue[pos.getPieceAt((tSquare)m.bit.to)][1]
 							+ ( pos.isEnPassantMove(m) ? Position::pieceValue[Position::whitePawns][1] : 0);
+
+					if( m.bit.flags == Move::fpromotion )
+					{
+						futilityValue += Position::pieceValue[m.bit.promotion + Position::whiteQueens][1] - Position::pieceValue[Position::whitePawns][1];
+					}
+
 
 					if (futilityValue < beta)
 					{

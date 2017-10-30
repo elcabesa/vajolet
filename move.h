@@ -73,6 +73,7 @@ struct extMove{
 	Score score;
 
 	extMove(){};
+	inline bool operator < (const extMove& d1) const { return score < d1.score;}
 };
 
 /*!	\brief return the offset of a pawn push

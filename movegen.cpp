@@ -704,27 +704,14 @@ Move Movegen::getNextMove()
 		case generateCaptureEvasionMoves:
 		{
 
-			//generateMoves<Movegen::allEvasionMg>();
 			generateMoves<Movegen::captureEvasionMg>();
-			//generateMoves<Movegen::quietEvasionMg>();
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
-			killerMoves[0] = (src.getKillers(ply,0));
-			killerMoves[1] = (src.getKillers(ply,1));
+			killerMoves[0] = src.getKillers(ply,0);
+			killerMoves[1] = src.getKillers(ply,1);
 
 			scoreCaptureMoves();
 
-			/*Move previousMove = pos.getActualState().currentMove;
-			if(previousMove.packed)
-			{
-				counterMoves[0] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
-				counterMoves[1] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
-			}
-			else
-			{
-				counterMoves[0] = NOMOVE;
-				counterMoves[1] = NOMOVE;
-			}*/
 
 
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
@@ -732,29 +719,8 @@ Move Movegen::getNextMove()
 			break;
 		case generateQuietEvasionMoves:
 		{
-
-			//generateMoves<Movegen::allEvasionMg>();
-			//generateMoves<Movegen::captureEvasionMg>();
 			generateMoves<Movegen::quietEvasionMg>();
 			scoreQuietEvasion();
-
-			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
-			//killerMoves[0] = (src.getKillers(ply,0));
-			//killerMoves[1] = (src.getKillers(ply,1));
-
-			/*Move previousMove = pos.getActualState().currentMove;
-			if(previousMove.packed)
-			{
-				counterMoves[0] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
-				counterMoves[1] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
-			}
-			else
-			{
-				counterMoves[0] = NOMOVE;
-				counterMoves[1] = NOMOVE;
-			}*/
-
-
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 		}
 			break;
@@ -762,112 +728,87 @@ Move Movegen::getNextMove()
 		case generateQuietCheks:
 
 			resetMoveList();
-
 			generateMoves<Movegen::quietChecksMg>();
-
 			scoreQuietMoves();
-
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
+
 			break;
 
 		case iterateQuietMoves:
-			if( moveListPosition < moveListSize )
+			if(FindNextBestMove())
 			{
-				FindNextBestMove();
-
-				if(moveList[moveListPosition].m != ttMove && !isKillerMove(moveList[moveListPosition].m) && moveList[moveListPosition].m != counterMoves[0] &&  moveList[moveListPosition].m != counterMoves[1])
+				Move mm = moveListPosition->m;
+				if(mm != ttMove && !isKillerMove(mm) && mm != counterMoves[0] &&  mm != counterMoves[1])
 				{
-					//if(moveList[moveListPosition].score > 0 || this->depth >= 3* ONE_PLY )
-					//{
-						return moveList[moveListPosition++].m;
-					//}
-					//else
-					//{
-					//	moveListPosition++;
-					//	// TODO qui posso pasa allo stage successivo
-					//}
+						++moveListPosition;
+						return mm;
 				}
 				else
 				{
-					moveListPosition++;
+					++moveListPosition;
 				}
 			}
 			else
 			{
+
 				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
+
 			}
 			break;
+
+		case iterateQuiescentCaptures:
 		case iterateCaptureEvasionMoves:
-			if(moveListPosition < moveListSize)
+
+			if(FindNextBestMove())
 			{
-				FindNextBestMove();
-				if(moveList[moveListPosition].m != ttMove)
+				if(moveListPosition->m != ttMove)
 				{
-					return moveList[moveListPosition++].m;
+					return (moveListPosition++)->m;
 				}
-				moveListPosition++;
+				++moveListPosition;
 			}
 			else
 			{
 				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
-		case iterateQuietEvasionMoves:
-		if(moveListPosition < moveListSize)
-		{
-			FindNextBestMove();
-			if(moveList[moveListPosition].m != ttMove)
-			{
-				return moveList[moveListPosition++].m;
-			}
-			moveListPosition++;
-		}
-		else
-		{
-			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
-		}
-		break;
+		case iterateQuiescentMoves:
 		case iterateQuietChecks:
-			if(moveListPosition < moveListSize)
+		case iterateQuietEvasionMoves:
+			if(FindNextBestMove())
 			{
-				FindNextBestMove();
-
-				if(moveList[moveListPosition].m != ttMove)
+				if(moveListPosition->m != ttMove)
 				{
-					return moveList[moveListPosition++].m;
+					return (moveListPosition++)->m;
 				}
-				else
-				{
-					moveListPosition++;
-				}
+				++moveListPosition;
 			}
 			else
 			{
-				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
+				return NOMOVE;
 			}
-
-
 			break;
 		case iterateGoodCaptureMoves:
-			if(moveListPosition < moveListSize)
+			if(FindNextBestMove())
 			{
-				FindNextBestMove();
-
-				if(moveList[moveListPosition].m != ttMove)
+				Move mm = moveListPosition->m;
+				if(mm != ttMove)
 				{
-					if((pos.seeSign(moveList[moveListPosition].m)>=0) || (pos.moveGivesSafeDoubleCheck(moveList[moveListPosition].m)))
+					if((pos.seeSign(mm)>=0) || (pos.moveGivesSafeDoubleCheck(mm)))
 					{
-						return moveList[moveListPosition++].m;
+						++moveListPosition;
+						return mm;
 					}
 					else
 					{
-						assert(badCaptureSize<MAX_BAD_MOVE_PER_POSITION);
-						badCaptureList[badCaptureSize++].m = moveList[moveListPosition++].m;
+						assert(badCaptureEnd<MAX_BAD_MOVE_PER_POSITION);
+						(badCaptureEnd++)->m = mm;
+						++moveListPosition;
 					}
 				}
 				else
 				{
-					moveListPosition++;
+					++moveListPosition;
 				}
 
 			}
@@ -893,58 +834,37 @@ Move Movegen::getNextMove()
 			}
 			break;
 		case iterateProbCutCaptures:
-			if(moveListPosition < moveListSize)
+			if(FindNextBestMove())
 			{
-				FindNextBestMove();
-
-				if(moveList[moveListPosition].m != ttMove)
+				Move mm = moveListPosition->m;
+				if(mm != ttMove)
 				{
-					if(pos.see(moveList[moveListPosition].m) >= captureThreshold)
+					if(pos.see(mm) >= captureThreshold)
 					{
-						return moveList[moveListPosition++].m;
+						++moveListPosition;
+						return mm;
 					}
-					moveListPosition++;
+					++moveListPosition;
 				}
 				else
 				{
-					moveListPosition++;
+					++moveListPosition;
 				}
 
 			}
 			else
 			{
-				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
+				return NOMOVE;
 			}
 			break;
 		case iterateBadCaptureMoves:
-			if(badCapturePosition < badCaptureSize)
+			if(badCapturePosition != badCaptureEnd)
 			{
-				return badCaptureList[badCapturePosition++].m;
-			}
-			else{
-				stagedGeneratorState=(eStagedGeneratorState)(stagedGeneratorState+1);
-			}
-			break;
-
-
-		case iterateQuiescentMoves:
-		case iterateQuiescentCaptures:
-			if(moveListPosition < moveListSize)
-			{
-				FindNextBestMove();
-
-				if(moveList[moveListPosition].m != ttMove)
-				{
-					return moveList[moveListPosition++].m;
-				}
-				else
-				{
-					moveListPosition++;
-				}
+				return (badCapturePosition++)->m;
 			}
 			else
 			{
-				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
+				return NOMOVE;
 			}
 			break;
 		case getKillers:

@@ -555,7 +555,7 @@ public:
 	*/
 	inline Score getMvvLvaScore(const Move & m) const
 	{
-		Score s = pieceValue[ squares[m.bit.to] ][0] - (squares[m.bit.from]);
+		Score s = pieceValue[ squares[m.bit.to] ][0] + (squares[m.bit.from]);
 		if ( isPromotionMove(m) )
 		{
 			s += (pieceValue[ whiteQueens +m.bit.promotion ] - pieceValue[whitePawns])[0];

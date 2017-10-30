@@ -49,8 +49,8 @@ int main()
 	//----------------------------------
 	//	init global data
 	//----------------------------------
-	std::cout.rdbuf()->pubsetbuf( 0, 0 );
-	std::cin.rdbuf()->pubsetbuf( 0, 0 );
+	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
+	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
 	initData();
 	HashKeys::init();
 	Position::initScoreValues();

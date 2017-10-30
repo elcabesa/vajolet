@@ -18,9 +18,10 @@
 #ifndef MOVEGEN_H_
 #define MOVEGEN_H_
 
-#include <stack>
 #include <list>
 #include <utility>
+#include <algorithm>
+#include <array>
 #include "vajolet.h"
 #include "move.h"
 #include "position.h"
@@ -33,13 +34,13 @@
 class Movegen{
 private:
 
-	extMove moveList[MAX_MOVE_PER_POSITION];
-	unsigned int moveListSize;
-	unsigned int moveListPosition;
+	std::array<extMove,MAX_MOVE_PER_POSITION> moveList;
+	std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListEnd;
+	std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListPosition;
 
-	extMove badCaptureList[MAX_BAD_MOVE_PER_POSITION];
-	unsigned int badCaptureSize;
-	unsigned int badCapturePosition;
+	std::array<extMove,MAX_BAD_MOVE_PER_POSITION> badCaptureList;
+	std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCaptureEnd;
+	std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCapturePosition;
 
 	unsigned int killerPos;
 	Score captureThreshold;
@@ -117,65 +118,57 @@ private:
 
 	void insertMove(const Move& m)
 	{
-		assert(moveListSize<MAX_MOVE_PER_POSITION);
-		moveList[moveListSize++].m=m;
+		assert(moveListEnd<MAX_MOVE_PER_POSITION);
+		(moveListEnd++)->m = m;
 	}
 
 	inline void scoreCaptureMoves()
 	{
-		for(unsigned int i = moveListPosition; i < moveListSize; i++)
+		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
 		{
-			moveList[i].score = pos.getMvvLvaScore(moveList[i].m);
+			mov->score = pos.getMvvLvaScore(mov->m);
 		}
 	}
 
 	inline void scoreQuietMoves()
 	{
-		for(unsigned int i = moveListPosition; i < moveListSize; i++)
+		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
 		{
-			moveList[i].score = src.getHistory().getValue(pos.getPieceAt((tSquare)moveList[i].m.bit.from),(tSquare)moveList[i].m.bit.to);
+			mov->score = src.getHistory().getValue(pos.getPieceAt((tSquare)mov->m.bit.from),(tSquare)mov->m.bit.to);
 		}
 	}
 
 	inline void scoreQuietEvasion()
 	{
-		for(unsigned int i = moveListPosition; i < moveListSize; i++)
+		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
 		{
-			moveList[i].score = (pos.getPieceAt((tSquare)moveList[i].m.bit.from));
-			if(pos.getPieceAt((tSquare)moveList[i].m.bit.from) % Position::separationBitmap == Position::King)
+			mov->score = (pos.getPieceAt((tSquare)mov->m.bit.from));
+			if(pos.getPieceAt((tSquare)mov->m.bit.from) % Position::separationBitmap == Position::King)
 			{
-				moveList[i].score = 20;
+				mov->score = 20;
 			}
-			moveList[i].score *=500000;
+			mov->score *=500000;
 
-			moveList[i].score += src.getHistory().getValue(pos.getPieceAt((tSquare)moveList[i].m.bit.from),(tSquare)moveList[i].m.bit.to);
+			mov->score += src.getHistory().getValue(pos.getPieceAt((tSquare)mov->m.bit.from),(tSquare)mov->m.bit.to);
 		}
 	}
 
 	inline void resetMoveList()
 	{
-		moveListPosition = 0;
-		moveListSize = 0;
+		moveListPosition = moveList.begin();
+		moveListEnd = moveList.begin();
 	}
 
 
-	inline void FindNextBestMove()
+	inline bool FindNextBestMove()
 	{
-		Score bestScore = -SCORE_INFINITE;
-		unsigned int bestIndex = moveListPosition;
-		for(unsigned int i = moveListPosition; i < moveListSize; i++) // itera sulle mosse rimanenti
+		const auto max = std::max_element(moveListPosition,moveListEnd);
+		if( max != moveListEnd)
 		{
-			Score res = moveList[i].score;
-			if(res > bestScore)
-			{
-				bestScore = res;
-				bestIndex = i;
-			}
+			std::swap(*max, *moveListPosition);
+			return true;
 		}
-		if(bestIndex != moveListPosition)
-		{
-			std::swap(moveList[moveListPosition], moveList[bestIndex]);
-		}
+		return false;
 	}
 
 
@@ -183,7 +176,7 @@ public:
 	const static Move NOMOVE;
 	unsigned int getNumberOfLegalMoves();
 
-	inline unsigned int getGeneratedMoveNumber(void)const { return moveListSize;}
+	inline unsigned int getGeneratedMoveNumber(void)const { return moveListEnd-moveList.begin();}
 
 	bool isKillerMove(Move &m) const
 	{
@@ -209,10 +202,10 @@ public:
 		{
 			stagedGeneratorState = getTT;
 		}
-		moveListPosition = 0;
-		moveListSize = 0;
-		badCaptureSize = 0;
-		badCapturePosition = 0;
+		moveListPosition =  moveList.begin();
+		moveListEnd =  moveList.begin();
+		badCaptureEnd = badCaptureList.begin();
+		badCapturePosition = badCaptureList.begin();
 
 	}
 
