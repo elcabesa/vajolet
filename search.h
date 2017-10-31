@@ -29,6 +29,27 @@
 #include "history.h"
 #include "eval.h"
 
+class PVline : public std::list<Move> 
+{
+public:
+	inline void reset()
+	{
+		clear();
+	}
+	
+	inline void appendNewPvLine( Move bestMove, PVline childPV )
+	{
+		clear();
+		emplace_back( bestMove );
+		splice( end(), childPV );
+	}
+	
+	inline void appendNewMove( Move move )
+	{
+		clear();
+		emplace_back( move );
+	}
+};
 
 struct startThinkResult
 {
@@ -154,8 +175,8 @@ private:
 		CUT_NODE
 	} ;
 
-	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
-	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,std::list<Move>& PV);
+	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& PV);
+	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& PV);
 
 	static std::atomic<unsigned long long> visitedNodes;
 
