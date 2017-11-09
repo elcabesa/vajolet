@@ -365,6 +365,7 @@ void uciLoop()
 			cmd = "quit";
 		std::istringstream is(cmd);
 
+		token.clear();
 		is >> std::skipws >> token;
 
 

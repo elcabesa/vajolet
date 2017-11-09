@@ -38,10 +38,10 @@ extern const int FILES[squareNumber];
 extern const int RANKS[squareNumber];
 extern bitMap RANKMASK[squareNumber];
 extern bitMap FILEMASK[squareNumber];
-extern bitMap DIAGA1H8MASK[squareNumber];
-extern bitMap DIAGA8H1MASK[squareNumber];
+//extern bitMap DIAGA1H8MASK[squareNumber];
+//extern bitMap DIAGA8H1MASK[squareNumber];
 extern bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
-extern bitMap LINES[squareNumber][squareNumber];
+//extern bitMap LINES[squareNumber][squareNumber];
 extern bitMap ISOLATED_PAWN[squareNumber];
 extern bitMap PASSED_PAWN[2][squareNumber];
 extern bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
@@ -74,6 +74,7 @@ inline bitMap bitSet(tSquare n)
 */
 inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3)
 {
+	extern bitMap LINES[squareNumber][squareNumber];
 	return LINES[s1][s2] & bitSet(s3);
 	/*return  (SQUARES_BETWEEN[s1][s2] | SQUARES_BETWEEN[s1][s3] | SQUARES_BETWEEN[s2][s3])
 			& (     bitSet(s1) |        bitSet(s2) |        bitSet(s3));*/
