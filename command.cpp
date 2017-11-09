@@ -198,6 +198,13 @@ void setoption(std::istringstream& is)
 	std::string token, name, value;
 
 	is >> token; // Consume "name" token
+	
+	if( token != "name" )
+	{
+		return;
+		//sync_cout << "No such option: " << name << sync_endl;
+	}
+	
 
 	// Read option name (can contain spaces)
 	while (is >> token && token != "value")
@@ -209,22 +216,45 @@ void setoption(std::istringstream& is)
 	{
 		value += std::string(" ", !value.empty()) + token;
 	}
+	
+	if( value.empty())
+	{
+		return;
+		//sync_cout << "No such option: " << name << sync_endl;
+	}
 
 	if(name == "Hash")
 	{
-		int hash = stoi(value);
+		int hash = 1;
+		try
+		{
+			hash = std::stoi(value);
+		}
+		catch(...)
+		{
+			hash = 1;
+		}
 		hash = std::min(hash,65536);
 		TT.setSize(hash);
+
 	}
 	else if(name == "Threads")
 	{
-		int i = stoi(value);
-		Search::threads = (i<=128)?(i>0?i:1):128;
+		try
+		{
+			int i = std::stoi(value);
+			Search::threads = (i<=128)?(i>0?i:1):128;
+		}
+		catch(...){}
 	}
 	else if(name == "MultiPV")
 	{
-		int i = stoi(value);
-		Search::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
+		try
+		{
+			int i = std::stoi(value);
+			Search::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
+		}
+		catch(...){}	
 	}
 	else if(name == "OwnBook")
 	{
@@ -268,7 +298,14 @@ void setoption(std::istringstream& is)
 	}
 	else if(name == "SyzygyProbeDepth")
 	{
-		Search::SyzygyProbeDepth = stoi(value);
+		try
+		{
+			Search::SyzygyProbeDepth = std::stoi(value);
+		}
+		catch(...)
+		{
+			Search::SyzygyProbeDepth = 1;
+		}
 	}
 	else if(name == "Syzygy50MoveRule")
 	{
@@ -418,13 +455,31 @@ void uciLoop()
 		}
 		else if (token == "perft" && (is>>token))
 		{
-			int n = stoi(token);
+			int n = 1;
+			try
+			{
+				n = std::stoi(token);
+			}
+			catch(...)
+			{
+				n = 1;
+			}
 			n = std::max(n,1);
 			doPerft(n, pos);
 		}
 		else if (token == "divide" && (is>>token))
 		{
-			unsigned long long res = pos.divide(stoi(token));
+			int n = 1;
+			try
+			{
+				n = std::stoi(token);
+			}
+			catch(...)
+			{
+				n = 1;
+			}
+			
+			unsigned long long res = pos.divide(n);
 			sync_cout << "divide Res= " << res << sync_endl;
 		}
 		else if (token == "go")
