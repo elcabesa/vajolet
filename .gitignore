@@ -8,3 +8,7 @@
 /.release64/
 
 /Release64/
+*.[oad]
+*~
+cmake-build-debug
+.idea

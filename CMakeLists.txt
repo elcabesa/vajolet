@@ -1,7 +1,10 @@
 cmake_minimum_required (VERSION 2.8)
 project (Vajolet)
-
-set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -msse4.2 -mpopcnt -pedantic -Wall -Wextra -fmessage-length=0")
+IF(NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
+    set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -msse4.2 -mpopcnt -pedantic -Wall -Wextra -fmessage-length=0")
+else()
+    set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -pedantic -Wall -Wextra -fmessage-length=0")
+endif()
 set (CMAKE_EXE_LINKER_FLAGS "-s -pthread")
 
 add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp eval.cpp hashKeys.cpp io.cpp magicmoves.cpp movegen.cpp position.cpp search.cpp see.cpp thread.cpp transposition.cpp syzygy/tbprobe.cpp)
