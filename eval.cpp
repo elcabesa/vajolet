@@ -356,8 +356,8 @@ bool Position::evalKQvsK(Score& res)
 	}
 
 	res = SCORE_KNOWN_WIN + 40000;
-	res -= 5 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
-	res += 5 * SQUARE_DISTANCE[enemySquare][E4];// devo portare il re avversario vicino al bordo
+	res -= 10 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
+	res += 20 * SQUARE_DISTANCE[enemySquare][E4];// devo portare il re avversario vicino al bordo
 
 	res *= mul;
 	return true;
@@ -385,8 +385,8 @@ bool Position::evalKRvsK(Score& res)
 	}
 
 	res = SCORE_KNOWN_WIN + 30000;
-	res -= 5 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
-	res += 5 * SQUARE_DISTANCE[enemySquare][E4];// devo portare il re avversario vicino al boardo
+	res -= 10 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
+	res += 20 * SQUARE_DISTANCE[enemySquare][E4];// devo portare il re avversario vicino al bordo
 
 	res *= mul;
 	return true;
