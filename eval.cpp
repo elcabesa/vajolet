@@ -325,7 +325,7 @@ bool Position::evalKBNvsK( Score& res)
 		mateSquare2 = H1;
 	}
 
-	res = SCORE_KNOWN_WIN + 50000;
+	res = SCORE_KNOWN_WIN + 20000;
 
 	res -= 5 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
 	res -= 10 * std::min( SQUARE_DISTANCE[enemySquare][mateSquare1], SQUARE_DISTANCE[enemySquare][mateSquare2]);// devo portare il re avversario nel giusto angolo
@@ -338,7 +338,6 @@ bool Position::evalKBNvsK( Score& res)
 bool Position::evalKQvsK(Score& res)
 {
 	Color color = getBitmap(whiteQueens) ? white : black;
-	tSquare queenSquare;
 	tSquare kingSquare;
 	tSquare enemySquare;
 
@@ -346,21 +345,19 @@ bool Position::evalKQvsK(Score& res)
 	if(color == white)
 	{
 		mul = 1;
-		queenSquare = getSquareOfThePiece(whiteQueens);
 		kingSquare = getSquareOfThePiece(whiteKing);
 		enemySquare = getSquareOfThePiece(blackKing);
 	}
 	else
 	{
 		mul = -1;
-		queenSquare = getSquareOfThePiece(blackQueens);
 		kingSquare = getSquareOfThePiece(blackKing);
 		enemySquare = getSquareOfThePiece(whiteKing);
 	}
 
 	res = SCORE_KNOWN_WIN + 40000;
 	res -= 5 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
-	res -= 5 * SQUARE_DISTANCE[enemySquare][queenSquare];// devo portare il re avversario nel giusto angolo
+	res += 5 * SQUARE_DISTANCE[enemySquare][E4];// devo portare il re avversario vicino al bordo
 
 	res *= mul;
 	return true;
@@ -370,7 +367,6 @@ bool Position::evalKQvsK(Score& res)
 bool Position::evalKRvsK(Score& res)
 {
 	Color color = getBitmap(whiteRooks) ? white : black;
-	tSquare rookSquare;
 	tSquare kingSquare;
 	tSquare enemySquare;
 
@@ -378,21 +374,19 @@ bool Position::evalKRvsK(Score& res)
 	if(color == white)
 	{
 		mul = 1;
-		rookSquare = getSquareOfThePiece(whiteRooks);
 		kingSquare = getSquareOfThePiece(whiteKing);
 		enemySquare = getSquareOfThePiece(blackKing);
 	}
 	else
 	{
 		mul = -1;
-		rookSquare = getSquareOfThePiece(blackRooks);
 		kingSquare = getSquareOfThePiece(blackKing);
 		enemySquare = getSquareOfThePiece(whiteKing);
 	}
 
 	res = SCORE_KNOWN_WIN + 30000;
 	res -= 5 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
-	res -= 5 * SQUARE_DISTANCE[enemySquare][rookSquare];// devo portare il re avversario nel giusto angolo
+	res += 5 * SQUARE_DISTANCE[enemySquare][E4];// devo portare il re avversario vicino al boardo
 
 	res *= mul;
 	return true;
