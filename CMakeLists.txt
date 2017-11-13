@@ -10,7 +10,7 @@ endif()
 if (WIN32)
 	set (CMAKE_EXE_LINKER_FLAGS "-s -static -pthread")
 else()
-	set (CMAKE_EXE_LINKER_FLAGS "-s -pthread")
+		set (CMAKE_EXE_LINKER_FLAGS "-s -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static")
 endif()
 
 add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp eval.cpp hashKeys.cpp io.cpp magicmoves.cpp movegen.cpp position.cpp search.cpp see.cpp thread.cpp transposition.cpp syzygy/tbprobe.cpp)
