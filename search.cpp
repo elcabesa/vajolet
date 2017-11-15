@@ -33,9 +33,7 @@
 #include "command.h"
 #include "syzygy/tbprobe.h"
 #include "bitops.h"
-//#include "logger.h"
 
-//logger Log;
 
 
 #ifdef DEBUG_EVAL_SIMMETRY
@@ -44,8 +42,8 @@
 
 Search defaultSearch;
 std::vector<rootMove> Search::rootMoves;
-std::atomic<unsigned long long> Search::visitedNodes;
-std::atomic<unsigned long long> Search::tbHits;
+unsigned long long Search::visitedNodes;
+unsigned long long Search::tbHits;
 int Search::globalReduction =0;
 
 
@@ -64,70 +62,6 @@ unsigned int Search::SyzygyProbeDepth = 1;
 bool Search::Syzygy50MoveRule= true;
 
 
-
-/*void Search::reloadPv( unsigned int i )
-{
-	if( rootMoves[i].PV.size() > 0)
-	{
-		auto PV = rootMoves[i].PV;
-		unsigned int n = 0;
-
-		for(const Move& m : PV)
-		{
-			if (!pos.isMoveLegal(m))
-			{
-				break;
-			}
-
-			const ttEntry* const tte = TT.probe(pos.getKey());
-
-			if (!tte || tte->getPackedMove() != m.packed)
-			{
-				// Don't overwrite correct entries
-				TT.store(pos.getKey(), SCORE_NONE, typeExact, -1000, m.packed, pos.eval<false>());
-			}
-
-			pos.doMove(m);
-			n++;
-		}
-
-		for(unsigned int i = 0; i< n; i++)
-		{
-			pos.undoMove();
-		}
-	}
-}*/
-
-/*void Search::verifyPv(std::list<Move> &newPV, Score res)
-{
-
-	unsigned int n = 0;
-
-	for(const Move& m : newPV)
-	{
-		if (!pos.isMoveLegal(m))
-		{
-			break;
-		}
-		pos.doMove(m);
-		n++;
-	}
-	pos.display();
-	Score temp = pos.eval<true>();
-	sync_cout<<"EVAL:" <<temp/10000.0<<sync_endl;
-	sync_cout<<"gamePhase:" <<pos.getGamePhase()/65536.0*100<<sync_endl;
-	if( n %2 )
-	{
-		temp = -temp;
-	}
-	sync_cout<< temp << " " <<res<<sync_endl;
-
-	for(unsigned int i = 0; i< n; i++)
-	{
-		pos.undoMove();
-	}
-
-}*/
 
 startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 {
@@ -406,9 +340,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 				newPV.clear();
 				// main thread
-//				Log.open(depth);
 				res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
-//				Log.close();
 
 				res = useTBresult ? TBres : res;
 				// stop helper threads
@@ -600,7 +532,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 
-//	Log.addNode(pos.getActualState().currentMove);
 
 
 
@@ -639,7 +570,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			{
 				pvLine.reset();
 			}
-//			Log.closeNode();
 			return std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
 		}
 
@@ -650,7 +580,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		beta = std::min(mateIn(ply+1), beta);
 		if (alpha >= beta)
 		{
-//			Log.closeNode();
 			return alpha;
 		}
 
@@ -700,7 +629,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				pvLine.reset();
 			}
 		}
-//		Log.closeNode();
 		return ttValue;
 	}
 
@@ -806,7 +734,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 						ttMove.packed,
 						pos.eval<false>());
 
-//				Log.closeNode();
 				return value;
 			}
 		}
@@ -881,7 +808,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score v = qsearch<CUT_NODE>(ply,0, ralpha, ralpha+1, childPV);
 			if (v <= ralpha)
 			{
-//				Log.closeNode();
 				return v;
 			}
 		}
@@ -900,7 +826,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		{
 			assert((depth>>ONE_PLY_SHIFT)<8);
 			assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
-//			Log.closeNode();
 			return eval - futility[depth>>ONE_PLY_SHIFT];
 		}
 
@@ -953,7 +878,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				{
 					nullVal = beta;
 				}
-//				Log.closeNode();
 				return nullVal;
 
 
@@ -997,7 +921,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 				if(s >= rBeta)
 				{
-//					Log.closeNode();
 					return s;
 				}
 
@@ -1346,7 +1269,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	{
 		if( excludedMove.packed)
 		{
-//			Log.closeNode();
 			return alpha;
 		}
 		else if(!inCheck)
@@ -1396,7 +1318,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 	}
-//	Log.closeNode();
 	return bestScore;
 
 }
@@ -1419,7 +1340,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	maxPlyReached = std::max(ply, maxPlyReached);
 	visitedNodes++;
 
-//	Log.addNode(pos.getActualState().currentMove);
 
 
 	if(pos.isDraw(PVnode) || stop)
@@ -1429,7 +1349,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		{
 			pvLine.reset();
 		}
-//		Log.closeNode();
 		return std::min((int)0,(int)(-5000 + pos.getPly()*250));
 	}
 /*	//---------------------------------------
@@ -1484,7 +1403,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				pvLine.clear();
 			}
 		}
-//		Log.closeNode();
 		return ttValue;
 	}
 
@@ -1569,7 +1487,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				{
 					TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
 				}
-//				Log.closeNode();
 				return bestScore;
 			}
 			alpha = bestScore;
@@ -1705,7 +1622,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 					{
 						TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove.packed, staticEval);
 					}
-//					Log.closeNode();
 					return bestScore;
 				}
 			}
@@ -1719,7 +1635,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		{
 			pvLine.reset();
 		}
-//		Log.closeNode();
 		return matedIn(ply);
 	}
 
@@ -1732,7 +1647,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	{
 		TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove.packed, staticEval);
 	}
-//	Log.closeNode();
 	return bestScore;
 
 }

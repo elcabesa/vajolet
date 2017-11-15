@@ -178,7 +178,7 @@ private:
 	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& PV);
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& PV);
 
-	static std::atomic<unsigned long long> visitedNodes;
+	static unsigned long long visitedNodes;
 
 	unsigned int maxPlyReached;
 
@@ -186,7 +186,7 @@ private:
 //	void verifyPv(std::list<Move> &newPV, Score res);
 
 public:
-	static std::atomic<unsigned long long> tbHits;
+	static unsigned long long tbHits;
 	static std::vector<rootMove> rootMoves;
 	std::list<Move> PV;
 	searchLimits limits;
