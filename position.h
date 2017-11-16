@@ -25,6 +25,7 @@
 #include "move.h"
 #include "io.h"
 #include "tables.h"
+#include "bitops.h"
 
 
 
@@ -60,7 +61,6 @@ class Position
 	};
 public:
 	void static initMaterialKeys(void);
-	static const int maxNumberOfPieces = 10;
 
 	/*! \brief define the index of the bitboards
 		\author Marco Belli
@@ -144,16 +144,10 @@ public:
 		for(int i=0; i<squareNumber; i++)
 		{
 			squares[i] = other.squares[i];
-			index[i] = other.index[i];
 		}
 		for(int i = 0; i < lastBitboard; i++)
 		{
 			bitBoard[i] = other.bitBoard[i];
-			pieceCount[i] = other.pieceCount[i];
-			for(int n = 0; n < maxNumberOfPieces; n++)
-			{
-				pieceList[i][n] =other.pieceList[i][n];
-			}
 		}
 
 
@@ -178,16 +172,10 @@ public:
 		for(int i = 0; i < squareNumber; i++)
 		{
 			squares[i] = other.squares[i];
-			index[i] = other.index[i];
 		}
 		for(int i=0;i<lastBitboard;i++)
 		{
 			bitBoard[i] = other.bitBoard[i];
-			pieceCount[i] = other.pieceCount[i];
-			for(int n = 0; n < maxNumberOfPieces; n++)
-			{
-				pieceList[i][n] = other.pieceList[i][n];
-			}
 		}
 
 
@@ -271,9 +259,6 @@ private:
 	*/
 	bitboardIndex squares[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
 	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
-	unsigned int pieceCount[lastBitboard];	// number of pieces indexed by bitboardIndex enum
-	tSquare pieceList[lastBitboard][maxNumberOfPieces];	// lista di pezzi indicizzata per tipo di pezzo e numero ( puo contentere al massimo 64 pezzi di ogni tipo)
-	unsigned int index[squareNumber];		// indice del pezzo all'interno della sua lista
 	bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 
 
@@ -294,16 +279,16 @@ public:
 	}
 	inline unsigned int getPieceCount(const bitboardIndex in) const
 	{
-		return pieceCount[in];
+		return bitCnt(getBitmap(in));
 	}
 
 	inline bitboardIndex getPieceAt(const tSquare sq) const
 	{
 		return squares[sq];
 	}
-	inline tSquare getSquareOfThePiece(const bitboardIndex piece,const unsigned int n = 0) const
+	inline tSquare getSquareOfThePiece(const bitboardIndex piece) const
 	{
-		return pieceList[piece][n];
+		return firstOne(getBitmap(piece));
 	}
 	inline bitMap getOurBitmap(const bitboardIndex piece)const { return Us[piece];}
 	inline bitMap getTheirBitmap(const bitboardIndex piece)const { return Them[piece];}
@@ -660,9 +645,6 @@ private:
 		bitBoard[piece] |= b;
 		bitBoard[occupiedSquares] |= b;
 		bitBoard[color] |= b;
-		unsigned int temp = index[s] = pieceCount[piece]++;
-		assert(index[s]<maxNumberOfPieces);
-		pieceList[piece][temp] = s;
 	}
 
 	/*! \brief move a piece on the board
@@ -686,9 +668,6 @@ private:
 		bitBoard[color] ^= fromTo;
 		squares[from] = empty;
 		squares[to] = piece;
-		index[to] = index[from];
-		assert(index[to]<maxNumberOfPieces);
-		pieceList[piece][index[to]] = to;
 
 
 	}
@@ -717,10 +696,6 @@ private:
 
 		squares[s] = empty;
 
-		const tSquare lastSquare = pieceList[piece][--pieceCount[piece]];
-		unsigned int temp = index[lastSquare] = index[s];
-		pieceList[piece][temp] = lastSquare;
-		pieceList[piece][pieceCount[piece]] = squareNone;
 	}
 
 	template<Color c> simdScore evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const;

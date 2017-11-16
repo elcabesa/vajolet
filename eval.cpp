@@ -1553,7 +1553,7 @@ Score Position::eval(void)
 
 	if( getPieceCount(whiteBishops) >= 2 )
 	{
-		if(getPieceCount(whiteBishops) != 2 || SQUARE_COLOR[ getSquareOfThePiece(whiteBishops) ] != SQUARE_COLOR[ getSquareOfThePiece(whiteBishops, 1) ] )
+		if( (getBitmap(whiteBishops) & BITMAP_COLOR [0]) && (getBitmap(whiteBishops) & BITMAP_COLOR [1]) )
 		{
 			res += bishopPair;
 		}
@@ -1561,7 +1561,7 @@ Score Position::eval(void)
 
 	if( getPieceCount(blackBishops) >= 2 )
 	{
-		if(getPieceCount(blackBishops) != 2 || SQUARE_COLOR[ getSquareOfThePiece(blackBishops) ] != SQUARE_COLOR[ getSquareOfThePiece(blackBishops, 1) ] )
+		if( (getBitmap(blackBishops) & BITMAP_COLOR [0]) && (getBitmap(blackBishops) & BITMAP_COLOR [1]) )
 		{
 			res -= bishopPair;
 		}

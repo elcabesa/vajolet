@@ -351,9 +351,9 @@ void Position::setupFromFen(const std::string& fenStr)
 
 	calcCheckingSquares();
 
-	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
-	x.pinnedPieces=getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
-	x.checkers= getAttackersTo(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0]) & bitBoard[blackPieces-x.nextMove];
+	x.hiddenCheckersCandidate=getHiddenCheckers(getSquareOfThePiece((bitboardIndex)(blackKing-x.nextMove)),x.nextMove);
+	x.pinnedPieces=getHiddenCheckers(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),eNextMove(blackTurn-x.nextMove));
+	x.checkers= getAttackersTo(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))) & bitBoard[blackPieces-x.nextMove];
 
 
 
@@ -418,16 +418,10 @@ void Position::clear()
 	for (tSquare i = square0; i < squareNumber; i++)
 	{
 		squares[i] = empty;
-		index[i] = 0;
 	};
 	for (int i = 0; i < lastBitboard; i++)
 	{
-		pieceCount[i] = 0;
 		bitBoard[i] = 0;
-		for (int n = 0; n < maxNumberOfPieces; n++)
-		{
-			pieceList[i][n] = square0;
-		}
 	}
 	stateIndex=0;
 	actualState = &stateInfo[stateIndex];
@@ -727,11 +721,14 @@ U64 Position::calcPawnKey(void) const
 U64 Position::calcMaterialKey(void) const
 {
 	U64 hash = 0;
-	for (int i = 0; i < lastBitboard; i++)
+	for (int i = whiteKing; i < lastBitboard; i++)
 	{
-		for (unsigned int cnt = 0; cnt < pieceCount[i]; cnt++)
+		if ( i != occupiedSquares && i != whitePieces && i != blackPieces)
 		{
-			hash ^= HashKeys::keys[i][cnt];
+			for (unsigned int cnt = 0; cnt < getPieceCount((bitboardIndex)i); cnt++)
+			{
+				hash ^= HashKeys::keys[i][cnt];
+			}
 		}
 	}
 
@@ -816,10 +813,10 @@ void Position::doNullMove(void)
 
 
 	calcCheckingSquares();
-	assert(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0]!=squareNone);
-	assert(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0]!=squareNone);
-	x.hiddenCheckersCandidate = getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
-	x.pinnedPieces = getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
+	assert(getSquareOfThePiece((bitboardIndex)(blackKing-x.nextMove))!=squareNone);
+	assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))!=squareNone);
+	x.hiddenCheckersCandidate = getHiddenCheckers(getSquareOfThePiece((bitboardIndex)(blackKing-x.nextMove)),x.nextMove);
+	x.pinnedPieces = getHiddenCheckers(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),eNextMove(blackTurn-x.nextMove));
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(1);
@@ -921,8 +918,8 @@ void Position::doMove(const Move & m){
 
 		// update keys
 		x.key ^= HashKeys::keys[captureSquare][capture];
-		assert(pieceCount[capture]<30);
-		x.materialKey ^= HashKeys::keys[capture][pieceCount[capture]]; // ->after removing the piece
+		assert(getPieceCount(capture)<30);
+		x.materialKey ^= HashKeys::keys[capture][getPieceCount(capture)]; // ->after removing the piece
 
 		// reset fifty move counter
 		x.fiftyMoveCnt = 0;
@@ -974,7 +971,7 @@ void Position::doMove(const Move & m){
 
 			x.key ^= HashKeys::keys[to][piece]^ HashKeys::keys[to][promotedPiece];
 			x.pawnKey ^= HashKeys::keys[to][piece];
-			x.materialKey ^= HashKeys::keys[promotedPiece][pieceCount[promotedPiece]-1] ^ HashKeys::keys[piece][pieceCount[piece]];
+			x.materialKey ^= HashKeys::keys[promotedPiece][getPieceCount(promotedPiece)-1] ^ HashKeys::keys[piece][getPieceCount(piece)];
 		}
 		x.pawnKey ^= HashKeys::keys[from][piece] ^ HashKeys::keys[to][piece];
 		x.fiftyMoveCnt = 0;
@@ -996,8 +993,8 @@ void Position::doMove(const Move & m){
 
 		if(m.bit.flags != Move::fnone)
 		{
-			assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
-			x.checkers |= getAttackersTo(pieceList[whiteKing+x.nextMove][0]) & Them[Pieces];
+			assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
+			x.checkers |= getAttackersTo(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))) & Them[Pieces];
 		}
 		else
 		{
@@ -1009,23 +1006,23 @@ void Position::doMove(const Move & m){
 			{
 				if(!isRook(piece))
 				{
-					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
-					x.checkers |= Movegen::attackFrom<Position::whiteRooks>(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
+					assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
+					x.checkers |= Movegen::attackFrom<Position::whiteRooks>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
 				}
 				if(!isBishop(piece))
 				{
-					assert(pieceList[whiteKing+x.nextMove][0]<squareNumber);
-					x.checkers |= Movegen::attackFrom<Position::whiteBishops>(pieceList[whiteKing+x.nextMove][0],bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]);
+					assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
+					x.checkers |= Movegen::attackFrom<Position::whiteBishops>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]);
 				}
 			}
 		}
 	}
 
 	calcCheckingSquares();
-	assert(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0]<squareNumber);
-	x.hiddenCheckersCandidate=getHiddenCheckers(pieceList[(bitboardIndex)(blackKing-x.nextMove)][0],x.nextMove);
-	assert(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0]<squareNumber);
-	x.pinnedPieces = getHiddenCheckers(pieceList[(bitboardIndex)(whiteKing+x.nextMove)][0],eNextMove(blackTurn-x.nextMove));
+	assert(getSquareOfThePiece((bitboardIndex)(blackKing-x.nextMove))<squareNumber);
+	x.hiddenCheckersCandidate=getHiddenCheckers(getSquareOfThePiece((bitboardIndex)(blackKing-x.nextMove)),x.nextMove);
+	assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
+	x.pinnedPieces = getHiddenCheckers(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),eNextMove(blackTurn-x.nextMove));
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(1);
@@ -1184,7 +1181,7 @@ bool Position::checkPosConsistency(int nn)
 	{
 		if(i!= whitePieces && i!= separationBitmap)
 		{
-			if(pieceCount[i]!= bitCnt(bitBoard[i]))
+			if(getPieceCount((bitboardIndex)i) != bitCnt(bitBoard[i]))
 			{
 				sync_cout<<"pieceCount Error"<<sync_endl;
 				sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
@@ -1194,20 +1191,7 @@ bool Position::checkPosConsistency(int nn)
 		}
 	}
 
-	for (int i = empty; i < lastBitboard; i++)
-	{
-		for (unsigned int n=0;n<pieceCount[i];n++)
-		{
-			assert(n<maxNumberOfPieces);
-			if((bitBoard[i] & bitSet(pieceList[i][n]))==0)
-			{
-				sync_cout<<"pieceList Error"<<sync_endl;
-				sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-				while(1){}
-				return false;
-			}
-		}
-	}
+
 	bitMap test=0;
 	for (int i = whiteKing; i < whitePieces; i++)
 	{
@@ -1381,7 +1365,7 @@ inline void Position::calcCheckingSquares(void)
 	assert(attackingPieces<lastBitboard);
 
 
-	tSquare kingSquare = pieceList[opponentKing][0];
+	tSquare kingSquare = getSquareOfThePiece(opponentKing);
 
 	bitMap occupancy = bitBoard[occupiedSquares];
 
@@ -1489,8 +1473,8 @@ bool Position::moveGivesCheck(const Move& m)const
 	if(s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from)))
 	{
 		// For pawn and king moves we need to verify also direction
-		assert(pieceList[blackKing-s.nextMove][0]<squareNumber);
-		if ( (!isPawn(piece)&& !isKing(piece)) || !squaresAligned(from, to, pieceList[blackKing-s.nextMove][0]))
+		assert(getSquareOfThePiece(blackKing-s.nextMove)<squareNumber);
+		if ( (!isPawn(piece)&& !isKing(piece)) || !squaresAligned(from, to, getSquareOfThePiece((bitboardIndex)(blackKing-s.nextMove))))
 			return true;
 	}
 	if(m.bit.flags == Move::fnone)
@@ -1498,7 +1482,7 @@ bool Position::moveGivesCheck(const Move& m)const
 		return false;
 	}
 
-	tSquare kingSquare =pieceList[blackKing-s.nextMove][0];
+	tSquare kingSquare = getSquareOfThePiece((bitboardIndex)(blackKing-s.nextMove));
 	assert(kingSquare<squareNumber);
 
 	switch(m.bit.flags)
@@ -1592,7 +1576,7 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 	assert(piece!=blackPieces);
 	state & s=getActualState();
 
-	tSquare kingSquare = pieceList[blackKing-s.nextMove][0];
+	tSquare kingSquare = getSquareOfThePiece((bitboardIndex)(blackKing-s.nextMove));
 	return (!(Movegen::attackFrom<Position::whiteKing>(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from))));
 
 
@@ -1696,7 +1680,7 @@ bool Position::isMoveLegal(const Move &m)const
 			if( !isKing(piece)
 				&& !(
 					((bitSet((tSquare)(m.bit.to-( isEnPassantMove(m) ? pawnPush(s.nextMove) : 0)))) & s.checkers)
-					|| ((bitSet((tSquare)m.bit.to) & SQUARES_BETWEEN[pieceList[Position::whiteKing+s.nextMove][0]][firstOne(s.checkers)]) & ~Us[Pieces])
+					|| ((bitSet((tSquare)m.bit.to) & SQUARES_BETWEEN[getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove))][firstOne(s.checkers)]) & ~Us[Pieces])
 				)
 			)
 			{
@@ -1704,7 +1688,7 @@ bool Position::isMoveLegal(const Move &m)const
 			}
 		}
 	}
-	if(((s.pinnedPieces & bitSet((tSquare)m.bit.from)) && !squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,pieceList[Position::whiteKing+s.nextMove][0])))
+	if(((s.pinnedPieces & bitSet((tSquare)m.bit.from)) && !squaresAligned((tSquare)m.bit.from,(tSquare)m.bit.to,getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove)))))
 	{
 		return false;
 	}
@@ -1865,7 +1849,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[m.bit.from];
 				bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
-				tSquare kingSquare=pieceList[Position::whiteKing+s.nextMove][0];
+				tSquare kingSquare=getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove));
 				assert(kingSquare<squareNumber);
 				if((Movegen::attackFrom<Position::whiteRooks>(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Rooks]))|
 							(Movegen::attackFrom<Position::whiteBishops>(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Bishops])))
@@ -1894,7 +1878,7 @@ bool Position::isMoveLegal(const Move &m)const
 			if( isEnPassantMove(m) ){
 				bitMap captureSquare = FILEMASK[s.epSquare] & RANKMASK[m.bit.from];
 				bitMap occ = bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
-				tSquare kingSquare = pieceList[Position::whiteKing+s.nextMove][0];
+				tSquare kingSquare = getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove));
 				assert(kingSquare<squareNumber);
 				if((Movegen::attackFrom<Position::whiteRooks>(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
 							(Movegen::attackFrom<Position::whiteBishops>(kingSquare, occ) & (Them[Queens] | Them[Bishops])))

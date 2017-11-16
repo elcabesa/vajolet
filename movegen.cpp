@@ -173,7 +173,7 @@ void Movegen::generateMoves()
 	bitMap promotionPawns =  pos.getOurBitmap(Position::Pawns) & seventhRankMask ;
 	bitMap nonPromotionPawns =  pos.getOurBitmap(Position::Pawns)^ promotionPawns;
 
-	const tSquare kingSquare = pos.getSquareOfThePiece((Position::bitboardIndex)(Position::whiteKing+s.nextMove),0);
+	const tSquare kingSquare = pos.getSquareOfThePiece((Position::bitboardIndex)(Position::whiteKing+s.nextMove));
 	assert(kingSquare<squareNumber);
 
 	// populate the target squares bitmaps
@@ -268,12 +268,10 @@ void Movegen::generateMoves()
 	// queen
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)( piece+1 );
-
-	for(unsigned int i = 0; i < pos.getPieceCount(piece); i++)
+	bitMap bFrom = pos.getBitmap(piece);
+	while(bFrom)
 	{
-
-		assert(i<Position::maxNumberOfPieces);
-		tSquare from = pos.getSquareOfThePiece(piece,i);
+		tSquare from = iterateBit(bFrom);
 		assert(from < squareNumber);
 		m.bit.from = from;
 
@@ -298,11 +296,10 @@ void Movegen::generateMoves()
 	// rook
 	//------------------------------------------------------
 	piece= (Position::bitboardIndex)(piece+1);
-
-	for(unsigned int i=0; i<pos.getPieceCount(piece); i++)
+	bFrom = pos.getBitmap(piece);
+	while(bFrom)
 	{
-		assert(i<Position::maxNumberOfPieces);
-		tSquare from = pos.getSquareOfThePiece(piece,i);
+		tSquare from = iterateBit(bFrom);
 		assert(from < squareNumber);
 		m.bit.from = from;
 
@@ -327,11 +324,10 @@ void Movegen::generateMoves()
 	// bishop
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)(piece+1);
-
-	for(unsigned int i=0; i<pos.getPieceCount(piece); i++)
+	bFrom = pos.getBitmap(piece);
+	while(bFrom)
 	{
-		assert(i<Position::maxNumberOfPieces);
-		tSquare from = pos.getSquareOfThePiece(piece,i);
+		tSquare from = iterateBit(bFrom);
 		assert(from < squareNumber);
 		m.bit.from = from;
 
@@ -359,11 +355,10 @@ void Movegen::generateMoves()
 	// knight
 	//------------------------------------------------------
 	piece = (Position::bitboardIndex)(piece+1);
-
-	for(unsigned int i=0; i<pos.getPieceCount(piece); i++)
+	bFrom = pos.getBitmap(piece);
+	while(bFrom)
 	{
-		assert(i<Position::maxNumberOfPieces);
-		tSquare from = pos.getSquareOfThePiece(piece,i);
+		tSquare from = iterateBit(bFrom);
 		assert(from<squareNumber);
 		m.bit.from = from;
 
