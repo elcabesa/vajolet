@@ -18,6 +18,7 @@
 #define TRANSPOSITION_H_
 
 #include "vajolet.h"
+#include <algorithm>
 #include <stdlib.h>
 #include <cstring>
 
@@ -87,7 +88,6 @@ class transpositionTable
 private:
 	ttCluster* table;
 	unsigned long int elements;
-	unsigned long int usedElements;
 	unsigned char generation;
 
 public:
@@ -96,7 +96,6 @@ public:
 		table = nullptr;
 		generation = 0;
 		elements = 1;
-		usedElements = 0;
 	}
 	~transpositionTable()
 	{
@@ -106,7 +105,7 @@ public:
 		//}
 	}
 
-	void newSearch() { generation++; usedElements=0; }
+	void newSearch() { generation++; }
 	void setSize(unsigned long int mbSize);
 	void clear();
 
@@ -121,7 +120,6 @@ public:
 
 		if(tte->getGeneration() != generation)
 		{
-			usedElements++;
 			tte->setGeneration(generation);
 		}
 
@@ -132,11 +130,25 @@ public:
 
 	void store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
 
-	unsigned int getFullness(void)
+	unsigned int getFullness() const
 	{
-		unsigned int ret = (unsigned int)(((unsigned long long int)usedElements*250)/elements);
-		return ret;
+		unsigned int cnt = 0u;
+		unsigned int end = std::min( 1000lu / ttCluster::clusterSize, elements );
+
+		for (unsigned int i = 0u; i < end; ++i)
+		{
+			ttCluster t = table[i];
+			for (unsigned int j = 0u; j < ttCluster::clusterSize; ++j )
+			{
+				if ( t.data[j].getGeneration() == generation)
+				{
+	              cnt++;
+				}
+			}
+		}
+		return (unsigned int)cnt*1000lu/(end*ttCluster::clusterSize);
 	}
+
 
 	// value_to_tt() adjusts a mate score from "plies to mate from the root" to
 	// "plies to mate from the current position". Non-mate scores are unchanged.

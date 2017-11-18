@@ -33,7 +33,7 @@ std::string displayMove(const Position& pos,const Move & m);
 void printCurrMoveNumber(unsigned int moveNumber, const Move &m, unsigned long long visitedNodes, long long int time);
 void showCurrLine(const Position & pos, unsigned int ply);
 void printPVs(unsigned int count);
-void printPV(Score res, unsigned int depth, unsigned int seldepth, Score alpha, Score beta, long long time, unsigned int count, std::list<Move>& PV, unsigned long long nodes,unsigned long long tbHits);
+void printPV(Score res, unsigned int depth, unsigned int seldepth, Score alpha, Score beta, long long time, unsigned int count, std::list<Move>& PV, unsigned long long nodes);
 
 
 

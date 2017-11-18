@@ -119,8 +119,6 @@ std::mutex  my_thread::_mutex;
 
 void my_thread::timerThread()
 {
-	unsigned int oldFullness = 0;
-	unsigned long long oldThbits = 0;
 	std::mutex mutex;
 	while (!quit)
 	{
@@ -164,22 +162,15 @@ void my_thread::timerThread()
 
 				lastHasfullMessage = time;
 				unsigned int fullness = TT.getFullness();
-				if( fullness != oldFullness)
-				{
-					sync_cout<<"info hashfull " << fullness << sync_endl;
-				}
+				unsigned long long int thbits = src.getTbHits();
+				unsigned long long int nodes = src.getVisitedNodes();
+
+				sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes << " nps " << (unsigned int)((double)nodes*1000/(double)time) << sync_endl;
+
 				if(src.showCurrentLine)
 				{
 					src.showLine = true;
 				}
-				oldFullness = fullness;
-
-				unsigned long long int thbits = src.tbHits;
-				if( thbits != oldThbits)
-				{
-					sync_cout<<"info tbhits " << thbits << sync_endl;
-				}
-				oldThbits = thbits;
 
 			}
 
@@ -208,7 +199,7 @@ void my_thread::timerThread()
 			if(src.stop)
 			{
 				sync_cout<<"info hashfull " << TT.getFullness() << sync_endl;
-				sync_cout<<"info tbhits " << src.tbHits << sync_endl;
+				sync_cout<<"info tbhits " << src.getTbHits() << sync_endl;
 			}
 			timeMan.idLoopIterationFinished = false;
 		}

@@ -711,13 +711,13 @@ void printPVs(unsigned int count)
 	{
 		if(rm.nodes)
 		{
-			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes,Search::tbHits);
+			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes );
 		}
 		i++;
 	});
 }
 
-void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes, unsigned long long tbHits)
+void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes)
 {
 
 	sync_cout<<"info multipv "<< (count+1) << " depth "<< (depth) <<" seldepth "<< seldepth <<" score ";
@@ -735,7 +735,7 @@ void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Sco
 
 	std::cout << (res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
 
-	std::cout << " nodes " << nodes <<" tbhits "<<tbHits;
+	std::cout << " nodes " << nodes;
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 	std::cout << " nps " << (unsigned int)((double)nodes*1000/(double)time) << " time " << (long long int)(time);
 #endif

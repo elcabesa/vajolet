@@ -20,7 +20,6 @@
 #include <chrono>
 #include <vector>
 #include <list>
-#include <atomic>
 #include <cmath>
 #include <string>
 #include "vajolet.h"
@@ -178,7 +177,8 @@ private:
 	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& PV);
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& PV);
 
-	static unsigned long long visitedNodes;
+	unsigned long long visitedNodes;
+	unsigned long long tbHits;
 
 	unsigned int maxPlyReached;
 
@@ -186,7 +186,7 @@ private:
 //	void verifyPv(std::list<Move> &newPV, Score res);
 
 public:
-	static unsigned long long tbHits;
+
 	static std::vector<rootMove> rootMoves;
 	std::list<Move> PV;
 	searchLimits limits;
@@ -227,7 +227,8 @@ public:
 
 
 	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE);
-	unsigned long long getVisitedNodes() const { return visitedNodes; }
+	unsigned long long getVisitedNodes() const;
+	unsigned long long getTbHits() const;
 
 private:
 	// gestione timer

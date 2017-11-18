@@ -22,7 +22,6 @@
 #include <list>
 #include <algorithm>    // std::copy
 #include <iterator>     // std::back_inserter
-#include <atomic>
 #include "search.h"
 #include "position.h"
 #include "movegen.h"
@@ -42,8 +41,6 @@
 
 Search defaultSearch;
 std::vector<rootMove> Search::rootMoves;
-unsigned long long Search::visitedNodes;
-unsigned long long Search::tbHits;
 int Search::globalReduction =0;
 
 
@@ -61,6 +58,23 @@ std::string Search::SyzygyPath ="<empty>";
 unsigned int Search::SyzygyProbeDepth = 1;
 bool Search::Syzygy50MoveRule= true;
 
+static std::vector<Search> helperSearch;
+
+unsigned long long Search::getVisitedNodes() const
+{
+	unsigned long long n = visitedNodes;
+	for (auto& hs : helperSearch)
+		n += hs.visitedNodes;
+	return n;
+}
+
+unsigned long long Search::getTbHits() const
+{
+	unsigned long long n = tbHits;
+	for (auto& hs : helperSearch)
+		n += hs.tbHits;
+	return n;
+}
 
 
 startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
@@ -80,7 +94,18 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	visitedNodes = 0;
 	tbHits = 0;
 
-	std::vector<Search> helperSearch(threads-1);
+	helperSearch.clear();
+	helperSearch.resize(threads-1);
+
+	for (auto& hs : helperSearch)
+	{
+		hs.counterMoves.clear();
+		hs.cleanData();
+		hs.history.clear();
+		hs.visitedNodes = 0;
+		hs.tbHits = 0;
+	}
+
 
 	rootMoves.clear();
 
@@ -380,7 +405,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 							it->score = res;
 							it->maxPlyReached = maxPlyReached;
 							it->depth = depth;
-							it->nodes = visitedNodes;
+							it->nodes = getVisitedNodes();
 							it->time = elapsedTime;
 
 							std::iter_swap( it, rootMoves.begin()+indexPV);
@@ -404,7 +429,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 						newPV.clear();
 						newPV.emplace_back( rootMoves[indexPV].PV.front() );
 
-						printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
+						printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, getVisitedNodes());
 
 						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
@@ -416,7 +441,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					else if (res >= beta)
 					{
 
-						printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, visitedNodes,tbHits);
+						printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, getVisitedNodes());
 
 						beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 						if(depth > 1)
@@ -468,8 +493,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			for(int i = 9; i>=0;i--)
 			{
 
-				//unsigned long long v = visitedNodes;
-				//sync_cout<<"SINGULAR MOVE SEARCH"<<sync_endl;
 				Score rBeta = res - 20000+2000*i;
 				sd[0].excludeMove = newPV.front();
 				sd[0].skipNullMove = true;
@@ -481,7 +504,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 				if(temp < rBeta)
 				{
 					my_thread::timeMan.singularRootMoveCount++;
-					//sync_cout<<"info debug SINGULAR MOVE "<<rBeta/100<<" "<<100.0*(visitedNodes-v)/float(visitedNodes)<<"% "<<my_thread::timeMan.singularRootMoveCount<<sync_endl;
 				}
 				else
 				{
@@ -490,7 +512,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 						my_thread::timeMan.singularRootMoveCount = 0;
 					}
 
-					//sync_cout<<"info debug NO SINGULAR MOVE "<<rBeta/100<<" "<<100.0*(visitedNodes-v)/float(visitedNodes)<<"%"<<sync_endl;
 					break;
 				}
 			}
@@ -1095,7 +1116,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				!stop
 				)
 			{
-				printCurrMoveNumber(moveNumber, m, visitedNodes, elapsed);
+				printCurrMoveNumber(moveNumber, m, getVisitedNodes(), elapsed);
 			}
 		}
 
@@ -1249,7 +1270,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 						}*/
 						if(val < beta && depth > 1*ONE_PLY)
 						{
-							printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, visitedNodes,tbHits);
+							printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, getVisitedNodes());
 						}
 						if(val > ExpectedValue - 800)
 						{
