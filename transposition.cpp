@@ -23,6 +23,7 @@ transpositionTable TT;
 
 void transpositionTable::setSize(unsigned long int mbSize)
 {
+
 	long long unsigned int size = (long unsigned int)( ((unsigned long long int)mbSize << 20) / sizeof(ttCluster));
 	elements = size;
 
@@ -40,10 +41,6 @@ void transpositionTable::setSize(unsigned long int mbSize)
 	sync_cout<<"info string hash table allocated"<<sync_endl;
 }
 
-void transpositionTable::clear()
-{
-	//setSize(elements*sizeof(ttCluster)/(1<<20));
-}
 
 ttEntry* transpositionTable::probe(const U64 key)
 {
@@ -97,7 +94,6 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 		}
 	}
 	assert(candidate != nullptr);
-	//if(!move){move = candidate->getPackedMove();}
 	candidate->save(keyH, value, type, depth, move, statValue, generation);
 
 

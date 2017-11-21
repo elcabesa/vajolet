@@ -50,7 +50,6 @@ static const std::vector<std::string>positions = {
 void benchmark(void)
 {
 	TT.setSize(32);
-	TT.clear();
 
 	unsigned long long nodes = 0;
 

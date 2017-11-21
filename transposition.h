@@ -38,13 +38,13 @@ enum ttType
 class ttEntry
 {
 private:
-	unsigned int key; 			/*! 32 bit for the upper part of the key*/
-	unsigned short packedMove;	/*!	16 bit for the move*/
-	signed short int depth;		/*! 16 bit for depth*/
+	signed int key:32; 			/*! 32 bit for the upper part of the key*/
+	signed int  packedMove:16;	/*!	16 bit for the move*/
+	signed int depth:16;		/*! 16 bit for depth*/
 	signed int value:22;		/*! 22 bit for the value*/
-	unsigned char generation:8;	/*! 8 bit for the generation id*/
+	signed int generation:8;	/*! 8 bit for the generation id*/
 	signed int staticValue:22;	/*! 22 bit for the static evalutation (eval())*/
-	unsigned char type:2;		/*! 2 bit for the type of the entry*/
+	signed int type:2;		/*! 2 bit for the type of the entry*/
 							/*  144 bits total =18 bytes*/
 public:
 	void save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue, unsigned char gen)
@@ -102,14 +102,9 @@ public:
 		generation = 0;
 		elements = 1;
 	}
-/*	~transpositionTable()
-	{
-		free(table);
-	}*/
 
 	void newSearch() { generation++; }
 	void setSize(unsigned long int mbSize);
-	void clear();
 
 	inline ttCluster& findCluster(U64 key)
 	{
@@ -130,10 +125,9 @@ public:
 		unsigned int cnt = 0u;
 		unsigned int end = std::min( 250lu, elements );
 
-		for (unsigned int i = 0u; i < end; ++i)
+		for (auto t = table.begin(); t != table.begin()+end; t++)
 		{
-			ttCluster t = table[i];
-			cnt+= std::count_if (t.begin(), t.end(), [=](ttEntry d){return d.getGeneration() == this->generation;});
+			cnt+= std::count_if (t->begin(), t->end(), [=](ttEntry d){return d.getGeneration() == this->generation;});
 		}
 		return (unsigned int)(cnt*250lu/(end));
 	}
