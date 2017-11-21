@@ -628,7 +628,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
 		                              : (tte->getType() ==  typeScoreLowerThanAlpha || tte->getType() == typeExact)))
 	{
-		TT.refresh(tte);
+		TT.refresh(*tte);
 
 		//save killers
 		if (ttValue >= beta
@@ -1411,7 +1411,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
 	                              : (tte->getType() ==  typeScoreLowerThanAlpha || tte->getType() == typeExact)))
 	{
-		TT.refresh(tte);
+		TT.refresh(*tte);
 
 		if(PVnode)
 		{

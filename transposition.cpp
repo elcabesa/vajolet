@@ -48,11 +48,11 @@ ttEntry* transpositionTable::probe(const U64 key) const
 	ttCluster& ttc = findCluster(key);
 	unsigned int keyH = (unsigned int)(key >> 32);
 
-
-	for (unsigned i = 0; i < ttCluster::clusterSize; i++)
+	
+	for(auto& d: ttc.data)
 	{
-		if ( ttc.data[i].getKey() == keyH )
-			return &(ttc.data[i]);
+		if ( d.getKey() == keyH )
+			return &d;
 	}
 
 	return nullptr;
@@ -61,43 +61,40 @@ ttEntry* transpositionTable::probe(const U64 key) const
 void transpositionTable::store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
 {
 
-	int c1, c2, c3;
-	ttEntry *tte, *replace;
+	bool cc1,cc2,cc3,cc4;
+	ttEntry *candidate;
 	unsigned int key32 = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
 
 	ttCluster& ttc = findCluster(key);
-	tte = replace = ttc.data;
+	candidate = &ttc.data[0];
 
-	assert(tte!=nullptr);
 	assert(replace!=nullptr);
 
-	for (unsigned i = 0; i < ttCluster::clusterSize; i++, tte++)
+	for(auto& d: ttc.data)
 	{
-		if(!tte->getKey() || tte->getKey() == key32) // Empty or overwrite old
+		if(!d.getKey() || d.getKey() == key32) // Empty or overwrite old
 		{
-
-			refresh(tte);
-			if(!move){move = tte->getPackedMove();}
-			tte->save(key32, value, type, depth, move, statValue);
-			return;
+			candidate = &d;
+			
+			break;
 		}
 
 
-		// Implement replace strategy
-		c1 = (replace->getGeneration() == generation ?  2 : 0);
-		c2 = (tte->getGeneration() == generation || tte->getType() == typeExact ? -2 : 0);
-		c3 = (tte->getDepth() < replace->getDepth() ?  1 : 0);
+		cc1 = candidate->getGeneration() == generation;
+		cc2 = d.getGeneration() == generation;
+		cc3 = d.getType() == typeExact;
+		cc4 = d.getDepth() < candidate->getDepth();
 
-		if (c1 + c2 + c3 > 0)
+
+		if( (cc1 && cc4) || (!(cc2 || cc3) && (cc4 || cc1)) )
 		{
-			replace = tte;
+			candidate = &d;
 		}
+
 	}
-
-	assert(replace!=nullptr);
-
-	refresh(replace);
-	replace->save(key32, value, type, depth, move, statValue);
+	assert(candidate != nullptr);
+	//if(!move){move = candidate->getPackedMove();}
+	candidate->save(key32, value, type, depth, move, statValue, generation);
 
 
 

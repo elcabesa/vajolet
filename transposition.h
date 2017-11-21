@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <cstring>
+#include <array>
 
 
 
@@ -37,15 +38,15 @@ class ttEntry
 {
 private:
 	unsigned int key; 			/*! 32 bit for the upper part of the key*/
-	Score value;				/*! 32 bit for the value*/
-	Score staticValue;			/*! 32 bit for the static evalutation (eval())*/
 	unsigned short packedMove;	/*!	16 bit for the move*/
 	signed short int depth;		/*! 16 bit for depth*/
-	unsigned char generation;	/*! 8 bit for the generation id*/
-	unsigned char type;			/*! 8 bit for the type of the entry*/
-								/*  144 bits total =18 bytes*/
+	signed int value:22;		/*! 22 bit for the value*/
+	unsigned char generation:8;	/*! 8 bit for the generation id*/
+	signed int staticValue:22;	/*! 22 bit for the static evalutation (eval())*/
+	unsigned char type:2;		/*! 2 bit for the type of the entry*/
+							/*  144 bits total =18 bytes*/
 public:
-	void save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue)
+	void save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue, unsigned char gen)
 	{
 		assert(Value < SCORE_INFINITE || Value == SCORE_NONE);
 		assert(Value >- SCORE_INFINITE);
@@ -55,8 +56,12 @@ public:
 		key = Key;
 		value = Value;
 		staticValue = StaticValue;
-		packedMove = Move;
+		if(Move)
+		{
+			packedMove = Move;
+		}
 		depth = Depth;
+		generation = gen;
 		type = Type;
 	}
 
@@ -78,8 +83,7 @@ public:
 
 struct ttCluster
 {
-	static const unsigned int clusterSize =4;
-	ttEntry data[clusterSize];
+	std::array< ttEntry, 4> data;
 };
 
 
@@ -99,10 +103,7 @@ public:
 	}
 	~transpositionTable()
 	{
-		//if(table)
-		//{
-			free(table);
-		//}
+		free(table);
 	}
 
 	void newSearch() { generation++; }
@@ -114,16 +115,9 @@ public:
 		return table[static_cast<size_t>(((unsigned int)key) % elements)];
 	}
 
-	inline void refresh(ttEntry* const tte)
+	inline void refresh(ttEntry& tte)
 	{
-		assert(tte != nullptr);
-
-		if(tte->getGeneration() != generation)
-		{
-			tte->setGeneration(generation);
-		}
-
-
+		tte.setGeneration(generation);
 	}
 
 	ttEntry* probe(const U64 key) const;
@@ -133,20 +127,14 @@ public:
 	unsigned int getFullness() const
 	{
 		unsigned int cnt = 0u;
-		unsigned int end = std::min( 1000lu / ttCluster::clusterSize, elements );
+		unsigned int end = std::min( 250lu, elements );
 
 		for (unsigned int i = 0u; i < end; ++i)
 		{
 			ttCluster t = table[i];
-			for (unsigned int j = 0u; j < ttCluster::clusterSize; ++j )
-			{
-				if ( t.data[j].getGeneration() == generation)
-				{
-	              cnt++;
-				}
-			}
+			cnt+= std::count_if (t.data.begin(), t.data.end(), [=](ttEntry d){return d.getGeneration() == this->generation;});
 		}
-		return (unsigned int)cnt*1000lu/(end*ttCluster::clusterSize);
+		return (unsigned int)(cnt*250lu/(end));
 	}
 
 
