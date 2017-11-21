@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <cstring>
 #include <array>
+#include <vector>
 
 
 
@@ -81,38 +82,38 @@ public:
 
 };
 
-struct ttCluster
-{
-	std::array< ttEntry, 4> data;
-};
+typedef	std::array< ttEntry, 4> ttCluster;
+
 
 
 class transpositionTable
 {
 private:
-	ttCluster* table;
+	std::vector<ttCluster> table;
 	unsigned long int elements;
 	unsigned char generation;
 
 public:
 	transpositionTable()
 	{
-		table = nullptr;
+		table.clear();
+		table.shrink_to_fit();
+
 		generation = 0;
 		elements = 1;
 	}
-	~transpositionTable()
+/*	~transpositionTable()
 	{
 		free(table);
-	}
+	}*/
 
 	void newSearch() { generation++; }
 	void setSize(unsigned long int mbSize);
 	void clear();
 
-	inline ttCluster& findCluster(U64 key) const
+	inline ttCluster& findCluster(U64 key)
 	{
-		return table[static_cast<size_t>(((unsigned int)key) % elements)];
+		return table[ static_cast<size_t>(((unsigned int)key) % elements) ];
 	}
 
 	inline void refresh(ttEntry& tte)
@@ -120,7 +121,7 @@ public:
 		tte.setGeneration(generation);
 	}
 
-	ttEntry* probe(const U64 key) const;
+	ttEntry* probe(const U64 key);
 
 	void store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
 
@@ -132,7 +133,7 @@ public:
 		for (unsigned int i = 0u; i < end; ++i)
 		{
 			ttCluster t = table[i];
-			cnt+= std::count_if (t.data.begin(), t.data.end(), [=](ttEntry d){return d.getGeneration() == this->generation;});
+			cnt+= std::count_if (t.begin(), t.end(), [=](ttEntry d){return d.getGeneration() == this->generation;});
 		}
 		return (unsigned int)(cnt*250lu/(end));
 	}
