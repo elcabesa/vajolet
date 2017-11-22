@@ -44,6 +44,7 @@ void transpositionTable::setSize(unsigned long int mbSize)
 
 ttEntry* transpositionTable::probe(const U64 key)
 {
+	static ttEntry null(0,SCORE_NONE, typeVoid, -100, 0, 0, 0);
 
 	ttCluster& ttc = findCluster(key);
 	unsigned int keyH = (unsigned int)(key >> 32);
@@ -54,8 +55,9 @@ ttEntry* transpositionTable::probe(const U64 key)
 		return it;
 	}
 
-	return nullptr;
+	return &null;
 }
+
 
 void transpositionTable::store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
 {

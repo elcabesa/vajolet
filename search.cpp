@@ -614,14 +614,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	// test the transposition table
 	//--------------------------------------
 	ttEntry* tte = TT.probe(posKey);
-	Move ttMove;
-
-	ttMove = (tte != nullptr) ? tte->getPackedMove() : 0;
-	Score ttValue = tte != nullptr ? transpositionTable::scoreFromTT(tte->getValue(), ply) : SCORE_NONE;
+	Move ttMove = tte->getPackedMove();
+	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
 	if (	type != Search::nodeType::ROOT_NODE
 			&& type != Search::nodeType::HELPER_ROOT_NODE
-			&& tte != nullptr
 			&& tte->getDepth() >= (depth +1 - ONE_PLY)
 		    && ttValue != SCORE_NONE // Only in case of TT access race
 		    && (	PVnode ?  false
@@ -767,7 +764,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	Score staticEval;
 	Score eval;
-	if(inCheck || tte == nullptr)
+	if(inCheck || tte->getType() == typeVoid)
 	{
 		staticEval = pos.eval<false>();
 		eval = staticEval;
@@ -970,7 +967,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		sd[ply].skipNullMove = skipBackup;
 
 		tte = TT.probe(posKey);
-		ttMove = tte != nullptr ? tte->getPackedMove() : 0;
+		ttMove = tte->getPackedMove();
 	}
 
 
@@ -1397,15 +1394,13 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 
 	ttEntry* const tte = TT.probe(pos.getKey());
-	Move ttMove;
-	ttMove = tte ? tte->getPackedMove() : Movegen::NOMOVE;
+	Move ttMove = tte->getPackedMove();
 
 	Movegen mg(pos, *this, ply, ttMove);
 	int TTdepth = mg.setupQuiescentSearch(inCheck, depth);
-	Score ttValue = tte ? transpositionTable::scoreFromTT(tte->getValue(),ply) : SCORE_NONE;
+	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(),ply);
 
-	if (tte
-		&& tte->getDepth() >= TTdepth
+	if (tte->getDepth() >= TTdepth
 	    && ttValue != SCORE_NONE // Only in case of TT access race
 	    && (	PVnode ?  false
 	            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
@@ -1450,7 +1445,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	ttType TTtype = typeScoreLowerThanAlpha;
 
 
-	Score staticEval = tte ? tte->getStaticValue() : pos.eval<false>();
+	Score staticEval = tte->getType()!=typeVoid ? tte->getStaticValue() : pos.eval<false>();
 #ifdef DEBUG_EVAL_SIMMETRY
 	ppp.setupFromFen(pos.getSymmetricFen());
 	Score test = ppp.eval<false>();

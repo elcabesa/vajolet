@@ -273,7 +273,7 @@ void my_thread::manageNewSearch()
 			const ttEntry* const tte = TT.probe(src.pos.getKey());
 			src.pos.undoMove();
 
-			if(tte && ( m.packed = (tte->getPackedMove())))
+			if((m.packed = (tte->getPackedMove())))
 			{
 				std::cout<<" ponder "<<displayUci(m);
 			}
@@ -334,7 +334,7 @@ void my_thread::manageNewSearch()
 		src.pos.undoMove();
 
 		Move m;
-		if(tte && ( m.packed = tte->getPackedMove()))
+		if(( m.packed = tte->getPackedMove()))
 		{
 			std::cout << " ponder " << displayUci(m);
 		}

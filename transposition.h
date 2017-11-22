@@ -32,7 +32,8 @@ enum ttType
 {
 	typeExact,
 	typeScoreLowerThanAlpha,
-	typeScoreHigherThanBeta
+	typeScoreHigherThanBeta,
+	typeVoid
 };
 
 class ttEntry
@@ -48,6 +49,9 @@ private:
 	signed int type:3;			/*! 2 bit for the type of the entry*/
 							/*  144 bits total =16 bytes*/
 public:
+	ttEntry(unsigned int _Key, Score _Value, unsigned char _Type, signed short int _Depth, unsigned short _Move, Score _StaticValue, unsigned char _gen): key(_Key),packedMove(_Move),depth(_Depth), value(_Value),generation(_gen),staticValue(_StaticValue),type(_Type){}
+	ttEntry(){}
+
 	void save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue, unsigned char gen)
 	{
 		assert(Value < SCORE_INFINITE || Value == SCORE_NONE);
