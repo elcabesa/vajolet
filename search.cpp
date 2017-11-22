@@ -625,8 +625,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&& tte->getDepth() >= (depth +1 - ONE_PLY)
 		    && ttValue != SCORE_NONE // Only in case of TT access race
 		    && (	PVnode ?  false
-		            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
-		                              : (tte->getType() ==  typeScoreLowerThanAlpha || tte->getType() == typeExact)))
+		            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
+		                              : tte->isTypeGoodForAlphaCutoff()))
 	{
 		TT.refresh(*tte);
 
@@ -793,8 +793,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		if (ttValue != SCORE_NONE)
 		{
 			if (
-					((tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact) && (ttValue > eval) )
-					|| ((tte->getType() == typeScoreLowerThanAlpha || tte->getType() == typeExact ) && (ttValue < eval) )
+					( tte->isTypeGoodForBetaCutoff() && (ttValue > eval) )
+					|| (tte->isTypeGoodForAlphaCutoff() && (ttValue < eval) )
 				)
 			{
 				eval = ttValue;
@@ -993,7 +993,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		&& ttMove.packed != 0
 		&& !excludedMove.packed // Recursive singular Search is not allowed
 		&& tte != nullptr
-		&& (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
+		&& tte->isTypeGoodForBetaCutoff()
 		&&  tte->getDepth() >= depth - 3 * ONE_PLY;
 
 	while (bestScore <beta  && ( m = mg.getNextMove() ) != Movegen::NOMOVE)
@@ -1407,9 +1407,9 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	if (tte
 		&& tte->getDepth() >= TTdepth
 	    && ttValue != SCORE_NONE // Only in case of TT access race
-	    && (	PVnode ?  false/*tte->getType() == typeExact*/
-	            : ttValue >= beta ? (tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact)
-	                              : (tte->getType() ==  typeScoreLowerThanAlpha || tte->getType() == typeExact)))
+	    && (	PVnode ?  false
+	            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
+	                              : tte->isTypeGoodForAlphaCutoff()))
 	{
 		TT.refresh(*tte);
 
@@ -1480,8 +1480,8 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		if (ttValue != SCORE_NONE)
 		{
 			if (
-					((tte->getType() ==  typeScoreHigherThanBeta || tte->getType() == typeExact) && (ttValue > staticEval) )
-					|| ((tte->getType() == typeScoreLowerThanAlpha || tte->getType() == typeExact ) && (ttValue < staticEval) )
+					( tte->isTypeGoodForBetaCutoff() && (ttValue > staticEval) )
+					|| (tte->isTypeGoodForAlphaCutoff() && (ttValue < staticEval) )
 			)
 			{
 				bestScore = ttValue;

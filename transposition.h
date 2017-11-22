@@ -38,14 +38,15 @@ enum ttType
 class ttEntry
 {
 private:
+
 	signed int key:32; 			/*! 32 bit for the upper part of the key*/
-	signed int  packedMove:16;	/*!	16 bit for the move*/
+	signed int packedMove:16;	/*! 16 bit for the move*/
 	signed int depth:16;		/*! 16 bit for depth*/
-	signed int value:22;		/*! 22 bit for the value*/
-	signed int generation:8;	/*! 8 bit for the generation id*/
-	signed int staticValue:22;	/*! 22 bit for the static evalutation (eval())*/
-	signed int type:2;		/*! 2 bit for the type of the entry*/
-							/*  144 bits total =18 bytes*/
+	signed int value:23;		/*! 23 bit for the value*/
+	signed int generation:8;		/*! 8 bit for the generation id*/
+	signed int staticValue:23;	/*! 23 bit for the static evalutation (eval())*/
+	signed int type:3;			/*! 2 bit for the type of the entry*/
+							/*  144 bits total =16 bytes*/
 public:
 	void save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue, unsigned char gen)
 	{
@@ -78,6 +79,16 @@ public:
 	signed short int getDepth()const { return depth; }
 	unsigned char getType()const { return type; }
 	unsigned char getGeneration()const { return generation; }
+	
+	
+	bool isTypeGoodForBetaCutoff() const
+	{
+		return (getType() ==  typeScoreHigherThanBeta) || (getType() == typeExact);
+	}
+	bool isTypeGoodForAlphaCutoff() const
+	{
+		return (getType() ==  typeScoreLowerThanAlpha || getType() == typeExact);
+	}
 
 
 };
