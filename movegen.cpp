@@ -668,6 +668,7 @@ unsigned int Movegen::getNumberOfLegalMoves()
 
 Move Movegen::getNextMove()
 {
+	Move mm;
 
 	while(true)
 	{
@@ -679,6 +680,8 @@ Move Movegen::getNextMove()
 		case generateProbCutCaptures:
 
 			generateMoves<Movegen::genType::captureMg>();
+			RemoveMove(ttMove);
+
 
 			scoreCaptureMoves();
 
@@ -690,6 +693,12 @@ Move Movegen::getNextMove()
 			resetMoveList();
 
 			generateMoves<Movegen::genType::quietMg>();
+			RemoveMove(ttMove);
+			RemoveMove(killerMoves[0]);
+			RemoveMove(killerMoves[1]);
+			RemoveMove(counterMoves[0]);
+			RemoveMove(counterMoves[1]);
+
 
 			scoreQuietMoves();
 
@@ -700,6 +709,7 @@ Move Movegen::getNextMove()
 		{
 
 			generateMoves<Movegen::captureEvasionMg>();
+			RemoveMove(ttMove);
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
 			killerMoves[0] = src.getKillers(ply,0);
@@ -707,14 +717,14 @@ Move Movegen::getNextMove()
 
 			scoreCaptureMoves();
 
-
-
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 		}
 			break;
 		case generateQuietEvasionMoves:
 		{
 			generateMoves<Movegen::quietEvasionMg>();
+			RemoveMove(ttMove);
+
 			scoreQuietEvasion();
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 		}
@@ -724,86 +734,40 @@ Move Movegen::getNextMove()
 
 			resetMoveList();
 			generateMoves<Movegen::quietChecksMg>();
+			RemoveMove(ttMove);
+
 			scoreQuietMoves();
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 
 			break;
 
 		case iterateQuietMoves:
-			if(FindNextBestMove())
-			{
-				Move mm = moveListPosition->m;
-				if(mm != ttMove && !isKillerMove(mm) && mm != counterMoves[0] &&  mm != counterMoves[1])
-				{
-						++moveListPosition;
-						return mm;
-				}
-				else
-				{
-					++moveListPosition;
-				}
-			}
-			else
-			{
-
-				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
-
-			}
-			break;
-
 		case iterateQuiescentCaptures:
 		case iterateCaptureEvasionMoves:
-
-			if(FindNextBestMove())
-			{
-				if(moveListPosition->m != ttMove)
-				{
-					return (moveListPosition++)->m;
-				}
-				++moveListPosition;
-			}
-			else
-			{
-				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
-			}
-			break;
 		case iterateQuiescentMoves:
 		case iterateQuietChecks:
 		case iterateQuietEvasionMoves:
-			if(FindNextBestMove())
+
+			if((mm = FindNextBestMove()) != NOMOVE)
 			{
-				if(moveListPosition->m != ttMove)
-				{
-					return (moveListPosition++)->m;
-				}
-				++moveListPosition;
+				return mm;
 			}
 			else
 			{
-				return NOMOVE;
+				stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			}
 			break;
 		case iterateGoodCaptureMoves:
-			if(FindNextBestMove())
+			if((mm = FindNextBestMove()) != NOMOVE)
 			{
-				Move mm = moveListPosition->m;
-				if(mm != ttMove)
+				if((pos.seeSign(mm)>=0) || (pos.moveGivesSafeDoubleCheck(mm)))
 				{
-					if((pos.seeSign(mm)>=0) || (pos.moveGivesSafeDoubleCheck(mm)))
-					{
-						++moveListPosition;
-						return mm;
-					}
-					else
-					{
-						assert(badCaptureEnd<MAX_BAD_MOVE_PER_POSITION);
-						(badCaptureEnd++)->m = mm;
-						++moveListPosition;
-					}
+					return mm;
 				}
 				else
 				{
-					++moveListPosition;
+					assert(badCaptureEnd<MAX_BAD_MOVE_PER_POSITION);
+					(badCaptureEnd++)->m = mm;
 				}
 
 			}
@@ -829,23 +793,12 @@ Move Movegen::getNextMove()
 			}
 			break;
 		case iterateProbCutCaptures:
-			if(FindNextBestMove())
+			if((mm = FindNextBestMove()) != NOMOVE)
 			{
-				Move mm = moveListPosition->m;
-				if(mm != ttMove)
+				if(pos.see(mm) >= captureThreshold)
 				{
-					if(pos.see(mm) >= captureThreshold)
-					{
-						++moveListPosition;
-						return mm;
-					}
-					++moveListPosition;
+					return mm;
 				}
-				else
-				{
-					++moveListPosition;
-				}
-
 			}
 			else
 			{

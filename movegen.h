@@ -160,15 +160,24 @@ private:
 	}
 
 
-	inline bool FindNextBestMove()
+	inline const Move& FindNextBestMove()
 	{
 		const auto max = std::max_element(moveListPosition,moveListEnd);
 		if( max != moveListEnd)
 		{
 			std::swap(*max, *moveListPosition);
-			return true;
+			return (moveListPosition++)->m;
 		}
-		return false;
+		return NOMOVE;
+	}
+	inline void RemoveMove(Move m)
+	{
+		const auto i = std::find(moveListPosition,moveListEnd,m);
+		if( i != moveListEnd)
+		{
+			std::swap(*i, *moveListPosition);
+			++moveListPosition;
+		}
 	}
 
 
@@ -183,7 +192,7 @@ public:
 		return m == killerMoves[0] || m == killerMoves[1];
 	}
 
-	Move getMoveFromMoveList(unsigned int n) const {	return moveList[n].m; }
+	const Move& getMoveFromMoveList(unsigned int n) const {	return moveList[n].m; }
 
 	Move getNextMove(void);
 
