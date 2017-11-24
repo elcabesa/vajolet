@@ -638,7 +638,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		if(PVnode)
 		{
-			if(ttMove.packed && pos.isMoveLegal(ttMove))
+			if(pos.isMoveLegal(ttMove))
 			{
 				pvLine.appendNewMove( ttMove );
 			}
@@ -1018,7 +1018,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
-		bool isDangerous = moveGivesCheck || pos.isCastleMove(m) || pos.isPassedPawnMove(m);
+		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
 
 		int ext = 0;
 		if(PVnode && isDangerous)
@@ -1410,7 +1410,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 		if(PVnode)
 		{
-			if(ttMove.packed && pos.isMoveLegal(ttMove))
+			if(pos.isMoveLegal(ttMove))
 			{
 				pvLine.appendNewMove(ttMove);
 			}
@@ -1541,7 +1541,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		if(!inCheck)
 		{
 			// allow only queen promotion at deeper search
-			if( (TTdepth <- 1*ONE_PLY) && ( pos.isPromotionMove(m) ) && (m.bit.promotion != Move::promQueen))
+			if( (TTdepth <- 1*ONE_PLY) && ( m.isPromotionMove() ) && (m.bit.promotion != Move::promQueen))
 			{
 				continue;
 			}
@@ -1570,7 +1570,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				{
 					Score futilityValue = futilityBase
 							+ Position::pieceValue[pos.getPieceAt((tSquare)m.bit.to)][1]
-							+ ( pos.isEnPassantMove(m) ? Position::pieceValue[Position::whitePawns][1] : 0);
+							+ ( m.isEnPassantMove() ? Position::pieceValue[Position::whitePawns][1] : 0);
 
 					if( m.bit.flags == Move::fpromotion )
 					{

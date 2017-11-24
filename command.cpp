@@ -552,9 +552,9 @@ std::string displayMove(const Position& pos, const Move & m)
 	unsigned int legalMoves;
 	Position::bitboardIndex piece = pos.getPieceAt((tSquare)m.bit.from);
 	bool pawnMove = pos.isPawn(piece);
-	bool isPromotion = pos.isPromotionMove(m);
-	bool isEnPassant = pos.isEnPassantMove(m);
-	bool isCastle = pos.isCastleMove(m);
+	bool isPromotion = m.isPromotionMove();
+	bool isEnPassant = m.isEnPassantMove();
+	bool isCastle = m.isCastleMove();
 
 	bool disambigusFlag = false;
 	bool fileFlag = false;

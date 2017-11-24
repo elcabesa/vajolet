@@ -541,11 +541,11 @@ public:
 	inline Score getMvvLvaScore(const Move & m) const
 	{
 		Score s = pieceValue[ squares[m.bit.to] ][0] + (squares[m.bit.from]);
-		if ( isPromotionMove(m) )
+		if ( m.isPromotionMove() )
 		{
 			s += (pieceValue[ whiteQueens +m.bit.promotion ] - pieceValue[whitePawns])[0];
 		}
-		else if( isEnPassantMove(m) )
+		else if( m.isEnPassantMove() )
 		{
 			s += pieceValue[ whitePawns ][0];
 		}
@@ -574,28 +574,13 @@ public:
 		return (unsigned int)((float)(opening-tot)*(65536.0f/(float)(opening-endgame)));
 	}
 
-
-
-
-	inline bool isPromotionMove(const Move & m) const
-	{
-		return m.bit.flags == Move::fpromotion;
-	}
-	inline bool isCastleMove(const Move & m) const
-	{
-		return  m.bit.flags == Move::fcastle;
-	}
-	inline bool isEnPassantMove(const Move & m) const
-	{
-		return  m.bit.flags == Move::fenpassant;
-	}
 	inline bool isCaptureMove(const Move & m) const
 	{
-		return squares[m.bit.to] !=empty || isEnPassantMove(m) ;
+		return squares[m.bit.to] !=empty || m.isEnPassantMove() ;
 	}
 	inline bool isCaptureMoveOrPromotion(const Move & m) const
 	{
-		return isCaptureMove(m) || isPromotionMove(m);
+		return isCaptureMove(m) || m.isPromotionMove();
 	}
 	inline bool isPassedPawnMove(const Move & m) const
 	{

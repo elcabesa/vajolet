@@ -647,7 +647,6 @@ void Movegen::generateMoves<Movegen::allMg>()
 
 	if(pos.isInCheck())
 	{
-		//generateMoves<Movegen::allEvasionMg>();
 		generateMoves<Movegen::captureEvasionMg>();
 		generateMoves<Movegen::quietEvasionMg>();
 	}
@@ -682,7 +681,6 @@ Move Movegen::getNextMove()
 			generateMoves<Movegen::genType::captureMg>();
 			RemoveMove(ttMove);
 
-
 			scoreCaptureMoves();
 
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
@@ -699,14 +697,12 @@ Move Movegen::getNextMove()
 			RemoveMove(counterMoves[0]);
 			RemoveMove(counterMoves[1]);
 
-
 			scoreQuietMoves();
 
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 
 		case generateCaptureEvasionMoves:
-		{
 
 			generateMoves<Movegen::captureEvasionMg>();
 			RemoveMove(ttMove);
@@ -718,16 +714,15 @@ Move Movegen::getNextMove()
 			scoreCaptureMoves();
 
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
-		}
 			break;
+
 		case generateQuietEvasionMoves:
-		{
+
 			generateMoves<Movegen::quietEvasionMg>();
 			RemoveMove(ttMove);
 
 			scoreQuietEvasion();
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
-		}
 			break;
 
 		case generateQuietCheks:
@@ -737,8 +732,8 @@ Move Movegen::getNextMove()
 			RemoveMove(ttMove);
 
 			scoreQuietMoves();
-			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 
+			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
 			break;
 
 		case iterateQuietMoves:
@@ -758,6 +753,7 @@ Move Movegen::getNextMove()
 			}
 			break;
 		case iterateGoodCaptureMoves:
+
 			if((mm = FindNextBestMove()) != NOMOVE)
 			{
 				if((pos.seeSign(mm)>=0) || (pos.moveGivesSafeDoubleCheck(mm)))
@@ -836,7 +832,7 @@ Move Movegen::getNextMove()
 			{
 				Move& t = counterMoves[killerPos++];
 
-				if((t != ttMove) && (t != killerMoves[0]) && (t != killerMoves[1]) && !pos.isCaptureMove(t) && pos.isMoveLegal(t))
+				if((t != ttMove) && !isKillerMove(t) && !pos.isCaptureMove(t) && pos.isMoveLegal(t))
 				{
 					return t;
 				}
@@ -852,7 +848,7 @@ Move Movegen::getNextMove()
 		case getQsearchTTquiet:
 		case getProbCutTT:
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
-			if(ttMove.packed && pos.isMoveLegal(ttMove))
+			if(pos.isMoveLegal(ttMove))
 			{
 				return ttMove;
 			}

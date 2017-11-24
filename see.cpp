@@ -27,7 +27,7 @@
 Score Position::seeSign(const Move& m) const
 {
 	assert(m.packed);
-	if (pieceValue[getPieceAt((tSquare)m.bit.from)][0] <= pieceValue[getPieceAt((tSquare)m.bit.to)][0])
+	if ( (pieceValue[getPieceAt((tSquare)m.bit.from)][0] <= pieceValue[getPieceAt((tSquare)m.bit.to)][0]) ||  m.isEnPassantMove() )
 	{
 		return 1;
 	}
@@ -57,16 +57,16 @@ Score Position::see(const Move& m) const
 	swapList[0] = pieceValue[getPieceAt(to)][0];
 	captured = bitboardIndex(getPieceAt(from) % separationBitmap);
 
-	if( isEnPassantMove(m) )
+	if( m.isEnPassantMove() )
 	{
 		occupied ^= bitSet(to - pawnPush(color));
 		swapList[0] = pieceValue[whitePawns][0];
 	}
-	if( isCastleMove(m) )
+	if( m.isCastleMove() )
 	{
 		return 0;
 	}
-	if( isPromotionMove(m) )
+	if( m.isPromotionMove() )
 	{
 		captured = bitboardIndex(whiteQueens + m.bit.promotion);
 		swapList[0] += pieceValue[whiteQueens + m.bit.promotion][0] - pieceValue[whitePawns][0];

@@ -64,6 +64,19 @@ struct Move
 	inline Move& operator = (const Move&&m){ packed = m.packed; return *this;}
 	inline Move( Move && m){packed = m.packed;};
 
+	inline bool isPromotionMove() const
+	{
+		return bit.flags == Move::fpromotion;
+	}
+	inline bool isCastleMove() const
+	{
+		return bit.flags == Move::fcastle;
+	}
+	inline bool isEnPassantMove() const
+	{
+		return bit.flags == Move::fenpassant;
+	}
+
 
 
 };
