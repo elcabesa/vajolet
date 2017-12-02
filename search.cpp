@@ -1399,7 +1399,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	Movegen mg(pos, *this, ply, ttMove);
 	int TTdepth = mg.setupQuiescentSearch(inCheck, depth);
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(),ply);
-
 	if (tte->getDepth() >= TTdepth
 	    && ttValue != SCORE_NONE // Only in case of TT access race
 	    && (	PVnode ?  false

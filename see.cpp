@@ -27,7 +27,7 @@
 Score Position::seeSign(const Move& m) const
 {
 	assert(m.packed);
-	if ( (pieceValue[getPieceAt((tSquare)m.bit.from)][0] <= pieceValue[getPieceAt((tSquare)m.bit.to)][0]) ||  m.isEnPassantMove() )
+	if ( (pieceValue[getPieceAt((tSquare)m.bit.from)][0] <= pieceValue[getPieceAt((tSquare)m.bit.to)][0])/* ||  m.isEnPassantMove() */)
 	{
 		return 1;
 	}

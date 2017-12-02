@@ -693,6 +693,7 @@ private:
 	std::unordered_map<U64, materialStruct> static materialKeyMap;
 
 	const materialStruct  * getMaterialData();
+	bool evalKxvsK(Score& res);
 	bool evalKBPvsK(Score& res);
 	bool evalKQvsKP(Score& res);
 	bool evalKRPvsKr(Score& res);

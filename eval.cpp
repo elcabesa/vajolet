@@ -159,6 +159,49 @@ simdScore queenVsRook2MinorsImbalance={20000,20000,0,0};
 
 std::unordered_map<U64, Position::materialStruct> Position::materialKeyMap;
 
+
+bool Position::evalKxvsK(Score& res)
+{
+	//display();
+	Color StrongColor = bitCnt(getBitmap(whitePieces))>1  ? white : black;
+	tSquare winKingSquare;
+	tSquare losKingSquare;
+	bitboardIndex pieces;
+	int mul = 1;
+	if(StrongColor == white)
+	{
+		winKingSquare = getSquareOfThePiece(whiteKing);
+		losKingSquare = getSquareOfThePiece(blackKing);
+		pieces = whitePieces;
+
+		mul = 1;
+	}
+	else
+	{
+		winKingSquare = getSquareOfThePiece(blackKing);
+		losKingSquare = getSquareOfThePiece(whiteKing);
+		pieces = blackPieces;
+
+		mul = -1;
+	}
+
+	res = SCORE_KNOWN_WIN + 50000;
+	res -= 10 * SQUARE_DISTANCE[winKingSquare][losKingSquare];// devo tenere il re vicino
+	res += 20 * SQUARE_DISTANCE[losKingSquare][E4];// devo portare il re avversario vicino al bordo
+	res += 50 * bitCnt(getBitmap(pieces));
+
+	if( res >=SCORE_MATE_IN_MAX_PLY)
+	{
+		std::cout<<"ERRORREEEE"<<std::endl;
+	}
+	assert( res < SCORE_MATE_IN_MAX_PLY);
+
+	res *= mul;
+	return true;
+
+}
+
+
 bool Position::evalKBPvsK(Score& res)
 {
 	Color Pcolor = getBitmap(whitePawns) ? white : black;
@@ -1496,6 +1539,8 @@ Score Position::eval(void)
 	//-----------------------------------------------------
 	//	material evalutation
 	//-----------------------------------------------------
+
+
 	const materialStruct* materialData = getMaterialData();
 	if( materialData )
 	{
@@ -1529,6 +1574,16 @@ Score Position::eval(void)
 			case materialStruct::saturationL:
 				lowSat = materialData->val;
 				break;
+		}
+	}
+	else
+	{
+		// analize k and pieces vs king
+		if( (bitCnt(getBitmap(whitePieces) )== 1 && bitCnt(getBitmap(blackPieces) )> 1) || (bitCnt(getBitmap(whitePieces) )> 1 && bitCnt(getBitmap(blackPieces) )== 1) )
+		{
+			Score r;
+			evalKxvsK(r);
+			return st.nextMove? -r : r;
 		}
 	}
 

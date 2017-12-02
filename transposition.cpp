@@ -42,9 +42,10 @@ void transpositionTable::setSize(unsigned long int mbSize)
 }
 
 
+static ttEntry null(0,SCORE_NONE, typeVoid, -100, 0, 0, 0);
 ttEntry* transpositionTable::probe(const U64 key)
 {
-	static ttEntry null(0,SCORE_NONE, typeVoid, -100, 0, 0, 0);
+
 
 	ttCluster& ttc = findCluster(key);
 	unsigned int keyH = (unsigned int)(key >> 32);
