@@ -54,22 +54,22 @@ simdScore mobilityBonus[Position::separationBitmap][32];
 //------------------------------------------------
 //	PAWN Bonus/Penalties
 //------------------------------------------------
-simdScore isolatedPawnPenalty={533,1600,0,0};
-simdScore isolatedPawnPenaltyOpp={100,1088,0,0};
-simdScore doubledPawnPenalty={290,1530,0,0};
-simdScore backwardPawnPenalty={1120,1330,0,0};
-simdScore chainedPawnBonus={540,600,0,0};
-simdScore passedPawnFileAHPenalty = {-1030,720,0,0};
-simdScore passedPawnSupportedBonus = {1060,-450,0,0};
-simdScore candidateBonus = {110,1330,0,0};
-simdScore passedPawnBonus = {460,840,0,0};
-simdScore passedPawnUnsafeSquares ={-10,70,0,0};
-simdScore passedPawnBlockedSquares ={150,370,0,0};
-simdScore passedPawnDefendedSquares = {150,240,0,0};
-simdScore passedPawnDefendedBlockingSquare = {260,170,0,0};
-simdScore unstoppablePassed = {0,2000,0,0};
-simdScore rookBehindPassedPawn = {0,20,0,0};
-simdScore EnemyRookBehindPassedPawn = {0,10,0,0};
+simdScore isolatedPawnPenalty={591,1447,0,0};
+simdScore isolatedPawnPenaltyOpp={87,625,0,0};
+simdScore doubledPawnPenalty={213,1391,0,0};
+simdScore backwardPawnPenalty={1172,1433,0,0};
+simdScore chainedPawnBonus={574,-79,0,0};
+simdScore passedPawnFileAHPenalty = {-1005,688,0,0};
+simdScore passedPawnSupportedBonus = {997,-503,0,0};
+simdScore candidateBonus = {13,1020,0,0};
+simdScore passedPawnBonus = {334,752,0,0};
+simdScore passedPawnUnsafeSquares ={-106,280,0,0};
+simdScore passedPawnBlockedSquares ={-23,141,0,0};
+simdScore passedPawnDefendedSquares = {-138,192,0,0};
+simdScore passedPawnDefendedBlockingSquare = {129,211,0,0};
+simdScore unstoppablePassed = {0,2117,0,0};
+simdScore rookBehindPassedPawn = {80,394,0,0};
+simdScore EnemyRookBehindPassedPawn = {14,318,0,0};
 
 simdScore holesPenalty={100,260,0,0};
 simdScore pawnCenterControl={70,120,0,0};

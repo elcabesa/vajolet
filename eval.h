@@ -27,6 +27,23 @@
 
 void initMobilityBonus();
 
+extern simdScore isolatedPawnPenalty;
+extern simdScore isolatedPawnPenaltyOpp;
+extern simdScore doubledPawnPenalty;
+extern simdScore backwardPawnPenalty;
+extern simdScore chainedPawnBonus;
+extern simdScore passedPawnFileAHPenalty;
+extern simdScore passedPawnSupportedBonus;
+extern simdScore candidateBonus;
+extern simdScore passedPawnBonus;
+extern simdScore passedPawnUnsafeSquares;
+extern simdScore passedPawnBlockedSquares;
+extern simdScore passedPawnDefendedSquares;
+extern simdScore passedPawnDefendedBlockingSquare;
+extern simdScore unstoppablePassed;
+extern simdScore rookBehindPassedPawn;
+extern simdScore EnemyRookBehindPassedPawn;
+
 
 
 
