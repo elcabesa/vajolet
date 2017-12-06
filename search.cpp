@@ -814,9 +814,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		if (depth < 4 * ONE_PLY
 			&&  eval + razorMargin(depth,type==CUT_NODE) <= alpha
 			&&  alpha >= -SCORE_INFINITE+razorMargin(depth,type==CUT_NODE)
-			//&&  abs(alpha) < SCORE_MATE_IN_MAX_PLY // implicito nell riga precedente
 			&&  ((!ttMove.packed ) || type == ALL_NODE)
-			//&& !((pos.getNextTurn() && (pos.getBitmap(Position::blackPawns) & RANKMASK[A2])) || (!pos.getNextTurn() && (pos.getBitmap(Position::whitePawns) & RANKMASK[A7]) ) )
 		)
 		{
 			Score ralpha = alpha - razorMargin(depth,type==CUT_NODE);
@@ -837,9 +835,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		//---------------------------
 		if (!sd[ply].skipNullMove
 			&& depth < 8 * ONE_PLY
-			&& eval > -SCORE_INFINITE + futility[ depth>>ONE_PLY_SHIFT ]
+			//&& eval > -SCORE_INFINITE + futility[ depth>>ONE_PLY_SHIFT ]
 			&& eval - futility[depth>>ONE_PLY_SHIFT] >= beta
-			&& abs(eval) < SCORE_KNOWN_WIN
+			&& eval < SCORE_KNOWN_WIN
 			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[Position::whiteKnights][0])))
 		{
 			assert((depth>>ONE_PLY_SHIFT)<8);
@@ -1036,7 +1034,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		if( singularExtensionNode
 			&& !ext
 			&&  m == ttMove
-			&&  abs(ttValue) < SCORE_KNOWN_WIN
+			//&&  abs(ttValue) < SCORE_KNOWN_WIN
 //			&& abs(beta) < SCORE_MATE_IN_MAX_PLY
 		)
 		{
@@ -1064,7 +1062,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		//---------------------------------------
 		//	FUTILITY PRUNING
 		//---------------------------------------
-		if( !PVnode/*type != Search::nodeType::ROOT_NODE*/
+		if( /*!PVnode*/type != Search::nodeType::ROOT_NODE
 			&& !captureOrPromotion
 			&& !inCheck
 			&& m != ttMove
