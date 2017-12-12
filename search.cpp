@@ -811,7 +811,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		//------------------------
 		// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
 		//------------------------
-		if (depth < 4 * ONE_PLY
+		if (!sd[ply].skipNullMove
+			&&  depth < 4 * ONE_PLY
 			&&  eval + razorMargin(depth,type==CUT_NODE) <= alpha
 			&&  alpha >= -SCORE_INFINITE+razorMargin(depth,type==CUT_NODE)
 			&&  ((!ttMove.packed ) || type == ALL_NODE)
@@ -894,8 +895,29 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				{
 					nullVal = beta;
 				}
-				return nullVal;
 
+				if (depth < 12 * ONE_PLY)
+				{
+					return nullVal;
+				}
+
+				// Do verification search at high depths
+				sd[ply].skipNullMove = true;
+				assert(depth - red >= ONE_PLY);
+				Score val;
+				/*if(depth-red < ONE_PLY)
+				{
+					val = qsearch<childNodesType>(ply, depth-red, beta-1, beta,childPV);
+				}
+				else
+				{*/
+					val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
+				/*}*/
+				sd[ply].skipNullMove = false;
+				if (val >= beta)
+				{
+					return nullVal;
+				}
 
 			}
 			/*else
