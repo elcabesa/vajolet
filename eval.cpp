@@ -189,15 +189,42 @@ bool Position::evalKxvsK(Score& res)
 	res -= 10 * SQUARE_DISTANCE[winKingSquare][losKingSquare];// devo tenere il re vicino
 	res += 20 * SQUARE_DISTANCE[losKingSquare][E4];// devo portare il re avversario vicino al bordo
 	res += 50 * bitCnt(getBitmap(pieces));
-
-	if( res >=SCORE_MATE_IN_MAX_PLY)
-	{
-		std::cout<<"ERRORREEEE"<<std::endl;
-	}
 	assert( res < SCORE_MATE_IN_MAX_PLY);
 
 	res *= mul;
 	return true;
+
+}
+
+bool Position::evalKNPvsK(Score& res)
+{
+	Color Pcolor = getBitmap(whitePawns) ? white : black;
+	tSquare pawnSquare;
+	if(Pcolor == white)
+	{
+		pawnSquare = getSquareOfThePiece(whitePawns);
+		int pawnFile = FILES[pawnSquare];
+		int pawnRank = RANKS[pawnSquare];
+		if( (pawnFile ==0 || pawnFile ==7) && pawnRank == 6 )
+		{
+
+			res = 0;
+			return true;
+
+		}
+	}
+	else
+	{
+		pawnSquare = getSquareOfThePiece(blackPawns);
+		int pawnFile = FILES[pawnSquare];
+		int pawnRank = RANKS[pawnSquare];
+		if( (pawnFile ==0 || pawnFile ==7) && pawnRank == 1 )
+		{
+			res = 10;
+			return true;
+		}
+	}
+	return false;
 
 }
 
@@ -778,6 +805,9 @@ void Position::initMaterialKeys(void)
 			{"kbn5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
 			{"kbb5/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
 			{"kbb5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+
+			{"knp5/8/8/8/8/8/8/7K w - -",materialStruct::multiplicativeFunction, &Position::evalKNPvsK, 0 },
+			{"k7/8/8/8/8/8/8/5KNP w - -",materialStruct::multiplicativeFunction, &Position::evalKNPvsK, 0 },
 
 			{"kn6/8/8/8/8/8/8/5NNK w - -",materialStruct::exact, nullptr, 0 },
 			{"kb6/8/8/8/8/8/8/5NNK w - -",materialStruct::exact, nullptr, 0 },
@@ -1586,6 +1616,7 @@ Score Position::eval(void)
 			return st.nextMove? -r : r;
 		}
 	}
+
 
 	//---------------------------------------------
 	//	tempo

@@ -705,6 +705,7 @@ private:
 	bool evalOppositeBishopEndgame(Score& res);
 	bool evalKRvsKm(Score& res);
 	bool evalKNNvsK(Score& res);
+	bool evalKNPvsK(Score& res);
 
 
 
