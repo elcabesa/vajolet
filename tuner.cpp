@@ -222,7 +222,7 @@ int main()
 	parameters.push_back(parameter("knightMobilityPars[3]",&knightMobilityPars[3]));
 
 
-	parameters.push_back(parameter("isolatedPawnPenalty[0]",&isolatedPawnPenalty[0]));
+/*	parameters.push_back(parameter("isolatedPawnPenalty[0]",&isolatedPawnPenalty[0]));
 	parameters.push_back(parameter("isolatedPawnPenalty[1]",&isolatedPawnPenalty[1]));
 	parameters.push_back(parameter("isolatedPawnPenaltyOpp[0]",&isolatedPawnPenaltyOpp[0]));
 	parameters.push_back(parameter("isolatedPawnPenaltyOpp[1]",&isolatedPawnPenaltyOpp[1]));
@@ -316,7 +316,7 @@ int main()
 	parameters.push_back(parameter("spaceBonus[1]",&spaceBonus[1]));
 	parameters.push_back(parameter("undefendedMinorPenalty[0]",&undefendedMinorPenalty[0]));
 	parameters.push_back(parameter("undefendedMinorPenalty[1]",&undefendedMinorPenalty[1]));
-
+*/
 
 	std::cout<<"start to optimizing "<<parameters.size()<<" parameters"<<std::endl;
 
@@ -328,7 +328,7 @@ int main()
 
 	std::vector<parameter> bestParameters;
 
-	long double learningRate = 0.1;
+	long double learningRate = 2.0;
 	long double minValue = 1e6;
 
 	double initialError = calcError();
@@ -382,8 +382,9 @@ int main()
 			std::cout<<"###### NEW BEST ITERATION ####"<<std::endl;
 			minValue = error;
 			bestIteration = iteration;
+			bestParameters.clear();
 			std::copy(parameters.begin(), parameters.end(),std::back_inserter(bestParameters));
-			std::cout<<"BESTA PARAMETERS"<<std::endl;
+			std::cout<<"BEST PARAMETERS"<<std::endl;
 			for(auto& p : bestParameters)
 			{
 				std::cout<<p.name<<" = "<<(int)p.value<<" ("<<p.value<<")"<<std::endl;
