@@ -737,7 +737,7 @@ void initMobilityBonus(void)
 		mobilityBonus[Position::Knights][n] =simdScore{knightMobilityPars[2]*(n-knightMobilityPars[0]),knightMobilityPars[3]*(n-knightMobilityPars[1]),0,0};
 	}
 
-	mobilityBonus[Position::Knights][0][0] = -4000;
+	/*mobilityBonus[Position::Knights][0][0] = -4000;
 	mobilityBonus[Position::Knights][1][0] = -1000;
 	mobilityBonus[Position::Knights][2][0] = -500;
 	mobilityBonus[Position::Knights][3][0] = 0;
@@ -745,7 +745,7 @@ void initMobilityBonus(void)
 	mobilityBonus[Position::Knights][5][0] = 600;
 	mobilityBonus[Position::Knights][6][0] = 900;
 	mobilityBonus[Position::Knights][7][0] = 1300;
-	mobilityBonus[Position::Knights][8][0] = 1400;
+	mobilityBonus[Position::Knights][8][0] = 1400;*/
 
 
 }

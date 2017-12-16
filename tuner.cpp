@@ -104,6 +104,7 @@ int readFile() {
 long double calcError(void)
 {
 	Position p;
+	initMobilityBonus();
 	long double totalError = 0.0;
 	const long double k = 3.7e-5;
 
@@ -199,6 +200,28 @@ int main()
 
 	readFile();
 
+
+	parameters.push_back(parameter("queenMobilityPars[0]",&queenMobilityPars[0]));
+	parameters.push_back(parameter("queenMobilityPars[1]",&queenMobilityPars[1]));
+	parameters.push_back(parameter("queenMobilityPars[2]",&queenMobilityPars[2]));
+	parameters.push_back(parameter("queenMobilityPars[3]",&queenMobilityPars[3]));
+
+	parameters.push_back(parameter("rookMobilityPars[0]",&rookMobilityPars[0]));
+	parameters.push_back(parameter("rookMobilityPars[1]",&rookMobilityPars[1]));
+	parameters.push_back(parameter("rookMobilityPars[2]",&rookMobilityPars[2]));
+	parameters.push_back(parameter("rookMobilityPars[3]",&rookMobilityPars[3]));
+
+	parameters.push_back(parameter("bishopMobilityPars[0]",&bishopMobilityPars[0]));
+	parameters.push_back(parameter("bishopMobilityPars[1]",&bishopMobilityPars[1]));
+	parameters.push_back(parameter("bishopMobilityPars[2]",&bishopMobilityPars[2]));
+	parameters.push_back(parameter("bishopMobilityPars[3]",&bishopMobilityPars[3]));
+
+	parameters.push_back(parameter("knightMobilityPars[0]",&knightMobilityPars[0]));
+	parameters.push_back(parameter("knightMobilityPars[1]",&knightMobilityPars[1]));
+	parameters.push_back(parameter("knightMobilityPars[2]",&knightMobilityPars[2]));
+	parameters.push_back(parameter("knightMobilityPars[3]",&knightMobilityPars[3]));
+
+
 	parameters.push_back(parameter("isolatedPawnPenalty[0]",&isolatedPawnPenalty[0]));
 	parameters.push_back(parameter("isolatedPawnPenalty[1]",&isolatedPawnPenalty[1]));
 	parameters.push_back(parameter("isolatedPawnPenaltyOpp[0]",&isolatedPawnPenaltyOpp[0]));
@@ -231,6 +254,68 @@ int main()
 	parameters.push_back(parameter("rookBehindPassedPawn[1]",&rookBehindPassedPawn[1]));
 	parameters.push_back(parameter("EnemyRookBehindPassedPawn[0]",&EnemyRookBehindPassedPawn[0]));
 	parameters.push_back(parameter("EnemyRookBehindPassedPawn[1]",&EnemyRookBehindPassedPawn[1]));
+
+	parameters.push_back(parameter("holesPenalty[0]",&holesPenalty[0]));
+	parameters.push_back(parameter("holesPenalty[1]",&holesPenalty[1]));
+	parameters.push_back(parameter("pawnCenterControl[0]",&pawnCenterControl[0]));
+	parameters.push_back(parameter("pawnCenterControl[1]",&pawnCenterControl[1]));
+	parameters.push_back(parameter("pawnBigCenterControl[0]",&pawnBigCenterControl[0]));
+	parameters.push_back(parameter("pawnBigCenterControl[1]",&pawnBigCenterControl[1]));
+	parameters.push_back(parameter("pieceCoordination[0]",&pieceCoordination[0]));
+	parameters.push_back(parameter("pieceCoordination[1]",&pieceCoordination[1]));
+
+	parameters.push_back(parameter("piecesCenterControl[0]",&piecesCenterControl[0]));
+	parameters.push_back(parameter("piecesCenterControl[1]",&piecesCenterControl[1]));
+
+	parameters.push_back(parameter("piecesBigCenterControl[0]",&piecesBigCenterControl[0]));
+	parameters.push_back(parameter("piecesBigCenterControl[1]",&piecesBigCenterControl[1]));
+	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
+	parameters.push_back(parameter("rookOn7Bonus[1]",&rookOn7Bonus[1]));
+	parameters.push_back(parameter("rookOnPawns[0]",&rookOnPawns[0]));
+	parameters.push_back(parameter("rookOnPawns[1]",&rookOnPawns[1]));
+
+	parameters.push_back(parameter("queenOn7Bonus[0]",&queenOn7Bonus[0]));
+	parameters.push_back(parameter("queenOn7Bonus[1]",&queenOn7Bonus[1]));
+	parameters.push_back(parameter("queenOnPawns[0]",&queenOnPawns[0]));
+	parameters.push_back(parameter("queenOnPawns[1]",&queenOnPawns[1]));
+	parameters.push_back(parameter("rookOnOpen[0]",&rookOnOpen[0]));
+	parameters.push_back(parameter("rookOnOpen[1]",&rookOnOpen[1]));
+	parameters.push_back(parameter("rookOnSemi[0]",&rookOnSemi[0]));
+	parameters.push_back(parameter("rookOnSemi[1]",&rookOnSemi[1]));
+	parameters.push_back(parameter("rookTrapped[0]",&rookTrapped[0]));
+	parameters.push_back(parameter("rookTrapped[1]",&rookTrapped[1]));
+
+	parameters.push_back(parameter("rookTrappedKingWithoutCastling[0]",&rookTrappedKingWithoutCastling[0]));
+	parameters.push_back(parameter("rookTrappedKingWithoutCastling[1]",&rookTrappedKingWithoutCastling[1]));
+	parameters.push_back(parameter("knightOnOutpost[0]",&knightOnOutpost[0]));
+	parameters.push_back(parameter("knightOnOutpost[1]",&knightOnOutpost[1]));
+	parameters.push_back(parameter("knightOnOutpostSupported[0]",&knightOnOutpostSupported[0]));
+	parameters.push_back(parameter("knightOnOutpostSupported[1]",&knightOnOutpostSupported[1]));
+	parameters.push_back(parameter("knightOnHole[0]",&knightOnHole[0]));
+	parameters.push_back(parameter("knightOnHole[1]",&knightOnHole[1]));
+	parameters.push_back(parameter("KnightAttackingWeakPawn[0]",&KnightAttackingWeakPawn[0]));
+	parameters.push_back(parameter("KnightAttackingWeakPawn[1]",&KnightAttackingWeakPawn[1]));
+	parameters.push_back(parameter("bishopOnOutpost[0]",&bishopOnOutpost[0]));
+	parameters.push_back(parameter("bishopOnOutpost[1]",&bishopOnOutpost[1]));
+	parameters.push_back(parameter("bishopOnOutpostSupported[0]",&bishopOnOutpostSupported[0]));
+	parameters.push_back(parameter("bishopOnOutpostSupported[1]",&bishopOnOutpostSupported[1]));
+	parameters.push_back(parameter("bishopOnHole[0]",&bishopOnHole[0]));
+	parameters.push_back(parameter("bishopOnHole[1]",&bishopOnHole[1]));
+	parameters.push_back(parameter("badBishop[0]",&badBishop[0]));
+	parameters.push_back(parameter("badBishop[1]",&badBishop[1]));
+
+	parameters.push_back(parameter("tempo[0]",&tempo[0]));
+	parameters.push_back(parameter("tempo[1]",&tempo[1]));
+	parameters.push_back(parameter("bishopPair[0]",&bishopPair[0]));
+	parameters.push_back(parameter("bishopPair[1]",&bishopPair[1]));
+	parameters.push_back(parameter("ownKingNearPassedPawn[0]",&ownKingNearPassedPawn[0]));
+	parameters.push_back(parameter("ownKingNearPassedPawn[1]",&ownKingNearPassedPawn[1]));
+	parameters.push_back(parameter("enemyKingNearPassedPawn[0]",&enemyKingNearPassedPawn[0]));
+	parameters.push_back(parameter("enemyKingNearPassedPawn[1]",&enemyKingNearPassedPawn[1]));
+	parameters.push_back(parameter("spaceBonus[0]",&spaceBonus[0]));
+	parameters.push_back(parameter("spaceBonus[1]",&spaceBonus[1]));
+	parameters.push_back(parameter("undefendedMinorPenalty[0]",&undefendedMinorPenalty[0]));
+	parameters.push_back(parameter("undefendedMinorPenalty[1]",&undefendedMinorPenalty[1]));
 
 
 
