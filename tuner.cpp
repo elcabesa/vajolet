@@ -318,6 +318,7 @@ int main()
 	parameters.push_back(parameter("undefendedMinorPenalty[1]",&undefendedMinorPenalty[1]));
 
 
+	std::cout<<"start to optimizing "<<parameters.size()<<" parameters"<<std::endl;
 
 	/*
 	for(auto& p : parameters)
@@ -329,6 +330,9 @@ int main()
 
 	long double learningRate = 0.1;
 	long double minValue = 1e6;
+
+	double initialError = calcError();
+	std::cout<<"initial error= "<<initialError<<std::endl;
 
 
 	std::random_device rd;
@@ -351,12 +355,10 @@ int main()
 		for(auto& p : parameters)
 		{
 			++par;
-			//std::cout<<"calc gradient "<<par<<"/"<<parameters.size()<<std::endl;
 			p.partialDerivate = calcPartialDerivate(p);
 			p.totalGradient += std::pow(p.partialDerivate, 2.0);
 			gradientMagnitude += std::pow(p.partialDerivate, 2.0);
-			std::cout<<"dy/d"<<p.name<<" "<<p.partialDerivate<<std::endl;
-			std::cout<<p.name<<" "<<p.totalGradient<<std::endl;
+			std::cout<<par<<"/"<<parameters.size()<<": dy/d("<<p.name<<") = "<<p.partialDerivate<<" totalGradient = "<<p.totalGradient<<std::endl;
 		}
 		std::cout<<"\ngradient magnitude "<<gradientMagnitude<<std::endl;
 		if(gradientMagnitude < 1e-6)
@@ -369,9 +371,9 @@ int main()
 		std::cout<<"newValues:"<<std::endl;
 		for(auto& p : parameters)
 		{
-			std::cout<<"new learning rate  "<<learningRate/(std::pow(p.totalGradient,0.5))<<std::endl;
-			p.value -= learningRate/(std::pow(p.totalGradient,0.5)) * p.partialDerivate;
-			std::cout<<p.name<<" "<<p.value<<std::endl;
+			double lr = learningRate/(std::pow(p.totalGradient,0.5));
+			p.value -= lr * p.partialDerivate;
+			std::cout<<p.name<<" = "<<p.value<<" learning rate = "<<lr<<std::endl;
 		}
 		double error = calcError();
 		if( error < minValue)
@@ -381,6 +383,11 @@ int main()
 			minValue = error;
 			bestIteration = iteration;
 			std::copy(parameters.begin(), parameters.end(),std::back_inserter(bestParameters));
+			std::cout<<"BESTA PARAMETERS"<<std::endl;
+			for(auto& p : bestParameters)
+			{
+				std::cout<<p.name<<" = "<<(int)p.value<<" ("<<p.value<<")"<<std::endl;
+			}
 
 		}
 		std::cout<<"--------------------------------------------------------------------"<<std::endl;
@@ -388,6 +395,8 @@ int main()
 
 		std::cout<<"newError "<<error<<std::endl;
 		std::cout<<"bestIteration "<<bestIteration<<" minError "<<minValue<<std::endl;
+
+
 
 	}
 

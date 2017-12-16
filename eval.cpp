@@ -44,10 +44,10 @@ const int KingExposed[] = {
 //------------------------------------------------
 //	MOBILITY BONUS
 //------------------------------------------------
-simdScore queenMobilityPars={5,5,20,335};
-simdScore rookMobilityPars={5,5,215,230};
-simdScore bishopMobilityPars={4,4,283,318};
-simdScore knightMobilityPars={3,3,280,220};
+simdScore queenMobilityPars={500,500,20,335};
+simdScore rookMobilityPars={500,500,215,230};
+simdScore bishopMobilityPars={400,400,283,318};
+simdScore knightMobilityPars={300,300,280,220};
 simdScore mobilityBonus[Position::separationBitmap][32];
 
 
@@ -722,19 +722,19 @@ void initMobilityBonus(void)
 	}
 	for(int n=0;n<32;n++)
 	{
-		mobilityBonus[Position::Queens][n] =simdScore{queenMobilityPars[2]*(n-queenMobilityPars[0]),queenMobilityPars[3]*(n-queenMobilityPars[1]),0,0};
+		mobilityBonus[Position::Queens][n] =simdScore{(queenMobilityPars[2]*(n*100-queenMobilityPars[0]))/100,(queenMobilityPars[3]*(n*100-queenMobilityPars[1]))/100,0,0};
 	}
 	for(int n=0;n<32;n++)
 	{
-		mobilityBonus[Position::Rooks][n] =simdScore{rookMobilityPars[2]*(n-rookMobilityPars[0]),rookMobilityPars[3]*(n-rookMobilityPars[1]),0,0};
+		mobilityBonus[Position::Rooks][n] =simdScore{(rookMobilityPars[2]*(n*100-rookMobilityPars[0]))/100,(rookMobilityPars[3]*(n*100-rookMobilityPars[1]))/100,0,0};
 	}
 	for(int n=0;n<32;n++)
 	{
-		mobilityBonus[Position::Bishops][n] =simdScore{bishopMobilityPars[2]*(n-bishopMobilityPars[0]),bishopMobilityPars[3]*(n-bishopMobilityPars[1]),0,0};
+		mobilityBonus[Position::Bishops][n] =simdScore{(bishopMobilityPars[2]*(n*100-bishopMobilityPars[0]))/100,(bishopMobilityPars[3]*(n*100-bishopMobilityPars[1]))/100,0,0};
 	}
 	for(int n=0;n<32;n++)
 	{
-		mobilityBonus[Position::Knights][n] =simdScore{knightMobilityPars[2]*(n-knightMobilityPars[0]),knightMobilityPars[3]*(n-knightMobilityPars[1]),0,0};
+		mobilityBonus[Position::Knights][n] =simdScore{(knightMobilityPars[2]*(n*100-knightMobilityPars[0]))/100,(knightMobilityPars[3]*(n*100-knightMobilityPars[1]))/100,0,0};
 	}
 
 	/*mobilityBonus[Position::Knights][0][0] = -4000;
