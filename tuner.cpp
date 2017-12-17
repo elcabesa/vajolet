@@ -269,7 +269,7 @@ int main()
 
 	parameters.push_back(parameter("piecesBigCenterControl[0]",&piecesBigCenterControl[0]));
 	parameters.push_back(parameter("piecesBigCenterControl[1]",&piecesBigCenterControl[1]));*/
-	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
+/*	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
 	parameters.push_back(parameter("rookOn7Bonus[1]",&rookOn7Bonus[1]));
 	parameters.push_back(parameter("rookOnPawns[0]",&rookOnPawns[0]));
 	parameters.push_back(parameter("rookOnPawns[1]",&rookOnPawns[1]));
@@ -286,8 +286,8 @@ int main()
 	parameters.push_back(parameter("rookTrapped[1]",&rookTrapped[1]));
 
 	parameters.push_back(parameter("rookTrappedKingWithoutCastling[0]",&rookTrappedKingWithoutCastling[0]));
-	parameters.push_back(parameter("rookTrappedKingWithoutCastling[1]",&rookTrappedKingWithoutCastling[1]));
-/*	parameters.push_back(parameter("knightOnOutpost[0]",&knightOnOutpost[0]));
+	parameters.push_back(parameter("rookTrappedKingWithoutCastling[1]",&rookTrappedKingWithoutCastling[1]));*/
+	parameters.push_back(parameter("knightOnOutpost[0]",&knightOnOutpost[0]));
 	parameters.push_back(parameter("knightOnOutpost[1]",&knightOnOutpost[1]));
 	parameters.push_back(parameter("knightOnOutpostSupported[0]",&knightOnOutpostSupported[0]));
 	parameters.push_back(parameter("knightOnOutpostSupported[1]",&knightOnOutpostSupported[1]));
@@ -304,7 +304,7 @@ int main()
 	parameters.push_back(parameter("badBishop[0]",&badBishop[0]));
 	parameters.push_back(parameter("badBishop[1]",&badBishop[1]));
 
-	parameters.push_back(parameter("tempo[0]",&tempo[0]));
+/*	parameters.push_back(parameter("tempo[0]",&tempo[0]));
 	parameters.push_back(parameter("tempo[1]",&tempo[1]));
 	parameters.push_back(parameter("bishopPair[0]",&bishopPair[0]));
 	parameters.push_back(parameter("bishopPair[1]",&bishopPair[1]));

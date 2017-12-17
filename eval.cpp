@@ -81,14 +81,14 @@ simdScore pieceCoordination={530,432,0,0};
 simdScore piecesCenterControl={236,217,0,0};
 simdScore piecesBigCenterControl={105,203,0,0};
 
-simdScore rookOn7Bonus={3699,1799,0,0};
-simdScore rookOnPawns={-600,1299,0,0};
-simdScore queenOn7Bonus={-3200,6999,0,0};
-simdScore queenOnPawns={-1000,2999,0,0};
-simdScore rookOnOpen={2000,500,0,0};
-simdScore rookOnSemi={500,1100,0,0};
-simdScore rookTrapped = {299,0,0,0};
-simdScore rookTrappedKingWithoutCastling = {300,0,0,0};
+simdScore rookOn7Bonus={3397,1652,0,0};
+simdScore rookOnPawns={-894,1021,0,0};
+simdScore queenOn7Bonus={-3505,6689,0,0};
+simdScore queenOnPawns={-1305,2691,0,0};
+simdScore rookOnOpen={2301,768,0,0};
+simdScore rookOnSemi={488,1379,0,0};
+simdScore rookTrapped = {24,305,0,0};
+simdScore rookTrappedKingWithoutCastling = {609,303,0,0};
 
 simdScore knightOnOutpost= {380,0,0,0};
 simdScore knightOnOutpostSupported= {100,1289,0,0};
