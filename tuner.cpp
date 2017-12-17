@@ -201,7 +201,7 @@ int main()
 	readFile();
 
 
-	parameters.push_back(parameter("queenMobilityPars[0]",&queenMobilityPars[0]));
+	/*parameters.push_back(parameter("queenMobilityPars[0]",&queenMobilityPars[0]));
 	parameters.push_back(parameter("queenMobilityPars[1]",&queenMobilityPars[1]));
 	parameters.push_back(parameter("queenMobilityPars[2]",&queenMobilityPars[2]));
 	parameters.push_back(parameter("queenMobilityPars[3]",&queenMobilityPars[3]));
@@ -219,7 +219,7 @@ int main()
 	parameters.push_back(parameter("knightMobilityPars[0]",&knightMobilityPars[0]));
 	parameters.push_back(parameter("knightMobilityPars[1]",&knightMobilityPars[1]));
 	parameters.push_back(parameter("knightMobilityPars[2]",&knightMobilityPars[2]));
-	parameters.push_back(parameter("knightMobilityPars[3]",&knightMobilityPars[3]));
+	parameters.push_back(parameter("knightMobilityPars[3]",&knightMobilityPars[3]));*/
 
 
 /*	parameters.push_back(parameter("isolatedPawnPenalty[0]",&isolatedPawnPenalty[0]));
@@ -253,7 +253,7 @@ int main()
 	parameters.push_back(parameter("rookBehindPassedPawn[0]",&rookBehindPassedPawn[0]));
 	parameters.push_back(parameter("rookBehindPassedPawn[1]",&rookBehindPassedPawn[1]));
 	parameters.push_back(parameter("EnemyRookBehindPassedPawn[0]",&EnemyRookBehindPassedPawn[0]));
-	parameters.push_back(parameter("EnemyRookBehindPassedPawn[1]",&EnemyRookBehindPassedPawn[1]));
+	parameters.push_back(parameter("EnemyRookBehindPassedPawn[1]",&EnemyRookBehindPassedPawn[1]));*/
 
 	parameters.push_back(parameter("holesPenalty[0]",&holesPenalty[0]));
 	parameters.push_back(parameter("holesPenalty[1]",&holesPenalty[1]));
@@ -269,7 +269,7 @@ int main()
 
 	parameters.push_back(parameter("piecesBigCenterControl[0]",&piecesBigCenterControl[0]));
 	parameters.push_back(parameter("piecesBigCenterControl[1]",&piecesBigCenterControl[1]));
-	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
+/*	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
 	parameters.push_back(parameter("rookOn7Bonus[1]",&rookOn7Bonus[1]));
 	parameters.push_back(parameter("rookOnPawns[0]",&rookOnPawns[0]));
 	parameters.push_back(parameter("rookOnPawns[1]",&rookOnPawns[1]));
@@ -328,7 +328,7 @@ int main()
 
 	std::vector<parameter> bestParameters;
 
-	long double learningRate = 2.0;
+	long double learningRate = 20.0;
 	long double minValue = 1e6;
 
 	double initialError = calcError();
@@ -358,7 +358,12 @@ int main()
 			p.partialDerivate = calcPartialDerivate(p);
 			p.totalGradient += std::pow(p.partialDerivate, 2.0);
 			gradientMagnitude += std::pow(p.partialDerivate, 2.0);
-			std::cout<<par<<"/"<<parameters.size()<<": dy/d("<<p.name<<") = "<<p.partialDerivate<<" totalGradient = "<<p.totalGradient<<std::endl;
+			double lr = learningRate/(std::pow(p.totalGradient,0.5));
+			long double oldvalue = p.value;
+			p.value -= lr * p.partialDerivate;
+
+			std::cout<<par<<"/"<<parameters.size()<<": dy/d("<<p.name<<") = "<<p.partialDerivate<<" totalGradient = "<<p.totalGradient<<
+					" newValue = "<<p.value <<" ("<<oldvalue<<") learning rate = "<<lr<<std::endl;
 		}
 		std::cout<<"\ngradient magnitude "<<gradientMagnitude<<std::endl;
 		if(gradientMagnitude < 1e-6)
@@ -366,16 +371,12 @@ int main()
 			stop = true;
 		}
 
-
-		std::cout<<"--------------------------------------------------------------------"<<std::endl;
-		std::cout<<"newValues:"<<std::endl;
 		for(auto& p : parameters)
 		{
-			double lr = learningRate/(std::pow(p.totalGradient,0.5));
-			p.value -= lr * p.partialDerivate;
-			std::cout<<p.name<<" = "<<p.value<<" learning rate = "<<lr<<std::endl;
+			*(p.pointer) = int (p.value);
 		}
 		double error = calcError();
+
 		if( error < minValue)
 		{
 			std::cout<<"--------------------------------------------------------------------"<<std::endl;
