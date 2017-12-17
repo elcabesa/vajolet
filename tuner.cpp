@@ -255,7 +255,7 @@ int main()
 	parameters.push_back(parameter("EnemyRookBehindPassedPawn[0]",&EnemyRookBehindPassedPawn[0]));
 	parameters.push_back(parameter("EnemyRookBehindPassedPawn[1]",&EnemyRookBehindPassedPawn[1]));*/
 
-	parameters.push_back(parameter("holesPenalty[0]",&holesPenalty[0]));
+/*	parameters.push_back(parameter("holesPenalty[0]",&holesPenalty[0]));
 	parameters.push_back(parameter("holesPenalty[1]",&holesPenalty[1]));
 	parameters.push_back(parameter("pawnCenterControl[0]",&pawnCenterControl[0]));
 	parameters.push_back(parameter("pawnCenterControl[1]",&pawnCenterControl[1]));
@@ -268,8 +268,8 @@ int main()
 	parameters.push_back(parameter("piecesCenterControl[1]",&piecesCenterControl[1]));
 
 	parameters.push_back(parameter("piecesBigCenterControl[0]",&piecesBigCenterControl[0]));
-	parameters.push_back(parameter("piecesBigCenterControl[1]",&piecesBigCenterControl[1]));
-/*	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
+	parameters.push_back(parameter("piecesBigCenterControl[1]",&piecesBigCenterControl[1]));*/
+	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
 	parameters.push_back(parameter("rookOn7Bonus[1]",&rookOn7Bonus[1]));
 	parameters.push_back(parameter("rookOnPawns[0]",&rookOnPawns[0]));
 	parameters.push_back(parameter("rookOnPawns[1]",&rookOnPawns[1]));
@@ -287,7 +287,7 @@ int main()
 
 	parameters.push_back(parameter("rookTrappedKingWithoutCastling[0]",&rookTrappedKingWithoutCastling[0]));
 	parameters.push_back(parameter("rookTrappedKingWithoutCastling[1]",&rookTrappedKingWithoutCastling[1]));
-	parameters.push_back(parameter("knightOnOutpost[0]",&knightOnOutpost[0]));
+/*	parameters.push_back(parameter("knightOnOutpost[0]",&knightOnOutpost[0]));
 	parameters.push_back(parameter("knightOnOutpost[1]",&knightOnOutpost[1]));
 	parameters.push_back(parameter("knightOnOutpostSupported[0]",&knightOnOutpostSupported[0]));
 	parameters.push_back(parameter("knightOnOutpostSupported[1]",&knightOnOutpostSupported[1]));

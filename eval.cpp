@@ -71,15 +71,15 @@ simdScore unstoppablePassed = {0,2117,0,0};
 simdScore rookBehindPassedPawn = {80,394,0,0};
 simdScore EnemyRookBehindPassedPawn = {14,318,0,0};
 
-simdScore holesPenalty={100,259,0,0};
-simdScore pawnCenterControl={69,119,0,0};
-simdScore pawnBigCenterControl={360,-669,0,0};
+simdScore holesPenalty={206,105,0,0};
+simdScore pawnCenterControl={51,-228,0,0};
+simdScore pawnBigCenterControl={662,-407,0,0};
 
 
-simdScore pieceCoordination={280,160,0,0};
+simdScore pieceCoordination={530,432,0,0};
 
-simdScore piecesCenterControl={170,160,0,0};
-simdScore piecesBigCenterControl={120,50,0,0};
+simdScore piecesCenterControl={236,217,0,0};
+simdScore piecesBigCenterControl={105,203,0,0};
 
 simdScore rookOn7Bonus={3699,1799,0,0};
 simdScore rookOnPawns={-600,1299,0,0};
