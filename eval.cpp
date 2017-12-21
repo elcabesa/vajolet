@@ -44,70 +44,70 @@ const int KingExposed[] = {
 //------------------------------------------------
 //	MOBILITY BONUS
 //------------------------------------------------
-simdScore queenMobilityPars={383,311,-41,544};
-simdScore rookMobilityPars={735,539,388,433};
-simdScore bishopMobilityPars={52,110,504,351};
-simdScore knightMobilityPars={-59,285,521,450};
+simdScore queenMobilityPars={410,361,100,554};
+simdScore rookMobilityPars={805,627,376,438};
+simdScore bishopMobilityPars={-105,172,639,299};
+simdScore knightMobilityPars={-166,380,674,577};
 simdScore mobilityBonus[Position::separationBitmap][32];
 
 
 //------------------------------------------------
 //	PAWN Bonus/Penalties
 //------------------------------------------------
-simdScore isolatedPawnPenalty={591,1446,0,0};
-simdScore isolatedPawnPenaltyOpp={87,624,0,0};
-simdScore doubledPawnPenalty={212,1390,0,0};
-simdScore backwardPawnPenalty={1172,1433,0,0};
-simdScore chainedPawnBonus={574,-79,0,0};
-simdScore passedPawnFileAHPenalty = {-1004,687,0,0};
-simdScore passedPawnSupportedBonus = {996,-502,0,0};
-simdScore candidateBonus = {12,1019,0,0};
-simdScore passedPawnBonus = {333,751,0,0};
-simdScore passedPawnUnsafeSquares ={-106,280,0,0};
-simdScore passedPawnBlockedSquares ={-23,140,0,0};
-simdScore passedPawnDefendedSquares = {-138,191,0,0};
-simdScore passedPawnDefendedBlockingSquare = {128,211,0,0};
-simdScore unstoppablePassed = {0,2117,0,0};
-simdScore rookBehindPassedPawn = {80,394,0,0};
-simdScore EnemyRookBehindPassedPawn = {14,318,0,0};
+simdScore isolatedPawnPenalty={749,1598,0,0};
+simdScore isolatedPawnPenaltyOpp={216,597,0,0};
+simdScore doubledPawnPenalty={45,1241,0,0};
+simdScore backwardPawnPenalty={1305,1544,0,0};
+simdScore chainedPawnBonus={721,26,0,0};
+simdScore passedPawnFileAHPenalty = {-1065,580,0,0};
+simdScore passedPawnSupportedBonus = {836,-338,0,0};
+simdScore candidateBonus = {-136,872,0,0};
+simdScore passedPawnBonus = {263,662,0,0};
+simdScore passedPawnUnsafeSquares ={-195,369,0,0};
+simdScore passedPawnBlockedSquares ={-112,123,0,0};
+simdScore passedPawnDefendedSquares = {-247,208,0,0};
+simdScore passedPawnDefendedBlockingSquare = {34,259,0,0};
+simdScore unstoppablePassed = {0,2287,0,0};
+simdScore rookBehindPassedPawn = {169,510,0,0};
+simdScore EnemyRookBehindPassedPawn = {1,453,0,0};
 
-simdScore holesPenalty={206,105,0,0};
-simdScore pawnCenterControl={51,-228,0,0};
-simdScore pawnBigCenterControl={662,-407,0,0};
+simdScore holesPenalty={171,66,0,0};
+simdScore pawnCenterControl={179,-375,0,0};
+simdScore pawnBigCenterControl={822,-265,0,0};
 
 
-simdScore pieceCoordination={530,432,0,0};
+simdScore pieceCoordination={603,423,0,0};
 
-simdScore piecesCenterControl={236,217,0,0};
-simdScore piecesBigCenterControl={105,203,0,0};
+simdScore piecesCenterControl={140,181,0,0};
+simdScore piecesBigCenterControl={43,213,0,0};
 
-simdScore rookOn7Bonus={3397,1652,0,0};
-simdScore rookOnPawns={-894,1021,0,0};
-simdScore queenOn7Bonus={-3505,6689,0,0};
-simdScore queenOnPawns={-1305,2691,0,0};
-simdScore rookOnOpen={2301,768,0,0};
-simdScore rookOnSemi={488,1379,0,0};
-simdScore rookTrapped = {24,305,0,0};
-simdScore rookTrappedKingWithoutCastling = {609,303,0,0};
+simdScore rookOn7Bonus={3232,1834,0,0};
+simdScore rookOnPawns={-1036,888,0,0};
+simdScore queenOn7Bonus={-3678,6515,0,0};
+simdScore queenOnPawns={-1475,2518,0,0};
+simdScore rookOnOpen={2485,919,0,0};
+simdScore rookOnSemi={488,1477,0,0};
+simdScore rookTrapped = {-109,482,0,0};
+simdScore rookTrappedKingWithoutCastling = {787,478,0,0};
 
-simdScore knightOnOutpost= {380,0,0,0};
-simdScore knightOnOutpostSupported= {100,1289,0,0};
-simdScore knightOnHole= {1609,1189,0,0};
-simdScore KnightAttackingWeakPawn= {299,300,0,0};
+simdScore knightOnOutpost= {403,-123,0,0};
+simdScore knightOnOutpostSupported= {15,1272,0,0};
+simdScore knightOnHole= {1440,1353,0,0};
+simdScore KnightAttackingWeakPawn= {131,473,0,0};
 
-simdScore bishopOnOutpost= {-1020,809,0,0};
-simdScore bishopOnOutpostSupported= {3599,269,0,0};
-simdScore bishopOnHole= {590,-729,0,0};
-simdScore badBishop= {-199,1529,0,0};
+simdScore bishopOnOutpost= {-1198,637,0,0};
+simdScore bishopOnOutpostSupported= {3441,114,0,0};
+simdScore bishopOnHole= {765,-549,0,0};
+simdScore badBishop= {-19,1445,0,0};
 
-simdScore tempo= {530,480,0,0};
-simdScore bishopPair ={3260,4690,0,0};
+simdScore tempo= {707,657,0,0};
+simdScore bishopPair ={3409,4863,0,0};
 
-simdScore ownKingNearPassedPawn={0,149,0,0};
-simdScore enemyKingNearPassedPawn={9,240,0,0};
+simdScore ownKingNearPassedPawn={-44,114,0,0};
+simdScore enemyKingNearPassedPawn={-86,251,0,0};
 
-simdScore spaceBonus={599,199,0,0};
-simdScore undefendedMinorPenalty = {756,353,0,0};
+simdScore spaceBonus={439,135,0,0};
+simdScore undefendedMinorPenalty = {869,287,0,0};
 
 simdScore attackedByPawnPenalty[Position::separationBitmap]=
 {	{0,0,0,0},

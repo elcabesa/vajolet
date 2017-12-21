@@ -702,12 +702,17 @@ U64 Position::calcKey(void) const
 U64 Position::calcPawnKey(void) const
 {
 	U64 hash = 1;
-	for (int i = 0; i < squareNumber; i++)
+	bitMap b= getBitmap(whitePawns);
+	while(b)
 	{
-		if(squares[i] == whitePawns || squares[i] == blackPawns)
-		{
-			hash ^= HashKeys::keys[i][squares[i]];
-		}
+		tSquare n = iterateBit(b);
+		hash ^= HashKeys::keys[n][whitePawns];
+	}
+	b= getBitmap(blackPawns);
+	while(b)
+	{
+		tSquare n = iterateBit(b);
+		hash ^= HashKeys::keys[n][blackPawns];
 	}
 
 	return hash;
@@ -742,9 +747,10 @@ U64 Position::calcMaterialKey(void) const
 */
 simdScore Position::calcMaterialValue(void) const{
 	simdScore score = {0,0,0,0};
-	for (tSquare s = (tSquare)0; s<squareNumber; s++)
+	bitMap b= getOccupationBitmap();
+	while(b)
 	{
-
+		tSquare s = iterateBit(b);
 		bitboardIndex val = squares[s];
 		score += pstValue[val][s];
 
@@ -764,10 +770,12 @@ simdScore Position::calcNonPawnMaterialValue() const
 	simdScore t[2] ={{0,0,0,0},{0,0,0,0}};
 	simdScore res;
 
-	for (tSquare n = (tSquare)0; n < squareNumber; n++)
+	bitMap b= getOccupationBitmap();
+	while(b)
 	{
+		tSquare n = iterateBit(b);
 		bitboardIndex val = squares[n];
-		if(!isPawn(val) && !isKing(val))
+		if(!isPawn(val) && !isKing(val) )
 		{
 			if(val > separationBitmap)
 			{
@@ -1122,6 +1130,7 @@ void Position::initCastleRightsMask(void)
 */
 bool Position::checkPosConsistency(int nn)
 {
+	return true;
 	state &x =getActualState();
 	if(x.nextMove !=whiteTurn && x.nextMove !=blackTurn)
 	{

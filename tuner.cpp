@@ -101,41 +101,36 @@ int readFile() {
 	return 0;
 }
 
+long double calcSigleError(Position &p, long double res)
+{
+	const long double k = 3.7e-5;
+	long double eval = p.eval<false>();
+	if(p.getNextTurn() == Position::blackTurn)
+	{
+		eval *= -1.0;
+	}
+	long double sigmoid = 1.0l / (1.0l + std::pow(10.0, -k * eval));
+	long double error = res - sigmoid;
+	return std::pow(error, 2);
+	
+}
+
 long double calcError(void)
 {
 	Position p;
 	initMobilityBonus();
 	long double totalError = 0.0;
-	const long double k = 3.7e-5;
 
-	unsigned int counter = 0;
 	for(const auto& v : positions)
 	{
-		++counter;
-		std::string FEN = v.FEN;
-		long double res = v.res;
-		p.setupFromFen(FEN);
-		long double eval = p.eval<false>();
-		if(p.getNextTurn() == Position::blackTurn)
-		{
-			eval *= -1.0;
-		}
-		long double sigmoid = 1.0l / (1.0l + std::pow(10.0, -k * eval));
-		long double error = res - sigmoid;
-		totalError += std::pow(error, 2);
-		/*std::cout<<FEN<<std::endl;
-		 std::cout<<res<<std::endl;
-		 std::cout<<eval<<std::endl;
-		 std::cout<<sigmoid<<std::endl;
-		 std::cout<<error<<std::endl;
-		 std::cout<<"-------------------------"<<std::endl;*/
-		if( counter == 1000000)
-		{
-			break;
-		}
+		p.setupFromFen(v.FEN);
+		totalError += calcSigleError(p, v.res);
+
 	}
 	return totalError;
 }
+
+
 
 struct parameter
 {
@@ -144,7 +139,9 @@ struct parameter
 	int* pointer;
 	long double partialDerivate;
 	long double totalGradient;
-	parameter(std::string _name, int* _pointer):name(_name),pointer(_pointer){value = *pointer;partialDerivate=0;totalGradient=1e-8;}
+	long double totalError;
+	bool requireUpdate;
+	parameter(std::string _name, int* _pointer, bool _r= false):name(_name),pointer(_pointer),requireUpdate(_r){value = *pointer;partialDerivate = 0;totalGradient = 1e-8; totalError = 0;}
 };
 
 std::vector<parameter> parameters;
@@ -167,6 +164,93 @@ long double calcPartialDerivate(parameter& p)
 	return pd;
 
 }
+
+void updateParameter(parameter& par, const long double delta)
+{
+	*(par.pointer) = int (par.value + delta);
+	if(par.requireUpdate)
+	{
+		initMobilityBonus();
+	}
+
+}
+long double calcPartialDerivate2(parameter& par, Position & pos, long double res)
+{
+
+	const long double delta = 1.0;
+
+	updateParameter(par, delta);
+
+	long double ep = calcSigleError(pos, res);
+
+	updateParameter(par, -delta);
+
+	long double em = calcSigleError(pos, res);
+
+	long double pd = (ep - em)/(2.0* delta);
+
+	updateParameter(par, 0);
+
+	return pd;
+
+}
+
+long double calcGradient(void)
+{
+	std::cout<<"calc gradient"<<std::endl;	
+	long double gradientMagnitude = 0.0;
+	for(auto& p : parameters)
+	{
+		p.partialDerivate = calcPartialDerivate(p);
+		long double x = std::pow(p.partialDerivate, 2.0);
+		p.totalGradient += x;
+		gradientMagnitude += x;
+		
+	}
+	return gradientMagnitude;
+	
+}
+
+long double calcGradient2(long double& error)
+{
+	std::cout<<"calc gradient"<<std::endl;	
+	long double gradientMagnitude = 0.0;
+	error= 0.0;
+	
+	Position pos;
+	
+	for(auto& par : parameters)
+	{
+		par.partialDerivate =0.0;
+	}
+	
+	for(const auto& v : positions)
+	{
+		pos.setupFromFen(v.FEN);
+		long double res = v.res;
+		error += calcSigleError(pos, res);
+		for(auto& par : parameters)
+		{
+			
+			par.partialDerivate += calcPartialDerivate2(par,pos, res);
+
+
+		}
+		
+	}
+	
+	for(auto& p : parameters)
+	{
+		long double x = std::pow(p.partialDerivate, 2.0);
+		p.totalGradient += x;
+		gradientMagnitude += x;
+		
+	}
+
+	return gradientMagnitude;
+	
+}
+
 
 /*!	\brief	main function
 	\author Marco Belli
@@ -201,28 +285,28 @@ int main()
 	readFile();
 
 
-	/*parameters.push_back(parameter("queenMobilityPars[0]",&queenMobilityPars[0]));
-	parameters.push_back(parameter("queenMobilityPars[1]",&queenMobilityPars[1]));
-	parameters.push_back(parameter("queenMobilityPars[2]",&queenMobilityPars[2]));
-	parameters.push_back(parameter("queenMobilityPars[3]",&queenMobilityPars[3]));
+	parameters.push_back(parameter("queenMobilityPars[0]",&queenMobilityPars[0],true));
+	parameters.push_back(parameter("queenMobilityPars[1]",&queenMobilityPars[1],true));
+	parameters.push_back(parameter("queenMobilityPars[2]",&queenMobilityPars[2],true));
+	parameters.push_back(parameter("queenMobilityPars[3]",&queenMobilityPars[3],true));
 
-	parameters.push_back(parameter("rookMobilityPars[0]",&rookMobilityPars[0]));
-	parameters.push_back(parameter("rookMobilityPars[1]",&rookMobilityPars[1]));
-	parameters.push_back(parameter("rookMobilityPars[2]",&rookMobilityPars[2]));
-	parameters.push_back(parameter("rookMobilityPars[3]",&rookMobilityPars[3]));
+	parameters.push_back(parameter("rookMobilityPars[0]",&rookMobilityPars[0],true));
+	parameters.push_back(parameter("rookMobilityPars[1]",&rookMobilityPars[1],true));
+	parameters.push_back(parameter("rookMobilityPars[2]",&rookMobilityPars[2],true));
+	parameters.push_back(parameter("rookMobilityPars[3]",&rookMobilityPars[3],true));
 
-	parameters.push_back(parameter("bishopMobilityPars[0]",&bishopMobilityPars[0]));
-	parameters.push_back(parameter("bishopMobilityPars[1]",&bishopMobilityPars[1]));
-	parameters.push_back(parameter("bishopMobilityPars[2]",&bishopMobilityPars[2]));
-	parameters.push_back(parameter("bishopMobilityPars[3]",&bishopMobilityPars[3]));
+	parameters.push_back(parameter("bishopMobilityPars[0]",&bishopMobilityPars[0],true));
+	parameters.push_back(parameter("bishopMobilityPars[1]",&bishopMobilityPars[1],true));
+	parameters.push_back(parameter("bishopMobilityPars[2]",&bishopMobilityPars[2],true));
+	parameters.push_back(parameter("bishopMobilityPars[3]",&bishopMobilityPars[3],true));
 
-	parameters.push_back(parameter("knightMobilityPars[0]",&knightMobilityPars[0]));
-	parameters.push_back(parameter("knightMobilityPars[1]",&knightMobilityPars[1]));
-	parameters.push_back(parameter("knightMobilityPars[2]",&knightMobilityPars[2]));
-	parameters.push_back(parameter("knightMobilityPars[3]",&knightMobilityPars[3]));*/
+	parameters.push_back(parameter("knightMobilityPars[0]",&knightMobilityPars[0],true));
+	parameters.push_back(parameter("knightMobilityPars[1]",&knightMobilityPars[1],true));
+	parameters.push_back(parameter("knightMobilityPars[2]",&knightMobilityPars[2],true));
+	parameters.push_back(parameter("knightMobilityPars[3]",&knightMobilityPars[3],true));
 
 
-/*	parameters.push_back(parameter("isolatedPawnPenalty[0]",&isolatedPawnPenalty[0]));
+	parameters.push_back(parameter("isolatedPawnPenalty[0]",&isolatedPawnPenalty[0]));
 	parameters.push_back(parameter("isolatedPawnPenalty[1]",&isolatedPawnPenalty[1]));
 	parameters.push_back(parameter("isolatedPawnPenaltyOpp[0]",&isolatedPawnPenaltyOpp[0]));
 	parameters.push_back(parameter("isolatedPawnPenaltyOpp[1]",&isolatedPawnPenaltyOpp[1]));
@@ -253,9 +337,9 @@ int main()
 	parameters.push_back(parameter("rookBehindPassedPawn[0]",&rookBehindPassedPawn[0]));
 	parameters.push_back(parameter("rookBehindPassedPawn[1]",&rookBehindPassedPawn[1]));
 	parameters.push_back(parameter("EnemyRookBehindPassedPawn[0]",&EnemyRookBehindPassedPawn[0]));
-	parameters.push_back(parameter("EnemyRookBehindPassedPawn[1]",&EnemyRookBehindPassedPawn[1]));*/
+	parameters.push_back(parameter("EnemyRookBehindPassedPawn[1]",&EnemyRookBehindPassedPawn[1]));
 
-/*	parameters.push_back(parameter("holesPenalty[0]",&holesPenalty[0]));
+	parameters.push_back(parameter("holesPenalty[0]",&holesPenalty[0]));
 	parameters.push_back(parameter("holesPenalty[1]",&holesPenalty[1]));
 	parameters.push_back(parameter("pawnCenterControl[0]",&pawnCenterControl[0]));
 	parameters.push_back(parameter("pawnCenterControl[1]",&pawnCenterControl[1]));
@@ -268,8 +352,8 @@ int main()
 	parameters.push_back(parameter("piecesCenterControl[1]",&piecesCenterControl[1]));
 
 	parameters.push_back(parameter("piecesBigCenterControl[0]",&piecesBigCenterControl[0]));
-	parameters.push_back(parameter("piecesBigCenterControl[1]",&piecesBigCenterControl[1]));*/
-/*	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
+	parameters.push_back(parameter("piecesBigCenterControl[1]",&piecesBigCenterControl[1]));
+	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
 	parameters.push_back(parameter("rookOn7Bonus[1]",&rookOn7Bonus[1]));
 	parameters.push_back(parameter("rookOnPawns[0]",&rookOnPawns[0]));
 	parameters.push_back(parameter("rookOnPawns[1]",&rookOnPawns[1]));
@@ -286,7 +370,7 @@ int main()
 	parameters.push_back(parameter("rookTrapped[1]",&rookTrapped[1]));
 
 	parameters.push_back(parameter("rookTrappedKingWithoutCastling[0]",&rookTrappedKingWithoutCastling[0]));
-	parameters.push_back(parameter("rookTrappedKingWithoutCastling[1]",&rookTrappedKingWithoutCastling[1]));*/
+	parameters.push_back(parameter("rookTrappedKingWithoutCastling[1]",&rookTrappedKingWithoutCastling[1]));
 	parameters.push_back(parameter("knightOnOutpost[0]",&knightOnOutpost[0]));
 	parameters.push_back(parameter("knightOnOutpost[1]",&knightOnOutpost[1]));
 	parameters.push_back(parameter("knightOnOutpostSupported[0]",&knightOnOutpostSupported[0]));
@@ -304,7 +388,7 @@ int main()
 	parameters.push_back(parameter("badBishop[0]",&badBishop[0]));
 	parameters.push_back(parameter("badBishop[1]",&badBishop[1]));
 
-/*	parameters.push_back(parameter("tempo[0]",&tempo[0]));
+	parameters.push_back(parameter("tempo[0]",&tempo[0]));
 	parameters.push_back(parameter("tempo[1]",&tempo[1]));
 	parameters.push_back(parameter("bishopPair[0]",&bishopPair[0]));
 	parameters.push_back(parameter("bishopPair[1]",&bishopPair[1]));
@@ -316,7 +400,7 @@ int main()
 	parameters.push_back(parameter("spaceBonus[1]",&spaceBonus[1]));
 	parameters.push_back(parameter("undefendedMinorPenalty[0]",&undefendedMinorPenalty[0]));
 	parameters.push_back(parameter("undefendedMinorPenalty[1]",&undefendedMinorPenalty[1]));
-*/
+
 
 	std::cout<<"start to optimizing "<<parameters.size()<<" parameters"<<std::endl;
 
@@ -329,6 +413,7 @@ int main()
 	std::vector<parameter> bestParameters;
 
 	long double learningRate = 20.0;
+	long double error = 1e22;// big number
 	long double minValue = 1e6;
 
 	double initialError = calcError();
@@ -341,6 +426,7 @@ int main()
 	unsigned long bestIteration = 0;
 
 	bool stop = false;
+
 	while(!stop)
 	{
 		++iteration;
@@ -349,17 +435,15 @@ int main()
 		std::shuffle(positions.begin(), positions.end(), g);
 
 		std::cout<<"--------------------------------------------------------------------"<<std::endl;
-		std::cout<<"calc gradient"<<std::endl;
-		long double gradientMagnitude = 0.0;
+
+
+		long double gradientMagnitude = calcGradient2(error);
 		unsigned int par = 0;
 		for(auto& p : parameters)
 		{
 			++par;
-			p.partialDerivate = calcPartialDerivate(p);
-			p.totalGradient += std::pow(p.partialDerivate, 2.0);
-			gradientMagnitude += std::pow(p.partialDerivate, 2.0);
-			double lr = learningRate/(std::pow(p.totalGradient,0.5));
 			long double oldvalue = p.value;
+			double lr = learningRate/(std::pow(p.totalGradient,0.5));
 			p.value -= lr * p.partialDerivate;
 
 			std::cout<<par<<"/"<<parameters.size()<<": dy/d("<<p.name<<") = "<<p.partialDerivate<<" totalGradient = "<<p.totalGradient<<
@@ -370,12 +454,6 @@ int main()
 		{
 			stop = true;
 		}
-
-		for(auto& p : parameters)
-		{
-			*(p.pointer) = int (p.value);
-		}
-		double error = calcError();
 
 		if( error < minValue)
 		{
@@ -392,11 +470,11 @@ int main()
 			}
 
 		}
+
 		std::cout<<"--------------------------------------------------------------------"<<std::endl;
-
-
 		std::cout<<"newError "<<error<<std::endl;
 		std::cout<<"bestIteration "<<bestIteration<<" minError "<<minValue<<std::endl;
+
 
 
 
