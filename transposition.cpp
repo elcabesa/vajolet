@@ -38,7 +38,7 @@ void transpositionTable::setSize(unsigned long int mbSize)
 		std::cerr << "Failed to allocate " << mbSize<< "MB for transposition table." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	sync_cout<<"info string hash table allocated"<<sync_endl;
+	sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<mbSize<<"MB)"<<sync_endl;
 }
 
 

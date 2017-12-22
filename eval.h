@@ -24,71 +24,7 @@
 #include "position.h"
 #include "tables.h"
 
-
+extern bool enablePawnHash;
 void initMobilityBonus();
-
-extern simdScore queenMobilityPars;
-extern simdScore rookMobilityPars;
-extern simdScore bishopMobilityPars;
-extern simdScore knightMobilityPars;
-
-extern simdScore isolatedPawnPenalty;
-extern simdScore isolatedPawnPenaltyOpp;
-extern simdScore doubledPawnPenalty;
-extern simdScore backwardPawnPenalty;
-extern simdScore chainedPawnBonus;
-extern simdScore passedPawnFileAHPenalty;
-extern simdScore passedPawnSupportedBonus;
-extern simdScore candidateBonus;
-extern simdScore passedPawnBonus;
-extern simdScore passedPawnUnsafeSquares;
-extern simdScore passedPawnBlockedSquares;
-extern simdScore passedPawnDefendedSquares;
-extern simdScore passedPawnDefendedBlockingSquare;
-extern simdScore unstoppablePassed;
-extern simdScore rookBehindPassedPawn;
-extern simdScore EnemyRookBehindPassedPawn;
-
-extern simdScore holesPenalty;
-extern simdScore pawnCenterControl;
-extern simdScore pawnBigCenterControl;
-
-
-extern simdScore pieceCoordination;
-
-extern simdScore piecesCenterControl;
-extern simdScore piecesBigCenterControl;
-
-extern simdScore rookOn7Bonus;
-extern simdScore rookOnPawns;
-extern simdScore queenOn7Bonus;
-extern simdScore queenOnPawns;
-extern simdScore rookOnOpen;
-extern simdScore rookOnSemi;
-extern simdScore rookTrapped;
-extern simdScore rookTrappedKingWithoutCastling;
-
-extern simdScore knightOnOutpost;
-extern simdScore knightOnOutpostSupported;
-extern simdScore knightOnHole;
-extern simdScore KnightAttackingWeakPawn;
-
-extern simdScore bishopOnOutpost;
-extern simdScore bishopOnOutpostSupported;
-extern simdScore bishopOnHole;
-extern simdScore badBishop;
-
-extern simdScore tempo;
-extern simdScore bishopPair;
-
-extern simdScore ownKingNearPassedPawn;
-extern simdScore enemyKingNearPassedPawn;
-
-extern simdScore spaceBonus;
-extern simdScore undefendedMinorPenalty;
-
-
-
-
 
 #endif /* EVAL_H_ */

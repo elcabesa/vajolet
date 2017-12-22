@@ -26,6 +26,7 @@
 #include "transposition.h"
 #include "search.h"
 #include "eval.h"
+#include "parameters.h"
 #include "syzygy/tbprobe.h"
 #include "eval.h"
 
@@ -132,83 +133,59 @@ long double calcError(void)
 
 
 
+
 struct parameter
 {
 	std::string name;
-	long double value;
-	int* pointer;
-	long double partialDerivate;
-	long double totalGradient;
-	long double totalError;
+	long double value[4];
+	unsigned int count;
+	simdScore* pointer;
+	long double partialDerivate[4];
+	long double totalGradient[4];
+	long double totalError[4];
 	bool requireUpdate;
-	parameter(std::string _name, int* _pointer, bool _r= false):name(_name),pointer(_pointer),requireUpdate(_r){value = *pointer;partialDerivate = 0;totalGradient = 1e-8; totalError = 0;}
+	parameter(std::string _name, simdScore* _pointer,unsigned int _count, bool _r= false):name(_name),count(_count),pointer(_pointer),requireUpdate(_r)
+	{
+		for( int i = 0; i <4 ; ++i)
+		{
+		value[i] = (*pointer)[i] ;
+		partialDerivate[i] = 0;
+		totalGradient[i] = 1e-8;
+		totalError[i] = 0;
+		}
+	}
 };
 
 std::vector<parameter> parameters;
 
-long double calcPartialDerivate(parameter& p)
+void updateParameter(parameter& par,unsigned int i, const long double delta)
 {
-
-
-	const long double delta = 1.0;
-
-	*(p.pointer) = int (p.value + delta);
-
-	long double ep = calcError();
-
-	*(p.pointer) = int (p.value - delta);
-	long double em = calcError();
-
-	long double pd = (ep - em)/(2.0* delta);
-	*(p.pointer) = int (p.value);
-	return pd;
-
-}
-
-void updateParameter(parameter& par, const long double delta)
-{
-	*(par.pointer) = int (par.value + delta);
+	(*(par.pointer))[i] = int (par.value[i] + delta);
 	if(par.requireUpdate)
 	{
 		initMobilityBonus();
 	}
 
 }
-long double calcPartialDerivate2(parameter& par, Position & pos, long double res)
+long double calcPartialDerivate2(parameter& par,unsigned int i, Position & pos, long double res)
 {
 
 	const long double delta = 1.0;
 
-	updateParameter(par, delta);
+	updateParameter(par, i, delta);
 
 	long double ep = calcSigleError(pos, res);
 
-	updateParameter(par, -delta);
+	updateParameter(par, i, -delta);
 
 	long double em = calcSigleError(pos, res);
 
 	long double pd = (ep - em)/(2.0* delta);
 
-	updateParameter(par, 0);
+	updateParameter(par, i, 0);
 
 	return pd;
 
-}
-
-long double calcGradient(void)
-{
-	std::cout<<"calc gradient"<<std::endl;	
-	long double gradientMagnitude = 0.0;
-	for(auto& p : parameters)
-	{
-		p.partialDerivate = calcPartialDerivate(p);
-		long double x = std::pow(p.partialDerivate, 2.0);
-		p.totalGradient += x;
-		gradientMagnitude += x;
-		
-	}
-	return gradientMagnitude;
-	
 }
 
 long double calcGradient2(long double& error)
@@ -221,7 +198,10 @@ long double calcGradient2(long double& error)
 	
 	for(auto& par : parameters)
 	{
-		par.partialDerivate =0.0;
+		for( unsigned int i = 0; i < par.count; ++i)
+		{
+			par.partialDerivate[i] =0.0;
+		}
 	}
 	
 	for(const auto& v : positions)
@@ -231,8 +211,10 @@ long double calcGradient2(long double& error)
 		error += calcSigleError(pos, res);
 		for(auto& par : parameters)
 		{
-			
-			par.partialDerivate += calcPartialDerivate2(par,pos, res);
+			for( unsigned int i = 0; i < par.count; ++i)
+			{
+				par.partialDerivate[i] += calcPartialDerivate2(par,i,pos, res);
+			}
 
 
 		}
@@ -241,9 +223,12 @@ long double calcGradient2(long double& error)
 	
 	for(auto& p : parameters)
 	{
-		long double x = std::pow(p.partialDerivate, 2.0);
-		p.totalGradient += x;
-		gradientMagnitude += x;
+		for( unsigned int i = 0; i < p.count; ++i)
+		{
+			long double x = std::pow(p.partialDerivate[i], 2.0);
+			p.totalGradient[i] += x;
+			gradientMagnitude += x;
+		}
 		
 	}
 
@@ -275,6 +260,8 @@ int main()
 	Position::initMaterialKeys();
 	initMobilityBonus();
 	tb_init(Search::SyzygyPath.c_str());
+	
+	enablePawnHash =false;
 
 	//----------------------------------
 	//	main loop
@@ -285,124 +272,118 @@ int main()
 	readFile();
 
 
-	parameters.push_back(parameter("queenMobilityPars[0]",&queenMobilityPars[0],true));
-	parameters.push_back(parameter("queenMobilityPars[1]",&queenMobilityPars[1],true));
-	parameters.push_back(parameter("queenMobilityPars[2]",&queenMobilityPars[2],true));
-	parameters.push_back(parameter("queenMobilityPars[3]",&queenMobilityPars[3],true));
+	parameters.push_back(parameter("queenMobilityPars",&queenMobilityPars,4,true));
+	parameters.push_back(parameter("rookMobilityPars",&rookMobilityPars,4,true));
+	parameters.push_back(parameter("bishopMobilityPars",&bishopMobilityPars,4,true));
+	parameters.push_back(parameter("knightMobilityPars",&knightMobilityPars,4,true));
+	parameters.push_back(parameter("isolatedPawnPenalty",&isolatedPawnPenalty,2));
+	parameters.push_back(parameter("isolatedPawnPenaltyOpp",&isolatedPawnPenaltyOpp,2));
+	parameters.push_back(parameter("doubledPawnPenalty",&doubledPawnPenalty,2));
+	parameters.push_back(parameter("backwardPawnPenalty",&backwardPawnPenalty,2));
+	parameters.push_back(parameter("chainedPawnBonus",&chainedPawnBonus,2));
+	parameters.push_back(parameter("passedPawnFileAHPenalty",&passedPawnFileAHPenalty,2));
+	parameters.push_back(parameter("passedPawnSupportedBonus",&passedPawnSupportedBonus,2));
+	parameters.push_back(parameter("candidateBonus",&candidateBonus,2));
+	parameters.push_back(parameter("passedPawnBonus",&passedPawnBonus,2));
+	parameters.push_back(parameter("passedPawnUnsafeSquares",&passedPawnUnsafeSquares,2));
+	parameters.push_back(parameter("passedPawnBlockedSquares",&passedPawnBlockedSquares,2));
+	parameters.push_back(parameter("passedPawnDefendedSquares",&passedPawnDefendedSquares,2));
+	parameters.push_back(parameter("passedPawnDefendedBlockingSquare",&passedPawnDefendedBlockingSquare,2));
+	parameters.push_back(parameter("unstoppablePassed",&unstoppablePassed,2));
+	parameters.push_back(parameter("rookBehindPassedPawn",&rookBehindPassedPawn,2));
+	parameters.push_back(parameter("EnemyRookBehindPassedPawn",&EnemyRookBehindPassedPawn,2));
+	parameters.push_back(parameter("holesPenalty",&holesPenalty,2));
+	parameters.push_back(parameter("pawnCenterControl",&pawnCenterControl,2));
+	parameters.push_back(parameter("pawnBigCenterControl",&pawnBigCenterControl,2));
+	parameters.push_back(parameter("pieceCoordination",&pieceCoordination,2));
+	parameters.push_back(parameter("piecesCenterControl",&piecesCenterControl,2));
+	parameters.push_back(parameter("piecesBigCenterControl",&piecesBigCenterControl,2));
+	parameters.push_back(parameter("rookOn7Bonus",&rookOn7Bonus,2));
+	parameters.push_back(parameter("rookOnPawns",&rookOnPawns,2));
+	parameters.push_back(parameter("queenOn7Bonus",&queenOn7Bonus,2));
+	parameters.push_back(parameter("queenOnPawns",&queenOnPawns,2));
+	parameters.push_back(parameter("rookOnOpen",&rookOnOpen,2));
+	parameters.push_back(parameter("rookOnSemi",&rookOnSemi,2));
+	parameters.push_back(parameter("rookTrapped",&rookTrapped,2));
+	parameters.push_back(parameter("rookTrappedKingWithoutCastling",&rookTrappedKingWithoutCastling,2));
+	parameters.push_back(parameter("knightOnOutpost",&knightOnOutpost,2));
+	parameters.push_back(parameter("knightOnOutpostSupported",&knightOnOutpostSupported,2));
+	parameters.push_back(parameter("knightOnHole",&knightOnHole,2));
+	parameters.push_back(parameter("KnightAttackingWeakPawn",&KnightAttackingWeakPawn,2));
+	parameters.push_back(parameter("bishopOnOutpost",&bishopOnOutpost,2));
+	parameters.push_back(parameter("bishopOnOutpostSupported",&bishopOnOutpostSupported,2));
+	parameters.push_back(parameter("bishopOnHole",&bishopOnHole,2));
+	parameters.push_back(parameter("badBishop",&badBishop,2));
+	parameters.push_back(parameter("tempo",&tempo,2));
+	parameters.push_back(parameter("bishopPair",&bishopPair,2));
+	parameters.push_back(parameter("ownKingNearPassedPawn",&ownKingNearPassedPawn,2));
+	parameters.push_back(parameter("enemyKingNearPassedPawn",&enemyKingNearPassedPawn,2));
+	parameters.push_back(parameter("spaceBonus",&spaceBonus,2));
+	parameters.push_back(parameter("undefendedMinorPenalty",&undefendedMinorPenalty,2));
+	
+	parameters.push_back(parameter("attackedByPawnPenalty[2]",&attackedByPawnPenalty[2],2));
+	parameters.push_back(parameter("attackedByPawnPenalty[3]",&attackedByPawnPenalty[3],2));
+	parameters.push_back(parameter("attackedByPawnPenalty[4]",&attackedByPawnPenalty[4],2));
+	parameters.push_back(parameter("attackedByPawnPenalty[5]",&attackedByPawnPenalty[5],2));
 
-	parameters.push_back(parameter("rookMobilityPars[0]",&rookMobilityPars[0],true));
-	parameters.push_back(parameter("rookMobilityPars[1]",&rookMobilityPars[1],true));
-	parameters.push_back(parameter("rookMobilityPars[2]",&rookMobilityPars[2],true));
-	parameters.push_back(parameter("rookMobilityPars[3]",&rookMobilityPars[3],true));
+	parameters.push_back(parameter("weakPiecePenalty[2][2]",&weakPiecePenalty[2][2],2));
+	parameters.push_back(parameter("weakPiecePenalty[2][3]",&weakPiecePenalty[2][3],2));
+	parameters.push_back(parameter("weakPiecePenalty[2][4]",&weakPiecePenalty[2][4],2));
+	parameters.push_back(parameter("weakPiecePenalty[2][5]",&weakPiecePenalty[2][5],2));
+	parameters.push_back(parameter("weakPiecePenalty[2][6]",&weakPiecePenalty[2][6],2));
 
-	parameters.push_back(parameter("bishopMobilityPars[0]",&bishopMobilityPars[0],true));
-	parameters.push_back(parameter("bishopMobilityPars[1]",&bishopMobilityPars[1],true));
-	parameters.push_back(parameter("bishopMobilityPars[2]",&bishopMobilityPars[2],true));
-	parameters.push_back(parameter("bishopMobilityPars[3]",&bishopMobilityPars[3],true));
+	parameters.push_back(parameter("weakPiecePenalty[3][2]",&weakPiecePenalty[3][2],2));
+	parameters.push_back(parameter("weakPiecePenalty[3][3]",&weakPiecePenalty[3][3],2));
+	parameters.push_back(parameter("weakPiecePenalty[3][4]",&weakPiecePenalty[3][4],2));
+	parameters.push_back(parameter("weakPiecePenalty[3][5]",&weakPiecePenalty[3][5],2));
+	parameters.push_back(parameter("weakPiecePenalty[3][6]",&weakPiecePenalty[3][6],2));
 
-	parameters.push_back(parameter("knightMobilityPars[0]",&knightMobilityPars[0],true));
-	parameters.push_back(parameter("knightMobilityPars[1]",&knightMobilityPars[1],true));
-	parameters.push_back(parameter("knightMobilityPars[2]",&knightMobilityPars[2],true));
-	parameters.push_back(parameter("knightMobilityPars[3]",&knightMobilityPars[3],true));
+	parameters.push_back(parameter("weakPiecePenalty[4][2]",&weakPiecePenalty[4][2],2));
+	parameters.push_back(parameter("weakPiecePenalty[4][3]",&weakPiecePenalty[4][3],2));
+	parameters.push_back(parameter("weakPiecePenalty[4][4]",&weakPiecePenalty[4][4],2));
+	parameters.push_back(parameter("weakPiecePenalty[4][5]",&weakPiecePenalty[4][5],2));
+	parameters.push_back(parameter("weakPiecePenalty[4][6]",&weakPiecePenalty[4][6],2));
 
+	parameters.push_back(parameter("weakPiecePenalty[5][2]",&weakPiecePenalty[5][2],2));
+	parameters.push_back(parameter("weakPiecePenalty[5][3]",&weakPiecePenalty[5][3],2));
+	parameters.push_back(parameter("weakPiecePenalty[5][4]",&weakPiecePenalty[5][4],2));
+	parameters.push_back(parameter("weakPiecePenalty[5][5]",&weakPiecePenalty[5][5],2));
+	parameters.push_back(parameter("weakPiecePenalty[5][6]",&weakPiecePenalty[5][6],2));
 
-	parameters.push_back(parameter("isolatedPawnPenalty[0]",&isolatedPawnPenalty[0]));
-	parameters.push_back(parameter("isolatedPawnPenalty[1]",&isolatedPawnPenalty[1]));
-	parameters.push_back(parameter("isolatedPawnPenaltyOpp[0]",&isolatedPawnPenaltyOpp[0]));
-	parameters.push_back(parameter("isolatedPawnPenaltyOpp[1]",&isolatedPawnPenaltyOpp[1]));
-	parameters.push_back(parameter("doubledPawnPenalty[0]",&doubledPawnPenalty[0]));
-	parameters.push_back(parameter("doubledPawnPenalty[1]",&doubledPawnPenalty[1]));
-	parameters.push_back(parameter("backwardPawnPenalty[0]",&backwardPawnPenalty[0]));
-	parameters.push_back(parameter("backwardPawnPenalty[1]",&backwardPawnPenalty[1]));
-	parameters.push_back(parameter("chainedPawnBonus[0]",&chainedPawnBonus[0]));
-	parameters.push_back(parameter("chainedPawnBonus[1]",&chainedPawnBonus[1]));
-	parameters.push_back(parameter("passedPawnFileAHPenalty[0]",&passedPawnFileAHPenalty[0]));
-	parameters.push_back(parameter("passedPawnFileAHPenalty[1]",&passedPawnFileAHPenalty[1]));
-	parameters.push_back(parameter("passedPawnSupportedBonus[0]",&passedPawnSupportedBonus[0]));
-	parameters.push_back(parameter("passedPawnSupportedBonus[1]",&passedPawnSupportedBonus[1]));
-	parameters.push_back(parameter("candidateBonus[0]",&candidateBonus[0]));
-	parameters.push_back(parameter("candidateBonus[1]",&candidateBonus[1]));
-	parameters.push_back(parameter("passedPawnBonus[0]",&passedPawnBonus[0]));
-	parameters.push_back(parameter("passedPawnBonus[1]",&passedPawnBonus[1]));
-	parameters.push_back(parameter("passedPawnUnsafeSquares[0]",&passedPawnUnsafeSquares[0]));
-	parameters.push_back(parameter("passedPawnUnsafeSquares[1]",&passedPawnUnsafeSquares[1]));
-	parameters.push_back(parameter("passedPawnBlockedSquares[0]",&passedPawnBlockedSquares[0]));
-	parameters.push_back(parameter("passedPawnBlockedSquares[1]",&passedPawnBlockedSquares[1]));
-	parameters.push_back(parameter("passedPawnDefendedSquares[0]",&passedPawnDefendedSquares[0]));
-	parameters.push_back(parameter("passedPawnDefendedSquares[1]",&passedPawnDefendedSquares[1]));
-	parameters.push_back(parameter("passedPawnDefendedBlockingSquare[0]",&passedPawnDefendedBlockingSquare[0]));
-	parameters.push_back(parameter("passedPawnDefendedBlockingSquare[1]",&passedPawnDefendedBlockingSquare[1]));
-	parameters.push_back(parameter("unstoppablePassed[0]",&unstoppablePassed[0]));
-	parameters.push_back(parameter("unstoppablePassed[1]",&unstoppablePassed[1]));
-	parameters.push_back(parameter("rookBehindPassedPawn[0]",&rookBehindPassedPawn[0]));
-	parameters.push_back(parameter("rookBehindPassedPawn[1]",&rookBehindPassedPawn[1]));
-	parameters.push_back(parameter("EnemyRookBehindPassedPawn[0]",&EnemyRookBehindPassedPawn[0]));
-	parameters.push_back(parameter("EnemyRookBehindPassedPawn[1]",&EnemyRookBehindPassedPawn[1]));
+	parameters.push_back(parameter("weakPiecePenalty[6][2]",&weakPiecePenalty[6][2],2));
+	parameters.push_back(parameter("weakPiecePenalty[6][3]",&weakPiecePenalty[6][3],2));
+	parameters.push_back(parameter("weakPiecePenalty[6][4]",&weakPiecePenalty[6][4],2));
+	parameters.push_back(parameter("weakPiecePenalty[6][5]",&weakPiecePenalty[6][5],2));
+	parameters.push_back(parameter("weakPiecePenalty[6][6]",&weakPiecePenalty[6][6],2));
 
-	parameters.push_back(parameter("holesPenalty[0]",&holesPenalty[0]));
-	parameters.push_back(parameter("holesPenalty[1]",&holesPenalty[1]));
-	parameters.push_back(parameter("pawnCenterControl[0]",&pawnCenterControl[0]));
-	parameters.push_back(parameter("pawnCenterControl[1]",&pawnCenterControl[1]));
-	parameters.push_back(parameter("pawnBigCenterControl[0]",&pawnBigCenterControl[0]));
-	parameters.push_back(parameter("pawnBigCenterControl[1]",&pawnBigCenterControl[1]));
-	parameters.push_back(parameter("pieceCoordination[0]",&pieceCoordination[0]));
-	parameters.push_back(parameter("pieceCoordination[1]",&pieceCoordination[1]));
+	parameters.push_back(parameter("weakPawnAttackedByKing",&weakPawnAttackedByKing,2));
 
-	parameters.push_back(parameter("piecesCenterControl[0]",&piecesCenterControl[0]));
-	parameters.push_back(parameter("piecesCenterControl[1]",&piecesCenterControl[1]));
+	parameters.push_back(parameter("kingShieldBonus",&kingShieldBonus,1));
+	parameters.push_back(parameter("kingFarShieldBonus",&kingFarShieldBonus,1));
+	parameters.push_back(parameter("kingStormBonus",&kingStormBonus,1));
 
-	parameters.push_back(parameter("piecesBigCenterControl[0]",&piecesBigCenterControl[0]));
-	parameters.push_back(parameter("piecesBigCenterControl[1]",&piecesBigCenterControl[1]));
-	parameters.push_back(parameter("rookOn7Bonus[0]",&rookOn7Bonus[0]));
-	parameters.push_back(parameter("rookOn7Bonus[1]",&rookOn7Bonus[1]));
-	parameters.push_back(parameter("rookOnPawns[0]",&rookOnPawns[0]));
-	parameters.push_back(parameter("rookOnPawns[1]",&rookOnPawns[1]));
+	parameters.push_back(parameter("kingSafetyBonus",&kingSafetyBonus,2));
 
-	parameters.push_back(parameter("queenOn7Bonus[0]",&queenOn7Bonus[0]));
-	parameters.push_back(parameter("queenOn7Bonus[1]",&queenOn7Bonus[1]));
-	parameters.push_back(parameter("queenOnPawns[0]",&queenOnPawns[0]));
-	parameters.push_back(parameter("queenOnPawns[1]",&queenOnPawns[1]));
-	parameters.push_back(parameter("rookOnOpen[0]",&rookOnOpen[0]));
-	parameters.push_back(parameter("rookOnOpen[1]",&rookOnOpen[1]));
-	parameters.push_back(parameter("rookOnSemi[0]",&rookOnSemi[0]));
-	parameters.push_back(parameter("rookOnSemi[1]",&rookOnSemi[1]));
-	parameters.push_back(parameter("rookTrapped[0]",&rookTrapped[0]));
-	parameters.push_back(parameter("rookTrapped[1]",&rookTrapped[1]));
-
-	parameters.push_back(parameter("rookTrappedKingWithoutCastling[0]",&rookTrappedKingWithoutCastling[0]));
-	parameters.push_back(parameter("rookTrappedKingWithoutCastling[1]",&rookTrappedKingWithoutCastling[1]));
-	parameters.push_back(parameter("knightOnOutpost[0]",&knightOnOutpost[0]));
-	parameters.push_back(parameter("knightOnOutpost[1]",&knightOnOutpost[1]));
-	parameters.push_back(parameter("knightOnOutpostSupported[0]",&knightOnOutpostSupported[0]));
-	parameters.push_back(parameter("knightOnOutpostSupported[1]",&knightOnOutpostSupported[1]));
-	parameters.push_back(parameter("knightOnHole[0]",&knightOnHole[0]));
-	parameters.push_back(parameter("knightOnHole[1]",&knightOnHole[1]));
-	parameters.push_back(parameter("KnightAttackingWeakPawn[0]",&KnightAttackingWeakPawn[0]));
-	parameters.push_back(parameter("KnightAttackingWeakPawn[1]",&KnightAttackingWeakPawn[1]));
-	parameters.push_back(parameter("bishopOnOutpost[0]",&bishopOnOutpost[0]));
-	parameters.push_back(parameter("bishopOnOutpost[1]",&bishopOnOutpost[1]));
-	parameters.push_back(parameter("bishopOnOutpostSupported[0]",&bishopOnOutpostSupported[0]));
-	parameters.push_back(parameter("bishopOnOutpostSupported[1]",&bishopOnOutpostSupported[1]));
-	parameters.push_back(parameter("bishopOnHole[0]",&bishopOnHole[0]));
-	parameters.push_back(parameter("bishopOnHole[1]",&bishopOnHole[1]));
-	parameters.push_back(parameter("badBishop[0]",&badBishop[0]));
-	parameters.push_back(parameter("badBishop[1]",&badBishop[1]));
-
-	parameters.push_back(parameter("tempo[0]",&tempo[0]));
-	parameters.push_back(parameter("tempo[1]",&tempo[1]));
-	parameters.push_back(parameter("bishopPair[0]",&bishopPair[0]));
-	parameters.push_back(parameter("bishopPair[1]",&bishopPair[1]));
-	parameters.push_back(parameter("ownKingNearPassedPawn[0]",&ownKingNearPassedPawn[0]));
-	parameters.push_back(parameter("ownKingNearPassedPawn[1]",&ownKingNearPassedPawn[1]));
-	parameters.push_back(parameter("enemyKingNearPassedPawn[0]",&enemyKingNearPassedPawn[0]));
-	parameters.push_back(parameter("enemyKingNearPassedPawn[1]",&enemyKingNearPassedPawn[1]));
-	parameters.push_back(parameter("spaceBonus[0]",&spaceBonus[0]));
-	parameters.push_back(parameter("spaceBonus[1]",&spaceBonus[1]));
-	parameters.push_back(parameter("undefendedMinorPenalty[0]",&undefendedMinorPenalty[0]));
-	parameters.push_back(parameter("undefendedMinorPenalty[1]",&undefendedMinorPenalty[1]));
+	parameters.push_back(parameter("kingSafetyScaling",&kingSafetyScaling,1));
+	parameters.push_back(parameter("KingSafetyMaxAttack",&KingSafetyMaxAttack,1));
+	parameters.push_back(parameter("KingSafetyLinearCoefficent",&KingSafetyLinearCoefficent,1));
+	parameters.push_back(parameter("KingSafetyMaxResult",&KingSafetyMaxResult,1));
 
 
-	std::cout<<"start to optimizing "<<parameters.size()<<" parameters"<<std::endl;
+
+
+
+
+	unsigned int totParameters = 0;
+	for(auto& p : parameters)
+	{
+		for( unsigned int i = 0; i < p.count; ++i)
+		{
+			++totParameters;
+		}
+	}
+
+	std::cout<<"start to optimizing "<<totParameters<<" parameters"<<std::endl;
 
 	/*
 	for(auto& p : parameters)
@@ -441,13 +422,17 @@ int main()
 		unsigned int par = 0;
 		for(auto& p : parameters)
 		{
-			++par;
-			long double oldvalue = p.value;
-			double lr = learningRate/(std::pow(p.totalGradient,0.5));
-			p.value -= lr * p.partialDerivate;
+			
+			for( unsigned int i = 0; i < p.count; ++i)
+			{
+				++par;
+				long double oldvalue = p.value[i];
+				double lr = learningRate/(std::pow(p.totalGradient[i],0.5));
+				p.value[i] -= lr * p.partialDerivate[i];
 
-			std::cout<<par<<"/"<<parameters.size()<<": dy/d("<<p.name<<") = "<<p.partialDerivate<<" totalGradient = "<<p.totalGradient<<
-					" newValue = "<<p.value <<" ("<<oldvalue<<") learning rate = "<<lr<<std::endl;
+				std::cout<<par<<"/"<<totParameters<<": dy/d("<<p.name<<"["<<i<<"]) = "<<p.partialDerivate[i]<<" totalGradient = "<<p.totalGradient[i]<<
+						" newValue = "<<p.value[i] <<" ("<<oldvalue<<") learning rate = "<<lr<<std::endl;
+			}
 		}
 		std::cout<<"\ngradient magnitude "<<gradientMagnitude<<std::endl;
 		if(gradientMagnitude < 1e-6)
@@ -466,7 +451,18 @@ int main()
 			std::cout<<"BEST PARAMETERS"<<std::endl;
 			for(auto& p : bestParameters)
 			{
-				std::cout<<p.name<<" = "<<(int)p.value<<" ("<<p.value<<")"<<std::endl;
+				std::cout<<"simdScore "<<p.name<<" =  {" ;
+				
+				for( unsigned int i = 0; i < 4; ++i)
+				{
+					//std::cout<<p.name<<"["<<i<<"] = "<<(int)p.value[i]<<" ("<<p.value[i]<<")"<<std::endl;
+					std::cout<<(int)p.value[i];
+					if(i<3)
+					{
+						std::cout<<",";
+					}
+				}
+				std::cout<<"};"<<std::endl;
 			}
 
 		}

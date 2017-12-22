@@ -51,6 +51,9 @@ int main()
 	//----------------------------------
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
+	
+	printStartInfo();
+	
 	initData();
 	HashKeys::init();
 	Position::initScoreValues();
@@ -66,7 +69,7 @@ int main()
 	//----------------------------------
 	//	main loop
 	//----------------------------------
-	printStartInfo();
+	
 	uciLoop();
 	return 0;
 }

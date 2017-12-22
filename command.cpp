@@ -201,8 +201,9 @@ void setoption(std::istringstream& is)
 	
 	if( token != "name" )
 	{
+		sync_cout << "info string malformed command"<< sync_endl;
 		return;
-		//sync_cout << "No such option: " << name << sync_endl;
+		
 	}
 	
 
@@ -219,8 +220,9 @@ void setoption(std::istringstream& is)
 	
 	if( value.empty())
 	{
+		sync_cout << "info string malformed command"<< sync_endl;
 		return;
-		//sync_cout << "No such option: " << name << sync_endl;
+		
 	}
 
 	if(name == "Hash")
@@ -320,7 +322,7 @@ void setoption(std::istringstream& is)
 	}
 	else
 	{
-		sync_cout << "No such option: " << name << sync_endl;
+		sync_cout << "info string No such option: " << name << sync_endl;
 	}
 
 }
