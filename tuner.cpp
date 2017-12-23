@@ -163,6 +163,7 @@ void updateParameter(parameter& par,unsigned int i, const long double delta)
 	(*(par.pointer))[i] = int (par.value[i] + delta);
 	if(par.requireUpdate)
 	{
+		Position::initPstValues();
 		initMobilityBonus();
 	}
 
@@ -190,7 +191,7 @@ long double calcPartialDerivate2(parameter& par,unsigned int i, Position & pos, 
 
 long double calcGradient2(long double& error)
 {
-	std::cout<<"calc gradient"<<std::endl;	
+	std::cout<<"calc error and gradient"<<std::endl;
 	long double gradientMagnitude = 0.0;
 	error= 0.0;
 	
@@ -270,6 +271,32 @@ int main()
 
 
 	readFile();
+
+/*	parameters.push_back(parameter("initialPieceValue[2]",&initialPieceValue[2],2,true));
+	parameters.push_back(parameter("initialPieceValue[3]",&initialPieceValue[3],2,true));
+	parameters.push_back(parameter("initialPieceValue[4]",&initialPieceValue[4],2,true));
+	parameters.push_back(parameter("initialPieceValue[5]",&initialPieceValue[5],2,true));
+	parameters.push_back(parameter("initialPieceValue[6]",&initialPieceValue[6],1,true));
+
+	parameters.push_back(parameter("PawnD3",&PawnD3,2,true));
+	parameters.push_back(parameter("PawnD4",&PawnD4,2,true));
+	parameters.push_back(parameter("PawnD5",&PawnD5,2,true));
+	parameters.push_back(parameter("PawnE3",&PawnE3,2,true));
+	parameters.push_back(parameter("PawnE4",&PawnE4,2,true));
+	parameters.push_back(parameter("PawnE5",&PawnE5,2,true));
+	parameters.push_back(parameter("PawnCentering",&PawnCentering,2,true));
+	parameters.push_back(parameter("PawnRankBonus",&PawnRankBonus,2,true));
+	parameters.push_back(parameter("KnightPST",&KnightPST,2,true));
+	parameters.push_back(parameter("BishopPST",&BishopPST,2,true));
+	parameters.push_back(parameter("RookPST",&RookPST,2,true));
+	parameters.push_back(parameter("QueenPST",&QueenPST,2,true));
+	parameters.push_back(parameter("KingPST",&KingPST,2,true));
+
+	parameters.push_back(parameter("BishopBackRankOpening",&BishopBackRankOpening,2,true));
+	parameters.push_back(parameter("KnightBackRankOpening",&KnightBackRankOpening,2,true));
+	parameters.push_back(parameter("RookBackRankOpening",&RookBackRankOpening,2,true));
+	parameters.push_back(parameter("QueenBackRankOpening",&QueenBackRankOpening,2,true));
+	parameters.push_back(parameter("BishopOnBigDiagonals",&BishopOnBigDiagonals,2,true));
 
 
 	parameters.push_back(parameter("queenMobilityPars",&queenMobilityPars,4,true));
@@ -356,7 +383,7 @@ int main()
 	parameters.push_back(parameter("weakPiecePenalty[6][5]",&weakPiecePenalty[6][5],2));
 	parameters.push_back(parameter("weakPiecePenalty[6][6]",&weakPiecePenalty[6][6],2));
 
-	parameters.push_back(parameter("weakPawnAttackedByKing",&weakPawnAttackedByKing,2));
+	parameters.push_back(parameter("weakPawnAttackedByKing",&weakPawnAttackedByKing,2));*/
 
 	parameters.push_back(parameter("kingShieldBonus",&kingShieldBonus,1));
 	parameters.push_back(parameter("kingFarShieldBonus",&kingFarShieldBonus,1));
@@ -367,6 +394,7 @@ int main()
 	parameters.push_back(parameter("kingSafetyScaling",&kingSafetyScaling,1));
 	parameters.push_back(parameter("KingSafetyMaxAttack",&KingSafetyMaxAttack,1));
 	parameters.push_back(parameter("KingSafetyLinearCoefficent",&KingSafetyLinearCoefficent,1));
+	parameters.push_back(parameter("KingAttackUnitWeigth",&KingAttackUnitWeigth,4));
 	parameters.push_back(parameter("KingSafetyMaxResult",&KingSafetyMaxResult,1));
 
 
@@ -393,13 +421,9 @@ int main()
 
 	std::vector<parameter> bestParameters;
 
-	long double learningRate = 1.0;
+	long double learningRate = 20.0;
 	long double error = 1e22;// big number
 	long double minValue = 1e6;
-
-	double initialError = calcError();
-	std::cout<<"initial error= "<<initialError<<std::endl;
-
 
 	std::random_device rd;
 	std::mt19937 g(rd());
@@ -411,41 +435,24 @@ int main()
 	while(!stop)
 	{
 		++iteration;
+		std::cout<<"--------------------------------------------------------------------"<<std::endl;
 		std::cout<<"iteration #"<<iteration<<std::endl;
 		std::cout<<"shuffle"<<std::endl;
 		std::shuffle(positions.begin(), positions.end(), g);
 
-		std::cout<<"--------------------------------------------------------------------"<<std::endl;
+
 
 
 		long double gradientMagnitude = calcGradient2(error);
-		unsigned int par = 0;
-		for(auto& p : parameters)
-		{
-			
-			for( unsigned int i = 0; i < p.count; ++i)
-			{
-				++par;
-				long double oldvalue = p.value[i];
-				double lr = learningRate/(std::pow(p.totalGradient[i],0.5));
-				p.value[i] -= lr * p.partialDerivate[i];
 
-				std::cout<<par<<"/"<<totParameters<<": dy/d("<<p.name<<"["<<i<<"]) = "<<p.partialDerivate[i]<<" totalGradient = "<<p.totalGradient[i]<<
-						" newValue = "<<p.value[i] <<" ("<<oldvalue<<") learning rate = "<<lr<<std::endl;
-			}
-		}
-		std::cout<<"\ngradient magnitude "<<gradientMagnitude<<std::endl;
-		if(gradientMagnitude < 1e-6)
-		{
-			stop = true;
-		}
-
+		std::cout<<"newError "<<error<<std::endl;
 		if( error < minValue)
 		{
-			std::cout<<"--------------------------------------------------------------------"<<std::endl;
 			std::cout<<"###### NEW BEST ITERATION ####"<<std::endl;
+
 			minValue = error;
 			bestIteration = iteration;
+			std::cout<<"bestIteration "<<bestIteration<<" minError "<<minValue<<std::endl;
 			bestParameters.clear();
 			std::copy(parameters.begin(), parameters.end(),std::back_inserter(bestParameters));
 			std::cout<<"BEST PARAMETERS"<<std::endl;
@@ -468,8 +475,32 @@ int main()
 		}
 
 		std::cout<<"--------------------------------------------------------------------"<<std::endl;
-		std::cout<<"newError "<<error<<std::endl;
-		std::cout<<"bestIteration "<<bestIteration<<" minError "<<minValue<<std::endl;
+		std::cout<<"UPDATE PARAMETERS"<<std::endl;
+
+
+
+		unsigned int par = 0;
+		for(auto& p : parameters)
+		{
+
+			for( unsigned int i = 0; i < p.count; ++i)
+			{
+				++par;
+				long double oldvalue = p.value[i];
+				double lr = learningRate/(std::pow(p.totalGradient[i],0.5));
+				p.value[i] -= lr * p.partialDerivate[i];
+
+				std::cout<<par<<"/"<<totParameters<<": dy/d("<<p.name<<"["<<i<<"]) = "<<p.partialDerivate[i]<<" totalGradient = "<<p.totalGradient[i]<<
+						" newValue = "<<p.value[i] <<" ("<<oldvalue<<") learning rate = "<<lr<<std::endl;
+			}
+		}
+		std::cout<<"\ngradient magnitude "<<gradientMagnitude<<std::endl;
+		if(gradientMagnitude < 1e-6)
+		{
+			stop = true;
+		}
+
+
 
 
 

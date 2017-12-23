@@ -26,6 +26,46 @@
 #include "parameters.h"
 
 
+simdScore initialPieceValue[Position::lastBitboard] = {
+		{0,0,0,0},
+		{3000000,3000000,0,0},//king
+		{137000,100000,0,0},//queen
+		{52000,61000,0,0},//rook
+		{35300,36100,0,0},//bishop
+		{34500,34900,0,0},//knight
+		{5700,10000,0,0},//panws
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0},
+		{0,0,0,0}
+};
+
+simdScore PawnD3 = {1755,0,0,0};
+simdScore PawnD4 = {2100,0,0,0};
+simdScore PawnD5 = {85,0,0,0};
+simdScore PawnE3 = {185,0,0,0};
+simdScore PawnE4 = {620,0,0,0};
+simdScore PawnE5 = {-5,0,0,0};
+simdScore PawnCentering = {141,-119,0,0};
+simdScore PawnRankBonus = {450,30,0,0};
+simdScore KnightPST = {545,462,0,0};
+simdScore BishopPST = {22,273,0,0};
+simdScore RookPST = {418,-290,0,0};
+simdScore QueenPST = {-170,342,0,0};
+simdScore KingPST = {700,787,0,0};
+
+simdScore BishopBackRankOpening = {400,-200,0,0};
+simdScore KnightBackRankOpening = {-800,-300,0,0};
+simdScore RookBackRankOpening = {-400,400,0,0};
+simdScore QueenBackRankOpening = {200,3900,0,0};
+simdScore BishopOnBigDiagonals = {1400,600,0,0};
+
+
 
 simdScore queenMobilityPars =  {437,383,111,528};
 simdScore rookMobilityPars =  {776,628,372,431};
@@ -103,15 +143,18 @@ simdScore weakPawnAttackedByKing =  {73,4973,0,0};
 //king safety
 //------------------------------------------------
 const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
-simdScore kingShieldBonus =  {2404,0,0,0};
-simdScore kingFarShieldBonus =  {1788,0,0,0};
-simdScore kingStormBonus =  {83,0,0,0};
-simdScore kingSafetyBonus =  {93,-5,0,0};
-simdScore kingSafetyScaling =  {316,0,0,0};
-simdScore KingSafetyMaxAttack =  {89,0,0,0};
-simdScore KingSafetyLinearCoefficent =  {7,0,0,0};
+simdScore kingShieldBonus =  {2407,0,0,0};
+simdScore kingFarShieldBonus =  {1628,0,0,0};
+simdScore kingStormBonus =  {148,0,0,0};
+simdScore kingSafetyBonus =  {90,-2,0,0};
+simdScore kingSafetyScaling =  {301,0,0,0};
+simdScore KingSafetyMaxAttack =  {104,0,0,0};
+simdScore KingSafetyLinearCoefficent =  {505,0,0,0};
+simdScore KingAttackUnitWeigth =  {36,77,17,10};
 simdScore KingSafetyMaxResult =  {1000,0,0,0};
 //------------------------------------------------
+
+
 
 
 simdScore queenVsRook2MinorsImbalance={20000,20000,0,0};

@@ -620,7 +620,7 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 		safeContactSquare &= (AttackedByTheirPieces[Rooks]| AttackedByTheirPieces[Bishops] | AttackedByTheirPieces[Knights]| AttackedByTheirPieces[Pawns]);
 		if(safeContactSquare)
 		{
-			attackUnits += 20 * bitCnt(safeContactSquare);
+			attackUnits += KingAttackUnitWeigth[0] * bitCnt(safeContactSquare);
 		}
 
 		// safe contact rook check
@@ -631,7 +631,7 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 
 		if(safeContactSquare)
 		{
-			attackUnits += 15 * bitCnt(safeContactSquare);
+			attackUnits += KingAttackUnitWeigth[1] * bitCnt(safeContactSquare);
 		}
 
 
@@ -643,14 +643,14 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 		bitMap longDistCheck = rMap & (AttackedByTheirPieces[Rooks] | AttackedByTheirPieces[Queens] ) & ~AttackedByOurPieces[Pieces] & ~TheirPieces;
 		if(longDistCheck)
 		{
-			attackUnits += 8 * bitCnt( longDistCheck );
+			attackUnits += KingAttackUnitWeigth[2] * bitCnt( longDistCheck );
 		}
 
 		// diagonal check
 		longDistCheck = bMap & (AttackedByTheirPieces[Bishops] | AttackedByTheirPieces[Queens] ) & ~AttackedByOurPieces[Pieces] & ~TheirPieces;
 		if(longDistCheck)
 		{
-			attackUnits += 3 * bitCnt( longDistCheck );
+			attackUnits += KingAttackUnitWeigth[3] * bitCnt( longDistCheck );
 		}
 
 		///knight check;
@@ -661,7 +661,7 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 		}
 
 		attackUnits = std::min(KingSafetyMaxAttack[0], std::max(0, attackUnits));
-		attackUnits *= std::min(KingSafetyLinearCoefficent[0], attackUnits);
+		attackUnits = (attackUnits * KingSafetyLinearCoefficent[0]) / 100;
 		attackUnits = std::min(KingSafetyMaxResult[0], attackUnits);
 		res = -(kingSafetyBonus * attackUnits);
 

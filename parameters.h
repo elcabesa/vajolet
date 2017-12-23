@@ -24,6 +24,28 @@
 #include "position.h"
 #include "tables.h"
 
+extern simdScore initialPieceValue[Position::lastBitboard];
+
+extern simdScore PawnD3;
+extern simdScore PawnD4;
+extern simdScore PawnD5;
+extern simdScore PawnE3;
+extern simdScore PawnE4;
+extern simdScore PawnE5;
+extern simdScore PawnCentering;
+extern simdScore PawnRankBonus;
+extern simdScore KnightPST;
+extern simdScore BishopPST;
+extern simdScore RookPST;
+extern simdScore QueenPST;
+extern simdScore KingPST;
+
+extern simdScore BishopBackRankOpening;
+extern simdScore KnightBackRankOpening;
+extern simdScore RookBackRankOpening;
+extern simdScore QueenBackRankOpening;
+extern simdScore BishopOnBigDiagonals;
+
 extern simdScore queenMobilityPars;
 extern simdScore rookMobilityPars;
 extern simdScore bishopMobilityPars;
@@ -100,6 +122,7 @@ extern simdScore kingSafetyBonus;
 extern simdScore kingSafetyScaling;
 extern simdScore KingSafetyMaxAttack;
 extern simdScore KingSafetyLinearCoefficent;
+extern simdScore KingAttackUnitWeigth;
 extern simdScore KingSafetyMaxResult;
 //------------------------------------------------
 
