@@ -393,7 +393,7 @@ int main()
 
 	std::vector<parameter> bestParameters;
 
-	long double learningRate = 20.0;
+	long double learningRate = 1.0;
 	long double error = 1e22;// big number
 	long double minValue = 1e6;
 

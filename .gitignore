@@ -6,6 +6,6 @@
 *.exe
 /.Release/
 /.release64/
-
+/build/
 /Release64/
 /tuner/
