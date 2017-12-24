@@ -284,7 +284,7 @@ void Position::setupFromFen(const std::string& fenStr)
 
 	ss >> std::skipws >> x.fiftyMoveCnt;
 	if(ss.eof()){
-		x.ply=0;
+		x.ply = int(x.nextMove == blackTurn);
 		x.fiftyMoveCnt=0;
 
 	}else{

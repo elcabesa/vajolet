@@ -102,10 +102,19 @@ int readFile() {
 	return 0;
 }
 
+Search src;
+PVline newPV;
 long double calcSigleError(Position &p, long double res)
 {
 	const long double k = 3.7e-5;
-	long double eval = p.eval<false>();
+
+	src.pos = p;
+	newPV.reset();
+	long double eval = src.qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, newPV);
+	//long double eval = p.eval<false>();
+
+	//std::cout<<p.getFen()<<" "<<eval <<" "<<eval2<<" " << eval -eval2<<std::endl;
+
 	if(p.getNextTurn() == Position::blackTurn)
 	{
 		eval *= -1.0;
@@ -204,9 +213,11 @@ long double calcGradient2(long double& error)
 			par.partialDerivate[i] =0.0;
 		}
 	}
-	
+	//unsigned int tot = 0;
 	for(const auto& v : positions)
 	{
+		//tot++;
+		//std::cout<<"\r"<<tot;
 		pos.setupFromFen(v.FEN);
 		long double res = v.res;
 		error += calcSigleError(pos, res);
@@ -421,7 +432,7 @@ int main()
 
 	std::vector<parameter> bestParameters;
 
-	long double learningRate = 20.0;
+	long double learningRate = 1.0;
 	long double error = 1e22;// big number
 	long double minValue = 1e6;
 
