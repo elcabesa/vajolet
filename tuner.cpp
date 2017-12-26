@@ -102,16 +102,16 @@ int readFile() {
 	return 0;
 }
 
-Search src;
-PVline newPV;
+//Search src;
+//PVline newPV;
 long double calcSigleError(Position &p, long double res)
 {
 	const long double k = 3.7e-5;
 
-	src.pos = p;
-	newPV.reset();
-	long double eval = src.qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, newPV);
-	//long double eval = p.eval<false>();
+	//src.pos = p;
+	//newPV.reset();
+	//long double eval = src.qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, newPV);
+	long double eval = p.eval<false>();
 
 	//std::cout<<p.getFen()<<" "<<eval <<" "<<eval2<<" " << eval -eval2<<std::endl;
 
@@ -358,7 +358,7 @@ int main()
 	parameters.push_back(parameter("enemyKingNearPassedPawn",&enemyKingNearPassedPawn,2));
 	parameters.push_back(parameter("spaceBonus",&spaceBonus,2));
 	parameters.push_back(parameter("undefendedMinorPenalty",&undefendedMinorPenalty,2));
-	
+*/
 	parameters.push_back(parameter("attackedByPawnPenalty[2]",&attackedByPawnPenalty[2],2));
 	parameters.push_back(parameter("attackedByPawnPenalty[3]",&attackedByPawnPenalty[3],2));
 	parameters.push_back(parameter("attackedByPawnPenalty[4]",&attackedByPawnPenalty[4],2));
@@ -394,9 +394,9 @@ int main()
 	parameters.push_back(parameter("weakPiecePenalty[6][5]",&weakPiecePenalty[6][5],2));
 	parameters.push_back(parameter("weakPiecePenalty[6][6]",&weakPiecePenalty[6][6],2));
 
-	parameters.push_back(parameter("weakPawnAttackedByKing",&weakPawnAttackedByKing,2));*/
+	parameters.push_back(parameter("weakPawnAttackedByKing",&weakPawnAttackedByKing,2));
 
-	parameters.push_back(parameter("kingShieldBonus",&kingShieldBonus,1));
+/*	parameters.push_back(parameter("kingShieldBonus",&kingShieldBonus,1));
 	parameters.push_back(parameter("kingFarShieldBonus",&kingFarShieldBonus,1));
 	parameters.push_back(parameter("kingStormBonus",&kingStormBonus,1));
 
@@ -406,7 +406,7 @@ int main()
 	parameters.push_back(parameter("KingSafetyMaxAttack",&KingSafetyMaxAttack,1));
 	parameters.push_back(parameter("KingSafetyLinearCoefficent",&KingSafetyLinearCoefficent,1));
 	parameters.push_back(parameter("KingAttackUnitWeigth",&KingAttackUnitWeigth,4));
-	parameters.push_back(parameter("KingSafetyMaxResult",&KingSafetyMaxResult,1));
+	parameters.push_back(parameter("KingSafetyMaxResult",&KingSafetyMaxResult,1));*/
 
 
 
