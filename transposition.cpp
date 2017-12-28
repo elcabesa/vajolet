@@ -21,7 +21,7 @@
 
 transpositionTable TT;
 
-void transpositionTable::setSize(unsigned long int mbSize)
+unsigned long int transpositionTable::setSize(unsigned long int mbSize)
 {
 
 	long long unsigned int size = (long unsigned int)( ((unsigned long long int)mbSize << 20) / sizeof(ttCluster));
@@ -38,7 +38,7 @@ void transpositionTable::setSize(unsigned long int mbSize)
 		std::cerr << "Failed to allocate " << mbSize<< "MB for transposition table." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<mbSize<<"MB)"<<sync_endl;
+	return elements;
 }
 
 

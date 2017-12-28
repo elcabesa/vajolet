@@ -218,7 +218,7 @@ void setoption(std::istringstream& is)
 		value += std::string(" ", !value.empty()) + token;
 	}
 	
-	if( value.empty())
+	if( value.empty() && name != "SyzygyPath") // sygyzy path is allowed to have an empty value
 	{
 		sync_cout << "info string malformed command"<< sync_endl;
 		return;
@@ -237,7 +237,8 @@ void setoption(std::istringstream& is)
 			hash = 1;
 		}
 		hash = std::min(hash,65536);
-		TT.setSize(hash);
+		unsigned long elements = TT.setSize(hash);
+		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<hash<<"MB)"<<sync_endl;
 
 	}
 	else if(name == "Threads")
@@ -246,6 +247,7 @@ void setoption(std::istringstream& is)
 		{
 			int i = std::stoi(value);
 			Search::threads = (i<=128)?(i>0?i:1):128;
+			sync_cout<<"info string Threads number set to "<<Search::threads<<sync_endl;
 		}
 		catch(...){}
 	}
@@ -255,6 +257,7 @@ void setoption(std::istringstream& is)
 		{
 			int i = std::stoi(value);
 			Search::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
+			sync_cout<<"info string MultiPv Lines set to "<<Search::multiPVLines<<sync_endl;
 		}
 		catch(...){}	
 	}
@@ -263,9 +266,11 @@ void setoption(std::istringstream& is)
 		if(value=="true")
 		{
 			Search::useOwnBook = true;
+			sync_cout<<"info string OwnBook option set to true"<<sync_endl;
 		}
 		else{
 			Search::useOwnBook = false;
+			sync_cout<<"info string OwnBook option set to false"<<sync_endl;
 		}
 	}
 	else if(name == "BestMoveBook")
@@ -273,24 +278,30 @@ void setoption(std::istringstream& is)
 		if(value == "true")
 		{
 			Search::bestMoveBook = true;
+			sync_cout<<"info string BestMoveBook option set to true"<<sync_endl;
 		}
 		else
 		{
 			Search::bestMoveBook = false;
+			sync_cout<<"info string BestMoveBook option set to false"<<sync_endl;
 		}
 	}
 	else if(name == "UCI_ShowCurrLine")
 	{
-		if(value == "true"){
+		if(value == "true")
+		{
 			Search::showCurrentLine = true;
+			sync_cout<<"info string UCI_ShowCurrLine option set to true"<<sync_endl;
 		}
 		else
 		{
 			Search::showCurrentLine = false;
+			sync_cout<<"info string UCI_ShowCurrLine option set to false"<<sync_endl;
 		}
 	}
 	else if(name == "Ponder")
 	{
+		sync_cout<<"info string Ponder option set to "<<value<<sync_endl;
 	}
 	else if(name == "SyzygyPath")
 	{
@@ -302,22 +313,25 @@ void setoption(std::istringstream& is)
 	{
 		try
 		{
-			Search::SyzygyProbeDepth = std::stoi(value);
+			Search::SyzygyProbeDepth = std::max(std::stoi(value),0) ;
 		}
 		catch(...)
 		{
 			Search::SyzygyProbeDepth = 1;
 		}
+		sync_cout<<"info string SyzygyProbeDepth option set to "<<Search::SyzygyProbeDepth<<sync_endl;
 	}
 	else if(name == "Syzygy50MoveRule")
 	{
 		if(value == "true")
 		{
 			Search::Syzygy50MoveRule = true;
+			sync_cout<<"info string Syzygy50MoveRule option set to true"<<sync_endl;
 		}
 		else
 		{
 			Search::Syzygy50MoveRule = false;
+			sync_cout<<"info string Syzygy50MoveRule option set to false"<<sync_endl;
 		}
 	}
 	else

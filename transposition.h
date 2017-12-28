@@ -119,7 +119,7 @@ public:
 	}
 
 	void newSearch() { generation++; }
-	void setSize(unsigned long int mbSize);
+	unsigned long int setSize(unsigned long int mbSize);
 
 	inline ttCluster& findCluster(U64 key)
 	{
