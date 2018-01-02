@@ -167,7 +167,7 @@ void my_thread::timerThread()
 				unsigned long long int thbits = src.getTbHits();
 				unsigned long long int nodes = src.getVisitedNodes();
 
-				sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes << " nps " << (unsigned int)((double)nodes*1000/(double)time) << sync_endl;
+				sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)time) << sync_endl;
 
 				if(src.showCurrentLine)
 				{

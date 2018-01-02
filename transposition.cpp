@@ -38,7 +38,7 @@ unsigned long int transpositionTable::setSize(unsigned long int mbSize)
 		std::cerr << "Failed to allocate " << mbSize<< "MB for transposition table." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	return elements;
+	return elements * 4;
 }
 
 

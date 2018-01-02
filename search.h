@@ -118,6 +118,7 @@ public:
 class Search
 {
 private:
+	bool mainSearcher;
 	bool followPV;
 	static int globalReduction;
 	bool useTBresult;

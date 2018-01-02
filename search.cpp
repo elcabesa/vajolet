@@ -93,6 +93,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	cleanData();
 	visitedNodes = 0;
 	tbHits = 0;
+	mainSearcher = true;
 
 	helperSearch.clear();
 	helperSearch.resize(threads-1);
@@ -104,6 +105,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 		hs.history.clear();
 		hs.visitedNodes = 0;
 		hs.tbHits = 0;
+		hs.mainSearcher = false;
 	}
 
 
@@ -568,7 +570,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//--------------------------------------
 	// show current line if needed
 	//--------------------------------------
-	if( showLine && depth <= ONE_PLY)
+	if( mainSearcher && showLine && depth <= ONE_PLY)
 	{
 		showLine = false;
 		showCurrLine(pos,ply);

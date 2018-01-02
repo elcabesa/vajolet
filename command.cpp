@@ -64,7 +64,7 @@ const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w
 void static printUciInfo(void)
 {
 	sync_cout << "id name " << PROGRAM_NAME << " " << VERSION << sync_endl;
-	sync_cout << "id author Belli Marco" << sync_endl;
+	sync_cout << "id author Marco Belli" << sync_endl;
 	sync_cout << "option name Hash type spin default 1 min 1 max 65535" << sync_endl;
 	sync_cout << "option name Threads type spin default 1 min 1 max 128" << sync_endl;
 	sync_cout << "option name MultiPV type spin default 1 min 1 max 500" << sync_endl;
@@ -218,7 +218,7 @@ void setoption(std::istringstream& is)
 		value += std::string(" ", !value.empty()) + token;
 	}
 	
-	if( value.empty() && name != "SyzygyPath") // sygyzy path is allowed to have an empty value
+	if( value.empty() && (name != "SyzygyPath" && name != "UCI_EngineAbout")) // sygyzy path is allowed to have an empty value
 	{
 		sync_cout << "info string malformed command"<< sync_endl;
 		return;
@@ -333,6 +333,10 @@ void setoption(std::istringstream& is)
 			Search::Syzygy50MoveRule = false;
 			sync_cout<<"info string Syzygy50MoveRule option set to false"<<sync_endl;
 		}
+	}
+	else if(name == "UCI_EngineAbout")
+	{
+		sync_cout<< PROGRAM_NAME << " " << VERSION << " by Marco Belli (build date: " <<__DATE__<<")"<<sync_endl;
 	}
 	else
 	{
