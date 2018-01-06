@@ -31,6 +31,7 @@ struct Move
 	Move(const Move& m): packed(m.packed){}
 	Move(const Move&& m):packed(m.packed){}
 	Move(unsigned short i):packed(i){}
+	Move(unsigned short _from, unsigned short _to, unsigned short _flag=fnone, unsigned short _prom=promQueen):bit{_from,_to,_prom, _flag}{}
 	union
 	{
 		struct

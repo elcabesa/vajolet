@@ -45,7 +45,7 @@ Score Position::see(const Move& m) const
 	assert(m.packed);
 
 	tSquare from = (tSquare)m.bit.from, to = (tSquare)m.bit.to;
-	const int relativeRank = getNextTurn() ? 7-RANKS[to] : RANKS[to];
+	const bool canBePromotion = RANKS[to] == 0 ||  RANKS[to] == 7;
 	bitMap occupied = getOccupationBitmap() ^ bitSet(from);
 	eNextMove color = getPieceAt(from) > separationBitmap ? blackTurn : whiteTurn;
 
@@ -55,6 +55,7 @@ Score Position::see(const Move& m) const
 	bitboardIndex captured;
 
 	swapList[0] = pieceValue[getPieceAt(to)][0];
+	//std::cout<<"DEBUG inital capture: "<<swapList[0]<<std::endl;
 	captured = bitboardIndex(getPieceAt(from) % separationBitmap);
 
 	if( m.isEnPassantMove() )
@@ -95,15 +96,20 @@ Score Position::see(const Move& m) const
 	// capture with the least valuable piece. After each capture, we look for
 	// new X-ray attacks from behind the capturing piece.
 
+	//std::cout<<"DEBUG start the loop "<<swapList[0]<<std::endl;
 	assert(captured<lastBitboard);
 	assert(getPieceAt(from) != empty);
 	do
 	{
 		assert(slIndex < 64);
+		//std::cout<<"DEBUG iteration "<<slIndex<<std::endl;
 
 		// Add the new entry to the swap list
 		swapList[slIndex] = -swapList[slIndex - 1] + pieceValue[captured][0];
-		slIndex++;
+		//std::cout<<"DEBUG capture piece "<<captured<<std::endl;
+		//std::cout<<"DEBUG capture value "<<pieceValue[captured][0]<<std::endl;
+		//std::cout<<"DEBUG new swaplist "<<swapList[slIndex]<<std::endl;
+
 
 		// Locate and remove the next least valuable attacker
 		bitboardIndex nextAttacker = (bitboardIndex)(Pawns);
@@ -114,6 +120,8 @@ Score Position::see(const Move& m) const
 
 			if(att)
 			{
+				//std::cout<<"DEBUG attacking piece "<<nextAttacker<<std::endl;
+				//std::cout<<"DEBUG can be promotion "<<canBePromotion<<std::endl;
 				att= att & ~(att - 1); // find only one attacker
 				occupied ^= att;
 				attackers ^= att;
@@ -128,14 +136,18 @@ Score Position::see(const Move& m) const
 				}
 				attackers &= occupied;
 				captured = nextAttacker;
-				if(relativeRank == 7 && captured == whitePawns)
+				if( nextAttacker == Pawns && canBePromotion)
 				{
+					//nextAttacker = Queens;
+					swapList[slIndex] += pieceValue[whiteQueens][0] - pieceValue[whitePawns][0];
+					//std::cout<<"DEBUG changed swaplist "<<swapList[slIndex]<<std::endl;
 					captured = whiteQueens;
 				}
 				break;
 			}
 			nextAttacker = bitboardIndex(nextAttacker - 1);
 		}
+		slIndex++;
 
 
 		color = (eNextMove)(blackTurn-color);
@@ -145,6 +157,7 @@ Score Position::see(const Move& m) const
 		if (captured == King && colorAttackers)
 		{
 			swapList[slIndex++] = pieceValue[whiteKing][0];
+			//std::cout<<"DEBUG king capture, insert block "<<swapList[slIndex-1]<<std::endl;
 			break;
 		}
 

@@ -31,8 +31,9 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	if((!lim.btime && !lim.wtime) && !lim.moveTime)
 	{
 		lim.infinite = true;
+		timeMan.resolution = 100;
 	}
-	if(lim.moveTime)
+	else if(lim.moveTime)
 	{
 		timeMan.maxAllocatedTime = lim.moveTime;
 		timeMan.allocatedTime = lim.moveTime;
@@ -41,59 +42,47 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	}
 	else
 	{
+		unsigned int time;
+		unsigned int increment;
 
 		if(pos.getNextTurn())
 		{
-			if(lim.movesToGo > 2)
-			{
-				timeMan.allocatedTime = lim.btime/lim.movesToGo;
-				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
-			}else if(lim.movesToGo > 0)
-			{
-				timeMan.allocatedTime = lim.btime/lim.movesToGo;
-				timeMan.maxAllocatedTime= timeMan.allocatedTime;
-			}else
-			{
-				timeMan.allocatedTime = lim.btime/40.0+lim.binc*0.98;
-				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
-			}
-
-			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
-			timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(lim.btime - 2 * timeMan.resolution));
-			timeMan.minSearchTime =timeMan.allocatedTime*0.3;
-			long long buffer = std::max( 2 * timeMan.resolution, 200u );
-			timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(lim.btime - buffer ));
+			time = lim.btime;
+			increment = lim.binc;
 		}
 		else
 		{
-			if(lim.movesToGo > 2)
-			{
-				timeMan.allocatedTime = lim.wtime/lim.movesToGo;
-				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
-			}else if(lim.movesToGo > 0)
-			{
-				timeMan.allocatedTime = lim.wtime/lim.movesToGo;
-				timeMan.maxAllocatedTime= timeMan.allocatedTime;
-			}else
-			{
-				timeMan.allocatedTime = lim.wtime/40.0+lim.winc*0.98;
-				timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
-			}
-			timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
-			timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(lim.wtime - 2 * timeMan.resolution));
-			timeMan.minSearchTime =timeMan.allocatedTime*0.3;
-			long long buffer = std::max( 2 * timeMan.resolution, 200u );
-			timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)( lim.wtime - buffer ));
+			time = lim.wtime;
+			increment = lim.winc;
 		}
 
 
 
+		if(lim.movesToGo > 2)
+		{
+			timeMan.allocatedTime = time / lim.movesToGo;
+			timeMan.maxAllocatedTime = 2 * timeMan.allocatedTime;
+		}
+		else if(lim.movesToGo > 0)
+		{
+			timeMan.allocatedTime = time / lim.movesToGo;
+			timeMan.maxAllocatedTime = timeMan.allocatedTime;
+		}
+		else
+		{
+			timeMan.allocatedTime = time / 40.0 + increment * 0.98;
+			timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
+		}
+
+		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
+		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)( time - 2 * timeMan.resolution));
+		timeMan.minSearchTime = timeMan.allocatedTime * 0.3;
+		long long buffer = std::max( 2 * timeMan.resolution, 200u );
+		timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(time - buffer ));
 	}
 
-	if(lim.infinite)
-	{
-		timeMan.resolution = 100;
-	}
+
+
 	timeMan.singularRootMoveCount = 0;
 	timeMan.idLoopIterationFinished = false;
 	timeMan.idLoopAlpha = false;
