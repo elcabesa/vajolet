@@ -189,7 +189,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					break;
 				case 3:
 					TBres = 100;
-					sync_cout<<"cursed won"<<sync_endl;
+					//sync_cout<<"cursed won"<<sync_endl;
 					break;
 				case 4:
 					TBres = SCORE_MATE -100;
@@ -486,7 +486,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 		//-----------------------
 		//	single good move at root
 		//-----------------------
-		if (alpha > -11000 && beta <11000 && depth >= 12
+/*		if (alpha > -11000 && beta <11000 && depth >= 12
 			&& !stop
 			&&  linesToBeSearched == 1
 			&&  res > - SCORE_KNOWN_WIN
@@ -519,7 +519,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			}
 
 		}
-
+*/
 		//------------------------------------------------
 		// check wheter or not the new best move has changed
 		//------------------------------------------------

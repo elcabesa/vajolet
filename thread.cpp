@@ -58,20 +58,16 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 
 
 
-		if(lim.movesToGo > 2)
+		if(lim.movesToGo > 0)
 		{
 			timeMan.allocatedTime = time / lim.movesToGo;
-			timeMan.maxAllocatedTime = 2 * timeMan.allocatedTime;
-		}
-		else if(lim.movesToGo > 0)
-		{
-			timeMan.allocatedTime = time / lim.movesToGo;
-			timeMan.maxAllocatedTime = timeMan.allocatedTime;
+			timeMan.maxAllocatedTime = std::min(10.0,lim.movesToGo+1.5) * timeMan.allocatedTime;
+			timeMan.maxAllocatedTime = std::max(timeMan.maxAllocatedTime,timeMan.allocatedTime);
 		}
 		else
 		{
-			timeMan.allocatedTime = time / 40.0 + increment * 0.98;
-			timeMan.maxAllocatedTime= 2 * timeMan.allocatedTime;
+			timeMan.allocatedTime = time / 35.0 + increment * 0.98;
+			timeMan.maxAllocatedTime= 10 * timeMan.allocatedTime;
 		}
 
 		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
@@ -131,7 +127,7 @@ void my_thread::timerThread()
 				timeMan.allocatedTime = timeMan.maxAllocatedTime;
 				//sync_cout<<"info debug EXTEND TIME: "<<timeMan.allocatedTime<<sync_endl;
 			}
-			if(!src.stop && timeMan.maxAllocatedTime == timeMan.allocatedTime && time >= timeMan.allocatedTime && ( timeMan.idLoopIterationFinished ) && !(src.limits.infinite || src.limits.ponder) )
+			if(!src.stop && timeMan.maxAllocatedTime == timeMan.allocatedTime /*&& time >= timeMan.allocatedTime */&& ( timeMan.idLoopIterationFinished ) && !(src.limits.infinite || src.limits.ponder) )
 			{
 				src.stop = true;
 				//sync_cout<<"info debug FINISHED ITERATION IN EXTEND TIME "<<time<<sync_endl;
