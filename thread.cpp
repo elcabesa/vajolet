@@ -61,7 +61,8 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 		if(lim.movesToGo > 0)
 		{
 			timeMan.allocatedTime = time / lim.movesToGo;
-			timeMan.maxAllocatedTime = std::min(10.0,lim.movesToGo+1.5) * timeMan.allocatedTime;
+			timeMan.maxAllocatedTime = 10.0 * timeMan.allocatedTime;
+			timeMan.maxAllocatedTime = std::min(10.0 * timeMan.allocatedTime, 0.8 * time);
 			timeMan.maxAllocatedTime = std::max(timeMan.maxAllocatedTime,timeMan.allocatedTime);
 		}
 		else
@@ -74,6 +75,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)( time - 2 * timeMan.resolution));
 		timeMan.minSearchTime = timeMan.allocatedTime * 0.3;
 		long long buffer = std::max( 2 * timeMan.resolution, 200u );
+		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(time - buffer ));
 		timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(time - buffer ));
 	}
 
