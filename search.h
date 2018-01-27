@@ -121,7 +121,6 @@ private:
 	bool mainSearcher;
 	bool followPV;
 	static int globalReduction;
-	bool useTBresult;
 	static const unsigned int LmrLimit = 32;
 	static Score futility[8];
 	static Score futilityMargin[7];

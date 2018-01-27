@@ -79,12 +79,11 @@ unsigned long long Search::getTbHits() const
 
 startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 {
-	useTBresult = false;
 	//------------------------------------
 	//init the new search
 	//------------------------------------
 	Score res = 0;
-	Score TBres = 0;
+
 
 
 	TT.newSearch();
@@ -168,36 +167,11 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 			if (result != TB_RESULT_FAILED)
 			{
-				useTBresult= true;
 
 				//sync_cout<<"endgame found"<<sync_endl;
 				const unsigned wdl = TB_GET_WDL(result);
 				assert(wdl<5);
-				switch(wdl)
-				{
-				case 0:
-					TBres = SCORE_MATED +100;
-					//sync_cout<<"lost"<<sync_endl;
-					break;
-				case 1:
-					TBres = -100;
-					//sync_cout<<"blessed lost"<<sync_endl;
-					break;
-				case 2:
-					TBres = 0;
-					//sync_cout<<"draw"<<sync_endl;
-					break;
-				case 3:
-					TBres = 100;
-					//sync_cout<<"cursed won"<<sync_endl;
-					break;
-				case 4:
-					TBres = SCORE_MATE -100;
-					//sync_cout<<"won"<<sync_endl;
-					break;
-				default:
-					TBres = 0;
-				}
+
 				unsigned r;
 				for (int i = 0; (r = results[i]) != TB_RESULT_FAILED; i++)
 				{
@@ -249,13 +223,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 							//sync_cout<<"erase "<<displayUci(m)<<sync_endl;
 							rootMoves.erase(position);
 						}
-
-					}
-					else
-					{
-						sync_cout<<"ERRRRORE "<<displayUci(m)<<sync_endl;
-						sync_cout<<m.packed<<sync_endl;
-						sync_cout<<rootMoves.size()<<sync_endl;
 
 					}
 
@@ -369,7 +336,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 				// main thread
 				res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
-				res = useTBresult ? TBres : res;
 				// stop helper threads
 				for(unsigned int i = 0; i< (threads - 1); i++)
 				{
@@ -671,7 +637,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	}
 
 	//Tablebase probe
-	if (type != Search::nodeType::ROOT_NODE  && type != Search::nodeType::HELPER_ROOT_NODE && TB_LARGEST)
+	if (!PVnode && TB_LARGEST)
 	{
 		unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
 

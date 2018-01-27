@@ -7,7 +7,7 @@
 #include "./../position.h"
 #include "./../syzygy/tbprobe.h"
 
-TEST(seeSyzygy, test)
+TEST(Syzygy, test)
 {
 	Position pos;
 	
@@ -16,7 +16,7 @@ TEST(seeSyzygy, test)
 	
 	ASSERT_TRUE(myfile.is_open());
 	
-	tb_init("D:/vajolet/syzygy");
+	tb_init("C:/vajolet/syzygy");
 	ASSERT_TRUE(TB_LARGEST > 0);
 	
 	
@@ -54,7 +54,7 @@ TEST(seeSyzygy, test)
 			pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
 			pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
 			pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
-			pos.getActualState().fiftyMoveCnt,
+			0,//pos.getActualState().fiftyMoveCnt,
 			pos.getActualState().castleRights,
 			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
 			pos.getActualState().nextMove== Position::whiteTurn);
