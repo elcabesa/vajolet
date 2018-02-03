@@ -261,7 +261,7 @@ public:
 		}
 
 		captureThreshold = Position::pieceValue[capturePiece][0];
-		if(ttMove.packed && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove) < captureThreshold)))
+		if(ttMove.packed && pos.isMoveLegal(ttMove) && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove) < captureThreshold)))
 		{
 			ttMove = NOMOVE;
 		}
