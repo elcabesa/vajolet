@@ -284,12 +284,12 @@ void Position::setupFromFen(const std::string& fenStr)
 
 	ss >> std::skipws >> x.fiftyMoveCnt;
 	if(ss.eof()){
-		x.ply = int(x.nextMove == blackTurn);
+		ply = int(x.nextMove == blackTurn);
 		x.fiftyMoveCnt=0;
 
 	}else{
-		ss>> x.ply;
-		x.ply = std::max(2 * (x.ply - 1), (unsigned int)0) + int(x.nextMove == blackTurn);
+		ss>> ply;
+		ply = std::max(2 * (ply - 1), (unsigned int)0) + int(x.nextMove == blackTurn);
 	}
 
 	x.pliesFromNull = 0;
@@ -521,7 +521,7 @@ std::string  Position::getFen() const {
 	}
 	s += ' ';
 	s += std::to_string(st.fiftyMoveCnt);
-	s += " " + std::to_string(1 + (st.ply - int(st.nextMove == blackTurn)) / 2);
+	s += " " + std::to_string(1 + (ply - int(st.nextMove == blackTurn)) / 2);
 
 
 	return s;
@@ -613,7 +613,7 @@ std::string Position::getSymmetricFen() const {
 	}
 	s += ' ';
 	s += std::to_string(st.fiftyMoveCnt);
-	s += " " + std::to_string(1 + (st.ply - int(st.nextMove == blackTurn)) / 2);
+	s += " " + std::to_string(1 + (ply - int(st.nextMove == blackTurn)) / 2);
 
 	return s;
 }
@@ -771,7 +771,7 @@ void Position::doNullMove(void)
 	x.nextMove = (eNextMove)(blackTurn-x.nextMove);
 
 
-	x.ply++;
+	++ply;
 	x.capturedPiece = empty;
 
 	std::swap(Us,Them);
@@ -825,7 +825,7 @@ void Position::doMove(const Move & m){
 
 	// change side
 	x.key ^= HashKeys::side;
-	x.ply++;
+	++ply;
 
 	// update counter
 	x.fiftyMoveCnt++;
@@ -1004,6 +1004,7 @@ void Position::doMove(const Move & m){
 void Position::undoMove()
 {
 
+	--ply;
 
 	state x = getActualState();
 	Move &m = x.currentMove;

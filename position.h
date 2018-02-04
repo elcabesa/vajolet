@@ -206,8 +206,8 @@ public:
 		tSquare epSquare;	/*!<  en passant square*/
 
 		unsigned int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
-			pliesFromNull,	/*!<  plies from null move*/
-			ply;			/*!<  ply from the start*/
+			pliesFromNull;	/*!<  plies from null move*/
+		//	ply;			/*!<  ply from the start*/
 
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
 		//Score material[2];	/*!<  two values for opening/endgame score*/
@@ -226,6 +226,8 @@ public:
 	};
 
 private:
+
+	unsigned int ply;
 
 	/*! \brief helper mask used to speedup castle right management
 		\author STOCKFISH
@@ -330,6 +332,7 @@ public:
 	*/
 	inline void undoNullMove(void)
 	{
+		--ply;
 		removeState();
 		std::swap( Us , Them );
 
@@ -444,7 +447,8 @@ public:
 
 	unsigned int getPly(void) const
 	{
-		return getActualState().ply;
+		return ply;
+		//return getActualState().ply;
 	}
 
 	bitboardIndex getCapturedPiece(void) const

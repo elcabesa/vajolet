@@ -1544,7 +1544,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			//----------------------------
 			if(	!PVnode
 				&& m != ttMove
-				&& m.bit.flags != Move::fpromotion
+				//&& m.bit.flags != Move::fpromotion
 				//&& !pos.moveGivesCheck(m)
 				)
 			{
