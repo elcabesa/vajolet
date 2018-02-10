@@ -260,13 +260,17 @@ void my_thread::manageNewSearch()
 
 			src.pos.doMove(m);
 			const ttEntry* const tte = TT.probe(src.pos.getKey());
-			src.pos.undoMove();
-
-			if((m.packed = (tte->getPackedMove())))
+			
+			m.packed = tte->getPackedMove();
+			if( src.pos.isMoveLegal(m) )
 			{
-				std::cout<<" ponder "<<displayUci(m);
+				std::cout<<" ponder "<<displayUci(m)<<sync_endl;
 			}
-			std::cout<<sync_endl;
+			else
+			{
+				std::cout<<sync_endl;
+			}
+			src.pos.undoMove();
 
 			return;
 		}
@@ -314,23 +318,29 @@ void my_thread::manageNewSearch()
 	{
 		std::list<Move>::iterator it = PV.begin();
 		std::advance(it, 1);
-		std::cout<<" ponder "<<displayUci(*it);
+		std::cout<<" ponder "<<displayUci(*it)<<sync_endl;
 	}
 	else
 	{
 		src.pos.doMove( PV.front() );
 		const ttEntry* const tte = TT.probe(src.pos.getKey());
-		src.pos.undoMove();
+		
 
 		Move m;
-		if(( m.packed = tte->getPackedMove()))
+		m.packed = tte->getPackedMove();
+		if( src.pos.isMoveLegal(m) )
 		{
-			std::cout << " ponder " << displayUci(m);
+			std::cout<<" ponder "<<displayUci(m)<<sync_endl;
 		}
+		else
+		{
+			std::cout<<sync_endl;
+		}
+		src.pos.undoMove();
 
 	}
 
-	std::cout<<sync_endl;
+	
 	game.savePV(PV, res.depth, res.alpha, res.beta);
 
 
