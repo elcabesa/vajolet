@@ -713,7 +713,7 @@ void printCurrMoveNumber(unsigned int moveNumber, const Move &m, unsigned long l
 void showCurrLine(const Position & pos, unsigned int ply)
 {
 	sync_cout << "info currline";
-	unsigned int start = pos.getStateIndex()-ply + 1;
+	unsigned int start = pos.getStateSize() - ply;
 
 	for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
 	{

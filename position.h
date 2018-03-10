@@ -18,6 +18,7 @@
 #define POSITION_H_
 
 #include <unordered_map>
+#include <vector>
 #include <map>
 #include "vajolet.h"
 #include "data.h"
@@ -125,22 +126,26 @@ public:
 		\date 27/10/2013
 	*/
 	Position()
-	{
-		stateIndex = 0;
-		actualState = &stateInfo[stateIndex];
+	{		
+		stateInfo2.clear();
+		stateInfo2.emplace_back(state());
+		actualState = &stateInfo2.back();
+
+		
 		actualState->nextMove = whiteTurn;
+		
 		Us=&bitBoard[ getNextTurn() ];
 		Them=&bitBoard[blackTurn - getNextTurn()];
 	}
 
 
-	Position(const Position& other) : stateIndex(other.stateIndex) // calls the copy constructor of the age
+	Position(const Position& other)// calls the copy constructor of the age
 	{
+		stateInfo2 = other.stateInfo2;
+		actualState = &stateInfo2.back();
 
-		for(unsigned int i = 0; i <= stateIndex; i++)
-		{
-			stateInfo[i] = other.stateInfo[i];
-		}
+		
+		
 		for(int i=0; i<squareNumber; i++)
 		{
 			squares[i] = other.squares[i];
@@ -151,8 +156,6 @@ public:
 		}
 
 
-		actualState = &stateInfo[stateIndex];
-
 		Us=&bitBoard[ getNextTurn() ];
 		Them=&bitBoard[blackTurn - getNextTurn()];
 	};
@@ -162,12 +165,9 @@ public:
 		if (this == &other)
 			return *this;
 
-		stateIndex = other.stateIndex;
-
-		for(unsigned int i=0; i<=stateIndex; i++)
-		{
-			stateInfo[i] = other.stateInfo[i];
-		}
+		stateInfo2 = other.stateInfo2;
+		actualState = &stateInfo2.back();
+		
 
 		for(int i = 0; i < squareNumber; i++)
 		{
@@ -177,9 +177,6 @@ public:
 		{
 			bitBoard[i] = other.bitBoard[i];
 		}
-
-
-		actualState = &stateInfo[stateIndex];
 
 		Us = &bitBoard[ getNextTurn() ];
 		Them = &bitBoard[blackTurn-getNextTurn()];
@@ -225,6 +222,7 @@ public:
 
 	};
 
+
 private:
 
 	unsigned int ply;
@@ -242,17 +240,10 @@ private:
 
 	/*used for search*/
 	pawnTable pawnHashTable;
+	state* actualState;
 
-	/*data defining the position*/
-	state * actualState;
-	unsigned int stateIndex;
-	/*! \brief list of the past states, this is the history of the position
-		the last element is the actual state
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	state stateInfo[STATE_INFO_LENGTH];
+	std::vector<state> stateInfo2;
+
 
 	/*! \brief board rapresentation
 		\author Marco Belli
@@ -296,7 +287,11 @@ public:
 	inline bitMap getTheirBitmap(const bitboardIndex piece)const { return Them[piece];}
 
 
-	unsigned int getStateIndex(void)const { return stateIndex;}
+	unsigned int getStateSize() const
+	{
+		return stateInfo2.size();
+	}
+	//unsigned int getStateIndex(void)const { return 0;}
 
 	/*! \brief piece values used to calculate scores
 		\author Marco Belli
@@ -412,53 +407,52 @@ public:
 
 	U64 getKey(void) const
 	{
-		return getActualState().key;
+		return getActualStateConst().key;
 	}
 
 	U64 getExclusionKey(void) const
 	{
-		return getActualState().key^HashKeys::exclusion;
+		return getActualStateConst().key^HashKeys::exclusion;
 	}
 
 	U64 getPawnKey(void) const
 	{
-		return getActualState().pawnKey;
+		return getActualStateConst().pawnKey;
 	}
 
 	U64 getMaterialKey(void) const
 	{
-		return getActualState().materialKey;
+		return getActualStateConst().materialKey;
 	}
 
 	eNextMove getNextTurn(void) const
 	{
-		return getActualState().nextMove;
+		return getActualStateConst().nextMove;
 	}
 
 	tSquare getEpSquare(void) const
 	{
-		return getActualState().epSquare;
+		return getActualStateConst().epSquare;
 	}
 
 	eCastle getCastleRights(void) const
 	{
-		return getActualState().castleRights;
+		return getActualStateConst().castleRights;
 	}
 
 	unsigned int getPly(void) const
 	{
 		return ply;
-		//return getActualState().ply;
 	}
 
 	bitboardIndex getCapturedPiece(void) const
 	{
-		return getActualState().capturedPiece;
+		return getActualStateConst().capturedPiece;
 	}
 
 	bool isInCheck(void) const
 	{
-		return getActualState().checkers;
+		return getActualStateConst().checkers;
 	}
 
 
@@ -471,18 +465,19 @@ public:
 		\version 1.1 get rid of continuos malloc/free
 		\date 21/11/2013
 	*/
-	inline state& getActualState(void)const
+	inline const state& getActualStateConst(void)const
 	{
-		//assert(stateIndex>=0);
-		assert(stateIndex<STATE_INFO_LENGTH);
-		return (state&) *actualState;/*stateInfo[stateIndex];*/
+		return *actualState;
+	}
+	
+	inline state& getActualState(void)
+	{
+		return *actualState;
 	}
 
-	inline state& getState(unsigned int n)const
+	inline const state& getState(unsigned int n)const
 	{
-		//assert(stateIndex>=0);
-		assert(stateIndex<STATE_INFO_LENGTH);
-		return (state&) stateInfo[n];
+		return stateInfo2[n];	
 	}
 
 private:
@@ -495,10 +490,8 @@ private:
 	*/
 	inline void insertState(state & s)
 	{
-		assert(stateIndex+1<STATE_INFO_LENGTH);
-
-		stateInfo[++stateIndex] = s;
-		actualState = &stateInfo[stateIndex];
+		stateInfo2.emplace_back(s);
+		actualState = &stateInfo2.back();
 	}
 
 	/*! \brief  remove the last state
@@ -509,10 +502,8 @@ private:
 	*/
 	inline void removeState()
 	{
-		//assert(stateIndex>=0);
-
-		assert(stateIndex<STATE_INFO_LENGTH);
-		actualState = &stateInfo[--stateIndex];
+		stateInfo2.pop_back();
+		actualState = &stateInfo2.back();
 	}
 
 
@@ -565,7 +556,7 @@ public:
 	{
 		const int opening = 700000;
 		const int endgame = 100000;
-		Score tot = getActualState().nonPawnMaterial[0]+getActualState().nonPawnMaterial[2];
+		Score tot = getActualStateConst().nonPawnMaterial[0]+getActualStateConst().nonPawnMaterial[2];
 		if(tot>opening) //opening
 		{
 			return 0;
@@ -605,7 +596,7 @@ private:
 	U64 calcMaterialKey(void) const;
 	simdScore calcMaterialValue(void) const;
 	simdScore calcNonPawnMaterialValue(void) const;
-	bool checkPosConsistency(int nn);
+	bool checkPosConsistency(int nn) const;
 	void clear();
 	inline void calcCheckingSquares(void);
 	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next) const;

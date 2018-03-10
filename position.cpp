@@ -380,8 +380,10 @@ void Position::clear()
 	{
 		bitBoard[i] = 0;
 	}
-	stateIndex=0;
-	actualState = &stateInfo[stateIndex];
+	stateInfo2.clear();
+	stateInfo2.emplace_back(state());
+	actualState = &stateInfo2.back();
+
 }
 
 
@@ -395,7 +397,7 @@ void Position::display()const
 	sync_cout<<getFen()<<sync_endl;
 
 	int rank, file;
-	const state& st =getActualState();
+	const state& st =getActualStateConst();
 	sync_cout;
 	{
 		for (rank = 7; rank >= 0; rank--)
@@ -450,7 +452,7 @@ std::string  Position::getFen() const {
 
 	int file,rank;
 	int emptyFiles = 0;
-	state& st = getActualState();
+	const state& st = getActualStateConst();
 	for (rank = 7; rank >= 0; rank--)
 	{
 		emptyFiles = 0;
@@ -533,7 +535,7 @@ std::string Position::getSymmetricFen() const {
 	std::string s;
 	int file,rank;
 	int emptyFiles=0;
-	state& st =getActualState();
+	const state& st =getActualStateConst();
 	for (rank = 0; rank <=7 ; rank++)
 	{
 		emptyFiles=0;
@@ -626,7 +628,7 @@ std::string Position::getSymmetricFen() const {
 U64 Position::calcKey(void) const
 {
 	U64 hash = 0;
-	state& st =getActualState();
+	const state& st =getActualStateConst();
 
 	for (int i = 0; i < squareNumber; i++)
 	{
@@ -1006,7 +1008,7 @@ void Position::undoMove()
 
 	--ply;
 
-	state x = getActualState();
+	state x = getActualStateConst();
 	Move &m = x.currentMove;
 	assert(m.packed);
 	tSquare to = (tSquare)m.bit.to;
@@ -1086,10 +1088,10 @@ void Position::initCastleRightsMask(void)
 	\version 1.0
 	\date 27/10/2013
 */
-bool Position::checkPosConsistency(int nn)
+bool Position::checkPosConsistency(int nn) const
 {
 	return true;
-	state &x =getActualState();
+	const state &x = getActualStateConst();
 	if(x.nextMove !=whiteTurn && x.nextMove !=blackTurn)
 	{
 		sync_cout<<"nextMove error" <<sync_endl;
@@ -1423,7 +1425,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	assert(piece!=separationBitmap);
 	assert(piece!=whitePieces);
 	assert(piece!=blackPieces);
-	state &s =getActualState();
+	const state &s = getActualStateConst();
 
 	// Direct check ?
 	if (s.checkingSquares[piece] & bitSet(to))
@@ -1435,7 +1437,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	if(s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from)))
 	{
 		// For pawn and king moves we need to verify also direction
-		assert(getSquareOfThePiece(blackKing-s.nextMove)<squareNumber);
+		assert(getSquareOfThePiece((bitboardIndex)(blackKing-s.nextMove))<squareNumber);
 		if ( (!isPawn(piece)&& !isKing(piece)) || !squaresAligned(from, to, getSquareOfThePiece((bitboardIndex)(blackKing-s.nextMove))))
 			return true;
 	}
@@ -1517,7 +1519,7 @@ bool Position::moveGivesDoubleCheck(const Move& m)const
 	assert(piece!=separationBitmap);
 	assert(piece!=whitePieces);
 	assert(piece!=blackPieces);
-	state &s = getActualState();
+	const state &s = getActualStateConst();
 
 
 	// Direct check ?
@@ -1536,7 +1538,7 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 	assert(piece!=separationBitmap);
 	assert(piece!=whitePieces);
 	assert(piece!=blackPieces);
-	state & s=getActualState();
+	const state & s=getActualStateConst();
 
 	tSquare kingSquare = getSquareOfThePiece((bitboardIndex)(blackKing-s.nextMove));
 	return (!(Movegen::attackFrom<Position::whiteKing>(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from))));
@@ -1551,15 +1553,15 @@ bool Position::isDraw(bool isPVline) const
 	// Draw by material?
 
 	if (  !bitBoard[whitePawns] && !bitBoard[blackPawns]
-		&&( ( (getActualState().nonPawnMaterial[0]<= pieceValue[whiteBishops][0]) && getActualState().nonPawnMaterial[2] == 0)
-		|| ( (getActualState().nonPawnMaterial[2]<= pieceValue[whiteBishops][0]) && getActualState().nonPawnMaterial[0] == 0) )
+		&&( ( (getActualStateConst().nonPawnMaterial[0]<= pieceValue[whiteBishops][0]) && getActualStateConst().nonPawnMaterial[2] == 0)
+		|| ( (getActualStateConst().nonPawnMaterial[2]<= pieceValue[whiteBishops][0]) && getActualStateConst().nonPawnMaterial[0] == 0) )
 	)
 	{
 		return true;
 	}
 
 	// Draw by the 50 moves rule?
-	if (getActualState().fiftyMoveCnt>  99)
+	if (getActualStateConst().fiftyMoveCnt>  99)
 	{
 		if(!isInCheck())
 		{
@@ -1575,16 +1577,22 @@ bool Position::isDraw(bool isPVline) const
 
 	// Draw by repetition?
 	unsigned int counter=1;
-	U64 actualkey = getActualState().key;
-	for(int i = 4, e = std::min(getActualState().fiftyMoveCnt, getActualState().pliesFromNull);	i<=e;i+=2)
-	{
-		unsigned int stateIndexPointer = stateIndex-i;
-		assert(stateIndex>=i);
-		assert(stateIndexPointer<STATE_INFO_LENGTH);
-		const state* stp = &stateInfo[stateIndexPointer];
-		assert(stp);
+	U64 actualkey = getActualStateConst().key;
+	auto it = stateInfo2.rbegin();
+	
 
-		if(stp->key == actualkey)
+	int e = std::min(getActualStateConst().fiftyMoveCnt, getActualStateConst().pliesFromNull);
+	if( e >= 4)
+	{
+		std::advance( it,2);
+	}
+	for(int i = 4 ;	i<=e;i+=2)
+	{
+		std::advance( it,2);
+		//unsigned int stateIndexPointer = stateIndex-i;
+		//assert(stateIndex>=i);
+		//assert(stateIndexPointer<STATE_INFO_LENGTH);		
+		if(it->key == actualkey)
 		{
 			counter++;
 			if(!isPVline || counter>=3)
@@ -1604,7 +1612,7 @@ bool Position::isMoveLegal(const Move &m)const
 		return false;
 	}
 
-	const state &s = getActualState();
+	const state &s = getActualStateConst();
 	const bitboardIndex piece = squares[m.bit.from];
 	assert(piece<Position::lastBitboard);
 

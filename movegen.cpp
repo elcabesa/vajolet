@@ -162,7 +162,7 @@ void Movegen::generateMoves()
 {
 
 	// initialize constants
-	const Position::state &s =pos.getActualState();
+	const Position::state &s =pos.getActualStateConst();
 	const bitMap& enemy = pos.getTheirBitmap(Position::Pieces);
 	const bitMap& occupiedSquares = pos.getOccupationBitmap();
 
@@ -630,10 +630,6 @@ void Movegen::generateMoves()
 			}
 		}
 	}
-	assert(moveListSize<=MAX_MOVE_PER_POSITION);
-
-
-
 }
 template void Movegen::generateMoves<Movegen::captureMg>();
 template void Movegen::generateMoves<Movegen::quietMg>();
@@ -762,7 +758,7 @@ Move Movegen::getNextMove()
 				}
 				else
 				{
-					assert(badCaptureEnd<MAX_BAD_MOVE_PER_POSITION);
+					assert(badCaptureEnd<badCaptureList.end());
 					(badCaptureEnd++)->m = mm;
 				}
 
@@ -772,7 +768,7 @@ Move Movegen::getNextMove()
 				killerMoves[0] = src.getKillers(ply, 0);
 				killerMoves[1] = src.getKillers(ply, 1);
 
-				Move previousMove = pos.getActualState().currentMove;
+				Move previousMove = pos.getActualStateConst().currentMove;
 				if(previousMove.packed)
 				{
 					counterMoves[0] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);

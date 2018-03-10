@@ -72,7 +72,7 @@ public:
 	void insertNewMoves(Position &pos)
 	{
 		unsigned int actualPosition = positions.size();
-		for(unsigned int i = actualPosition; i <= pos.getStateIndex(); i++)
+		for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
 		{
 			//sync_cout<<"info debug new position inserted in game:"<<displayUci(pos.getState(i).currentMove)<<sync_endl;
 			GamePosition p;
@@ -115,7 +115,7 @@ public:
 	}
 	bool isNewGame(Position &pos)
 	{
-		if( positions.size() == 0 || pos.getStateIndex()+1 < positions.size())
+		if( positions.size() == 0 || pos.getStateSize() < positions.size())
 		{
 			//printGamesInfo();
 			//sync_cout<<"NEW GAME"<<sync_endl;

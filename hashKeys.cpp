@@ -41,7 +41,7 @@ void HashKeys::init()
 {
 	// initialize all random 64-bit numbers
 	int i,j;
-	U64 temp[16];
+	U64 temp[4];
 	std::mt19937_64 rnd;
 	std::uniform_int_distribution<uint64_t> uint_dist;
 

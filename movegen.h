@@ -118,7 +118,7 @@ private:
 
 	void insertMove(const Move& m)
 	{
-		assert(moveListEnd<MAX_MOVE_PER_POSITION);
+		assert(moveListEnd<moveList.end());
 		(moveListEnd++)->m = m;
 	}
 
@@ -239,8 +239,9 @@ public:
 			}
 			else
 			{
+				
 				stagedGeneratorState = getQsearchTT;
-				if(ttMove.packed && !pos.isCaptureMove(ttMove))
+				if(ttMove.packed && /*pos.isMoveLegal(ttMove)&&  */!pos.isCaptureMove(ttMove))
 				{
 					ttMove = NOMOVE;
 				}
@@ -261,7 +262,7 @@ public:
 		}
 
 		captureThreshold = Position::pieceValue[capturePiece][0];
-		if(ttMove.packed && pos.isMoveLegal(ttMove) && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove) < captureThreshold)))
+		if(pos.isMoveLegal(ttMove) && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove) < captureThreshold)))
 		{
 			ttMove = NOMOVE;
 		}

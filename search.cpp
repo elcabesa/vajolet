@@ -524,7 +524,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 
 
-	Position::state& st = pos.getActualState();
+	const Position::state& st = pos.getActualState();
 	visitedNodes++;
 	clearKillers(ply+1);
 
@@ -1516,7 +1516,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 	PVline childPV;
 
-	Position::state &st = pos.getActualState();
+	const Position::state& st = pos.getActualState();
 	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != Movegen::NOMOVE)
 	{
 		assert(alpha < beta);

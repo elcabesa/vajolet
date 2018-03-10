@@ -70,7 +70,7 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 	ttCluster& ttc = findCluster(key);
 	candidate = &ttc[0];
 
-	assert(replace!=nullptr);
+	assert(candidate!=nullptr);
 
 	auto it = std::find_if (ttc.begin(), ttc.end(), [keyH](ttEntry p){return (!p.getKey()) || (p.getKey()==keyH);});
 	if( it != ttc.end())
