@@ -20,7 +20,7 @@
 
 
 // disable assert define
-#define NDEBUG
+//#define NDEBUG
 #include <cassert>
 
 //---------------------------------------------
