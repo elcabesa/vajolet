@@ -1250,7 +1250,7 @@ Score Position::eval(void)
 	}
 	if(trace)
 	{
-		bScore = -simdScore{ kingSafety[black], 0, 0, 0};
+		bScore = simdScore{ kingSafety[black], 0, 0, 0};
 	}
 
 	res+=simdScore{kingSafety[white]-kingSafety[black],0,0,0};
@@ -1271,7 +1271,7 @@ Score Position::eval(void)
 	res-= kingSaf;
 	if(trace)
 	{
-		bScore -= kingSaf;
+		bScore += kingSaf;
 	}
 
 	if(trace)
