@@ -1399,15 +1399,10 @@ bitMap Position::getAttackersTo(const tSquare to, const bitMap occupancy) const
 			|(Movegen::attackFrom<Position::whiteKnights>(to) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))
 			|(Movegen::attackFrom<Position::whiteKing>(to) & (bitBoard[blackKing]|bitBoard[whiteKing]));
 	bitMap mask = (bitBoard[blackBishops]|bitBoard[whiteBishops]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
-	if(mask & Movegen::getBishopPseudoAttack(to) )
-	{
-		res |= Movegen::attackFrom<Position::whiteBishops>(to,occupancy) & mask;
-	}
+	res |= Movegen::attackFrom<Position::whiteBishops>(to,occupancy) & mask;
 	mask = (bitBoard[blackRooks]|bitBoard[whiteRooks]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
-	if(mask & Movegen::getRookPseudoAttack(to))
-	{
-		res |=Movegen::attackFrom<Position::whiteRooks>(to,occupancy) & mask;
-	}
+	res |=Movegen::attackFrom<Position::whiteRooks>(to,occupancy) & mask;
+
 	return res;
 }
 

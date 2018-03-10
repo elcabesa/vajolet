@@ -2,15 +2,15 @@ cmake_minimum_required (VERSION 2.8)
 project (Vajolet)
 
 IF(NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
-    set(CMAKE_CXX_FLAGS "-std=c++1z -O3 -msse4.2 -mpopcnt -pedantic -Wall -Wextra -fmessage-length=0")
+    set(CMAKE_CXX_FLAGS "-std=c++1z -O3 -msse4.2 -mpopcnt -mbmi -mbmi2 -pedantic -Wall -Wextra -fmessage-length=0")
 else()
     set(CMAKE_CXX_FLAGS "-std=c++1z -O3 -pedantic -Wall -Wextra -fmessage-length=0")
 endif()
 
 if (WIN32)
-	set (CMAKE_EXE_LINKER_FLAGS "-s -static -pthread")
+	set (CMAKE_EXE_LINKER_FLAGS "-s -Wl,--allow-multiple-definition -static  -pthread")
 else()
-		set (CMAKE_EXE_LINKER_FLAGS "-s -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static")
+	set (CMAKE_EXE_LINKER_FLAGS "-s -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static")
 endif()
 
 add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp endgame.cpp eval.cpp hashKeys.cpp io.cpp magicmoves.cpp movegen.cpp parameters.cpp position.cpp search.cpp see.cpp thread.cpp transposition.cpp syzygy/tbprobe.cpp)

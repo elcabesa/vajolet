@@ -31,7 +31,6 @@
 #include "eval.h"
 
 #include <fstream>
-#include <random>
 
 std::ifstream infile("quiet-labeled.epd");
 struct results

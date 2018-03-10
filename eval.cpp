@@ -277,7 +277,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 
 		bitMap defendedPieces = attack & ourPieces & ~ourPawns;
 		// piece coordination
-		res += bitCnt( defendedPieces ) * pieceCoordination;
+		res += (int)bitCnt( defendedPieces ) * pieceCoordination;
 
 
 		//unsigned int mobility = (bitCnt(attack&~(threatenSquares|ourPieces))+ bitCnt(attack&~(ourPieces)))/2;
@@ -296,11 +296,11 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		/////////////////////////////////////////
 		if(attack & centerBitmap)
 		{
-			res += bitCnt(attack & centerBitmap) * piecesCenterControl;
+			res += (int)bitCnt(attack & centerBitmap) * piecesCenterControl;
 		}
 		if(attack & bigCenterBitmap)
 		{
-			res += bitCnt(attack & bigCenterBitmap) * piecesBigCenterControl;
+			res += (int)bitCnt(attack & bigCenterBitmap) * piecesBigCenterControl;
 		}
 
 		switch(piece)
@@ -374,13 +374,13 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 				)
 				{
 
-					res -= rookTrapped*(3-mobility);
+					res -= rookTrapped*(int)(3-mobility);
 					Position::state & st = getActualState();
 					if(piece > separationBitmap)
 					{
 						if( !( st.castleRights & (Position::bCastleOO | Position::bCastleOOO) ) )
 						{
-							res -= rookTrappedKingWithoutCastling * ( 3 - mobility );
+							res -= rookTrappedKingWithoutCastling * (int)( 3 - mobility );
 						}
 
 					}
@@ -388,7 +388,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 					{
 						if( !(st.castleRights & (Position::wCastleOO | Position::wCastleOOO) ) )
 						{
-							res -= rookTrappedKingWithoutCastling * ( 3 - mobility ) ;
+							res -= rookTrappedKingWithoutCastling * (int)( 3 - mobility ) ;
 						}
 					}
 				}
@@ -416,7 +416,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 				bitMap blockingPawns = ourPieces & blockedPawns & BITMAP_COLOR[color];
 				if( moreThanOneBit(blockingPawns) )
 				{
-					res -= bitCnt(blockingPawns) * badBishop;
+					res -= (int)bitCnt(blockingPawns) * badBishop;
 				}
 			}
 
@@ -441,7 +441,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 				bitMap wpa = attack & (weakPawns) & theirPieces;
 				if(wpa)
 				{
-					res += bitCnt(wpa) * KnightAttackingWeakPawn;
+					res += (int)bitCnt(wpa) * KnightAttackingWeakPawn;
 				}
 			}
 			break;
@@ -539,7 +539,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 				}
 				if(defendedSquares)
 				{
-					passedPawnsBonus += passedPawnDefendedSquares * rr * bitCnt( defendedSquares );
+					passedPawnsBonus += passedPawnDefendedSquares * rr * (int)bitCnt( defendedSquares );
 					if(defendedSquares & bitSet(blockingSquare) )
 					{
 						passedPawnsBonus += passedPawnDefendedBlockingSquare * rr;
@@ -928,7 +928,7 @@ Score Position::eval(void)
 		temp |= temp >> 32;
 
 		holes[black] = weakSquares[black] & temp;
-		pawnResult -= ( bitCnt( holes[white] ) - bitCnt( holes[black] ) ) * holesPenalty;
+		pawnResult -= ( (int)bitCnt( holes[white] ) - (int)bitCnt( holes[black] ) ) * holesPenalty;
 
 		if(enablePawnHash)
 		{
@@ -944,20 +944,20 @@ Score Position::eval(void)
 
 	if( attackedSquares[whitePawns] & centerBitmap )
 	{
-		res += bitCnt( attackedSquares[whitePawns] & centerBitmap ) * pawnCenterControl;
+		res += (int)bitCnt( attackedSquares[whitePawns] & centerBitmap ) * pawnCenterControl;
 	}
 	if( attackedSquares[whitePawns] & bigCenterBitmap )
 	{
-		res += bitCnt( attackedSquares[whitePawns] & bigCenterBitmap )* pawnBigCenterControl;
+		res += (int)bitCnt( attackedSquares[whitePawns] & bigCenterBitmap )* pawnBigCenterControl;
 	}
 
 	if( attackedSquares[blackPawns] & centerBitmap )
 	{
-		res -= bitCnt( attackedSquares[blackPawns] & centerBitmap ) * pawnCenterControl;
+		res -= (int)bitCnt( attackedSquares[blackPawns] & centerBitmap ) * pawnCenterControl;
 	}
 	if( attackedSquares[blackPawns] & bigCenterBitmap )
 	{
-		res -= bitCnt( attackedSquares[blackPawns] & bigCenterBitmap ) * pawnBigCenterControl;
+		res -= (int)bitCnt( attackedSquares[blackPawns] & bigCenterBitmap ) * pawnBigCenterControl;
 	}
 
 	if(trace)
@@ -1102,12 +1102,12 @@ Score Position::eval(void)
 	spaceb |= spaceb << 32;
 	spaceb &= ~attackedSquares[whitePieces];
 
-	res += ( bitCnt(spacew) - bitCnt(spaceb) ) * spaceBonus;
+	res += ( (int)bitCnt(spacew) - (int)bitCnt(spaceb) ) * spaceBonus;
 
 	if(trace)
 	{
-		wScore = bitCnt(spacew) * spaceBonus;
-		bScore = bitCnt(spaceb) * spaceBonus;
+		wScore = (int)bitCnt(spacew) * spaceBonus;
+		bScore = (int)bitCnt(spaceb) * spaceBonus;
 		sync_cout << std::setw(20) << "space" << " |"
 				  << std::setw(6)  << (wScore[0])/10000.0 << " "
 				  << std::setw(6)  << (wScore[1])/10000.0 << " |"

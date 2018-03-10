@@ -329,18 +329,18 @@ public:
 
 
 
-	inline static const bitMap& getRookPseudoAttack(const tSquare& from)
+	inline static bitMap getRookPseudoAttack(const tSquare& from)
 	{
 		assert(from<squareNumber);
-		return ROOK_PSEUDO_ATTACK[from];
+		return attackFromRook(from,0);
 	}
 
-	inline static const bitMap& getBishopPseudoAttack(const tSquare& from)
+	inline static bitMap getBishopPseudoAttack(const tSquare& from)
 	{
 		assert(from<squareNumber);
-		return BISHOP_PSEUDO_ATTACK[from];
+		return attackFromBishop(from,0);
 	}
-	inline static const bitMap& getCastlePath(const int x, const int y)
+	inline static bitMap getCastlePath(const int x, const int y)
 	{
 		return castlePath[x][y];
 	}
