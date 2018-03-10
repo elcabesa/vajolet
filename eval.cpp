@@ -591,80 +591,56 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const
 {
 	simdScore res = {0,0,0,0};
-	//bitMap * OurPieces = c ? &getBitmap(separationBitmap) : &getBitmap(occupiedSquares);
-	bitMap TheirPieces = c ? getBitmap(whitePieces) : getBitmap(blackPieces);
-	bitMap * AttackedByOurPieces = c ? &attackedSquares[separationBitmap] : &attackedSquares[occupiedSquares];
-	bitMap * AttackedByTheirPieces = c ? &attackedSquares[occupiedSquares] : &attackedSquares[separationBitmap];
+	bitMap AttackingPieces = c ? getBitmap(whitePieces) : getBitmap(blackPieces);
+	bitMap * DefendedSquaresBy = c ? &attackedSquares[separationBitmap] : &attackedSquares[occupiedSquares];
+	bitMap * AttackedSquaresBy = c ? &attackedSquares[occupiedSquares] : &attackedSquares[separationBitmap];
 	tSquare kingSquare = c ? getSquareOfThePiece(blackKing) : getSquareOfThePiece(whiteKing);
 
 	if( kingAttackersCount )// se il re e' attaccato
 	{
 
-		bitMap undefendedSquares = AttackedByTheirPieces[Pieces] & AttackedByOurPieces[King];
+		bitMap undefendedSquares = AttackedSquaresBy[Pieces] & DefendedSquaresBy[King];
 		undefendedSquares &=
-			~(AttackedByOurPieces[Pawns]
-			| AttackedByOurPieces[Knights]
-			| AttackedByOurPieces[Bishops]
-			| AttackedByOurPieces[Rooks]
-			| AttackedByOurPieces[Queens]);
+			~( DefendedSquaresBy[Pawns]
+			| DefendedSquaresBy[Knights]
+			| DefendedSquaresBy[Bishops]
+			| DefendedSquaresBy[Rooks]
+			| DefendedSquaresBy[Queens]);
+		bitMap undefendedSquares2 = ~ DefendedSquaresBy[Pieces];
+		
+		signed int attackUnits = kingAttackersCount * kingAttackersWeight;
+		attackUnits += kingAdjacentZoneAttacksCount * 500;
+		attackUnits += bitCnt( undefendedSquares ) * 500;
+		attackUnits += KingExposed[ c? 63 - kingSquare : kingSquare ] * 10;
+		attackUnits -= (getPieceCount(c? whiteQueens: blackQueens)==0) * 200;
 
-
-		signed int attackUnits =  std::min((unsigned int)25, (kingAttackersCount * kingAttackersWeight) / 2)
-							 + 3 * (kingAdjacentZoneAttacksCount + bitCnt( undefendedSquares ) )
-							 + KingExposed[c? 63 - kingSquare : kingSquare ]
-							 - kingSafety / kingSafetyScaling[0]
-							 - (getPieceCount(c? whiteQueens: blackQueens)==0)*40;
-
-		// safe contact queen check
-		bitMap safeContactSquare = undefendedSquares & AttackedByTheirPieces[Queens]  & ~TheirPieces;
-		safeContactSquare &= (AttackedByTheirPieces[Rooks]| AttackedByTheirPieces[Bishops] | AttackedByTheirPieces[Knights]| AttackedByTheirPieces[Pawns]);
-		if(safeContactSquare)
-		{
-			attackUnits += KingAttackUnitWeigth[0] * bitCnt(safeContactSquare);
-		}
-
-		// safe contact rook check
-		safeContactSquare = undefendedSquares & AttackedByTheirPieces[Rooks] & ~TheirPieces;
-		safeContactSquare &= (AttackedByTheirPieces[Queens]| AttackedByTheirPieces[Bishops] |AttackedByTheirPieces[Knights]| AttackedByTheirPieces[Pawns]);
-
-		safeContactSquare &= Movegen::getRookPseudoAttack( kingSquare );
-
-		if(safeContactSquare)
-		{
-			attackUnits += KingAttackUnitWeigth[1] * bitCnt(safeContactSquare);
-		}
+		attackUnits -= kingSafety / 10 ;
 
 
 		// long distance check
 		bitMap rMap = Movegen::attackFrom<whiteRooks>( kingSquare, getOccupationBitmap() );
 		bitMap bMap = Movegen::attackFrom<whiteBishops>( kingSquare, getOccupationBitmap() );
 
-		// vertical check
-		bitMap longDistCheck = rMap & (AttackedByTheirPieces[Rooks] | AttackedByTheirPieces[Queens] ) & ~AttackedByOurPieces[Pieces] & ~TheirPieces;
-		if(longDistCheck)
+		if(  (rMap | bMap) & AttackedSquaresBy[Queens] &  ~AttackingPieces & undefendedSquares2 )
 		{
-			attackUnits += KingAttackUnitWeigth[2] * bitCnt( longDistCheck );
+			attackUnits += 1000;
+		}
+		if(  rMap & AttackedSquaresBy[Rooks] &  ~AttackingPieces & undefendedSquares2 )
+		{
+			attackUnits += 1000;
+		}
+		if(  bMap & AttackedSquaresBy[Bishops] &  ~AttackingPieces & undefendedSquares2 )
+		{
+			attackUnits += 1000;
+		}
+		if( Movegen::attackFrom<whiteKnights>( kingSquare ) & ( AttackedSquaresBy[Knights] ) & ~AttackingPieces & undefendedSquares2 )
+		{
+			attackUnits += 1000;
 		}
 
-		// diagonal check
-		longDistCheck = bMap & (AttackedByTheirPieces[Bishops] | AttackedByTheirPieces[Queens] ) & ~AttackedByOurPieces[Pieces] & ~TheirPieces;
-		if(longDistCheck)
-		{
-			attackUnits += KingAttackUnitWeigth[3] * bitCnt( longDistCheck );
-		}
-
-		///knight check;
-		longDistCheck = Movegen::attackFrom<whiteKnights>( kingSquare ) & ( AttackedByTheirPieces[Knights] ) & ~AttackedByOurPieces[Pieces] & ~TheirPieces;
-		if(longDistCheck)
-		{
-			attackUnits += bitCnt( longDistCheck );
-		}
-
-		attackUnits = std::min(KingSafetyMaxAttack[0], std::max(0, attackUnits));
-		attackUnits = (attackUnits * KingSafetyLinearCoefficent[0]) / 100;
-		attackUnits = std::min(KingSafetyMaxResult[0], attackUnits);
-		res = -(kingSafetyBonus * attackUnits);
-
+		attackUnits = std::max( 0, attackUnits );
+		simdScore ks = {attackUnits * attackUnits / kingSafetyBonus[0], attackUnits / kingSafetyBonus[1], 0, 0 };
+		res = -ks;
 	}
 	return res;
 }

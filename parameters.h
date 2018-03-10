@@ -119,11 +119,7 @@ extern simdScore kingShieldBonus;
 extern simdScore kingFarShieldBonus;
 extern simdScore kingStormBonus;
 extern simdScore kingSafetyBonus;
-extern simdScore kingSafetyScaling;
-extern simdScore KingSafetyMaxAttack;
-extern simdScore KingSafetyLinearCoefficent;
-extern simdScore KingAttackUnitWeigth;
-extern simdScore KingSafetyMaxResult;
+
 //------------------------------------------------
 
 

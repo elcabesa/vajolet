@@ -142,16 +142,12 @@ simdScore weakPawnAttackedByKing={86,4986,0,0};
 //------------------------------------------------
 //king safety
 //------------------------------------------------
-const unsigned int KingAttackWeights[] = { 0, 0, 5, 3, 2, 2 };
+const unsigned int KingAttackWeights[] = { 0, 0, 500, 300, 200, 200 };
 simdScore kingShieldBonus =  {2400,0,0,0};
 simdScore kingFarShieldBonus =  {1800,0,0,0};
-simdScore kingStormBonus =  {100,0,0,0};
-simdScore kingSafetyBonus={93,-5,0,0};
-simdScore kingSafetyScaling =  {310,0,0,0};
-simdScore KingSafetyMaxAttack =  {93,0,0,0};
-simdScore KingSafetyLinearCoefficent =  {500,0,0,0};
-simdScore KingAttackUnitWeigth =  {20,15,8,3};
-simdScore KingSafetyMaxResult =  {1000,0,0,0};
+simdScore kingStormBonus =  {150,0,0,0};
+simdScore kingSafetyBonus={2000,100,0,0};
+
 //------------------------------------------------
 
 
