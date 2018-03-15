@@ -265,7 +265,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		if(attack & enemyKingRing)
 		{
 			(*pKingAttackersCount)++;
-			(*pkingAttackersWeight) += KingAttackWeights[ piece % separationBitmap];
+			(*pkingAttackersWeight) += KingAttackWeights[ ( piece % separationBitmap ) -2 ];
 			bitMap adjacent = attack & Movegen::attackFrom<whiteKing>(enemyKingSquare);
 			if(adjacent)
 			{
@@ -609,12 +609,14 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 		bitMap undefendedSquares2 = ~ DefendedSquaresBy[Pieces];
 		
 		signed int attackUnits = kingAttackersCount * kingAttackersWeight;
-		attackUnits += kingAdjacentZoneAttacksCount * 500;
-		attackUnits += bitCnt( undefendedSquares ) * 500;
-		attackUnits += KingExposed[ c? 63 - kingSquare : kingSquare ] * 10;
-		attackUnits -= (getPieceCount(c? whiteQueens: blackQueens)==0) * 200;
+		attackUnits += kingAdjacentZoneAttacksCount * kingSafetyPars1[0];
+		attackUnits += bitCnt( undefendedSquares ) * kingSafetyPars1[1];
+		attackUnits += KingExposed[ c? 63 - kingSquare : kingSquare ] * kingSafetyPars1[2];
+		attackUnits -= (getPieceCount(c? whiteQueens: blackQueens)==0) * kingSafetyPars1[3];
 
-		attackUnits -= kingSafety / 10 ;
+		attackUnits -= kingSafety / kingStormBonus[1] ;
+		attackUnits += kingStormBonus[2] ;
+
 
 
 		// long distance check
@@ -623,19 +625,19 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 
 		if(  (rMap | bMap) & AttackedSquaresBy[Queens] &  ~AttackingPieces & undefendedSquares2 )
 		{
-			attackUnits += 1000;
+			attackUnits += kingSafetyPars2[0];
 		}
 		if(  rMap & AttackedSquaresBy[Rooks] &  ~AttackingPieces & undefendedSquares2 )
 		{
-			attackUnits += 1000;
+			attackUnits += kingSafetyPars2[1];
 		}
 		if(  bMap & AttackedSquaresBy[Bishops] &  ~AttackingPieces & undefendedSquares2 )
 		{
-			attackUnits += 1000;
+			attackUnits += kingSafetyPars2[2];
 		}
 		if( Movegen::attackFrom<whiteKnights>( kingSquare ) & ( AttackedSquaresBy[Knights] ) & ~AttackingPieces & undefendedSquares2 )
 		{
-			attackUnits += 1000;
+			attackUnits += kingSafetyPars2[3];
 		}
 
 		attackUnits = std::max( 0, attackUnits );

@@ -32,7 +32,7 @@
 
 #include <fstream>
 
-std::ifstream infile("quiet-labeled.epd");
+std::ifstream infile("out.epd");
 struct results
 {
 	results(const std::string& _FEN, const double _res):FEN(_FEN),res(_res){}
@@ -136,6 +136,7 @@ long double calcError(void)
 		totalError += calcSigleError(p, v.res);
 
 	}
+	totalError /= positions.size();
 	return totalError;
 }
 
@@ -189,7 +190,7 @@ long double calcPartialDerivate2(parameter& par,unsigned int i, Position & pos, 
 
 	long double em = calcSigleError(pos, res);
 
-	long double pd = (ep - em)/(2.0* delta);
+	long double pd = (ep - em)/(2.0 * delta);
 
 	updateParameter(par, i, 0);
 
@@ -236,12 +237,21 @@ long double calcGradient2(long double& error)
 	{
 		for( unsigned int i = 0; i < p.count; ++i)
 		{
+			p.partialDerivate[i] /= positions.size();
+		}
+	}
+	
+	for(auto& p : parameters)
+	{
+		for( unsigned int i = 0; i < p.count; ++i)
+		{
 			long double x = std::pow(p.partialDerivate[i], 2.0);
 			p.totalGradient[i] += x;
 			gradientMagnitude += x;
 		}
 		
 	}
+	error /= positions.size();
 
 	return gradientMagnitude;
 	
@@ -357,7 +367,7 @@ int main()
 	parameters.push_back(parameter("enemyKingNearPassedPawn",&enemyKingNearPassedPawn,2));
 	parameters.push_back(parameter("spaceBonus",&spaceBonus,2));
 	parameters.push_back(parameter("undefendedMinorPenalty",&undefendedMinorPenalty,2));
-*/
+
 	parameters.push_back(parameter("attackedByPawnPenalty[2]",&attackedByPawnPenalty[2],2));
 	parameters.push_back(parameter("attackedByPawnPenalty[3]",&attackedByPawnPenalty[3],2));
 	parameters.push_back(parameter("attackedByPawnPenalty[4]",&attackedByPawnPenalty[4],2));
@@ -395,7 +405,7 @@ int main()
 
 	parameters.push_back(parameter("weakPawnAttackedByKing",&weakPawnAttackedByKing,2));
 
-/*	parameters.push_back(parameter("kingShieldBonus",&kingShieldBonus,1));
+	parameters.push_back(parameter("kingShieldBonus",&kingShieldBonus,1));
 	parameters.push_back(parameter("kingFarShieldBonus",&kingFarShieldBonus,1));
 	parameters.push_back(parameter("kingStormBonus",&kingStormBonus,1));
 
@@ -407,7 +417,13 @@ int main()
 	parameters.push_back(parameter("KingAttackUnitWeigth",&KingAttackUnitWeigth,4));
 	parameters.push_back(parameter("KingSafetyMaxResult",&KingSafetyMaxResult,1));*/
 
-
+	parameters.push_back( parameter( "KingAttackWeights", &KingAttackWeights, 4 ) );
+	parameters.push_back( parameter( "kingShieldBonus", &kingShieldBonus, 1 ) );
+	parameters.push_back( parameter( "kingFarShieldBonus", &kingFarShieldBonus, 1 ) );
+	parameters.push_back( parameter( "kingStormBonus", &kingStormBonus, 3 ) );
+	parameters.push_back( parameter( "kingSafetyBonus", &kingSafetyBonus, 2 ) );
+	parameters.push_back( parameter( "kingSafetyPars1", &kingSafetyPars1, 4 ) );
+	parameters.push_back( parameter( "kingSafetyPars2", &kingSafetyPars2, 4 ) );
 
 
 
@@ -431,7 +447,7 @@ int main()
 
 	std::vector<parameter> bestParameters;
 
-	long double learningRate = 1.0;
+	long double learningRate = 10000.0;
 	long double error = 1e22;// big number
 	long double minValue = 1e6;
 
@@ -505,7 +521,7 @@ int main()
 			}
 		}
 		std::cout<<"\ngradient magnitude "<<gradientMagnitude<<std::endl;
-		if(gradientMagnitude < 1e-6)
+		if(gradientMagnitude < 1e-12)
 		{
 			stop = true;
 		}

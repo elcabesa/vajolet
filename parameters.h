@@ -114,11 +114,13 @@ extern simdScore weakPawnAttackedByKing;
 //------------------------------------------------
 //king safety
 //------------------------------------------------
-extern const unsigned int KingAttackWeights[];
+extern simdScore KingAttackWeights;
 extern simdScore kingShieldBonus;
 extern simdScore kingFarShieldBonus;
 extern simdScore kingStormBonus;
 extern simdScore kingSafetyBonus;
+extern simdScore kingSafetyPars1;
+extern simdScore kingSafetyPars2;
 
 //------------------------------------------------
 
