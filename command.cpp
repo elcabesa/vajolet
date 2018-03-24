@@ -355,51 +355,81 @@ void setvalue(std::istringstream& is)
 
 	is >> value;
 
-	if(name =="queenMG")
+	if(name =="KingAttackWeights0")
 	{
-		Position::pieceValue[Position::whiteQueens][0] = stoi(value);
-		Position::pieceValue[Position::blackQueens][0] = stoi(value);
-		Position::initPstValues();
-	}else if(name =="queenEG")
+		KingAttackWeights[0] = stoi(value);
+	}
+	else if(name =="KingAttackWeights1")
 	{
-		Position::pieceValue[Position::whiteQueens][1] = stoi(value);
-		Position::pieceValue[Position::blackQueens][1] = stoi(value);
-		Position::initPstValues();
-	}else if(name =="rookMG")
+		KingAttackWeights[1] = stoi(value);
+	}
+	else if(name =="KingAttackWeights2")
 	{
-		Position::pieceValue[Position::whiteRooks][0] = stoi(value);
-		Position::pieceValue[Position::blackRooks][0] = stoi(value);
-		Position::initPstValues();
-	}else if(name =="rookEG")
+		KingAttackWeights[2] = stoi(value);
+	}
+	else if(name =="KingAttackWeights3")
 	{
-		Position::pieceValue[Position::whiteRooks][1] = stoi(value);
-		Position::pieceValue[Position::blackRooks][1] = stoi(value);
-		Position::initPstValues();
-	}else if(name =="bishopMG")
+		KingAttackWeights[3] = stoi(value);
+	}
+	else if(name =="kingShieldBonus")
 	{
-		Position::pieceValue[Position::whiteBishops][0] = stoi(value);
-		Position::pieceValue[Position::blackBishops][0] = stoi(value);
-		Position::initPstValues();
-	}else if(name =="bishopEG")
+		kingShieldBonus[0] = stoi(value);
+	}
+	else if(name =="kingFarShieldBonus")
 	{
-		Position::pieceValue[Position::whiteBishops][1] = stoi(value);
-		Position::pieceValue[Position::blackBishops][1] = stoi(value);
-		Position::initPstValues();
-	}else if(name =="knightMG")
+		kingFarShieldBonus[0] = stoi(value);
+	}
+	else if(name =="kingStormBonus0")
 	{
-		Position::pieceValue[Position::whiteKnights][0] = stoi(value);
-		Position::pieceValue[Position::blackKnights][0] = stoi(value);
-		Position::initPstValues();
-	}else if(name =="knightEG")
+		kingStormBonus[0] = stoi(value);
+	}
+	else if(name =="kingStormBonus1")
 	{
-		Position::pieceValue[Position::whiteKnights][1] = stoi(value);
-		Position::pieceValue[Position::blackKnights][1] = stoi(value);
-		Position::initPstValues();
-	}else if(name =="pawnsMG")
+		kingStormBonus[1] = stoi(value);
+	}
+	else if(name =="kingStormBonus2")
 	{
-		Position::pieceValue[Position::whitePawns][0] = stoi(value);
-		Position::pieceValue[Position::blackPawns][0] = stoi(value);
-		Position::initPstValues();
+		kingStormBonus[2] = stoi(value);
+	}
+	else if(name =="kingSafetyBonus0")
+	{
+		kingSafetyBonus[0] = stoi(value);
+	}
+	else if(name =="kingSafetyBonus1")
+	{
+		kingSafetyBonus[1] = stoi(value);
+	}
+	else if(name =="kingSafetyPars10")
+	{
+		kingSafetyPars1[0] = stoi(value);
+	}
+	else if(name =="kingSafetyPars11")
+	{
+		kingSafetyPars1[1] = stoi(value);
+	}
+	else if(name =="kingSafetyPars12")
+	{
+		kingSafetyPars1[2] = stoi(value);
+	}
+	else if(name =="kingSafetyPars13")
+	{
+		kingSafetyPars1[3] = stoi(value);
+	}
+	else if(name =="kingSafetyPars20")
+	{
+		kingSafetyPars2[0] = stoi(value);
+	}
+	else if(name =="kingSafetyPars21")
+	{
+		kingSafetyPars2[1] = stoi(value);
+	}
+	else if(name =="kingSafetyPars22")
+	{
+		kingSafetyPars2[2] = stoi(value);
+	}
+	else if(name =="kingSafetyPars23")
+	{
+		kingSafetyPars2[3] = stoi(value);
 	}
 }
 
