@@ -1650,7 +1650,7 @@ bool Position::isMoveLegal(const Move &m)const
 			if( !isKing(piece)
 				&& !(
 					((bitSet((tSquare)(m.bit.to-( m.isEnPassantMove() ? pawnPush(s.nextMove) : 0)))) & s.checkers)
-					|| ((bitSet((tSquare)m.bit.to) & SQUARES_BETWEEN[getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove))][firstOne(s.checkers)]) & ~Us[Pieces])
+					|| ((bitSet((tSquare)m.bit.to) & SQUARES_BETWEEN[getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove))][firstOne(s.checkers)]) /*& ~Us[Pieces]*/)
 				)
 			)
 			{
@@ -1671,10 +1671,10 @@ bool Position::isMoveLegal(const Move &m)const
 	}
 
 	// mossa mal formata
-	if(m.bit.flags!=Move::fpromotion && m.bit.promotion!=0)
+	/*if(m.bit.flags!=Move::fpromotion && m.bit.promotion!=0)
 	{
 		return false;
-	}
+	}*/
 	//arrocco impossibile
 	if( m.isCastleMove() )
 	{
