@@ -575,7 +575,7 @@ void Movegen::generateMoves()
 	//king castle
 	if(type !=Movegen::allEvasionMg && type!=Movegen::captureEvasionMg && type!=Movegen::quietEvasionMg && type!= Movegen::captureMg)
 	{
-
+		m.bit.promotion = 0;
 		if(s.castleRights & ((Position::wCastleOO |Position::wCastleOOO)<<(2*color)))
 		{
 

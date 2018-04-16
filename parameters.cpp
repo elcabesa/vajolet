@@ -140,15 +140,15 @@ simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitma
 };
 simdScore weakPawnAttackedByKing={86,4986,0,0};
 //------------------------------------------------
-//king safety
+//king safety 
 //------------------------------------------------
-simdScore KingAttackWeights =  {500,300,200,200};
-simdScore kingShieldBonus =  {2400,0,0,0};
-simdScore kingFarShieldBonus =  {1800,0,0,0};
-simdScore kingStormBonus =  {150,10,0,0};
-simdScore kingSafetyBonus =  {2000,100,0,0};
-simdScore kingSafetyPars1 =  {500,500,10,200};
-simdScore kingSafetyPars2 =  {1000,1000,1000,1000};
+simdScore KingAttackWeights =  {471,257,136,145};
+simdScore kingShieldBonus =  {2483,0,0,0};
+simdScore kingFarShieldBonus =  {1724,0,0,0};
+simdScore kingStormBonus =  {184,58,10,0};
+simdScore kingSafetyBonus =  {2002,170,0,0};
+simdScore kingSafetyPars1 =  {448,516,16,163};
+simdScore kingSafetyPars2 =  {1103,914,981,1076};
 
 //------------------------------------------------
 

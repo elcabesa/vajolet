@@ -614,7 +614,7 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 		attackUnits += KingExposed[ c? 63 - kingSquare : kingSquare ] * kingSafetyPars1[2];
 		attackUnits -= (getPieceCount(c? whiteQueens: blackQueens)==0) * kingSafetyPars1[3];
 
-		attackUnits -= kingSafety / kingStormBonus[1] ;
+		attackUnits -= 10 * kingSafety / kingStormBonus[1] ;
 		attackUnits += kingStormBonus[2] ;
 
 
