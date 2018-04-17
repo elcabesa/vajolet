@@ -15,6 +15,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <algorithm>
+
 #include "vajolet.h"
 #include "command.h"
 #include "io.h"
@@ -32,7 +34,7 @@
 
 #include <fstream>
 
-std::ifstream infile("out.epd");
+std::ifstream infile("oracle.epd");
 struct results
 {
 	results(const std::string& _FEN, const double _res):FEN(_FEN),res(_res){}
@@ -58,36 +60,14 @@ int readFile() {
 		sync_cout<<"start parsing file"<<sync_endl;
 		while (getline(infile, line)) {
 			double res = 0;
-			std::size_t delimiter = line.find("c9 \"");
+			std::size_t delimiter = line.find(" c9 ");
 			std::string FEN = line.substr(0, delimiter);
-			std::size_t end = line.find("\"", delimiter + 4);
-			std::string RESULT = line.substr(delimiter + 4, end - delimiter - 4);
-			if(RESULT == "1-0")
-			{
-				res = 1.0;
-				//std::cout << RESULT <<": 1"<< std::endl;
-			}
-			else if(RESULT == "0-1")
-			{
-				res = 0.0;
-				//std::cout << RESULT <<": 0"<< std::endl;
-			}else if (RESULT == "1/2-1/2")
-			{
-				res = 0.5;
-				//std::cout << RESULT <<": 0.5"<< std::endl;
-			}
-			else
-			{
-				std::cout << "ERRORE" << std::endl;
-				return -1;
-			}
+			std::string RESULT = line.substr(delimiter + 4);
+
+			res = std::stod(RESULT);
 
 			positions.emplace_back(results(FEN, res));
-			//std::cout << RESULT << std::endl;
-			/*std::cout << delimiter << std::endl;
-			 std::cout << end << std::endl;
-			 std::cout << RESULT << std::endl;
-			 return 0;*/
+
 		}
 		infile.close();
 		sync_cout<<"finished parsing file"<<sync_endl;
@@ -101,30 +81,30 @@ int readFile() {
 	return 0;
 }
 
-//Search src;
-//PVline newPV;
-long double calcSigleError(Position &p, long double res)
+
+
+long double calcSigleError2(Position &p, long double res)
 {
-	const long double k = 3.7e-5;
-
-	//src.pos = p;
-	//newPV.reset();
-	//long double eval = src.qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, newPV);
+	
 	long double eval = p.eval<false>();
+	
+	long double sateval = std::min( std::max(eval, -200000.0L ), 200000.0L );
+	long double satres = std::min( std::max(res, -200000.0L ), 200000.0L );
+	
 
-	//std::cout<<p.getFen()<<" "<<eval <<" "<<eval2<<" " << eval -eval2<<std::endl;
-
-	if(p.getNextTurn() == Position::blackTurn)
+	/*if( std::abs(sateval - satres) > 200000 )
 	{
-		eval *= -1.0;
-	}
-	long double sigmoid = 1.0l / (1.0l + std::pow(10.0, -k * eval));
-	long double error = res - sigmoid;
+		std::cout<<p.getFen()<<" "<<sateval <<" "<<satres<<" " << sateval - satres<<std::endl;
+	}*/
+	
+	long double error = sateval - satres ;
 	return std::pow(error, 2);
 	
 }
 
-long double calcError(void)
+
+
+long double calcError2(void)
 {
 	Position p;
 	initMobilityBonus();
@@ -133,12 +113,14 @@ long double calcError(void)
 	for(const auto& v : positions)
 	{
 		p.setupFromFen(v.FEN);
-		totalError += calcSigleError(p, v.res);
+		totalError += calcSigleError2(p, v.res);
 
 	}
 	totalError /= positions.size();
 	return totalError;
 }
+
+
 
 
 
@@ -170,92 +152,16 @@ std::vector<parameter> parameters;
 void updateParameter(parameter& par,unsigned int i, const long double delta)
 {
 	(*(par.pointer))[i] = int (par.value[i] + delta);
-	if(par.requireUpdate)
+	/*if(par.requireUpdate)
 	{
 		Position::initPstValues();
 		initMobilityBonus();
-	}
-
-}
-long double calcPartialDerivate2(parameter& par,unsigned int i, Position & pos, long double res)
-{
-
-	const long double delta = 1.0;
-
-	updateParameter(par, i, delta);
-
-	long double ep = calcSigleError(pos, res);
-
-	updateParameter(par, i, -delta);
-
-	long double em = calcSigleError(pos, res);
-
-	long double pd = (ep - em)/(2.0 * delta);
-
-	updateParameter(par, i, 0);
-
-	return pd;
+	}*/
 
 }
 
-long double calcGradient2(long double& error)
-{
-	std::cout<<"calc error and gradient"<<std::endl;
-	long double gradientMagnitude = 0.0;
-	error= 0.0;
-	
-	Position pos;
-	
-	for(auto& par : parameters)
-	{
-		for( unsigned int i = 0; i < par.count; ++i)
-		{
-			par.partialDerivate[i] =0.0;
-		}
-	}
-	//unsigned int tot = 0;
-	for(const auto& v : positions)
-	{
-		//tot++;
-		//std::cout<<"\r"<<tot;
-		pos.setupFromFen(v.FEN);
-		long double res = v.res;
-		error += calcSigleError(pos, res);
-		for(auto& par : parameters)
-		{
-			for( unsigned int i = 0; i < par.count; ++i)
-			{
-				par.partialDerivate[i] += calcPartialDerivate2(par,i,pos, res);
-			}
 
 
-		}
-		
-	}
-	
-	for(auto& p : parameters)
-	{
-		for( unsigned int i = 0; i < p.count; ++i)
-		{
-			p.partialDerivate[i] /= positions.size();
-		}
-	}
-	
-	for(auto& p : parameters)
-	{
-		for( unsigned int i = 0; i < p.count; ++i)
-		{
-			long double x = std::pow(p.partialDerivate[i], 2.0);
-			p.totalGradient[i] += x;
-			gradientMagnitude += x;
-		}
-		
-	}
-	error /= positions.size();
-
-	return gradientMagnitude;
-	
-}
 
 
 /*!	\brief	main function
@@ -292,7 +198,7 @@ int main()
 
 	readFile();
 
-/*	parameters.push_back(parameter("initialPieceValue[2]",&initialPieceValue[2],2,true));
+	parameters.push_back(parameter("initialPieceValue[2]",&initialPieceValue[2],2,true));
 	parameters.push_back(parameter("initialPieceValue[3]",&initialPieceValue[3],2,true));
 	parameters.push_back(parameter("initialPieceValue[4]",&initialPieceValue[4],2,true));
 	parameters.push_back(parameter("initialPieceValue[5]",&initialPieceValue[5],2,true));
@@ -405,18 +311,6 @@ int main()
 
 	parameters.push_back(parameter("weakPawnAttackedByKing",&weakPawnAttackedByKing,2));
 
-	parameters.push_back(parameter("kingShieldBonus",&kingShieldBonus,1));
-	parameters.push_back(parameter("kingFarShieldBonus",&kingFarShieldBonus,1));
-	parameters.push_back(parameter("kingStormBonus",&kingStormBonus,1));
-
-	parameters.push_back(parameter("kingSafetyBonus",&kingSafetyBonus,2));
-
-	parameters.push_back(parameter("kingSafetyScaling",&kingSafetyScaling,1));
-	parameters.push_back(parameter("KingSafetyMaxAttack",&KingSafetyMaxAttack,1));
-	parameters.push_back(parameter("KingSafetyLinearCoefficent",&KingSafetyLinearCoefficent,1));
-	parameters.push_back(parameter("KingAttackUnitWeigth",&KingAttackUnitWeigth,4));
-	parameters.push_back(parameter("KingSafetyMaxResult",&KingSafetyMaxResult,1));*/
-
 	parameters.push_back( parameter( "KingAttackWeights", &KingAttackWeights, 4 ) );
 	parameters.push_back( parameter( "kingShieldBonus", &kingShieldBonus, 1 ) );
 	parameters.push_back( parameter( "kingFarShieldBonus", &kingFarShieldBonus, 1 ) );
@@ -439,24 +333,28 @@ int main()
 
 	std::cout<<"start to optimizing "<<totParameters<<" parameters"<<std::endl;
 
-	/*
-	for(auto& p : parameters)
+	
+	/*for(auto& p : parameters)
 	{
 		std::cout<<p.name<<" "<<p.value<<std::endl;
 	}*/
 
 	std::vector<parameter> bestParameters;
 
-	long double learningRate = 10000.0;
-	long double error = 1e22;// big number
-	long double minValue = 1e6;
-
 	std::random_device rd;
 	std::mt19937 g(rd());
+	
+	std::uniform_int_distribution<> dis(-10, 10);
+	
 	unsigned long iteration = 0;
 	unsigned long bestIteration = 0;
 
 	bool stop = false;
+	
+	long double error = calcError2();// big number
+	long double minValue = error;
+	std::cout<<"iteration #"<<iteration<<std::endl;
+	std::cout<<"startError "<<error<<std::endl;
 
 	while(!stop)
 	{
@@ -466,14 +364,32 @@ int main()
 		std::cout<<"shuffle"<<std::endl;
 		std::shuffle(positions.begin(), positions.end(), g);
 
+		for(auto& p : parameters)
+		{
+			for( unsigned int i = 0; i < 4; ++i)
+			{
+				updateParameter(p,i, dis(g));
+
+			}
+		}
+		Position::initPstValues();
+		initMobilityBonus();
+		
 
 
-
-		long double gradientMagnitude = calcGradient2(error);
+		error = calcError2();
 
 		std::cout<<"newError "<<error<<std::endl;
 		if( error < minValue)
 		{
+			for(auto& p : parameters)
+			{
+				for( unsigned int i = 0; i < 4; ++i)
+				{
+					(p.value[i]) = (*(p.pointer))[i];
+				}
+			}
+			
 			std::cout<<"###### NEW BEST ITERATION ####"<<std::endl;
 
 			minValue = error;
@@ -499,38 +415,6 @@ int main()
 			}
 
 		}
-
-		std::cout<<"--------------------------------------------------------------------"<<std::endl;
-		std::cout<<"UPDATE PARAMETERS"<<std::endl;
-
-
-
-		unsigned int par = 0;
-		for(auto& p : parameters)
-		{
-
-			for( unsigned int i = 0; i < p.count; ++i)
-			{
-				++par;
-				long double oldvalue = p.value[i];
-				double lr = learningRate/(std::pow(p.totalGradient[i],0.5));
-				p.value[i] -= lr * p.partialDerivate[i];
-
-				std::cout<<par<<"/"<<totParameters<<": dy/d("<<p.name<<"["<<i<<"]) = "<<p.partialDerivate[i]<<" totalGradient = "<<p.totalGradient[i]<<
-						" newValue = "<<p.value[i] <<" ("<<oldvalue<<") learning rate = "<<lr<<std::endl;
-			}
-		}
-		std::cout<<"\ngradient magnitude "<<gradientMagnitude<<std::endl;
-		if(gradientMagnitude < 1e-12)
-		{
-			stop = true;
-		}
-
-
-
-
-
-
 	}
 
 
