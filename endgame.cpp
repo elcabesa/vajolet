@@ -59,6 +59,13 @@ bool Position::evalKxvsK(Score& res)
 
 		mul = -1;
 	}
+	Movegen mg(*this);
+	if( mg.getNumberOfLegalMoves() == 0 )
+	{
+		res = 0;
+		return true;
+	}
+
 
 	res = SCORE_KNOWN_WIN + 50000;
 	res -= 10 * SQUARE_DISTANCE[winKingSquare][losKingSquare];// devo tenere il re vicino
@@ -104,16 +111,21 @@ bool Position::evalKNPvsK(Score& res)
 }
 
 
-bool Position::evalKBPvsK(Score& res)
+bool Position::evalKBPsvsK(Score& res)
 {
 	Color Pcolor = getBitmap(whitePawns) ? white : black;
-	tSquare pawnSquare;
+	bitMap pawns;
 	tSquare bishopSquare;
+	
+	bitMap HFile = FILEMASK[H1];
+	bitMap AFile = FILEMASK[A1];
+	
 	if(Pcolor == white)
-	{
-		pawnSquare = getSquareOfThePiece(whitePawns);
-		int pawnFile = FILES[pawnSquare];
-		if( pawnFile ==0 || pawnFile ==7 )
+	{	
+		pawns = getBitmap(whitePawns);
+		int pawnFile = FILES[firstOne( pawns )];
+		
+		if(  0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
 		{
 			bishopSquare = getSquareOfThePiece(whiteBishops);
 			if( SQUARE_COLOR[BOARDINDEX[pawnFile][7]] != SQUARE_COLOR[bishopSquare])
@@ -129,9 +141,9 @@ bool Position::evalKBPvsK(Score& res)
 	}
 	else
 	{
-		pawnSquare = getSquareOfThePiece(blackPawns);
-		int pawnFile = FILES[pawnSquare];
-		if( pawnFile==0 || pawnFile == 7 )
+		pawns = getBitmap(blackPawns);
+		int pawnFile = FILES[firstOne( pawns )];
+		if( 0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
 		{
 			bishopSquare = getSquareOfThePiece(blackBishops);
 			if( SQUARE_COLOR[BOARDINDEX[pawnFile][0]] != SQUARE_COLOR[ bishopSquare ])
@@ -285,6 +297,13 @@ bool Position::evalKQvsK(Score& res)
 	Color color = getBitmap(whiteQueens) ? white : black;
 	tSquare kingSquare;
 	tSquare enemySquare;
+	
+	Movegen mg(*this);
+	if( mg.getNumberOfLegalMoves() == 0 )
+	{
+		res = 0;
+		return true;
+	}
 
 	int mul = 1;
 	if(color == white)
@@ -315,6 +334,13 @@ bool Position::evalKRvsK(Score& res)
 	tSquare kingSquare;
 	tSquare enemySquare;
 
+	Movegen mg(*this);
+	if( mg.getNumberOfLegalMoves() == 0 )
+	{
+		res = 0;
+		return true;
+	}
+	
 	int mul = 1;
 	if(color == white)
 	{
@@ -518,6 +544,44 @@ bool Position::evalKPvsK(Score& res)
 	return false;
 }
 
+bool Position::evalKPsvsK(Score& res)
+{
+	Color color = getBitmap(whitePawns) ? white : black;
+	
+	tSquare kingSquare;
+	bitMap pawns;
+	
+	bitMap HFile = FILEMASK[H1];
+	bitMap AFile = FILEMASK[A1];
+	
+	// If all pawns are ahead of the king, on a single rook file and
+	// the king is within one file of the pawns, it's a draw.
+	if( color == white )
+	{
+		kingSquare = getSquareOfThePiece( blackKing );
+		pawns = getBitmap(whitePawns);
+	}
+	else
+	{
+		kingSquare = getSquareOfThePiece( whiteKing );
+		pawns = getBitmap(blackPawns);
+	}
+	
+	if( 
+			// re e pedoni sono al massimo su colonne adiacenti
+			(std::abs(FILES[ firstOne( pawns ) ] - FILES[ kingSquare ])<=1 )
+			// se tutti i pedoni sono sulla colonna A oppure tutti i pedoni sono sulla colonna H
+			&&(  0 ==( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
+			// se tutti i pedoni sono davanti al re
+			&& ( ( ~PASSED_PAWN[ 1 - color ][kingSquare] & pawns) == 0 )
+	)
+	{
+		res = 0;
+		return true;
+	}
+	return false;
+}
+
 
 bool Position::evalOppositeBishopEndgame(Score& res)
 {
@@ -686,8 +750,13 @@ void Position::initMaterialKeys(void)
 			{"k7/1ppppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
 			{"k7/pppppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
 
-			{"k7/8/8/8/8/8/8/5BPK w - -",materialStruct::exactFunction, &Position::evalKBPvsK, 0 },
-			{"kbp5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBPvsK, 0 },
+			{"k7/8/8/8/8/8/8/5BPK w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/4BPPK w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/3BPPPK w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"kbp5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"kbpp4/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"kbppp3/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
+			
 			{"k7/8/8/8/8/8/8/5BNK w - -",materialStruct::exactFunction, &Position::evalKBNvsK, 0 },
 			{"kbn5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBNvsK, 0 },
 
@@ -699,6 +768,23 @@ void Position::initMaterialKeys(void)
 
 			{"k7/8/8/8/8/8/8/6PK w - -",materialStruct::exactFunction, &Position::evalKPvsK, 0 },
 			{"kp6/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPvsK, 0 },
+			
+			{"k7/8/8/8/8/8/8/5PPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/4PPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/3PPPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/2PPPPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/1PPPPPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/PPPPPPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kpp5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kppp4/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kpppp3/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kppppp2/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
+			
+			
+			
+			
 
 			{"kr6/8/8/8/8/8/8/6NK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
 			{"kr6/8/8/8/8/8/8/6BK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },

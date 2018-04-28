@@ -689,7 +689,7 @@ private:
 
 	const materialStruct  * getMaterialData();
 	bool evalKxvsK(Score& res);
-	bool evalKBPvsK(Score& res);
+	bool evalKBPsvsK(Score& res);
 	bool evalKQvsKP(Score& res);
 	bool evalKRPvsKr(Score& res);
 	bool evalKBNvsK(Score& res);
@@ -697,6 +697,7 @@ private:
 	bool evalKRvsK(Score& res);
 	bool kingsDirectOpposition();
 	bool evalKPvsK(Score& res);
+	bool evalKPsvsK(Score& res);
 	bool evalOppositeBishopEndgame(Score& res);
 	bool evalKRvsKm(Score& res);
 	bool evalKNNvsK(Score& res);
