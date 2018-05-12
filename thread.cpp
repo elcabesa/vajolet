@@ -35,7 +35,7 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	}
 	else if(lim.moveTime)
 	{
-		timeMan.maxAllocatedTime = lim.moveTime;
+		timeMan.maxAllocatedTime = lim.moveTime+1;
 		timeMan.allocatedTime = lim.moveTime;
 		timeMan.minSearchTime =lim.moveTime;
 		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
