@@ -34,6 +34,10 @@
 
 #include <fstream>
 
+const int arraySize = 200;
+const int arrayScaling = 300;
+unsigned long long int array[arraySize]= {0};
+
 std::ifstream infile("oracle.epd");
 struct results
 {
@@ -91,11 +95,25 @@ long double calcSigleError2(Position &p, long double res)
 	long double sateval = std::min( std::max(eval, -200000.0L ), 200000.0L );
 	long double satres = std::min( std::max(res, -200000.0L ), 200000.0L );
 	
-
-	/*if( std::abs(sateval - satres) > 200000 )
+	if( std::abs( sateval ) <= 199900.0L && std::abs( satres ) <= 199900.0L)
 	{
-		std::cout<<p.getFen()<<" "<<sateval <<" "<<satres<<" " << sateval - satres<<std::endl;
-	}*/
+		/*unsigned int index = std::abs(sateval - satres)/ arrayScaling;
+		if( index >= arraySize )
+		{
+			index = arraySize -1;
+		}
+		array[index]++;
+		
+
+		if( 
+		std::abs(sateval - satres) >15000
+		//&& std::abs(sateval - satres) < 14100  
+		//&& bitCnt(p.getOccupationBitmap()) >3 
+		)
+		{
+			std::cout<<p.getFen()<<" "<<sateval <<" "<<satres<<" " << sateval - satres<<std::endl;
+		}*/
+	}
 	
 	long double error = sateval - satres ;
 	return std::pow(error, 2);
@@ -107,7 +125,6 @@ long double calcSigleError2(Position &p, long double res)
 long double calcError2(void)
 {
 	Position p;
-	initMobilityBonus();
 	long double totalError = 0.0;
 
 	for(const auto& v : positions)
@@ -152,10 +169,13 @@ std::vector<parameter> parameters;
 void updateParameter(parameter& par,unsigned int i, const long double delta)
 {
 	(*(par.pointer))[i] = int (par.value[i] + delta);
+	if( (*(par.pointer))[i] == 0 )
+	{
+		(*(par.pointer))[i] = 1;
+	}
 	/*if(par.requireUpdate)
 	{
 		Position::initPstValues();
-		initMobilityBonus();
 	}*/
 
 }
@@ -185,7 +205,6 @@ int main()
 	Search::initLMRreduction();
 	TT.setSize(1);
 	Position::initMaterialKeys();
-	initMobilityBonus();
 	tb_init(Search::SyzygyPath.c_str());
 	
 	enablePawnHash =false;
@@ -198,45 +217,48 @@ int main()
 
 	readFile();
 
-	parameters.push_back(parameter("initialPieceValue[2]",&initialPieceValue[2],2,true));
-	parameters.push_back(parameter("initialPieceValue[3]",&initialPieceValue[3],2,true));
-	parameters.push_back(parameter("initialPieceValue[4]",&initialPieceValue[4],2,true));
-	parameters.push_back(parameter("initialPieceValue[5]",&initialPieceValue[5],2,true));
-	parameters.push_back(parameter("initialPieceValue[6]",&initialPieceValue[6],1,true));
+/*
+++	parameters.push_back(parameter("initialPieceValue[2]",&initialPieceValue[2],2,true));
+++	parameters.push_back(parameter("initialPieceValue[3]",&initialPieceValue[3],2,true));
+++	parameters.push_back(parameter("initialPieceValue[4]",&initialPieceValue[4],2,true));
+++	parameters.push_back(parameter("initialPieceValue[5]",&initialPieceValue[5],2,true));
+++	parameters.push_back(parameter("initialPieceValue[6]",&initialPieceValue[6],1,true));
 
-	parameters.push_back(parameter("PawnD3",&PawnD3,2,true));
-	parameters.push_back(parameter("PawnD4",&PawnD4,2,true));
-	parameters.push_back(parameter("PawnD5",&PawnD5,2,true));
-	parameters.push_back(parameter("PawnE3",&PawnE3,2,true));
-	parameters.push_back(parameter("PawnE4",&PawnE4,2,true));
-	parameters.push_back(parameter("PawnE5",&PawnE5,2,true));
-	parameters.push_back(parameter("PawnCentering",&PawnCentering,2,true));
-	parameters.push_back(parameter("PawnRankBonus",&PawnRankBonus,2,true));
-	parameters.push_back(parameter("KnightPST",&KnightPST,2,true));
-	parameters.push_back(parameter("BishopPST",&BishopPST,2,true));
-	parameters.push_back(parameter("RookPST",&RookPST,2,true));
-	parameters.push_back(parameter("QueenPST",&QueenPST,2,true));
-	parameters.push_back(parameter("KingPST",&KingPST,2,true));
+++	parameters.push_back(parameter("PawnD3",&PawnD3,2,true));
+++	parameters.push_back(parameter("PawnD4",&PawnD4,2,true));
+++	parameters.push_back(parameter("PawnD5",&PawnD5,2,true));
+++	parameters.push_back(parameter("PawnE3",&PawnE3,2,true));
+++	parameters.push_back(parameter("PawnE4",&PawnE4,2,true));
+++	parameters.push_back(parameter("PawnE5",&PawnE5,2,true));
+++	parameters.push_back(parameter("PawnCentering",&PawnCentering,2,true));
+++	parameters.push_back(parameter("PawnRankBonus",&PawnRankBonus,2,true));
+++	parameters.push_back(parameter("KnightPST",&KnightPST,2,true));
+++	parameters.push_back(parameter("BishopPST",&BishopPST,2,true));
+++	parameters.push_back(parameter("RookPST",&RookPST,2,true));
+++	parameters.push_back(parameter("QueenPST",&QueenPST,2,true));
+++	parameters.push_back(parameter("KingPST",&KingPST,2,true));
 
-	parameters.push_back(parameter("BishopBackRankOpening",&BishopBackRankOpening,2,true));
-	parameters.push_back(parameter("KnightBackRankOpening",&KnightBackRankOpening,2,true));
-	parameters.push_back(parameter("RookBackRankOpening",&RookBackRankOpening,2,true));
-	parameters.push_back(parameter("QueenBackRankOpening",&QueenBackRankOpening,2,true));
-	parameters.push_back(parameter("BishopOnBigDiagonals",&BishopOnBigDiagonals,2,true));
+++	parameters.push_back(parameter("BishopBackRankOpening",&BishopBackRankOpening,2,true));
+++	parameters.push_back(parameter("KnightBackRankOpening",&KnightBackRankOpening,2,true));
+++	parameters.push_back(parameter("RookBackRankOpening",&RookBackRankOpening,2,true));
+++	parameters.push_back(parameter("QueenBackRankOpening",&QueenBackRankOpening,2,true));
+++	parameters.push_back(parameter("BishopOnBigDiagonals",&BishopOnBigDiagonals,2,true));
 
-
-	parameters.push_back(parameter("queenMobilityPars",&queenMobilityPars,4,true));
-	parameters.push_back(parameter("rookMobilityPars",&rookMobilityPars,4,true));
-	parameters.push_back(parameter("bishopMobilityPars",&bishopMobilityPars,4,true));
-	parameters.push_back(parameter("knightMobilityPars",&knightMobilityPars,4,true));
-	parameters.push_back(parameter("isolatedPawnPenalty",&isolatedPawnPenalty,2));
-	parameters.push_back(parameter("isolatedPawnPenaltyOpp",&isolatedPawnPenaltyOpp,2));
-	parameters.push_back(parameter("doubledPawnPenalty",&doubledPawnPenalty,2));
-	parameters.push_back(parameter("backwardPawnPenalty",&backwardPawnPenalty,2));
++	parameters.push_back(parameter("queenMobilityPars",&queenMobilityPars,4,true));
++	parameters.push_back(parameter("rookMobilityPars",&rookMobilityPars,4,true));
++	parameters.push_back(parameter("bishopMobilityPars",&bishopMobilityPars,4,true));
++	parameters.push_back(parameter("knightMobilityPars",&knightMobilityPars,4,true));
+++	parameters.push_back(parameter("isolatedPawnPenalty",&isolatedPawnPenalty,2));
+++	parameters.push_back(parameter("isolatedPawnPenaltyOpp",&isolatedPawnPenaltyOpp,2));
+++	parameters.push_back(parameter("doubledPawnPenalty",&doubledPawnPenalty,2));
+++	parameters.push_back(parameter("backwardPawnPenalty",&backwardPawnPenalty,2));*/
 	parameters.push_back(parameter("chainedPawnBonus",&chainedPawnBonus,2));
-	parameters.push_back(parameter("passedPawnFileAHPenalty",&passedPawnFileAHPenalty,2));
+	parameters.push_back(parameter("chainedPawnBonusOffset",&chainedPawnBonusOffset,2));
+	parameters.push_back(parameter("chainedPawnBonusOpp",&chainedPawnBonusOpp,2));
+	parameters.push_back(parameter("chainedPawnBonusOffsetOpp",&chainedPawnBonusOffsetOpp,2));
+/*	parameters.push_back(parameter("passedPawnFileAHPenalty",&passedPawnFileAHPenalty,2));
 	parameters.push_back(parameter("passedPawnSupportedBonus",&passedPawnSupportedBonus,2));
-	parameters.push_back(parameter("candidateBonus",&candidateBonus,2));
+++	parameters.push_back(parameter("candidateBonus",&candidateBonus,2));
 	parameters.push_back(parameter("passedPawnBonus",&passedPawnBonus,2));
 	parameters.push_back(parameter("passedPawnUnsafeSquares",&passedPawnUnsafeSquares,2));
 	parameters.push_back(parameter("passedPawnBlockedSquares",&passedPawnBlockedSquares,2));
@@ -245,30 +267,44 @@ int main()
 	parameters.push_back(parameter("unstoppablePassed",&unstoppablePassed,2));
 	parameters.push_back(parameter("rookBehindPassedPawn",&rookBehindPassedPawn,2));
 	parameters.push_back(parameter("EnemyRookBehindPassedPawn",&EnemyRookBehindPassedPawn,2));
-	parameters.push_back(parameter("holesPenalty",&holesPenalty,2));
-	parameters.push_back(parameter("pawnCenterControl",&pawnCenterControl,2));
-	parameters.push_back(parameter("pawnBigCenterControl",&pawnBigCenterControl,2));
-	parameters.push_back(parameter("pieceCoordination",&pieceCoordination,2));
-	parameters.push_back(parameter("piecesCenterControl",&piecesCenterControl,2));
-	parameters.push_back(parameter("piecesBigCenterControl",&piecesBigCenterControl,2));
-	parameters.push_back(parameter("rookOn7Bonus",&rookOn7Bonus,2));
-	parameters.push_back(parameter("rookOnPawns",&rookOnPawns,2));
-	parameters.push_back(parameter("queenOn7Bonus",&queenOn7Bonus,2));
-	parameters.push_back(parameter("queenOnPawns",&queenOnPawns,2));
-	parameters.push_back(parameter("rookOnOpen",&rookOnOpen,2));
-	parameters.push_back(parameter("rookOnSemi",&rookOnSemi,2));
-	parameters.push_back(parameter("rookTrapped",&rookTrapped,2));
-	parameters.push_back(parameter("rookTrappedKingWithoutCastling",&rookTrappedKingWithoutCastling,2));
-	parameters.push_back(parameter("knightOnOutpost",&knightOnOutpost,2));
-	parameters.push_back(parameter("knightOnOutpostSupported",&knightOnOutpostSupported,2));
-	parameters.push_back(parameter("knightOnHole",&knightOnHole,2));
-	parameters.push_back(parameter("KnightAttackingWeakPawn",&KnightAttackingWeakPawn,2));
-	parameters.push_back(parameter("bishopOnOutpost",&bishopOnOutpost,2));
-	parameters.push_back(parameter("bishopOnOutpostSupported",&bishopOnOutpostSupported,2));
-	parameters.push_back(parameter("bishopOnHole",&bishopOnHole,2));
-	parameters.push_back(parameter("badBishop",&badBishop,2));
-	parameters.push_back(parameter("tempo",&tempo,2));
-	parameters.push_back(parameter("bishopPair",&bishopPair,2));
+++	parameters.push_back(parameter("holesPenalty",&holesPenalty,2));
+++	parameters.push_back(parameter("pawnCenterControl",&pawnCenterControl,2));
+++	parameters.push_back(parameter("pawnBigCenterControl",&pawnBigCenterControl,2));
+
++	parameters.push_back(parameter("pieceCoordination[2]",&pieceCoordination[2],2));
++	parameters.push_back(parameter("pieceCoordination[3]",&pieceCoordination[3],2));
++	parameters.push_back(parameter("pieceCoordination[4]",&pieceCoordination[4],2));
++	parameters.push_back(parameter("pieceCoordination[5]",&pieceCoordination[5],2));
+	
++	parameters.push_back(parameter("piecesCenterControl[2]",&piecesCenterControl[2],2));
++	parameters.push_back(parameter("piecesCenterControl[3]",&piecesCenterControl[3],2));
++	parameters.push_back(parameter("piecesCenterControl[4]",&piecesCenterControl[4],2));
++	parameters.push_back(parameter("piecesCenterControl[5]",&piecesCenterControl[5],2));
+	
++	parameters.push_back(parameter("piecesBigCenterControl[2]",&piecesBigCenterControl[2],2));
++	parameters.push_back(parameter("piecesBigCenterControl[3]",&piecesBigCenterControl[3],2));
++	parameters.push_back(parameter("piecesBigCenterControl[4]",&piecesBigCenterControl[4],2));
++	parameters.push_back(parameter("piecesBigCenterControl[5]",&piecesBigCenterControl[5],2));
+	
++	parameters.push_back(parameter("rookOn7Bonus",&rookOn7Bonus,2));
++	parameters.push_back(parameter("rookOnPawns",&rookOnPawns,2));
++	parameters.push_back(parameter("queenOn7Bonus",&queenOn7Bonus,2));
++	parameters.push_back(parameter("queenOnPawns",&queenOnPawns,2));
++	parameters.push_back(parameter("rookOnOpen",&rookOnOpen,2));
++	parameters.push_back(parameter("rookOnSemi",&rookOnSemi,2));
++	parameters.push_back(parameter("rookTrapped",&rookTrapped,2));
++	parameters.push_back(parameter("rookTrappedKingWithoutCastling",&rookTrappedKingWithoutCastling,2));
++	parameters.push_back(parameter("knightOnOutpost",&knightOnOutpost,2));
++	parameters.push_back(parameter("knightOnOutpostSupported",&knightOnOutpostSupported,2));
++	parameters.push_back(parameter("knightOnHole",&knightOnHole,2));
++	parameters.push_back(parameter("KnightAttackingWeakPawn",&KnightAttackingWeakPawn,2));
++	parameters.push_back(parameter("bishopOnOutpost",&bishopOnOutpost,2));
++	parameters.push_back(parameter("bishopOnOutpostSupported",&bishopOnOutpostSupported,2));
++	parameters.push_back(parameter("bishopOnHole",&bishopOnHole,2));
++	parameters.push_back(parameter("badBishop",&badBishop,2));
+++	parameters.push_back(parameter("tempo",&tempo,2));
+++	parameters.push_back(parameter("bishopPair",&bishopPair,2));
+++	parameters.push_back(parameter("queenVsRook2MinorsImbalance",&queenVsRook2MinorsImbalance,2));
 	parameters.push_back(parameter("ownKingNearPassedPawn",&ownKingNearPassedPawn,2));
 	parameters.push_back(parameter("enemyKingNearPassedPawn",&enemyKingNearPassedPawn,2));
 	parameters.push_back(parameter("spaceBonus",&spaceBonus,2));
@@ -319,7 +355,51 @@ int main()
 	parameters.push_back( parameter( "kingSafetyPars1", &kingSafetyPars1, 4 ) );
 	parameters.push_back( parameter( "kingSafetyPars2", &kingSafetyPars2, 4 ) );
 
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][0]",&mobilityBonus[Position::Knights][0],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][1]",&mobilityBonus[Position::Knights][1],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][2]",&mobilityBonus[Position::Knights][2],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][3]",&mobilityBonus[Position::Knights][3],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][4]",&mobilityBonus[Position::Knights][4],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][5]",&mobilityBonus[Position::Knights][5],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][6]",&mobilityBonus[Position::Knights][6],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][7]",&mobilityBonus[Position::Knights][7],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Knights][8]",&mobilityBonus[Position::Knights][8],2));
+	
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][0]",&mobilityBonus[Position::Bishops][0],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][1]",&mobilityBonus[Position::Bishops][1],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][2]",&mobilityBonus[Position::Bishops][2],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][3]",&mobilityBonus[Position::Bishops][3],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][4]",&mobilityBonus[Position::Bishops][4],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][5]",&mobilityBonus[Position::Bishops][5],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][6]",&mobilityBonus[Position::Bishops][6],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][7]",&mobilityBonus[Position::Bishops][7],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][8]",&mobilityBonus[Position::Bishops][8],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][9]",&mobilityBonus[Position::Bishops][9],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][10]",&mobilityBonus[Position::Bishops][10],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][11]",&mobilityBonus[Position::Bishops][11],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][12]",&mobilityBonus[Position::Bishops][12],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][13]",&mobilityBonus[Position::Bishops][13],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][14]",&mobilityBonus[Position::Bishops][14],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][15]",&mobilityBonus[Position::Bishops][15],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Bishops][16]",&mobilityBonus[Position::Bishops][16],2));
 
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][0]",&mobilityBonus[Position::Rooks][0],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][1]",&mobilityBonus[Position::Rooks][1],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][2]",&mobilityBonus[Position::Rooks][2],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][3]",&mobilityBonus[Position::Rooks][3],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][4]",&mobilityBonus[Position::Rooks][4],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][5]",&mobilityBonus[Position::Rooks][5],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][6]",&mobilityBonus[Position::Rooks][6],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][7]",&mobilityBonus[Position::Rooks][7],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][8]",&mobilityBonus[Position::Rooks][8],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][9]",&mobilityBonus[Position::Rooks][9],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][10]",&mobilityBonus[Position::Rooks][10],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][11]",&mobilityBonus[Position::Rooks][11],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][12]",&mobilityBonus[Position::Rooks][12],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][13]",&mobilityBonus[Position::Rooks][13],2));
++	parameters.push_back(parameter("mobilityBonus[Position::Rooks][14]",&mobilityBonus[Position::Rooks][14],2));
+	
+*/
 
 
 	unsigned int totParameters = 0;
@@ -355,6 +435,12 @@ int main()
 	long double minValue = error;
 	std::cout<<"iteration #"<<iteration<<std::endl;
 	std::cout<<"startError "<<error<<std::endl;
+	
+	/*for( int i = 0; i < arraySize; ++i )
+	{
+	std::cout<<"["<<arrayScaling*(i)<<";"<<arrayScaling*(i+1)<<") "<<array[i]<<std::endl;
+	}
+	return 0;*/
 
 	while(!stop)
 	{
@@ -372,8 +458,7 @@ int main()
 
 			}
 		}
-		Position::initPstValues();
-		initMobilityBonus();
+		Position::initScoreValues();
 		
 
 
@@ -384,7 +469,7 @@ int main()
 		{
 			for(auto& p : parameters)
 			{
-				for( unsigned int i = 0; i < 4; ++i)
+				for( unsigned int i = 0; i < p.count; ++i)
 				{
 					(p.value[i]) = (*(p.pointer))[i];
 				}

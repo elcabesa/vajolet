@@ -63,7 +63,6 @@ int main()
 	Search::initLMRreduction();
 	TT.setSize(1);
 	Position::initMaterialKeys();
-	initMobilityBonus();
 	tb_init(Search::SyzygyPath.c_str());
 
 	//----------------------------------

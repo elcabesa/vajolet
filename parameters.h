@@ -56,6 +56,9 @@ extern simdScore isolatedPawnPenaltyOpp;
 extern simdScore doubledPawnPenalty;
 extern simdScore backwardPawnPenalty;
 extern simdScore chainedPawnBonus;
+extern simdScore chainedPawnBonusOffset;
+extern simdScore chainedPawnBonusOpp;
+extern simdScore chainedPawnBonusOffsetOpp;
 extern simdScore passedPawnFileAHPenalty;
 extern simdScore passedPawnSupportedBonus;
 extern simdScore candidateBonus;
@@ -73,10 +76,10 @@ extern simdScore pawnCenterControl;
 extern simdScore pawnBigCenterControl;
 
 
-extern simdScore pieceCoordination;
+extern simdScore pieceCoordination[Position::lastBitboard];
 
-extern simdScore piecesCenterControl;
-extern simdScore piecesBigCenterControl;
+extern simdScore piecesCenterControl[Position::lastBitboard];
+extern simdScore piecesBigCenterControl[Position::lastBitboard];
 
 extern simdScore rookOn7Bonus;
 extern simdScore rookOnPawns;
@@ -127,6 +130,7 @@ extern simdScore kingSafetyPars2;
 
 extern simdScore queenVsRook2MinorsImbalance;
 
+extern simdScore mobilityBonus[Position::separationBitmap][32];
 
 
 

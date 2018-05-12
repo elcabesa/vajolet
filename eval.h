@@ -25,6 +25,5 @@
 #include "tables.h"
 
 extern bool enablePawnHash;
-void initMobilityBonus();
 
 #endif /* EVAL_H_ */

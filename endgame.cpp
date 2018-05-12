@@ -796,6 +796,12 @@ void Position::initMaterialKeys(void)
 
 			{"kr6/8/8/8/8/8/8/5PRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
 			{"krp5/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
+			
+			{"kr6/8/8/8/8/8/8/5NRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"krn5/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			
+			{"krn5/8/8/8/8/8/8/4NNRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"krnn4/8/8/8/8/8/8/5NRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
 
 			{"kq6/8/8/8/8/8/8/6PK w - -",materialStruct::exactFunction, &Position::evalKQvsKP, 0 },
 			{"kp6/8/8/8/8/8/8/6QK w - -",materialStruct::exactFunction, &Position::evalKQvsKP, 0 }
