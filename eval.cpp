@@ -1042,14 +1042,14 @@ Score Position::eval(void)
 	//	space
 	//---------------------------------------
 	// white pawns
-	bitMap spacew = getBitmap(whitePawns);
+	bitMap spacew = getBitmap(whitePawns) & spaceMask;
 	spacew |= spacew >> 8;
 	spacew |= spacew >> 16;
 	spacew |= spacew >> 32;
 	spacew &= ~attackedSquares[blackPieces];
 
 	// black pawns
-	bitMap spaceb = getBitmap(blackPawns);
+	bitMap spaceb = getBitmap(blackPawns) & spaceMask;
 	spaceb |= spaceb << 8;
 	spaceb |= spaceb << 16;
 	spaceb |= spaceb << 32;

@@ -46,11 +46,6 @@ extern simdScore RookBackRankOpening;
 extern simdScore QueenBackRankOpening;
 extern simdScore BishopOnBigDiagonals;
 
-extern simdScore queenMobilityPars;
-extern simdScore rookMobilityPars;
-extern simdScore bishopMobilityPars;
-extern simdScore knightMobilityPars;
-
 extern simdScore isolatedPawnPenalty;
 extern simdScore isolatedPawnPenaltyOpp;
 extern simdScore doubledPawnPenalty;

@@ -50,6 +50,7 @@ extern bitMap BITMAP_COLOR[2];
 extern int SQUARE_DISTANCE[squareNumber][squareNumber];
 extern bitMap centerBitmap;
 extern bitMap bigCenterBitmap;
+extern bitMap spaceMask;
 
 
 

@@ -77,6 +77,7 @@ int SQUARE_DISTANCE[squareNumber][squareNumber];
 
 bitMap centerBitmap;
 bitMap bigCenterBitmap;
+bitMap spaceMask;
 
 //--------------------------------------------------------------
 //	function bodies
@@ -369,5 +370,7 @@ void initData(void)
 			BITMAP_COLOR[0] |= BITSET[square];
 		}
 	}
+	
+	spaceMask = FILEMASK[C1] | FILEMASK[D1] | FILEMASK[E1] | FILEMASK[F1];
 }
 
