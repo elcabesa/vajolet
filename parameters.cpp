@@ -168,7 +168,7 @@ simdScore KingAttackWeights =  {415,214,164,174};
 simdScore kingShieldBonus =  {2676,0,0,0};
 simdScore kingFarShieldBonus =  {1667,0,0,0};
 simdScore kingStormBonus =  {247,64,234,0};
-simdScore kingSafetyBonus =  {1800,55,0,0};
+simdScore kingSafetyBonus =  {1800,550,0,0};
 simdScore kingSafetyPars1 =  {646,589,-4,328};
 simdScore kingSafetyPars2 =  {1268,959,894,1290};
 
