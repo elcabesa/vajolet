@@ -1589,9 +1589,6 @@ bool Position::isDraw(bool isPVline) const
 	for(int i = 4 ;	i<=e;i+=2)
 	{
 		std::advance( it,2);
-		//unsigned int stateIndexPointer = stateIndex-i;
-		//assert(stateIndex>=i);
-		//assert(stateIndexPointer<STATE_INFO_LENGTH);		
 		if(it->key == actualkey)
 		{
 			counter++;

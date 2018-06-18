@@ -68,9 +68,6 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 	unsigned int keyH = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
 
 	ttCluster& ttc = findCluster(key);
-	candidate = &ttc[0];
-
-	assert(candidate!=nullptr);
 
 	auto it = std::find_if (ttc.begin(), ttc.end(), [keyH](ttEntry p){return (!p.getKey()) || (p.getKey()==keyH);});
 	if( it != ttc.end())
@@ -79,6 +76,7 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 	}
 	else
 	{
+		candidate = &ttc[0];
 		for(auto& d: ttc)
 		{
 			bool cc1,cc2,cc3,cc4;

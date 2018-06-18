@@ -447,45 +447,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			}
 		}
 
-
-
-		//-----------------------
-		//	single good move at root
-		//-----------------------
-/*		if (alpha > -11000 && beta <11000 && depth >= 12
-			&& !stop
-			&&  linesToBeSearched == 1
-			&&  res > - SCORE_KNOWN_WIN
-			&& limits.depth==-1)
-		{
-			for(int i = 9; i>=0;i--)
-			{
-
-				Score rBeta = res - 20000+2000*i;
-				sd[0].excludeMove = newPV.front();
-				sd[0].skipNullMove = true;
-				PVline locChildPV;
-				Score temp = alphaBeta<Search::nodeType::ALL_NODE>(0, (depth-3) * ONE_PLY, rBeta - 1, rBeta, locChildPV);
-				sd[0].skipNullMove = false;
-				sd[0].excludeMove = Movegen::NOMOVE;
-
-				if(temp < rBeta)
-				{
-					my_thread::timeMan.singularRootMoveCount++;
-				}
-				else
-				{
-					if(i==9)
-					{
-						my_thread::timeMan.singularRootMoveCount = 0;
-					}
-
-					break;
-				}
-			}
-
-		}
-*/
 		//------------------------------------------------
 		// check wheter or not the new best move has changed
 		//------------------------------------------------
