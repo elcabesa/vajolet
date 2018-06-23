@@ -993,6 +993,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			PVline childPv;
 
 			Score rBeta = ttValue - int(depth*20);
+			rBeta = std::max( rBeta, -SCORE_MATE + 1 );
 
 			sd[ply].excludeMove = m;
 			bool backup = sd[ply].skipNullMove;
