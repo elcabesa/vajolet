@@ -1,4 +1,4 @@
-#include <vector>
+#include <list>
 #include "gtest/gtest.h"
 #include "./../parameters.h"
 #include "./../position.h"
@@ -22,7 +22,7 @@ TEST(seeTest, see)
 	//const Score K = initialPieceValue[Position::King][0];
 
 	/* manythanks to Fabio Gobbato for this list of fen Tests*/
-	static const std::vector<positions> posList ={
+	static const std::list<positions> posList ={
 		/* capture initial move */
 		{"3r3k/3r4/2n1n3/8/3p4/2PR4/1B1Q4/3R3K w - - 0 1",							Move(D3,D4), P - R + N - P },
 		{"1k1r4/1ppn3p/p4b2/4n3/8/P2N2P1/1PP1R1BP/2K1Q3 w - - 0 1",					Move(D3,E5), N - N + B - R + N },
