@@ -64,7 +64,7 @@ const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w
 */
 void static printUciInfo(void)
 {
-	sync_cout << "id name " << PROGRAM_NAME << " " << VERSION << sync_endl;
+	sync_cout << "id name " << PROGRAM_NAME << " " << VERSION PRE_RELEASE << sync_endl;
 	sync_cout << "id author Marco Belli" << sync_endl;
 	sync_cout << "option name Hash type spin default 1 min 1 max 65535" << sync_endl;
 	sync_cout << "option name Threads type spin default 1 min 1 max 128" << sync_endl;
@@ -72,7 +72,7 @@ void static printUciInfo(void)
 	sync_cout << "option name Ponder type check default true" << sync_endl;
 	sync_cout << "option name OwnBook type check default true" <<sync_endl;
 	sync_cout << "option name BestMoveBook type check default false"<<sync_endl;
-	sync_cout << "option name UCI_EngineAbout type string default VajoletII by Marco Belli" << sync_endl;
+	sync_cout << "option name UCI_EngineAbout type string default " << PROGRAM_NAME << " " << VERSION PRE_RELEASE<< " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
 	sync_cout << "option name UCI_ShowCurrLine type check default false" << sync_endl;
 	sync_cout << "option name SyzygyPath type string default <empty>" << sync_endl;
 	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
@@ -337,7 +337,7 @@ void setoption(std::istringstream& is)
 	}
 	else if(name == "UCI_EngineAbout")
 	{
-		sync_cout<< PROGRAM_NAME << " " << VERSION << " by Marco Belli (build date: " <<__DATE__<<")"<<sync_endl;
+		sync_cout<< PROGRAM_NAME << " " << VERSION PRE_RELEASE<< " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
 	}
 	else
 	{

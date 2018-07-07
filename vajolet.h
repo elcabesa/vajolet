@@ -32,7 +32,8 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.7"
+#define VERSION			"2.7.0"
+#define PRE_RELEASE		"-PRE-1"
 
 
 //---------------------------------------------

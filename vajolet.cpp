@@ -36,7 +36,7 @@
 */
 static void printStartInfo(void)
 {
-	sync_cout<<PROGRAM_NAME<<" "<<VERSION<<" by Marco Belli"<<sync_endl;
+	sync_cout << "id name " << PROGRAM_NAME << " " << VERSION PRE_RELEASE << sync_endl;
 }
 
 /*!	\brief	main function
