@@ -39,15 +39,17 @@ public :
 
 	inline void update(Color c, tSquare from, tSquare to, Score v)
 	{
+		const int W = 32;
+		const int D = 500;
 
 		assert(c<=black);
 		assert(from<squareNumber);
 		assert(to<squareNumber);
+		
+		Score & e = table[c][from][to];
+		e += v * W - e * std::abs(v)/ D;
 
-		if (abs(table[c][from][to] + v) < Max)
-		{
-			table[c][from][to] +=  v;
-		}
+	
 	}
 	inline Score getValue(Color c, tSquare from, tSquare to) const
 	{
