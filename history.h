@@ -31,28 +31,30 @@ class History
 {
 private:
 	static const Score Max = Score(500000);
-	Score table[Position::lastBitboard][squareNumber];
+	Score table[2][squareNumber][squareNumber];
 public :
 
 	inline void clear() { std::memset(table, 0, sizeof(table)); }
 
 
-	inline void update(Position::bitboardIndex p, tSquare to, Score v)
+	inline void update(Color c, tSquare from, tSquare to, Score v)
 	{
 
-		assert(p<Position::lastBitboard);
+		assert(c<=black);
+		assert(from<squareNumber);
 		assert(to<squareNumber);
 
-		if (abs(table[p][to] + v) < Max)
+		if (abs(table[c][from][to] + v) < Max)
 		{
-			table[p][to] +=  v;
+			table[c][from][to] +=  v;
 		}
 	}
-	inline Score getValue(Position::bitboardIndex p, tSquare to) const
+	inline Score getValue(Color c, tSquare from, tSquare to) const
 	{
-		assert(p<Position::lastBitboard);
+		assert(c<=black);
+		assert(from<squareNumber);
 		assert(to<squareNumber);
-		return table[p][to];
+		return table[c][from][to];
 	}
 
 

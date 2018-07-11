@@ -134,7 +134,7 @@ private:
 	{
 		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
 		{
-			mov->score = src.getHistory().getValue(pos.getPieceAt((tSquare)mov->m.bit.from),(tSquare)mov->m.bit.to);
+			mov->score = src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)mov->m.bit.from, (tSquare)mov->m.bit.to);
 		}
 	}
 
@@ -149,7 +149,7 @@ private:
 			}
 			mov->score *=500000;
 
-			mov->score += src.getHistory().getValue(pos.getPieceAt((tSquare)mov->m.bit.from),(tSquare)mov->m.bit.to);
+			mov->score += src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)mov->m.bit.from, (tSquare)mov->m.bit.to);
 		}
 	}
 
