@@ -1293,22 +1293,29 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				counterMoves.update(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, bestMove);
 			}
 		}
-		else
-		{
 		
-			// update capture history
-			Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
+		
+		
+		// update capture history
+		int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
+		Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-			captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), (tSquare)m.bit.to, pos.getPieceAt((tSquare)m.bit.to), bonus);
-			if( captureMoveList.size() > 1 )
+		if(pos.isCaptureMoveOrPromotion(bestMove))
+		{
+			captureHistory.update( pos.getPieceAt((tSquare)bestMove.bit.from), (tSquare)bestMove.bit.to, pos.getPieceAt((tSquare)bestMove.bit.to), bonus);
+		}
+		if( captureMoveList.size() > 1 )
+		{
+			if( pos.isCaptureMoveOrPromotion(bestMove) )
 			{
 				captureMoveList.pop_back();
-				for( auto & m: captureMoveList )
-				{
-					captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), (tSquare)m.bit.to, pos.getPieceAt((tSquare)m.bit.to), -bonus);
-				}
+			}
+			for( auto & m: captureMoveList )
+			{
+				captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), (tSquare)m.bit.to, pos.getPieceAt((tSquare)m.bit.to), -bonus);
 			}
 		}
+		
 		
 
 	}
