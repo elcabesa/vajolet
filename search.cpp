@@ -88,6 +88,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 	TT.newSearch();
 	history.clear();
+	captureHistory.clear();
 	counterMoves.clear();
 	cleanData();
 	visitedNodes = 0;
@@ -102,6 +103,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 		hs.counterMoves.clear();
 		hs.cleanData();
 		hs.history.clear();
+		hs.captureHistory.clear();
 		hs.visitedNodes = 0;
 		hs.tbHits = 0;
 		hs.mainSearcher = false;
@@ -1266,29 +1268,48 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	// save killer move & update history
 	if (bestScore >= beta
-		&& !pos.isCaptureMoveOrPromotion(bestMove)
 		&& !inCheck)
 	{
-		saveKillers(ply,bestMove);
-
-		// update history
-		Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
-
-		history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, bestMove, bonus);
-		if( quietMoveList.size() > 1 )
+		if (!pos.isCaptureMoveOrPromotion(bestMove))
 		{
-			quietMoveList.pop_back();
-			for( auto & m: quietMoveList )
+			saveKillers(ply,bestMove);
+
+			// update history
+			Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
+
+			history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, bestMove, bonus);
+			if( quietMoveList.size() > 1 )
 			{
-				history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
+				quietMoveList.pop_back();
+				for( auto & m: quietMoveList )
+				{
+					history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
+				}
+			}
+			
+			Move previousMove = pos.getActualState().currentMove;
+			if(previousMove.packed)
+			{
+				counterMoves.update(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, bestMove);
 			}
 		}
-
-		Move previousMove = pos.getActualState().currentMove;
-		if(previousMove.packed)
+		else
 		{
-			counterMoves.update(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, bestMove);
+		
+			// update capture history
+			Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
+
+			captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), (tSquare)m.bit.to, pos.getPieceAt((tSquare)m.bit.to), bonus);
+			if( captureMoveList.size() > 1 )
+			{
+				captureMoveList.pop_back();
+				for( auto & m: captureMoveList )
+				{
+					captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), (tSquare)m.bit.to, pos.getPieceAt((tSquare)m.bit.to), -bonus);
+				}
+			}
 		}
+		
 
 	}
 	return bestScore;

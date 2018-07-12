@@ -135,6 +135,7 @@ private:
 
 	unsigned int indexPV = 0;
 	History history;
+	CaptureHistory captureHistory;
 	CounterMove counterMoves;
 
 	searchData sd[STATE_INFO_LENGTH];
@@ -193,6 +194,7 @@ public:
 	Position pos;
 
 	const History& getHistory()const {return history;}
+	const CaptureHistory& getCaptureHistory()const {return captureHistory;}
 	const CounterMove& getCounterMove()const {return  counterMoves;}
 
 

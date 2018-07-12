@@ -63,6 +63,41 @@ public :
 
 };
 
+class CaptureHistory
+{
+private:
+	// piece, to, captured piece
+	Score table[Position::lastBitboard][squareNumber][Position::lastBitboard];
+public :
+
+	inline void clear() { std::memset(table, 0, sizeof(table)); }
+
+
+	inline void update( const Position::bitboardIndex p, const Move& m, const Position::bitboardIndex captured,  Score v)
+	{
+				
+		const int W = 32;
+		const int D = 500;
+		assert(p<Position::lastBitboard);
+		assert(captured<Position::lastBitboard);
+		const tSquare to = (tSquare)m.bit.to;
+
+		Score & e = table[p][to][captured];
+		e += v * W - e * std::abs(v)/ D;
+	}
+	inline Score getValue( const Position::bitboardIndex p, const Move& m, const Position::bitboardIndex captured ) const
+	{
+		assert(p<Position::lastBitboard);
+		assert(captured<Position::lastBitboard);
+		const tSquare to = (tSquare)m.bit.to;
+		return table[p][to][captured];
+	}
+
+
+	CaptureHistory(){}
+
+};
+
 class CounterMove
 {
 private:
@@ -72,7 +107,7 @@ public :
 	inline void clear() { std::memset(table, 0, sizeof(table)); }
 
 
-	inline void update(Position::bitboardIndex p, tSquare to, Move m)
+	inline void update( const Position::bitboardIndex p, const tSquare to, const Move m)
 	{
 
 		assert(p<Position::lastBitboard);
@@ -85,8 +120,9 @@ public :
 		}
 
 	}
-	inline const Move& getMove(Position::bitboardIndex p, tSquare to, unsigned int pos) const
+	inline const Move& getMove( const Position::bitboardIndex p, const tSquare to, const unsigned int pos ) const
 	{
+		assert( pos < 2 );
 		assert(p<Position::lastBitboard);
 		assert(to<squareNumber);
 		return table[p][to][pos];
