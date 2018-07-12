@@ -76,8 +76,8 @@ public :
 	inline void update( const Position::bitboardIndex p, const Move& m, const Position::bitboardIndex captured,  Score v)
 	{
 				
-		const int W = 32;
-		const int D = 500;
+		const int W = 2;
+		const int D = 324;
 		assert(p<Position::lastBitboard);
 		assert(captured<Position::lastBitboard);
 		const tSquare to = (tSquare)m.bit.to;
