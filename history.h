@@ -30,7 +30,6 @@
 class History
 {
 private:
-	static const Score Max = Score(500000);
 	Score table[2][squareNumber][squareNumber];
 public :
 
