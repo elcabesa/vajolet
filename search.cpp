@@ -929,8 +929,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Move m;
 	Movegen mg(pos, *this, ply, ttMove);
 	unsigned int moveNumber = 0;
-	unsigned int quietMoveCount = 0;
-	Move quietMoveList[64];
+	std::vector<Move> quietMoveList;
+	std::vector<Move> captureMoveList;
 
 	bool singularExtensionNode =
 		type != Search::nodeType::ROOT_NODE
@@ -961,9 +961,13 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		bool captureOrPromotion = pos.isCaptureMoveOrPromotion(m);
 
-		if(!captureOrPromotion && quietMoveCount < 64)
+		if(!captureOrPromotion)
 		{
-			quietMoveList[quietMoveCount++] = m;
+			quietMoveList.push_back( m );
+		}
+		else
+		{
+			captureMoveList.push_back( m );
 		}
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
@@ -1271,11 +1275,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
 
 		history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)bestMove.bit.from, (tSquare)bestMove.bit.to, bonus);
-		if(quietMoveCount > 1)
+		if( quietMoveList.size() > 1 )
 		{
-			for (unsigned int i = 0; i < quietMoveCount - 1; i++)
+			quietMoveList.pop_back();
+			for( auto & m: quietMoveList )
 			{
-				Move m = quietMoveList[i];
 				history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)m.bit.from, (tSquare)m.bit.to, -bonus);
 			}
 		}
