@@ -24,6 +24,7 @@
 #include <cstring>
 
 #include "vajolet.h"
+#include "move.h"
 #include "position.h"
 
 
@@ -37,23 +38,23 @@ public :
 	inline void clear() { std::memset(table, 0, sizeof(table)); }
 
 
-	inline void update(Color c, tSquare from, tSquare to, Score v)
+	inline void update( const Color c, const Move& m,  Score v)
 	{
 
 		assert(c<=black);
-		assert(from<squareNumber);
-		assert(to<squareNumber);
+		const tSquare from = (tSquare)m.bit.from;
+		const tSquare to = (tSquare)m.bit.to;
 
 		if (abs(table[c][from][to] + v) < Max)
 		{
 			table[c][from][to] +=  v;
 		}
 	}
-	inline Score getValue(Color c, tSquare from, tSquare to) const
+	inline Score getValue( const Color c, const Move& m ) const
 	{
 		assert(c<=black);
-		assert(from<squareNumber);
-		assert(to<squareNumber);
+		const tSquare from = (tSquare)m.bit.from;
+		const tSquare to = (tSquare)m.bit.to;
 		return table[c][from][to];
 	}
 

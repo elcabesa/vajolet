@@ -1274,13 +1274,13 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		// update history
 		Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
 
-		history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)bestMove.bit.from, (tSquare)bestMove.bit.to, bonus);
+		history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, bestMove, bonus);
 		if( quietMoveList.size() > 1 )
 		{
 			quietMoveList.pop_back();
 			for( auto & m: quietMoveList )
 			{
-				history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)m.bit.from, (tSquare)m.bit.to, -bonus);
+				history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
 			}
 		}
 
