@@ -1268,7 +1268,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		saveKillers(ply,bestMove);
 
 		// update history
-		Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
+		int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
+		Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
 		history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)bestMove.bit.from, (tSquare)bestMove.bit.to, bonus);
 		if(quietMoveCount > 1)
