@@ -82,7 +82,7 @@ public :
 		assert(captured<Position::lastBitboard);
 		const tSquare to = (tSquare)m.bit.to;
 
-		Score & e = table[p][to][captured];
+		Score &e = table[p][to][captured];
 		e += v * W - e * std::abs(v)/ D;
 	}
 	inline Score getValue( const Position::bitboardIndex p, const Move& m, const Position::bitboardIndex captured ) const
