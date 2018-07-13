@@ -932,7 +932,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Movegen mg(pos, *this, ply, ttMove);
 	unsigned int moveNumber = 0;
 	std::vector<Move> quietMoveList;
+	quietMoveList.reserve(64);
 	std::vector<Move> captureMoveList;
+	captureMoveList.reserve(32);
 
 	bool singularExtensionNode =
 		type != Search::nodeType::ROOT_NODE
