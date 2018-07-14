@@ -133,7 +133,7 @@ private:
 				mov->score += Position::pieceValue[ Position::whitePawns ][0];
 			}
 			// history of capture
-			mov->score += src.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) )* 50;
+			mov->score += src.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) );
 				
 		}
 	}
