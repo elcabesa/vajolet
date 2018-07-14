@@ -283,8 +283,8 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			if (depth >= 5)
 			{
 				delta = 800;
-				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int)-SCORE_INFINITE);
-				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].previousScore) + delta,(signed long long int) SCORE_INFINITE);
+				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int) SCORE_MATED);
+				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].previousScore) + delta,(signed long long int) SCORE_MATE);
 			}
 
 			for (unsigned int x = indexPV; x < rootMoves.size() ; x++)
@@ -869,6 +869,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&&  !sd[ply].skipNullMove
 			// && abs(beta)<SCORE_KNOWN_WIN
 			// && eval> beta-40000
+			&& abs(beta) < SCORE_MATE_IN_MAX_PLY
 		){
 			Score s;
 			Score rBeta = std::min(beta + 8000, SCORE_INFINITE);
@@ -1000,7 +1001,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&& !ext
 			&&  m == ttMove
 			//&&  abs(ttValue) < SCORE_KNOWN_WIN
-//			&& abs(beta) < SCORE_MATE_IN_MAX_PLY
+			&& abs(beta) < SCORE_MATE_IN_MAX_PLY
 		)
 		{
 
