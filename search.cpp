@@ -88,7 +88,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 	TT.newSearch();
 	history.clear();
-	//captureHistory.clear();
+	captureHistory.clear();
 	counterMoves.clear();
 	cleanData();
 	visitedNodes = 0;
@@ -103,7 +103,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 		hs.counterMoves.clear();
 		hs.cleanData();
 		hs.history.clear();
-		//hs.captureHistory.clear();
+		hs.captureHistory.clear();
 		hs.visitedNodes = 0;
 		hs.tbHits = 0;
 		hs.mainSearcher = false;
@@ -931,10 +931,10 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Move m;
 	Movegen mg(pos, *this, ply, ttMove);
 	unsigned int moveNumber = 0;
-	std::vector<Move> quietMoveList;
-	quietMoveList.reserve(64);
-	std::vector<Move> captureMoveList;
-	captureMoveList.reserve(32);
+	unsigned int quietMoveCount = 0;
+	Move quietMoveList[64];
+	unsigned int captureMoveCount = 0;
+	Move captureMoveList[32];
 
 	bool singularExtensionNode =
 		type != Search::nodeType::ROOT_NODE
@@ -967,11 +967,17 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		if(!captureOrPromotion)
 		{
-			quietMoveList.push_back( m );
+			if(quietMoveCount < 64)
+			{
+				quietMoveList[quietMoveCount++] = m;
+			}
 		}
 		else
 		{
-			captureMoveList.push_back( m );
+			if(captureMoveCount < 32)
+			{
+				captureMoveList[captureMoveCount++] = m;
+			}
 		}
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
@@ -1280,11 +1286,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score bonus = Score(depth * depth)/(ONE_PLY*ONE_PLY);
 
 			history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, bestMove, bonus);
-			if( quietMoveList.size() > 1 )
+			if(quietMoveCount > 1)
 			{
-				quietMoveList.pop_back();
-				for( auto & m: quietMoveList )
+				for (unsigned int i = 0; i < quietMoveCount - 1; i++)
 				{
+					Move m = quietMoveList[i];
 					history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
 				}
 			}
@@ -1295,26 +1301,20 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				counterMoves.update(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, bestMove);
 			}
 		}
-		
-		
-		
-		// update capture history
-		int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
-		Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
+		else
+		{
+			// update capture history
+			int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
+			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-		if( pos.isCaptureMoveOrPromotion(bestMove) )
-		{
 			captureHistory.update( pos.getPieceAt((tSquare)bestMove.bit.from), bestMove, pos.getPieceAt((tSquare)bestMove.bit.to), bonus);
-		}
-		if( captureMoveList.size() > 1 )
-		{
-			if( pos.isCaptureMoveOrPromotion(bestMove) )
+			if(captureMoveCount > 1)
 			{
-				captureMoveList.pop_back();
-			}
-			for( auto & m: captureMoveList )
-			{
-				captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), m, pos.getPieceAt((tSquare)m.bit.to), -bonus);
+				for (unsigned int i = 0; i < captureMoveCount - 1; i++)
+				{
+					Move m = captureMoveList[i];
+					captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), m, pos.getPieceAt((tSquare)m.bit.to), -bonus);
+				}
 			}
 		}
 		
