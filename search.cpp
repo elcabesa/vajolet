@@ -88,7 +88,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 	TT.newSearch();
 	history.clear();
-	captureHistory.clear();
+	//captureHistory.clear();
 	counterMoves.clear();
 	cleanData();
 	visitedNodes = 0;
@@ -103,7 +103,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 		hs.counterMoves.clear();
 		hs.cleanData();
 		hs.history.clear();
-		hs.captureHistory.clear();
+		//hs.captureHistory.clear();
 		hs.visitedNodes = 0;
 		hs.tbHits = 0;
 		hs.mainSearcher = false;
