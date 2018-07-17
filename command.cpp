@@ -43,6 +43,7 @@
 //---------------------------------------------
 //	local global constant
 //---------------------------------------------
+const char PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
 
 const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 /*! \brief array of char to create the fen string
@@ -56,6 +57,12 @@ const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w
 //---------------------------------------------
 //	function implementation
 //---------------------------------------------
+
+char getPieceName( const unsigned int idx )
+{
+	assert( idx < Position::lastBitboard );
+	return PIECE_NAMES_FEN[ idx ];
+}
 
 /*	\brief print the uci reply
 	\author Marco Belli
@@ -748,30 +755,39 @@ std::string displayMove(const Position& pos, const Move & m)
 
 }
 
-void printCurrMoveNumber(unsigned int moveNumber, const Move &m, unsigned long long visitedNodes, long long int time)
+
+
+
+
+
+class UciNoOutputInterface: public UciOutputInterface
 {
-	sync_cout << "info currmovenumber " << moveNumber << " currmove " << displayUci(m) << " nodes " << visitedNodes <<
-#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-			" time " << time <<
-#endif
-	sync_endl;
-}
+public:
+	void printPVs(const unsigned int count) const;
+	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const;
+	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
+	void showCurrLine(const Position & pos, const unsigned int ply) const;
+	void printDepth(const unsigned int depth) const;
+	void printScore(const signed int cp) const;
+	void printBestMove( const Move m, const Move ponder = Move(0) ) const;
+	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
+};
 
-void showCurrLine(const Position & pos, unsigned int ply)
+class UciStandardOutputInterface: public UciOutputInterface
 {
-	sync_cout << "info currline";
-	unsigned int start = pos.getStateSize() - ply;
+public:
+	void printPVs(const unsigned int count) const;
+	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const;
+	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
+	void showCurrLine(const Position & pos, const unsigned int ply) const;
+	void printDepth(const unsigned int depth) const;
+	void printScore(const signed int cp) const;
+	void printBestMove( const Move m, const Move ponder = Move(0)) const;
+	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
+};
 
-	for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
-	{
-		std::cout << " " << displayUci(pos.getState(i).currentMove);
-	}
-	std::cout << sync_endl;
 
-}
-
-
-void printPVs(unsigned int count)
+void UciStandardOutputInterface::printPVs(const unsigned int count) const
 {
 
 	int i= 0;
@@ -785,7 +801,7 @@ void printPVs(unsigned int count)
 	});
 }
 
-void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Score beta, long long time,unsigned int count,std::list<Move>& PV,unsigned long long nodes)
+void UciStandardOutputInterface::printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const
 {
 
 	sync_cout<<"info multipv "<< (count+1) << " depth "<< (depth) <<" seldepth "<< seldepth <<" score ";
@@ -811,4 +827,72 @@ void printPV(Score res,unsigned int depth,unsigned int seldepth,Score alpha, Sco
 	std::cout << " pv ";
 	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<displayUci(m)<<" ";});
 	std::cout<<sync_endl;
+}
+
+void UciStandardOutputInterface::printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const
+{
+	sync_cout << "info currmovenumber " << moveNumber << " currmove " << displayUci(m) << " nodes " << visitedNodes <<
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+			" time " << time <<
+#endif
+	sync_endl;
+}
+
+void UciStandardOutputInterface::showCurrLine(const Position & pos, const unsigned int ply) const
+{
+	sync_cout << "info currline";
+	unsigned int start = pos.getStateSize() - ply;
+
+	for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
+	{
+		std::cout << " " << displayUci(pos.getState(i).currentMove);
+	}
+	std::cout << sync_endl;
+
+}
+void UciStandardOutputInterface::printDepth(const unsigned int depth) const
+{
+	sync_cout<<"info depth "<<depth<<sync_endl;
+}
+
+void UciStandardOutputInterface::printScore(const signed int cp) const
+{
+	sync_cout<<"info score cp "<<cp<<sync_endl;
+}
+
+void UciStandardOutputInterface::printBestMove( const Move bm, const Move ponder ) const
+{
+	sync_cout<<"bestmove "<< displayUci(bm);
+	if( ponder.packed != 0 )
+	{
+		std::cout<<" ponder " << displayUci(ponder);
+	}
+	std::cout<< sync_endl;
+}
+
+void UciStandardOutputInterface::printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const
+{
+	long long int localtime = std::max(time,1ll);
+	sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)localtime) << sync_endl;
+}
+
+void UciNoOutputInterface::printPVs( const unsigned int ) const{}
+void UciNoOutputInterface::printPV(const Score ,const unsigned int , const unsigned int ,const Score , const Score , const long long, const unsigned int, std::list<Move>&, const unsigned long long ) const{}
+void UciNoOutputInterface::printCurrMoveNumber(const unsigned int, const Move& , const unsigned long long , const long long int ) const {}
+void UciNoOutputInterface::showCurrLine(const Position & , const unsigned int ) const{}
+void UciNoOutputInterface::printDepth(const unsigned int ) const{}
+void UciNoOutputInterface::printScore(const signed int ) const{}
+void UciNoOutputInterface::printBestMove( const Move, const Move ) const{}
+void UciNoOutputInterface::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
+
+std::unique_ptr<UciOutputInterface> UciOutputInterface::factory( const UciOutputInterface::type t )
+{
+	if( t == standardUciOutput)
+	{
+		return std::unique_ptr<UciOutputInterface>(new UciStandardOutputInterface);
+	}
+	else/* if(t == noUciOutput)*/
+	{
+		return std::unique_ptr<UciOutputInterface>(new UciNoOutputInterface);
+	}
 }

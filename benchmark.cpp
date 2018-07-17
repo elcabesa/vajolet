@@ -58,12 +58,12 @@ void benchmark(void)
 
 	for (unsigned int i = 0; i < positions.size(); i++)
 	{
-		Search src;
+		Search src( UciOutputInterface::factory( UciOutputInterface::noUciOutput ) );
 		src.limits.depth = 15;
 		src.resetStartTime();
 		src.resetPonderTime();
 		src.pos.setupFromFen(positions[i]);
-		sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
+		sync_cout << "Position: " << i + 1 << '/' << positions.size() << sync_endl;
 		src.startThinking();
 		nodes += src.getVisitedNodes();
 	}

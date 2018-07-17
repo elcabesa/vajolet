@@ -27,6 +27,7 @@
 #include "move.h"
 #include "history.h"
 #include "eval.h"
+#include "command.h"
 
 class PVline : public std::list<Move> 
 {
@@ -118,6 +119,7 @@ public:
 class Search
 {
 private:
+	std::unique_ptr<UciOutputInterface> _UOI;
 	bool mainSearcher;
 	bool followPV;
 	static int globalReduction;
@@ -168,7 +170,6 @@ private:
 	enum nodeType
 	{
 		ROOT_NODE,
-		HELPER_ROOT_NODE,
 		PV_NODE,
 		ALL_NODE,
 		CUT_NODE
@@ -242,6 +243,14 @@ public:
 	long long int getClockTime() const { return getTime() - ponderTime; }
 	void resetStartTime(){ startTime = getTime(); }
 	void resetPonderTime(){ ponderTime = getTime(); }
+	
+	Search( std::unique_ptr<UciOutputInterface> UOI = std::move( UciOutputInterface::factory( ) ) ){ _UOI = std::move(UOI);}
+	UciOutputInterface& getUOI(){ return *_UOI;}
+	void setUOI( std::unique_ptr<UciOutputInterface> UOI )
+	{
+		_UOI = std::move(UOI);
+	}
+	
 
 };
 

@@ -408,7 +408,7 @@ void Position::display()const
 			std::cout << rank+1 <<  " |";
 			for (file = 0; file <= 7; file++)
 			{
-				std::cout << " " << PIECE_NAMES_FEN[squares[BOARDINDEX[file][rank]]] << " |";
+				std::cout << " " << getPieceName(squares[BOARDINDEX[file][rank]] ) << " |";
 			}
 			std::cout << std::endl;
 		}
@@ -467,7 +467,7 @@ std::string  Position::getFen() const {
 					s+=std::to_string(emptyFiles);
 				}
 				emptyFiles=0;
-				s += PIECE_NAMES_FEN[squares[BOARDINDEX[file][rank]]];
+				s += getPieceName( squares[BOARDINDEX[file][rank]] );
 			}
 			else
 			{
@@ -559,7 +559,7 @@ std::string Position::getSymmetricFen() const {
 				{
 					xx = (bitboardIndex)(xx + separationBitmap);
 				}
-				s += PIECE_NAMES_FEN[xx];
+				s += getPieceName( xx );
 			}
 			else
 			{
@@ -714,8 +714,6 @@ simdScore Position::calcMaterialValue(void) const{
 		tSquare s = iterateBit(b);
 		bitboardIndex val = squares[s];
 		score += pstValue[val][s];
-
-		//sync_cout<<"square["<<s<<"] piece:"<<val<<" score:"<<pstValue[val][s][0]<<sync_endl;
 	}
 	return score;
 
@@ -799,7 +797,6 @@ void Position::doNullMove(void)
 	\date 27/10/2013
 */
 void Position::doMove(const Move & m){
-	//sync_cout<<displayUci(m)<<sync_endl;
 	assert(m.packed);
 
 	bool moveIsCheck = moveGivesCheck(m);

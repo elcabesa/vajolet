@@ -17,23 +17,55 @@
 
 #ifndef COMMAND_H_
 #define COMMAND_H_
+
+
 #include <string>
 #include <list>
-#include <algorithm>
-#include "position.h"
+#include <memory>
+#include "vajolet.h"
 #include "move.h"
+//--------------------------------------------------------------------
+//	forward declaration
+//--------------------------------------------------------------------
+struct Move;
+class Position;
+
 //--------------------------------------------------------------------
 //	function prototype
 //--------------------------------------------------------------------
-const char PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
+
 void uciLoop(void);
+char getPieceName( const unsigned int idx );
 
 std::string displayUci(const Move & m);
 std::string displayMove(const Position& pos,const Move & m);
-void printCurrMoveNumber(unsigned int moveNumber, const Move &m, unsigned long long visitedNodes, long long int time);
-void showCurrLine(const Position & pos, unsigned int ply);
-void printPVs(unsigned int count);
-void printPV(Score res, unsigned int depth, unsigned int seldepth, Score alpha, Score beta, long long time, unsigned int count, std::list<Move>& PV, unsigned long long nodes);
+
+
+
+
+class UciOutputInterface
+{
+public:
+	enum type
+	{
+		standardUciOutput,
+		noUciOutput
+	};
+	virtual ~UciOutputInterface(){};
+	virtual void printPVs(const unsigned int count) const = 0;
+	virtual void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const = 0;
+	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const = 0;
+	virtual void showCurrLine(const Position & pos, const unsigned int ply) const = 0;
+	virtual void printDepth(const unsigned int depth) const = 0;
+	virtual void printScore(const signed int cp) const = 0;
+	virtual void printBestMove( const Move bm, const Move ponder = Move(0)  ) const = 0;
+	virtual void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const = 0;
+	static std::unique_ptr<UciOutputInterface> factory( const UciOutputInterface::type t  = UciOutputInterface::standardUciOutput );
+	
+	
+};
+
+
 
 
 
