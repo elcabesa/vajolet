@@ -126,12 +126,7 @@ private:
 	{
 		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
 		{
-			// value of the victim
-			mov->score = Position::pieceValue[ pos.getPieceAt((tSquare)mov->m.bit.to) ][0];
-			if( mov->m.isEnPassantMove() )
-			{
-				mov->score += Position::pieceValue[ Position::whitePawns ][0];
-			}
+			mov->score = pos.getMvvLvaScore(mov->m);
 			// history of capture
 			mov->score += src.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) ) * 50;
 				
