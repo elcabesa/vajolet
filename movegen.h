@@ -127,6 +127,9 @@ private:
 		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
 		{
 			mov->score = pos.getMvvLvaScore(mov->m);
+			// history of capture
+			mov->score += src.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) ) * 50;
+				
 		}
 	}
 
@@ -134,7 +137,7 @@ private:
 	{
 		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
 		{
-			mov->score = src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)mov->m.bit.from, (tSquare)mov->m.bit.to);
+			mov->score = src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
 		}
 	}
 
@@ -149,7 +152,7 @@ private:
 			}
 			mov->score *=500000;
 
-			mov->score += src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white: black, (tSquare)mov->m.bit.from, (tSquare)mov->m.bit.to);
+			mov->score += src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
 		}
 	}
 
