@@ -60,7 +60,7 @@ public:
 	virtual void printScore(const signed int cp) const = 0;
 	virtual void printBestMove( const Move bm, const Move ponder = Move(0)  ) const = 0;
 	virtual void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const = 0;
-	static std::unique_ptr<UciOutputInterface> factory( const UciOutputInterface::type t  = UciOutputInterface::standardUciOutput );
+	static std::shared_ptr<UciOutputInterface> factory( const UciOutputInterface::type t  = UciOutputInterface::standardUciOutput );
 	
 	
 };

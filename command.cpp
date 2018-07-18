@@ -885,14 +885,14 @@ void UciNoOutputInterface::printScore(const signed int ) const{}
 void UciNoOutputInterface::printBestMove( const Move, const Move ) const{}
 void UciNoOutputInterface::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
 
-std::unique_ptr<UciOutputInterface> UciOutputInterface::factory( const UciOutputInterface::type t )
+std::shared_ptr<UciOutputInterface> UciOutputInterface::factory( const UciOutputInterface::type t )
 {
 	if( t == standardUciOutput)
 	{
-		return std::unique_ptr<UciOutputInterface>(new UciStandardOutputInterface);
+		return std::shared_ptr<UciOutputInterface>(new UciStandardOutputInterface);
 	}
 	else/* if(t == noUciOutput)*/
 	{
-		return std::unique_ptr<UciOutputInterface>(new UciNoOutputInterface);
+		return std::shared_ptr<UciOutputInterface>(new UciNoOutputInterface);
 	}
 }

@@ -119,7 +119,7 @@ public:
 class Search
 {
 private:
-	std::unique_ptr<UciOutputInterface> _UOI;
+	std::shared_ptr<UciOutputInterface> _UOI;
 	bool mainSearcher;
 	bool followPV;
 	static int globalReduction;
@@ -244,11 +244,14 @@ public:
 	void resetStartTime(){ startTime = getTime(); }
 	void resetPonderTime(){ ponderTime = getTime(); }
 	
-	Search( std::unique_ptr<UciOutputInterface> UOI = std::move( UciOutputInterface::factory( ) ) ){ _UOI = std::move(UOI);}
+	Search( std::shared_ptr<UciOutputInterface> UOI = UciOutputInterface::factory( ) ):_UOI(UOI){}
 	UciOutputInterface& getUOI(){ return *_UOI;}
-	void setUOI( std::unique_ptr<UciOutputInterface> UOI )
+	void setUOI( std::shared_ptr<UciOutputInterface> UOI )
 	{
-		_UOI = std::move(UOI);
+		// manage output syncronization
+		sync_cout;
+		_UOI = UOI;
+		std::cout<<sync_noNewLineEndl;
 	}
 	
 
