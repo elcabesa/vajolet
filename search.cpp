@@ -966,20 +966,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		bool captureOrPromotion = pos.isCaptureMoveOrPromotion(m);
 
-		if(!captureOrPromotion)
-		{
-			if(quietMoveCount < 64)
-			{
-				quietMoveList[quietMoveCount++] = m;
-			}
-		}
-		else
-		{
-			if(captureMoveCount < 32)
-			{
-				captureMoveList[captureMoveCount++] = m;
-			}
-		}
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
@@ -1241,6 +1227,21 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					}
 				}
 
+			}
+		}
+		
+		if(!captureOrPromotion)
+		{
+			if(quietMoveCount < 64)
+			{
+				quietMoveList[quietMoveCount++] = m;
+			}
+		}
+		else
+		{
+			if(captureMoveCount < 32)
+			{
+				captureMoveList[captureMoveCount++] = m;
 			}
 		}
 	}
