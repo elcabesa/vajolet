@@ -1230,18 +1230,21 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			}
 		}
 		
-		if(!captureOrPromotion)
+		if( m != bestMove )
 		{
-			if(quietMoveCount < 64)
+			if(!captureOrPromotion)
 			{
-				quietMoveList[quietMoveCount++] = m;
+				if(quietMoveCount < 64)
+				{
+					quietMoveList[quietMoveCount++] = m;
+				}
 			}
-		}
-		else
-		{
-			if(captureMoveCount < 32)
+			else
 			{
-				captureMoveList[captureMoveCount++] = m;
+				if(captureMoveCount < 32)
+				{
+					captureMoveList[captureMoveCount++] = m;
+				}
 			}
 		}
 	}
@@ -1289,9 +1292,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
 			history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, bestMove, bonus);
-			if(quietMoveCount > 1)
+			//if(quietMoveCount > 1)
 			{
-				for (unsigned int i = 0; i < quietMoveCount - 1; i++)
+				for (unsigned int i = 0; i < quietMoveCount/* - 1*/; i++)
 				{
 					Move m = quietMoveList[i];
 					history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
@@ -1311,9 +1314,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
 			captureHistory.update( pos.getPieceAt((tSquare)bestMove.bit.from), bestMove, pos.getPieceAt((tSquare)bestMove.bit.to), bonus);
-			if(captureMoveCount > 1)
+			//if(captureMoveCount > 1)
 			{
-				for (unsigned int i = 0; i < captureMoveCount - 1; i++)
+				for (unsigned int i = 0; i < captureMoveCount/* - 1*/; i++)
 				{
 					Move m = captureMoveList[i];
 					captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), m, pos.getPieceAt((tSquare)m.bit.to), -bonus);
