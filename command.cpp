@@ -760,7 +760,7 @@ std::string displayMove(const Position& pos, const Move & m)
 
 
 
-class UciNoOutputInterface: public UciOutputInterface
+class UciMuteOutput: public UciOutput
 {
 public:
 	void printPVs(const unsigned int count) const;
@@ -773,7 +773,7 @@ public:
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
 };
 
-class UciStandardOutputInterface: public UciOutputInterface
+class UciStandardOutput: public UciOutput
 {
 public:
 	void printPVs(const unsigned int count) const;
@@ -787,7 +787,7 @@ public:
 };
 
 
-void UciStandardOutputInterface::printPVs(const unsigned int count) const
+void UciStandardOutput::printPVs(const unsigned int count) const
 {
 
 	int i= 0;
@@ -801,7 +801,7 @@ void UciStandardOutputInterface::printPVs(const unsigned int count) const
 	});
 }
 
-void UciStandardOutputInterface::printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const
+void UciStandardOutput::printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const
 {
 
 	sync_cout<<"info multipv "<< (count+1) << " depth "<< (depth) <<" seldepth "<< seldepth <<" score ";
@@ -829,7 +829,7 @@ void UciStandardOutputInterface::printPV(const Score res, const unsigned int dep
 	std::cout<<sync_endl;
 }
 
-void UciStandardOutputInterface::printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const
+void UciStandardOutput::printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const
 {
 	sync_cout << "info currmovenumber " << moveNumber << " currmove " << displayUci(m) << " nodes " << visitedNodes <<
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
@@ -838,7 +838,7 @@ void UciStandardOutputInterface::printCurrMoveNumber(const unsigned int moveNumb
 	sync_endl;
 }
 
-void UciStandardOutputInterface::showCurrLine(const Position & pos, const unsigned int ply) const
+void UciStandardOutput::showCurrLine(const Position & pos, const unsigned int ply) const
 {
 	sync_cout << "info currline";
 	unsigned int start = pos.getStateSize() - ply;
@@ -850,17 +850,17 @@ void UciStandardOutputInterface::showCurrLine(const Position & pos, const unsign
 	std::cout << sync_endl;
 
 }
-void UciStandardOutputInterface::printDepth(const unsigned int depth) const
+void UciStandardOutput::printDepth(const unsigned int depth) const
 {
 	sync_cout<<"info depth "<<depth<<sync_endl;
 }
 
-void UciStandardOutputInterface::printScore(const signed int cp) const
+void UciStandardOutput::printScore(const signed int cp) const
 {
 	sync_cout<<"info score cp "<<cp<<sync_endl;
 }
 
-void UciStandardOutputInterface::printBestMove( const Move bm, const Move ponder ) const
+void UciStandardOutput::printBestMove( const Move bm, const Move ponder ) const
 {
 	sync_cout<<"bestmove "<< displayUci(bm);
 	if( ponder.packed != 0 )
@@ -870,29 +870,29 @@ void UciStandardOutputInterface::printBestMove( const Move bm, const Move ponder
 	std::cout<< sync_endl;
 }
 
-void UciStandardOutputInterface::printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const
+void UciStandardOutput::printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const
 {
 	long long int localtime = std::max(time,1ll);
 	sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)localtime) << sync_endl;
 }
 
-void UciNoOutputInterface::printPVs( const unsigned int ) const{}
-void UciNoOutputInterface::printPV(const Score ,const unsigned int , const unsigned int ,const Score , const Score , const long long, const unsigned int, std::list<Move>&, const unsigned long long ) const{}
-void UciNoOutputInterface::printCurrMoveNumber(const unsigned int, const Move& , const unsigned long long , const long long int ) const {}
-void UciNoOutputInterface::showCurrLine(const Position & , const unsigned int ) const{}
-void UciNoOutputInterface::printDepth(const unsigned int ) const{}
-void UciNoOutputInterface::printScore(const signed int ) const{}
-void UciNoOutputInterface::printBestMove( const Move, const Move ) const{}
-void UciNoOutputInterface::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
+void UciMuteOutput::printPVs( const unsigned int ) const{}
+void UciMuteOutput::printPV(const Score ,const unsigned int , const unsigned int ,const Score , const Score , const long long, const unsigned int, std::list<Move>&, const unsigned long long ) const{}
+void UciMuteOutput::printCurrMoveNumber(const unsigned int, const Move& , const unsigned long long , const long long int ) const {}
+void UciMuteOutput::showCurrLine(const Position & , const unsigned int ) const{}
+void UciMuteOutput::printDepth(const unsigned int ) const{}
+void UciMuteOutput::printScore(const signed int ) const{}
+void UciMuteOutput::printBestMove( const Move, const Move ) const{}
+void UciMuteOutput::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
 
-std::shared_ptr<UciOutputInterface> UciOutputInterface::factory( const UciOutputInterface::type t )
+std::shared_ptr<UciOutput> UciOutput::create( const UciOutput::type t )
 {
-	if( t == standardUciOutput)
+	if( t == standard)
 	{
-		return std::shared_ptr<UciOutputInterface>(new UciStandardOutputInterface);
+		return std::shared_ptr<UciOutput>(new UciStandardOutput);
 	}
-	else/* if(t == noUciOutput)*/
+	else/* if(t == mute)*/
 	{
-		return std::shared_ptr<UciOutputInterface>(new UciNoOutputInterface);
+		return std::shared_ptr<UciOutput>(new UciMuteOutput);
 	}
 }

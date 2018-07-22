@@ -100,7 +100,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 	for (auto& hs : helperSearch)
 	{
-		hs.setUOI(UciOutputInterface::factory( UciOutputInterface::noUciOutput ) );
+		hs.setUOI(UciOutput::create( UciOutput::mute ) );
 		hs.counterMoves.clear();
 		hs.cleanData();
 		hs.history.clear();

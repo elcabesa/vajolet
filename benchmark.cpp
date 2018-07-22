@@ -58,7 +58,7 @@ void benchmark(void)
 
 	for (unsigned int i = 0; i < positions.size(); i++)
 	{
-		Search src( UciOutputInterface::factory( UciOutputInterface::noUciOutput ) );
+		Search src( UciOutput::create( UciOutput::mute ) );
 		src.limits.depth = 15;
 		src.resetStartTime();
 		src.resetPonderTime();
