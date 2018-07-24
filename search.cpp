@@ -966,20 +966,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		bool captureOrPromotion = pos.isCaptureMoveOrPromotion(m);
 
-		if(!captureOrPromotion)
-		{
-			if(quietMoveCount < 64)
-			{
-				quietMoveList[quietMoveCount++] = m;
-			}
-		}
-		else
-		{
-			if(captureMoveCount < 32)
-			{
-				captureMoveList[captureMoveCount++] = m;
-			}
-		}
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
@@ -1243,6 +1229,24 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			}
 		}
+		
+		if( m != bestMove )
+		{
+			if(!captureOrPromotion)
+			{
+				if(quietMoveCount < 64)
+				{
+					quietMoveList[quietMoveCount++] = m;
+				}
+			}
+			else
+			{
+				if(captureMoveCount < 32)
+				{
+					captureMoveList[captureMoveCount++] = m;
+				}
+			}
+		}
 	}
 
 
@@ -1288,13 +1292,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
 			history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, bestMove, bonus);
-			if(quietMoveCount > 1)
+
+			for (unsigned int i = 0; i < quietMoveCount; i++)
 			{
-				for (unsigned int i = 0; i < quietMoveCount - 1; i++)
-				{
-					Move m = quietMoveList[i];
-					history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
-				}
+				Move m = quietMoveList[i];
+				history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
 			}
 			
 			Move previousMove = pos.getActualState().currentMove;
@@ -1310,13 +1312,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
 			captureHistory.update( pos.getPieceAt((tSquare)bestMove.bit.from), bestMove, pos.getPieceAt((tSquare)bestMove.bit.to), bonus);
-			if(captureMoveCount > 1)
+
+			for (unsigned int i = 0; i < captureMoveCount; i++)
 			{
-				for (unsigned int i = 0; i < captureMoveCount - 1; i++)
-				{
-					Move m = captureMoveList[i];
-					captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), m, pos.getPieceAt((tSquare)m.bit.to), -bonus);
-				}
+				Move m = captureMoveList[i];
+				captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), m, pos.getPieceAt((tSquare)m.bit.to), -bonus);
 			}
 		}
 		
