@@ -565,7 +565,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&& !inCheck)
 		{
 			saveKillers(ply ,ttMove);
+			
+			Move previousMove = pos.getActualState().currentMove;
+			if(previousMove.packed)
+			{
+				counterMoves.update(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, ttMove);
+			}
 		}
+		
 
 		if(PVnode)
 		{
