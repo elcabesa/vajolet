@@ -759,11 +759,13 @@ std::string displayMove(const Position& pos, const Move & m)
 
 
 
-
+/*****************************
+uci concrete output definitions
+******************************/
 class UciMuteOutput: public UciOutput
 {
 public:
-	void printPVs(const unsigned int count) const;
+	void printPVs(std::vector<rootMove>& rm, const unsigned int count) const;
 	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const;
 	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
@@ -776,7 +778,7 @@ public:
 class UciStandardOutput: public UciOutput
 {
 public:
-	void printPVs(const unsigned int count) const;
+	void printPVs(std::vector<rootMove>& rm, const unsigned int count) const;
 	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const;
 	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
@@ -787,11 +789,14 @@ public:
 };
 
 
-void UciStandardOutput::printPVs(const unsigned int count) const
+/*****************************
+uci standard output implementation
+******************************/
+void UciStandardOutput::printPVs(std::vector<rootMove>& rmList, const unsigned int count) const
 {
 
 	int i= 0;
-	std::for_each(Search::rootMoves.begin(),std::next(Search::rootMoves.begin(), count), [&](rootMove& rm)
+	std::for_each(rmList.begin(),std::next(rmList.begin(), count), [&]( rootMove& rm)
 	{
 		if(rm.nodes)
 		{
@@ -876,7 +881,10 @@ void UciStandardOutput::printGeneralInfo( const unsigned int fullness, const uns
 	sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)localtime) << sync_endl;
 }
 
-void UciMuteOutput::printPVs( const unsigned int ) const{}
+/*****************************
+uci Mute output implementation
+******************************/
+void UciMuteOutput::printPVs(std::vector<rootMove>&, const unsigned int ) const{}
 void UciMuteOutput::printPV(const Score ,const unsigned int , const unsigned int ,const Score , const Score , const long long, const unsigned int, std::list<Move>&, const unsigned long long ) const{}
 void UciMuteOutput::printCurrMoveNumber(const unsigned int, const Move& , const unsigned long long , const long long int ) const {}
 void UciMuteOutput::showCurrLine(const Position & , const unsigned int ) const{}
@@ -885,6 +893,11 @@ void UciMuteOutput::printScore(const signed int ) const{}
 void UciMuteOutput::printBestMove( const Move, const Move ) const{}
 void UciMuteOutput::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
 
+
+
+/*****************************
+uci output factory method implementation
+******************************/
 std::shared_ptr<UciOutput> UciOutput::create( const UciOutput::type t )
 {
 	if( t == standard)

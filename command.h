@@ -21,6 +21,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <memory>
 #include "vajolet.h"
 #include "move.h"
@@ -29,6 +30,7 @@
 //--------------------------------------------------------------------
 struct Move;
 class Position;
+class rootMove;
 
 //--------------------------------------------------------------------
 //	function prototype
@@ -42,17 +44,25 @@ std::string displayMove(const Position& pos,const Move & m);
 
 
 
-
+/******************************************
+UCI output library
+*******************************************/
 class UciOutput
 {
 public:
+	/* factory method */
 	enum type
 	{
-		standard,
-		mute
+		standard,	// standard output
+		mute		// no output
 	};
+	static std::shared_ptr<UciOutput> create( const UciOutput::type t  = UciOutput::standard );
+	
+	// destructor
 	virtual ~UciOutput(){};
-	virtual void printPVs(const unsigned int count) const = 0;
+	
+	// virtual output methods
+	virtual void printPVs(std::vector<rootMove>& rm, const unsigned int count) const = 0;
 	virtual void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const = 0;
 	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const = 0;
 	virtual void showCurrLine(const Position & pos, const unsigned int ply) const = 0;
@@ -60,7 +70,7 @@ public:
 	virtual void printScore(const signed int cp) const = 0;
 	virtual void printBestMove( const Move bm, const Move ponder = Move(0)  ) const = 0;
 	virtual void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const = 0;
-	static std::shared_ptr<UciOutput> create( const UciOutput::type t  = UciOutput::standard );
+	
 	
 	
 };
