@@ -1265,7 +1265,7 @@ unsigned long long Position::perft(unsigned int depth)
 #endif
 
 	ttEntry* tte = TT.probe( getKey() );
-	if( tte->getKey() == (getKey()>>32) && tte->getDepth() == depth ) return tte->getPerftValue();
+	if( tte->getKey() == (getKey()>>32) && (unsigned int)tte->getDepth() == depth ) return tte->getPerftValue();
 	
 	unsigned long long tot = 0;
 	Movegen mg(*this);
