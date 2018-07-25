@@ -93,6 +93,11 @@ public:
 	{
 		return (getType() ==  typeScoreLowerThanAlpha || getType() == typeExact);
 	}
+	
+	unsigned long long getPerftValue() const
+	{
+		return (unsigned long long)(((unsigned int)getValue())&0x7FFFFF) + (((unsigned long long)((unsigned int)getStaticValue())&0x7FFFFF)<<23);
+	}
 
 
 };
@@ -134,6 +139,9 @@ public:
 	ttEntry* probe(const U64 key);
 
 	void store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
+	void storePerft(const U64 key, signed short int depth, unsigned long long v);
+	
+	
 
 	unsigned int getFullness() const
 	{

@@ -97,7 +97,27 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 	assert(candidate != nullptr);
 	candidate->save(keyH, value, type, depth, move, statValue, generation);
 
-
-
-
 }
+
+void transpositionTable::storePerft(const U64 key, signed short int depth, unsigned long long v)
+{
+	ttEntry *candidate;
+	unsigned int keyH = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
+
+	ttCluster& ttc = findCluster(key);
+
+	auto it = std::find_if (ttc.begin(), ttc.end(), [keyH](ttEntry p){return (!p.getKey()) || (p.getKey()==keyH);});
+	
+	if( it != ttc.end())
+	{
+		candidate = it;
+	}
+	else
+	{
+		candidate = &ttc[key%4];
+	}
+	assert(candidate != nullptr);
+	candidate->save(keyH, Score(v&0x7FFFFF), 0, depth, 0, (v>>23)&0x7FFFFF, 0);
+	
+}
+

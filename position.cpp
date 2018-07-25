@@ -1265,7 +1265,7 @@ unsigned long long Position::perft(unsigned int depth)
 #endif
 
 	ttEntry* tte = TT.probe( getKey() );
-	if( tte->getKey() == (getKey()>>32) && tte->getDepth() == depth ) return (unsigned long long)(((unsigned int)tte->getValue())&0x7FFFFF) + (((unsigned long long)((unsigned int)tte->getStaticValue())&0x7FFFFF)<<23);
+	if( tte->getKey() == (getKey()>>32) && tte->getDepth() == depth ) return tte->getPerftValue();
 	
 	unsigned long long tot = 0;
 	Movegen mg(*this);
@@ -1283,7 +1283,7 @@ unsigned long long Position::perft(unsigned int depth)
 		tot += perft(depth - 1);
 		undoMove();
 	}
-	TT.store( getKey(), Score(tot&0x7FFFFF), typeExact, depth, m.packed, Score((tot>>23)&0x7FFFFF));
+	TT.storePerft( getKey(), depth, tot );
 	return tot;
 
 }
