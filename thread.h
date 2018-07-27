@@ -185,6 +185,9 @@ class my_thread
 	void timerThread();
 	void searchThread();
 	void manageNewSearch();
+	Move getPonderMoveFromHash(const Move bestMove );
+	Move getPonderMoveFromBook(const Move bookMove );
+	void waitStopPondering() const;
 public :
 	void quitThreads();
 

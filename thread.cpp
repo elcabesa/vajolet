@@ -229,44 +229,32 @@ void my_thread::manageNewSearch()
 
 	if(legalMoves == 0)
 	{
-		while((src.limits.infinite && !src.stop) || src.limits.ponder){}
-
 		std::list<Move> PV( 1, Move(0) );
 		src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+		
+		waitStopPondering();
+
 		src.getUOI().printBestMove( Move(0) );
 
 		return;
 	}
-	else if( legalMoves == 1 )
+	
+	if( legalMoves == 1 && !src.limits.infinite)
 	{
-		if(!src.limits.infinite)
-		{
-			Move bestMove = mg.getMoveFromMoveList(0);
-			
-			std::list<Move> PV( 1, bestMove );
-			src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
-			
-			while(src.limits.ponder){}
-			
-			Move ponderMove(0);
 		
-			src.pos.doMove(bestMove);
-			
-			const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
-			Move m;
-			m.packed = tte->getPackedMove();
+		Move bestMove = mg.getMoveFromMoveList(0);
 		
-			if( src.pos.isMoveLegal(m) )
-			{
-				ponderMove = m;
-			}
-			
-			src.pos.undoMove();
-			
-			src.getUOI().printBestMove(bestMove, ponderMove);
+		std::list<Move> PV( 1, bestMove );
+		src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+		
+		waitStopPondering();
+		
+		Move ponderMove = getPonderMoveFromHash( bestMove );
+		
+		src.getUOI().printBestMove(bestMove, ponderMove);
 
-			return;
-		}
+		return;
+
 	}
 
 	//----------------------------------------------
@@ -279,9 +267,15 @@ void my_thread::manageNewSearch()
 		if(bookM.packed)
 		{
 			std::list<Move> PV( 1, bookM );
+			
 			src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
-			while( (src.limits.infinite && !src.stop) || src.limits.ponder){}
-			src.getUOI().printBestMove(bookM);
+			
+			waitStopPondering();
+			
+			Move ponderMove = getPonderMoveFromBook( bookM );
+			
+			src.getUOI().printBestMove(bookM, ponderMove);
+			
 			return;
 		}
 	}
@@ -290,16 +284,14 @@ void my_thread::manageNewSearch()
 	res = src.startThinking();
 	std::list<Move> PV = res.PV;
 
-	while(src.limits.ponder)
-	{
-	}
+	waitStopPondering();
 
 	//-----------------------------
 	// print out the choosen line
 	//-----------------------------
 	
 	Move bestMove = PV.front();
-	Move ponderMove = Move(0);
+	Move ponderMove(0);
 	if(PV.size() > 1)
 	{
 		std::list<Move>::iterator it = PV.begin();
@@ -308,23 +300,12 @@ void my_thread::manageNewSearch()
 	}
 	else
 	{
-		src.pos.doMove( PV.front() );
-		const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
-		
-		Move m;
-		m.packed = tte->getPackedMove();
-		if( src.pos.isMoveLegal(m) )
-		{
-			ponderMove = m;
-		}
-		src.pos.undoMove();
-
+		ponderMove = getPonderMoveFromHash( bestMove );
 	}
 	
 	src.getUOI().printBestMove( bestMove, ponderMove );
 
 	game.savePV(PV, res.depth, res.alpha, res.beta);
-
 
 }
 
@@ -344,6 +325,45 @@ void my_thread::quitThreads()
 	timerCond.notify_one();
 	timer.join();
 	searcher.join();
+}
+
+Move my_thread::getPonderMoveFromHash(const Move bestMove )
+{
+	Move ponderMove(0);
+	src.pos.doMove( bestMove );
+	
+	const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
+	
+	Move m;
+	m.packed = tte->getPackedMove();
+	if( src.pos.isMoveLegal(m) )
+	{
+		ponderMove = m;
+	}
+	src.pos.undoMove();
+	
+	return ponderMove;
+}
+
+Move my_thread::getPonderMoveFromBook(const Move bookMove )
+{
+	Move ponderMove(0);
+	src.pos.doMove( bookMove );
+	PolyglotBook pol;
+	Move m = pol.probe(src.pos, Search::bestMoveBook);
+	
+	if( src.pos.isMoveLegal(m) )
+	{
+		ponderMove = m;
+	}
+	src.pos.undoMove();
+	
+	return ponderMove;
+}
+
+void my_thread::waitStopPondering() const
+{
+	while(src.limits.ponder){}
 }
 
 
