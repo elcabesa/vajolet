@@ -113,7 +113,6 @@ private:
 	unsigned long int elements;
 	unsigned char generation;
 
-public:
 	transpositionTable()
 	{
 		table.clear();
@@ -122,7 +121,20 @@ public:
 		generation = 0;
 		elements = 1;
 	}
+	static transpositionTable instance; // Guaranteed to be destroyed.
+	// Instantiated on first use.
+	
+public:
 
+	static transpositionTable& getInstance()
+	{
+		
+
+		return instance;
+	}
+	transpositionTable(transpositionTable const&) = delete;
+	void operator=(transpositionTable const&) = delete;
+	
 	void newSearch() { generation++; }
 	unsigned long int setSize(unsigned long int mbSize);
 
@@ -190,8 +202,6 @@ public:
 				: v <= SCORE_MATED_IN_MAX_PLY ? v + ply : v;
 	}
 };
-
-extern transpositionTable TT;
 
 
 

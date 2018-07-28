@@ -19,8 +19,7 @@
 #include "io.h"
 
 
-transpositionTable TT;
-
+transpositionTable transpositionTable::instance; // Guaranteed to be destroyed.
 unsigned long int transpositionTable::setSize(unsigned long int mbSize)
 {
 

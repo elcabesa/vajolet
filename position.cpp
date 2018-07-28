@@ -1264,7 +1264,7 @@ unsigned long long Position::perft(unsigned int depth)
 	}
 #endif
 
-	ttEntry* tte = TT.probe( getKey() );
+	ttEntry* tte = transpositionTable::getInstance().probe( getKey() );
 	if( tte->getKey() == (getKey()>>32) && (unsigned int)tte->getDepth() == depth ) return tte->getPerftValue();
 	
 	unsigned long long tot = 0;
@@ -1283,7 +1283,7 @@ unsigned long long Position::perft(unsigned int depth)
 		tot += perft(depth - 1);
 		undoMove();
 	}
-	TT.storePerft( getKey(), depth, tot );
+	transpositionTable::getInstance().storePerft( getKey(), depth, tot );
 	return tot;
 
 }

@@ -61,7 +61,7 @@ int main()
 	Movegen::initMovegenConstant();
 
 	Search::initLMRreduction();
-	TT.setSize(1);
+	transpositionTable::getInstance().setSize(1);
 	Position::initMaterialKeys();
 	tb_init(Search::SyzygyPath.c_str());
 

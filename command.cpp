@@ -238,7 +238,7 @@ void setoption(std::istringstream& is)
 			hash = 1;
 		}
 		hash = std::min(hash,65535);
-		unsigned long elements = TT.setSize(hash);
+		unsigned long elements = transpositionTable::getInstance().setSize(hash);
 		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<hash<<"MB)"<<sync_endl;
 
 	}
