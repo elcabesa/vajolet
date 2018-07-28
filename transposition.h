@@ -94,12 +94,6 @@ public:
 		return (getType() ==  typeScoreLowerThanAlpha || getType() == typeExact);
 	}
 	
-	unsigned long long getPerftValue() const
-	{
-		return (unsigned long long)(((unsigned int)getValue())&0x7FFFFF) + (((unsigned long long)((unsigned int)getStaticValue())&0x7FFFFF)<<23);
-	}
-
-
 };
 
 typedef	std::array< ttEntry, 4> ttCluster;
@@ -151,7 +145,6 @@ public:
 	ttEntry* probe(const U64 key);
 
 	void store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
-	void storePerft(const U64 key, signed short int depth, unsigned long long v);
 	
 	
 
@@ -201,6 +194,15 @@ public:
 				: v >= SCORE_MATE_IN_MAX_PLY  ? v - ply
 				: v <= SCORE_MATED_IN_MAX_PLY ? v + ply : v;
 	}
+};
+
+class PerftTranspositionTable
+{
+public:
+	PerftTranspositionTable(){}
+	
+	void store(const U64 key, signed short int depth, unsigned long long v);
+	bool retrieve(const U64 key, unsigned int depth, unsigned long long& res);
 };
 
 

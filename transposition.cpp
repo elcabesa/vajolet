@@ -98,25 +98,21 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 
 }
 
-void transpositionTable::storePerft(const U64 key, signed short int depth, unsigned long long v)
+void PerftTranspositionTable::store(const U64 key, signed short int depth, unsigned long long v)
 {
-	ttEntry *candidate;
-	unsigned int keyH = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
-
-	ttCluster& ttc = findCluster(key);
-
-	auto it = std::find_if (ttc.begin(), ttc.end(), [keyH](ttEntry p){return (!p.getKey()) || (p.getKey()==keyH);});
-	
-	if( it != ttc.end())
-	{
-		candidate = it;
-	}
-	else
-	{
-		candidate = &ttc[key%4];
-	}
-	assert(candidate != nullptr);
-	candidate->save(keyH, Score(v&0x7FFFFF), 0, depth, 0, (v>>23)&0x7FFFFF, 0);
-	
+	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, 0, (v>>23)&0x7FFFFF);	
 }
 
+bool PerftTranspositionTable::retrieve(const U64 key, unsigned int depth, unsigned long long& res)
+{
+	ttEntry* tte = transpositionTable::getInstance().probe( key );
+	
+	if( tte->getKey() == (key>>32) && (unsigned int)tte->getDepth() == depth )
+	{
+		res = (unsigned long long)(((unsigned int)tte->getValue())&0x7FFFFF) + (((unsigned long long)((unsigned int)tte->getStaticValue())&0x7FFFFF)<<23);
+
+		return true;
+	}
+	return false;
+	
+}

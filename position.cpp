@@ -1263,11 +1263,13 @@ unsigned long long Position::perft(unsigned int depth)
 		return 1;
 	}
 #endif
-
-	ttEntry* tte = transpositionTable::getInstance().probe( getKey() );
-	if( tte->getKey() == (getKey()>>32) && (unsigned int)tte->getDepth() == depth ) return tte->getPerftValue();
+	PerftTranspositionTable tt;
 	
 	unsigned long long tot = 0;
+	if( tt.retrieve(getKey(), depth, tot) )
+	{
+		return tot;
+	}
 	Movegen mg(*this);
 #ifdef FAST_PERFT
 	if(depth==1)
@@ -1283,7 +1285,9 @@ unsigned long long Position::perft(unsigned int depth)
 		tot += perft(depth - 1);
 		undoMove();
 	}
-	transpositionTable::getInstance().storePerft( getKey(), depth, tot );
+	
+	tt.store( getKey(), depth, tot );
+	
 	return tot;
 
 }
