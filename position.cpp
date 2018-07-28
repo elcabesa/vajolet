@@ -46,6 +46,8 @@ simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 int Position::castleRightsMask[squareNumber];
 
+bool Position::perftUseHash = false;
+
 
 void Position::initPstValues(void)
 {
@@ -1266,7 +1268,7 @@ unsigned long long Position::perft(unsigned int depth)
 	PerftTranspositionTable tt;
 	
 	unsigned long long tot = 0;
-	if( tt.retrieve(getKey(), depth, tot) )
+	if( perftUseHash && tt.retrieve(getKey(), depth, tot) )
 	{
 		return tot;
 	}
@@ -1286,7 +1288,10 @@ unsigned long long Position::perft(unsigned int depth)
 		undoMove();
 	}
 	
-	tt.store( getKey(), depth, tot );
+	if( perftUseHash )
+	{
+		tt.store( getKey(), depth, tot );
+	}
 	
 	return tot;
 

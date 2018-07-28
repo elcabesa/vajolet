@@ -97,6 +97,12 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 	candidate->save(keyH, value, type, depth, move, statValue, generation);
 
 }
+void transpositionTable::clear()
+{
+	ttCluster ttc;
+	ttc.fill(ttEntry(0,0,0,0,0,0,0));
+	std::fill(table.begin(), table.end(), ttc);
+}
 
 void PerftTranspositionTable::store(const U64 key, signed short int depth, unsigned long long v)
 {
