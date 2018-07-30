@@ -86,7 +86,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 
 
-	TT.newSearch();
+	transpositionTable::getInstance().newSearch();
 	history.clear();
 	captureHistory.clear();
 	counterMoves.clear();
@@ -544,7 +544,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//--------------------------------------
 	// test the transposition table
 	//--------------------------------------
-	ttEntry* tte = TT.probe(posKey);
+	ttEntry* tte = transpositionTable::getInstance().probe(posKey);
 	Move ttMove = tte->getPackedMove();
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
@@ -556,7 +556,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
 		                              : tte->isTypeGoodForAlphaCutoff()))
 	{
-		TT.refresh(*tte);
+		transpositionTable::getInstance().refresh(*tte);
 
 		//save killers
 		if (ttValue >= beta
@@ -683,7 +683,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				}
 
 				
-				TT.store(posKey,
+				transpositionTable::getInstance().store(posKey,
 						transpositionTable::scoreToTT(value, ply),
 						typeExact,
 						std::min(90, depth + 6 * ONE_PLY),
@@ -860,7 +860,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			}
 			/*else
 			{
-				const ttEntry * const tteNull = TT.probe(nullKey);
+				const ttEntry * const tteNull = transpositionTable::getInstance().probe(nullKey);
 				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : Movegen::NOMOVE;
 			}*/
 
@@ -925,7 +925,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		sd[ply].skipNullMove = skipBackup;
 
-		tte = TT.probe(posKey);
+		tte = transpositionTable::getInstance().probe(posKey);
 		ttMove = tte->getPackedMove();
 	}
 
@@ -1280,7 +1280,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	if(!stop)
 	{
-		TT.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta  ? typeScoreHigherThanBeta :
 					(PVnode && bestMove.packed) ? typeExact : typeScoreLowerThanAlpha,
 							(short int)depth, bestMove.packed, staticEval);
@@ -1387,7 +1387,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				Search::nodeType::PV_NODE;
 
 
-	ttEntry* const tte = TT.probe(pos.getKey());
+	ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
 	Move ttMove = tte->getPackedMove();
 
 	Movegen mg(pos, *this, ply, ttMove);
@@ -1399,7 +1399,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
 	                              : tte->isTypeGoodForAlphaCutoff()))
 	{
-		TT.refresh(*tte);
+		transpositionTable::getInstance().refresh(*tte);
 
 		if(PVnode)
 		{
@@ -1494,7 +1494,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				}
 				if(!stop)
 				{
-					TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
+					transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
 				}
 				return bestScore;
 			}
@@ -1629,7 +1629,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 					}
 					if(!stop)
 					{
-						TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove.packed, staticEval);
+						transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove.packed, staticEval);
 					}
 					return bestScore;
 				}
@@ -1654,7 +1654,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 	if( !stop )
 	{
-		TT.store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove.packed, staticEval);
+		transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove.packed, staticEval);
 	}
 	return bestScore;
 

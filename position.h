@@ -223,8 +223,10 @@ public:
 	};
 
 
+	static bool perftUseHash;
 private:
 
+	
 	unsigned int ply;
 
 	/*! \brief helper mask used to speedup castle right management

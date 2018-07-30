@@ -76,6 +76,8 @@ void static printUciInfo(void)
 	sync_cout << "option name UCI_ShowCurrLine type check default false" << sync_endl;
 	sync_cout << "option name SyzygyPath type string default <empty>" << sync_endl;
 	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
+	sync_cout << "option name ClearHash type button" << sync_endl;
+	sync_cout << "option name PerftUseHash type check default false" << sync_endl;
 
 	sync_cout << "uciok" << sync_endl;
 }
@@ -219,7 +221,7 @@ void setoption(std::istringstream& is)
 		value += std::string(" ", !value.empty()) + token;
 	}
 	
-	if( value.empty() && (name != "SyzygyPath" && name != "UCI_EngineAbout")) // sygyzy path is allowed to have an empty value
+	if( value.empty() && (name != "SyzygyPath" && name != "UCI_EngineAbout" && name != "ClearHash")) // sygyzy path is allowed to have an empty value
 	{
 		sync_cout << "info string malformed command"<< sync_endl;
 		return;
@@ -238,9 +240,24 @@ void setoption(std::istringstream& is)
 			hash = 1;
 		}
 		hash = std::min(hash,65535);
-		unsigned long elements = TT.setSize(hash);
+		unsigned long elements = transpositionTable::getInstance().setSize(hash);
 		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<hash<<"MB)"<<sync_endl;
 
+	}
+	else if(name == "ClearHash")
+	{
+		transpositionTable::getInstance().clear();
+	}
+	else if(name == "PerftUseHash")
+	{
+		if(value=="true")
+		{
+			Position::perftUseHash = true;
+		}
+		else
+		{
+			Position::perftUseHash = false;
+		}
 	}
 	else if(name == "Threads")
 	{

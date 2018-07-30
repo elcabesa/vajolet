@@ -150,7 +150,7 @@ void my_thread::timerThread()
 			{
 
 				lastHasfullMessage = time;
-				unsigned int fullness = TT.getFullness();
+				unsigned int fullness = transpositionTable::getInstance().getFullness();
 				unsigned long long int thbits = src.getTbHits();
 				unsigned long long int nodes = src.getVisitedNodes();
 
@@ -187,7 +187,7 @@ void my_thread::timerThread()
 			}
 			if(src.stop)
 			{
-				sync_cout<<"info hashfull " << TT.getFullness() << sync_endl;
+				sync_cout<<"info hashfull " << transpositionTable::getInstance().getFullness() << sync_endl;
 				sync_cout<<"info tbhits " << src.getTbHits() << sync_endl;
 			}
 			timeMan.idLoopIterationFinished = false;
@@ -259,7 +259,7 @@ void my_thread::manageNewSearch()
 			sync_cout << "bestmove " << displayUci(m);
 
 			src.pos.doMove(m);
-			const ttEntry* const tte = TT.probe(src.pos.getKey());
+			const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
 			
 			m.packed = tte->getPackedMove();
 			if( src.pos.isMoveLegal(m) )
@@ -323,7 +323,7 @@ void my_thread::manageNewSearch()
 	else
 	{
 		src.pos.doMove( PV.front() );
-		const ttEntry* const tte = TT.probe(src.pos.getKey());
+		const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
 		
 
 		Move m;

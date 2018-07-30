@@ -93,8 +93,7 @@ public:
 	{
 		return (getType() ==  typeScoreLowerThanAlpha || getType() == typeExact);
 	}
-
-
+	
 };
 
 typedef	std::array< ttEntry, 4> ttCluster;
@@ -108,7 +107,6 @@ private:
 	unsigned long int elements;
 	unsigned char generation;
 
-public:
 	transpositionTable()
 	{
 		table.clear();
@@ -117,7 +115,21 @@ public:
 		generation = 0;
 		elements = 1;
 	}
+	static transpositionTable instance; // Guaranteed to be destroyed.
+	// Instantiated on first use.
+	
+public:
 
+	void clear();
+	static transpositionTable& getInstance()
+	{
+		
+
+		return instance;
+	}
+	transpositionTable(transpositionTable const&) = delete;
+	void operator=(transpositionTable const&) = delete;
+	
 	void newSearch() { generation++; }
 	unsigned long int setSize(unsigned long int mbSize);
 
@@ -134,6 +146,8 @@ public:
 	ttEntry* probe(const U64 key);
 
 	void store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
+	
+	
 
 	unsigned int getFullness() const
 	{
@@ -183,7 +197,14 @@ public:
 	}
 };
 
-extern transpositionTable TT;
+class PerftTranspositionTable
+{
+public:
+	PerftTranspositionTable(){}
+	
+	void store(const U64 key, signed short int depth, unsigned long long v);
+	bool retrieve(const U64 key, unsigned int depth, unsigned long long& res);
+};
 
 
 

@@ -49,7 +49,7 @@ static const std::vector<std::string>positions = {
 
 void benchmark(void)
 {
-	TT.setSize(32);
+	transpositionTable::getInstance().setSize(32);
 
 	unsigned long long nodes = 0;
 

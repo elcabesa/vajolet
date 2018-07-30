@@ -19,8 +19,7 @@
 #include "io.h"
 
 
-transpositionTable TT;
-
+transpositionTable transpositionTable::instance; // Guaranteed to be destroyed.
 unsigned long int transpositionTable::setSize(unsigned long int mbSize)
 {
 
@@ -97,7 +96,29 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 	assert(candidate != nullptr);
 	candidate->save(keyH, value, type, depth, move, statValue, generation);
 
+}
+void transpositionTable::clear()
+{
+	ttCluster ttc;
+	ttc.fill(ttEntry(0,0,0,0,0,0,0));
+	std::fill(table.begin(), table.end(), ttc);
+}
 
+void PerftTranspositionTable::store(const U64 key, signed short int depth, unsigned long long v)
+{
+	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, 0, (v>>23)&0x7FFFFF);	
+}
 
+bool PerftTranspositionTable::retrieve(const U64 key, unsigned int depth, unsigned long long& res)
+{
+	ttEntry* tte = transpositionTable::getInstance().probe( key );
+	
+	if( tte->getKey() == (key>>32) && (unsigned int)tte->getDepth() == depth )
+	{
+		res = (unsigned long long)(((unsigned int)tte->getValue())&0x7FFFFF) + (((unsigned long long)((unsigned int)tte->getStaticValue())&0x7FFFFF)<<23);
 
+		return true;
+	}
+	return false;
+	
 }
