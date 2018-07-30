@@ -65,7 +65,6 @@ public:
 
 	void CreateNewGame(void)
 	{
-		//sync_cout<<"info debug NEW GAME DETECTED"<<sync_endl;
 		positions.clear();
 	}
 
@@ -74,7 +73,6 @@ public:
 		unsigned int actualPosition = positions.size();
 		for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
 		{
-			//sync_cout<<"info debug new position inserted in game:"<<displayUci(pos.getState(i).currentMove)<<sync_endl;
 			GamePosition p;
 			p.key = pos.getState(i).key;
 			p.m =  pos.getState(i).currentMove;
@@ -118,7 +116,6 @@ public:
 		if( positions.size() == 0 || pos.getStateSize() < positions.size())
 		{
 			//printGamesInfo();
-			//sync_cout<<"NEW GAME"<<sync_endl;
 			return true;
 		}
 
@@ -128,7 +125,6 @@ public:
 			if(pos.getState(n).key != p.key)
 			{
 				//printGamesInfo();
-				//sync_cout<<"NEW GAME"<<sync_endl;
 				return true;
 			}
 			n++;
@@ -144,12 +140,10 @@ public:
 			GamePosition previous =*(positions.end()-3);
 			if(previous.PV.size()>=1 && previous.PV[1] == positions.back().m)
 			{
-				//sync_cout<<"PONDER HIT"<<sync_endl;
 				return true;
 			}
 
 		}
-		//sync_cout<<"PONDER FAIL"<<sync_endl;
 		return false;
 	}
 
@@ -191,6 +185,9 @@ class my_thread
 	void timerThread();
 	void searchThread();
 	void manageNewSearch();
+	Move getPonderMoveFromHash(const Move bestMove );
+	Move getPonderMoveFromBook(const Move bookMove );
+	void waitStopPondering() const;
 public :
 	void quitThreads();
 

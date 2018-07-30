@@ -86,9 +86,6 @@ void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruc
 	timeMan.idLoopAlpha = false;
 	timeMan.idLoopBeta = false;
 
-	//sync_cout<<"info debug resolution "<<timeMan.resolution<<sync_endl;
-	//sync_cout<<"info debug allocatedTime "<<timeMan.allocatedTime<<sync_endl;
-
 }
 
 
@@ -127,34 +124,26 @@ void my_thread::timerThread()
 			if(!src.stop && time >= timeMan.allocatedTime && ( timeMan.idLoopAlpha || timeMan.idLoopBeta ) )
 			{
 				timeMan.allocatedTime = timeMan.maxAllocatedTime;
-				//sync_cout<<"info debug EXTEND TIME: "<<timeMan.allocatedTime<<sync_endl;
 			}
 			if(!src.stop && timeMan.maxAllocatedTime == timeMan.allocatedTime /*&& time >= timeMan.allocatedTime */&& ( timeMan.idLoopIterationFinished ) && !(src.limits.infinite || src.limits.ponder) )
 			{
 				src.stop = true;
-				//sync_cout<<"info debug FINISHED ITERATION IN EXTEND TIME "<<time<<sync_endl;
 			}
 
 			if(!src.stop && time >= timeMan.allocatedTime && timeMan.FirstIterationFinished && !(src.limits.infinite || src.limits.ponder))
 			{
-				//sync_cout<<"info debug TIME EXPIRED "<<time<< " >= "<<timeMan.allocatedTime<<sync_endl;
 				src.stop = true;
 			}
 			if(!src.stop && timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(src.limits.infinite || src.limits.ponder))
 			{
-				//sync_cout<<"info debug STOP BECAUSE WE WILL PROBABLY NOT BE ABLE TO FINISH THE NEXT ITERATION "<<time<<":"<<timeMan.allocatedTime<<sync_endl;
 				src.stop = true;
 			}
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			if(time - lastHasfullMessage > 1000)
 			{
-
 				lastHasfullMessage = time;
-				unsigned int fullness = transpositionTable::getInstance().getFullness();
-				unsigned long long int thbits = src.getTbHits();
-				unsigned long long int nodes = src.getVisitedNodes();
-
-				sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)time) << sync_endl;
+				
+				src.getUOI().printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), time);
 
 				if(src.showCurrentLine)
 				{
@@ -171,7 +160,6 @@ void my_thread::timerThread()
 			{
 				if(timeMan.singularRootMoveCount >=20)
 				{
-					//sync_cout<<"info debug EARLY STOP"<<sync_endl;
 					src.stop = true;
 				}
 			}
@@ -187,8 +175,7 @@ void my_thread::timerThread()
 			}
 			if(src.stop)
 			{
-				sync_cout<<"info hashfull " << transpositionTable::getInstance().getFullness() << sync_endl;
-				sync_cout<<"info tbhits " << src.getTbHits() << sync_endl;
+				src.getUOI().printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), time);
 			}
 			timeMan.idLoopIterationFinished = false;
 		}
@@ -242,38 +229,32 @@ void my_thread::manageNewSearch()
 
 	if(legalMoves == 0)
 	{
-		while((src.limits.infinite && !src.stop) || src.limits.ponder){}
+		std::list<Move> PV( 1, Move(0) );
+		src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+		
+		waitStopPondering();
 
-		sync_cout<<"info depth 0 score cp 0"<<sync_endl;
-		sync_cout<<"bestmove 0000"<<sync_endl;
+		src.getUOI().printBestMove( Move(0) );
 
 		return;
 	}
-	else if( legalMoves == 1 )
+	
+	if( legalMoves == 1 && !src.limits.infinite)
 	{
-		if(!src.limits.infinite)
-		{
-			Move m = mg.getMoveFromMoveList(0);
-			sync_cout << "info pv " << displayUci(m) << sync_endl;
-			while(src.limits.ponder){}
-			sync_cout << "bestmove " << displayUci(m);
+		
+		Move bestMove = mg.getMoveFromMoveList(0);
+		
+		std::list<Move> PV( 1, bestMove );
+		src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+		
+		waitStopPondering();
+		
+		Move ponderMove = getPonderMoveFromHash( bestMove );
+		
+		src.getUOI().printBestMove(bestMove, ponderMove);
 
-			src.pos.doMove(m);
-			const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
-			
-			m.packed = tte->getPackedMove();
-			if( src.pos.isMoveLegal(m) )
-			{
-				std::cout<<" ponder "<<displayUci(m)<<sync_endl;
-			}
-			else
-			{
-				std::cout<<sync_endl;
-			}
-			src.pos.undoMove();
+		return;
 
-			return;
-		}
 	}
 
 	//----------------------------------------------
@@ -285,64 +266,46 @@ void my_thread::manageNewSearch()
 		Move bookM = pol.probe(src.pos, Search::bestMoveBook);
 		if(bookM.packed)
 		{
-			sync_cout << "info pv " << displayUci(bookM) << sync_endl;
-			while( (src.limits.infinite && !src.stop) || src.limits.ponder){}
-			sync_cout<<"bestmove "<< displayUci(bookM) << sync_endl;
+			std::list<Move> PV( 1, bookM );
+			
+			src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+			
+			waitStopPondering();
+			
+			Move ponderMove = getPonderMoveFromBook( bookM );
+			
+			src.getUOI().printBestMove(bookM, ponderMove);
+			
 			return;
 		}
 	}
 	startThinkResult res;
-	/*if(game.isPonderRight())
-	{
-		sync_cout<<"info debug PONDER RIGHT"<<sync_endl;
-	}else
-	{
-		sync_cout<<"info debug PONDER WRONG"<<sync_endl;
-	}*/
+	
 	res = src.startThinking();
-
-
-
 	std::list<Move> PV = res.PV;
 
-	while(src.limits.ponder)
-	{
-	}
+	waitStopPondering();
 
 	//-----------------------------
 	// print out the choosen line
 	//-----------------------------
-	sync_cout << "bestmove " << displayUci( PV.front() );
-
+	
+	Move bestMove = PV.front();
+	Move ponderMove(0);
 	if(PV.size() > 1)
 	{
 		std::list<Move>::iterator it = PV.begin();
 		std::advance(it, 1);
-		std::cout<<" ponder "<<displayUci(*it)<<sync_endl;
+		ponderMove = *it;
 	}
 	else
 	{
-		src.pos.doMove( PV.front() );
-		const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
-		
-
-		Move m;
-		m.packed = tte->getPackedMove();
-		if( src.pos.isMoveLegal(m) )
-		{
-			std::cout<<" ponder "<<displayUci(m)<<sync_endl;
-		}
-		else
-		{
-			std::cout<<sync_endl;
-		}
-		src.pos.undoMove();
-
+		ponderMove = getPonderMoveFromHash( bestMove );
 	}
-
 	
-	game.savePV(PV, res.depth, res.alpha, res.beta);
+	src.getUOI().printBestMove( bestMove, ponderMove );
 
+	game.savePV(PV, res.depth, res.alpha, res.beta);
 
 }
 
@@ -362,6 +325,45 @@ void my_thread::quitThreads()
 	timerCond.notify_one();
 	timer.join();
 	searcher.join();
+}
+
+Move my_thread::getPonderMoveFromHash(const Move bestMove )
+{
+	Move ponderMove(0);
+	src.pos.doMove( bestMove );
+	
+	const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
+	
+	Move m;
+	m.packed = tte->getPackedMove();
+	if( src.pos.isMoveLegal(m) )
+	{
+		ponderMove = m;
+	}
+	src.pos.undoMove();
+	
+	return ponderMove;
+}
+
+Move my_thread::getPonderMoveFromBook(const Move bookMove )
+{
+	Move ponderMove(0);
+	src.pos.doMove( bookMove );
+	PolyglotBook pol;
+	Move m = pol.probe(src.pos, Search::bestMoveBook);
+	
+	if( src.pos.isMoveLegal(m) )
+	{
+		ponderMove = m;
+	}
+	src.pos.undoMove();
+	
+	return ponderMove;
+}
+
+void my_thread::waitStopPondering() const
+{
+	while(src.limits.ponder){}
 }
 
 

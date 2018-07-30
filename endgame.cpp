@@ -837,7 +837,6 @@ void Position::initMaterialKeys(void)
 				}
 				if(wp!=8){s+=std::to_string(8-wp);}
 				s+="/6BK w - -";
-				//sync_cout<<s<<sync_endl;
 				p.setupFromFen(s);
 				key = p.getMaterialKey();
 				t.type=materialStruct::multiplicativeFunction;

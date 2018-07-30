@@ -25,6 +25,7 @@
 
 #define sync_cout std::cout << io_lock				/*!< synchronized cout start*/
 #define sync_endl std::endl << io_unlock			/*!< synchronized cout end*/
+#define sync_noNewLineEndl io_unlock				/*!< synchronized cout end*/
 
 //--------------------------------------------------------------------
 //	enum
