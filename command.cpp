@@ -817,9 +817,9 @@ void UciStandardOutput::printPV(const Score res, const unsigned int depth, const
 	}
 	else
 	{
-		int satRes = std::min(res,SCORE_MAX_OUTPUT_VALUE);
-		satRes = std::max(satRes,SCORE_MIN_OUTPUT_VALUE);
-		std::cout << "cp "<< (int)((float)satRes/100.0);
+		//int satRes = std::min(res,SCORE_MAX_OUTPUT_VALUE);
+		//satRes = std::max(satRes,SCORE_MIN_OUTPUT_VALUE);
+		std::cout << "cp "<< (int)((float)res/100.0);
 	}
 
 	std::cout << (res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
