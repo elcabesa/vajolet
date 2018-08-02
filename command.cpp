@@ -44,6 +44,7 @@
 //	local global constant
 //---------------------------------------------
 const char PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
+static bool reduceVerbosity = false;
 
 const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 /*! \brief array of char to create the fen string
@@ -85,6 +86,7 @@ void static printUciInfo(void)
 	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
 	sync_cout << "option name ClearHash type button" << sync_endl;
 	sync_cout << "option name PerftUseHash type check default false" << sync_endl;
+	sync_cout << "option name reduceVerbosity type check default false" << sync_endl;
 
 	sync_cout << "uciok" << sync_endl;
 }
@@ -264,6 +266,17 @@ void setoption(std::istringstream& is)
 		else
 		{
 			Position::perftUseHash = false;
+		}
+	}
+	else if(name == "reduceVerbosity")
+	{
+		if(value=="true")
+		{
+			reduceVerbosity = true;
+		}
+		else
+		{
+			reduceVerbosity = false;
 		}
 	}
 	else if(name == "Threads")
@@ -877,8 +890,11 @@ void UciStandardOutput::printBestMove( const Move bm, const Move ponder ) const
 
 void UciStandardOutput::printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const
 {
-	long long int localtime = std::max(time,1ll);
-	sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)localtime) << sync_endl;
+	if( !reduceVerbosity )
+	{
+		long long int localtime = std::max(time,1ll);
+		sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)localtime) << sync_endl;
+	}
 }
 
 /*****************************
