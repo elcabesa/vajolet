@@ -898,14 +898,14 @@ void UciMuteOutput::printGeneralInfo( const unsigned int , const unsigned long l
 /*****************************
 uci output factory method implementation
 ******************************/
-std::shared_ptr<UciOutput> UciOutput::create( const UciOutput::type t )
+std::unique_ptr<UciOutput> UciOutput::create( const UciOutput::type t )
 {
 	if( t == standard)
 	{
-		return std::shared_ptr<UciOutput>(new UciStandardOutput);
+		return std::make_unique<UciStandardOutput>();
 	}
 	else/* if(t == mute)*/
 	{
-		return std::shared_ptr<UciOutput>(new UciMuteOutput);
+		return std::make_unique<UciMuteOutput>();
 	}
 }

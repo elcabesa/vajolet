@@ -56,7 +56,7 @@ public:
 		standard,	// standard output
 		mute		// no output
 	};
-	static std::shared_ptr<UciOutput> create( const UciOutput::type t  = UciOutput::standard );
+	static std::unique_ptr<UciOutput> create( const UciOutput::type t  = UciOutput::standard );
 	
 	// destructor
 	virtual ~UciOutput(){};
