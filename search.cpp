@@ -966,13 +966,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
+		bool FutilityMoveCountFlag = depth < 16*ONE_PLY && moveNumber >= FutilityMoveCounts[depth >> ONE_PLY_SHIFT];
 
 		int ext = 0;
-		if(PVnode && isDangerous)
+		if(PVnode && isDangerous )
 		{
 			ext = ONE_PLY;
 		}
-		else if( moveGivesCheck && pos.seeSign(m) >= 0)
+		else if( moveGivesCheck && pos.seeSign(m) >= 0 && !FutilityMoveCountFlag)
 		{
 			ext = ONE_PLY / 2;
 		}
@@ -1021,10 +1022,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		){
 			assert(moveNumber > 1);
 
-			if(newDepth < 16*ONE_PLY
-				&& moveNumber >= FutilityMoveCounts[newDepth >> ONE_PLY_SHIFT]
-				//&& (!threatMove.packed)
-				)
+			if(FutilityMoveCountFlag)
 			{
 				assert((newDepth>>ONE_PLY_SHIFT)<11);
 				continue;
@@ -1091,7 +1089,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				//------------------------------
 				bool doFullDepthSearch = true;
 				if( depth >= 3*ONE_PLY
-					&& !captureOrPromotion
+					&& (!captureOrPromotion || FutilityMoveCountFlag )
 					&& !isDangerous
 					&& m != ttMove
 					&& !mg.isKillerMove(m)
@@ -1147,7 +1145,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//------------------------------
 			bool doFullDepthSearch = true;
 			if( depth >= 3*ONE_PLY
-				&& !captureOrPromotion
+				&& (!captureOrPromotion || FutilityMoveCountFlag )
 				&& !isDangerous
 				&& m != ttMove
 				&& !mg.isKillerMove(m)
