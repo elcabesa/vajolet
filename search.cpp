@@ -46,7 +46,7 @@ int Search::globalReduction =0;
 
 Score Search::futility[8] = {0,6000,12000,18000,24000,30000,36000,42000};
 Score Search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
-unsigned int Search::FutilityMoveCounts[11] = {5,10,17,26,37,50,66,85,105,130,151};
+unsigned int Search::FutilityMoveCounts[16] = {2,3,4,7,11,15,20,26,32,39,46,55,64,73,83,94};
 Score Search::PVreduction[LmrLimit*ONE_PLY][64];
 Score Search::nonPVreduction[LmrLimit*ONE_PLY][64];
 unsigned int Search::threads = 1;
@@ -966,13 +966,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
+		bool FutilityMoveCountFlag = depth < 16*ONE_PLY && moveNumber >= FutilityMoveCounts[depth >> ONE_PLY_SHIFT];
 
 		int ext = 0;
-		if(PVnode && isDangerous)
+		if(PVnode && isDangerous )
 		{
 			ext = ONE_PLY;
 		}
-		else if( moveGivesCheck && pos.seeSign(m) >= 0)
+		else if( moveGivesCheck && pos.seeSign(m) >= 0 && !FutilityMoveCountFlag)
 		{
 			ext = ONE_PLY / 2;
 		}
@@ -1021,10 +1022,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		){
 			assert(moveNumber > 1);
 
-			if(newDepth < 11*ONE_PLY
-				&& moveNumber >= FutilityMoveCounts[newDepth >> ONE_PLY_SHIFT]
-				//&& (!threatMove.packed)
-				)
+			if(FutilityMoveCountFlag)
 			{
 				assert((newDepth>>ONE_PLY_SHIFT)<11);
 				continue;
@@ -1091,7 +1089,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				//------------------------------
 				bool doFullDepthSearch = true;
 				if( depth >= 3*ONE_PLY
-					&& !captureOrPromotion
+					&& (!captureOrPromotion || FutilityMoveCountFlag )
 					&& !isDangerous
 					&& m != ttMove
 					&& !mg.isKillerMove(m)
@@ -1147,7 +1145,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//------------------------------
 			bool doFullDepthSearch = true;
 			if( depth >= 3*ONE_PLY
-				&& !captureOrPromotion
+				&& (!captureOrPromotion || FutilityMoveCountFlag )
 				&& !isDangerous
 				&& m != ttMove
 				&& !mg.isKillerMove(m)

@@ -126,7 +126,7 @@ private:
 	static const unsigned int LmrLimit = 32;
 	static Score futility[8];
 	static Score futilityMargin[7];
-	static unsigned int FutilityMoveCounts[11];
+	static unsigned int FutilityMoveCounts[16];
 	static Score PVreduction[LmrLimit*ONE_PLY][64];
 	static Score nonPVreduction[LmrLimit*ONE_PLY][64];
 
