@@ -44,7 +44,7 @@
 //	local global constant
 //---------------------------------------------
 const char PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
-static bool reduceVerbosity = false;
+
 
 const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 /*! \brief array of char to create the fen string
@@ -53,6 +53,36 @@ const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w
 	\date 27/10/2013
 */
 
+/*****************************
+uci concrete output definitions
+******************************/
+class UciMuteOutput: public UciOutput
+{
+public:
+	void printPVs(std::vector<rootMove>& rm, const unsigned int count) const;
+	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const;
+	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
+	void showCurrLine(const Position & pos, const unsigned int ply) const;
+	void printDepth(const unsigned int depth) const;
+	void printScore(const signed int cp) const;
+	void printBestMove( const Move m, const Move ponder = Move(0) ) const;
+	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
+};
+
+
+class UciStandardOutput: public UciOutput
+{
+public:
+	static bool reduceVerbosity;
+	void printPVs(std::vector<rootMove>& rm, const unsigned int count) const;
+	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const;
+	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
+	void showCurrLine(const Position & pos, const unsigned int ply) const;
+	void printDepth(const unsigned int depth) const;
+	void printScore(const signed int cp) const;
+	void printBestMove( const Move m, const Move ponder = Move(0)) const;
+	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
+};
 
 
 //---------------------------------------------
@@ -272,11 +302,11 @@ void setoption(std::istringstream& is)
 	{
 		if(value=="true")
 		{
-			reduceVerbosity = true;
+			UciStandardOutput::reduceVerbosity = true;
 		}
 		else
 		{
-			reduceVerbosity = false;
+			UciStandardOutput::reduceVerbosity = false;
 		}
 	}
 	else if(name == "Threads")
@@ -772,39 +802,15 @@ std::string displayMove(const Position& pos, const Move & m)
 
 
 
-/*****************************
-uci concrete output definitions
-******************************/
-class UciMuteOutput: public UciOutput
-{
-public:
-	void printPVs(std::vector<rootMove>& rm, const unsigned int count) const;
-	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const;
-	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
-	void showCurrLine(const Position & pos, const unsigned int ply) const;
-	void printDepth(const unsigned int depth) const;
-	void printScore(const signed int cp) const;
-	void printBestMove( const Move m, const Move ponder = Move(0) ) const;
-	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
-};
 
-class UciStandardOutput: public UciOutput
-{
-public:
-	void printPVs(std::vector<rootMove>& rm, const unsigned int count) const;
-	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const;
-	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
-	void showCurrLine(const Position & pos, const unsigned int ply) const;
-	void printDepth(const unsigned int depth) const;
-	void printScore(const signed int cp) const;
-	void printBestMove( const Move m, const Move ponder = Move(0)) const;
-	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
-};
 
 
 /*****************************
 uci standard output implementation
 ******************************/
+
+bool UciStandardOutput::reduceVerbosity = false;
+
 void UciStandardOutput::printPVs(std::vector<rootMove>& rmList, const unsigned int count) const
 {
 
