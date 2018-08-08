@@ -40,7 +40,7 @@
 #endif
 
 Search defaultSearch;
-std::vector<rootMove> Search::rootMoves;
+std::vector<Move> Search::rootMoves;
 int Search::globalReduction =0;
 
 
@@ -86,7 +86,7 @@ void Search::cleanMemoryBeforeStartingNewSearch(void)
 	tbHits = 0;
 }
 
-void Search::filterRootMovesByTablebase( std::vector<rootMove>& rm )
+void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 {
 	unsigned results[TB_MAX_MOVES];
 
@@ -170,7 +170,7 @@ void Search::filterRootMovesByTablebase( std::vector<rootMove>& rm )
 	}
 }
 
-void Search::generateRootMovesList( std::vector<rootMove>& rm, std::list<Move>& ml)
+void Search::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
 {
 	rm.clear();
 	
@@ -179,12 +179,13 @@ void Search::generateRootMovesList( std::vector<rootMove>& rm, std::list<Move>& 
 		Move m(Movegen::NOMOVE);
 		for(  Movegen mg(pos); ( m = mg.getNextMove() ) != Movegen::NOMOVE; )
 		{
-			rm.emplace_back( rootMove(m) );
+			rm.emplace_back( m );
 		}
 	}
 	else
-	{	//only selected moves
-		for_each( ml.begin(), ml.end(), [&](Move &m){rm.emplace_back(rootMove(m));} );
+	{
+		//only selected moves
+		for_each( ml.begin(), ml.end(), [&](Move &m){rm.emplace_back(m);} );
 	}
 }
 
@@ -211,8 +212,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	//init the new search
 	//------------------------------------
 	
-	// manage multi PV moves
-	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
+	
 	
 	//clean transposition table
 	transpositionTable::getInstance().newSearch();
@@ -237,6 +237,10 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	// generate the list of root moves to be searched
 	//--------------------------------
 	generateRootMovesList( rootMoves, limits.searchMoves );
+	
+	
+	// manage multi PV moves
+	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
 
 	//--------------------------------
 	//	tablebase probing, filtering rootmoves to be searched
@@ -263,7 +267,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	//----------------------------------
 	Score delta = 800;
 	
-	
+	// ramdomly initialize the bestmove
 	rootMove bestMove = rootMoves[0];
 	
 	do
@@ -272,12 +276,9 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 		//----------------------------
 		// iterative loop
 		//----------------------------
-		for (rootMove& rm : rootMoves)
-		{
-			rm.previousScore = rm.score;
-		}
 
-		std::vector<rootMove> searchResults;
+		std::vector<rootMove> previousIterationResults = rootMovesSearched;
+		rootMovesSearched.clear();
 		
 		for (indexPV = 0; indexPV < linesToBeSearched; indexPV++)
 		{
@@ -288,16 +289,11 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			if (depth >= 5)
 			{
 				delta = 800;
-				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int) SCORE_MATED);
-				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].previousScore) + delta,(signed long long int) SCORE_MATE);
+				alpha = (Score) std::max((signed long long int)(previousIterationResults[indexPV].score) - delta,(signed long long int) SCORE_MATED);
+				beta  = (Score) std::min((signed long long int)(previousIterationResults[indexPV].score) + delta,(signed long long int) SCORE_MATE);
 			}
 
-			for (unsigned int x = indexPV; x < rootMoves.size() ; x++)
-			{
-				rootMoves[x].score = -SCORE_INFINITE;
-			}
-			
-			globalReduction = 0;
+			Search::globalReduction = 0;
 
 			do
 			{
@@ -308,10 +304,21 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 				maxPlyReached = 0;
 				validIteration = false;
-				ExpectedValue = rootMoves[indexPV].previousScore;
 
-				PV = rootMoves[indexPV].PV;
-				followPV = true;
+				if( previousIterationResults.size()> indexPV )
+				{
+					ExpectedValue = previousIterationResults[indexPV].score;
+					PV = previousIterationResults[indexPV].PV;
+					followPV = true;
+				}
+				else
+				{
+					ExpectedValue = 0;
+					PV.clear();
+					followPV = false;
+				}
+				
+				
 
 				//----------------------------
 				// multithread : lazy smp threads
@@ -355,25 +362,25 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					assert(newPV.size()==0 || res >alpha);
 					if( newPV.size() !=0 && res > alpha)
 					{
-						auto it = std::find(rootMoves.begin()+indexPV, rootMoves.end(), newPV.front() );
+						auto it = std::find(rootMoves.begin(), rootMoves.end(), newPV.front() );
 
 						if (it != rootMoves.end())
 						{
-							assert( it->firstMove == newPV.front());
+							assert( *it == newPV.front());
 
-							//if(it->firstMove == newPV.front())
-							//{
-							it->PV = newPV;
-							it->score = res;
-							it->maxPlyReached = maxPlyReached;
-							it->depth = depth;
-							it->nodes = getVisitedNodes();
-							it->time = elapsedTime;
+							rootMove rm( newPV.front() );
 							
-							searchResults.push_back(*it);
-							bestMove = *it;
+							rm.PV = newPV;
+							rm.score = res;
+							rm.maxPlyReached = maxPlyReached;
+							rm.depth = depth;
+							rm.nodes = getVisitedNodes();
+							rm.time = elapsedTime;
 							
-							std::iter_swap( it, rootMoves.begin()+indexPV);
+							rootMovesSearched.push_back(rm);
+							// todo va inserito qualche controllo ? if vari?
+							bestMove = rm;
+							
 							
 						}
 						else
@@ -392,8 +399,9 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 					if (res <= alpha)
 					{
-						newPV.clear();
-						newPV.emplace_back( rootMoves[indexPV].PV.front() );
+						// can i remove it?  i think I can, it's only an extetic value
+						//newPV.clear();
+						//newPV.emplace_back( rootMoves[indexPV].PV.front() );
 
 						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, getVisitedNodes());
 
@@ -433,13 +441,11 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			if((!stop || validIteration) && (linesToBeSearched>1 || depth == 1) )
 			{
 
-				// Sort the PV lines searched so far and update the GUI
-				std::stable_sort(rootMoves.begin(), rootMoves.begin() + indexPV + 1);
+				// Sort the PV lines searched so far and update the GUI				
+				std::stable_sort(rootMovesSearched.begin(), rootMovesSearched.end());
+				bestMove = rootMovesSearched[0];
 				
-				std::stable_sort(searchResults.begin(), searchResults.end());
-				bestMove = searchResults[0];
-				
-				_UOI->printPVs( searchResults );
+				_UOI->printPVs( rootMovesSearched );
 			}
 		}
 
@@ -455,16 +461,12 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 
 	startThinkResult ret;
-	if( rootMoves[0].PV.front() != bestMove.PV.front() )
-	{
-		std::cout<<"ARGHHHHHHHHHHHHHHHH"<<std::endl;
-	}
-	ret.PV = rootMoves[0].PV;
+
+	ret.PV = bestMove.PV;
 	ret.depth = depth-1;
 	ret.alpha = alpha;
 	ret.beta = beta;
-	ret.Res = rootMoves[0].previousScore;
-
+	ret.Res = bestMove.score;
 
 	return ret;
 
@@ -953,7 +955,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		// Search only the moves in the Search list
-		if( type == Search::nodeType::ROOT_NODE && !std::count(rootMoves.begin() + indexPV, rootMoves.end(), m))
+		if( type == Search::nodeType::ROOT_NODE && std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m) && !std::count(rootMoves.begin(), rootMoves.end(), m) )
 		{
 			continue;
 		}

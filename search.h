@@ -88,7 +88,6 @@ class rootMove
 {
 public:
 	Score score = -SCORE_INFINITE;
-	Score previousScore = -SCORE_INFINITE;
 	std::list<Move> PV;
 	Move firstMove;
 	unsigned int maxPlyReached = 0u;
@@ -142,8 +141,8 @@ private:
 	searchData sd[STATE_INFO_LENGTH];
 	
 	void cleanMemoryBeforeStartingNewSearch(void);
-	void generateRootMovesList( std::vector<rootMove>& rm, std::list<Move>& ml);
-	void filterRootMovesByTablebase( std::vector<rootMove>& rm );
+	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
+	void filterRootMovesByTablebase( std::vector<Move>& rm );
 	startThinkResult manageQsearch(void);
 	
 	void cleanData(void)
@@ -194,7 +193,8 @@ private:
 
 public:
 
-	static std::vector<rootMove> rootMoves;
+	static std::vector<Move> rootMoves;
+	std::vector<rootMove> rootMovesSearched;
 	std::list<Move> PV;
 	searchLimits limits;
 	Position pos;
