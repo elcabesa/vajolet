@@ -88,7 +88,7 @@ class rootMove
 {
 public:
 	Score score = -SCORE_INFINITE;
-	std::list<Move> PV;
+	PVline PV;
 	Move firstMove;
 	unsigned int maxPlyReached = 0u;
 	unsigned int depth = 0u;
@@ -101,6 +101,8 @@ public:
 	{
 		PV.clear();
 	}
+	
+	rootMove(Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
 };
 
 
@@ -234,7 +236,7 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE);
+	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, std::list<Move> PV= {} );
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 

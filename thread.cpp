@@ -279,9 +279,22 @@ void my_thread::manageNewSearch()
 			return;
 		}
 	}
-	startThinkResult res;
 	
-	res = src.startThinking();
+	startThinkResult res;
+	if( game.isPonderRight() )
+	{
+		Game::GamePosition gp = game.getNewSearchParameters();
+
+		std::list<Move> newPV;
+		std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
+		
+		newPV.resize(gp.depth/2 + 1);
+		res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
+	}
+	else
+	{
+		res = src.startThinking( );
+	}
 	std::list<Move> PV = res.PV;
 
 	waitStopPondering();

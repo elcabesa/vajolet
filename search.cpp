@@ -206,8 +206,9 @@ startThinkResult Search::manageQsearch(void)
 	return ret;
 }
 
-startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
+startThinkResult Search::startThinking(int depth, Score alpha, Score beta, std::list<Move> pv)
 {
+	PV = pv;
 	//------------------------------------
 	//init the new search
 	//------------------------------------
@@ -268,7 +269,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	Score delta = 800;
 	
 	// ramdomly initialize the bestmove
-	rootMove bestMove = rootMoves[0];
+	rootMove bestMove{ rootMoves[0] };
 	
 	do
 	{
@@ -387,34 +388,19 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 							globalReduction = 1;
 						}
 						my_thread::timeMan.idLoopAlpha = false;
-						my_thread::	timeMan.idLoopBeta = true;
+						my_thread::timeMan.idLoopBeta = true;
 						
 						PV = newPV;
 						followPV = true;
-						
-						rootMove rm( newPV.front() );
-						rm.PV = newPV;
-						rm.score = res;
-						rm.maxPlyReached = maxPlyReached;
-						rm.depth = depth;
-						rm.nodes = getVisitedNodes();
-						rm.time = elapsedTime;
-						
-						bestMove = rm;
+												
+						bestMove = rootMove( newPV.front(), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 					}
 					else
 					{
-						rootMove rm( newPV.front() );
-						rm.PV = newPV;
-						rm.score = res;
-						rm.maxPlyReached = maxPlyReached;
-						rm.depth = depth;
-						rm.nodes = getVisitedNodes();
-						rm.time = elapsedTime;
+						bestMove = rootMove( newPV.front(), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 						
-						rootMovesSearched.push_back(rm);
+						rootMovesSearched.push_back(bestMove);
 
-						bestMove = rm;
 						break;
 					}
 
@@ -442,10 +428,9 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 		my_thread::timeMan.idLoopIterationFinished = true;
 		my_thread::timeMan.idLoopAlpha = false;
 		my_thread::	timeMan.idLoopBeta = false;
-		depth += 1;
 
 	}
-	while( depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
+	while( ++depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
 
 
 	startThinkResult ret;
