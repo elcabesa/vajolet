@@ -295,6 +295,20 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 			Search::globalReduction = 0;
 
+			if( previousIterationResults.size()> indexPV )
+			{
+				ExpectedValue = previousIterationResults[indexPV].score;
+				PV = previousIterationResults[indexPV].PV;
+				followPV = true;
+			}
+			else
+			{
+				ExpectedValue = 0;
+				PV.clear();
+				followPV = false;
+			}
+			
+			
 			do
 			{
 
@@ -304,19 +318,9 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 				maxPlyReached = 0;
 				validIteration = false;
+				followPV = true;
 
-				if( previousIterationResults.size()> indexPV )
-				{
-					ExpectedValue = previousIterationResults[indexPV].score;
-					PV = previousIterationResults[indexPV].PV;
-					followPV = true;
-				}
-				else
-				{
-					ExpectedValue = 0;
-					PV.clear();
-					followPV = false;
-				}
+				
 				
 				
 
@@ -355,53 +359,10 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 				if(validIteration ||!stop)
 				{
-
-
 					long long int elapsedTime  = getElapsedTime();
-
-					assert(newPV.size()==0 || res >alpha);
-					if( newPV.size() !=0 && res > alpha)
-					{
-						auto it = std::find(rootMoves.begin(), rootMoves.end(), newPV.front() );
-
-						if (it != rootMoves.end())
-						{
-							assert( *it == newPV.front());
-
-							rootMove rm( newPV.front() );
-							
-							rm.PV = newPV;
-							rm.score = res;
-							rm.maxPlyReached = maxPlyReached;
-							rm.depth = depth;
-							rm.nodes = getVisitedNodes();
-							rm.time = elapsedTime;
-							
-							rootMovesSearched.push_back(rm);
-							// todo va inserito qualche controllo ? if vari?
-							bestMove = rm;
-							
-							
-						}
-						else
-						{
-							//std::cout<<"info ERROR"<<sync_endl;
-						}
-
-						//}
-
-					}
-
-
-
-
-
 
 					if (res <= alpha)
 					{
-						// can i remove it?  i think I can, it's only an extetic value
-						//newPV.clear();
-						//newPV.emplace_back( rootMoves[indexPV].PV.front() );
 
 						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, getVisitedNodes());
 
@@ -410,6 +371,9 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 						globalReduction = 0;
 						my_thread::timeMan.idLoopAlpha = true;
 						my_thread::	timeMan.idLoopBeta = false;
+						
+						//PV = newPV;
+						followPV = true;
 
 					}
 					else if (res >= beta)
@@ -424,9 +388,33 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 						}
 						my_thread::timeMan.idLoopAlpha = false;
 						my_thread::	timeMan.idLoopBeta = true;
+						
+						PV = newPV;
+						followPV = true;
+						
+						rootMove rm( newPV.front() );
+						rm.PV = newPV;
+						rm.score = res;
+						rm.maxPlyReached = maxPlyReached;
+						rm.depth = depth;
+						rm.nodes = getVisitedNodes();
+						rm.time = elapsedTime;
+						
+						bestMove = rm;
 					}
 					else
 					{
+						rootMove rm( newPV.front() );
+						rm.PV = newPV;
+						rm.score = res;
+						rm.maxPlyReached = maxPlyReached;
+						rm.depth = depth;
+						rm.nodes = getVisitedNodes();
+						rm.time = elapsedTime;
+						
+						rootMovesSearched.push_back(rm);
+
+						bestMove = rm;
 						break;
 					}
 
