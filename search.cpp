@@ -76,6 +76,134 @@ unsigned long long Search::getTbHits() const
 	return n;
 }
 
+void Search::cleanMemoryBeforeStartingNewSearch(void)
+{
+	history.clear();
+	captureHistory.clear();
+	counterMoves.clear();
+	cleanData();
+	visitedNodes = 0;
+	tbHits = 0;
+}
+
+void Search::filterRootMovesByTablebase( std::vector<rootMove>& rm )
+{
+	unsigned results[TB_MAX_MOVES];
+
+	unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
+
+	if ( piecesCnt <= TB_LARGEST )
+	{
+		unsigned result = tb_probe_root(pos.getBitmap(Position::whitePieces),
+			pos.getBitmap(Position::blackPieces),
+			pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
+			pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
+			pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
+			pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
+			pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
+			pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
+			pos.getActualState().fiftyMoveCnt,
+			pos.getActualState().castleRights,
+			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
+			pos.getActualState().nextMove== Position::whiteTurn,
+			results);
+
+		if (result != TB_RESULT_FAILED)
+		{
+
+			const unsigned wdl = TB_GET_WDL(result);
+			assert(wdl<5);
+
+			unsigned r;
+			for (int i = 0; (r = results[i]) != TB_RESULT_FAILED; i++)
+			{
+				const unsigned moveWdl = TB_GET_WDL(r);
+
+				unsigned ep = TB_GET_EP(r);
+				Move m( Movegen::NOMOVE );
+				m.bit.from = TB_GET_FROM(r);
+				m.bit.to = TB_GET_TO(r);
+				if (ep)
+				{
+					m.bit.flags = Move::fenpassant;
+				}
+				switch (TB_GET_PROMOTES(r))
+				{
+				case TB_PROMOTES_QUEEN:
+					m.bit.flags = Move::fpromotion;
+					m.bit.promotion = Move::promQueen;
+					break;
+				case TB_PROMOTES_ROOK:
+					m.bit.flags = Move::fpromotion;
+					m.bit.promotion = Move::promRook;
+					break;
+				case TB_PROMOTES_BISHOP:
+					m.bit.flags = Move::fpromotion;
+					m.bit.promotion = Move::promBishop;
+					break;
+				case TB_PROMOTES_KNIGHT:
+					m.bit.flags = Move::fpromotion;
+					m.bit.promotion = Move::promKnight;
+					break;
+				default:
+					break;
+				}
+
+
+
+				auto position = std::find(rm.begin(), rm.end(), m);
+				if (position != rm.end()) // == myVector.end() means the element was not found
+				{
+					if (moveWdl >= wdl)
+					{
+						// preserve move
+					}
+					else
+					{
+						rm.erase(position);
+					}
+
+				}
+
+			}
+		}
+	}
+}
+
+void Search::generateRootMovesList( std::vector<rootMove>& rm, std::list<Move>& ml)
+{
+	rm.clear();
+	
+	if( ml.size() == 0 )	// all the legal moves
+	{
+		Move m(Movegen::NOMOVE);
+		for(  Movegen mg(pos); ( m = mg.getNextMove() ) != Movegen::NOMOVE; )
+		{
+			rm.emplace_back( rootMove(m) );
+		}
+	}
+	else
+	{	//only selected moves
+		for_each( ml.begin(), ml.end(), [&](Move &m){rm.emplace_back(rootMove(m));} );
+	}
+}
+
+startThinkResult Search::manageQsearch(void)
+{
+	PVline PV;
+	Score res =qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, PV);
+	
+	_UOI->printScore( res/100 );
+	
+	startThinkResult ret;
+	
+	ret.PV = PV;
+	ret.depth = 0;
+	ret.alpha = -SCORE_INFINITE;
+	ret.beta = SCORE_INFINITE;
+	
+	return ret;
+}
 
 startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 {
@@ -83,62 +211,30 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	//init the new search
 	//------------------------------------
 	Score res = 0;
-
-
-	transpositionTable::getInstance().newSearch();
-	history.clear();
-	captureHistory.clear();
-	counterMoves.clear();
-	cleanData();
-	visitedNodes = 0;
-	tbHits = 0;
-	mainSearcher = true;
-
 	
+	//clean transposition table
+	transpositionTable::getInstance().newSearch();
+	
+	// setup main thread
+	cleanMemoryBeforeStartingNewSearch();
+
+	// setup other threads
 	helperSearch.clear();
 	helperSearch.resize(threads-1);
 
 	for (auto& hs : helperSearch)
 	{
+		// mute helper thread
 		hs.setUOI(UciOutput::create( UciOutput::mute ) );
-		hs.counterMoves.clear();
-		hs.cleanData();
-		hs.history.clear();
-		hs.captureHistory.clear();
-		hs.visitedNodes = 0;
-		hs.tbHits = 0;
-		hs.mainSearcher = false;
+		
+		// setup helper thread
+		hs.cleanMemoryBeforeStartingNewSearch();
 	}
 
+	// generate the list of root moves to be searched
+	generateRootMovesList( rootMoves, limits.searchMoves );
 
-	rootMoves.clear();
-
-
-	//--------------------------------
-	//	generate the list of root moves to be searched
-	//--------------------------------
-	if(limits.searchMoves.size() == 0)	// all the legal moves
-	{
-		Move m(Movegen::NOMOVE);
-		Movegen mg(pos);
-		while ((m = mg.getNextMove())!= Movegen::NOMOVE)
-		{
-			rootMoves.emplace_back(rootMove(m));
-		}
-
-	}
-	else
-	{	//only selected moves
-		for_each(limits.searchMoves.begin(), limits.searchMoves.end(), [&](Move &m){rootMoves.emplace_back(rootMove(m));});
-	}
-
-
-
-
-
-	//-----------------------------
 	// manage multi PV moves
-	//-----------------------------
 	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
 
 	//--------------------------------
@@ -146,118 +242,23 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 	//--------------------------------
 	if(limits.searchMoves.size() == 0 && Search::multiPVLines==1)
 	{
-
-		unsigned results[TB_MAX_MOVES];
-
-		unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
-
-		if (    piecesCnt <= TB_LARGEST)
-		{
-			unsigned result = tb_probe_root(pos.getBitmap(Position::whitePieces),
-				pos.getBitmap(Position::blackPieces),
-				pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
-				pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
-				pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
-				pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
-				pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
-				pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
-				pos.getActualState().fiftyMoveCnt,
-				pos.getActualState().castleRights,
-				pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-				pos.getActualState().nextMove== Position::whiteTurn,
-				results);
-
-			if (result != TB_RESULT_FAILED)
-			{
-
-				const unsigned wdl = TB_GET_WDL(result);
-				assert(wdl<5);
-
-				unsigned r;
-				for (int i = 0; (r = results[i]) != TB_RESULT_FAILED; i++)
-				{
-					const unsigned moveWdl = TB_GET_WDL(r);
-
-					unsigned ep = TB_GET_EP(r);
-					Move m(0);
-					m.bit.from = TB_GET_FROM(r);
-					m.bit.to = TB_GET_TO(r);
-					if (ep)
-					{
-						m.bit.flags = Move::fenpassant;
-					}
-					switch (TB_GET_PROMOTES(r))
-					{
-					case TB_PROMOTES_QUEEN:
-						m.bit.flags = Move::fpromotion;
-						m.bit.promotion = Move::promQueen;
-						break;
-					case TB_PROMOTES_ROOK:
-						m.bit.flags = Move::fpromotion;
-						m.bit.promotion = Move::promRook;
-						break;
-					case TB_PROMOTES_BISHOP:
-						m.bit.flags = Move::fpromotion;
-						m.bit.promotion = Move::promBishop;
-						break;
-					case TB_PROMOTES_KNIGHT:
-						m.bit.flags = Move::fpromotion;
-						m.bit.promotion = Move::promKnight;
-						break;
-					default:
-						break;
-					}
-
-
-
-					auto position = std::find(rootMoves.begin(), rootMoves.end(), m);
-					if (position != rootMoves.end()) // == myVector.end() means the element was not found
-					{
-						if (moveWdl >= wdl)
-						{
-							// preserve move
-						}
-						else
-						{
-							rootMoves.erase(position);
-						}
-
-					}
-
-				}
-			}
-		}
-
+		filterRootMovesByTablebase( rootMoves );
 	}
 	//----------------------------------
 	// we can start the real search
 	//----------------------------------
 
+	// manage depth 0 searcg ( return qsearch )
 	if(limits.depth == 0)
 	{
-
-		PVline newPV;
-		Score res =qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, newPV);
-		_UOI->printScore( res/100 );
-		startThinkResult ret;
-		ret.PV = newPV;
-		ret.depth = 0;
-		ret.alpha = -SCORE_INFINITE;
-		ret.beta = SCORE_INFINITE;
-
-
-		return ret;
-
+		return manageQsearch();
 	}
 
-
-	PVline newPV;
-	//unsigned int depth = 1;
-
-	//Score alpha = -SCORE_INFINITE, beta = SCORE_INFINITE;
+	
+	//----------------------------------
+	// iterative deepening loop
+	//----------------------------------
 	Score delta = 800;
-	Move oldBestMove(Movegen::NOMOVE);
-
 	do
 	{
 		_UOI->printDepth(depth);
@@ -286,16 +287,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			{
 				rootMoves[x].score = -SCORE_INFINITE;
 			}
-
-			//----------------------------------
-			// reload the last PV in the transposition table
-			//----------------------------------
-/*			for(unsigned int i = 0; i<=indexPV; i++)
-			{
-				reloadPv(i);
-			}*/
-
-
+			
 			globalReduction = 0;
 
 			do
@@ -329,7 +321,9 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
  					helperThread.emplace_back( std::thread(&Search::alphaBeta<Search::nodeType::ROOT_NODE>, &helperSearch[i], 0, (depth-globalReduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
 				}
 
+				PVline newPV;
 				newPV.clear();
+				
 				// main thread
 				res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
@@ -342,12 +336,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 				{
 					t.join();
 				}
-
-				// don't stop befor having finished at least one iteration
-				/*if(depth != 1 && stop)
-				{
-					break;
-				}*/
 
 				if(validIteration ||!stop)
 				{
@@ -418,12 +406,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 					}
 					else
 					{
-						//verify search result
-						// print PV
-						/*sync_cout<<"PV ";
-						for_each( newPV.begin(), newPV.end(), [&](Move &m){std::cout<<displayUci(m)<<" ";});
-						std::cout<<sync_endl;
-						verifyPv(newPV,res);*/
 						break;
 					}
 
@@ -444,10 +426,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			}
 		}
 
-		//------------------------------------------------
-		// check wheter or not the new best move has changed
-		//------------------------------------------------
-		oldBestMove = newPV.front();
 
 
 		my_thread::timeMan.idLoopIterationFinished = true;
@@ -494,7 +472,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//--------------------------------------
 	// show current line if needed
 	//--------------------------------------
-	if( mainSearcher && showLine && depth <= ONE_PLY)
+	if( showLine && depth <= ONE_PLY)
 	{
 		showLine = false;
 		_UOI->showCurrLine(pos,ply);

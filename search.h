@@ -120,7 +120,6 @@ class Search
 {
 private:
 	std::unique_ptr<UciOutput> _UOI;
-	bool mainSearcher;
 	bool followPV;
 	static int globalReduction;
 	static const unsigned int LmrLimit = 32;
@@ -141,6 +140,12 @@ private:
 	CounterMove counterMoves;
 
 	searchData sd[STATE_INFO_LENGTH];
+	
+	void cleanMemoryBeforeStartingNewSearch(void);
+	void generateRootMovesList( std::vector<rootMove>& rm, std::list<Move>& ml);
+	void filterRootMovesByTablebase( std::vector<rootMove>& rm );
+	startThinkResult manageQsearch(void);
+	
 	void cleanData(void)
 	{
 		std::memset(sd, 0, sizeof(sd));

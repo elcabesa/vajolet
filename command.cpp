@@ -194,7 +194,6 @@ void static go(std::istringstream& is, Position & pos, my_thread * thr)
         	Move m = moveFromUci(pos, token);
 			if(m.packed)
 			{
-				sync_cout << "mossa " << token << sync_endl;
 				limits.searchMoves.push_back( moveFromUci(pos, token) );
 			}
         }
