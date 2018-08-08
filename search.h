@@ -197,7 +197,7 @@ public:
 
 	static std::vector<Move> rootMoves;
 	std::vector<rootMove> rootMovesSearched;
-	std::list<Move> PV;
+	PVline PV;
 	searchLimits limits;
 	Position pos;
 
@@ -236,7 +236,7 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, std::list<Move> PV= {} );
+	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 

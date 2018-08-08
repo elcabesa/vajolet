@@ -206,9 +206,8 @@ startThinkResult Search::manageQsearch(void)
 	return ret;
 }
 
-startThinkResult Search::startThinking(int depth, Score alpha, Score beta, std::list<Move> pv)
+startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVline pv)
 {
-	PV = pv;
 	//------------------------------------
 	//init the new search
 	//------------------------------------
@@ -269,7 +268,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, std::
 	Score delta = 800;
 	
 	// ramdomly initialize the bestmove
-	rootMove bestMove{ rootMoves[0] };
+	rootMove bestMove = rootMoves[0];
 	
 	do
 	{

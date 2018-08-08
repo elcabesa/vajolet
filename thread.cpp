@@ -281,11 +281,11 @@ void my_thread::manageNewSearch()
 	}
 	
 	startThinkResult res;
-	if( game.isPonderRight() )
+/*	if( game.isPonderRight() )
 	{
 		Game::GamePosition gp = game.getNewSearchParameters();
 
-		std::list<Move> newPV;
+		PVline newPV;
 		std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
 		
 		newPV.resize(gp.depth/2 + 1);
@@ -294,7 +294,7 @@ void my_thread::manageNewSearch()
 		res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
 	}
 	else
-	{
+*/	{
 		res = src.startThinking( );
 	}
 	std::list<Move> PV = res.PV;
