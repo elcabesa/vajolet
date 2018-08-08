@@ -280,7 +280,10 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		std::vector<rootMove> previousIterationResults = rootMovesSearched;
 		rootMovesSearched.clear();
 		
-		for (indexPV = 0; indexPV < linesToBeSearched; indexPV++)
+		//----------------------------------
+		// multi PV loop
+		//----------------------------------
+		for (multiPVcounter = 0; multiPVcounter < linesToBeSearched; ++multiPVcounter)
 		{
 
 			//----------------------------------
@@ -289,40 +292,38 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 			if (depth >= 5)
 			{
 				delta = 800;
-				alpha = (Score) std::max((signed long long int)(previousIterationResults[indexPV].score) - delta,(signed long long int) SCORE_MATED);
-				beta  = (Score) std::min((signed long long int)(previousIterationResults[indexPV].score) + delta,(signed long long int) SCORE_MATE);
+				alpha = (Score) std::max((signed long long int)(previousIterationResults[multiPVcounter].score) - delta,(signed long long int) SCORE_MATED);
+				beta  = (Score) std::min((signed long long int)(previousIterationResults[multiPVcounter].score) + delta,(signed long long int) SCORE_MATE);
 			}
 
 			Search::globalReduction = 0;
 
-			if( previousIterationResults.size()> indexPV )
+			//----------------------------------
+			// reload PV
+			//----------------------------------
+			if( previousIterationResults.size()> multiPVcounter )
 			{
-				ExpectedValue = previousIterationResults[indexPV].score;
-				PV = previousIterationResults[indexPV].PV;
+				ExpectedValue = previousIterationResults[multiPVcounter].score;
+				PV = previousIterationResults[multiPVcounter].PV;
 				followPV = true;
 			}
 			else
 			{
-				ExpectedValue = 0;
+				ExpectedValue = -SCORE_INFINITE;
 				PV.clear();
 				followPV = false;
 			}
 			
 			
+			//----------------------------------
+			// aspiration window
+			//----------------------------------
 			do
 			{
-
-				//----------------------------
-				// search at depth d with aspiration window
-				//----------------------------
 
 				maxPlyReached = 0;
 				validIteration = false;
 				followPV = true;
-
-				
-				
-				
 
 				//----------------------------
 				// multithread : lazy smp threads
@@ -364,7 +365,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 					if (res <= alpha)
 					{
 
-						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, getVisitedNodes());
+						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, multiPVcounter, newPV, getVisitedNodes());
 
 						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
@@ -372,14 +373,14 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 						my_thread::timeMan.idLoopAlpha = true;
 						my_thread::	timeMan.idLoopBeta = false;
 						
-						//PV = newPV;
+						// follow the old PV
 						followPV = true;
 
 					}
 					else if (res >= beta)
 					{
 
-						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, getVisitedNodes());
+						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, multiPVcounter, newPV, getVisitedNodes());
 
 						beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 						if(depth > 1)
@@ -411,7 +412,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 			}while(!stop);
 
-			if((!stop || validIteration) && (linesToBeSearched>1 || depth == 1) )
+			if((!stop || validIteration) && (linesToBeSearched > 1 || depth == 1) )
 			{
 
 				// Sort the PV lines searched so far and update the GUI				
@@ -435,7 +436,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	startThinkResult ret;
 
 	ret.PV = bestMove.PV;
-	ret.depth = depth-1;
+	ret.depth = bestMove.depth;
 	ret.alpha = alpha;
 	ret.beta = beta;
 	ret.Res = bestMove.score;
@@ -1182,7 +1183,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 						if(val < beta && depth > 1*ONE_PLY)
 						{
-							_UOI->printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, getVisitedNodes());
+							_UOI->printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), multiPVcounter, pvLine, getVisitedNodes());
 						}
 						if(val > ExpectedValue - 800)
 						{

@@ -135,7 +135,7 @@ private:
 	bool validIteration = false;
 	Score ExpectedValue = 0;
 
-	unsigned int indexPV = 0;
+	unsigned int multiPVcounter = 0;
 	History history;
 	CaptureHistory captureHistory;
 	CounterMove counterMoves;
