@@ -289,6 +289,8 @@ void my_thread::manageNewSearch()
 		std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
 		
 		newPV.resize(gp.depth/2 + 1);
+		newPV.pop_front();
+		newPV.pop_front();
 		res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
 	}
 	else
