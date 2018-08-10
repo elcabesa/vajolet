@@ -265,7 +265,7 @@ public:
 
 	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
 	
-	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {}, bool masterThread = false);
+	rootMove idLoop(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {}, bool masterThread = false);
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 
