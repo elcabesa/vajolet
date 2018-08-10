@@ -41,7 +41,6 @@
 
 Search defaultSearch;
 std::vector<Move> Search::rootMoves;
-int Search::globalReduction =0;
 
 
 Score Search::futility[8] = {0,6000,12000,18000,24000,30000,36000,42000};
@@ -84,6 +83,7 @@ void Search::cleanMemoryBeforeStartingNewSearch(void)
 	cleanData();
 	visitedNodes = 0;
 	tbHits = 0;
+	rootMovesSearched.clear();
 }
 
 void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
@@ -199,7 +199,7 @@ startThinkResult Search::manageQsearch(void)
 	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, PV, res );
 }
 
-rootMove Search::idLoop(int depth, Score alpha, Score beta, PVline PV )
+rootMove Search::idLoop(int depth, Score alpha, Score beta, PVline )
 {
 	// manage multi PV moves
 	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
@@ -264,38 +264,10 @@ rootMove Search::idLoop(int depth, Score alpha, Score beta, PVline PV )
 				validIteration = false;
 				followPV = true;
 
-				//----------------------------
-				// multithread : lazy smp threads
-				//----------------------------
-
-				std::vector<PVline> pvl2(threads-1);
-				std::vector<std::thread> helperThread;
-
-				// launch helper threads
-				for(unsigned int i = 0; i < (threads - 1); i++)
-				{
-					helperSearch[i].stop = false;
-					helperSearch[i].pos = pos;
-					helperSearch[i].PV = PV;
-					helperSearch[i].followPV = true;
- 					helperThread.emplace_back( std::thread(&Search::alphaBeta<Search::nodeType::ROOT_NODE>, &helperSearch[i], 0, (depth-globalReduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
-				}
-
 				PVline newPV;
 				newPV.clear();
 				
-				// main thread
 				Score res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
-
-				// stop helper threads
-				for(unsigned int i = 0; i< (threads - 1); i++)
-				{
-					helperSearch[i].stop = true;
-				}
-				for(auto &t : helperThread)
-				{
-					t.join();
-				}
 
 				if(validIteration ||!stop)
 				{
@@ -380,8 +352,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//init the new search
 	//------------------------------------
 	
-	rootMovesSearched.clear();
-	
 	//clean transposition table
 	transpositionTable::getInstance().newSearch();
 	
@@ -428,7 +398,37 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	// iterative deepening loop
 	//----------------------------------
+	
+	
+	//----------------------------
+	// multithread : lazy smp threads
+	//----------------------------
+
+	
+	std::vector<std::thread> helperThread;
+
+	// launch helper threads
+	for( unsigned int i = 0; i < (threads - 1); ++i)
+	{
+		helperSearch[i].stop = false;
+		helperSearch[i].pos = pos;
+		helperSearch[i].PV = PV;
+		//helperSearch[i].followPV = true;
+		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], depth, alpha, beta, pv));
+	}
+
+	
 	rootMove bestMove = idLoop(depth, alpha, beta, pv);
+	
+	// stop helper threads
+	for(unsigned int i = 0; i< (threads - 1); i++)
+	{
+		helperSearch[i].stop = true;
+	}
+	for(auto &t : helperThread)
+	{
+		t.join();
+	}
 	
 	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 

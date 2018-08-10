@@ -124,7 +124,7 @@ class Search
 private:
 	std::unique_ptr<UciOutput> _UOI;
 	bool followPV;
-	static int globalReduction;
+	int globalReduction;
 	static const unsigned int LmrLimit = 32;
 	static Score futility[8];
 	static Score futilityMargin[7];
