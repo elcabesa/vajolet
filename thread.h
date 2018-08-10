@@ -94,7 +94,7 @@ public:
 	{
 		for(auto p : positions)
 		{
-			if( p.m != Movegen::NOMOVE)
+			if( p.m != NOMOVE)
 			{
 				std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
 				for( auto m : p.PV )

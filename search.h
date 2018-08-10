@@ -29,9 +29,13 @@
 #include "eval.h"
 #include "command.h"
 
-class PVline : public std::list<Move>
+class PVline : private std::list<Move>
 {
 public:
+	inline unsigned int size() const
+	{
+		return std::list<Move>::size();
+	}
 	inline void reset()
 	{
 		clear();
@@ -50,13 +54,23 @@ public:
 		emplace_back( move );
 	}
 	
-	inline Move& getMove( unsigned int n )
+	inline const Move& getMove( unsigned int n ) const
 	{
-		auto it = begin();
-		std::advance(it, n);
-		return *it;
+		if( size() > n )
+		{
+			auto it = begin();
+			std::advance(it, n);
+			return *it;
+		}
+		else
+		{
+			return NOMOVE;
+		}
 	}
 	
+	using std::list<Move>::iterator;
+	using std::list<Move>::begin;
+	using std::list<Move>::end;
 	PVline( unsigned int n, const Move m ) : std::list<Move>(n,m){}
 	PVline(){}
 	
@@ -79,7 +93,7 @@ public:
 	volatile bool ponder,infinite;
 	unsigned int wtime,btime,winc,binc,movesToGo,nodes,mate,moveTime;
 	int depth;
-	PVline searchMoves;
+	std::list<Move> searchMoves;
 	searchLimits()
 	{
 		ponder = false;
@@ -115,7 +129,7 @@ public:
 		PV.reset();
 	}
 	
-	rootMove(Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
+	rootMove( const Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
 };
 
 
@@ -156,7 +170,7 @@ private:
 	searchData sd[STATE_INFO_LENGTH];
 	
 	void cleanMemoryBeforeStartingNewSearch(void);
-	void generateRootMovesList( std::vector<Move>& rm, PVline& ml);
+	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
 	startThinkResult manageQsearch(void);
 	

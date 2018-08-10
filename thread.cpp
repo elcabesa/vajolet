@@ -304,15 +304,9 @@ void my_thread::manageNewSearch()
 	// print out the choosen line
 	//-----------------------------
 	
-	Move bestMove = PV.front();
-	Move ponderMove(0);
-	if(PV.size() > 1)
-	{
-		PVline::iterator it = PV.begin();
-		std::advance(it, 1);
-		ponderMove = *it;
-	}
-	else
+	Move bestMove = PV.getMove(0);
+	Move ponderMove = PV.getMove(1);
+	if( ponderMove == NOMOVE )
 	{
 		ponderMove = getPonderMoveFromHash( bestMove );
 	}

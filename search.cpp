@@ -120,7 +120,7 @@ void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 				const unsigned moveWdl = TB_GET_WDL(r);
 
 				unsigned ep = TB_GET_EP(r);
-				Move m( Movegen::NOMOVE );
+				Move m( NOMOVE );
 				m.bit.from = TB_GET_FROM(r);
 				m.bit.to = TB_GET_TO(r);
 				if (ep)
@@ -170,14 +170,14 @@ void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 	}
 }
 
-void Search::generateRootMovesList( std::vector<Move>& rm, PVline& ml)
+void Search::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
 {
 	rm.clear();
 	
 	if( ml.size() == 0 )	// all the legal moves
 	{
-		Move m(Movegen::NOMOVE);
-		for(  Movegen mg(pos); ( m = mg.getNextMove() ) != Movegen::NOMOVE; )
+		Move m(NOMOVE);
+		for(  Movegen mg(pos); ( m = mg.getNextMove() ) != NOMOVE; )
 		{
 			rm.emplace_back( m );
 		}
@@ -249,7 +249,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 			else
 			{
 				ExpectedValue = -SCORE_INFINITE;
-				PV.clear();
+				PV.reset();
 				followPV = false;
 			}
 			
@@ -265,7 +265,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 				followPV = true;
 
 				PVline newPV;
-				newPV.clear();
+				newPV.reset();
 				
 				Score res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
@@ -310,11 +310,11 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 						PV = newPV;
 						followPV = true;
 												
-						bestMove = rootMove( newPV.front(), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 					}
 					else
 					{
-						bestMove = rootMove( newPV.front(), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 						
 						rootMovesSearched.push_back(bestMove);
 
@@ -479,7 +479,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
 	const bool inCheck = pos.isInCheck();
-	//Move threatMove(Movegen::NOMOVE);
+	//Move threatMove(NOMOVE);
 
 
 	//--------------------------------------
@@ -843,7 +843,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			/*else
 			{
 				const ttEntry * const tteNull = transpositionTable::getInstance().probe(nullKey);
-				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : Movegen::NOMOVE;
+				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : NOMOVE;
 			}*/
 
 		}
@@ -869,7 +869,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			Move m;
 			PVline childPV;
-			while((m = mg.getNextMove()) != Movegen::NOMOVE)
+			while((m = mg.getNextMove()) != NOMOVE)
 			{
 				pos.doMove(m);
 
@@ -916,7 +916,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	Score bestScore = -SCORE_INFINITE;
 
-	Move bestMove(Movegen::NOMOVE);
+	Move bestMove(NOMOVE);
 
 	Move m;
 	Movegen mg(pos, *this, ply, ttMove);
@@ -935,7 +935,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		&& tte->isTypeGoodForBetaCutoff()
 		&&  tte->getDepth() >= depth - 3 * ONE_PLY;
 
-	while (bestScore <beta  && ( m = mg.getNextMove() ) != Movegen::NOMOVE)
+	while (bestScore <beta  && ( m = mg.getNextMove() ) != NOMOVE)
 	{
 
 		assert(m.packed);
@@ -990,7 +990,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			sd[ply].skipNullMove = true;
 			Score temp = alphaBeta<ALL_NODE>(ply, depth/2, rBeta-1, rBeta, childPv);
 			sd[ply].skipNullMove = backup;
-			sd[ply].excludeMove = Movegen::NOMOVE;
+			sd[ply].excludeMove = NOMOVE;
 
 			if(temp < rBeta)
 			{
@@ -1378,7 +1378,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			}
 			else
 			{
-				pvLine.clear();
+				pvLine.reset();
 			}
 		}
 		return ttValue;
@@ -1492,7 +1492,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	PVline childPV;
 
 	const Position::state& st = pos.getActualState();
-	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != Movegen::NOMOVE)
+	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != NOMOVE)
 	{
 		assert(alpha < beta);
 		assert(beta <= SCORE_INFINITE);

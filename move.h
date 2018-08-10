@@ -27,6 +27,7 @@
  */
 struct Move
 {
+	
 	Move(){}
 	Move(const Move& m): packed(m.packed){}
 	Move(unsigned short i):packed(i){}
@@ -96,6 +97,8 @@ struct extMove{
 inline tSquare pawnPush(int color){
 	return color? sud:north;
 }
+
+const static Move NOMOVE = Move(0);
 
 
 
