@@ -229,7 +229,7 @@ void my_thread::manageNewSearch()
 
 	if(legalMoves == 0)
 	{
-		std::list<Move> PV( 1, Move(0) );
+		PVline PV( 1, Move(0) );
 		src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 		
 		waitStopPondering();
@@ -244,7 +244,7 @@ void my_thread::manageNewSearch()
 		
 		Move bestMove = mg.getMoveFromMoveList(0);
 		
-		std::list<Move> PV( 1, bestMove );
+		PVline PV( 1, bestMove );
 		src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 		
 		waitStopPondering();
@@ -266,7 +266,7 @@ void my_thread::manageNewSearch()
 		Move bookM = pol.probe(src.pos, Search::bestMoveBook);
 		if(bookM.packed)
 		{
-			std::list<Move> PV( 1, bookM );
+			PVline PV( 1, bookM );
 			
 			src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 			
@@ -296,7 +296,7 @@ void my_thread::manageNewSearch()
 */	
 	startThinkResult res = src.startThinking( );
 	
-	std::list<Move> PV = res.PV;
+	PVline PV = res.PV;
 
 	waitStopPondering();
 
@@ -308,7 +308,7 @@ void my_thread::manageNewSearch()
 	Move ponderMove(0);
 	if(PV.size() > 1)
 	{
-		std::list<Move>::iterator it = PV.begin();
+		PVline::iterator it = PV.begin();
 		std::advance(it, 1);
 		ponderMove = *it;
 	}

@@ -22,6 +22,7 @@
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
+#include <list>
 #include "position.h"
 #include "search.h"
 #include "transposition.h"
@@ -54,7 +55,7 @@ public:
 	{
 		U64 key;
 		Move m;
-		std::vector<Move> PV;
+		PVline PV;
 		Score alpha;
 		Score beta;
 		unsigned int depth;
@@ -80,9 +81,9 @@ public:
 		}
 	}
 
-	void savePV(std::list<Move> PV,unsigned int depth, Score alpha, Score beta)
+	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta)
 	{
-		std::copy(std::begin(PV), std::end(PV), std::back_inserter(positions.back().PV));
+		positions.back().PV = PV;
 		positions.back().depth = depth;
 		positions.back().alpha = alpha;
 		positions.back().beta = beta;
@@ -138,7 +139,7 @@ public:
 		if( positions.size() > 2)
 		{
 			GamePosition previous =*(positions.end()-3);
-			if(previous.PV.size()>=1 && previous.PV[1] == positions.back().m)
+			if(previous.PV.size()>=1 && previous.PV.getMove(1) == positions.back().m)
 			{
 				return true;
 			}

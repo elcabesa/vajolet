@@ -170,7 +170,7 @@ void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 	}
 }
 
-void Search::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
+void Search::generateRootMovesList( std::vector<Move>& rm, PVline& ml)
 {
 	rm.clear();
 	
@@ -199,7 +199,7 @@ startThinkResult Search::manageQsearch(void)
 	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, PV, res );
 }
 
-void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVline )
+void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVline , bool masterThread)
 {
 	// manage multi PV moves
 	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
@@ -281,8 +281,11 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
 						globalReduction = 0;
-						my_thread::timeMan.idLoopAlpha = true;
-						my_thread::	timeMan.idLoopBeta = false;
+						if( masterThread )
+						{
+							my_thread::timeMan.idLoopAlpha = true;
+							my_thread::timeMan.idLoopBeta = false;
+						}
 						
 						// follow the old PV
 						followPV = true;
@@ -298,8 +301,11 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 						{
 							globalReduction = 1;
 						}
-						my_thread::timeMan.idLoopAlpha = false;
-						my_thread::timeMan.idLoopBeta = true;
+						if( masterThread )
+						{
+							my_thread::timeMan.idLoopAlpha = false;
+							my_thread::timeMan.idLoopBeta = true;
+						}
 						
 						PV = newPV;
 						followPV = true;
@@ -335,10 +341,12 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 		}
 
 
-
-		my_thread::timeMan.idLoopIterationFinished = true;
-		my_thread::timeMan.idLoopAlpha = false;
-		my_thread::	timeMan.idLoopBeta = false;
+		if( masterThread )
+		{
+			my_thread::timeMan.idLoopIterationFinished = true;
+			my_thread::timeMan.idLoopAlpha = false;
+			my_thread::timeMan.idLoopBeta = false;
+		}
 
 	}
 	while( ++depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
@@ -415,8 +423,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		helperSearch[i].stop = false;
 		helperSearch[i].pos = pos;
 		helperSearch[i].PV = PV;
-		//helperSearch[i].followPV = true;
-		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, pv));
+		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, pv, false));
 	}
 
 	//----------------------------------
@@ -424,7 +431,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	Move m(0);
 	rootMove bestMove(m);
-	idLoop(bestMove, depth, alpha, beta, pv);
+	idLoop(bestMove, depth, alpha, beta, pv, true);
 	
 	// stop helper threads
 	for(unsigned int i = 0; i< (threads - 1); i++)

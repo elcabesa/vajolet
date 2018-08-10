@@ -29,7 +29,7 @@
 #include "eval.h"
 #include "command.h"
 
-class PVline : public std::list<Move> 
+class PVline : public std::list<Move>
 {
 public:
 	inline void reset()
@@ -49,6 +49,17 @@ public:
 		clear();
 		emplace_back( move );
 	}
+	
+	inline Move& getMove( unsigned int n )
+	{
+		auto it = begin();
+		std::advance(it, n);
+		return *it;
+	}
+	
+	PVline( unsigned int n, const Move m ) : std::list<Move>(n,m){}
+	PVline(){}
+	
 };
 
 class startThinkResult
@@ -57,9 +68,9 @@ public:
 	Score alpha;
 	Score beta;
 	unsigned int depth;
-	std::list<Move> PV;
+	PVline PV;
 	Score Res;
-	startThinkResult( Score Alpha, Score Beta, unsigned int Depth, std::list<Move> pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
+	startThinkResult( Score Alpha, Score Beta, unsigned int Depth, PVline pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
 };
 
 class searchLimits
@@ -68,7 +79,7 @@ public:
 	volatile bool ponder,infinite;
 	unsigned int wtime,btime,winc,binc,movesToGo,nodes,mate,moveTime;
 	int depth;
-	std::list<Move> searchMoves;
+	PVline searchMoves;
 	searchLimits()
 	{
 		ponder = false;
@@ -101,7 +112,7 @@ public:
 
 	rootMove(Move & m) : firstMove{m}
 	{
-		PV.clear();
+		PV.reset();
 	}
 	
 	rootMove(Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
@@ -145,7 +156,7 @@ private:
 	searchData sd[STATE_INFO_LENGTH];
 	
 	void cleanMemoryBeforeStartingNewSearch(void);
-	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
+	void generateRootMovesList( std::vector<Move>& rm, PVline& ml);
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
 	startThinkResult manageQsearch(void);
 	
@@ -193,7 +204,7 @@ private:
 	unsigned int maxPlyReached;
 
 //	void reloadPv(unsigned int i);
-//	void verifyPv(std::list<Move> &newPV, Score res);
+//	void verifyPv(PVline &newPV, Score res);
 
 public:
 
@@ -240,7 +251,7 @@ public:
 
 	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
 	
-	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
+	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {}, bool masterThread = false);
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 

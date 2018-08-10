@@ -20,7 +20,6 @@
 
 
 #include <string>
-#include <list>
 #include <vector>
 #include <memory>
 #include "vajolet.h"
@@ -28,9 +27,9 @@
 //--------------------------------------------------------------------
 //	forward declaration
 //--------------------------------------------------------------------
-struct Move;
 class Position;
 class rootMove;
+class PVline;
 
 //--------------------------------------------------------------------
 //	function prototype
@@ -63,7 +62,7 @@ public:
 	
 	// virtual output methods
 	virtual void printPVs(std::vector<rootMove>& rm) const = 0;
-	virtual void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, std::list<Move>& PV, const unsigned long long nodes) const = 0;
+	virtual void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, PVline& PV, const unsigned long long nodes) const = 0;
 	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const = 0;
 	virtual void showCurrLine(const Position & pos, const unsigned int ply) const = 0;
 	virtual void printDepth(const unsigned int depth) const = 0;
