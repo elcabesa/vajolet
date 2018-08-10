@@ -51,13 +51,15 @@ public:
 	}
 };
 
-struct startThinkResult
+class startThinkResult
 {
+public:
 	Score alpha;
 	Score beta;
 	unsigned int depth;
 	std::list<Move> PV;
 	Score Res;
+	startThinkResult( Score Alpha, Score Beta, unsigned int Depth, std::list<Move> pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
 };
 
 class searchLimits
@@ -237,6 +239,8 @@ public:
 
 
 	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
+	
+	rootMove idLoop(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 

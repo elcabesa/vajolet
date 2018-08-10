@@ -196,75 +196,14 @@ startThinkResult Search::manageQsearch(void)
 	
 	_UOI->printScore( res/100 );
 	
-	startThinkResult ret;
-	
-	ret.PV = PV;
-	ret.depth = 0;
-	ret.alpha = -SCORE_INFINITE;
-	ret.beta = SCORE_INFINITE;
-	
-	return ret;
+	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, PV, res );
 }
 
-startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVline pv)
+rootMove Search::idLoop(int depth, Score alpha, Score beta, PVline PV )
 {
-	//------------------------------------
-	//init the new search
-	//------------------------------------
-	
-	
-	
-	//clean transposition table
-	transpositionTable::getInstance().newSearch();
-	
-	// setup main thread
-	cleanMemoryBeforeStartingNewSearch();
-
-	// setup other threads
-	helperSearch.clear();
-	helperSearch.resize(threads-1);
-
-	for (auto& hs : helperSearch)
-	{
-		// mute helper thread
-		hs.setUOI(UciOutput::create( UciOutput::mute ) );
-		
-		// setup helper thread
-		hs.cleanMemoryBeforeStartingNewSearch();
-	}
-
-	//--------------------------------
-	// generate the list of root moves to be searched
-	//--------------------------------
-	generateRootMovesList( rootMoves, limits.searchMoves );
-	
-	
 	// manage multi PV moves
 	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
-
-	//--------------------------------
-	//	tablebase probing, filtering rootmoves to be searched
-	//--------------------------------
-	if(limits.searchMoves.size() == 0 && Search::multiPVLines==1)
-	{
-		filterRootMovesByTablebase( rootMoves );
-	}
 	
-	
-	//----------------------------------
-	// we can start the real search
-	//----------------------------------
-	
-	// manage depth 0 search ( return qsearch )
-	if(limits.depth == 0)
-	{
-		return manageQsearch();
-	}
-
-	
-	//----------------------------------
-	// iterative deepening loop
-	//----------------------------------
 	Score delta = 800;
 	
 	// ramdomly initialize the bestmove
@@ -301,7 +240,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 			//----------------------------------
 			// reload PV
 			//----------------------------------
-			if( previousIterationResults.size()> multiPVcounter )
+			if( previousIterationResults.size() > multiPVcounter )
 			{
 				ExpectedValue = previousIterationResults[multiPVcounter].score;
 				PV = previousIterationResults[multiPVcounter].PV;
@@ -431,17 +370,67 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 	}
 	while( ++depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
+	
+	return bestMove;
+}
 
+startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVline pv)
+{
+	//------------------------------------
+	//init the new search
+	//------------------------------------
+	
+	rootMovesSearched.clear();
+	
+	//clean transposition table
+	transpositionTable::getInstance().newSearch();
+	
+	// setup main thread
+	cleanMemoryBeforeStartingNewSearch();
 
-	startThinkResult ret;
+	// setup other threads
+	helperSearch.clear();
+	helperSearch.resize(threads-1);
 
-	ret.PV = bestMove.PV;
-	ret.depth = bestMove.depth;
-	ret.alpha = alpha;
-	ret.beta = beta;
-	ret.Res = bestMove.score;
+	for (auto& hs : helperSearch)
+	{
+		// mute helper thread
+		hs.setUOI(UciOutput::create( UciOutput::mute ) );
+		
+		// setup helper thread
+		hs.cleanMemoryBeforeStartingNewSearch();
+	}
 
-	return ret;
+	//--------------------------------
+	// generate the list of root moves to be searched
+	//--------------------------------
+	generateRootMovesList( rootMoves, limits.searchMoves );
+	
+	//--------------------------------
+	//	tablebase probing, filtering rootmoves to be searched
+	//--------------------------------
+	if(limits.searchMoves.size() == 0 && Search::multiPVLines==1)
+	{
+		filterRootMovesByTablebase( rootMoves );
+	}
+	
+	
+	//----------------------------------
+	// we can start the real search
+	//----------------------------------
+	
+	// manage depth 0 search ( return qsearch )
+	if(limits.depth == 0)
+	{
+		return manageQsearch();
+	}
+
+	//----------------------------------
+	// iterative deepening loop
+	//----------------------------------
+	rootMove bestMove = idLoop(depth, alpha, beta, pv);
+	
+	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 
 }
 

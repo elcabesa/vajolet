@@ -280,7 +280,6 @@ void my_thread::manageNewSearch()
 		}
 	}
 	
-	startThinkResult res;
 /*	if( game.isPonderRight() )
 	{
 		Game::GamePosition gp = game.getNewSearchParameters();
@@ -294,9 +293,9 @@ void my_thread::manageNewSearch()
 		res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
 	}
 	else
-*/	{
-		res = src.startThinking( );
-	}
+*/	
+	startThinkResult res = src.startThinking( );
+	
 	std::list<Move> PV = res.PV;
 
 	waitStopPondering();
