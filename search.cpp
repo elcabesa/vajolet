@@ -199,7 +199,7 @@ startThinkResult Search::manageQsearch(void)
 	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, PV, res );
 }
 
-rootMove Search::idLoop( int depth, Score alpha, Score beta, PVline , bool masterThread)
+void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVline , bool masterThread)
 {
 	// manage multi PV moves
 	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
@@ -207,7 +207,7 @@ rootMove Search::idLoop( int depth, Score alpha, Score beta, PVline , bool maste
 	Score delta = 800;
 	
 	// ramdomly initialize the bestmove
-	rootMove bestMove = rootMoves[0];
+	bestMove = rootMoves[0];
 	
 	do
 	{
@@ -350,8 +350,6 @@ rootMove Search::idLoop( int depth, Score alpha, Score beta, PVline , bool maste
 
 	}
 	while( ++depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
-	
-	return bestMove;
 
 }
 
@@ -413,25 +411,27 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 	
 	std::vector<std::thread> helperThread;
-	std::vector<rootMove> helperResults;
+	Move m(0);
+	rootMove rm(m);
+	std::vector<rootMove> helperResults(threads-1, rm);
 
 	// launch helper threads
 	for( unsigned int i = 0; i < (threads - 1); ++i)
 	{
-		Move m(0);
-		rootMove rm(m);
-		helperResults.push_back(rm);
+
+		helperResults[i].firstMove = m;
 		
 		helperSearch[i].stop = false;
 		helperSearch[i].pos = pos;
 		helperSearch[i].PV = PV;
-		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], depth, alpha, beta, pv, false));
+		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, pv, false));
 	}
 
 	//----------------------------------
 	// iterative deepening loop
 	//----------------------------------
-	rootMove bestMove = idLoop(depth, alpha, beta, pv, true);
+	rootMove bestMove(m);
+	idLoop(bestMove, depth, alpha, beta, pv, true);
 	
 	// stop helper threads
 	for(unsigned int i = 0; i< (threads - 1); i++)
