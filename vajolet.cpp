@@ -27,6 +27,7 @@
 #include "search.h"
 #include "eval.h"
 #include "syzygy/tbprobe.h"
+#include "benchmark.h"
 
 
 /*!	\brief	print the startup information
@@ -44,7 +45,7 @@ static void printStartInfo(void)
 	\version 1.0
 	\date 21/10/2013
 */
-int main()
+int main(int argc, char* argv[])
 {
 	//----------------------------------
 	//	init global data
@@ -65,6 +66,15 @@ int main()
 	Position::initMaterialKeys();
 	tb_init(Search::SyzygyPath.c_str());
 
+	if (argc > 1)
+	{
+		std::string command = argv[1];
+		if( command == "bench" )
+		{
+			benchmark();
+			return 0;
+		}
+	}
 	//----------------------------------
 	//	main loop
 	//----------------------------------
