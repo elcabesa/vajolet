@@ -147,7 +147,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 {
 
 	if (!open("book.bin"))
-		return Movegen::NOMOVE;
+		return NOMOVE;
 
 	std::mt19937_64 rnd;
 	std::uniform_int_distribution<unsigned int> uint_dist;
@@ -155,7 +155,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 	// use current time (in seconds) as random seed:
 	rnd.seed(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count());
 
-	Move m(Movegen::NOMOVE);
+	Move m(NOMOVE);
 	Entry e;
 	uint16_t best = 0;
 	unsigned sum = 0;
@@ -226,7 +226,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 		}
 	}
 
-	return Movegen::NOMOVE;
+	return NOMOVE;
 }
 
 

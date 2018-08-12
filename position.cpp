@@ -295,7 +295,7 @@ void Position::setupFromFen(const std::string& fenStr)
 	}
 
 	x.pliesFromNull = 0;
-	x.currentMove = Movegen::NOMOVE;
+	x.currentMove = NOMOVE;
 	x.capturedPiece = empty;
 
 
@@ -1614,7 +1614,7 @@ bool Position::isDraw(bool isPVline) const
 bool Position::isMoveLegal(const Move &m)const
 {
 
-	if(m == Movegen::NOMOVE)
+	if(m == NOMOVE)
 	{
 		return false;
 	}

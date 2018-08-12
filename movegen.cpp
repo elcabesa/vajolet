@@ -26,9 +26,6 @@
 #include "magicmoves.h"
 
 
-const Move Movegen::NOMOVE(0);
-
-
 
 bitMap Movegen::KNIGHT_MOVE[squareNumber];
 bitMap Movegen::KING_MOVE[squareNumber];

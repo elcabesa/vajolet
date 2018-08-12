@@ -29,9 +29,13 @@
 #include "eval.h"
 #include "command.h"
 
-class PVline : public std::list<Move> 
+class PVline : private std::list<Move>
 {
 public:
+	inline unsigned int size() const
+	{
+		return std::list<Move>::size();
+	}
 	inline void reset()
 	{
 		clear();
@@ -49,15 +53,38 @@ public:
 		clear();
 		emplace_back( move );
 	}
+	
+	inline const Move& getMove( unsigned int n ) const
+	{
+		if( size() > n )
+		{
+			auto it = begin();
+			std::advance(it, n);
+			return *it;
+		}
+		else
+		{
+			return NOMOVE;
+		}
+	}
+	
+	using std::list<Move>::iterator;
+	using std::list<Move>::begin;
+	using std::list<Move>::end;
+	PVline( unsigned int n, const Move m ) : std::list<Move>(n,m){}
+	PVline(){}
+	
 };
 
-struct startThinkResult
+class startThinkResult
 {
+public:
 	Score alpha;
 	Score beta;
 	unsigned int depth;
-	std::list<Move> PV;
+	PVline PV;
 	Score Res;
+	startThinkResult( Score Alpha, Score Beta, unsigned int Depth, PVline pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
 };
 
 class searchLimits
@@ -88,8 +115,7 @@ class rootMove
 {
 public:
 	Score score = -SCORE_INFINITE;
-	Score previousScore = -SCORE_INFINITE;
-	std::list<Move> PV;
+	PVline PV;
 	Move firstMove;
 	unsigned int maxPlyReached = 0u;
 	unsigned int depth = 0u;
@@ -100,8 +126,10 @@ public:
 
 	rootMove(Move & m) : firstMove{m}
 	{
-		PV.clear();
+		PV.reset();
 	}
+	
+	rootMove( const Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
 };
 
 
@@ -120,9 +148,8 @@ class Search
 {
 private:
 	std::unique_ptr<UciOutput> _UOI;
-	bool mainSearcher;
 	bool followPV;
-	static int globalReduction;
+	int globalReduction;
 	static const unsigned int LmrLimit = 32;
 	static Score futility[8];
 	static Score futilityMargin[7];
@@ -135,12 +162,18 @@ private:
 	bool validIteration = false;
 	Score ExpectedValue = 0;
 
-	unsigned int indexPV = 0;
+	unsigned int multiPVcounter = 0;
 	History history;
 	CaptureHistory captureHistory;
 	CounterMove counterMoves;
 
 	searchData sd[STATE_INFO_LENGTH];
+	
+	void cleanMemoryBeforeStartingNewSearch(void);
+	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
+	void filterRootMovesByTablebase( std::vector<Move>& rm );
+	startThinkResult manageQsearch(void);
+	
 	void cleanData(void)
 	{
 		std::memset(sd, 0, sizeof(sd));
@@ -185,12 +218,13 @@ private:
 	unsigned int maxPlyReached;
 
 //	void reloadPv(unsigned int i);
-//	void verifyPv(std::list<Move> &newPV, Score res);
+//	void verifyPv(PVline &newPV, Score res);
 
 public:
 
-	static std::vector<rootMove> rootMoves;
-	std::list<Move> PV;
+	static std::vector<Move> rootMoves;
+	std::vector<rootMove> rootMovesSearched;
+	PVline PV;
 	searchLimits limits;
 	Position pos;
 
@@ -229,7 +263,9 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE);
+	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
+	
+	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {}, bool masterThread = false);
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 

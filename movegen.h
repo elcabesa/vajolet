@@ -185,7 +185,6 @@ private:
 
 
 public:
-	const static Move NOMOVE;
 	unsigned int getNumberOfLegalMoves();
 
 	inline unsigned int getGeneratedMoveNumber(void)const { return moveListEnd-moveList.begin();}

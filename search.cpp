@@ -40,8 +40,7 @@
 #endif
 
 Search defaultSearch;
-std::vector<rootMove> Search::rootMoves;
-int Search::globalReduction =0;
+std::vector<Move> Search::rootMoves;
 
 
 Score Search::futility[8] = {0,6000,12000,18000,24000,30000,36000,42000};
@@ -76,200 +75,154 @@ unsigned long long Search::getTbHits() const
 	return n;
 }
 
-
-startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
+void Search::cleanMemoryBeforeStartingNewSearch(void)
 {
-	//------------------------------------
-	//init the new search
-	//------------------------------------
-	Score res = 0;
-
-
-	transpositionTable::getInstance().newSearch();
 	history.clear();
 	captureHistory.clear();
 	counterMoves.clear();
 	cleanData();
 	visitedNodes = 0;
 	tbHits = 0;
-	mainSearcher = true;
+	rootMovesSearched.clear();
+}
 
-	
-	helperSearch.clear();
-	helperSearch.resize(threads-1);
+void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
+{
+	unsigned results[TB_MAX_MOVES];
 
-	for (auto& hs : helperSearch)
+	unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
+
+	if ( piecesCnt <= TB_LARGEST )
 	{
-		hs.setUOI(UciOutput::create( UciOutput::mute ) );
-		hs.counterMoves.clear();
-		hs.cleanData();
-		hs.history.clear();
-		hs.captureHistory.clear();
-		hs.visitedNodes = 0;
-		hs.tbHits = 0;
-		hs.mainSearcher = false;
-	}
+		unsigned result = tb_probe_root(pos.getBitmap(Position::whitePieces),
+			pos.getBitmap(Position::blackPieces),
+			pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
+			pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
+			pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
+			pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
+			pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
+			pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
+			pos.getActualState().fiftyMoveCnt,
+			pos.getActualState().castleRights,
+			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
+			pos.getActualState().nextMove== Position::whiteTurn,
+			results);
 
-
-	rootMoves.clear();
-
-
-	//--------------------------------
-	//	generate the list of root moves to be searched
-	//--------------------------------
-	if(limits.searchMoves.size() == 0)	// all the legal moves
-	{
-		Move m(Movegen::NOMOVE);
-		Movegen mg(pos);
-		while ((m = mg.getNextMove())!= Movegen::NOMOVE)
+		if (result != TB_RESULT_FAILED)
 		{
-			rootMoves.emplace_back(rootMove(m));
-		}
 
-	}
-	else
-	{	//only selected moves
-		for_each(limits.searchMoves.begin(), limits.searchMoves.end(), [&](Move &m){rootMoves.emplace_back(rootMove(m));});
-	}
+			const unsigned wdl = TB_GET_WDL(result);
+			assert(wdl<5);
 
-
-
-
-
-	//-----------------------------
-	// manage multi PV moves
-	//-----------------------------
-	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
-
-	//--------------------------------
-	//	tablebase probing
-	//--------------------------------
-	if(limits.searchMoves.size() == 0 && Search::multiPVLines==1)
-	{
-
-		unsigned results[TB_MAX_MOVES];
-
-		unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
-
-		if (    piecesCnt <= TB_LARGEST)
-		{
-			unsigned result = tb_probe_root(pos.getBitmap(Position::whitePieces),
-				pos.getBitmap(Position::blackPieces),
-				pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
-				pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
-				pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
-				pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
-				pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
-				pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
-				pos.getActualState().fiftyMoveCnt,
-				pos.getActualState().castleRights,
-				pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-				pos.getActualState().nextMove== Position::whiteTurn,
-				results);
-
-			if (result != TB_RESULT_FAILED)
+			unsigned r;
+			for (int i = 0; (r = results[i]) != TB_RESULT_FAILED; i++)
 			{
+				const unsigned moveWdl = TB_GET_WDL(r);
 
-				const unsigned wdl = TB_GET_WDL(result);
-				assert(wdl<5);
-
-				unsigned r;
-				for (int i = 0; (r = results[i]) != TB_RESULT_FAILED; i++)
+				unsigned ep = TB_GET_EP(r);
+				Move m( NOMOVE );
+				m.bit.from = TB_GET_FROM(r);
+				m.bit.to = TB_GET_TO(r);
+				if (ep)
 				{
-					const unsigned moveWdl = TB_GET_WDL(r);
+					m.bit.flags = Move::fenpassant;
+				}
+				switch (TB_GET_PROMOTES(r))
+				{
+				case TB_PROMOTES_QUEEN:
+					m.bit.flags = Move::fpromotion;
+					m.bit.promotion = Move::promQueen;
+					break;
+				case TB_PROMOTES_ROOK:
+					m.bit.flags = Move::fpromotion;
+					m.bit.promotion = Move::promRook;
+					break;
+				case TB_PROMOTES_BISHOP:
+					m.bit.flags = Move::fpromotion;
+					m.bit.promotion = Move::promBishop;
+					break;
+				case TB_PROMOTES_KNIGHT:
+					m.bit.flags = Move::fpromotion;
+					m.bit.promotion = Move::promKnight;
+					break;
+				default:
+					break;
+				}
 
-					unsigned ep = TB_GET_EP(r);
-					Move m(0);
-					m.bit.from = TB_GET_FROM(r);
-					m.bit.to = TB_GET_TO(r);
-					if (ep)
+
+
+				auto position = std::find(rm.begin(), rm.end(), m);
+				if (position != rm.end()) // == myVector.end() means the element was not found
+				{
+					if (moveWdl >= wdl)
 					{
-						m.bit.flags = Move::fenpassant;
+						// preserve move
 					}
-					switch (TB_GET_PROMOTES(r))
+					else
 					{
-					case TB_PROMOTES_QUEEN:
-						m.bit.flags = Move::fpromotion;
-						m.bit.promotion = Move::promQueen;
-						break;
-					case TB_PROMOTES_ROOK:
-						m.bit.flags = Move::fpromotion;
-						m.bit.promotion = Move::promRook;
-						break;
-					case TB_PROMOTES_BISHOP:
-						m.bit.flags = Move::fpromotion;
-						m.bit.promotion = Move::promBishop;
-						break;
-					case TB_PROMOTES_KNIGHT:
-						m.bit.flags = Move::fpromotion;
-						m.bit.promotion = Move::promKnight;
-						break;
-					default:
-						break;
-					}
-
-
-
-					auto position = std::find(rootMoves.begin(), rootMoves.end(), m);
-					if (position != rootMoves.end()) // == myVector.end() means the element was not found
-					{
-						if (moveWdl >= wdl)
-						{
-							// preserve move
-						}
-						else
-						{
-							rootMoves.erase(position);
-						}
-
+						rm.erase(position);
 					}
 
 				}
+
 			}
 		}
-
 	}
-	//----------------------------------
-	// we can start the real search
-	//----------------------------------
+}
 
-	if(limits.depth == 0)
+void Search::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
+{
+	rm.clear();
+	
+	if( ml.size() == 0 )	// all the legal moves
 	{
-
-		PVline newPV;
-		Score res =qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, newPV);
-		_UOI->printScore( res/100 );
-		startThinkResult ret;
-		ret.PV = newPV;
-		ret.depth = 0;
-		ret.alpha = -SCORE_INFINITE;
-		ret.beta = SCORE_INFINITE;
-
-
-		return ret;
-
+		Move m(NOMOVE);
+		for(  Movegen mg(pos); ( m = mg.getNextMove() ) != NOMOVE; )
+		{
+			rm.emplace_back( m );
+		}
 	}
+	else
+	{
+		//only selected moves
+		for_each( ml.begin(), ml.end(), [&](Move &m){rm.emplace_back(m);} );
+	}
+}
 
+startThinkResult Search::manageQsearch(void)
+{
+	PVline PV;
+	Score res =qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, PV);
+	
+	_UOI->printScore( res/100 );
+	
+	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, PV, res );
+}
 
-	PVline newPV;
-	//unsigned int depth = 1;
-
-	//Score alpha = -SCORE_INFINITE, beta = SCORE_INFINITE;
+void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVline , bool masterThread)
+{
+	// manage multi PV moves
+	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
+	
 	Score delta = 800;
-	Move oldBestMove(Movegen::NOMOVE);
-
+	
+	// ramdomly initialize the bestmove
+	bestMove = rootMoves[0];
+	
 	do
 	{
 		_UOI->printDepth(depth);
 		//----------------------------
 		// iterative loop
 		//----------------------------
-		for (rootMove& rm : rootMoves)
-		{
-			rm.previousScore = rm.score;
-		}
 
-		for (indexPV = 0; indexPV < linesToBeSearched; indexPV++)
+		std::vector<rootMove> previousIterationResults = rootMovesSearched;
+		rootMovesSearched.clear();
+		
+		//----------------------------------
+		// multi PV loop
+		//----------------------------------
+		for (multiPVcounter = 0; multiPVcounter < linesToBeSearched; ++multiPVcounter)
 		{
 
 			//----------------------------------
@@ -278,152 +231,93 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 			if (depth >= 5)
 			{
 				delta = 800;
-				alpha = (Score) std::max((signed long long int)(rootMoves[indexPV].previousScore) - delta,(signed long long int) SCORE_MATED);
-				beta  = (Score) std::min((signed long long int)(rootMoves[indexPV].previousScore) + delta,(signed long long int) SCORE_MATE);
+				alpha = (Score) std::max((signed long long int)(previousIterationResults[multiPVcounter].score) - delta,(signed long long int) SCORE_MATED);
+				beta  = (Score) std::min((signed long long int)(previousIterationResults[multiPVcounter].score) + delta,(signed long long int) SCORE_MATE);
 			}
 
-			for (unsigned int x = indexPV; x < rootMoves.size() ; x++)
+			Search::globalReduction = 0;
+
+			//----------------------------------
+			// reload PV
+			//----------------------------------
+			if( previousIterationResults.size() > multiPVcounter )
 			{
-				rootMoves[x].score = -SCORE_INFINITE;
+				ExpectedValue = previousIterationResults[multiPVcounter].score;
+				PV = previousIterationResults[multiPVcounter].PV;
+				followPV = true;
 			}
-
-			//----------------------------------
-			// reload the last PV in the transposition table
-			//----------------------------------
-/*			for(unsigned int i = 0; i<=indexPV; i++)
+			else
 			{
-				reloadPv(i);
-			}*/
-
-
-			globalReduction = 0;
-
+				ExpectedValue = -SCORE_INFINITE;
+				PV.reset();
+				followPV = false;
+			}
+			
+			
+			//----------------------------------
+			// aspiration window
+			//----------------------------------
 			do
 			{
 
-				//----------------------------
-				// search at depth d with aspiration window
-				//----------------------------
-
 				maxPlyReached = 0;
 				validIteration = false;
-				ExpectedValue = rootMoves[indexPV].previousScore;
-
-				PV = rootMoves[indexPV].PV;
 				followPV = true;
 
-				//----------------------------
-				// multithread : lazy smp threads
-				//----------------------------
-
-				std::vector<PVline> pvl2(threads-1);
-				std::vector<std::thread> helperThread;
-
-				// launch helper threads
-				for(unsigned int i = 0; i < (threads - 1); i++)
-				{
-					helperSearch[i].stop = false;
-					helperSearch[i].pos = pos;
-					helperSearch[i].PV = PV;
-					helperSearch[i].followPV = true;
- 					helperThread.emplace_back( std::thread(&Search::alphaBeta<Search::nodeType::ROOT_NODE>, &helperSearch[i], 0, (depth-globalReduction+((i+1)%2))*ONE_PLY, alpha, beta, std::ref(pvl2[i])));
-				}
-
-				newPV.clear();
-				// main thread
-				res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
-
-				// stop helper threads
-				for(unsigned int i = 0; i< (threads - 1); i++)
-				{
-					helperSearch[i].stop = true;
-				}
-				for(auto &t : helperThread)
-				{
-					t.join();
-				}
-
-				// don't stop befor having finished at least one iteration
-				/*if(depth != 1 && stop)
-				{
-					break;
-				}*/
+				PVline newPV;
+				newPV.reset();
+				
+				Score res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
 				if(validIteration ||!stop)
 				{
-
-
 					long long int elapsedTime  = getElapsedTime();
-
-					assert(newPV.size()==0 || res >alpha);
-					if( newPV.size() !=0 && res > alpha)
-					{
-						auto it = std::find(rootMoves.begin()+indexPV, rootMoves.end(), newPV.front() );
-
-						if (it != rootMoves.end())
-						{
-							assert( it->firstMove == newPV.front());
-
-							//if(it->firstMove == newPV.front())
-							//{
-							it->PV = newPV;
-							it->score = res;
-							it->maxPlyReached = maxPlyReached;
-							it->depth = depth;
-							it->nodes = getVisitedNodes();
-							it->time = elapsedTime;
-
-							std::iter_swap( it, rootMoves.begin()+indexPV);
-						}
-						else
-						{
-							//std::cout<<"info ERROR"<<sync_endl;
-						}
-
-						//}
-
-					}
-
-
-
-
-
 
 					if (res <= alpha)
 					{
-						newPV.clear();
-						newPV.emplace_back( rootMoves[indexPV].PV.front() );
 
-						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, getVisitedNodes());
+						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, multiPVcounter, newPV, getVisitedNodes());
 
 						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
 						globalReduction = 0;
-						my_thread::timeMan.idLoopAlpha = true;
-						my_thread::	timeMan.idLoopBeta = false;
+						if( masterThread )
+						{
+							my_thread::timeMan.idLoopAlpha = true;
+							my_thread::timeMan.idLoopBeta = false;
+						}
+						
+						// follow the old PV
+						followPV = true;
 
 					}
 					else if (res >= beta)
 					{
 
-						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, indexPV, newPV, getVisitedNodes());
+						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, multiPVcounter, newPV, getVisitedNodes());
 
 						beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 						if(depth > 1)
 						{
 							globalReduction = 1;
 						}
-						my_thread::timeMan.idLoopAlpha = false;
-						my_thread::	timeMan.idLoopBeta = true;
+						if( masterThread )
+						{
+							my_thread::timeMan.idLoopAlpha = false;
+							my_thread::timeMan.idLoopBeta = true;
+						}
+						
+						PV = newPV;
+						followPV = true;
+												
+						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 					}
 					else
 					{
-						//verify search result
-						// print PV
-						/*sync_cout<<"PV ";
-						for_each( newPV.begin(), newPV.end(), [&](Move &m){std::cout<<displayUci(m)<<" ";});
-						std::cout<<sync_endl;
-						verifyPv(newPV,res);*/
+						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+						
+						rootMovesSearched.push_back(bestMove);
+
 						break;
 					}
 
@@ -435,39 +329,136 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta)
 
 			}while(!stop);
 
-			if((!stop || validIteration) && (linesToBeSearched>1 || depth == 1) )
+			if((!stop || validIteration) && (linesToBeSearched > 1 || depth == 1) )
 			{
 
-				// Sort the PV lines searched so far and update the GUI
-				std::stable_sort(rootMoves.begin(), rootMoves.begin() + indexPV + 1);
-				_UOI->printPVs( rootMoves, indexPV + 1 );
+				// Sort the PV lines searched so far and update the GUI				
+				std::stable_sort(rootMovesSearched.begin(), rootMovesSearched.end());
+				bestMove = rootMovesSearched[0];
+				
+				_UOI->printPVs( rootMovesSearched );
 			}
 		}
 
-		//------------------------------------------------
-		// check wheter or not the new best move has changed
-		//------------------------------------------------
-		oldBestMove = newPV.front();
 
-
-		my_thread::timeMan.idLoopIterationFinished = true;
-		my_thread::timeMan.idLoopAlpha = false;
-		my_thread::	timeMan.idLoopBeta = false;
-		depth += 1;
+		if( masterThread )
+		{
+			my_thread::timeMan.idLoopIterationFinished = true;
+			my_thread::timeMan.idLoopAlpha = false;
+			my_thread::timeMan.idLoopBeta = false;
+		}
 
 	}
-	while( depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
+	while( ++depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
 
+}
 
-	startThinkResult ret;
-	ret.PV = rootMoves[0].PV;
-	ret.depth = depth-1;
-	ret.alpha = alpha;
-	ret.beta = beta;
-	ret.Res = rootMoves[0].previousScore;
+startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVline pv)
+{
+	//------------------------------------
+	//init the new search
+	//------------------------------------
+	
+	//clean transposition table
+	transpositionTable::getInstance().newSearch();
+	
+	// setup main thread
+	cleanMemoryBeforeStartingNewSearch();
 
+	// setup other threads
+	helperSearch.clear();
+	helperSearch.resize(threads-1);
 
-	return ret;
+	for (auto& hs : helperSearch)
+	{
+		// mute helper thread
+		hs.setUOI(UciOutput::create( UciOutput::mute ) );
+		
+		// setup helper thread
+		hs.cleanMemoryBeforeStartingNewSearch();
+	}
+
+	//--------------------------------
+	// generate the list of root moves to be searched
+	//--------------------------------
+	generateRootMovesList( rootMoves, limits.searchMoves );
+	
+	//--------------------------------
+	//	tablebase probing, filtering rootmoves to be searched
+	//--------------------------------
+	if(limits.searchMoves.size() == 0 && Search::multiPVLines==1)
+	{
+		filterRootMovesByTablebase( rootMoves );
+	}
+	
+	
+	//----------------------------------
+	// we can start the real search
+	//----------------------------------
+	
+	// manage depth 0 search ( return qsearch )
+	if(limits.depth == 0)
+	{
+		return manageQsearch();
+	}
+
+	
+	
+	
+	//----------------------------
+	// multithread : lazy smp threads
+	//----------------------------
+
+	
+	std::vector<std::thread> helperThread;
+	Move m(0);
+	rootMove rm(m);
+	std::vector<rootMove> helperResults(threads-1, rm);
+
+	// launch helper threads
+	for( unsigned int i = 0; i < (threads - 1); ++i)
+	{
+
+		helperResults[i].firstMove = m;
+		
+		helperSearch[i].stop = false;
+		helperSearch[i].pos = pos;
+		helperSearch[i].PV = PV;
+		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, pv, false));
+	}
+
+	//----------------------------------
+	// iterative deepening loop
+	//----------------------------------
+	rootMove bestMove(m);
+	idLoop(bestMove, depth, alpha, beta, pv, true);
+	
+	// stop helper threads
+	for(unsigned int i = 0; i< (threads - 1); i++)
+	{
+		helperSearch[i].stop = true;
+	}
+	for(auto &t : helperThread)
+	{
+		t.join();
+	}
+	
+	//----------------------------------
+	// gather results
+	//----------------------------------
+	/*std::cout<<"-------main thread----------"<<std::endl;
+	std::cout<<"bestMove "<<displayUci(bestMove.firstMove)<<std::endl;
+	std::cout<<"score "<<bestMove.score<<std::endl;
+	std::cout<<"depth "<<bestMove.depth<<std::endl;
+	for(unsigned int i = 0; i< (threads - 1); i++)
+	{
+		std::cout<<"-------helper thread----------"<<std::endl;
+		std::cout<<"bestMove "<<displayUci(helperResults[i].firstMove)<<std::endl;
+		std::cout<<"score "<<helperResults[i].score<<std::endl;
+		std::cout<<"depth "<<helperResults[i].depth<<std::endl;
+	}*/
+	
+	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 
 }
 
@@ -488,13 +479,13 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
 	const bool inCheck = pos.isInCheck();
-	//Move threatMove(Movegen::NOMOVE);
+	//Move threatMove(NOMOVE);
 
 
 	//--------------------------------------
 	// show current line if needed
 	//--------------------------------------
-	if( mainSearcher && showLine && depth <= ONE_PLY)
+	if( showLine && depth <= ONE_PLY)
 	{
 		showLine = false;
 		_UOI->showCurrLine(pos,ply);
@@ -852,7 +843,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			/*else
 			{
 				const ttEntry * const tteNull = transpositionTable::getInstance().probe(nullKey);
-				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : Movegen::NOMOVE;
+				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : NOMOVE;
 			}*/
 
 		}
@@ -878,7 +869,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			Move m;
 			PVline childPV;
-			while((m = mg.getNextMove()) != Movegen::NOMOVE)
+			while((m = mg.getNextMove()) != NOMOVE)
 			{
 				pos.doMove(m);
 
@@ -925,7 +916,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	Score bestScore = -SCORE_INFINITE;
 
-	Move bestMove(Movegen::NOMOVE);
+	Move bestMove(NOMOVE);
 
 	Move m;
 	Movegen mg(pos, *this, ply, ttMove);
@@ -944,7 +935,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		&& tte->isTypeGoodForBetaCutoff()
 		&&  tte->getDepth() >= depth - 3 * ONE_PLY;
 
-	while (bestScore <beta  && ( m = mg.getNextMove() ) != Movegen::NOMOVE)
+	while (bestScore <beta  && ( m = mg.getNextMove() ) != NOMOVE)
 	{
 
 		assert(m.packed);
@@ -954,7 +945,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		// Search only the moves in the Search list
-		if( type == Search::nodeType::ROOT_NODE && !std::count(rootMoves.begin() + indexPV, rootMoves.end(), m))
+		if( type == Search::nodeType::ROOT_NODE && std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m) && !std::count(rootMoves.begin(), rootMoves.end(), m) )
 		{
 			continue;
 		}
@@ -999,7 +990,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			sd[ply].skipNullMove = true;
 			Score temp = alphaBeta<ALL_NODE>(ply, depth/2, rBeta-1, rBeta, childPv);
 			sd[ply].skipNullMove = backup;
-			sd[ply].excludeMove = Movegen::NOMOVE;
+			sd[ply].excludeMove = NOMOVE;
 
 			if(temp < rBeta)
 			{
@@ -1209,7 +1200,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 						if(val < beta && depth > 1*ONE_PLY)
 						{
-							_UOI->printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), indexPV, pvLine, getVisitedNodes());
+							_UOI->printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), multiPVcounter, pvLine, getVisitedNodes());
 						}
 						if(val > ExpectedValue - 800)
 						{
@@ -1387,7 +1378,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			}
 			else
 			{
-				pvLine.clear();
+				pvLine.reset();
 			}
 		}
 		return ttValue;
@@ -1501,7 +1492,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	PVline childPV;
 
 	const Position::state& st = pos.getActualState();
-	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != Movegen::NOMOVE)
+	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != NOMOVE)
 	{
 		assert(alpha < beta);
 		assert(beta <= SCORE_INFINITE);

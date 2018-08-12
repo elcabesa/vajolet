@@ -229,7 +229,7 @@ void my_thread::manageNewSearch()
 
 	if(legalMoves == 0)
 	{
-		std::list<Move> PV( 1, Move(0) );
+		PVline PV( 1, Move(0) );
 		src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 		
 		waitStopPondering();
@@ -244,7 +244,7 @@ void my_thread::manageNewSearch()
 		
 		Move bestMove = mg.getMoveFromMoveList(0);
 		
-		std::list<Move> PV( 1, bestMove );
+		PVline PV( 1, bestMove );
 		src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 		
 		waitStopPondering();
@@ -266,7 +266,7 @@ void my_thread::manageNewSearch()
 		Move bookM = pol.probe(src.pos, Search::bestMoveBook);
 		if(bookM.packed)
 		{
-			std::list<Move> PV( 1, bookM );
+			PVline PV( 1, bookM );
 			
 			src.getUOI().printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 			
@@ -279,10 +279,24 @@ void my_thread::manageNewSearch()
 			return;
 		}
 	}
-	startThinkResult res;
 	
-	res = src.startThinking();
-	std::list<Move> PV = res.PV;
+/*	if( game.isPonderRight() )
+	{
+		Game::GamePosition gp = game.getNewSearchParameters();
+
+		PVline newPV;
+		std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
+		
+		newPV.resize(gp.depth/2 + 1);
+		newPV.pop_front();
+		newPV.pop_front();
+		res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
+	}
+	else
+*/	
+	startThinkResult res = src.startThinking( );
+	
+	PVline PV = res.PV;
 
 	waitStopPondering();
 
@@ -290,15 +304,9 @@ void my_thread::manageNewSearch()
 	// print out the choosen line
 	//-----------------------------
 	
-	Move bestMove = PV.front();
-	Move ponderMove(0);
-	if(PV.size() > 1)
-	{
-		std::list<Move>::iterator it = PV.begin();
-		std::advance(it, 1);
-		ponderMove = *it;
-	}
-	else
+	Move bestMove = PV.getMove(0);
+	Move ponderMove = PV.getMove(1);
+	if( ponderMove == NOMOVE )
 	{
 		ponderMove = getPonderMoveFromHash( bestMove );
 	}
