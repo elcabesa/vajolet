@@ -1507,7 +1507,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			}
 
 			// at very deep search allow only recapture
-			if(depth < -7 * ONE_PLY && pos.getActualStateconst().currentMove.bit.to != m.bit.to)
+			if(depth < -7 * ONE_PLY && pos.getActualStateConst().currentMove.bit.to != m.bit.to)
 			{
 				continue;
 			}
