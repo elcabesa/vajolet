@@ -85,23 +85,34 @@ void Search::cleanMemoryBeforeStartingNewSearch(void)
 	tbHits = 0;
 	rootMovesSearched.clear();
 }
-
+inline void Search::enableFollowPv()
+{
+	followPV = true;
+}
+inline void Search::disableFollowPv()
+{
+	followPV = false;
+}
 inline void Search::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 {
 	if (followPV)
 	{
-		if(ply >= pvLineToFollow.size())
+		unsigned int lastElementIndex = pvLineToFollow.size() - 1;
+		// if line is already finished, stop following PV
+		if( ply > lastElementIndex )
 		{
-			followPV = false;
+			disableFollowPv();
 		}
 		else
 		{
+			// overwrite the ttMove
 			PVline::iterator it = pvLineToFollow.begin();
 			std::advance(it, ply);
 			ttMove = *it;
-			if(ply >= pvLineToFollow.size() - 1)
+			// if this is the last move of the PVline, stop following it
+			if( ply == lastElementIndex )
 			{
-				followPV = false;
+				disableFollowPv();
 			}
 		}
 	}
@@ -265,13 +276,13 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 			{
 				ExpectedValue = previousIterationResults[multiPVcounter].score;
 				pvLineToFollow = previousIterationResults[multiPVcounter].PV;
-				followPV = true;
+				enableFollowPv();
 			}
 			else
 			{
 				ExpectedValue = -SCORE_INFINITE;
 				pvLineToFollow.reset();
-				followPV = false;
+				disableFollowPv();
 			}
 			
 			
@@ -283,7 +294,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 
 				maxPlyReached = 0;
 				validIteration = false;
-				followPV = true;
+				enableFollowPv();
 
 				PVline newPV;
 				newPV.reset();
@@ -309,7 +320,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 						}
 						
 						// follow the old PV
-						followPV = true;
+						enableFollowPv();
 
 					}
 					else if (res >= beta)
@@ -329,7 +340,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 						}
 						
 						pvLineToFollow = newPV;
-						followPV = true;
+						enableFollowPv();
 												
 						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 					}

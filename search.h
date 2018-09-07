@@ -192,6 +192,8 @@ private:
 	
 	bool followPV;
 	PVline pvLineToFollow;
+	void enableFollowPv();
+	void disableFollowPv();
 	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
 	void clearKillers(unsigned int ply)
 	{
