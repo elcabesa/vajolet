@@ -191,15 +191,15 @@ void Search::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
 
 startThinkResult Search::manageQsearch(void)
 {
-	PVline PV;
-	Score res =qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, PV);
+	PVline pvLine;
+	Score res =qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, pvLine);
 	
 	_UOI->printScore( res/100 );
 	
-	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, PV, res );
+	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, res );
 }
 
-void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVline , bool masterThread)
+void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , bool masterThread)
 {
 	// manage multi PV moves
 	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
@@ -243,13 +243,13 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 			if( previousIterationResults.size() > multiPVcounter )
 			{
 				ExpectedValue = previousIterationResults[multiPVcounter].score;
-				PV = previousIterationResults[multiPVcounter].PV;
+				pvLineToFollow = previousIterationResults[multiPVcounter].PV;
 				followPV = true;
 			}
 			else
 			{
 				ExpectedValue = -SCORE_INFINITE;
-				PV.reset();
+				pvLineToFollow.reset();
 				followPV = false;
 			}
 			
@@ -307,7 +307,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 							my_thread::timeMan.idLoopBeta = true;
 						}
 						
-						PV = newPV;
+						pvLineToFollow = newPV;
 						followPV = true;
 												
 						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
@@ -353,11 +353,13 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, PVli
 
 }
 
-startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVline pv)
+startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed)
 {
 	//------------------------------------
 	//init the new search
 	//------------------------------------
+	
+	pvLineToFollow = pvToBeFollowed;
 	
 	//clean transposition table
 	transpositionTable::getInstance().newSearch();
@@ -423,15 +425,15 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		
 		helperSearch[i].stop = false;
 		helperSearch[i].pos = pos;
-		helperSearch[i].PV = PV;
-		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, pv, false));
+		helperSearch[i].pvLineToFollow = pvLineToFollow;
+		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, false));
 	}
 
 	//----------------------------------
 	// iterative deepening loop
 	//----------------------------------
 	rootMove bestMove(m);
-	idLoop(bestMove, depth, alpha, beta, pv, true);
+	idLoop(bestMove, depth, alpha, beta, true);
 	
 	// stop helper threads
 	for(unsigned int i = 0; i< (threads - 1); i++)
@@ -575,16 +577,16 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	if (PVnode && followPV)
 	{
-		if(ply >= PV.size())
+		if(ply >= pvLineToFollow.size())
 		{
 			followPV = false;
 		}
 		else
 		{
-			PVline::iterator it = PV.begin();
+			PVline::iterator it = pvLineToFollow.begin();
 			std::advance(it, ply);
 			ttMove = *it;
-			if(ply >= PV.size() - 1)
+			if(ply >= pvLineToFollow.size() - 1)
 			{
 				followPV = false;
 			}
@@ -1386,18 +1388,18 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 	if (PVnode && followPV)
 	{
-		if(ply >= PV.size())
+		if(ply >= pvLineToFollow.size())
 		{
 			followPV = false;
 		}
 		else
 		{
-			PVline::iterator it = PV.begin();
+			PVline::iterator it = pvLineToFollow.begin();
 			std::advance(it, ply);
 
 			ttMove = *it;
 
-			if(ply >= PV.size() - 1)
+			if(ply >= pvLineToFollow.size() - 1)
 			{
 				followPV = false;
 			}

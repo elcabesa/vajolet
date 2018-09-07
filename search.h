@@ -209,8 +209,8 @@ private:
 	} ;
 
 
-	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& PV);
-	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& PV);
+	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
+	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
 
 	unsigned long long visitedNodes;
 	unsigned long long tbHits;
@@ -224,7 +224,7 @@ public:
 
 	static std::vector<Move> rootMoves;
 	std::vector<rootMove> rootMovesSearched;
-	PVline PV;
+	PVline pvLineToFollow;
 	searchLimits limits;
 	Position pos;
 
@@ -263,9 +263,9 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
+	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
 	
-	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {}, bool masterThread = false);
+	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 
