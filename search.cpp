@@ -86,6 +86,27 @@ void Search::cleanMemoryBeforeStartingNewSearch(void)
 	rootMovesSearched.clear();
 }
 
+inline void Search::manageLineToBefollowed(unsigned int ply, Move& ttMove)
+{
+	if (followPV)
+	{
+		if(ply >= pvLineToFollow.size())
+		{
+			followPV = false;
+		}
+		else
+		{
+			PVline::iterator it = pvLineToFollow.begin();
+			std::advance(it, ply);
+			ttMove = *it;
+			if(ply >= pvLineToFollow.size() - 1)
+			{
+				followPV = false;
+			}
+		}
+	}
+}
+
 void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 {
 	unsigned results[TB_MAX_MOVES];
@@ -574,23 +595,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 		return ttValue;
 	}
-
-	if (PVnode && followPV)
+	
+	// overwrite ttMove with move from move from PVlineToBeFollowed
+	if( PVnode )
 	{
-		if(ply >= pvLineToFollow.size())
-		{
-			followPV = false;
-		}
-		else
-		{
-			PVline::iterator it = pvLineToFollow.begin();
-			std::advance(it, ply);
-			ttMove = *it;
-			if(ply >= pvLineToFollow.size() - 1)
-			{
-				followPV = false;
-			}
-		}
+		manageLineToBefollowed(ply, ttMove);
 	}
 
 	//Tablebase probe
@@ -1386,24 +1395,10 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		return ttValue;
 	}
 
-	if (PVnode && followPV)
+	// overwrite ttMove with move from move from PVlineToBeFollowed
+	if( PVnode )
 	{
-		if(ply >= pvLineToFollow.size())
-		{
-			followPV = false;
-		}
-		else
-		{
-			PVline::iterator it = pvLineToFollow.begin();
-			std::advance(it, ply);
-
-			ttMove = *it;
-
-			if(ply >= pvLineToFollow.size() - 1)
-			{
-				followPV = false;
-			}
-		}
+		manageLineToBefollowed(ply, ttMove);
 	}
 
 	ttType TTtype = typeScoreLowerThanAlpha;

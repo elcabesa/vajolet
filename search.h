@@ -148,7 +148,7 @@ class Search
 {
 private:
 	std::unique_ptr<UciOutput> _UOI;
-	bool followPV;
+	
 	int globalReduction;
 	static const unsigned int LmrLimit = 32;
 	static Score futility[8];
@@ -189,7 +189,10 @@ private:
 		}
 
 	}
-
+	
+	bool followPV;
+	PVline pvLineToFollow;
+	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
 	void clearKillers(unsigned int ply)
 	{
 		Move * const tempKillers =  sd[ply].killers;
@@ -224,7 +227,6 @@ public:
 
 	static std::vector<Move> rootMoves;
 	std::vector<rootMove> rootMovesSearched;
-	PVline pvLineToFollow;
 	searchLimits limits;
 	Position pos;
 
