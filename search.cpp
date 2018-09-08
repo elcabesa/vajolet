@@ -480,7 +480,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	// gather results
 	//----------------------------------
-	/*std::cout<<"-------main thread----------"<<std::endl;
+	std::cout<<"-------main thread----------"<<std::endl;
 	std::cout<<"bestMove "<<displayUci(bestMove.firstMove)<<std::endl;
 	std::cout<<"score "<<bestMove.score<<std::endl;
 	std::cout<<"depth "<<bestMove.depth<<std::endl;
@@ -490,7 +490,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		std::cout<<"bestMove "<<displayUci(helperResults[i].firstMove)<<std::endl;
 		std::cout<<"score "<<helperResults[i].score<<std::endl;
 		std::cout<<"depth "<<helperResults[i].depth<<std::endl;
-	}*/
+	}
 	
 	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 
