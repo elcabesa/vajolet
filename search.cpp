@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <list>
+#include <map>
 #include <algorithm>    // std::copy
 #include <iterator>     // std::back_inserter
 #include "search.h"
@@ -464,8 +465,8 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	// iterative deepening loop
 	//----------------------------------
-	rootMove bestMove(m);
-	idLoop(bestMove, depth, alpha, beta, true);
+	rootMove MainThreadMove(m);
+	idLoop(MainThreadMove, depth, alpha, beta, true);
 	
 	// stop helper threads
 	for(unsigned int i = 0; i< (threads - 1); i++)
@@ -480,7 +481,36 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	// gather results
 	//----------------------------------
-	std::cout<<"-------main thread----------"<<std::endl;
+	
+	helperResults.push_back(MainThreadMove);
+	
+	std::map<unsigned short, int> votes;
+	
+	Score minScore = MainThreadMove.score;
+	for (auto &res : helperResults)
+	{
+		minScore = std::min( minScore, res.score );
+		votes[ res.firstMove.packed ] = 0;
+	}
+	
+	for (auto &res : helperResults)
+	{
+		votes[ res.firstMove.packed ] += (int)( res.score - minScore ) + 40 * res.depth;
+	}
+	
+	rootMove* bestMove = &MainThreadMove;
+	int bestResult = votes[ MainThreadMove.firstMove.packed ];
+	
+	for ( auto &res : helperResults )
+	{
+		if( votes[ res.firstMove.packed ] > bestResult )
+		{
+			bestResult = votes[ res.firstMove.packed ];
+			bestMove = &res;
+		}
+	}
+	
+	/*std::cout<<"-------main thread----------"<<std::endl;
 	std::cout<<"bestMove "<<displayUci(bestMove.firstMove)<<std::endl;
 	std::cout<<"score "<<bestMove.score<<std::endl;
 	std::cout<<"depth "<<bestMove.depth<<std::endl;
@@ -490,9 +520,10 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		std::cout<<"bestMove "<<displayUci(helperResults[i].firstMove)<<std::endl;
 		std::cout<<"score "<<helperResults[i].score<<std::endl;
 		std::cout<<"depth "<<helperResults[i].depth<<std::endl;
-	}
+	}*/
 	
-	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
+	
+	return startThinkResult( alpha, beta, bestMove->depth, bestMove->PV, bestMove->score);
 
 }
 
