@@ -148,7 +148,7 @@ class Search
 {
 private:
 	std::unique_ptr<UciOutput> _UOI;
-	bool followPV;
+	
 	int globalReduction;
 	static const unsigned int LmrLimit = 32;
 	static Score futility[8];
@@ -189,7 +189,12 @@ private:
 		}
 
 	}
-
+	
+	bool followPV;
+	PVline pvLineToFollow;
+	void enableFollowPv();
+	void disableFollowPv();
+	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
 	void clearKillers(unsigned int ply)
 	{
 		Move * const tempKillers =  sd[ply].killers;
@@ -209,8 +214,8 @@ private:
 	} ;
 
 
-	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& PV);
-	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& PV);
+	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
+	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
 
 	unsigned long long visitedNodes;
 	unsigned long long tbHits;
@@ -224,7 +229,6 @@ public:
 
 	static std::vector<Move> rootMoves;
 	std::vector<rootMove> rootMovesSearched;
-	PVline PV;
 	searchLimits limits;
 	Position pos;
 
@@ -263,9 +267,9 @@ public:
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 
-	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {} );
+	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
 	
-	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline PV= {}, bool masterThread = false);
+	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 
