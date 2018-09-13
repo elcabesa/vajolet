@@ -1,17 +1,41 @@
 cmake_minimum_required (VERSION 2.8)
 project (Vajolet)
 
-IF(NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
-    set(CMAKE_CXX_FLAGS "-std=c++1z -O3 -msse4.2 -mpopcnt -pedantic -Wall -Wextra -fmessage-length=0")
-else()
-    set(CMAKE_CXX_FLAGS "-std=c++1z -O3 -pedantic -Wall -Wextra -fmessage-length=0")
+IF( VAJOLET_CPU_TYPE STREQUAL "64OLD")
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3 -m64" )
+ELSEIF( VAJOLET_CPU_TYPE STREQUAL "64NEW")
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -m64 -mpopcnt" )
+ELSEIF( VAJOLET_CPU_TYPE STREQUAL "64BMI2")
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -m64 -mbmi -mbmi2 -mpopcnt" )
+ELSE()
+ENDIF()
+
+
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -pedantic -Wall -Wextra" )
+
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}  ")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ")
+	
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
 endif()
 
 if (WIN32)
-	set (CMAKE_EXE_LINKER_FLAGS "-s -Wl,--allow-multiple-definition -static  -pthread")
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--allow-multiple-definition -static -pthread")
+	set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--allow-multiple-definition -static -pthread")		
 else()
-	set (CMAKE_EXE_LINKER_FLAGS "-s -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static")
+	
+	if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static")
+		set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static --coverage")
+	elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -lpthread")
+		set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -s -lpthread")
+	endif()
+	
 endif()
+
+set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 
 add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp endgame.cpp eval.cpp hashKeys.cpp io.cpp magicmoves.cpp movegen.cpp parameters.cpp position.cpp search.cpp see.cpp thread.cpp transposition.cpp syzygy/tbprobe.cpp)
 
