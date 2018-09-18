@@ -4,6 +4,8 @@
 
 -include ../makefile.init
 
+EXE = Vajolet
+
 RM := rm -rf
 
 # All of the sources participating in the build are defined here
@@ -130,13 +132,13 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: vajolet2.exe
+all: vajolet
 
 # Tool invocations
-vajolet2.exe: $(OBJS) $(USER_OBJS)
+vajolet: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -s -pthread -o "vajolet2.exe" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -s -pthread -o $(EXE) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
