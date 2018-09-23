@@ -37,7 +37,25 @@
 
 
 #ifdef DEBUG_EVAL_SIMMETRY
-	Position ppp;
+	
+	
+	void testSimmetry(Position& pos)
+	{
+		static Position ppp;
+		
+		ppp.setupFromFen(pos.getSymmetricFen());
+		
+		Score staticEval = pos.eval<false>();
+		Score test = ppp.eval<false>();
+		
+		if(test != staticEval)
+		{
+			sync_cout << "eval symmetry problem " << test << ":" << staticEval << sync_endl;
+			pos.display();
+			ppp.display();
+			while(1);
+		}
+	}
 #endif
 
 Search defaultSearch;
@@ -739,13 +757,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		eval = staticEval;
 
 #ifdef DEBUG_EVAL_SIMMETRY
-		ppp.setupFromFen(pos.getSymmetricFen());
-		Score test=ppp.eval<false>();
-		if(test!=eval){
-			sync_cout<<1<<" "<<test<<" "<<eval<<sync_endl;
-			pos.display();
-			while(1);
-		}
+		testSimmetry(pos);
 #endif
 	}
 	else
@@ -1447,15 +1459,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 	Score staticEval = tte->getType()!=typeVoid ? tte->getStaticValue() : pos.eval<false>();
 #ifdef DEBUG_EVAL_SIMMETRY
-	ppp.setupFromFen(pos.getSymmetricFen());
-	Score test = ppp.eval<false>();
-	if(test != staticEval)
-	{
-		sync_cout << 3 << " " << test << " " << staticEval << " " << pos.eval<false>() << sync_endl;
-		pos.display();
-		ppp.display();
-		while(1);
-	}
+	testSimmetry(pos);
 #endif
 
 

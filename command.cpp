@@ -555,15 +555,6 @@ void uciLoop()
 			Score s = pos.eval<true>();
 			sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
 			sync_cout << "gamePhase:"  << pos.getGamePhase()/65536.0*100 << "%" << sync_endl;
-#ifdef DEBUG_EVAL_SIMMETRY
-
-			Position ppp;
-			ppp.setupFromFen(pos.getSymmetricFen());
-			ppp.display();
-			sync_cout << "Eval:"  << ppp.eval<true>() / 10000.0 << sync_endl;
-			sync_cout << "gamePhase:" << ppp.getGamePhase()/65536.0*100 << "%" << sync_endl;
-
-#endif
 
 		}
 		else if (token == "isready")
