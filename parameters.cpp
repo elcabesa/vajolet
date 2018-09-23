@@ -45,12 +45,12 @@ simdScore initialPieceValue[Position::lastBitboard] = {
 		{0,0,0,0}
 };
 
-simdScore PawnD3 =  {213,33,-40,54};
-simdScore PawnD4 =  {675,-391,156,5};
-simdScore PawnD5 =  {574,-217,50,-344};
-simdScore PawnE3 =  {100,145,-271,-179};
-simdScore PawnE4 =  {715,-362,149,282};
-simdScore PawnE5 =  {29,-386,127,-128};
+simdScore PawnD3 =  {213,33,0,0};
+simdScore PawnD4 =  {675,-391,0,0};
+simdScore PawnD5 =  {574,-217,0,0};
+simdScore PawnE3 =  {100,145,0,0};
+simdScore PawnE4 =  {715,-362,0,0};
+simdScore PawnE5 =  {29,-386,0,0};
 simdScore PawnCentering =  {274,-28,-445,1};
 simdScore PawnRankBonus =  {165,357,1,-396};
 simdScore KnightPST =  {938,806,-204,70};
