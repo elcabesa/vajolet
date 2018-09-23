@@ -141,6 +141,7 @@ public:
 	Move excludeMove;
 	bool skipNullMove;
 	Move killers[2];
+	Score staticEval;
 };
 
 
