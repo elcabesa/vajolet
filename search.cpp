@@ -540,6 +540,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
 	const bool inCheck = pos.isInCheck();
+	bool improving = false;
 	//Move threatMove(NOMOVE);
 
 
@@ -756,6 +757,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		eval = staticEval;
 
+
 		if (ttValue != SCORE_NONE)
 		{
 			if (
@@ -766,7 +768,13 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				eval = ttValue;
 			}
 		}
-
+	}
+	
+	sd[ply].staticEval = staticEval;
+	
+	if( ply >=2 && sd[ply].staticEval >= sd[ply-2].staticEval )
+	{
+		improving = true;
 	}
 
 	//-----------------------------
