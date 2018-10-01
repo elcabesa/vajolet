@@ -241,7 +241,7 @@ public :
 
 	void ponderHit()
 	{
-		src.resetPonderTime();
+		src.resetPonderTimer();
 		src.stopPonder();
 	}
 

@@ -195,8 +195,7 @@ void my_thread::searchThread()
 		{
 			timeManagerInit(src.pos, src.limits, timeMan);
 			src.stop = false;
-			src.resetStartTime();
-			src.resetPonderTime();
+			src.resetStartTimers();
 			timerCond.notify_one();
 			src.stop = false;
 			manageNewSearch();

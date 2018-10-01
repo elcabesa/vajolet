@@ -282,8 +282,8 @@ public:
 	static long long int getTime(){ return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
 	long long int getElapsedTime() const { return getTime() - startTime; }
 	long long int getClockTime() const { return getTime() - ponderTime; }
-	void resetStartTime(){ startTime = getTime(); }
-	void resetPonderTime(){ ponderTime = getTime(); }
+	void resetStartTimers(){ ponderTime = startTime = getTime(); }
+	void resetPonderTimer(){ ponderTime = getTime(); }
 	
 	Search( std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)){}
 	UciOutput& getUOI(){ return *_UOI;}
