@@ -15,16 +15,15 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <utility>
-
 #include <iomanip>
-#include "position.h"
-#include "move.h"
+
 #include "bitops.h"
 #include "data.h"
-#include "movegen.h"
 #include "eval.h"
+#include "movegen.h"
 #include "parameters.h"
+#include "position.h"
+
 
 bool enablePawnHash= true;
 

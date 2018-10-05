@@ -20,10 +20,6 @@
 #ifndef EVAL_H_
 #define EVAL_H_
 
-#include "vajolet.h"
-#include "position.h"
-#include "tables.h"
-
 extern bool enablePawnHash;
 
 #endif /* EVAL_H_ */

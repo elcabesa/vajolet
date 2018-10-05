@@ -18,10 +18,11 @@
 #define SEARCH_H_
 
 #include <chrono>
-#include <vector>
-#include <list>
 #include <cmath>
+#include <list>
 #include <string>
+#include <vector>
+
 #include "vajolet.h"
 #include "position.h"
 #include "move.h"
