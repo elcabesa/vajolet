@@ -148,6 +148,9 @@ public:
 class Search
 {
 private:
+
+	static const int ONE_PLY = 16;
+	static const int ONE_PLY_SHIFT = 4;
 	std::unique_ptr<UciOutput> _UOI;
 	
 	int globalReduction;
@@ -168,7 +171,7 @@ private:
 	CaptureHistory captureHistory;
 	CounterMove counterMoves;
 
-	searchData sd[STATE_INFO_LENGTH];
+	searchData sd[800];
 	
 	void cleanMemoryBeforeStartingNewSearch(void);
 	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);

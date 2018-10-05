@@ -32,7 +32,6 @@
 //------------------------------------------------
 //	extern variables
 //------------------------------------------------
-extern bitMap BITSET[squareNumber+1];
 extern tSquare BOARDINDEX[8][8];
 extern const int FILES[squareNumber];
 extern const int RANKS[squareNumber];
@@ -65,6 +64,7 @@ extern bitMap spaceMask;
 */
 inline bitMap bitSet(tSquare n)
 {
+	extern bitMap BITSET[squareNumber+1];
 	return BITSET[n];
 }
 

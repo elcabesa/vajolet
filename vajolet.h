@@ -18,51 +18,28 @@
 #ifndef VAJOLET_H_
 #define VAJOLET_H_
 
-
-// disable assert define
-//#define NDEBUG
-#include <cassert>
-
 //---------------------------------------------
 //	include
 //---------------------------------------------
-
+#include <cassert>
 //---------------------------------------------
 //	configuration defines
-//---------------------------------------------
-
-#define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.7.0"
-#define PRE_RELEASE		"-PRE-17"
-
-
-//---------------------------------------------
-//	define
 //---------------------------------------------
 //#define DEBUG_EVAL_SIMMETRY
 //#define DISABLE_TIME_DIPENDENT_OUTPUT
 //#define ENABLE_CHECK_CONSISTENCY
 
-
-#define MAX_MOVE_PER_POSITION (250)
-#define MAX_BAD_MOVE_PER_POSITION (32)
-#define ONE_PLY		(16)
-#define ONE_PLY_SHIFT (4)
-#define STATE_INFO_LENGTH (800)
-
 //---------------------------------------------
 //SCORE DEFINITION
 //---------------------------------------------
 
-#define SCORE_NONE				(1700001)//(2000000001)
-#define SCORE_INFINITE			(1700000)//(2000000000)
-#define SCORE_MATE				(1699990)//(1999999990)
+#define SCORE_NONE				(1700001)
+#define SCORE_INFINITE			(1700000)
+#define SCORE_MATE				(1699990)
 #define SCORE_MATED				(-SCORE_MATE)
-#define SCORE_MATE_IN_MAX_PLY	(1690000)//(1999990000)
-#define SCORE_KNOWN_WIN			(1500000)//(1000000000)
+#define SCORE_MATE_IN_MAX_PLY	(1690000)
+#define SCORE_KNOWN_WIN			(1500000)
 #define SCORE_MATED_IN_MAX_PLY	(-SCORE_MATE_IN_MAX_PLY)
-//#define SCORE_MAX_OUTPUT_VALUE	( 360000)
-//#define SCORE_MIN_OUTPUT_VALUE	(-SCORE_MAX_OUTPUT_VALUE)
 
 //---------------------------------------------
 //

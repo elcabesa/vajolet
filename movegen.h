@@ -31,9 +31,12 @@
 #include "magicmoves.h"
 
 
-class Movegen{
-private:
+class Movegen
+{
 
+private:
+	static const int MAX_MOVE_PER_POSITION = 250;
+	static const int MAX_BAD_MOVE_PER_POSITION = 32;
 	std::array<extMove,MAX_MOVE_PER_POSITION> moveList;
 	std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListEnd;
 	std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListPosition;
@@ -230,14 +233,14 @@ public:
 		if(inCheck)
 		{
 			stagedGeneratorState = getTTevasion;
-			return (-1*ONE_PLY);
+			return -1;
 		}
 		else
 		{
-			if(depth >= (0*ONE_PLY))
+			if( depth >= 0 )
 			{
 				stagedGeneratorState = getQsearchTTquiet;
-				return -1*ONE_PLY;
+				return -1;
 			}
 			else
 			{
@@ -247,7 +250,7 @@ public:
 				{
 					ttMove = NOMOVE;
 				}
-				return (-2*ONE_PLY);
+				return -2;
 			}
 		}
 	}
