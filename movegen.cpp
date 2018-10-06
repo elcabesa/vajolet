@@ -17,13 +17,11 @@
 
 
 #include <functional>
-#include "vajolet.h"
-#include "move.h"
-#include "movegen.h"
-#include "data.h"
+
 #include "bitops.h"
-#include "history.h"
-#include "magicmoves.h"
+#include "data.h"
+#include "movegen.h"
+#include "vajolet.h"
 
 
 

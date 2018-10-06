@@ -43,7 +43,7 @@ unsigned long int transpositionTable::setSize(unsigned long int mbSize)
 
 
 static ttEntry null(0,SCORE_NONE, typeVoid, -100, 0, 0, 0);
-ttEntry* transpositionTable::probe(const U64 key)
+ttEntry* transpositionTable::probe(const uint64_t key)
 {
 
 
@@ -60,7 +60,7 @@ ttEntry* transpositionTable::probe(const U64 key)
 }
 
 
-void transpositionTable::store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
+void transpositionTable::store(const uint64_t key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
 {
 
 
@@ -105,12 +105,12 @@ void transpositionTable::clear()
 	std::fill(table.begin(), table.end(), ttc);
 }
 
-void PerftTranspositionTable::store(const U64 key, signed short int depth, unsigned long long v)
+void PerftTranspositionTable::store(const uint64_t key, signed short int depth, unsigned long long v)
 {
 	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, 0, (v>>23)&0x7FFFFF);	
 }
 
-bool PerftTranspositionTable::retrieve(const U64 key, unsigned int depth, unsigned long long& res)
+bool PerftTranspositionTable::retrieve(const uint64_t key, unsigned int depth, unsigned long long& res)
 {
 	ttEntry* tte = transpositionTable::getInstance().probe( key );
 	

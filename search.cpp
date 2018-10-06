@@ -15,26 +15,19 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <random>
-#include <ctime>
 
-#include <vector>
-#include <list>
 #include <map>
-#include <algorithm>    // std::copy
-#include <iterator>     // std::back_inserter
-#include "search.h"
-#include "position.h"
-#include "movegen.h"
-#include "transposition.h"
-#include "history.h"
-#include "book.h"
-#include "thread.h"
-#include "command.h"
-#include "syzygy/tbprobe.h"
+
 #include "bitops.h"
-
-
+#include "command.h"
+#include "history.h"
+#include "io.h"
+#include "movegen.h"
+#include "position.h"
+#include "search.h"
+#include "transposition.h"
+#include "thread.h"
+#include "syzygy/tbprobe.h"
 
 #ifdef DEBUG_EVAL_SIMMETRY
 	Position ppp;
@@ -587,7 +580,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	const Move& excludedMove = sd[ply].excludeMove;
 
-	U64 posKey = excludedMove.packed ? pos.getExclusionKey() : pos.getKey();
+	uint64_t posKey = excludedMove.packed ? pos.getExclusionKey() : pos.getKey();
 
 	//--------------------------------------
 	// test the transposition table
@@ -851,7 +844,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			pos.doNullMove();
 			sd[ply+1].skipNullMove = true;
 
-			//U64 nullKey = pos.getKey();
+			//uint64_t nullKey = pos.getKey();
 			Score nullVal;
 			PVline childPV;
 			if( depth-red < ONE_PLY )

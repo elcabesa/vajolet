@@ -18,7 +18,8 @@
 #ifndef MOVE_H_
 #define MOVE_H_
 
-#include "vajolet.h"
+#include "tSquare.h"
+#include "score.h"
 
 /*!	\brief struct move
     \author Marco Belli

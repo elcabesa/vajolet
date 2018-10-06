@@ -21,11 +21,15 @@
 
 
 #include <array>
+#include <cstdint>
+
+#include "bitops.h"
+#include "score.h"
 
 class pawnEntry
 {
 public:
-	U64 key;
+	uint64_t key;
 	bitMap weakPawns;
 	bitMap passedPawns;
 	bitMap pawnAttacks[2];
@@ -38,7 +42,7 @@ class pawnTable
 {
 static const int size = 8192;
 public:
-	void insert(U64 key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
+	void insert(uint64_t key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
 		pawnEntry& x=pawnTable[((unsigned int)key) %size];
 
 		x.key=key;
@@ -56,7 +60,7 @@ public:
 		x.holes[1]=blackHoles;
 	}
 
-	pawnEntry& probe(U64 key)
+	pawnEntry& probe(uint64_t key)
 	{
 		return pawnTable[((unsigned int)key) %size];
 	}

@@ -23,9 +23,12 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "vajolet.h"
 #include "move.h"
 #include "position.h"
+#include "score.h"
+#include "tSquare.h"
+#include "vajolet.h"
+
 
 
 class History

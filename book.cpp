@@ -16,28 +16,21 @@
 */
 
 
-
-
-#include <random>
 #include <chrono>
+#include <random>
+
 
 #include "bitops.h"
 #include "book.h"
-#include "io.h"
+#include "move.h"
 #include "movegen.h"
-#include "position.h"
 #include "vajolet.h"
 
 
-
-
-
-
-
 // polyglot_key() returns the PolyGlot hash key of the given position
-U64 PolyglotBook::polyglotKey(const Position& pos) const
+uint64_t PolyglotBook::polyglotKey(const Position& pos) const
 {
-	U64 k = 0;
+	uint64_t k = 0;
 	bitMap b = pos.getOccupationBitmap();
 
 	while (b)
@@ -110,7 +103,7 @@ bool PolyglotBook::open(const std::string& fName) {
 /// the book file for the given key. Returns the index of the leftmost book
 /// entry with the same key as the input.
 
-size_t PolyglotBook::find_first(U64 key)
+size_t PolyglotBook::find_first(uint64_t key)
 {
 
 	seekg(0, std::ios::end); // Move pointer to end, so tellg() gets file's size
@@ -160,7 +153,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 	Entry e;
 	uint16_t best = 0;
 	unsigned sum = 0;
-	U64 key = polyglotKey(pos);
+	uint64_t key = polyglotKey(pos);
 
 	seekg(find_first(key) * sizeof(Entry), ios_base::beg);
 

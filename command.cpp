@@ -19,26 +19,19 @@
 //	include
 //---------------------------------------------
 #include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <chrono>
-#include <iterator>
-#include "version.h"
-#include "vajolet.h"
+
+#include "benchmark.h"
 #include "command.h"
 #include "io.h"
-#include "position.h"
 #include "movegen.h"
-#include "move.h"
+#include "parameters.h"
+#include "position.h"
 #include "search.h"
+#include "syzygy/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"
-#include "benchmark.h"
-#include "syzygy/tbprobe.h"
-#include "parameters.h"
-
-
+#include "version.h"
+#include "vajolet.h"
 
 
 //---------------------------------------------

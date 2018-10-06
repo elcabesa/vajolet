@@ -38,7 +38,7 @@
  *BmagicNOMASK(square, occupancy)
  *RmagicNOMASK(square, occupancy)
  *
- *Unsigned 64 bit integers are referenced by this generator as U64.
+ *Unsigned 64 bit integers are referenced by this generator as uint64_t.
  *Edit the beginning lines of this header for the defenition of a 64 bit
  *integer if necessary.
  *
@@ -75,22 +75,17 @@
 #ifndef _magicmovesh
 #define _magicmovesh
 
-#include "vajolet.h"
+#include <cstdint>
 
-extern const U64 magicmoves_r_magics[64];
-extern const U64 magicmoves_r_mask[64];
-extern const U64 magicmoves_b_magics[64];
-extern const U64 magicmoves_b_mask[64];
+extern const uint64_t magicmoves_r_magics[64];
+extern const uint64_t magicmoves_r_mask[64];
+extern const uint64_t magicmoves_b_magics[64];
+extern const uint64_t magicmoves_b_mask[64];
 extern const unsigned int magicmoves_b_shift[64];
 extern const unsigned int magicmoves_r_shift[64];
+extern const uint64_t* magicmoves_b_indices[64];
+extern const uint64_t* magicmoves_r_indices[64];
 
-
-
-
-//extern U64 magicmovesbdb[5248];
-extern const U64* magicmoves_b_indices[64];
-//extern U64 magicmovesrdb[102400];
-extern const U64* magicmoves_r_indices[64];
 void initmagicmoves(void);
 
 #endif //_magicmoveshvesh

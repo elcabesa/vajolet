@@ -23,13 +23,12 @@
 #include <string>
 #include <vector>
 
-#include "vajolet.h"
+#include "data.h"
+#include "command.h"
 #include "position.h"
 #include "move.h"
 #include "history.h"
-#include "eval.h"
-#include "command.h"
-#include "io.h"
+#include "vajolet.h"
 
 class PVline : private std::list<Move>
 {

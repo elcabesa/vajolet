@@ -21,13 +21,11 @@
 #include <utility>
 #include <algorithm>
 #include <array>
-#include "vajolet.h"
-#include "move.h"
-#include "position.h"
-#include "search.h"
-#include "history.h"
+
 #include "bitops.h"
 #include "magicmoves.h"
+#include "position.h"
+#include "search.h"
 
 
 class Movegen

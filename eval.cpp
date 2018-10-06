@@ -15,11 +15,13 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <cstdint>
 #include <iomanip>
 
 #include "bitops.h"
 #include "data.h"
 #include "eval.h"
+#include "io.h"
 #include "movegen.h"
 #include "parameters.h"
 #include "position.h"
@@ -46,7 +48,7 @@ simdScore traceRes={0,0,0,0};
 //---------------------------------------------
 const Position::materialStruct * Position::getMaterialData()
 {
-	U64 key = getMaterialKey();
+	uint64_t key = getMaterialKey();
 
 	auto got= materialKeyMap.find(key);
 
@@ -804,7 +806,7 @@ Score Position::eval(void)
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
 	simdScore pawnResult;
-	U64 pawnKey = getPawnKey();
+	uint64_t pawnKey = getPawnKey();
 	pawnEntry& probePawn = pawnHashTable.probe(pawnKey);
 	if( enablePawnHash && (probePawn.key == pawnKey) )
 	{

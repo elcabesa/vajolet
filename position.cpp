@@ -14,27 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-
-#include <functional>
-#include <sstream>
-#include <string>
 #include <cstdlib>
-#include "vajolet.h"
-#include "position.h"
-#include "data.h"
-#include "bitops.h"
+#include <sstream>
+
 #include "io.h"
-#include "hashKeys.h"
-#include "move.h"
 #include "movegen.h"
-#include "transposition.h"
-#include "command.h"
 #include "parameters.h"
-
-
-
-
-
+#include "position.h"
+#include "transposition.h"
+#include "vajolet.h"
 
 /* PST data */
 const int Center[8]	= { -3, -1, +0, +1, +1, +0, -1, -3};
@@ -627,9 +615,9 @@ std::string Position::getSymmetricFen() const {
 	\version 1.0
 	\date 27/10/2013
 */
-U64 Position::calcKey(void) const
+uint64_t Position::calcKey(void) const
 {
-	U64 hash = 0;
+	uint64_t hash = 0;
 	const state& st =getActualStateConst();
 
 	for (int i = 0; i < squareNumber; i++)
@@ -660,9 +648,9 @@ U64 Position::calcKey(void) const
 	\version 1.0
 	\date 27/10/2013
 */
-U64 Position::calcPawnKey(void) const
+uint64_t Position::calcPawnKey(void) const
 {
-	U64 hash = 1;
+	uint64_t hash = 1;
 	bitMap b= getBitmap(whitePawns);
 	while(b)
 	{
@@ -684,9 +672,9 @@ U64 Position::calcPawnKey(void) const
 	\version 1.0
 	\date 27/10/2013
 */
-U64 Position::calcMaterialKey(void) const
+uint64_t Position::calcMaterialKey(void) const
 {
-	U64 hash = 0;
+	uint64_t hash = 0;
 	for (int i = whiteKing; i < lastBitboard; i++)
 	{
 		if ( i != occupiedSquares && i != whitePieces && i != blackPieces)
@@ -1587,7 +1575,7 @@ bool Position::isDraw(bool isPVline) const
 
 	// Draw by repetition?
 	unsigned int counter=1;
-	U64 actualkey = getActualStateConst().key;
+	uint64_t actualkey = getActualStateConst().key;
 	auto it = stateInfo2.rbegin();
 	
 
@@ -1871,4 +1859,135 @@ bool Position::isMoveLegal(const Move &m)const
 
 
 	return true;
+}
+
+
+Position::Position()
+{
+	stateInfo2.clear();
+	stateInfo2.emplace_back(state());
+	actualState = &stateInfo2.back();
+
+
+	actualState->nextMove = whiteTurn;
+
+	Us=&bitBoard[ getNextTurn() ];
+	Them=&bitBoard[blackTurn - getNextTurn()];
+}
+
+
+Position::Position(const Position& other)// calls the copy constructor of the age
+{
+	stateInfo2 = other.stateInfo2;
+	actualState = &stateInfo2.back();
+
+
+
+	for(int i=0; i<squareNumber; i++)
+	{
+		squares[i] = other.squares[i];
+	}
+	for(int i = 0; i < lastBitboard; i++)
+	{
+		bitBoard[i] = other.bitBoard[i];
+	}
+
+
+	Us=&bitBoard[ getNextTurn() ];
+	Them=&bitBoard[blackTurn - getNextTurn()];
+};
+
+Position& Position::operator=(const Position& other)
+{
+	if (this == &other)
+		return *this;
+
+	stateInfo2 = other.stateInfo2;
+	actualState = &stateInfo2.back();
+
+
+	for(int i = 0; i < squareNumber; i++)
+	{
+		squares[i] = other.squares[i];
+	}
+	for(int i=0;i<lastBitboard;i++)
+	{
+		bitBoard[i] = other.bitBoard[i];
+	}
+
+	Us = &bitBoard[ getNextTurn() ];
+	Them = &bitBoard[blackTurn-getNextTurn()];
+
+	return *this;
+};
+
+/*! \brief put a piece on the board
+	\author STOCKFISH
+	\version 1.0
+	\date 27/10/2013
+*/
+inline void Position::putPiece(const bitboardIndex piece,const tSquare s)
+{
+	assert(s<squareNumber);
+	assert(piece<lastBitboard);
+	bitboardIndex color = piece > separationBitmap ? blackPieces : whitePieces;
+	bitMap b=bitSet(s);
+
+	assert(squares[s]==empty);
+
+	squares[s] = piece;
+	bitBoard[piece] |= b;
+	bitBoard[occupiedSquares] |= b;
+	bitBoard[color] |= b;
+}
+
+/*! \brief move a piece on the board
+	\author STOCKFISH
+	\version 1.0
+	\date 27/10/2013
+*/
+inline void Position::movePiece(const bitboardIndex piece,const tSquare from,const tSquare to)
+{
+	assert(from<squareNumber);
+	assert(to<squareNumber);
+	assert(piece<lastBitboard);
+	// index[from] is not updated and becomes stale. This works as long
+	// as index[] is accessed just by known occupied squares.
+	assert(squares[from]!=empty);
+	assert(squares[to]==empty);
+	bitMap fromTo = bitSet(from) ^ bitSet(to);
+	bitboardIndex color = piece > separationBitmap ? blackPieces : whitePieces;
+	bitBoard[occupiedSquares] ^= fromTo;
+	bitBoard[piece] ^= fromTo;
+	bitBoard[color] ^= fromTo;
+	squares[from] = empty;
+	squares[to] = piece;
+
+
+}
+/*! \brief remove a piece from the board
+	\author STOCKFISH
+	\version 1.0
+	\date 27/10/2013
+*/
+inline void Position::removePiece(const bitboardIndex piece,const tSquare s)
+{
+
+	assert(!isKing(piece));
+	assert(s<squareNumber);
+	assert(piece<lastBitboard);
+	assert(squares[s]!=empty);
+
+	// WARNING: This is not a reversible operation. If we remove a piece in
+	// do_move() and then replace it in undo_move() we will put it at the end of
+	// the list and not in its original place, it means index[] and pieceList[]
+	// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
+	bitboardIndex color = piece  > separationBitmap ? blackPieces : whitePieces;
+	bitMap b = bitSet(s);
+	bitBoard[occupiedSquares] ^= b;
+	bitBoard[piece] ^= b;
+	bitBoard[color] ^= b;
+
+	squares[s] = empty;
+
 }

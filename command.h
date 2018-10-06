@@ -19,11 +19,11 @@
 #define COMMAND_H_
 
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include "vajolet.h"
 #include "move.h"
+#include "score.h"
 //--------------------------------------------------------------------
 //	forward declaration
 //--------------------------------------------------------------------

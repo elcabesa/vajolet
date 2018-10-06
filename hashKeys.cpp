@@ -26,11 +26,11 @@
 //	global static hashKeys
 //---------------------------------
 
-U64  HashKeys::keys[squareNumber][30];  	// position, piece (not all the keys are used)
-U64  HashKeys::side;          				// side to move (black)
-U64  HashKeys::ep[squareNumber];        	// ep targets (only 16 used)
-U64  HashKeys::castlingRight[16];			// white king-side castling right
-U64  HashKeys::exclusion;					// position with an exluded move
+uint64_t  HashKeys::keys[squareNumber][30];  	// position, piece (not all the keys are used)
+uint64_t  HashKeys::side;          				// side to move (black)
+uint64_t  HashKeys::ep[squareNumber];        	// ep targets (only 16 used)
+uint64_t  HashKeys::castlingRight[16];			// white king-side castling right
+uint64_t  HashKeys::exclusion;					// position with an exluded move
 
 /*!	\brief init the hashkeys
     \author Marco Belli
@@ -41,7 +41,7 @@ void HashKeys::init()
 {
 	// initialize all random 64-bit numbers
 	int i,j;
-	U64 temp[4];
+	uint64_t temp[4];
 	std::mt19937_64 rnd;
 	std::uniform_int_distribution<uint64_t> uint_dist;
 

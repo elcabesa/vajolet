@@ -20,9 +20,8 @@
 #ifndef PARAMETERS_H_
 #define PARAMETERS_H_
 
-#include "vajolet.h"
 #include "position.h"
-#include "tables.h"
+#include "score.h"
 
 extern simdScore initialPieceValue[Position::lastBitboard];
 

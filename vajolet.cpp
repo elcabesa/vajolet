@@ -15,6 +15,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <iostream>
+
 #include "benchmark.h"
 #include "command.h"
 #include "data.h"

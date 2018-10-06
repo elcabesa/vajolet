@@ -15,14 +15,11 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "thread.h"
-#include "search.h"
-#include "movegen.h"
 #include "book.h"
 #include "command.h"
-
-
-
+#include "movegen.h"
+#include "thread.h"
+#include "transposition.h"
 
 void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruct& timeMan)
 {

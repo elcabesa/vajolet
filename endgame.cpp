@@ -15,6 +15,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <cstdint>
+
 #include "position.h"
 #include "bitops.h"
 #include "movegen.h"
@@ -28,7 +30,7 @@
 
 
 
-std::unordered_map<U64, Position::materialStruct> Position::materialKeyMap;
+std::unordered_map<uint64_t, Position::materialStruct> Position::materialKeyMap;
 
 
 bool Position::evalKxvsK(Score& res)
@@ -668,7 +670,7 @@ void Position::initMaterialKeys(void)
 
 
 	Position p;
-	U64 key;
+	uint64_t key;
 
 	static const struct{
 		std::string fen;

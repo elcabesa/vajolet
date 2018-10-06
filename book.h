@@ -19,9 +19,11 @@
 #ifndef BOOK_H_
 #define BOOK_H_
 
+#include <cstdint>
 #include <fstream>
-#include <string>
 #include <iostream>
+#include <string>
+
 
 #include "position.h"
 
@@ -54,13 +56,13 @@ private:
 	// Random numbers from PolyGlot, used to compute book hash keys
 	const union
 	{
-		U64 PolyGlotRandoms[781];
+		uint64_t PolyGlotRandoms[781];
 		struct
 		{
-			U64 psq[12][64];  // [piece][square]
-			U64 castle[4];    // [castle right]
-			U64 enpassant[8]; // [file]
-			U64 turn;
+			uint64_t psq[12][64];  // [piece][square]
+			uint64_t castle[4];    // [castle right]
+			uint64_t enpassant[8]; // [file]
+			uint64_t turn;
 		} Zobrist;
 	} PG = {{
 			0x9D39247E33776D41ULL, 0x2AF7398005AAA5C7ULL, 0x44DB015024623547ULL,
@@ -328,9 +330,9 @@ private:
 
 	template<typename T> PolyglotBook& operator >> (T& n);
 
-	U64 polyglotKey(const Position& pos) const;
+	uint64_t polyglotKey(const Position& pos) const;
 	bool open(const std::string& fName);
-	size_t find_first(U64 key);
+	size_t find_first(uint64_t key);
 
 
 };

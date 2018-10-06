@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <random>
-#include "vajolet.h"
 #include "command.h"
 #include "io.h"
 #include "bitops.h"
@@ -27,6 +26,7 @@
 #include "movegen.h"
 #include "transposition.h"
 #include "search.h"
+#include "score.h"
 #include "eval.h"
 #include "parameters.h"
 #include "syzygy/tbprobe.h"
