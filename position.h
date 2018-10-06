@@ -24,7 +24,6 @@
 #include "data.h"
 #include "hashKeys.h"
 #include "move.h"
-#include "io.h"
 #include "tables.h"
 #include "bitops.h"
 

@@ -23,6 +23,13 @@
 #include <string>
 #include <iostream>
 
+#include "position.h"
+
+//forward declaration
+struct Move;
+
+
+
 
 
 class PolyglotBook : public std::ifstream

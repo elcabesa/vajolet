@@ -16,7 +16,6 @@
 */
 
 #include "thread.h"
-#include "io.h"
 #include "search.h"
 #include "movegen.h"
 #include "book.h"

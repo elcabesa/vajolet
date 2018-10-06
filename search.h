@@ -29,6 +29,7 @@
 #include "history.h"
 #include "eval.h"
 #include "command.h"
+#include "io.h"
 
 class PVline : private std::list<Move>
 {
@@ -291,13 +292,7 @@ public:
 	
 	Search( std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)){}
 	UciOutput& getUOI(){ return *_UOI;}
-	void setUOI( std::unique_ptr<UciOutput> UOI )
-	{
-		// manage output syncronization
-		sync_cout;
-		_UOI = std::move(UOI);
-		std::cout<<sync_noNewLineEndl;
-	}
+	void setUOI( std::unique_ptr<UciOutput> UOI );
 	
 
 };

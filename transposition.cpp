@@ -15,8 +15,9 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <iostream>
+
 #include "transposition.h"
-#include "io.h"
 
 
 transpositionTable transpositionTable::instance; // Guaranteed to be destroyed.

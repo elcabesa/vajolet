@@ -17,7 +17,6 @@
 
 #include "vajolet.h"
 
-#include "io.h"
 #include "move.h"
 #include "position.h"
 #include "movegen.h"

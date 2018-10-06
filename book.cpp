@@ -21,11 +21,12 @@
 #include <random>
 #include <chrono>
 
-#include "vajolet.h"
-#include "position.h"
-#include "book.h"
-#include "movegen.h"
 #include "bitops.h"
+#include "book.h"
+#include "io.h"
+#include "movegen.h"
+#include "position.h"
+#include "vajolet.h"
 
 
 

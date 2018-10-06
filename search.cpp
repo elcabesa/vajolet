@@ -1674,4 +1674,12 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 }
 
+void Search::setUOI( std::unique_ptr<UciOutput> UOI )
+{
+	// manage output syncronization
+	sync_cout;
+	_UOI = std::move(UOI);
+	std::cout<<sync_noNewLineEndl;
+}
+
 

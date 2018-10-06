@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "io.h"
 #include "search.h"
 #include "transposition.h"
 
