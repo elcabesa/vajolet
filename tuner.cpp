@@ -16,7 +16,7 @@
 */
 
 #include <algorithm>
-
+#include <random>
 #include "vajolet.h"
 #include "command.h"
 #include "io.h"
