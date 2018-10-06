@@ -18,7 +18,6 @@
 #ifndef MOVEGEN_H_
 #define MOVEGEN_H_
 
-#include <list>
 #include <utility>
 #include <algorithm>
 #include <array>
@@ -118,93 +117,26 @@ private:
 	}stagedGeneratorState;
 
 	template<Movegen::genType type>	void generateMoves();
-
-	void insertMove(const Move& m)
-	{
-		assert(moveListEnd<moveList.end());
-		(moveListEnd++)->m = m;
-	}
-
-	inline void scoreCaptureMoves()
-	{
-		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
-		{
-			mov->score = pos.getMvvLvaScore(mov->m);
-			// history of capture
-			mov->score += src.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) ) * 50;
-				
-		}
-	}
-
-	inline void scoreQuietMoves()
-	{
-		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
-		{
-			mov->score = src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
-		}
-	}
-
-	inline void scoreQuietEvasion()
-	{
-		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
-		{
-			mov->score = (pos.getPieceAt((tSquare)mov->m.bit.from));
-			if(pos.getPieceAt((tSquare)mov->m.bit.from) % Position::separationBitmap == Position::King)
-			{
-				mov->score = 20;
-			}
-			mov->score *=500000;
-
-			mov->score += src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
-		}
-	}
-
-	inline void resetMoveList()
-	{
-		moveListPosition = moveList.begin();
-		moveListEnd = moveList.begin();
-	}
-
-
-	inline const Move& FindNextBestMove()
-	{
-		const auto max = std::max_element(moveListPosition,moveListEnd);
-		if( max != moveListEnd)
-		{
-			std::swap(*max, *moveListPosition);
-			return (moveListPosition++)->m;
-		}
-		return NOMOVE;
-	}
-	inline void RemoveMove(Move m)
-	{
-		const auto i = std::find(moveListPosition,moveListEnd,m);
-		if( i != moveListEnd)
-		{
-			std::swap(*i, *moveListPosition);
-			++moveListPosition;
-		}
-	}
+	void insertMove(const Move& m);
+	void scoreCaptureMoves();
+	void scoreQuietMoves();
+	void scoreQuietEvasion();
+	void resetMoveList();
+	const Move& FindNextBestMove();
+	void RemoveMove(Move m);
+	unsigned int getGeneratedMoveNumber(void)const;
 
 
 public:
 	unsigned int getNumberOfLegalMoves();
-
-	inline unsigned int getGeneratedMoveNumber(void)const { return moveListEnd-moveList.begin();}
 
 	bool isKillerMove(Move &m) const
 	{
 		return m == killerMoves[0] || m == killerMoves[1];
 	}
 
-	const Move& getMoveFromMoveList(unsigned int n) const {	return moveList[n].m; }
-
+	const Move& getMoveFromMoveList(unsigned int n) const;
 	Move getNextMove(void);
-
-
-
-
-
 
 	Movegen(const Position & p, const Search& s, unsigned int ply, const Move & ttm): pos(p),src(s),ply(ply), ttMove(ttm)
 	{
