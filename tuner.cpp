@@ -35,7 +35,7 @@
 #include <fstream>
 
 const int arraySize = 200;
-const int arrayScaling = 300;
+//const int arrayScaling = 300;
 unsigned long long int array[arraySize]= {0};
 
 std::ifstream infile("oracle.epd");
