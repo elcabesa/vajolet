@@ -540,6 +540,8 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
+	bool testSyzygy = false;
+	Score SyzygyValue = 0;
 
 	assert(alpha <beta);
 	assert(alpha>=-SCORE_INFINITE);
@@ -653,13 +655,15 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	}
 
 	//Tablebase probe
-	if (!PVnode && TB_LARGEST)
+	if (!PVnode && TB_LARGEST && excludedMove.packed == 0)
 	{
+		ttType TTtype = typeScoreLowerThanAlpha;
 		unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
 
 		if (    piecesCnt <= TB_LARGEST
 			&& (piecesCnt <  TB_LARGEST || depth >= (int)(SyzygyProbeDepth*ONE_PLY))
-			&&  pos.getActualState().fiftyMoveCnt == 0)
+			&&  pos.getActualState().fiftyMoveCnt == 0
+		)
 		{
 			unsigned result = tb_probe_wdl(pos.getBitmap(Position::whitePieces),
 				pos.getBitmap(Position::blackPieces),
@@ -687,20 +691,27 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 					case 0:
 						value = SCORE_MATED +100 +ply;
+						TTtype = typeScoreLowerThanAlpha;
 						break;
 					case 1:
+						TTtype = typeExact;
 						value = -100;
 						break;
 					case 2:
+						TTtype = typeExact;
 						value = 0;
 						break;
 					case 3:
+						TTtype = typeExact;
 						value = 100;
 						break;
 					case 4:
+						TTtype = typeScoreHigherThanBeta;
 						value = SCORE_MATE -100 -ply;
+						//sync_cout<<value<<sync_endl;
 						break;
 					default:
+						sync_cout<<"ARGHHH"<<sync_endl;
 						value = 0;
 					}
 
@@ -711,29 +722,47 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 					case 0:
 					case 1:
+						TTtype = typeScoreLowerThanAlpha;
 						value = SCORE_MATED +100 +ply;
 						break;
 					case 2:
+						TTtype = typeExact;
 						value = 0;
 						break;
 					case 3:
 					case 4:
+						TTtype = typeScoreHigherThanBeta;
 						value = SCORE_MATE -100 -ply;
 						break;
 					default:
+						sync_cout<<"ARGHHH"<<sync_endl;
 						value = 0;
 					}
 				}
 
+				testSyzygy = true;
+				SyzygyValue = value;
 				
-				transpositionTable::getInstance().store(posKey,
+				if(false
+						//TTtype == typeExact
+						//||
+						//(TTtype == typeScoreHigherThanBeta  && value >=beta)
+						//||
+						//(TTtype == typeScoreLowerThanAlpha && value <=alpha)
+				)
+				{
+
+
+
+				/*transpositionTable::getInstance().store(posKey,
 						transpositionTable::scoreToTT(value, ply),
-						typeExact,
+						TTtype,
 						std::min(90, depth + 6 * ONE_PLY),
-						ttMove.packed,
-						pos.eval<false>());
+						0,
+						pos.eval<false>());*/
 
 				return value;
+				}
 			}
 		}
 	}
@@ -1370,6 +1399,21 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		
 
 	}
+
+	/*if(testSyzygy)
+	{
+		if( (bestScore >100000 && SyzygyValue < -100000 ) || (bestScore <-100000 && SyzygyValue > 100000 ) )
+		{
+
+
+			sync_cout<<" ARGHHH"<<sync_endl;
+			sync_cout<< displayUci(excludedMove)<<sync_endl;
+			sync_cout<< alpha <<" "<<beta<<sync_endl;
+
+			sync_cout<< bestScore<<" "<<SyzygyValue<<sync_endl;
+			pos.display();
+		}
+	}*/
 	return bestScore;
 
 }

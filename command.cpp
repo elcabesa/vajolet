@@ -127,6 +127,7 @@ void static printUciInfo(void)
 	sync_cout << "option name UCI_ShowCurrLine type check default false" << sync_endl;
 	sync_cout << "option name SyzygyPath type string default <empty>" << sync_endl;
 	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
+	sync_cout << "option name Syzygy50MoveRule type check default true" << sync_endl;
 	sync_cout << "option name ClearHash type button" << sync_endl;
 	sync_cout << "option name PerftUseHash type check default false" << sync_endl;
 	sync_cout << "option name reduceVerbosity type check default false" << sync_endl;

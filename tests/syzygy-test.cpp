@@ -16,7 +16,7 @@ TEST(Syzygy, test)
 	
 	ASSERT_TRUE(myfile.is_open());
 	
-	tb_init("C:/vajolet/syzygy");
+	tb_init("D:/vajolet/syzygy");
 	ASSERT_TRUE(TB_LARGEST > 0);
 	
 	
