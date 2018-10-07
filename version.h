@@ -14,31 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef HASHKEYS_H_
-#define HASHKEYS_H_
 
+#ifndef VERSION_H_
+#define VERSION_H_
 
-//---------------------------------
-//	includes
-//---------------------------------
-#include <cstdint>
-#include "tSquare.h"
+#define PROGRAM_NAME	"Vajolet2"
+#define VERSION			"2.7.0"
+#define PRE_RELEASE		"-PRE-18"
 
-//---------------------------------
-//	structure
-//---------------------------------
-struct HashKeys
-{
-	static uint64_t keys[squareNumber][30];	// position, piece (not all the keys are used)
-	static uint64_t side;					// side to move (black)
-	static uint64_t ep[squareNumber];		// ep targets (only 16 used)
-	static uint64_t castlingRight[16];		// white king-side castling right
-	static uint64_t exclusion;
-
-
-	static void init();       // initialize the random data
-};
-
-
-
-#endif /* HASHKEYS_H_ */
+#endif

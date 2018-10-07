@@ -19,25 +19,19 @@
 //	include
 //---------------------------------------------
 #include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <chrono>
-#include <iterator>
-#include "vajolet.h"
+
+#include "benchmark.h"
 #include "command.h"
 #include "io.h"
-#include "position.h"
 #include "movegen.h"
-#include "move.h"
+#include "parameters.h"
+#include "position.h"
 #include "search.h"
+#include "syzygy/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"
-#include "benchmark.h"
-#include "syzygy/tbprobe.h"
-#include "parameters.h"
-
-
+#include "version.h"
+#include "vajolet.h"
 
 
 //---------------------------------------------
@@ -95,6 +89,25 @@ char getPieceName( const unsigned int idx )
 	return PIECE_NAMES_FEN[ idx ];
 }
 
+std::string getProgramNameAndVersion()
+{
+	std::string s = PROGRAM_NAME;
+	s += " ";
+	s += VERSION;
+	s += PRE_RELEASE;
+	return s;
+}
+
+/*	\brief print the start message
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
+void static printStartMessage(void)
+{
+	sync_cout << "id name " << getProgramNameAndVersion() << sync_endl;
+}
+
 /*	\brief print the uci reply
 	\author Marco Belli
 	\version 1.0
@@ -102,7 +115,7 @@ char getPieceName( const unsigned int idx )
 */
 void static printUciInfo(void)
 {
-	sync_cout << "id name " << PROGRAM_NAME << " " << VERSION PRE_RELEASE << sync_endl;
+	sync_cout << "id name " << getProgramNameAndVersion() << sync_endl;
 	sync_cout << "id author Marco Belli" << sync_endl;
 	sync_cout << "option name Hash type spin default 1 min 1 max 65535" << sync_endl;
 	sync_cout << "option name Threads type spin default 1 min 1 max 128" << sync_endl;
@@ -110,7 +123,7 @@ void static printUciInfo(void)
 	sync_cout << "option name Ponder type check default true" << sync_endl;
 	sync_cout << "option name OwnBook type check default true" <<sync_endl;
 	sync_cout << "option name BestMoveBook type check default false"<<sync_endl;
-	sync_cout << "option name UCI_EngineAbout type string default " << PROGRAM_NAME << " " << VERSION PRE_RELEASE<< " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
+	sync_cout << "option name UCI_EngineAbout type string default " << getProgramNameAndVersion() << " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
 	sync_cout << "option name UCI_ShowCurrLine type check default false" << sync_endl;
 	sync_cout << "option name SyzygyPath type string default <empty>" << sync_endl;
 	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
@@ -507,6 +520,7 @@ void setvalue(std::istringstream& is)
 */
 void uciLoop()
 {
+	printStartMessage();
 	my_thread *thr = my_thread::getInstance();
 	Position pos;
 	pos.setupFromFen(StartFEN);
@@ -647,7 +661,7 @@ std::string displayUci(const Move & m){
 	//promotion
 	if(m.bit.flags == Move::fpromotion)
 	{
-		s += PIECE_NAMES_FEN[m.bit.promotion+Position::blackQueens];
+		s += getPieceName( m.bit.promotion + Position::blackQueens );
 	}
 	return s;
 
@@ -738,7 +752,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	// 1 ) use the name of the piece if it's not a pawn move
 	if( !pawnMove )
 	{
-		s+=PIECE_NAMES_FEN[piece % Position::separationBitmap];
+		s+= getPieceName( piece % Position::separationBitmap );
 	}
 	if( fileFlag )
 	{
@@ -772,7 +786,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	if(isPromotion)
 	{
 		s += "=";
-		s += PIECE_NAMES_FEN[m.bit.promotion + Position::whiteQueens];
+		s +=  getPieceName( m.bit.promotion + Position::whiteQueens);
 	}
 	// add check information
 	if( check  )

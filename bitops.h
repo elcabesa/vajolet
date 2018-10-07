@@ -18,8 +18,12 @@
 #ifndef BITOPS_H_
 #define BITOPS_H_
 
-#include "vajolet.h"
+#include <cstdint>
 
+#include "tSquare.h"
+
+
+typedef uint64_t bitMap;			/*!< 64 bit bitMap*/
 
 //-----------------------------------------------------------------------------
 //	inline function

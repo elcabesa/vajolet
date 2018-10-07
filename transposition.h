@@ -17,16 +17,14 @@
 #ifndef TRANSPOSITION_H_
 #define TRANSPOSITION_H_
 
-#include "vajolet.h"
+
 #include <algorithm>
-#include <stdlib.h>
-#include <cstring>
 #include <array>
+#include <cstdint>
 #include <vector>
 
-
-
-
+#include "score.h"
+#include "vajolet.h"
 
 enum ttType
 {
@@ -133,7 +131,7 @@ public:
 	void newSearch() { generation++; }
 	unsigned long int setSize(unsigned long int mbSize);
 
-	inline ttCluster& findCluster(U64 key)
+	inline ttCluster& findCluster(uint64_t key)
 	{
 		return table[ static_cast<size_t>(((unsigned int)key) % elements) ];
 	}
@@ -143,9 +141,9 @@ public:
 		tte.setGeneration(generation);
 	}
 
-	ttEntry* probe(const U64 key);
+	ttEntry* probe(const uint64_t key);
 
-	void store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
+	void store(const uint64_t key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
 	
 	
 
@@ -202,8 +200,8 @@ class PerftTranspositionTable
 public:
 	PerftTranspositionTable(){}
 	
-	void store(const U64 key, signed short int depth, unsigned long long v);
-	bool retrieve(const U64 key, unsigned int depth, unsigned long long& res);
+	void store(const uint64_t key, signed short int depth, unsigned long long v);
+	bool retrieve(const uint64_t key, unsigned int depth, unsigned long long& res);
 };
 
 

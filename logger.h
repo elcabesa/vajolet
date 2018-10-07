@@ -21,8 +21,10 @@
 #include <iostream>
 #include <fstream>
 #include <stack>
-#include "move.h"
+
 #include "command.h"
+#include "move.h"
+
 
 class logger
 {

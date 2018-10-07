@@ -14,31 +14,28 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef HASHKEYS_H_
-#define HASHKEYS_H_
 
+#ifndef SCORE_H_
+#define SCORE_H_
 
-//---------------------------------
-//	includes
-//---------------------------------
 #include <cstdint>
-#include "tSquare.h"
 
-//---------------------------------
-//	structure
-//---------------------------------
-struct HashKeys
-{
-	static uint64_t keys[squareNumber][30];	// position, piece (not all the keys are used)
-	static uint64_t side;					// side to move (black)
-	static uint64_t ep[squareNumber];		// ep targets (only 16 used)
-	static uint64_t castlingRight[16];		// white king-side castling right
-	static uint64_t exclusion;
+//---------------------------------------------
+//	typedefs
+//---------------------------------------------
+typedef int simdScore __attribute__ ((vector_size (16)));
+typedef int32_t Score;					/*!< score saved as a single signed int value*/
 
+//---------------------------------------------
+//SCORE DEFINITION
+//---------------------------------------------
 
-	static void init();       // initialize the random data
-};
+const Score SCORE_NONE = 1700001;
+const Score SCORE_INFINITE = 1700000;
+const Score SCORE_MATE = 1699990;
+const Score SCORE_MATED = -SCORE_MATE;
+const Score SCORE_MATE_IN_MAX_PLY = 1690000;
+const Score SCORE_KNOWN_WIN = 1500000;
+const Score SCORE_MATED_IN_MAX_PLY = -SCORE_MATE_IN_MAX_PLY;
 
-
-
-#endif /* HASHKEYS_H_ */
+#endif

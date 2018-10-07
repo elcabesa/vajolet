@@ -14,14 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#include <utility>
 
-#include <iomanip>
+#include <cstdint>
+
 #include "position.h"
-#include "move.h"
 #include "bitops.h"
 #include "movegen.h"
-#include "eval.h"
 
   
  
@@ -32,7 +30,7 @@
 
 
 
-std::unordered_map<U64, Position::materialStruct> Position::materialKeyMap;
+std::unordered_map<uint64_t, Position::materialStruct> Position::materialKeyMap;
 
 
 bool Position::evalKxvsK(Score& res)
@@ -672,7 +670,7 @@ void Position::initMaterialKeys(void)
 
 
 	Position p;
-	U64 key;
+	uint64_t key;
 
 	static const struct{
 		std::string fen;

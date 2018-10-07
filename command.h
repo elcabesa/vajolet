@@ -19,11 +19,11 @@
 #define COMMAND_H_
 
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include "vajolet.h"
 #include "move.h"
+#include "score.h"
 //--------------------------------------------------------------------
 //	forward declaration
 //--------------------------------------------------------------------
@@ -34,12 +34,10 @@ class PVline;
 //--------------------------------------------------------------------
 //	function prototype
 //--------------------------------------------------------------------
-
 void uciLoop(void);
 char getPieceName( const unsigned int idx );
-
-std::string displayUci(const Move & m);
-std::string displayMove(const Position& pos,const Move & m);
+std::string displayUci( const Move& m );
+std::string displayMove( const Position& pos, const Move& m );
 
 
 
@@ -70,12 +68,6 @@ public:
 	virtual void printBestMove( const Move bm, const Move ponder = Move(0)  ) const = 0;
 	virtual void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const = 0;
 	
-	
-	
 };
-
-
-
-
 
 #endif /* COMMAND_H_ */

@@ -15,16 +15,17 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <utility>
-
+#include <cstdint>
 #include <iomanip>
-#include "position.h"
-#include "move.h"
+
 #include "bitops.h"
 #include "data.h"
-#include "movegen.h"
 #include "eval.h"
+#include "io.h"
+#include "movegen.h"
 #include "parameters.h"
+#include "position.h"
+
 
 bool enablePawnHash= true;
 
@@ -47,7 +48,7 @@ simdScore traceRes={0,0,0,0};
 //---------------------------------------------
 const Position::materialStruct * Position::getMaterialData()
 {
-	U64 key = getMaterialKey();
+	uint64_t key = getMaterialKey();
 
 	auto got= materialKeyMap.find(key);
 
@@ -117,7 +118,7 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 		{
 			res -= isolatedPawnPenalty;
 		}
-		weakPawns |= BITSET[ sq ];
+		weakPawns |= bitSet( sq );
 	}
 
     if( doubled )
@@ -135,7 +136,7 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 		{
 			res -= backwardPawnPenalty;
 		}
-		weakPawns |= BITSET[ sq ];
+		weakPawns |= bitSet( sq );
 	}
 
     if(chain)
@@ -151,14 +152,14 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 	}
 	else
 	{
-		weakPawns |= BITSET[ sq ];
+		weakPawns |= bitSet( sq );
 	}
 
 
 	//passed pawn
 	if( passed && !doubled )
 	{
-		passedPawns |= BITSET[ sq ];
+		passedPawns |= bitSet( sq );
 	}
 
 	if ( !passed && !isolated && !doubled && !opposed && bitCnt( PASSED_PAWN[c][sq] & theirPawns ) < bitCnt(PASSED_PAWN[c][sq-pawnPush(c)] & ourPawns ) )
@@ -363,14 +364,14 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		}
 		case Position::whiteBishops:
 		case Position::blackBishops:
-			if(relativeRank >= 4 && (enemyWeakSquares & BITSET[sq]))
+			if(relativeRank >= 4 && (enemyWeakSquares & bitSet( sq )))
 			{
 				res += bishopOnOutpost;
-				if(supportedSquares & BITSET[sq])
+				if(supportedSquares & bitSet( sq ))
 				{
 					res += bishopOnOutpostSupported;
 				}
-				if(enemyHoles & BITSET[sq])
+				if(enemyHoles & bitSet( sq ))
 				{
 					res += bishopOnHole;
 				}
@@ -389,14 +390,14 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 			break;
 		case Position::whiteKnights:
 		case Position::blackKnights:
-			if(enemyWeakSquares & BITSET[sq])
+			if(enemyWeakSquares & bitSet( sq ))
 			{
 				res += knightOnOutpost * ( 5 - std::abs( (int)relativeRank - 5 ));
-				if(supportedSquares & BITSET[sq])
+				if(supportedSquares & bitSet( sq ))
 				{
 					res += knightOnOutpostSupported;
 				}
-				if(enemyHoles & BITSET[sq])
+				if(enemyHoles & bitSet( sq ))
 				{
 					res += knightOnHole;
 				}
@@ -662,7 +663,7 @@ Score Position::eval(void)
 	{
 		kingRing[white] |= Movegen::attackFrom<Position::whiteKing>( tSquare( k + 8) );
 	}
-	kingFarShield[white] = kingRing[white] & ~( kingShield[white] | BITSET[k] );
+	kingFarShield[white] = kingRing[white] & ~( kingShield[white] | bitSet( k ) );
 
 
 	k = getSquareOfThePiece(blackKing);
@@ -672,7 +673,7 @@ Score Position::eval(void)
 	{
 		kingRing[black] |= Movegen::attackFrom<Position::whiteKing>( tSquare( k - 8 ) );
 	}
-	kingFarShield[black] = kingRing[black] & ~( kingShield[black] | BITSET[k] );
+	kingFarShield[black] = kingRing[black] & ~( kingShield[black] | bitSet( k ) );
 
 	// todo modificare valori material value & pst
 	// material + pst
@@ -805,7 +806,7 @@ Score Position::eval(void)
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
 	simdScore pawnResult;
-	U64 pawnKey = getPawnKey();
+	uint64_t pawnKey = getPawnKey();
 	pawnEntry& probePawn = pawnHashTable.probe(pawnKey);
 	if( enablePawnHash && (probePawn.key == pawnKey) )
 	{

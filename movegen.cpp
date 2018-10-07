@@ -17,13 +17,11 @@
 
 
 #include <functional>
-#include "vajolet.h"
-#include "move.h"
-#include "movegen.h"
-#include "data.h"
+
 #include "bitops.h"
-#include "history.h"
-#include "magicmoves.h"
+#include "data.h"
+#include "movegen.h"
+#include "vajolet.h"
 
 
 
@@ -650,6 +648,11 @@ void Movegen::generateMoves<Movegen::allMg>()
 
 }
 
+inline unsigned int  Movegen::getGeneratedMoveNumber(void) const
+{
+	return moveListEnd-moveList.begin();
+}
+
 unsigned int Movegen::getNumberOfLegalMoves()
 {
 	generateMoves<Movegen::allMg>();
@@ -855,3 +858,77 @@ Move Movegen::getNextMove()
 
 
 }
+
+
+const Move& Movegen::getMoveFromMoveList(unsigned int n) const
+{
+	return moveList[n].m;
+}
+
+inline void Movegen::insertMove(const Move& m)
+{
+	assert(moveListEnd<moveList.end());
+	(moveListEnd++)->m = m;
+}
+
+inline void Movegen::scoreCaptureMoves()
+{
+	for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
+	{
+		mov->score = pos.getMvvLvaScore(mov->m);
+		// history of capture
+		mov->score += src.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) ) * 50;
+
+	}
+}
+
+inline void Movegen::scoreQuietMoves()
+{
+	for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
+	{
+		mov->score = src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
+	}
+}
+
+inline void Movegen::scoreQuietEvasion()
+{
+	for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
+	{
+		mov->score = (pos.getPieceAt((tSquare)mov->m.bit.from));
+		if(pos.getPieceAt((tSquare)mov->m.bit.from) % Position::separationBitmap == Position::King)
+		{
+			mov->score = 20;
+		}
+		mov->score *=500000;
+
+		mov->score += src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
+	}
+}
+
+inline void Movegen::resetMoveList()
+{
+	moveListPosition = moveList.begin();
+	moveListEnd = moveList.begin();
+}
+
+
+inline const Move& Movegen::FindNextBestMove()
+{
+	const auto max = std::max_element(moveListPosition,moveListEnd);
+	if( max != moveListEnd)
+	{
+		std::swap(*max, *moveListPosition);
+		return (moveListPosition++)->m;
+	}
+	return NOMOVE;
+}
+inline void Movegen::RemoveMove(Move m)
+{
+	const auto i = std::find(moveListPosition,moveListEnd,m);
+	if( i != moveListEnd)
+	{
+		std::swap(*i, *moveListPosition);
+		++moveListPosition;
+	}
+}
+

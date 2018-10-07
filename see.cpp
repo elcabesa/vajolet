@@ -15,13 +15,12 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "vajolet.h"
 
-#include "io.h"
+#include "bitops.h"
 #include "move.h"
 #include "position.h"
 #include "movegen.h"
-#include "bitops.h"
+#include "vajolet.h"
 
 
 Score Position::seeSign(const Move& m) const
@@ -34,10 +33,6 @@ Score Position::seeSign(const Move& m) const
 
 	return see(m);
 }
-
-
-
-
 
 Score Position::see(const Move& m) const
 {

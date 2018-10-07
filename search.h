@@ -18,16 +18,17 @@
 #define SEARCH_H_
 
 #include <chrono>
-#include <vector>
-#include <list>
 #include <cmath>
+#include <list>
 #include <string>
-#include "vajolet.h"
+#include <vector>
+
+#include "data.h"
+#include "command.h"
 #include "position.h"
 #include "move.h"
 #include "history.h"
-#include "eval.h"
-#include "command.h"
+#include "vajolet.h"
 
 class PVline : private std::list<Move>
 {
@@ -148,6 +149,9 @@ public:
 class Search
 {
 private:
+
+	static const int ONE_PLY = 16;
+	static const int ONE_PLY_SHIFT = 4;
 	std::unique_ptr<UciOutput> _UOI;
 	
 	int globalReduction;
@@ -168,7 +172,7 @@ private:
 	CaptureHistory captureHistory;
 	CounterMove counterMoves;
 
-	searchData sd[STATE_INFO_LENGTH];
+	searchData sd[800];
 	
 	void cleanMemoryBeforeStartingNewSearch(void);
 	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
@@ -287,13 +291,7 @@ public:
 	
 	Search( std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)){}
 	UciOutput& getUOI(){ return *_UOI;}
-	void setUOI( std::unique_ptr<UciOutput> UOI )
-	{
-		// manage output syncronization
-		sync_cout;
-		_UOI = std::move(UOI);
-		std::cout<<sync_noNewLineEndl;
-	}
+	void setUOI( std::unique_ptr<UciOutput> UOI );
 	
 
 };

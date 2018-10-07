@@ -15,12 +15,12 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <string>
 #include <vector>
 
-#include "position.h"
+#include "io.h"
 #include "search.h"
 #include "transposition.h"
-#include "vajolet.h"
 
 static const std::vector< std::string >positions = {
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -41,12 +41,25 @@ static const std::vector< std::string >positions = {
   "3q2k1/pb3p1p/4pbp1/2r5/PpN2N2/1P2P2P/5PP1/Q2R2K1 b - - 4 26"
 };
 
+static std::string getNodesPerSecond( unsigned long long nodeCount, long long int time )
+{
+	std::string s;
+	if( time == 0 )
+	{
+		s = "---";
+	}
+	else
+	{
+		s = std::to_string( 1000 * nodeCount / time );
+	}
+	return s;
+}
 
 void benchmark(void)
 {
 	transpositionTable::getInstance().setSize(32);
 
-	unsigned long long nodes = 0;
+	unsigned long long nodeCount = 0;
 
 	long long int startTime = Search::getTime();
 
@@ -66,14 +79,14 @@ void benchmark(void)
 		
 		src.startThinking();
 		
-		nodes += src.getVisitedNodes();
+		nodeCount += src.getVisitedNodes();
 	}
 
-	long long int totalTime = Search::getTime() - startTime + 1;
+	long long int totalTime = Search::getTime() - startTime;
 
 	sync_cout << "\n==========================="
        << "\nTotal time (ms) : " << totalTime
-       << "\nNodes searched  : " << nodes
-       << "\nNodes/second    : " << 1000 * nodes / totalTime << sync_endl;
+       << "\nNodes searched  : " << nodeCount
+       << "\nNodes/second    : " << getNodesPerSecond( nodeCount, totalTime ) << sync_endl;
 
 }

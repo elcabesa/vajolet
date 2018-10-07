@@ -31,7 +31,7 @@
 
 //For rooks
 
-#define C64(constantU64) constantU64##ULL
+#define C64(constantuint64_t) constantuint64_t##ULL
 
 
 const unsigned int magicmoves_r_shift[64]=
@@ -46,7 +46,7 @@ const unsigned int magicmoves_r_shift[64]=
 	53, 54, 54, 53, 53, 53, 53, 53
 };
 
-const U64 magicmoves_r_magics[64]=
+const uint64_t magicmoves_r_magics[64]=
 {
 	C64(0x0080001020400080), C64(0x0040001000200040), C64(0x0080081000200080), C64(0x0080040800100080),
 	C64(0x0080020400080080), C64(0x0080010200040080), C64(0x0080008001000200), C64(0x0080002040800100),
@@ -65,7 +65,7 @@ const U64 magicmoves_r_magics[64]=
 	C64(0x00FFFCDDFCED714A), C64(0x007FFCDDFCED714A), C64(0x003FFFCDFFD88096), C64(0x0000040810002101),
 	C64(0x0001000204080011), C64(0x0001000204000801), C64(0x0001000082000401), C64(0x0001FFFAABFAD1A2)
 };
-const U64 magicmoves_r_mask[64]=
+const uint64_t magicmoves_r_mask[64]=
 {	
 	C64(0x000101010101017E), C64(0x000202020202027C), C64(0x000404040404047A), C64(0x0008080808080876),
 	C64(0x001010101010106E), C64(0x002020202020205E), C64(0x004040404040403E), C64(0x008080808080807E),
@@ -98,7 +98,7 @@ const unsigned int magicmoves_b_shift[64]=
 	58, 59, 59, 59, 59, 59, 59, 58
 };
 
-const U64 magicmoves_b_magics[64]=
+const uint64_t magicmoves_b_magics[64]=
 {
 	C64(0x0002020202020200), C64(0x0002020202020000), C64(0x0004010202000000), C64(0x0004040080000000),
 	C64(0x0001104000000000), C64(0x0000821040000000), C64(0x0000410410400000), C64(0x0000104104104000),
@@ -119,7 +119,7 @@ const U64 magicmoves_b_magics[64]=
 };
 
 
-const U64 magicmoves_b_mask[64]=
+const uint64_t magicmoves_b_mask[64]=
 {
 	C64(0x0040201008040200), C64(0x0000402010080400), C64(0x0000004020100A00), C64(0x0000000040221400),
 	C64(0x0000000002442800), C64(0x0000000204085000), C64(0x0000020408102000), C64(0x0002040810204000),
@@ -140,8 +140,8 @@ const U64 magicmoves_b_mask[64]=
 };
 
 
-U64 magicmovesbdb[5248];
-const U64* magicmoves_b_indices[64]=
+uint64_t magicmovesbdb[5248];
+const uint64_t* magicmoves_b_indices[64]=
 {
 	magicmovesbdb+4992, magicmovesbdb+2624,  magicmovesbdb+256,  magicmovesbdb+896,
 	magicmovesbdb+1280, magicmovesbdb+1664, magicmovesbdb+4800, magicmovesbdb+5120,
@@ -162,8 +162,8 @@ const U64* magicmoves_b_indices[64]=
 };
 
 
-U64 magicmovesrdb[102400];
-const U64* magicmoves_r_indices[64]=
+uint64_t magicmovesrdb[102400];
+const uint64_t* magicmoves_r_indices[64]=
 {
 	magicmovesrdb+86016, magicmovesrdb+73728, magicmovesrdb+36864, magicmovesrdb+43008,
 	magicmovesrdb+47104, magicmovesrdb+51200, magicmovesrdb+77824, magicmovesrdb+94208,
@@ -183,41 +183,41 @@ const U64* magicmoves_r_indices[64]=
 	magicmovesrdb+49152, magicmovesrdb+55296, magicmovesrdb+79872, magicmovesrdb+98304
 };
 
-U64 initmagicmoves_occ(const int* squares, const int numSquares, const U64 linocc)
+uint64_t initmagicmoves_occ(const int* squares, const int numSquares, const uint64_t linocc)
 {
 	int i;
-	U64 ret=0;
+	uint64_t ret=0;
 	for(i=0;i<numSquares;i++)
-		if(linocc&(((U64)(1))<<i)) ret|=(((U64)(1))<<squares[i]);
+		if(linocc&(((uint64_t)(1))<<i)) ret|=(((uint64_t)(1))<<squares[i]);
 	return ret;
 }
 
-U64 initmagicmoves_Rmoves(const int square, const U64 occ)
+uint64_t initmagicmoves_Rmoves(const int square, const uint64_t occ)
 {
-	U64 ret=0;
-	U64 bit;
-	U64 rowbits=(((U64)0xFF)<<(8*(square/8)));
+	uint64_t ret=0;
+	uint64_t bit;
+	uint64_t rowbits=(((uint64_t)0xFF)<<(8*(square/8)));
 	
-	bit=(((U64)(1))<<square);
+	bit=(((uint64_t)(1))<<square);
 	do
 	{
 		bit<<=8;
 		ret|=bit;
 	}while(bit && !(bit&occ));
-	bit=(((U64)(1))<<square);
+	bit=(((uint64_t)(1))<<square);
 	do
 	{
 		bit>>=8;
 		ret|=bit;
 	}while(bit && !(bit&occ));
-	bit=(((U64)(1))<<square);
+	bit=(((uint64_t)(1))<<square);
 	do
 	{
 		bit<<=1;
 		if(bit&rowbits) ret|=bit;
 		else break;
 	}while(!(bit&occ));
-	bit=(((U64)(1))<<square);
+	bit=(((uint64_t)(1))<<square);
 	do
 	{
 		bit>>=1;
@@ -227,14 +227,14 @@ U64 initmagicmoves_Rmoves(const int square, const U64 occ)
 	return ret;
 }
 
-U64 initmagicmoves_Bmoves(const int square, const U64 occ)
+uint64_t initmagicmoves_Bmoves(const int square, const uint64_t occ)
 {
-	U64 ret=0;
-	U64 bit;
-	U64 bit2;
-	U64 rowbits=(((U64)0xFF)<<(8*(square/8)));
+	uint64_t ret=0;
+	uint64_t bit;
+	uint64_t bit2;
+	uint64_t rowbits=(((uint64_t)0xFF)<<(8*(square/8)));
 	
-	bit=(((U64)(1))<<square);
+	bit=(((uint64_t)(1))<<square);
 	bit2=bit;
 	do
 	{
@@ -243,7 +243,7 @@ U64 initmagicmoves_Bmoves(const int square, const U64 occ)
 		if(bit2&rowbits) ret|=bit;
 		else break;
 	}while(bit && !(bit&occ));
-	bit=(((U64)(1))<<square);
+	bit=(((uint64_t)(1))<<square);
 	bit2=bit;
 	do
 	{
@@ -252,7 +252,7 @@ U64 initmagicmoves_Bmoves(const int square, const U64 occ)
 		if(bit2&rowbits) ret|=bit;
 		else break;
 	}while(bit && !(bit&occ));
-	bit=(((U64)(1))<<square);
+	bit=(((uint64_t)(1))<<square);
 	bit2=bit;
 	do
 	{
@@ -261,7 +261,7 @@ U64 initmagicmoves_Bmoves(const int square, const U64 occ)
 		if(bit2&rowbits) ret|=bit;
 		else break;
 	}while(bit && !(bit&occ));
-	bit=(((U64)(1))<<square);
+	bit=(((uint64_t)(1))<<square);
 	bit2=bit;
 	do
 	{
@@ -297,7 +297,7 @@ void initmagicmoves(void)
 	};
 
 	//identical to magicmove_x_indices except without the const modifer
-	U64* magicmoves_b_indices2[64]=
+	uint64_t* magicmoves_b_indices2[64]=
 	{
 		magicmovesbdb+4992, magicmovesbdb+2624,  magicmovesbdb+256,  magicmovesbdb+896,
 		magicmovesbdb+1280, magicmovesbdb+1664, magicmovesbdb+4800, magicmovesbdb+5120,
@@ -316,7 +316,7 @@ void initmagicmoves(void)
 		magicmovesbdb+5056, magicmovesbdb+2720,  magicmovesbdb+864, magicmovesbdb+1248,
 		magicmovesbdb+1632, magicmovesbdb+2272, magicmovesbdb+4896, magicmovesbdb+5184
 	};
-	U64* magicmoves_r_indices2[64]=
+	uint64_t* magicmoves_r_indices2[64]=
 	{
 		magicmovesrdb+86016, magicmovesrdb+73728, magicmovesrdb+36864, magicmovesrdb+43008,
 		magicmovesrdb+47104, magicmovesrdb+51200, magicmovesrdb+77824, magicmovesrdb+94208,
@@ -340,16 +340,16 @@ void initmagicmoves(void)
 	{
 		int squares[64];
 		int numsquares=0;
-		U64 temp=magicmoves_b_mask[i];
+		uint64_t temp=magicmoves_b_mask[i];
 		while(temp)
 		{
-			U64 bit=temp&-temp;
+			uint64_t bit=temp&-temp;
 			squares[numsquares++]=initmagicmoves_bitpos64_database[(bit*C64(0x07EDD5E59A4E28C2))>>58];
 			temp^=bit;
 		}
-		for(temp=0;temp<(((U64)(1))<<numsquares);temp++)
+		for(temp=0;temp<(((uint64_t)(1))<<numsquares);temp++)
 		{
-			U64 tempocc=initmagicmoves_occ(squares,numsquares,temp);
+			uint64_t tempocc=initmagicmoves_occ(squares,numsquares,temp);
 			BmagicNOMASK2(i,tempocc)=initmagicmoves_Bmoves(i,tempocc);
 		}
 	}
@@ -357,16 +357,16 @@ void initmagicmoves(void)
 	{
 		int squares[64];
 		int numsquares=0;
-		U64 temp=magicmoves_r_mask[i];
+		uint64_t temp=magicmoves_r_mask[i];
 		while(temp)
 		{
-			U64 bit=temp&-temp;
+			uint64_t bit=temp&-temp;
 			squares[numsquares++]=initmagicmoves_bitpos64_database[(bit*C64(0x07EDD5E59A4E28C2))>>58];
 			temp^=bit;
 		}
-		for(temp=0;temp<(((U64)(1))<<numsquares);temp++)
+		for(temp=0;temp<(((uint64_t)(1))<<numsquares);temp++)
 		{
-			U64 tempocc=initmagicmoves_occ(squares,numsquares,temp);
+			uint64_t tempocc=initmagicmoves_occ(squares,numsquares,temp);
 			RmagicNOMASK2(i,tempocc)=initmagicmoves_Rmoves(i,tempocc);
 		}
 	}

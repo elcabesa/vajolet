@@ -15,14 +15,6 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <utility>
-
-#include <iomanip>
-#include "position.h"
-#include "move.h"
-#include "bitops.h"
-#include "movegen.h"
-#include "eval.h"
 #include "parameters.h"
 
 

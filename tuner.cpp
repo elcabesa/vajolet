@@ -16,8 +16,7 @@
 */
 
 #include <algorithm>
-
-#include "vajolet.h"
+#include <random>
 #include "command.h"
 #include "io.h"
 #include "bitops.h"
@@ -27,6 +26,7 @@
 #include "movegen.h"
 #include "transposition.h"
 #include "search.h"
+#include "score.h"
 #include "eval.h"
 #include "parameters.h"
 #include "syzygy/tbprobe.h"
@@ -35,7 +35,7 @@
 #include <fstream>
 
 const int arraySize = 200;
-const int arrayScaling = 300;
+//const int arrayScaling = 300;
 unsigned long long int array[arraySize]= {0};
 
 std::ifstream infile("oracle.epd");

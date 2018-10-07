@@ -18,18 +18,13 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
-#include <thread>
-#include <mutex>
-#include <chrono>
+#include <cstdint>
 #include <condition_variable>
-#include <list>
+#include <mutex>
+#include <thread>
+
 #include "position.h"
 #include "search.h"
-#include "transposition.h"
-#include "command.h"
-#include "movegen.h"
-
-
 
 struct timeManagementStruct
 {
@@ -53,7 +48,7 @@ class Game
 public:
 	struct GamePosition
 	{
-		U64 key;
+		uint64_t key;
 		Move m;
 		PVline PV;
 		Score alpha;
