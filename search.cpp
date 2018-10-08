@@ -745,15 +745,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				
 				if(	TTtype == typeExact || (TTtype == typeScoreHigherThanBeta  && value >=beta) || (TTtype == typeScoreLowerThanAlpha && value <=alpha)	)
 				{
-
-
-
-				/*transpositionTable::getInstance().store(posKey,
+					transpositionTable::getInstance().store(posKey,
 						transpositionTable::scoreToTT(value, ply),
 						TTtype,
 						std::min(90, depth + 6 * ONE_PLY),
 						0,
-						pos.eval<false>());*/
+						pos.eval<false>());
 
 				return value;
 				}
