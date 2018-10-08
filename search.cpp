@@ -743,13 +743,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				testSyzygy = true;
 				SyzygyValue = value;
 				
-				if(false
-						//TTtype == typeExact
-						//||
-						//(TTtype == typeScoreHigherThanBeta  && value >=beta)
-						//||
-						//(TTtype == typeScoreLowerThanAlpha && value <=alpha)
-				)
+				if(	TTtype == typeExact || (TTtype == typeScoreHigherThanBeta  && value >=beta) || (TTtype == typeScoreLowerThanAlpha && value <=alpha)	)
 				{
 
 
