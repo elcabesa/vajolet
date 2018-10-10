@@ -51,6 +51,9 @@
 	}
 #endif
 
+const int Search::ONE_PLY;
+const int Search::ONE_PLY_SHIFT;
+
 Search defaultSearch;
 std::vector<Move> Search::rootMoves;
 
