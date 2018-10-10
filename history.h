@@ -23,7 +23,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "bitboardIndex.h"
+#include "bitBoardIndex.h"
 #include "move.h"
 #include "position.h"
 #include "score.h"
