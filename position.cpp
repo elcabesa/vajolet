@@ -370,9 +370,9 @@ void Position::clear()
 	{
 		bitBoard[i] = 0;
 	}
-	stateInfo2.clear();
-	stateInfo2.emplace_back(state());
-	actualState = &stateInfo2.back();
+	stateInfo.clear();
+	stateInfo.emplace_back(state());
+	actualState = &stateInfo.back();
 
 }
 
@@ -1576,7 +1576,7 @@ bool Position::isDraw(bool isPVline) const
 	// Draw by repetition?
 	unsigned int counter=1;
 	uint64_t actualkey = getActualStateConst().key;
-	auto it = stateInfo2.rbegin();
+	auto it = stateInfo.rbegin();
 	
 
 	int e = std::min(getActualStateConst().fiftyMoveCnt, getActualStateConst().pliesFromNull);
@@ -1864,9 +1864,9 @@ bool Position::isMoveLegal(const Move &m)const
 
 Position::Position()
 {
-	stateInfo2.clear();
-	stateInfo2.emplace_back(state());
-	actualState = &stateInfo2.back();
+	stateInfo.clear();
+	stateInfo.emplace_back(state());
+	actualState = &stateInfo.back();
 
 
 	actualState->nextMove = whiteTurn;
@@ -1878,8 +1878,8 @@ Position::Position()
 
 Position::Position(const Position& other)// calls the copy constructor of the age
 {
-	stateInfo2 = other.stateInfo2;
-	actualState = &stateInfo2.back();
+	stateInfo = other.stateInfo;
+	actualState = &stateInfo.back();
 
 
 
@@ -1902,8 +1902,8 @@ Position& Position::operator=(const Position& other)
 	if (this == &other)
 		return *this;
 
-	stateInfo2 = other.stateInfo2;
-	actualState = &stateInfo2.back();
+	stateInfo = other.stateInfo;
+	actualState = &stateInfo.back();
 
 
 	for(int i = 0; i < squareNumber; i++)
