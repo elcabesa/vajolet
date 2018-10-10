@@ -43,7 +43,6 @@ void Position::initPstValues(void)
 	{
 		for(tSquare s = (tSquare)0; s < squareNumber; s++)
 		{
-			assert( isValidPiece( (bitboardIndex)piece ) );
 			assert(s<squareNumber);
 			nonPawnValue[piece] = simdScore{0,0,0,0};
 			pstValue[piece][s] = simdScore{0,0,0,0};
@@ -1027,9 +1026,10 @@ void Position::undoMove()
 	movePiece(piece,to,from);
 
 
-	assert( isValidPiece(x.capturedPiece) );
+	assert( isValidPiece(x.capturedPiece) || x.capturedPiece == empty);
 	if(x.capturedPiece)
 	{
+		
 		tSquare capSq = to;
 		if( m.isEnPassantMove() ){
 			capSq += pawnPush(x.nextMove);
@@ -1327,7 +1327,7 @@ inline void Position::calcCheckingSquares(void)
 	bitboardIndex opponentKing = (bitboardIndex)(blackKing-s.nextMove);
 	assert( isKing(opponentKing));
 	bitboardIndex attackingPieces = (bitboardIndex)(s.nextMove);
-	assert( isValidPiece(attackingPieces));
+	//assert( isValidPiece(attackingPieces));
 
 
 	tSquare kingSquare = getSquareOfThePiece(opponentKing);
@@ -1607,7 +1607,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 	const state &s = getActualStateConst();
 	const bitboardIndex piece = squares[m.bit.from];
-	assert( isValidPiece( piece ) );
+	assert( isValidPiece( piece ) || piece == empty );
 
 	// pezzo inesistente
 	if(piece == empty)

@@ -74,7 +74,7 @@ Score Position::see(const Move& m) const
 
 	// If the opponent has no attackers we are finished
 	color = (eNextMove)(blackTurn - color);
-	assert( isValidPiece( (bitboardIndex)( Pieces + color ) ) );
+	assert( (bitboardIndex)( Pieces + color ) == blackPieces || (bitboardIndex)( Pieces + color ) == whitePieces );
 	colorAttackers = attackers & getBitmap((bitboardIndex)(Pieces + color));
 
 

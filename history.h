@@ -78,20 +78,30 @@ public :
 	inline void clear() { std::memset(table, 0, sizeof(table)); }
 
 
-	inline void update( const bitboardIndex p, const Move& m, const bitboardIndex captured,  Score v)
+	inline void update( const bitboardIndex p, const Move& m, bitboardIndex captured,  Score v)
 	{
 				
 		const int W = 2;
 		const int D = 324;
+		
+		if( captured == empty && m.bit.flags == Move::fenpassant )
+		{
+			captured = ( bitboardIndex )(Pawns + ( isblack( p ) ? whitePawns : blackPawns ));
+		}
+		
 		assert( isValidPiece( p ));
-		assert( isValidPiece( captured) );
+		assert( isValidPiece( captured ) );
 		const tSquare to = (tSquare)m.bit.to;
 
 		Score &e = table[p][to][captured];
 		e += v * W - e * std::abs(v)/ D;
 	}
-	inline Score getValue( const bitboardIndex p, const Move& m, const bitboardIndex captured ) const
+	inline Score getValue( const bitboardIndex p, const Move& m, bitboardIndex captured ) const
 	{
+		if( captured == empty && m.bit.flags == Move::fenpassant )
+		{
+			captured = ( bitboardIndex )(Pawns + ( isblack( p ) ? whitePawns : blackPawns ));
+		}
 		assert( isValidPiece( p ) );
 		assert( isValidPiece( captured ) );
 		const tSquare to = (tSquare)m.bit.to;
