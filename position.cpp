@@ -1895,6 +1895,8 @@ Position::Position(const Position& other)// calls the copy constructor of the ag
 
 	Us=&bitBoard[ getNextTurn() ];
 	Them=&bitBoard[blackTurn - getNextTurn()];
+
+	ply = other.ply;
 };
 
 Position& Position::operator=(const Position& other)
@@ -1917,6 +1919,8 @@ Position& Position::operator=(const Position& other)
 
 	Us = &bitBoard[ getNextTurn() ];
 	Them = &bitBoard[blackTurn-getNextTurn()];
+
+	ply = other.ply;
 
 	return *this;
 };
