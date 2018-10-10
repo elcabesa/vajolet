@@ -43,7 +43,7 @@ void Position::initPstValues(void)
 	{
 		for(tSquare s = (tSquare)0; s < squareNumber; s++)
 		{
-			assert(piece<lastBitboard);
+			assert( isValidPiece( (bitboardIndex)piece ) );
 			assert(s<squareNumber);
 			nonPawnValue[piece] = simdScore{0,0,0,0};
 			pstValue[piece][s] = simdScore{0,0,0,0};
@@ -835,8 +835,7 @@ void Position::doMove(const Move & m){
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		assert(rFrom<squareNumber);
 		bitboardIndex rook = squares[rFrom];
-		assert(rook<lastBitboard);
-		assert(isRook(rook));
+		assert( isRook(rook) );
 		tSquare rTo = kingSide? to+ovest: to+est;
 		assert(rTo<squareNumber);
 		movePiece(rook,rFrom,rTo);
@@ -915,7 +914,7 @@ void Position::doMove(const Move & m){
 		if( m.isPromotionMove() )
 		{
 			bitboardIndex promotedPiece = (bitboardIndex)(whiteQueens + x.nextMove + m.bit.promotion);
-			assert(promotedPiece<lastBitboard);
+			assert( isValidPiece(promotedPiece) );
 			removePiece(piece,to);
 			putPiece(promotedPiece,to);
 
@@ -1020,8 +1019,7 @@ void Position::undoMove()
 		assert(rFrom<squareNumber);
 		assert(rTo<squareNumber);
 		bitboardIndex rook = squares[rTo];
-		assert(rook<lastBitboard);
-		assert(isRook(rook));
+		assert( isRook(rook) );
 		movePiece(rook,rTo,rFrom);
 
 	}
@@ -1029,7 +1027,7 @@ void Position::undoMove()
 	movePiece(piece,to,from);
 
 
-	assert(x.capturedPiece<lastBitboard);
+	assert( isValidPiece(x.capturedPiece) );
 	if(x.capturedPiece)
 	{
 		tSquare capSq = to;
@@ -1327,9 +1325,9 @@ inline void Position::calcCheckingSquares(void)
 {
 	state &s = getActualState();
 	bitboardIndex opponentKing = (bitboardIndex)(blackKing-s.nextMove);
-	assert(opponentKing<lastBitboard);
+	assert( isKing(opponentKing));
 	bitboardIndex attackingPieces = (bitboardIndex)(s.nextMove);
-	assert(attackingPieces<lastBitboard);
+	assert( isValidPiece(attackingPieces));
 
 
 	tSquare kingSquare = getSquareOfThePiece(opponentKing);
@@ -1338,7 +1336,7 @@ inline void Position::calcCheckingSquares(void)
 
 	s.checkingSquares[whiteKing+attackingPieces]=0;
 	assert(kingSquare<squareNumber);
-	assert(whitePawns+attackingPieces<lastBitboard);
+	assert( isValidPiece( (bitboardIndex)( whitePawns + attackingPieces ) ) );
 	s.checkingSquares[whiteRooks+attackingPieces] = Movegen::attackFrom<whiteRooks>(kingSquare,occupancy);
 	s.checkingSquares[whiteBishops+attackingPieces] = Movegen::attackFrom<whiteBishops>(kingSquare,occupancy);
 	s.checkingSquares[whiteQueens+attackingPieces] = s.checkingSquares[whiteRooks+attackingPieces]|s.checkingSquares[whiteBishops+attackingPieces];
@@ -1370,7 +1368,7 @@ inline void Position::calcCheckingSquares(void)
 bitMap Position::getHiddenCheckers(const tSquare kingSquare,const eNextMove next) const
 {
 	assert(kingSquare<squareNumber);
-	assert(whitePawns+next<lastBitboard);
+	assert( isValidPiece( (bitboardIndex)( whitePawns + next ) ) );
 	bitMap result = 0;
 	bitMap pinners = Movegen::getBishopPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteBishops+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
 	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteRooks+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
@@ -1451,13 +1449,13 @@ bool Position::moveGivesCheck(const Move& m)const
 	{
 	case Move::fpromotion:
 	{
-		assert((bitboardIndex)(whiteQueens+s.nextMove+m.bit.promotion)<lastBitboard);
+		assert( isValidPiece( (bitboardIndex)(whiteQueens + s.nextMove + m.bit.promotion ) ) );
 		if (s.checkingSquares[whiteQueens+s.nextMove+m.bit.promotion] & bitSet(to))
 		{
 			return true;
 		}
 		bitMap occ= bitBoard[occupiedSquares] ^ bitSet(from);
-		assert((bitboardIndex)(whiteQueens+m.bit.promotion)<lastBitboard);
+		assert( isValidPiece( (bitboardIndex)(whiteQueens + m.bit.promotion ) ) );
 		switch(m.bit.promotion)
 		{
 			case Move::promQueen:
@@ -1609,7 +1607,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 	const state &s = getActualStateConst();
 	const bitboardIndex piece = squares[m.bit.from];
-	assert(piece<lastBitboard);
+	assert( isValidPiece( piece ) );
 
 	// pezzo inesistente
 	if(piece == empty)
@@ -1929,7 +1927,7 @@ Position& Position::operator=(const Position& other)
 inline void Position::putPiece(const bitboardIndex piece,const tSquare s)
 {
 	assert(s<squareNumber);
-	assert(piece<lastBitboard);
+	assert( isValidPiece( piece ) );
 	bitboardIndex color = piece > separationBitmap ? blackPieces : whitePieces;
 	bitMap b=bitSet(s);
 
@@ -1950,7 +1948,7 @@ inline void Position::movePiece(const bitboardIndex piece,const tSquare from,con
 {
 	assert(from<squareNumber);
 	assert(to<squareNumber);
-	assert(piece<lastBitboard);
+	assert( isValidPiece( piece ) );
 	// index[from] is not updated and becomes stale. This works as long
 	// as index[] is accessed just by known occupied squares.
 	assert(squares[from]!=empty);
@@ -1975,7 +1973,7 @@ inline void Position::removePiece(const bitboardIndex piece,const tSquare s)
 
 	assert(!isKing(piece));
 	assert(s<squareNumber);
-	assert(piece<lastBitboard);
+	assert( isValidPiece( piece) );
 	assert(squares[s]!=empty);
 
 	// WARNING: This is not a reversible operation. If we remove a piece in

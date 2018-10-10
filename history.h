@@ -83,8 +83,8 @@ public :
 				
 		const int W = 2;
 		const int D = 324;
-		assert(p<lastBitboard);
-		assert(captured<lastBitboard);
+		assert( isValidPiece( p ));
+		assert( isValidPiece( captured) );
 		const tSquare to = (tSquare)m.bit.to;
 
 		Score &e = table[p][to][captured];
@@ -92,8 +92,8 @@ public :
 	}
 	inline Score getValue( const bitboardIndex p, const Move& m, const bitboardIndex captured ) const
 	{
-		assert(p<lastBitboard);
-		assert(captured<lastBitboard);
+		assert( isValidPiece( p ) );
+		assert( isValidPiece( captured ) );
 		const tSquare to = (tSquare)m.bit.to;
 		return table[p][to][captured];
 	}
@@ -115,7 +115,7 @@ public :
 	inline void update( const bitboardIndex p, const tSquare to, const Move m)
 	{
 
-		assert(p<lastBitboard);
+		assert( isValidPiece( p ) );
 		assert(to<squareNumber);
 		Move * const mm =  table[p][to];
 		if(mm[0] != m)
@@ -128,7 +128,7 @@ public :
 	inline const Move& getMove( const bitboardIndex p, const tSquare to, const unsigned int pos ) const
 	{
 		assert( pos < 2 );
-		assert(p<lastBitboard);
+		assert( isValidPiece( p ) );
 		assert(to<squareNumber);
 		return table[p][to][pos];
 	}

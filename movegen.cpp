@@ -229,8 +229,8 @@ void Movegen::generateMoves()
 	// king
 	//------------------------------------------------------
 	bitboardIndex piece = (bitboardIndex)( s.nextMove + whiteKing );
-	assert(pos.isKing(piece));
-	assert(piece<lastBitboard);
+	assert( isKing(piece) );
+	assert( isValidPiece(piece) );
 
 	{
 		m.bit.from = kingSquare;

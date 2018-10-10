@@ -213,12 +213,7 @@ public:
 
 	template<bitboardIndex piece> inline static bitMap attackFrom(const tSquare& from,const bitMap & occupancy=0xffffffffffffffff)
 	{
-		assert(piece<lastBitboard);
-		assert(piece!=occupiedSquares);
-		assert(piece!=whitePieces);
-		assert(piece!=blackPieces);
-		assert(piece!=blackPieces);
-		assert(piece!=separationBitmap);
+		assert( isValidPiece( piece ));
 		assert(from<squareNumber);
 		switch(piece)
 		{

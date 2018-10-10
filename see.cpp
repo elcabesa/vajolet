@@ -74,7 +74,7 @@ Score Position::see(const Move& m) const
 
 	// If the opponent has no attackers we are finished
 	color = (eNextMove)(blackTurn - color);
-	assert(Pieces + color < lastBitboard);
+	assert( isValidPiece( (bitboardIndex)( Pieces + color ) ) );
 	colorAttackers = attackers & getBitmap((bitboardIndex)(Pieces + color));
 
 
@@ -92,7 +92,7 @@ Score Position::see(const Move& m) const
 	// new X-ray attacks from behind the capturing piece.
 
 	//std::cout<<"DEBUG start the loop "<<swapList[0]<<std::endl;
-	assert(captured<lastBitboard);
+	assert( isValidPiece( captured ) );
 	assert(getPieceAt(from) != empty);
 	do
 	{

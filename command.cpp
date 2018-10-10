@@ -85,7 +85,7 @@ public:
 
 char getPieceName( const unsigned int idx )
 {
-	assert( idx < lastBitboard );
+	assert( isValidPiece( (bitboardIndex)idx ) );
 	return PIECE_NAMES_FEN[ idx ];
 }
 

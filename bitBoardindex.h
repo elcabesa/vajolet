@@ -109,6 +109,16 @@
 	{
 		return piece & 8;
 	}
+	
+		/*! \brief tell the color of a piece
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	inline static bool isValidPiece(bitboardIndex piece)
+	{
+		return piece < lastBitboard && piece != occupiedSquares && piece != whitePieces && piece != separationBitmap && piece != blackPieces;
+	}
 
 
 #endif /* BITBOARDINDEX_H_ */
