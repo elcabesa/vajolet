@@ -86,7 +86,7 @@ public :
 		
 		if( captured == empty && m.bit.flags == Move::fenpassant )
 		{
-			captured = ( bitboardIndex )(Pawns + ( isblack( p ) ? whitePawns : blackPawns ));
+			captured = ( isblack( p ) ? whitePawns : blackPawns );
 		}
 		
 		assert( isValidPiece( p ));
@@ -100,7 +100,7 @@ public :
 	{
 		if( captured == empty && m.bit.flags == Move::fenpassant )
 		{
-			captured = ( bitboardIndex )(Pawns + ( isblack( p ) ? whitePawns : blackPawns ));
+			captured = ( isblack( p ) ? whitePawns : blackPawns );
 		}
 		assert( isValidPiece( p ) );
 		assert( isValidPiece( captured ) );

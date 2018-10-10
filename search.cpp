@@ -1357,16 +1357,22 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 		else
 		{
-			// update capture history
-			int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
-			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
-
-			captureHistory.update( pos.getPieceAt((tSquare)bestMove.bit.from), bestMove, pos.getPieceAt((tSquare)bestMove.bit.to), bonus);
-
-			for (unsigned int i = 0; i < captureMoveCount; i++)
+			if( pos.isCaptureMove( bestMove ) )
 			{
-				Move m = captureMoveList[i];
-				captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), m, pos.getPieceAt((tSquare)m.bit.to), -bonus);
+				// update capture history
+				int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
+				Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
+
+				captureHistory.update( pos.getPieceAt((tSquare)bestMove.bit.from), bestMove, pos.getPieceAt((tSquare)bestMove.bit.to), bonus);
+
+				for (unsigned int i = 0; i < captureMoveCount; i++)
+				{
+					Move m = captureMoveList[i];
+					if( pos.isCaptureMove( m ) )
+					{
+						captureHistory.update( pos.getPieceAt((tSquare)m.bit.from), m, pos.getPieceAt((tSquare)m.bit.to), -bonus);
+					}
+				}
 			}
 		}
 		
