@@ -85,7 +85,7 @@ public:
 
 char getPieceName( const unsigned int idx )
 {
-	assert( idx < Position::lastBitboard );
+	assert( idx < lastBitboard );
 	return PIECE_NAMES_FEN[ idx ];
 }
 
@@ -652,7 +652,7 @@ std::string displayUci(const Move & m){
 	//promotion
 	if(m.bit.flags == Move::fpromotion)
 	{
-		s += getPieceName( m.bit.promotion + Position::blackQueens );
+		s += getPieceName( m.bit.promotion + blackQueens );
 	}
 	return s;
 
@@ -672,8 +672,8 @@ std::string displayMove(const Position& pos, const Move & m)
 	bool check = pos.moveGivesCheck(m);
 	bool doubleCheck = pos.moveGivesDoubleCheck(m);
 	unsigned int legalMoves;
-	Position::bitboardIndex piece = pos.getPieceAt((tSquare)m.bit.from);
-	bool pawnMove = pos.isPawn(piece);
+	bitboardIndex piece = pos.getPieceAt((tSquare)m.bit.from);
+	bool pawnMove = isPawn(piece);
 	bool isPromotion = m.isPromotionMove();
 	bool isEnPassant = m.isEnPassantMove();
 	bool isCastle = m.isCastleMove();
@@ -743,7 +743,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	// 1 ) use the name of the piece if it's not a pawn move
 	if( !pawnMove )
 	{
-		s+= getPieceName( piece % Position::separationBitmap );
+		s+= getPieceName( piece % separationBitmap );
 	}
 	if( fileFlag )
 	{
@@ -777,7 +777,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	if(isPromotion)
 	{
 		s += "=";
-		s +=  getPieceName( m.bit.promotion + Position::whiteQueens);
+		s +=  getPieceName( m.bit.promotion + whiteQueens);
 	}
 	// add check information
 	if( check  )

@@ -14,12 +14,12 @@ typedef struct _positions
 TEST(seeTest, see)
 {
 
-	const Score P = initialPieceValue[Position::Pawns][0];
-	const Score N = initialPieceValue[Position::Knights][0];
-	const Score B = initialPieceValue[Position::Bishops][0];
-	const Score R= initialPieceValue[Position::Rooks][0];
-	const Score Q = initialPieceValue[Position::Queens][0];
-	//const Score K = initialPieceValue[Position::King][0];
+	const Score P = initialPieceValue[Pawns][0];
+	const Score N = initialPieceValue[Knights][0];
+	const Score B = initialPieceValue[Bishops][0];
+	const Score R= initialPieceValue[Rooks][0];
+	const Score Q = initialPieceValue[Queens][0];
+	//const Score K = initialPieceValue[King][0];
 
 	/* manythanks to Fabio Gobbato for this list of fen Tests*/
 	static const std::list<positions> posList ={

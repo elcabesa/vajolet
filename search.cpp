@@ -134,22 +134,22 @@ void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 {
 	unsigned results[TB_MAX_MOVES];
 
-	unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
+	unsigned int piecesCnt = bitCnt (pos.getBitmap(whitePieces) | pos.getBitmap(blackPieces));
 
 	if ( piecesCnt <= TB_LARGEST )
 	{
-		unsigned result = tb_probe_root(pos.getBitmap(Position::whitePieces),
-			pos.getBitmap(Position::blackPieces),
-			pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
-			pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
-			pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
-			pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
-			pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
-			pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
+		unsigned result = tb_probe_root(pos.getBitmap(whitePieces),
+			pos.getBitmap(blackPieces),
+			pos.getBitmap(blackKing) | pos.getBitmap(whiteKing),
+			pos.getBitmap(blackQueens) | pos.getBitmap(whiteQueens),
+			pos.getBitmap(blackRooks) | pos.getBitmap(whiteRooks),
+			pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
+			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
+			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 			pos.getActualState().fiftyMoveCnt,
 			pos.getActualState().castleRights,
 			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-			pos.getActualState().nextMove== Position::whiteTurn,
+			pos.getActualState().nextMove == Position::whiteTurn,
 			results);
 
 		if (result != TB_RESULT_FAILED)
@@ -655,24 +655,24 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//Tablebase probe
 	if (!PVnode && TB_LARGEST)
 	{
-		unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
+		unsigned int piecesCnt = bitCnt (pos.getBitmap(whitePieces) | pos.getBitmap(blackPieces));
 
 		if (    piecesCnt <= TB_LARGEST
 			&& (piecesCnt <  TB_LARGEST || depth >= (int)(SyzygyProbeDepth*ONE_PLY))
 			&&  pos.getActualState().fiftyMoveCnt == 0)
 		{
-			unsigned result = tb_probe_wdl(pos.getBitmap(Position::whitePieces),
-				pos.getBitmap(Position::blackPieces),
-				pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
-				pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
-				pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
-				pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
-				pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
-				pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
+			unsigned result = tb_probe_wdl(pos.getBitmap(whitePieces),
+				pos.getBitmap(blackPieces),
+				pos.getBitmap(blackKing) | pos.getBitmap(whiteKing),
+				pos.getBitmap(blackQueens) | pos.getBitmap(whiteQueens),
+				pos.getBitmap(blackRooks) | pos.getBitmap(whiteRooks),
+				pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
+				pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
+				pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 				pos.getActualState().fiftyMoveCnt,
 				pos.getActualState().castleRights,
 				pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-				pos.getActualState().nextMove== Position::whiteTurn);
+				pos.getActualState().nextMove == Position::whiteTurn);
 
 			if(result != TB_RESULT_FAILED)
 			{
@@ -824,7 +824,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//&& eval > -SCORE_INFINITE + futility[ depth>>ONE_PLY_SHIFT ]
 			&& eval - futility[depth>>ONE_PLY_SHIFT] >= beta
 			&& eval < SCORE_KNOWN_WIN
-			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[Position::whiteKnights][0])))
+			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0])))
 		{
 			assert((depth>>ONE_PLY_SHIFT)<8);
 			assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
@@ -842,7 +842,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		if( depth >= ONE_PLY
 			&& eval >= beta
 			&& !sd[ply].skipNullMove
-			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[Position::whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[Position::whiteKnights][0]))
+			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0]))
 		){
 			// Null move dynamic reduction based on depth
 			int red = 3 * ONE_PLY + depth / 4;
@@ -1574,11 +1574,11 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				{
 					Score futilityValue = futilityBase
 							+ Position::pieceValue[pos.getPieceAt((tSquare)m.bit.to)][1]
-							+ ( m.isEnPassantMove() ? Position::pieceValue[Position::whitePawns][1] : 0);
+							+ ( m.isEnPassantMove() ? Position::pieceValue[whitePawns][1] : 0);
 
 					if( m.bit.flags == Move::fpromotion )
 					{
-						futilityValue += Position::pieceValue[m.bit.promotion + Position::whiteQueens][1] - Position::pieceValue[Position::whitePawns][1];
+						futilityValue += Position::pieceValue[m.bit.promotion + whiteQueens][1] - Position::pieceValue[whitePawns][1];
 					}
 
 

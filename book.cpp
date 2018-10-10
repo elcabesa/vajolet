@@ -36,7 +36,7 @@ uint64_t PolyglotBook::polyglotKey(const Position& pos) const
 	while (b)
 	{
 		tSquare s = iterateBit(b);
-		Position::bitboardIndex p = pos.getPieceAt(s);
+		bitboardIndex p = pos.getPieceAt(s);
 
 		// PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
 		k ^= PG.Zobrist.psq[pieceMapping[p]][s];

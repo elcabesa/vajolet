@@ -23,7 +23,7 @@
 #include "position.h"
 #include "score.h"
 
-extern simdScore initialPieceValue[Position::lastBitboard];
+extern simdScore initialPieceValue[lastBitboard];
 
 extern simdScore PawnD3;
 extern simdScore PawnD4;
@@ -70,10 +70,10 @@ extern simdScore pawnCenterControl;
 extern simdScore pawnBigCenterControl;
 
 
-extern simdScore pieceCoordination[Position::lastBitboard];
+extern simdScore pieceCoordination[lastBitboard];
 
-extern simdScore piecesCenterControl[Position::lastBitboard];
-extern simdScore piecesBigCenterControl[Position::lastBitboard];
+extern simdScore piecesCenterControl[lastBitboard];
+extern simdScore piecesBigCenterControl[lastBitboard];
 
 extern simdScore rookOn7Bonus;
 extern simdScore rookOnPawns;
@@ -104,9 +104,9 @@ extern simdScore spaceBonus;
 extern simdScore undefendedMinorPenalty;
 
 
-extern simdScore attackedByPawnPenalty[Position::separationBitmap];
+extern simdScore attackedByPawnPenalty[separationBitmap];
 
-extern simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitmap];
+extern simdScore weakPiecePenalty[separationBitmap][separationBitmap];
 extern simdScore weakPawnAttackedByKing;
 //------------------------------------------------
 //king safety
@@ -124,7 +124,7 @@ extern simdScore kingSafetyPars2;
 
 extern simdScore queenVsRook2MinorsImbalance;
 
-extern simdScore mobilityBonus[Position::separationBitmap][32];
+extern simdScore mobilityBonus[separationBitmap][32];
 
 
 

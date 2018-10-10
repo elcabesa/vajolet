@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "bitboardIndex.h"
 #include "move.h"
 #include "position.h"
 #include "score.h"
@@ -71,28 +72,28 @@ class CaptureHistory
 {
 private:
 	// piece, to, captured piece
-	Score table[Position::lastBitboard][squareNumber][Position::lastBitboard];
+	Score table[lastBitboard][squareNumber][lastBitboard];
 public :
 
 	inline void clear() { std::memset(table, 0, sizeof(table)); }
 
 
-	inline void update( const Position::bitboardIndex p, const Move& m, const Position::bitboardIndex captured,  Score v)
+	inline void update( const bitboardIndex p, const Move& m, const bitboardIndex captured,  Score v)
 	{
 				
 		const int W = 2;
 		const int D = 324;
-		assert(p<Position::lastBitboard);
-		assert(captured<Position::lastBitboard);
+		assert(p<lastBitboard);
+		assert(captured<lastBitboard);
 		const tSquare to = (tSquare)m.bit.to;
 
 		Score &e = table[p][to][captured];
 		e += v * W - e * std::abs(v)/ D;
 	}
-	inline Score getValue( const Position::bitboardIndex p, const Move& m, const Position::bitboardIndex captured ) const
+	inline Score getValue( const bitboardIndex p, const Move& m, const bitboardIndex captured ) const
 	{
-		assert(p<Position::lastBitboard);
-		assert(captured<Position::lastBitboard);
+		assert(p<lastBitboard);
+		assert(captured<lastBitboard);
 		const tSquare to = (tSquare)m.bit.to;
 		return table[p][to][captured];
 	}
@@ -105,16 +106,16 @@ public :
 class CounterMove
 {
 private:
-	Move table[Position::lastBitboard][squareNumber][2];
+	Move table[lastBitboard][squareNumber][2];
 public :
 
 	inline void clear() { std::memset(table, 0, sizeof(table)); }
 
 
-	inline void update( const Position::bitboardIndex p, const tSquare to, const Move m)
+	inline void update( const bitboardIndex p, const tSquare to, const Move m)
 	{
 
-		assert(p<Position::lastBitboard);
+		assert(p<lastBitboard);
 		assert(to<squareNumber);
 		Move * const mm =  table[p][to];
 		if(mm[0] != m)
@@ -124,10 +125,10 @@ public :
 		}
 
 	}
-	inline const Move& getMove( const Position::bitboardIndex p, const tSquare to, const unsigned int pos ) const
+	inline const Move& getMove( const bitboardIndex p, const tSquare to, const unsigned int pos ) const
 	{
 		assert( pos < 2 );
-		assert(p<Position::lastBitboard);
+		assert(p<lastBitboard);
 		assert(to<squareNumber);
 		return table[p][to][pos];
 	}
