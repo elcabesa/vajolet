@@ -84,13 +84,13 @@ public :
 		const int W = 2;
 		const int D = 324;
 		
-		if( captured == empty && m.bit.flags == Move::fenpassant )
+		/*if( captured == empty && m.bit.flags == Move::fenpassant )
 		{
 			captured = ( isblack( p ) ? whitePawns : blackPawns );
-		}
+		}*/
 		
 		assert( isValidPiece( p ));
-		assert( isValidPiece( captured ) );
+		assert( isValidPiece( captured ) || captured == empty );
 		const tSquare to = (tSquare)m.bit.to;
 
 		Score &e = table[p][to][captured];
@@ -98,12 +98,12 @@ public :
 	}
 	inline Score getValue( const bitboardIndex p, const Move& m, bitboardIndex captured ) const
 	{
-		if( captured == empty && m.bit.flags == Move::fenpassant )
+		/*if( captured == empty && m.bit.flags == Move::fenpassant )
 		{
 			captured = ( isblack( p ) ? whitePawns : blackPawns );
-		}
+		}*/
 		assert( isValidPiece( p ) );
-		assert( isValidPiece( captured ) );
+		assert( isValidPiece( captured ) || captured == empty );
 		const tSquare to = (tSquare)m.bit.to;
 		return table[p][to][captured];
 	}
