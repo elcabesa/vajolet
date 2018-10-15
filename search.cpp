@@ -540,7 +540,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
-	Score SyzygyValue = 0;
 
 	assert(alpha <beta);
 	assert(alpha>=-SCORE_INFINITE);
