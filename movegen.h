@@ -185,7 +185,7 @@ public:
 		}
 	}
 
-	void setupProbCutSearch(Position::bitboardIndex capturePiece)
+	void setupProbCutSearch(bitboardIndex capturePiece)
 	{
 		/*if(pos.isInCheck())
 		{
@@ -211,43 +211,38 @@ public:
 
 	static void initMovegenConstant(void);
 
-	template<Position::bitboardIndex piece> inline static bitMap attackFrom(const tSquare& from,const bitMap & occupancy=0xffffffffffffffff)
+	template<bitboardIndex piece> inline static bitMap attackFrom(const tSquare& from,const bitMap & occupancy=0xffffffffffffffff)
 	{
-		assert(piece<Position::lastBitboard);
-		assert(piece!=Position::occupiedSquares);
-		assert(piece!=Position::whitePieces);
-		assert(piece!=Position::blackPieces);
-		assert(piece!=Position::blackPieces);
-		assert(piece!=Position::separationBitmap);
+		assert( isValidPiece( piece ));
 		assert(from<squareNumber);
 		switch(piece)
 		{
-		case Position::whiteKing:
-		case Position::blackKing:
+		case whiteKing:
+		case blackKing:
 			return attackFromKing(from);
 			break;
-		case Position::whiteQueens:
-		case Position::blackQueens:
+		case whiteQueens:
+		case blackQueens:
 			assert(from<squareNumber);
 			return attackFromQueen(from,occupancy);
 			break;
-		case Position::whiteRooks:
-		case Position::blackRooks:
+		case whiteRooks:
+		case blackRooks:
 			assert(from<squareNumber);
 			return attackFromRook(from,occupancy);
 			break;
-		case Position::whiteBishops:
-		case Position::blackBishops:
+		case whiteBishops:
+		case blackBishops:
 			return attackFromBishop(from,occupancy);
 			break;
-		case Position::whiteKnights:
-		case Position::blackKnights:
+		case whiteKnights:
+		case blackKnights:
 			return attackFromKnight(from);
 			break;
-		case Position::whitePawns:
+		case whitePawns:
 			return attackFromPawn(from,0);
 			break;
-		case Position::blackPawns:
+		case blackPawns:
 			return attackFromPawn(from,1);
 			break;
 		default:

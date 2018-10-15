@@ -18,7 +18,7 @@
 #include "parameters.h"
 
 
-simdScore initialPieceValue[Position::lastBitboard] = {
+simdScore initialPieceValue[lastBitboard] = {
 		{0,0,0,0},
 		{3000000,3000000,0,0},//king
 		{118976,105579,4236,-3888},
@@ -80,7 +80,7 @@ simdScore EnemyRookBehindPassedPawn =  {-30,100,0,0};
 simdScore holesPenalty =  {19,-166,-216,83};
 simdScore pawnCenterControl =  {472,-125,-8,-69};
 simdScore pawnBigCenterControl =  {61,194,-129,107};
-simdScore pieceCoordination[Position::lastBitboard] = {
+simdScore pieceCoordination[lastBitboard] = {
 	{0},
 	{0},
 	{122,41,17,-60},
@@ -89,7 +89,7 @@ simdScore pieceCoordination[Position::lastBitboard] = {
 	{346,213,10,-97}
 };
 
-simdScore piecesCenterControl[Position::lastBitboard] = {
+simdScore piecesCenterControl[lastBitboard] = {
 	{0},
 	{0},
 	{80,-53,246,-230},
@@ -98,7 +98,7 @@ simdScore piecesCenterControl[Position::lastBitboard] = {
 	{83,55,70,-74}
 };
 
-simdScore piecesBigCenterControl[Position::lastBitboard] = {
+simdScore piecesBigCenterControl[lastBitboard] = {
 	{0},
 	{0},
 	{-69,-128,-288,-597},
@@ -130,7 +130,7 @@ simdScore enemyKingNearPassedPawn =  {24,185,38,9};
 simdScore spaceBonus =  {215,-31,0,0};
 simdScore undefendedMinorPenalty =  {259,234,0,0};
 
-simdScore attackedByPawnPenalty[Position::separationBitmap]=
+simdScore attackedByPawnPenalty[separationBitmap]=
 {	{0,0,0,0},
 	{0,0,0,0},//king
 	{8509,3188,0,0},
@@ -141,7 +141,7 @@ simdScore attackedByPawnPenalty[Position::separationBitmap]=
 	{0,0,0,0},
 };
 
-simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitmap]=
+simdScore weakPiecePenalty[separationBitmap][separationBitmap]=
 {	{{0,0,0,0},{0,0,0,0},	{0,0,0,0},			{0,0,0,0},		{0,0,0,0},		{0,0,0,0},		{0,0,0,0},	{0,0,0,0}},
 	{{0,0,0,0},{0,0,0,0},	{0,0,0,0},			{0,0,0,0},		{0,0,0,0},		{0,0,0,0},		{0,0,0,0},	{0,0,0,0}},//king
 	{{0,0,0,0},{0,0,0,0},	{-139,358,0,0},		{6033,2881,0,0},{5604,3529,0,0},{4944,3186,0,0},{1414,-578,0,0},{0,0,0,0}},//queen
@@ -171,7 +171,7 @@ simdScore kingSafetyPars2 =  {1854,1516,976,1733};
 
 simdScore queenVsRook2MinorsImbalance =  {19932,20041,-8,31};
 
-simdScore mobilityBonus[Position::separationBitmap][32] = {
+simdScore mobilityBonus[separationBitmap][32] = {
 	{0},
 	{0},
 	{ {-1625,-1500}, {-875,-625}, {125,333}, {125,750}, {583,1416},

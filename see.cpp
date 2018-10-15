@@ -74,7 +74,7 @@ Score Position::see(const Move& m) const
 
 	// If the opponent has no attackers we are finished
 	color = (eNextMove)(blackTurn - color);
-	assert(Pieces + color < lastBitboard);
+	assert( (bitboardIndex)( Pieces + color ) == blackPieces || (bitboardIndex)( Pieces + color ) == whitePieces );
 	colorAttackers = attackers & getBitmap((bitboardIndex)(Pieces + color));
 
 
@@ -92,7 +92,7 @@ Score Position::see(const Move& m) const
 	// new X-ray attacks from behind the capturing piece.
 
 	//std::cout<<"DEBUG start the loop "<<swapList[0]<<std::endl;
-	assert(captured<lastBitboard);
+	assert( isValidPiece( captured ) );
 	assert(getPieceAt(from) != empty);
 	do
 	{
@@ -122,12 +122,12 @@ Score Position::see(const Move& m) const
 				attackers ^= att;
 
 				if (nextAttacker == Pawns || nextAttacker == Bishops || nextAttacker == Queens){
-					attackers |= Movegen::attackFrom<Position::whiteBishops>(to,occupied)& (getBitmap(whiteBishops) |getBitmap(blackBishops) |getBitmap(whiteQueens) |getBitmap(blackQueens));
+					attackers |= Movegen::attackFrom<whiteBishops>(to,occupied)& (getBitmap(whiteBishops) |getBitmap(blackBishops) |getBitmap(whiteQueens) |getBitmap(blackQueens));
 				}
 
 				if (nextAttacker == Rooks || nextAttacker == Queens){
 					assert(to<squareNumber);
-					attackers |= Movegen::attackFrom<Position::whiteRooks>(to,occupied)& (getBitmap(whiteRooks) |getBitmap(blackRooks) |getBitmap(whiteQueens) |getBitmap(blackQueens));
+					attackers |= Movegen::attackFrom<whiteRooks>(to,occupied)& (getBitmap(whiteRooks) |getBitmap(blackRooks) |getBitmap(whiteQueens) |getBitmap(blackQueens));
 				}
 				attackers &= occupied;
 				captured = nextAttacker;

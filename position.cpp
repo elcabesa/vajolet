@@ -43,7 +43,6 @@ void Position::initPstValues(void)
 	{
 		for(tSquare s = (tSquare)0; s < squareNumber; s++)
 		{
-			assert(piece<lastBitboard);
 			assert(s<squareNumber);
 			nonPawnValue[piece] = simdScore{0,0,0,0};
 			pstValue[piece][s] = simdScore{0,0,0,0};
@@ -370,9 +369,9 @@ void Position::clear()
 	{
 		bitBoard[i] = 0;
 	}
-	stateInfo2.clear();
-	stateInfo2.emplace_back(state());
-	actualState = &stateInfo2.back();
+	stateInfo.clear();
+	stateInfo.emplace_back(state());
+	actualState = &stateInfo.back();
 
 }
 
@@ -835,8 +834,7 @@ void Position::doMove(const Move & m){
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		assert(rFrom<squareNumber);
 		bitboardIndex rook = squares[rFrom];
-		assert(rook<lastBitboard);
-		assert(isRook(rook));
+		assert( isRook(rook) );
 		tSquare rTo = kingSide? to+ovest: to+est;
 		assert(rTo<squareNumber);
 		movePiece(rook,rFrom,rTo);
@@ -915,7 +913,7 @@ void Position::doMove(const Move & m){
 		if( m.isPromotionMove() )
 		{
 			bitboardIndex promotedPiece = (bitboardIndex)(whiteQueens + x.nextMove + m.bit.promotion);
-			assert(promotedPiece<lastBitboard);
+			assert( isValidPiece(promotedPiece) );
 			removePiece(piece,to);
 			putPiece(promotedPiece,to);
 
@@ -961,12 +959,12 @@ void Position::doMove(const Move & m){
 				if(!isRook(piece))
 				{
 					assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
-					x.checkers |= Movegen::attackFrom<Position::whiteRooks>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
+					x.checkers |= Movegen::attackFrom<whiteRooks>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
 				}
 				if(!isBishop(piece))
 				{
 					assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
-					x.checkers |= Movegen::attackFrom<Position::whiteBishops>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]);
+					x.checkers |= Movegen::attackFrom<whiteBishops>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]);
 				}
 			}
 		}
@@ -1020,8 +1018,7 @@ void Position::undoMove()
 		assert(rFrom<squareNumber);
 		assert(rTo<squareNumber);
 		bitboardIndex rook = squares[rTo];
-		assert(rook<lastBitboard);
-		assert(isRook(rook));
+		assert( isRook(rook) );
 		movePiece(rook,rTo,rFrom);
 
 	}
@@ -1029,9 +1026,10 @@ void Position::undoMove()
 	movePiece(piece,to,from);
 
 
-	assert(x.capturedPiece<lastBitboard);
+	assert( isValidPiece(x.capturedPiece) || x.capturedPiece == empty);
 	if(x.capturedPiece)
 	{
+		
 		tSquare capSq = to;
 		if( m.isEnPassantMove() ){
 			capSq += pawnPush(x.nextMove);
@@ -1327,9 +1325,9 @@ inline void Position::calcCheckingSquares(void)
 {
 	state &s = getActualState();
 	bitboardIndex opponentKing = (bitboardIndex)(blackKing-s.nextMove);
-	assert(opponentKing<lastBitboard);
+	assert( isKing(opponentKing));
 	bitboardIndex attackingPieces = (bitboardIndex)(s.nextMove);
-	assert(attackingPieces<lastBitboard);
+	//assert( isValidPiece(attackingPieces));
 
 
 	tSquare kingSquare = getSquareOfThePiece(opponentKing);
@@ -1338,18 +1336,18 @@ inline void Position::calcCheckingSquares(void)
 
 	s.checkingSquares[whiteKing+attackingPieces]=0;
 	assert(kingSquare<squareNumber);
-	assert(whitePawns+attackingPieces<lastBitboard);
-	s.checkingSquares[whiteRooks+attackingPieces] = Movegen::attackFrom<Position::whiteRooks>(kingSquare,occupancy);
-	s.checkingSquares[whiteBishops+attackingPieces] = Movegen::attackFrom<Position::whiteBishops>(kingSquare,occupancy);
+	assert( isValidPiece( (bitboardIndex)( whitePawns + attackingPieces ) ) );
+	s.checkingSquares[whiteRooks+attackingPieces] = Movegen::attackFrom<whiteRooks>(kingSquare,occupancy);
+	s.checkingSquares[whiteBishops+attackingPieces] = Movegen::attackFrom<whiteBishops>(kingSquare,occupancy);
 	s.checkingSquares[whiteQueens+attackingPieces] = s.checkingSquares[whiteRooks+attackingPieces]|s.checkingSquares[whiteBishops+attackingPieces];
-	s.checkingSquares[whiteKnights+attackingPieces] = Movegen::attackFrom<Position::whiteKnights>(kingSquare);
+	s.checkingSquares[whiteKnights+attackingPieces] = Movegen::attackFrom<whiteKnights>(kingSquare);
 
 	if(attackingPieces)
 	{
-		s.checkingSquares[whitePawns+attackingPieces] = Movegen::attackFrom<Position::whitePawns>(kingSquare);
+		s.checkingSquares[whitePawns+attackingPieces] = Movegen::attackFrom<whitePawns>(kingSquare);
 	}else
 	{
-		s.checkingSquares[whitePawns+attackingPieces] = Movegen::attackFrom<Position::blackPawns>(kingSquare,1);
+		s.checkingSquares[whitePawns+attackingPieces] = Movegen::attackFrom<blackPawns>(kingSquare,1);
 	}
 
 	assert(blackPawns-attackingPieces>=0);
@@ -1370,7 +1368,7 @@ inline void Position::calcCheckingSquares(void)
 bitMap Position::getHiddenCheckers(const tSquare kingSquare,const eNextMove next) const
 {
 	assert(kingSquare<squareNumber);
-	assert(whitePawns+next<lastBitboard);
+	assert( isValidPiece( (bitboardIndex)( whitePawns + next ) ) );
 	bitMap result = 0;
 	bitMap pinners = Movegen::getBishopPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteBishops+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
 	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteRooks+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
@@ -1395,14 +1393,14 @@ bitMap Position::getHiddenCheckers(const tSquare kingSquare,const eNextMove next
 bitMap Position::getAttackersTo(const tSquare to, const bitMap occupancy) const
 {
 	assert(to<squareNumber);
-	bitMap res = (Movegen::attackFrom<Position::blackPawns>(to) & bitBoard[whitePawns])
-			|(Movegen::attackFrom<Position::whitePawns>(to) & bitBoard[blackPawns])
-			|(Movegen::attackFrom<Position::whiteKnights>(to) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))
-			|(Movegen::attackFrom<Position::whiteKing>(to) & (bitBoard[blackKing]|bitBoard[whiteKing]));
+	bitMap res = (Movegen::attackFrom<blackPawns>(to) & bitBoard[whitePawns])
+			|(Movegen::attackFrom<whitePawns>(to) & bitBoard[blackPawns])
+			|(Movegen::attackFrom<whiteKnights>(to) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))
+			|(Movegen::attackFrom<whiteKing>(to) & (bitBoard[blackKing]|bitBoard[whiteKing]));
 	bitMap mask = (bitBoard[blackBishops]|bitBoard[whiteBishops]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
-	res |= Movegen::attackFrom<Position::whiteBishops>(to,occupancy) & mask;
+	res |= Movegen::attackFrom<whiteBishops>(to,occupancy) & mask;
 	mask = (bitBoard[blackRooks]|bitBoard[whiteRooks]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
-	res |=Movegen::attackFrom<Position::whiteRooks>(to,occupancy) & mask;
+	res |=Movegen::attackFrom<whiteRooks>(to,occupancy) & mask;
 
 	return res;
 }
@@ -1451,13 +1449,13 @@ bool Position::moveGivesCheck(const Move& m)const
 	{
 	case Move::fpromotion:
 	{
-		assert((bitboardIndex)(whiteQueens+s.nextMove+m.bit.promotion)<lastBitboard);
+		assert( isValidPiece( (bitboardIndex)(whiteQueens + s.nextMove + m.bit.promotion ) ) );
 		if (s.checkingSquares[whiteQueens+s.nextMove+m.bit.promotion] & bitSet(to))
 		{
 			return true;
 		}
 		bitMap occ= bitBoard[occupiedSquares] ^ bitSet(from);
-		assert((bitboardIndex)(whiteQueens+m.bit.promotion)<lastBitboard);
+		assert( isValidPiece( (bitboardIndex)(whiteQueens + m.bit.promotion ) ) );
 		switch(m.bit.promotion)
 		{
 			case Move::promQueen:
@@ -1488,7 +1486,7 @@ bool Position::moveGivesCheck(const Move& m)const
 
 		bitMap occ = (bitBoard[occupiedSquares] ^ bitSet(kFrom) ^ bitSet(rFrom)) | bitSet(rTo) | bitSet(kTo);
 		return   (Movegen::getRookPseudoAttack(rTo) & bitSet(kingSquare))
-			     && (Movegen::attackFrom<Position::whiteRooks>(rTo,occ) & bitSet(kingSquare));
+			     && (Movegen::attackFrom<whiteRooks>(rTo,occ) & bitSet(kingSquare));
 	}
 		break;
 	case Move::fenpassant:
@@ -1496,8 +1494,8 @@ bool Position::moveGivesCheck(const Move& m)const
 		bitMap captureSquare = FILEMASK[m.bit.to] & RANKMASK[m.bit.from];
 		bitMap occ = bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet((tSquare)m.bit.to)^captureSquare;
 		return
-				(Movegen::attackFrom<Position::whiteRooks>(kingSquare, occ) & (Us[Queens] |Us[Rooks]))
-			   | (Movegen::attackFrom<Position::whiteBishops>(kingSquare, occ) & (Us[Queens] |Us[Bishops]));
+				(Movegen::attackFrom<whiteRooks>(kingSquare, occ) & (Us[Queens] |Us[Rooks]))
+			   | (Movegen::attackFrom<whiteBishops>(kingSquare, occ) & (Us[Queens] |Us[Bishops]));
 
 	}
 		break;
@@ -1539,7 +1537,7 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 	const state & s=getActualStateConst();
 
 	tSquare kingSquare = getSquareOfThePiece((bitboardIndex)(blackKing-s.nextMove));
-	return (!(Movegen::attackFrom<Position::whiteKing>(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from))));
+	return (!(Movegen::attackFrom<whiteKing>(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.hiddenCheckersCandidate && (s.hiddenCheckersCandidate & bitSet(from))));
 
 
 }
@@ -1576,7 +1574,7 @@ bool Position::isDraw(bool isPVline) const
 	// Draw by repetition?
 	unsigned int counter=1;
 	uint64_t actualkey = getActualStateConst().key;
-	auto it = stateInfo2.rbegin();
+	auto it = stateInfo.rbegin();
 	
 
 	int e = std::min(getActualStateConst().fiftyMoveCnt, getActualStateConst().pliesFromNull);
@@ -1609,7 +1607,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 	const state &s = getActualStateConst();
 	const bitboardIndex piece = squares[m.bit.from];
-	assert(piece<Position::lastBitboard);
+	assert( isValidPiece( piece ) || piece == empty );
 
 	// pezzo inesistente
 	if(piece == empty)
@@ -1696,8 +1694,8 @@ bool Position::isMoveLegal(const Move &m)const
 
 	switch(piece)
 	{
-		case Position::whiteKing:
-		case Position::blackKing:
+		case whiteKing:
+		case blackKing:
 		{
 			if( m.isCastleMove() )
 			{
@@ -1727,7 +1725,7 @@ bool Position::isMoveLegal(const Move &m)const
 				}
 			}
 			else{
-				if(!(Movegen::attackFrom<Position::whiteKing>((tSquare)m.bit.from) &bitSet((tSquare)m.bit.to)) || (bitSet((tSquare)m.bit.to)&Us[Pieces]))
+				if(!(Movegen::attackFrom<whiteKing>((tSquare)m.bit.from) &bitSet((tSquare)m.bit.to)) || (bitSet((tSquare)m.bit.to)&Us[Pieces]))
 				{
 					return false;
 				}
@@ -1745,17 +1743,17 @@ bool Position::isMoveLegal(const Move &m)const
 		}
 			break;
 
-		case Position::whiteRooks:
-		case Position::blackRooks:
+		case whiteRooks:
+		case blackRooks:
 			assert(m.bit.from<squareNumber);
-			if(!(Movegen::getRookPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFrom<Position::whiteRooks>((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
+			if(!(Movegen::getRookPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFrom<whiteRooks>((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
 			{
 				return false;
 			}
 			break;
 
-		case Position::whiteQueens:
-		case Position::blackQueens:
+		case whiteQueens:
+		case blackQueens:
 			assert(m.bit.from<squareNumber);
 			if(
 				!(
@@ -1766,8 +1764,8 @@ bool Position::isMoveLegal(const Move &m)const
 				!(
 					(
 
-						Movegen::attackFrom<Position::whiteBishops>((tSquare)m.bit.from,bitBoard[occupiedSquares])
-						| Movegen::attackFrom<Position::whiteRooks>((tSquare)m.bit.from,bitBoard[occupiedSquares])
+						Movegen::attackFrom<whiteBishops>((tSquare)m.bit.from,bitBoard[occupiedSquares])
+						| Movegen::attackFrom<whiteRooks>((tSquare)m.bit.from,bitBoard[occupiedSquares])
 					)
 					& bitSet((tSquare)m.bit.to)
 				)
@@ -1777,24 +1775,24 @@ bool Position::isMoveLegal(const Move &m)const
 			}
 			break;
 
-		case Position::whiteBishops:
-		case Position::blackBishops:
-			if(!(Movegen::getBishopPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFrom<Position::whiteBishops>((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
+		case whiteBishops:
+		case blackBishops:
+			if(!(Movegen::getBishopPseudoAttack((tSquare)m.bit.from) & bitSet((tSquare)m.bit.to)) || !(Movegen::attackFrom<whiteBishops>((tSquare)m.bit.from,bitBoard[occupiedSquares])& bitSet((tSquare)m.bit.to)))
 			{
 				return false;
 			}
 			break;
 
-		case Position::whiteKnights:
-		case Position::blackKnights:
-			if(!(Movegen::attackFrom<Position::whiteKnights>((tSquare)m.bit.from)& bitSet((tSquare)m.bit.to)))
+		case whiteKnights:
+		case blackKnights:
+			if(!(Movegen::attackFrom<whiteKnights>((tSquare)m.bit.from)& bitSet((tSquare)m.bit.to)))
 			{
 				return false;
 			}
 
 			break;
 
-		case Position::whitePawns:
+		case whitePawns:
 
 			if(
 				// not valid pawn push
@@ -1802,7 +1800,7 @@ bool Position::isMoveLegal(const Move &m)const
 				// not valid pawn double push
 				&& ((m.bit.from+2*pawnPush(s.nextMove)!= m.bit.to) || (RANKS[m.bit.from]!=1) || ((bitSet((tSquare)m.bit.to) | bitSet((tSquare)(m.bit.to-8)))&bitBoard[occupiedSquares]))
 				// not valid pawn attack
-				&& (!(Movegen::attackFrom<Position::whitePawns>((tSquare)m.bit.from)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Pieces]|bitSet(s.epSquare))))
+				&& (!(Movegen::attackFrom<whitePawns>((tSquare)m.bit.from)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Pieces]|bitSet(s.epSquare))))
 			){
 				return false;
 			}
@@ -1816,22 +1814,22 @@ bool Position::isMoveLegal(const Move &m)const
 				bitMap occ= bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
 				tSquare kingSquare=getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove));
 				assert(kingSquare<squareNumber);
-				if((Movegen::attackFrom<Position::whiteRooks>(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Rooks]))|
-							(Movegen::attackFrom<Position::whiteBishops>(kingSquare, occ) & (Them[Position::Queens] | Them[Position::Bishops])))
+				if((Movegen::attackFrom<whiteRooks>(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
+							(Movegen::attackFrom<whiteBishops>(kingSquare, occ) & (Them[Queens] | Them[Bishops])))
 				{
 				return false;
 				}
 			}
 
 			break;
-		case Position::blackPawns:
+		case blackPawns:
 			if(
 				// not valid pawn push
 				(m.bit.from+pawnPush(s.nextMove)!= m.bit.to || (bitSet((tSquare)m.bit.to)&bitBoard[occupiedSquares]))
 				// not valid pawn double push
 				&& ((m.bit.from+2*pawnPush(s.nextMove)!= m.bit.to) || (RANKS[m.bit.from]!=6) || ((bitSet((tSquare)m.bit.to) | bitSet((tSquare)(m.bit.to+8)))&bitBoard[occupiedSquares]))
 				// not valid pawn attack
-				&& (!(Movegen::attackFrom<Position::blackPawns>((tSquare)m.bit.from)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Position::Pieces]| bitSet(s.epSquare))))
+				&& (!(Movegen::attackFrom<blackPawns>((tSquare)m.bit.from)&bitSet((tSquare)m.bit.to)) || !((bitSet((tSquare)m.bit.to)) &(Them[Pieces]| bitSet(s.epSquare))))
 			){
 				return false;
 			}
@@ -1845,8 +1843,8 @@ bool Position::isMoveLegal(const Move &m)const
 				bitMap occ = bitBoard[occupiedSquares]^bitSet((tSquare)m.bit.from)^bitSet(s.epSquare)^captureSquare;
 				tSquare kingSquare = getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove));
 				assert(kingSquare<squareNumber);
-				if((Movegen::attackFrom<Position::whiteRooks>(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
-							(Movegen::attackFrom<Position::whiteBishops>(kingSquare, occ) & (Them[Queens] | Them[Bishops])))
+				if((Movegen::attackFrom<whiteRooks>(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
+							(Movegen::attackFrom<whiteBishops>(kingSquare, occ) & (Them[Queens] | Them[Bishops])))
 				{
 				return false;
 				}
@@ -1864,9 +1862,9 @@ bool Position::isMoveLegal(const Move &m)const
 
 Position::Position()
 {
-	stateInfo2.clear();
-	stateInfo2.emplace_back(state());
-	actualState = &stateInfo2.back();
+	stateInfo.clear();
+	stateInfo.emplace_back(state());
+	actualState = &stateInfo.back();
 
 
 	actualState->nextMove = whiteTurn;
@@ -1878,8 +1876,8 @@ Position::Position()
 
 Position::Position(const Position& other)// calls the copy constructor of the age
 {
-	stateInfo2 = other.stateInfo2;
-	actualState = &stateInfo2.back();
+	stateInfo = other.stateInfo;
+	actualState = &stateInfo.back();
 
 
 
@@ -1904,8 +1902,8 @@ Position& Position::operator=(const Position& other)
 	if (this == &other)
 		return *this;
 
-	stateInfo2 = other.stateInfo2;
-	actualState = &stateInfo2.back();
+	stateInfo = other.stateInfo;
+	actualState = &stateInfo.back();
 
 
 	for(int i = 0; i < squareNumber; i++)
@@ -1923,7 +1921,7 @@ Position& Position::operator=(const Position& other)
 	ply = other.ply;
 
 	return *this;
-};
+}
 
 /*! \brief put a piece on the board
 	\author STOCKFISH
@@ -1933,7 +1931,7 @@ Position& Position::operator=(const Position& other)
 inline void Position::putPiece(const bitboardIndex piece,const tSquare s)
 {
 	assert(s<squareNumber);
-	assert(piece<lastBitboard);
+	assert( isValidPiece( piece ) );
 	bitboardIndex color = piece > separationBitmap ? blackPieces : whitePieces;
 	bitMap b=bitSet(s);
 
@@ -1954,7 +1952,7 @@ inline void Position::movePiece(const bitboardIndex piece,const tSquare from,con
 {
 	assert(from<squareNumber);
 	assert(to<squareNumber);
-	assert(piece<lastBitboard);
+	assert( isValidPiece( piece ) );
 	// index[from] is not updated and becomes stale. This works as long
 	// as index[] is accessed just by known occupied squares.
 	assert(squares[from]!=empty);
@@ -1979,7 +1977,7 @@ inline void Position::removePiece(const bitboardIndex piece,const tSquare s)
 
 	assert(!isKing(piece));
 	assert(s<squareNumber);
-	assert(piece<lastBitboard);
+	assert( isValidPiece( piece) );
 	assert(squares[s]!=empty);
 
 	// WARNING: This is not a reversible operation. If we remove a piece in
