@@ -1895,7 +1895,7 @@ Position::Position(const Position& other)// calls the copy constructor of the ag
 	Them=&bitBoard[blackTurn - getNextTurn()];
 
 	ply = other.ply;
-};
+}
 
 Position& Position::operator=(const Position& other)
 {
