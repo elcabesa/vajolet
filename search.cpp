@@ -744,7 +744,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 						ttMove.packed,
 						pos.eval<false>());
 
-				return value;
+					return value;
 				}
 			}
 		}
