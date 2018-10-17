@@ -653,7 +653,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	}
 
 	//Tablebase probe
-	if (!PVnode && TB_LARGEST && excludedMove.packed == 0)
+	if (!PVnode && TB_LARGEST)
 	{
 		ttType TTtype = typeScoreLowerThanAlpha;
 		unsigned int piecesCnt = bitCnt (pos.getBitmap(Position::whitePieces) | pos.getBitmap(Position::blackPieces));
@@ -741,7 +741,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 						transpositionTable::scoreToTT(value, ply),
 						TTtype,
 						std::min(90, depth + 6 * ONE_PLY),
-						0,
+						ttMove.packed,
 						pos.eval<false>());
 
 				return value;
