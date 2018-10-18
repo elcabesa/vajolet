@@ -658,6 +658,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//Tablebase probe
 	if (!PVnode && TB_LARGEST)
 	{
+		ttType TTtype = typeScoreLowerThanAlpha;
 		unsigned int piecesCnt = bitCnt (pos.getBitmap(whitePieces) | pos.getBitmap(blackPieces));
 
 		if (    piecesCnt <= TB_LARGEST
@@ -690,17 +691,22 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 					case 0:
 						value = SCORE_MATED +100 +ply;
+						TTtype = typeScoreLowerThanAlpha;
 						break;
 					case 1:
+						TTtype = typeExact;
 						value = -100;
 						break;
 					case 2:
+						TTtype = typeExact;
 						value = 0;
 						break;
 					case 3:
+						TTtype = typeExact;
 						value = 100;
 						break;
 					case 4:
+						TTtype = typeScoreHigherThanBeta;
 						value = SCORE_MATE -100 -ply;
 						break;
 					default:
@@ -714,13 +720,16 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 					case 0:
 					case 1:
+						TTtype = typeScoreLowerThanAlpha;
 						value = SCORE_MATED +100 +ply;
 						break;
 					case 2:
+						TTtype = typeExact;
 						value = 0;
 						break;
 					case 3:
 					case 4:
+						TTtype = typeScoreHigherThanBeta;
 						value = SCORE_MATE -100 -ply;
 						break;
 					default:
@@ -729,14 +738,17 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				}
 
 				
-				transpositionTable::getInstance().store(posKey,
+				if(	TTtype == typeExact || (TTtype == typeScoreHigherThanBeta  && value >=beta) || (TTtype == typeScoreLowerThanAlpha && value <=alpha)	)
+				{
+					transpositionTable::getInstance().store(posKey,
 						transpositionTable::scoreToTT(value, ply),
-						typeExact,
+						TTtype,
 						std::min(90, depth + 6 * ONE_PLY),
 						ttMove.packed,
 						pos.eval<false>());
 
-				return value;
+					return value;
+				}
 			}
 		}
 	}
