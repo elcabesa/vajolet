@@ -282,6 +282,7 @@ private:
 	// gestione timer
 	long long int startTime;
 	long long int ponderTime;
+	Position::eNextMove initialNextMove;
 public:
 	static long long int getTime(){ return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
 	long long int getElapsedTime() const { return getTime() - startTime; }

@@ -440,7 +440,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		filterRootMovesByTablebase( rootMoves );
 	}
 	
-	
+	initialNextMove = pos.getActualStateConst().nextMove;
 	//----------------------------------
 	// we can start the real search
 	//----------------------------------
@@ -584,7 +584,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			{
 				pvLine.reset();
 			}
-			return std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
+			int contemptSign = (pos.getActualStateConst().nextMove == initialNextMove) ? 1 : -1;
+			return contemptSign * std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
 		}
 
 		//---------------------------------------
@@ -1422,7 +1423,8 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		{
 			pvLine.reset();
 		}
-		return std::min((int)0,(int)(-5000 + pos.getPly()*250));
+		int contemptSign = (pos.getActualStateConst().nextMove == initialNextMove) ? 1 : -1;
+		return contemptSign * std::min((int)0,(int)(-5000 + pos.getPly()*250));
 	}
 /*	//---------------------------------------
 	//	MATE DISTANCE PRUNING
