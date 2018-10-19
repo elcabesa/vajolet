@@ -1710,8 +1710,8 @@ void Search::initLMRreduction(void)
     {
       for (int mc = 1; mc < 64; ++mc)
       {
-        double    PVRed = -1.5 + 0.33 * log(double(d)) * log(double(mc));
-        double nonPVRed = -1.2 + 0.37 * log(double(d)) * log(double(mc));
+        double    PVRed = -1.6 + 0.33 * log(double(d)) * log(double(mc));
+        double nonPVRed = -1.3 + 0.37 * log(double(d)) * log(double(mc));
         PVreduction[improving][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
         nonPVreduction[improving][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
         
