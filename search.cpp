@@ -61,8 +61,8 @@ std::vector<Move> Search::rootMoves;
 Score Search::futility[8] = {0,6000,12000,18000,24000,30000,36000,42000};
 Score Search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
 unsigned int Search::FutilityMoveCounts[16] = {2,3,4,7,11,15,20,26,32,39,46,55,64,73,83,94};
-Score Search::PVreduction[LmrLimit*ONE_PLY][64];
-Score Search::nonPVreduction[LmrLimit*ONE_PLY][64];
+Score Search::PVreduction[2][LmrLimit*ONE_PLY][64];
+Score Search::nonPVreduction[2][LmrLimit*ONE_PLY][64];
 unsigned int Search::threads = 1;
 unsigned int Search::multiPVLines = 1;
 bool Search::useOwnBook = true;
@@ -793,7 +793,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	
 	sd[ply].staticEval = staticEval;
 	
-	if( ply >=2 && sd[ply].staticEval >= sd[ply-2].staticEval )
+	if( sd[ply].skipNullMove || !inCheck || ( ply >=2 && sd[ply].staticEval >= sd[ply-2].staticEval ) )
 	{
 		improving = true;
 	}
@@ -1169,7 +1169,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				{
 					assert(moveNumber!=0);
 
-					int reduction = PVreduction[ std::min(depth, int(LmrLimit*ONE_PLY-1)) ][ std::min(moveNumber, (unsigned int)63) ];
+					int reduction = PVreduction[improving][ std::min(depth, int(LmrLimit*ONE_PLY-1)) ][ std::min(moveNumber, (unsigned int)63) ];
 					int d = std::max(newDepth - reduction, ONE_PLY);
 
 					if(reduction != 0)
@@ -1223,7 +1223,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				&& !mg.isKillerMove(m)
 			)
 			{
-				int reduction = nonPVreduction[std::min(depth, int(LmrLimit*ONE_PLY-1))][std::min(moveNumber, (unsigned int)63)];
+				int reduction = nonPVreduction[improving][std::min(depth, int(LmrLimit*ONE_PLY-1))][std::min(moveNumber, (unsigned int)63)];
 				int d = std::max(newDepth - reduction, ONE_PLY);
 
 				if(reduction != 0)
@@ -1702,4 +1702,26 @@ void Search::setUOI( std::unique_ptr<UciOutput> UOI )
 	std::cout<<sync_noNewLineEndl;
 }
 
+void Search::initLMRreduction(void)
+{
+  for (unsigned int improving = 0; improving < 2; ++improving)
+  {
+    for (unsigned int d = 1; d < LmrLimit*ONE_PLY; ++d)
+    {
+      for (int mc = 1; mc < 64; ++mc)
+      {
+        double    PVRed = -1.5 + 0.33 * log(double(d)) * log(double(mc));
+        double nonPVRed = -1.2 + 0.37 * log(double(d)) * log(double(mc));
+        PVreduction[improving][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
+        nonPVreduction[improving][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
+        
+        if( !improving )
+        {
+          if(    PVreduction[improving][d][mc] > int(ONE_PLY) ){    PVreduction[improving][d][mc] += int(ONE_PLY); }
+          if( nonPVreduction[improving][d][mc] > int(ONE_PLY) ){ nonPVreduction[improving][d][mc] += int(ONE_PLY); }
+        }
+      }
+    }
+  }
+}
 

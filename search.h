@@ -159,8 +159,8 @@ private:
 	static Score futility[8];
 	static Score futilityMargin[7];
 	static unsigned int FutilityMoveCounts[16];
-	static Score PVreduction[LmrLimit*ONE_PLY][64];
-	static Score nonPVreduction[LmrLimit*ONE_PLY][64];
+	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
+	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
 
 	static Score mateIn(int ply) { return SCORE_MATE - ply; }
 	static Score matedIn(int ply) { return SCORE_MATED + ply; }
@@ -253,17 +253,7 @@ public:
 	static bool Syzygy50MoveRule;
 	volatile bool showLine = false;
 
-	static void initLMRreduction(void)
-	{
-		for (unsigned int d = 1; d < LmrLimit*ONE_PLY; d++)
-			for (int mc = 1; mc < 64; mc++)
-			{
-				double    PVRed = -1.5 + 0.33*log(double(d)) * log(double(mc));
-				double nonPVRed = -1.2 + 0.37*log(double(d)) * log(double(mc));
-				PVreduction[d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
-				nonPVreduction[d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
-			}
-	};
+	static void initLMRreduction(void);
 
 	void stopPonder(){ limits.ponder = false;}
 	volatile bool stop = false;
