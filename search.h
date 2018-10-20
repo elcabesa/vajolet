@@ -143,6 +143,7 @@ public:
 	bool skipNullMove;
 	Move killers[2];
 	Score staticEval;
+	bool inCheck;
 };
 
 

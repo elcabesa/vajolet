@@ -555,6 +555,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
 	const bool inCheck = pos.isInCheck();
 	bool improving = false;
+	sd[ply].inCheck = inCheck;
 	//Move threatMove(NOMOVE);
 
 
@@ -793,7 +794,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	
 	sd[ply].staticEval = staticEval;
 	
-	if( sd[ply].skipNullMove || !inCheck || ( ply >=2 && sd[ply].staticEval >= sd[ply-2].staticEval ) )
+	if( sd[ply].skipNullMove || !inCheck || ( ply >=2 && sd[ply-2].inCheck ) || ( ply >=2 && sd[ply].staticEval >= sd[ply-2].staticEval ) )
 	{
 		improving = true;
 	}
@@ -1410,6 +1411,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	assert(PVnode || alpha+1==beta);
 
 	bool inCheck = pos.isInCheck();
+	sd[ply].inCheck = inCheck;
 
 	maxPlyReached = std::max(ply, maxPlyReached);
 	visitedNodes++;
