@@ -1716,24 +1716,22 @@ void Search::setUOI( std::unique_ptr<UciOutput> UOI )
 
 void Search::initLMRreduction(void)
 {
-  for (unsigned int improving = 0; improving < 2; ++improving)
-  {
-    for (unsigned int d = 1; d < LmrLimit*ONE_PLY; ++d)
-    {
-      for (int mc = 1; mc < 64; ++mc)
-      {
-        double    PVRed = -1.5 + 0.33 * log(double(d)) * log(double(mc));
-        double nonPVRed = -1.2 + 0.37 * log(double(d)) * log(double(mc));
-        PVreduction[improving][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
-        nonPVreduction[improving][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
-        
-        if( !improving )
-        {
-          if(    PVreduction[improving][d][mc] > int(ONE_PLY) ){    PVreduction[improving][d][mc] += int(ONE_PLY); }
-          if( nonPVreduction[improving][d][mc] > int(ONE_PLY) ){ nonPVreduction[improving][d][mc] += int(ONE_PLY); }
-        }
-      }
-    }
-  }
+	for (unsigned int d = 1; d < LmrLimit*ONE_PLY; ++d)
+	{
+		for (int mc = 1; mc < 64; ++mc)
+		{
+			double    PVRed = -1.5 + 0.33 * log(double(d)) * log(double(mc));
+			double nonPVRed = -1.2 + 0.37 * log(double(d)) * log(double(mc));
+
+			PVreduction[1][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
+			nonPVreduction[1][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
+
+			PVreduction[0][d][mc] = PVreduction[1][d][mc];
+			nonPVreduction[0][d][mc] = nonPVreduction[1][d][mc];
+
+			if(    PVreduction[0][d][mc] > int(ONE_PLY) ){    PVreduction[0][d][mc] += int(ONE_PLY); }
+			if( nonPVreduction[0][d][mc] > int(ONE_PLY) ){ nonPVreduction[0][d][mc] += int(ONE_PLY); }
+		}
+	}
 }
 
