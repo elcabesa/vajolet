@@ -29,10 +29,6 @@
 #include "thread.h"
 #include "syzygy/tbprobe.h"
 
-/*unsigned long int imprcount = 0;
-unsigned long int noimprcount = 0;
-unsigned long int noimprcount1 = 0;
-unsigned long int noimprcount2 = 0;*/
 #ifdef DEBUG_EVAL_SIMMETRY
 	
 	
@@ -540,8 +536,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		std::cout<<"depth "<<helperResults[i].depth<<std::endl;
 	}*/
 	
-/*	std::cout<<noimprcount<<"/"<<imprcount<<"("<< 100.0* noimprcount / (noimprcount + imprcount) <<"%)"<<sync_endl;
-	std::cout<<noimprcount2<<"/"<<noimprcount1<<"("<< 100.0* noimprcount2 / (noimprcount1) <<"%)"<<sync_endl;*/
 	
 	return startThinkResult( alpha, beta, bestMove->depth, bestMove->PV, bestMove->score);
 
@@ -800,18 +794,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	
 	sd[ply].staticEval = staticEval;
 	
-	if( ply <2 /*|| sd[ply].skipNullMove*/ || inCheck || ( ply >=2 && sd[ply-2].inCheck ) || ( ply >=2 && sd[ply].staticEval >= sd[ply-2].staticEval ) )
+	if( ply <2 || inCheck || ( ply >=2 && sd[ply-2].inCheck ) || ( ply >=2 && sd[ply].staticEval >= sd[ply-2].staticEval ) )
 	{
 		improving = true;
 	}
-/*	if( improving )
-	{
-		++imprcount;
-	}
-	else
-	{
-		++noimprcount;
-	}*/
+
 	//-----------------------------
 	// reduction && pruning
 	//-----------------------------
@@ -1188,22 +1175,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 					if(reduction != 0)
 					{
-/*						if( !improving )
-						{
-							++noimprcount1;
-						}*/
 						val = -alphaBeta<Search::nodeType::CUT_NODE>(ply+1, d, -alpha-1, -alpha, childPV);
 						if(val<=alpha)
 						{
-/*							if( !improving )
-							{
-								++noimprcount2;
-							}*/
 							doFullDepthSearch = false;
 						}
-/*						else{
-							//pos.display();
-						}*/
 					}
 				}
 
@@ -1253,22 +1229,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 				if(reduction != 0)
 				{
-/*					if( !improving )
-					{
-						++noimprcount1;
-					}*/
 					val = -alphaBeta<childNodesType>(ply+1, d, -alpha-1, -alpha, childPV);
 					if(val <= alpha)
 					{
-/*						if( !improving )
-						{
-							++noimprcount2;
-						}*/
 						doFullDepthSearch = false;
 					}
-/*					else{
-						//pos.display();
-					}*/
 				}
 			}
 
