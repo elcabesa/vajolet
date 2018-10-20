@@ -29,6 +29,8 @@
 #include "thread.h"
 #include "syzygy/tbprobe.h"
 
+//unsigned long int imprcount = 0;
+//unsigned long int noimprcount = 0;
 #ifdef DEBUG_EVAL_SIMMETRY
 	
 	
@@ -536,6 +538,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		std::cout<<"depth "<<helperResults[i].depth<<std::endl;
 	}*/
 	
+	//std::cout<<noimprcount<<"/"<<imprcount<<"("<< 100.0* noimprcount / (noimprcount+ imprcount) <<"%)"<<sync_endl;
 	
 	return startThinkResult( alpha, beta, bestMove->depth, bestMove->PV, bestMove->score);
 
@@ -798,7 +801,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	{
 		improving = true;
 	}
-
+/*	if( improving )
+	{
+		++imprcount;
+	}
+	else
+	{
+		++noimprcount;
+	}*/
 	//-----------------------------
 	// reduction && pruning
 	//-----------------------------
@@ -1712,8 +1722,8 @@ void Search::initLMRreduction(void)
     {
       for (int mc = 1; mc < 64; ++mc)
       {
-        double    PVRed = -1.6 + 0.33 * log(double(d)) * log(double(mc));
-        double nonPVRed = -1.3 + 0.37 * log(double(d)) * log(double(mc));
+        double    PVRed = -1.5 + 0.33 * log(double(d)) * log(double(mc));
+        double nonPVRed = -1.2 + 0.37 * log(double(d)) * log(double(mc));
         PVreduction[improving][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
         nonPVreduction[improving][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
         
