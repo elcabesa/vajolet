@@ -179,20 +179,21 @@ public:
 		return * this;
 	}
 
+	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
+
 	const History& getHistory()const {return history;}
 	const CaptureHistory& getCaptureHistory()const {return captureHistory;}
 	const CounterMove& getCounterMove()const {return  counterMoves;}
+	const Move& getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
+
 	void stopPonder(){ limits.ponder = false;}
 	void stopSearch(){ stop = true;}
 	void resetStopCondition(){ stop = false;}
 	bool isNotStopped(){ return stop == false; }
-	const Move& getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
-
-	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
 
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
-	void showLine(){ _showLine= true;};
+	void showLine(){ _showLine= true;}
 
 private:
 	//--------------------------------------------------------
@@ -226,23 +227,27 @@ private:
 	// private members
 	//--------------------------------------------------------
 	std::unique_ptr<UciOutput> _UOI;
+
 	int globalReduction;
 	bool validIteration = false;
 	Score ExpectedValue = 0;
 	unsigned int multiPVcounter = 0;
+	bool followPV;
+	PVline pvLineToFollow;
+	Position::eNextMove initialNextMove;
+	bool _showLine = false;
+
 	History history;
 	CaptureHistory captureHistory;
 	CounterMove counterMoves;
 	searchData sd[800];
-	bool followPV;
-	PVline pvLineToFollow;
+
 	unsigned long long visitedNodes;
 	unsigned long long tbHits;
 	unsigned int maxPlyReached;
-	Position::eNextMove initialNextMove;
-	bool _showLine = false;
 
 	std::vector<rootMove> rootMovesSearched;
+
 	SearchTimer& _st;
 
 	volatile bool stop = false;
