@@ -482,10 +482,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 
-
-
-
-	const Position::state& st = pos.getActualState();
 	visitedNodes++;
 	clearKillers(ply+1);
 
@@ -763,6 +759,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		//---------------------------
 		//	at very low deep and with an evaluation well above beta, bet that we can found a move with a result above beta
 		//---------------------------
+		
+		const Position::state& st = pos.getActualStateConst();
 		if (!sd[ply].skipNullMove
 			&& depth < 8 * ONE_PLY
 			//&& eval > -SCORE_INFINITE + futility[ depth>>ONE_PLY_SHIFT ]
@@ -1478,7 +1476,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 	PVline childPV;
 
-	const Position::state& st = pos.getActualState();
 	while (/*bestScore < beta  &&  */(m = mg.getNextMove()) != Movegen::NOMOVE)
 	{
 		assert(alpha < beta);
@@ -1496,7 +1493,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			}
 
 			// at very deep search allow only recapture
-			if(depth < -7 * ONE_PLY && st.currentMove.bit.to != m.bit.to)
+			if(depth < -7 * ONE_PLY && pos.getActualStateConst().currentMove.bit.to != m.bit.to)
 			{
 				continue;
 			}

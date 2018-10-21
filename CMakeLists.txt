@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8)
 project (Vajolet)
 
 IF(NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
-    set(CMAKE_CXX_FLAGS "-std=c++1z -O3 -msse4.2 -mpopcnt -pedantic -Wall -Wextra -fmessage-length=0")
+    set(CMAKE_CXX_FLAGS "-std=c++1z -O3 -msse4.2 -mpopcnt -mbmi -mbmi2 -pedantic -Wall -Wextra -fmessage-length=0")
 else()
     set(CMAKE_CXX_FLAGS "-std=c++1z -O3 -pedantic -Wall -Wextra -fmessage-length=0")
 endif()
