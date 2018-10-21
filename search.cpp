@@ -16,7 +16,9 @@
 */
 
 
+#include <cmath>
 #include <map>
+
 
 #include "bitops.h"
 #include "command.h"
@@ -29,6 +31,7 @@
 #include "thread.h"
 #include "uciParameters.h"
 #include "syzygy/tbprobe.h"
+#include "vajolet.h"
 
 #ifdef DEBUG_EVAL_SIMMETRY
 	

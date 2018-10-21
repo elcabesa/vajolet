@@ -17,19 +17,17 @@
 #ifndef SEARCH_H_
 #define SEARCH_H_
 
-#include <chrono>
-#include <cmath>
+
 #include <list>
-#include <string>
 #include <vector>
 
-#include "data.h"
 #include "command.h"
-#include "position.h"
-#include "move.h"
 #include "history.h"
+#include "move.h"
+#include "position.h"
 #include "searchTimer.h"
-#include "vajolet.h"
+
+
 
 class PVline : private std::list<Move>
 {
