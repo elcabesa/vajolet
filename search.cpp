@@ -402,11 +402,11 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//init the new search
 	//------------------------------------
 	
-	pvLineToFollow = pvToBeFollowed;
-	
 	//clean transposition table
 	transpositionTable::getInstance().newSearch();
 	
+	pvLineToFollow = pvToBeFollowed;
+
 	// setup main thread
 	cleanMemoryBeforeStartingNewSearch();
 
@@ -463,6 +463,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 		helperResults[i].firstMove = m;
 		
+		helperSearch[i].cleanMemoryBeforeStartingNewSearch();
 		helperSearch[i].resetStopCondition();
 		helperSearch[i].pos = pos;
 		helperSearch[i].pvLineToFollow = pvLineToFollow;
