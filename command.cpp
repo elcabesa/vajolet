@@ -30,8 +30,10 @@
 #include "syzygy/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"
-#include "version.h"
+#include "uciParameters.h"
 #include "vajolet.h"
+#include "version.h"
+
 
 
 //---------------------------------------------
@@ -203,18 +205,20 @@ void static position(std::istringstream& is, Position & pos)
 void static doPerft(const unsigned int n, Position & pos)
 {
 
-	unsigned long long elapsed = Search::getTime();
+	SearchTimer st;
+
 	unsigned long long res = pos.perft(n);
-	elapsed = Search::getTime() - elapsed;
+
+	long long int totalTime = std::max( st.getElapsedTime(), 1ll) ;
 
 	sync_cout << "Perft " << n << " leaf nodes: " << res << sync_endl;
-	sync_cout << elapsed << "ms " << ((double)res) / (double)elapsed << " kN/s" << sync_endl;
+	sync_cout << totalTime << "ms " << ((double)res) / (double)totalTime << " kN/s" << sync_endl;
 }
 
 
 void static go(std::istringstream& is, Position & pos, my_thread * thr)
 {
-	searchLimits limits;
+	SearchLimits limits;
 	std::string token;
 	bool searchMovesCommand = false;
 
@@ -327,8 +331,8 @@ void setoption(std::istringstream& is)
 		try
 		{
 			int i = std::stoi(value);
-			Search::threads = (i<=128)?(i>0?i:1):128;
-			sync_cout<<"info string Threads number set to "<<Search::threads<<sync_endl;
+			uciParameters::threads = (i<=128)?(i>0?i:1):128;
+			sync_cout<<"info string Threads number set to "<<uciParameters::threads<<sync_endl;
 		}
 		catch(...){}
 	}
@@ -337,8 +341,8 @@ void setoption(std::istringstream& is)
 		try
 		{
 			int i = std::stoi(value);
-			Search::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
-			sync_cout<<"info string MultiPv Lines set to "<<Search::multiPVLines<<sync_endl;
+			uciParameters::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
+			sync_cout<<"info string MultiPv Lines set to "<<uciParameters::multiPVLines<<sync_endl;
 		}
 		catch(...){}	
 	}
@@ -346,11 +350,11 @@ void setoption(std::istringstream& is)
 	{
 		if(value=="true")
 		{
-			Search::useOwnBook = true;
+			uciParameters::useOwnBook = true;
 			sync_cout<<"info string OwnBook option set to true"<<sync_endl;
 		}
 		else{
-			Search::useOwnBook = false;
+			uciParameters::useOwnBook = false;
 			sync_cout<<"info string OwnBook option set to false"<<sync_endl;
 		}
 	}
@@ -358,12 +362,12 @@ void setoption(std::istringstream& is)
 	{
 		if(value == "true")
 		{
-			Search::bestMoveBook = true;
+			uciParameters::bestMoveBook = true;
 			sync_cout<<"info string BestMoveBook option set to true"<<sync_endl;
 		}
 		else
 		{
-			Search::bestMoveBook = false;
+			uciParameters::bestMoveBook = false;
 			sync_cout<<"info string BestMoveBook option set to false"<<sync_endl;
 		}
 	}
@@ -371,12 +375,12 @@ void setoption(std::istringstream& is)
 	{
 		if(value == "true")
 		{
-			Search::showCurrentLine = true;
+			uciParameters::showCurrentLine = true;
 			sync_cout<<"info string UCI_ShowCurrLine option set to true"<<sync_endl;
 		}
 		else
 		{
-			Search::showCurrentLine = false;
+			uciParameters::showCurrentLine = false;
 			sync_cout<<"info string UCI_ShowCurrLine option set to false"<<sync_endl;
 		}
 	}
@@ -386,32 +390,32 @@ void setoption(std::istringstream& is)
 	}
 	else if(name == "SyzygyPath")
 	{
-		Search::SyzygyPath = value;
-		tb_init(Search::SyzygyPath.c_str());
+		uciParameters::SyzygyPath = value;
+		tb_init(uciParameters::SyzygyPath.c_str());
 		sync_cout<<"info string TB_LARGEST = "<<TB_LARGEST<<sync_endl;
 	}
 	else if(name == "SyzygyProbeDepth")
 	{
 		try
 		{
-			Search::SyzygyProbeDepth = std::max(std::stoi(value),0) ;
+			uciParameters::SyzygyProbeDepth = std::max(std::stoi(value),0) ;
 		}
 		catch(...)
 		{
-			Search::SyzygyProbeDepth = 1;
+			uciParameters::SyzygyProbeDepth = 1;
 		}
-		sync_cout<<"info string SyzygyProbeDepth option set to "<<Search::SyzygyProbeDepth<<sync_endl;
+		sync_cout<<"info string SyzygyProbeDepth option set to "<<uciParameters::SyzygyProbeDepth<<sync_endl;
 	}
 	else if(name == "Syzygy50MoveRule")
 	{
 		if(value == "true")
 		{
-			Search::Syzygy50MoveRule = true;
+			uciParameters::Syzygy50MoveRule = true;
 			sync_cout<<"info string Syzygy50MoveRule option set to true"<<sync_endl;
 		}
 		else
 		{
-			Search::Syzygy50MoveRule = false;
+			uciParameters::Syzygy50MoveRule = false;
 			sync_cout<<"info string Syzygy50MoveRule option set to false"<<sync_endl;
 		}
 	}

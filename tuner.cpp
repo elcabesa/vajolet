@@ -29,6 +29,7 @@
 #include "score.h"
 #include "eval.h"
 #include "parameters.h"
+#include "uciParameters.h"
 #include "syzygy/tbprobe.h"
 #include "eval.h"
 
@@ -205,7 +206,7 @@ int main()
 	Search::initLMRreduction();
 	transpositionTable::getInstance().setSize(1);
 	Position::initMaterialKeys();
-	tb_init(Search::SyzygyPath.c_str());
+	tb_init(uciParameters::SyzygyPath.c_str());
 	
 	enablePawnHash =false;
 

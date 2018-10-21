@@ -25,6 +25,7 @@
 #include "position.h"
 #include "search.h"
 #include "transposition.h"
+#include "uciParameters.h"
 #include "syzygy/tbprobe.h"
 
 
@@ -46,7 +47,7 @@ static void init()
 	Search::initLMRreduction();
 	transpositionTable::getInstance().setSize(1);
 	Position::initMaterialKeys();
-	tb_init(Search::SyzygyPath.c_str());
+	tb_init(uciParameters::SyzygyPath.c_str());
 }
 
 static bool manageCommandLine( int argc, char* argv[] )

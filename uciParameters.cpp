@@ -14,12 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#include "uciParameters.h"
 
-#ifndef VERSION_H_
-#define VERSION_H_
+unsigned int uciParameters::threads = 1;
+unsigned int uciParameters::multiPVLines = 1;
+bool uciParameters::useOwnBook = true;
+bool uciParameters::bestMoveBook = false;
+bool uciParameters::showCurrentLine = false;
+std::string uciParameters::SyzygyPath = "<empty>";
+unsigned int uciParameters::SyzygyProbeDepth = 1;
+bool uciParameters::Syzygy50MoveRule =  true;
 
-#define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.7.0"
-#define PRE_RELEASE		"-PRE-26"
 
-#endif

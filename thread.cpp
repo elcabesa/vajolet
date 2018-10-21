@@ -20,8 +20,9 @@
 #include "movegen.h"
 #include "thread.h"
 #include "transposition.h"
+#include "uciParameters.h"
 
-void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruct& timeMan)
+void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruct& timeMan)
 {
 	timeMan.FirstIterationFinished = false;
 	if((!lim.btime && !lim.wtime) && !lim.moveTime)
@@ -111,7 +112,7 @@ void my_thread::timerThread()
 		if (!quit)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
-			long long int time = src.getClockTime();
+			long long int time = st.getClockTime();
 
 			if(timeMan.idLoopIterationFinished)
 			{
@@ -121,16 +122,16 @@ void my_thread::timerThread()
 			{
 				timeMan.allocatedTime = timeMan.maxAllocatedTime;
 			}
-			if(src.isNotStopped() && timeMan.maxAllocatedTime == timeMan.allocatedTime /*&& time >= timeMan.allocatedTime */&& ( timeMan.idLoopIterationFinished ) && !(src.limits.infinite || src.limits.ponder) )
+			if(src.isNotStopped() && timeMan.maxAllocatedTime == timeMan.allocatedTime /*&& time >= timeMan.allocatedTime */&& ( timeMan.idLoopIterationFinished ) && !(limits.infinite || limits.ponder) )
 			{
 				src.stopSearch();
 			}
 
-			if(src.isNotStopped() && time >= timeMan.allocatedTime && timeMan.FirstIterationFinished && !(src.limits.infinite || src.limits.ponder))
+			if(src.isNotStopped() && time >= timeMan.allocatedTime && timeMan.FirstIterationFinished && !(limits.infinite || limits.ponder))
 			{
 				src.stopSearch();
 			}
-			if(src.isNotStopped() && timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(src.limits.infinite || src.limits.ponder))
+			if(src.isNotStopped() && timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(limits.infinite || limits.ponder))
 			{
 				src.stopSearch();
 			}
@@ -141,18 +142,16 @@ void my_thread::timerThread()
 
 				_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), time);
 
-				if(src.showCurrentLine)
+				if( uciParameters::showCurrentLine )
 				{
-					src.showLine = true;
+					src.showLine();
 				}
 
 			}
 
 #endif
 
-
-
-			if(timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && !(src.limits.infinite || src.limits.ponder))
+			if(timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && !(limits.infinite || limits.ponder))
 			{
 				if(timeMan.singularRootMoveCount >=20)
 				{
@@ -161,11 +160,11 @@ void my_thread::timerThread()
 			}
 
 
-			if(src.limits.nodes && timeMan.FirstIterationFinished && src.getVisitedNodes() > src.limits.nodes)
+			if(limits.nodes && timeMan.FirstIterationFinished && src.getVisitedNodes() > limits.nodes)
 			{
 				src.stopSearch();
 			}
-			if(src.limits.moveTime && timeMan.FirstIterationFinished && time>=src.limits.moveTime)
+			if(limits.moveTime && timeMan.FirstIterationFinished && time>=limits.moveTime)
 			{
 				src.stopSearch();
 			}
@@ -185,9 +184,9 @@ void my_thread::searchThread()
 		searchCond.wait(lk, [&]{return startThink||quit;} );
 		if(!quit)
 		{
-			timeManagerInit(src.pos, src.limits, timeMan);
+			timeManagerInit(src.pos, limits, timeMan);
 			src.resetStopCondition();
-			src.resetStartTimers();
+			st.resetStartTimers();
 			timerCond.notify_one();
 			src.resetStopCondition();
 			manageNewSearch();
@@ -230,7 +229,7 @@ void my_thread::manageNewSearch()
 		return;
 	}
 	
-	if( legalMoves == 1 && !src.limits.infinite)
+	if( legalMoves == 1 && !limits.infinite)
 	{
 		
 		Move bestMove = mg.getMoveFromMoveList(0);
@@ -251,10 +250,10 @@ void my_thread::manageNewSearch()
 	//----------------------------------------------
 	//	book probing
 	//----------------------------------------------
-	if(Search::useOwnBook && !src.limits.infinite )
+	if( uciParameters::useOwnBook && !limits.infinite )
 	{
 		PolyglotBook pol;
-		Move bookM = pol.probe(src.pos, Search::bestMoveBook);
+		Move bookM = pol.probe(src.pos, uciParameters::bestMoveBook);
 		if(bookM.packed)
 		{
 			PVline PV( 1, bookM );
@@ -295,7 +294,7 @@ void my_thread::manageNewSearch()
 	// print out the choosen line
 	//-----------------------------
 
-	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), src.getClockTime());
+	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), st.getElapsedTime());
 	
 	Move bestMove = PV.getMove(0);
 	Move ponderMove = PV.getMove(1);
@@ -351,7 +350,7 @@ Move my_thread::getPonderMoveFromBook(const Move bookMove )
 	Move ponderMove(0);
 	src.pos.doMove( bookMove );
 	PolyglotBook pol;
-	Move m = pol.probe(src.pos, Search::bestMoveBook);
+	Move m = pol.probe(src.pos, uciParameters::bestMoveBook);
 	
 	if( src.pos.isMoveLegal(m) )
 	{
@@ -364,7 +363,7 @@ Move my_thread::getPonderMoveFromBook(const Move bookMove )
 
 void my_thread::waitStopPondering() const
 {
-	while(src.limits.ponder){}
+	while(limits.ponder){}
 }
 
 

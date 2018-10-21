@@ -34,6 +34,7 @@ CPP_SRCS := \
 ./see.cpp \
 ./thread.cpp \
 ./transposition.cpp \
+./uciParameters.cpp \
 ./vajolet.cpp \
 ./syzygy/tbprobe.cpp 
 
@@ -61,6 +62,7 @@ OBJS :=  \
 ./see.o \
 ./thread.o \
 ./transposition.o \
+./uciParameters.o \
 ./vajolet.o \
 ./syzygy/tbprobe.o 
 C_UPPER_DEPS := 
@@ -83,6 +85,7 @@ CPP_DEPS := \
 ./see.d \
 ./thread.d \
 ./transposition.d \
+./uciParameters.cd \
 ./vajolet.d \
 ./syzygy/tbprobe.d 
 C_DEPS := 

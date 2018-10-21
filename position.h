@@ -28,6 +28,7 @@
 #include "move.h"
 #include "tables.h"
 #include "score.h"
+#include "vajolet.h"
 
 typedef enum
 {

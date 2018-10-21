@@ -20,6 +20,8 @@
 
 #include "io.h"
 #include "search.h"
+#include "searchLimits.h"
+#include "searchTimer.h"
 #include "transposition.h"
 
 static const std::vector< std::string >positions = {
@@ -61,17 +63,16 @@ void benchmark(void)
 
 	unsigned long long nodeCount = 0;
 
-	long long int startTime = Search::getTime();
+	SearchTimer st;
+	SearchLimits sl;
+	sl.depth = 15;
 
-	Search src( UciOutput::create( UciOutput::mute ) );
-	src.limits.depth = 15;
+	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
 	int i = 0;
 	
 	for( auto pos: positions )
 	{
 		++i;
-		
-		src.resetStartTimers();
 		
 		src.pos.setupFromFen( pos );
 		
@@ -82,7 +83,7 @@ void benchmark(void)
 		nodeCount += src.getVisitedNodes();
 	}
 
-	long long int totalTime = Search::getTime() - startTime;
+	long long int totalTime = st.getElapsedTime();
 
 	sync_cout << "\n==========================="
        << "\nTotal time (ms) : " << totalTime

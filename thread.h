@@ -26,6 +26,8 @@
 #include "command.h"
 #include "position.h"
 #include "search.h"
+#include "searchLimits.h"
+#include "searchTimer.h"
 
 
 struct timeManagementStruct
@@ -39,7 +41,7 @@ struct timeManagementStruct
 	volatile bool idLoopIterationFinished;
 	volatile bool idLoopAlpha;
 	volatile bool idLoopBeta;
-//
+
 	bool FirstIterationFinished;
 
 };
@@ -157,8 +159,10 @@ public:
 class my_thread
 {
 
+	SearchLimits limits; // todo limits belong to threads
+
 	std::unique_ptr<UciOutput> _UOI;
-	my_thread()
+	my_thread():src(st, limits)
 	{
 		_UOI = UciOutput::create();
 		initThreads();
@@ -170,6 +174,8 @@ class my_thread
 
 	volatile static bool quit;
 	volatile static bool startThink;
+
+	SearchTimer st;
 	std::thread timer;
 	std::thread searcher;
 	std::mutex searchMutex;
@@ -189,6 +195,8 @@ class my_thread
 	Move getPonderMoveFromBook(const Move bookMove );
 	void waitStopPondering() const;
 public :
+
+
 	void quitThreads();
 
 	static std::mutex  _mutex;
@@ -215,7 +223,7 @@ public :
 	{
 		quitThreads();
 	}
-	void startThinking(Position * p, searchLimits& l)
+	void startThinking(Position * p, SearchLimits& l)
 	{
 		src.stopSearch();
 		lastHasfullMessage = 0;
@@ -225,23 +233,25 @@ public :
 		if(!startThink)
 		{
 			std::lock_guard<std::mutex> lk(searchMutex);
-			src.limits = l;
+			limits = l;
 			src.pos = *p;
 			startThink = true;
 			searchCond.notify_one();
 		}
 	}
 
+	void stopPonder(){ limits.ponder = false;}
+
 	void stopThinking()
 	{
 		src.stopSearch();
-		src.stopPonder();
+		stopPonder();
 	}
 
 	void ponderHit()
 	{
-		src.resetPonderTimer();
-		src.stopPonder();
+		st.resetPonderTimer();
+		stopPonder();
 	}
 
 };

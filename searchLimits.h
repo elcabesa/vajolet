@@ -15,11 +15,33 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VERSION_H_
-#define VERSION_H_
+#ifndef SEARCH_LIMITS_H_
+#define SEARCH_LIMITS_H_
 
-#define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.7.0"
-#define PRE_RELEASE		"-PRE-26"
+#include <list>
+
+class SearchLimits
+{
+public:
+	volatile bool ponder,infinite;
+	unsigned int wtime,btime,winc,binc,movesToGo,nodes,mate,moveTime;
+	int depth;
+	std::list<Move> searchMoves;
+	SearchLimits()
+	{
+		ponder = false;
+		infinite = false;
+		wtime = 0;
+		btime = 0;
+		winc = 0;
+		binc = 0;
+		movesToGo = 0;
+		depth = -1;
+		nodes = 0;
+		mate = 0;
+		moveTime = 0;
+	}
+
+};
 
 #endif
