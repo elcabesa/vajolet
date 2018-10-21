@@ -23,8 +23,10 @@
 #include <mutex>
 #include <thread>
 
+#include "command.h"
 #include "position.h"
 #include "search.h"
+
 
 struct timeManagementStruct
 {
@@ -155,8 +157,10 @@ public:
 class my_thread
 {
 
+	std::unique_ptr<UciOutput> _UOI;
 	my_thread()
 	{
+		_UOI = UciOutput::create();
 		initThreads();
 		game.CreateNewGame();
 	};
@@ -213,7 +217,7 @@ public :
 	}
 	void startThinking(Position * p, searchLimits& l)
 	{
-		src.stop = true;
+		src.stopSearch();
 		lastHasfullMessage = 0;
 
 		while(startThink){}
@@ -230,7 +234,7 @@ public :
 
 	void stopThinking()
 	{
-		src.stop = true;
+		src.stopSearch();
 		src.stopPonder();
 	}
 

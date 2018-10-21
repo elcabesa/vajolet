@@ -228,13 +228,14 @@ private:
 
 	unsigned int maxPlyReached;
 
-//	void reloadPv(unsigned int i);
-//	void verifyPv(PVline &newPV, Score res);
+	static std::vector<Move> rootMoves;
+	std::vector<rootMove> rootMovesSearched;
+
+	volatile bool stop = false;
 
 public:
 
-	static std::vector<Move> rootMoves;
-	std::vector<rootMove> rootMovesSearched;
+
 	searchLimits limits;
 	Position pos;
 
@@ -257,19 +258,21 @@ public:
 	static void initLMRreduction(void);
 
 	void stopPonder(){ limits.ponder = false;}
-	volatile bool stop = false;
-
+	void stopSearch(){ stop = true;}
+	void resetStopCondition(){ stop = false;}
+	bool isNotStopped(){ return stop == false; }
 
 	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
-
 	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
 	
-	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
+
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 
 private:
+
+	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
 	// gestione timer
 	long long int startTime;
 	long long int ponderTime;
@@ -282,7 +285,7 @@ public:
 	void resetPonderTimer(){ ponderTime = getTime(); }
 	
 	Search( std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)){}
-	UciOutput& getUOI(){ return *_UOI;}
+private:
 	void setUOI( std::unique_ptr<UciOutput> UOI );
 	
 
