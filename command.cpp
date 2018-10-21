@@ -203,12 +203,14 @@ void static position(std::istringstream& is, Position & pos)
 void static doPerft(const unsigned int n, Position & pos)
 {
 
-	unsigned long long elapsed = Search::getTime();
+	SearchTimer st;
+
 	unsigned long long res = pos.perft(n);
-	elapsed = Search::getTime() - elapsed;
+
+	long long int totalTime = std::max( st.getElapsedTime(), 1ll) ;
 
 	sync_cout << "Perft " << n << " leaf nodes: " << res << sync_endl;
-	sync_cout << elapsed << "ms " << ((double)res) / (double)elapsed << " kN/s" << sync_endl;
+	sync_cout << totalTime << "ms " << ((double)res) / (double)totalTime << " kN/s" << sync_endl;
 }
 
 

@@ -136,7 +136,7 @@ public:
 	const Move& getMoveFromMoveList(unsigned int n) const;
 	Move getNextMove(void);
 
-	Movegen(const Position & p, const Search& s, unsigned int ply, const Move & ttm): pos(p),src(s),ply(ply), ttMove(ttm)
+	Movegen(const Position & p, const Search& s = defaultSearch, unsigned int ply = 0, const Move & ttm = NOMOVE): pos(p),src(s),ply(ply), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{
@@ -153,9 +153,6 @@ public:
 
 	}
 
-	Movegen(const Position & p): Movegen(p, defaultSearch, 0, NOMOVE)
-	{
-	}
 
 
 	int setupQuiescentSearch(const bool inCheck,const int depth)

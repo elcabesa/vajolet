@@ -28,6 +28,7 @@
 #include "position.h"
 #include "move.h"
 #include "history.h"
+#include "searchTimer.h"
 #include "vajolet.h"
 
 class PVline : private std::list<Move>
@@ -149,32 +150,115 @@ public:
 
 class Search
 {
-private:
+public:
 
+	//--------------------------------------------------------
+	// public static members
+	//--------------------------------------------------------
+	static unsigned int threads;
+	static unsigned int multiPVLines;
+	static bool useOwnBook;
+	static bool bestMoveBook;
+	static bool showCurrentLine;
+	static std::string SyzygyPath;
+	static unsigned int SyzygyProbeDepth;
+	static bool Syzygy50MoveRule;
+
+	//--------------------------------------------------------
+	// public members
+	//--------------------------------------------------------
+	searchLimits limits; // todo limits belong to threads
+	Position pos;
+	volatile bool showLine = false;
+
+	//--------------------------------------------------------
+	// public static methods
+	//--------------------------------------------------------
+	static void initLMRreduction(void);
+
+	//--------------------------------------------------------
+	// public methods
+	//--------------------------------------------------------
+public:
+
+	Search( SearchTimer& st, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _st(st){}
+	Search( const Search& other ):_UOI(UciOutput::create()), _st(other._st){ /* todo fare la copia*/}
+	Search& operator=(const Search& other)
+	{
+		// todo fare una copia fatta bene
+		_st = other._st;
+		_UOI= UciOutput::create();
+		return * this;
+	}
+
+	const History& getHistory()const {return history;}
+	const CaptureHistory& getCaptureHistory()const {return captureHistory;}
+	const CounterMove& getCounterMove()const {return  counterMoves;}
+	void stopPonder(){ limits.ponder = false;}
+	void stopSearch(){ stop = true;}
+	void resetStopCondition(){ stop = false;}
+	bool isNotStopped(){ return stop == false; }
+	const Move& getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
+
+	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
+
+	unsigned long long getVisitedNodes() const;
+	unsigned long long getTbHits() const;
+
+private:
+	//--------------------------------------------------------
+	// private enum definition
+	//--------------------------------------------------------
+	enum nodeType
+	{
+		ROOT_NODE,
+		PV_NODE,
+		ALL_NODE,
+		CUT_NODE
+	};
+
+	//--------------------------------------------------------
+	// private static members
+	//--------------------------------------------------------
 	static const int ONE_PLY = 16;
 	static const int ONE_PLY_SHIFT = 4;
-	std::unique_ptr<UciOutput> _UOI;
-	
-	int globalReduction;
 	static const unsigned int LmrLimit = 32;
 	static Score futility[8];
 	static Score futilityMargin[7];
 	static unsigned int FutilityMoveCounts[16];
 	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
 	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
+	static std::vector<Move> rootMoves;
 
 	static Score mateIn(int ply) { return SCORE_MATE - ply; }
 	static Score matedIn(int ply) { return SCORE_MATED + ply; }
+
+	//--------------------------------------------------------
+	// private members
+	//--------------------------------------------------------
+	std::unique_ptr<UciOutput> _UOI;
+	int globalReduction;
 	bool validIteration = false;
 	Score ExpectedValue = 0;
-
 	unsigned int multiPVcounter = 0;
 	History history;
 	CaptureHistory captureHistory;
 	CounterMove counterMoves;
-
 	searchData sd[800];
-	
+	bool followPV;
+	PVline pvLineToFollow;
+	unsigned long long visitedNodes;
+	unsigned long long tbHits;
+	unsigned int maxPlyReached;
+
+	std::vector<rootMove> rootMovesSearched;
+	SearchTimer& _st;
+
+	volatile bool stop = false;
+
+	//--------------------------------------------------------
+	// private methods
+	//--------------------------------------------------------
 	void cleanMemoryBeforeStartingNewSearch(void);
 	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
@@ -196,8 +280,6 @@ private:
 
 	}
 	
-	bool followPV;
-	PVline pvLineToFollow;
 	void enableFollowPv();
 	void disableFollowPv();
 	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
@@ -211,81 +293,12 @@ private:
 
 	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*78+cut*20000; }
 
-	enum nodeType
-	{
-		ROOT_NODE,
-		PV_NODE,
-		ALL_NODE,
-		CUT_NODE
-	} ;
-
-
 	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
 
-	unsigned long long visitedNodes;
-	unsigned long long tbHits;
-
-	unsigned int maxPlyReached;
-
-	static std::vector<Move> rootMoves;
-	std::vector<rootMove> rootMovesSearched;
-
-	volatile bool stop = false;
-
-public:
-
-
-	searchLimits limits;
-	Position pos;
-
-	const History& getHistory()const {return history;}
-	const CaptureHistory& getCaptureHistory()const {return captureHistory;}
-	const CounterMove& getCounterMove()const {return  counterMoves;}
-
-
-
-	static unsigned int threads;
-	static unsigned int multiPVLines;
-	static bool useOwnBook;
-	static bool bestMoveBook;
-	static bool showCurrentLine;
-	static std::string SyzygyPath;
-	static unsigned int SyzygyProbeDepth;
-	static bool Syzygy50MoveRule;
-	volatile bool showLine = false;
-
-	static void initLMRreduction(void);
-
-	void stopPonder(){ limits.ponder = false;}
-	void stopSearch(){ stop = true;}
-	void resetStopCondition(){ stop = false;}
-	bool isNotStopped(){ return stop == false; }
-
-	const Move&  getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
-
-	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
-	
-
-	unsigned long long getVisitedNodes() const;
-	unsigned long long getTbHits() const;
-
-private:
-
 	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
-	// gestione timer
-	long long int startTime;
-	long long int ponderTime;
 	Position::eNextMove initialNextMove;
-public:
-	static long long int getTime(){ return std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count(); }
-	long long int getElapsedTime() const { return getTime() - startTime; }
-	long long int getClockTime() const { return getTime() - ponderTime; }
-	void resetStartTimers(){ ponderTime = startTime = getTime(); }
-	void resetPonderTimer(){ ponderTime = getTime(); }
-	
-	Search( std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)){}
-private:
+
 	void setUOI( std::unique_ptr<UciOutput> UOI );
 	
 

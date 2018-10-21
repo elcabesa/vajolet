@@ -111,7 +111,7 @@ void my_thread::timerThread()
 		if (!quit)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
-			long long int time = src.getClockTime();
+			long long int time = st.getClockTime();
 
 			if(timeMan.idLoopIterationFinished)
 			{
@@ -187,7 +187,7 @@ void my_thread::searchThread()
 		{
 			timeManagerInit(src.pos, src.limits, timeMan);
 			src.resetStopCondition();
-			src.resetStartTimers();
+			st.resetStartTimers();
 			timerCond.notify_one();
 			src.resetStopCondition();
 			manageNewSearch();
@@ -295,7 +295,7 @@ void my_thread::manageNewSearch()
 	// print out the choosen line
 	//-----------------------------
 
-	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), src.getClockTime());
+	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), st.getElapsedTime());
 	
 	Move bestMove = PV.getMove(0);
 	Move ponderMove = PV.getMove(1);

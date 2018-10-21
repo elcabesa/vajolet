@@ -26,6 +26,7 @@
 #include "command.h"
 #include "position.h"
 #include "search.h"
+#include "searchTimer.h"
 
 
 struct timeManagementStruct
@@ -156,9 +157,8 @@ public:
 
 class my_thread
 {
-
 	std::unique_ptr<UciOutput> _UOI;
-	my_thread()
+	my_thread():src(st)
 	{
 		_UOI = UciOutput::create();
 		initThreads();
@@ -170,6 +170,8 @@ class my_thread
 
 	volatile static bool quit;
 	volatile static bool startThink;
+
+	SearchTimer st;
 	std::thread timer;
 	std::thread searcher;
 	std::mutex searchMutex;
@@ -189,6 +191,8 @@ class my_thread
 	Move getPonderMoveFromBook(const Move bookMove );
 	void waitStopPondering() const;
 public :
+
+
 	void quitThreads();
 
 	static std::mutex  _mutex;
@@ -240,7 +244,7 @@ public :
 
 	void ponderHit()
 	{
-		src.resetPonderTimer();
+		st.resetPonderTimer();
 		src.stopPonder();
 	}
 

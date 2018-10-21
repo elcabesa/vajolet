@@ -54,7 +54,9 @@
 const int Search::ONE_PLY;
 const int Search::ONE_PLY_SHIFT;
 
-Search defaultSearch;
+// todo remove
+SearchTimer st;
+Search defaultSearch= Search(st );
 std::vector<Move> Search::rootMoves;
 
 
@@ -318,7 +320,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 
 				if(validIteration ||!stop)
 				{
-					long long int elapsedTime  = getElapsedTime();
+					long long int elapsedTime = _st.getElapsedTime();
 
 					if (res <= alpha)
 					{
@@ -416,7 +418,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 	// setup other threads
 	helperSearch.clear();
-	helperSearch.resize(threads-1);
+	helperSearch.resize(threads-1, Search( st ) );
 
 	for (auto& hs : helperSearch)
 	{
@@ -451,9 +453,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		return manageQsearch();
 	}
 
-	
-	
-	
 	//----------------------------
 	// multithread : lazy smp threads
 	//----------------------------
@@ -1124,7 +1123,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		if(type == ROOT_NODE)
 		{
-			long long int elapsed = getElapsedTime();
+			long long int elapsed = _st.getElapsedTime();
 			if(
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 				elapsed>3000 &&
@@ -1282,7 +1281,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 						if(val < beta && depth > 1*ONE_PLY)
 						{
-							_UOI->printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, getElapsedTime(), multiPVcounter, pvLine, getVisitedNodes());
+							_UOI->printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, _st.getElapsedTime(), multiPVcounter, pvLine, getVisitedNodes());
 						}
 						if(val > ExpectedValue - 800)
 						{
