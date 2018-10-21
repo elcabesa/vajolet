@@ -153,18 +153,6 @@ class Search
 public:
 
 	//--------------------------------------------------------
-	// public static members
-	//--------------------------------------------------------
-	static unsigned int threads;
-	static unsigned int multiPVLines;
-	static bool useOwnBook;
-	static bool bestMoveBook;
-	static bool showCurrentLine;
-	static std::string SyzygyPath;
-	static unsigned int SyzygyProbeDepth;
-	static bool Syzygy50MoveRule;
-
-	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
 	searchLimits limits; // todo limits belong to threads

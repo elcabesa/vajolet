@@ -20,6 +20,7 @@
 #include "movegen.h"
 #include "thread.h"
 #include "transposition.h"
+#include "uciParameters.h"
 
 void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruct& timeMan)
 {
@@ -141,7 +142,7 @@ void my_thread::timerThread()
 
 				_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), time);
 
-				if(src.showCurrentLine)
+				if( uciParameters::showCurrentLine )
 				{
 					src.showLine();
 				}
@@ -249,10 +250,10 @@ void my_thread::manageNewSearch()
 	//----------------------------------------------
 	//	book probing
 	//----------------------------------------------
-	if(Search::useOwnBook && !src.limits.infinite )
+	if( uciParameters::useOwnBook && !src.limits.infinite )
 	{
 		PolyglotBook pol;
-		Move bookM = pol.probe(src.pos, Search::bestMoveBook);
+		Move bookM = pol.probe(src.pos, uciParameters::bestMoveBook);
 		if(bookM.packed)
 		{
 			PVline PV( 1, bookM );
@@ -349,7 +350,7 @@ Move my_thread::getPonderMoveFromBook(const Move bookMove )
 	Move ponderMove(0);
 	src.pos.doMove( bookMove );
 	PolyglotBook pol;
-	Move m = pol.probe(src.pos, Search::bestMoveBook);
+	Move m = pol.probe(src.pos, uciParameters::bestMoveBook);
 	
 	if( src.pos.isMoveLegal(m) )
 	{

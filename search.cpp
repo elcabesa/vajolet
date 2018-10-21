@@ -27,6 +27,7 @@
 #include "search.h"
 #include "transposition.h"
 #include "thread.h"
+#include "uciParameters.h"
 #include "syzygy/tbprobe.h"
 
 #ifdef DEBUG_EVAL_SIMMETRY
@@ -65,14 +66,7 @@ Score Search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
 unsigned int Search::FutilityMoveCounts[16] = {2,3,4,7,11,15,20,26,32,39,46,55,64,73,83,94};
 Score Search::PVreduction[2][LmrLimit*ONE_PLY][64];
 Score Search::nonPVreduction[2][LmrLimit*ONE_PLY][64];
-unsigned int Search::threads = 1;
-unsigned int Search::multiPVLines = 1;
-bool Search::useOwnBook = true;
-bool Search::bestMoveBook = false;
-bool Search::showCurrentLine = false;
-std::string Search::SyzygyPath ="<empty>";
-unsigned int Search::SyzygyProbeDepth = 1;
-bool Search::Syzygy50MoveRule= true;
+
 
 static std::vector<Search> helperSearch;
 
@@ -251,7 +245,7 @@ startThinkResult Search::manageQsearch(void)
 void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , bool masterThread)
 {
 	// manage multi PV moves
-	unsigned int linesToBeSearched = std::min(Search::multiPVLines, (unsigned int)rootMoves.size());
+	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)rootMoves.size());
 	
 	Score delta = 800;
 	
@@ -418,7 +412,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 	// setup other threads
 	helperSearch.clear();
-	helperSearch.resize(threads-1, Search( st ) );
+	helperSearch.resize( uciParameters::threads - 1, Search( st ) );
 
 	for (auto& hs : helperSearch)
 	{
@@ -437,7 +431,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//--------------------------------
 	//	tablebase probing, filtering rootmoves to be searched
 	//--------------------------------
-	if(limits.searchMoves.size() == 0 && Search::multiPVLines==1)
+	if(limits.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
 	{
 		filterRootMovesByTablebase( rootMoves );
 	}
@@ -461,15 +455,15 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	std::vector<std::thread> helperThread;
 	Move m(0);
 	rootMove rm(m);
-	std::vector<rootMove> helperResults(threads-1, rm);
+	std::vector<rootMove> helperResults( uciParameters::threads - 1, rm);
 
 	// launch helper threads
-	for( unsigned int i = 0; i < (threads - 1); ++i)
+	for( unsigned int i = 0; i < ( uciParameters::threads - 1); ++i)
 	{
 
 		helperResults[i].firstMove = m;
 		
-		helperSearch[i].stop = false;
+		helperSearch[i].resetStopCondition();
 		helperSearch[i].pos = pos;
 		helperSearch[i].pvLineToFollow = pvLineToFollow;
 		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, false));
@@ -482,9 +476,9 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	idLoop(MainThreadMove, depth, alpha, beta, true);
 	
 	// stop helper threads
-	for(unsigned int i = 0; i< (threads - 1); i++)
+	for(unsigned int i = 0; i< ( uciParameters::threads - 1); i++)
 	{
-		helperSearch[i].stop = true;
+		helperSearch[i].stopSearch();
 	}
 	for(auto &t : helperThread)
 	{
@@ -663,7 +657,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		unsigned int piecesCnt = bitCnt (pos.getBitmap(whitePieces) | pos.getBitmap(blackPieces));
 
 		if (    piecesCnt <= TB_LARGEST
-			&& (piecesCnt <  TB_LARGEST || depth >= (int)(SyzygyProbeDepth*ONE_PLY))
+			&& (piecesCnt <  TB_LARGEST || depth >= (int)( uciParameters::SyzygyProbeDepth * ONE_PLY ) )
 			&&  pos.getActualState().fiftyMoveCnt == 0)
 		{
 			unsigned result = tb_probe_wdl(pos.getBitmap(whitePieces),
@@ -686,7 +680,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				Score value;
 				unsigned wdl = TB_GET_WDL(result);
 				assert(wdl<5);
-				if(Syzygy50MoveRule)
+				if( uciParameters::Syzygy50MoveRule )
 				{
 					switch(wdl)
 					{
@@ -1277,7 +1271,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				{
 					alpha = bestScore;
 					pvLine.appendNewPvLine( bestMove, childPV);
-					if(type == Search::nodeType::ROOT_NODE && Search::multiPVLines==1)
+					if(type == Search::nodeType::ROOT_NODE && uciParameters::multiPVLines == 1 )
 					{
 						if(val < beta && depth > 1*ONE_PLY)
 						{
