@@ -61,7 +61,10 @@ const int Search::ONE_PLY_SHIFT;
 std::vector<Move> Search::rootMoves;
 
 
-Score Search::futility[8] = {0,6000,12000,18000,24000,30000,36000,42000};
+Score Search::futility(int depth, bool improving )
+{
+	return 375 * depth;
+}
 Score Search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
 unsigned int Search::FutilityMoveCounts[16] = {2,3,4,7,11,15,20,26,32,39,46,55,64,73,83,94};
 Score Search::PVreduction[2][LmrLimit*ONE_PLY][64];
@@ -831,14 +834,13 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		
 		if (!sd.story[ply].skipNullMove
 			&& depth < 8 * ONE_PLY
-			//&& eval > -SCORE_INFINITE + futility[ depth>>ONE_PLY_SHIFT ]
-			&& eval - futility[depth>>ONE_PLY_SHIFT] >= beta
+			&& eval - futility( depth, improving ) >= beta
 			&& eval < SCORE_KNOWN_WIN
 			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0])))
 		{
 			assert((depth>>ONE_PLY_SHIFT)<8);
-			assert((eval -futility[depth>>ONE_PLY_SHIFT] >-SCORE_INFINITE));
-			return eval - futility[depth>>ONE_PLY_SHIFT];
+			//assert((eval -futility( depth ) >-SCORE_INFINITE));
+			return eval/* - futility( depth )*/;
 		}
 
 
