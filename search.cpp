@@ -1724,3 +1724,25 @@ void Search::initLMRreduction(void)
 	}
 }
 
+inline void Search::clearKillers(unsigned int ply)
+{
+	Move * const tempKillers =  sd[ply].killers;
+
+	tempKillers[1] = 0;
+	tempKillers[0] = 0;
+}
+inline void Search::cleanData(void)
+{
+	std::memset(sd, 0, sizeof(sd));
+}
+
+inline void Search::saveKillers(unsigned int ply, Move& m)
+{
+	Move * const tempKillers =  sd[ply].killers;
+	if(tempKillers[0] != m)
+	{
+		tempKillers[1] = tempKillers[0];
+		tempKillers[0] = m;
+	}
+
+}

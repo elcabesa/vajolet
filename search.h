@@ -250,6 +250,7 @@ private:
 	unsigned long long visitedNodes;
 	unsigned long long tbHits;
 	unsigned int maxPlyReached;
+	Position::eNextMove initialNextMove;
 
 	std::vector<rootMove> rootMovesSearched;
 	SearchTimer& _st;
@@ -264,32 +265,15 @@ private:
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
 	startThinkResult manageQsearch(void);
 	
-	void cleanData(void)
-	{
-		std::memset(sd, 0, sizeof(sd));
-	}
+	void cleanData(void);
 
-	void saveKillers(unsigned int ply, Move& m)
-	{
-		Move * const tempKillers =  sd[ply].killers;
-		if(tempKillers[0] != m)
-		{
-			tempKillers[1] = tempKillers[0];
-			tempKillers[0] = m;
-		}
-
-	}
+	void saveKillers(unsigned int ply, Move& m);
 	
 	void enableFollowPv();
 	void disableFollowPv();
 	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
-	void clearKillers(unsigned int ply)
-	{
-		Move * const tempKillers =  sd[ply].killers;
+	void clearKillers(unsigned int ply);
 
-		tempKillers[1] = 0;
-		tempKillers[0] = 0;
-	}
 
 	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*78+cut*20000; }
 
@@ -297,7 +281,6 @@ private:
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
 
 	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
-	Position::eNextMove initialNextMove;
 
 	void setUOI( std::unique_ptr<UciOutput> UOI );
 	
