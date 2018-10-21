@@ -561,9 +561,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	//--------------------------------------
 	// show current line if needed
 	//--------------------------------------
-	if( showLine && depth <= ONE_PLY)
+	if( _showLine && depth <= ONE_PLY)
 	{
-		showLine = false;
+		_showLine = false;
 		_UOI->showCurrLine(pos,ply);
 	}
 

@@ -143,14 +143,12 @@ void my_thread::timerThread()
 
 				if(src.showCurrentLine)
 				{
-					src.showLine = true;
+					src.showLine();
 				}
 
 			}
 
 #endif
-
-
 
 			if(timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && !(src.limits.infinite || src.limits.ponder))
 			{

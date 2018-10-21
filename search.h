@@ -169,7 +169,7 @@ public:
 	//--------------------------------------------------------
 	searchLimits limits; // todo limits belong to threads
 	Position pos;
-	volatile bool showLine = false;
+
 
 	//--------------------------------------------------------
 	// public static methods
@@ -204,6 +204,7 @@ public:
 
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
+	void showLine(){ _showLine= true;};
 
 private:
 	//--------------------------------------------------------
@@ -251,6 +252,7 @@ private:
 	unsigned long long tbHits;
 	unsigned int maxPlyReached;
 	Position::eNextMove initialNextMove;
+	bool _showLine = false;
 
 	std::vector<rootMove> rootMovesSearched;
 	SearchTimer& _st;
