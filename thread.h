@@ -26,6 +26,7 @@
 #include "command.h"
 #include "position.h"
 #include "search.h"
+#include "searchLimits.h"
 #include "searchTimer.h"
 
 
@@ -157,8 +158,11 @@ public:
 
 class my_thread
 {
+
+	SearchLimits limits; // todo limits belong to threads
+
 	std::unique_ptr<UciOutput> _UOI;
-	my_thread():src(st)
+	my_thread():src(st, limits)
 	{
 		_UOI = UciOutput::create();
 		initThreads();
@@ -219,7 +223,7 @@ public :
 	{
 		quitThreads();
 	}
-	void startThinking(Position * p, searchLimits& l)
+	void startThinking(Position * p, SearchLimits& l)
 	{
 		src.stopSearch();
 		lastHasfullMessage = 0;
@@ -229,23 +233,25 @@ public :
 		if(!startThink)
 		{
 			std::lock_guard<std::mutex> lk(searchMutex);
-			src.limits = l;
+			limits = l;
 			src.pos = *p;
 			startThink = true;
 			searchCond.notify_one();
 		}
 	}
 
+	void stopPonder(){ limits.ponder = false;}
+
 	void stopThinking()
 	{
 		src.stopSearch();
-		src.stopPonder();
+		stopPonder();
 	}
 
 	void ponderHit()
 	{
 		st.resetPonderTimer();
-		src.stopPonder();
+		stopPonder();
 	}
 
 };

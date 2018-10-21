@@ -59,8 +59,9 @@ const int Search::ONE_PLY;
 const int Search::ONE_PLY_SHIFT;
 
 // todo remove
-SearchTimer st;
-Search defaultSearch= Search(st );
+SearchLimits searchLimit;
+SearchTimer searchTimer;
+Search defaultSearch= Search( searchTimer, searchLimit );
 std::vector<Move> Search::rootMoves;
 
 
@@ -395,7 +396,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 		}
 
 	}
-	while( ++depth <= (limits.depth != -1 ? limits.depth : 100) && !stop);
+	while( ++depth <= (_sl.depth != -1 ? _sl.depth : 100) && !stop);
 
 }
 
@@ -415,7 +416,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 	// setup other threads
 	helperSearch.clear();
-	helperSearch.resize( uciParameters::threads - 1, Search( st ) );
+	helperSearch.resize( uciParameters::threads - 1, Search( _st, _sl ) );
 
 	for (auto& hs : helperSearch)
 	{
@@ -429,12 +430,12 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//--------------------------------
 	// generate the list of root moves to be searched
 	//--------------------------------
-	generateRootMovesList( rootMoves, limits.searchMoves );
+	generateRootMovesList( rootMoves, _sl.searchMoves );
 	
 	//--------------------------------
 	//	tablebase probing, filtering rootmoves to be searched
 	//--------------------------------
-	if(limits.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
+	if(_sl.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
 	{
 		filterRootMovesByTablebase( rootMoves );
 	}
@@ -445,7 +446,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	
 	// manage depth 0 search ( return qsearch )
-	if(limits.depth == 0)
+	if(_sl.depth == 0)
 	{
 		return manageQsearch();
 	}

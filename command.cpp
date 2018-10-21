@@ -31,8 +31,9 @@
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"
-#include "version.h"
 #include "vajolet.h"
+#include "version.h"
+
 
 
 //---------------------------------------------
@@ -217,7 +218,7 @@ void static doPerft(const unsigned int n, Position & pos)
 
 void static go(std::istringstream& is, Position & pos, my_thread * thr)
 {
-	searchLimits limits;
+	SearchLimits limits;
 	std::string token;
 	bool searchMovesCommand = false;
 

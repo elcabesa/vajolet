@@ -20,6 +20,7 @@
 
 #include "io.h"
 #include "search.h"
+#include "searchLimits.h"
 #include "searchTimer.h"
 #include "transposition.h"
 
@@ -63,9 +64,10 @@ void benchmark(void)
 	unsigned long long nodeCount = 0;
 
 	SearchTimer st;
+	SearchLimits sl;
+	sl.depth = 15;
 
-	Search src( st, UciOutput::create( UciOutput::mute ) );
-	src.limits.depth = 15;
+	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
 	int i = 0;
 	
 	for( auto pos: positions )

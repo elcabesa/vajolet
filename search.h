@@ -25,7 +25,9 @@
 #include "history.h"
 #include "move.h"
 #include "position.h"
+#include "searchLimits.h"
 #include "searchTimer.h"
+
 
 
 
@@ -87,29 +89,7 @@ public:
 	startThinkResult( Score Alpha, Score Beta, unsigned int Depth, PVline pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
 };
 
-class searchLimits
-{
-public:
-	volatile bool ponder,infinite;
-	unsigned int wtime,btime,winc,binc,movesToGo,nodes,mate,moveTime;
-	int depth;
-	std::list<Move> searchMoves;
-	searchLimits()
-	{
-		ponder = false;
-		infinite = false;
-		wtime = 0;
-		btime = 0;
-		winc = 0;
-		binc = 0;
-		movesToGo = 0;
-		depth = -1;
-		nodes = 0;
-		mate = 0;
-		moveTime = 0;
-	}
 
-};
 
 class rootMove
 {
@@ -153,7 +133,6 @@ public:
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
-	searchLimits limits; // todo limits belong to threads
 	Position pos;
 
 
@@ -167,11 +146,12 @@ public:
 	//--------------------------------------------------------
 public:
 
-	Search( SearchTimer& st, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _st(st){}
-	Search( const Search& other ):_UOI(UciOutput::create()), _st(other._st){ /* todo fare la copia*/}
+	Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st){}
+	Search( const Search& other ):_UOI(UciOutput::create()), _sl(other._sl), _st(other._st){ /* todo fare la copia*/}
 	Search& operator=(const Search& other)
 	{
 		// todo fare una copia fatta bene
+		_sl = other._sl;
 		_st = other._st;
 		_UOI= UciOutput::create();
 		return * this;
@@ -184,7 +164,6 @@ public:
 	const CounterMove& getCounterMove()const {return  counterMoves;}
 	const Move& getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
-	void stopPonder(){ limits.ponder = false;}
 	void stopSearch(){ stop = true;}
 	void resetStopCondition(){ stop = false;}
 	bool isNotStopped(){ return stop == false; }
@@ -246,7 +225,9 @@ private:
 
 	std::vector<rootMove> rootMovesSearched;
 
+	SearchLimits& _sl; // todo limits belong to threads
 	SearchTimer& _st;
+
 
 	volatile bool stop = false;
 
