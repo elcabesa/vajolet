@@ -27,6 +27,7 @@
 #include "position.h"
 #include "search.h"
 
+extern SearchData defaultSearchData;
 
 class Movegen
 {
@@ -47,7 +48,7 @@ private:
 
 
 	const Position &pos;
-	const Search &src;
+	const SearchData &_sd;
 	unsigned int ply;
 	Move ttMove;
 
@@ -136,7 +137,7 @@ public:
 	const Move& getMoveFromMoveList(unsigned int n) const;
 	Move getNextMove(void);
 
-	Movegen(const Position & p, const Search& s = defaultSearch, unsigned int ply = 0, const Move & ttm = NOMOVE): pos(p),src(s),ply(ply), ttMove(ttm)
+	Movegen(const Position & p, const SearchData& sd = defaultSearchData, unsigned int ply = 0, const Move & ttm = NOMOVE): pos(p),_sd(sd),ply(ply), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{

@@ -23,6 +23,8 @@
 #include "movegen.h"
 #include "vajolet.h"
 
+// todo create empty ogject?
+SearchData defaultSearchData;
 
 
 bitMap Movegen::KNIGHT_MOVE[squareNumber];
@@ -33,6 +35,7 @@ bitMap Movegen::ROOK_PSEUDO_ATTACK[squareNumber];
 bitMap Movegen::BISHOP_PSEUDO_ATTACK[squareNumber];
 
 bitMap Movegen::castlePath[2][2];
+
 
 
 void Movegen::initMovegenConstant(void){
@@ -703,8 +706,8 @@ Move Movegen::getNextMove()
 			RemoveMove(ttMove);
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
-			killerMoves[0] = src.getKillers(ply,0);
-			killerMoves[1] = src.getKillers(ply,1);
+			killerMoves[0] = _sd.getKillers(ply,0);
+			killerMoves[1] = _sd.getKillers(ply,1);
 
 			scoreCaptureMoves();
 
@@ -764,14 +767,14 @@ Move Movegen::getNextMove()
 			}
 			else
 			{
-				killerMoves[0] = src.getKillers(ply, 0);
-				killerMoves[1] = src.getKillers(ply, 1);
+				killerMoves[0] = _sd.getKillers(ply, 0);
+				killerMoves[1] = _sd.getKillers(ply, 1);
 
 				Move previousMove = pos.getActualStateConst().currentMove;
 				if(previousMove.packed)
 				{
-					counterMoves[0] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
-					counterMoves[1] = src.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
+					counterMoves[0] = _sd.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 0);
+					counterMoves[1] = _sd.getCounterMove().getMove(pos.getPieceAt((tSquare)previousMove.bit.to), (tSquare)previousMove.bit.to, 1);
 				}
 				else
 				{
@@ -877,7 +880,7 @@ inline void Movegen::scoreCaptureMoves()
 	{
 		mov->score = pos.getMvvLvaScore(mov->m);
 		// history of capture
-		mov->score += src.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) ) * 50;
+		mov->score += _sd.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) ) * 50;
 
 	}
 }
@@ -886,7 +889,7 @@ inline void Movegen::scoreQuietMoves()
 {
 	for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
 	{
-		mov->score = src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
+		mov->score = _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
 	}
 }
 
@@ -901,7 +904,7 @@ inline void Movegen::scoreQuietEvasion()
 		}
 		mov->score *=500000;
 
-		mov->score += src.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
+		mov->score += _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
 	}
 }
 

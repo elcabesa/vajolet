@@ -28,9 +28,6 @@
 #include "searchLimits.h"
 #include "searchTimer.h"
 
-
-
-
 class PVline : private std::list<Move>
 {
 public:
@@ -89,8 +86,6 @@ public:
 	startThinkResult( Score Alpha, Score Beta, unsigned int Depth, PVline pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
 };
 
-
-
 class rootMove
 {
 public:
@@ -113,16 +108,30 @@ public:
 };
 
 
-
-
-class searchData
+class SearchData
 {
 public:
-	Move excludeMove;
-	bool skipNullMove;
-	Move killers[2];
-	Score staticEval;
-	bool inCheck;
+	struct Sd
+	{
+	public:
+		Move excludeMove;
+		bool skipNullMove;
+		Move killers[2];
+		Score staticEval;
+		bool inCheck;
+	} story[800];
+	CounterMove counterMoves;
+	CaptureHistory captureHistory;
+	History history;
+
+	void clearKillers(unsigned int ply);
+	void cleanData(void);
+	void saveKillers(unsigned int ply, Move& m);
+
+	const History& getHistory()const {return history;}
+	const CaptureHistory& getCaptureHistory()const {return captureHistory;}
+	const CounterMove& getCounterMove()const {return  counterMoves;}
+	const Move& getKillers(unsigned int ply,unsigned int n) const { return story[ply].killers[n]; }
 };
 
 
@@ -158,11 +167,6 @@ public:
 	}
 
 	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
-
-	const History& getHistory()const {return history;}
-	const CaptureHistory& getCaptureHistory()const {return captureHistory;}
-	const CounterMove& getCounterMove()const {return  counterMoves;}
-	const Move& getKillers(unsigned int ply,unsigned int n) const { return sd[ply].killers[n]; }
 
 	void stopSearch(){ stop = true;}
 	void resetStopCondition(){ stop = false;}
@@ -214,10 +218,8 @@ private:
 	Position::eNextMove initialNextMove;
 	bool _showLine = false;
 
-	History history;
-	CaptureHistory captureHistory;
-	CounterMove counterMoves;
-	searchData sd[800];
+
+	SearchData sd;
 
 	unsigned long long visitedNodes;
 	unsigned long long tbHits;
@@ -239,14 +241,9 @@ private:
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
 	startThinkResult manageQsearch(void);
 	
-	void cleanData(void);
-
-	void saveKillers(unsigned int ply, Move& m);
-	
 	void enableFollowPv();
 	void disableFollowPv();
 	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
-	void clearKillers(unsigned int ply);
 
 
 	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*78+cut*20000; }
@@ -260,7 +257,5 @@ private:
 	
 
 };
-
-extern Search defaultSearch;
 
 #endif /* SEARCH_H_ */
