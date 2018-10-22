@@ -194,7 +194,6 @@ private:
 	static const int ONE_PLY = 16;
 	static const int ONE_PLY_SHIFT = 4;
 	static const unsigned int LmrLimit = 32;
-	static Score futility[8];
 	static Score futilityMargin[7];
 	static unsigned int FutilityMoveCounts[16];
 	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
@@ -254,6 +253,7 @@ private:
 	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
 
 	void setUOI( std::unique_ptr<UciOutput> UOI );
+	static Score futility(int depth, bool improving );
 	
 
 };
