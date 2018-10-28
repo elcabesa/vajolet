@@ -415,7 +415,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 	// setup other threads
 	helperSearch.clear();
-	helperSearch.resize( uciParameters::threads - 1, Search( _st, _sl ) );
+	helperSearch.resize( uciParameters::threads - 1, *this );
 
 	for (auto& hs : helperSearch)
 	{
