@@ -195,7 +195,7 @@ private:
 	static const int ONE_PLY_SHIFT = 4;
 	static const unsigned int LmrLimit = 32;
 	static Score futilityMargin[7];
-	static unsigned int FutilityMoveCounts[16];
+	static unsigned int FutilityMoveCounts[2][16];
 	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
 	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
 	static std::vector<Move> rootMoves;

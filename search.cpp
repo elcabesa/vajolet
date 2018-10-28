@@ -66,7 +66,7 @@ Score Search::futility(int depth, bool improving )
 	return 375 * depth - 2000 * improving;
 }
 Score Search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
-unsigned int Search::FutilityMoveCounts[16] = {2,3,4,7,11,15,20,26,32,39,46,55,64,73,83,94};
+unsigned int Search::FutilityMoveCounts[2][16] = {{2,3,4,6,9,13,17,24,28,33,40,48,55,63,73,83},{2,3,4,7,11,15,20,26,32,39,46,55,64,73,83,94}};
 Score Search::PVreduction[2][LmrLimit*ONE_PLY][64];
 Score Search::nonPVreduction[2][LmrLimit*ONE_PLY][64];
 
@@ -1035,7 +1035,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
-		bool FutilityMoveCountFlag = depth < 16*ONE_PLY && moveNumber >= FutilityMoveCounts[depth >> ONE_PLY_SHIFT];
+		bool FutilityMoveCountFlag = depth < 16*ONE_PLY && moveNumber >= FutilityMoveCounts[improving][depth >> ONE_PLY_SHIFT];
 
 		int ext = 0;
 		if(PVnode && isDangerous )
