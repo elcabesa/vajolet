@@ -1742,7 +1742,7 @@ void Search::initSearchParameters(void)
 	for (unsigned int d = 0; d < 16; ++d)
 	{
 		Search::FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
-		Search::FutilityMoveCounts[1][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
+		Search::FutilityMoveCounts[1][d] = int(4.5 + 0.704 * std::pow( d, 2.0));
 	}
 }
 
