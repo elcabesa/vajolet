@@ -65,8 +65,8 @@ Score Search::futility(int depth, bool improving )
 {
 	return 375 * depth - 2000 * improving;
 }
-Score Search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
-unsigned int Search::FutilityMoveCounts[2][16] = {{2,3,4,6,9,13,17,24,28,33,40,48,55,63,73,83},{2,3,4,7,11,15,20,26,32,39,46,55,64,73,83,94}};
+Score Search::futilityMargin[7] = {0};
+unsigned int Search::FutilityMoveCounts[2][16]= {{0},{0}};
 Score Search::PVreduction[2][LmrLimit*ONE_PLY][64];
 Score Search::nonPVreduction[2][LmrLimit*ONE_PLY][64];
 
@@ -1700,8 +1700,11 @@ void Search::setUOI( std::unique_ptr<UciOutput> UOI )
 	std::cout<<sync_noNewLineEndl;
 }
 
-void Search::initLMRreduction(void)
+void Search::initSearchParameters(void)
 {
+	/***************************************************
+	 * LRM
+	 ***************************************************/
 	for (unsigned int d = 1; d < LmrLimit*ONE_PLY; ++d)
 	{
 		for (int mc = 1; mc < 64; ++mc)
@@ -1718,6 +1721,22 @@ void Search::initLMRreduction(void)
 			if(    PVreduction[0][d][mc] > int(ONE_PLY) ){    PVreduction[0][d][mc] += int(ONE_PLY); }
 			if( nonPVreduction[0][d][mc] > int(ONE_PLY) ){ nonPVreduction[0][d][mc] += int(ONE_PLY); }
 		}
+	}
+	/***************************************************
+	 * FUTILITY
+	 ***************************************************/
+	for (unsigned int d = 1; d < 7; ++d)
+	{
+		Search::futilityMargin[d] = d*10000;
+	}
+
+	/***************************************************
+	 * FUTILITY MOVE COUNT
+	 ***************************************************/
+	for (unsigned int d = 1; d < 7; ++d)
+	{
+		Search::FutilityMoveCounts[0][d] = int(2 + 0.35 * std::pow( d, 1.8));
+		Search::FutilityMoveCounts[1][d] = int(2 + 0.46 * std::pow( d, 2.0));
 	}
 }
 

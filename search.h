@@ -148,7 +148,7 @@ public:
 	//--------------------------------------------------------
 	// public static methods
 	//--------------------------------------------------------
-	static void initLMRreduction(void);
+	static void initSearchParameters(void);
 
 	//--------------------------------------------------------
 	// public methods
