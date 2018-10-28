@@ -26,6 +26,7 @@
 #include "magicmoves.h"
 #include "position.h"
 #include "search.h"
+#include "vajolet.h"
 
 extern SearchData defaultSearchData;
 

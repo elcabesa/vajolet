@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "transposition.h"
+#include "vajolet.h"
 
 
 transpositionTable transpositionTable::instance; // Guaranteed to be destroyed.
