@@ -1733,7 +1733,7 @@ void Search::initSearchParameters(void)
 	/***************************************************
 	 * FUTILITY MOVE COUNT
 	 ***************************************************/
-	for (unsigned int d = 1; d < 7; ++d)
+	for (unsigned int d = 1; d < 16; ++d)
 	{
 		Search::FutilityMoveCounts[0][d] = int(2 + 0.35 * std::pow( d, 1.8));
 		Search::FutilityMoveCounts[1][d] = int(2 + 0.46 * std::pow( d, 2.0));
