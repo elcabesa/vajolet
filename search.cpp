@@ -1705,6 +1705,12 @@ void Search::initSearchParameters(void)
 	/***************************************************
 	 * LRM
 	 ***************************************************/
+
+	for (int mc = 1; mc < 64; ++mc)
+	{
+		PVreduction[0][0][mc] = 0;
+		nonPVreduction[0][1][mc] = 0;
+	}
 	for (unsigned int d = 1; d < LmrLimit*ONE_PLY; ++d)
 	{
 		for (int mc = 1; mc < 64; ++mc)
@@ -1725,7 +1731,7 @@ void Search::initSearchParameters(void)
 	/***************************************************
 	 * FUTILITY
 	 ***************************************************/
-	for (unsigned int d = 1; d < 7; ++d)
+	for (unsigned int d = 0; d < 7; ++d)
 	{
 		Search::futilityMargin[d] = d*10000;
 	}
@@ -1733,7 +1739,7 @@ void Search::initSearchParameters(void)
 	/***************************************************
 	 * FUTILITY MOVE COUNT
 	 ***************************************************/
-	for (unsigned int d = 1; d < 16; ++d)
+	for (unsigned int d = 0; d < 16; ++d)
 	{
 		Search::FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
 		Search::FutilityMoveCounts[1][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
