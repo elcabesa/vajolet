@@ -1709,7 +1709,7 @@ void Search::initSearchParameters(void)
 	for (int mc = 1; mc < 64; ++mc)
 	{
 		PVreduction[0][0][mc] = 0;
-		nonPVreduction[0][1][mc] = 0;
+		nonPVreduction[1][0][mc] = 0;
 	}
 	for (unsigned int d = 1; d < LmrLimit*ONE_PLY; ++d)
 	{
