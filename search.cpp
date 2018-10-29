@@ -840,8 +840,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0])))
 		{
 			assert((depth>>ONE_PLY_SHIFT)<8);
-			//assert((eval -futility( depth ) >-SCORE_INFINITE));
-			return eval/* - futility( depth )*/;
+			return eval;
 		}
 
 
