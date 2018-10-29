@@ -946,8 +946,15 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			Move m;
 			PVline childPV;
-			while((m = mg.getNextMove()) != NOMOVE)
+			unsigned int pbCount = 0u;
+			while( ( ( m = mg.getNextMove() ) != NOMOVE ) && ( pbCount < 3 ) )
 			{
+				if( m == excludedMove )
+				{
+					continue;
+				}
+
+				++pbCount;
 				pos.doMove(m);
 
 				assert(rDepth>=ONE_PLY);
@@ -1063,10 +1070,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			rBeta = std::max( rBeta, -SCORE_MATE + 1 );
 
 			sd.story[ply].excludeMove = m;
-			bool backup = sd.story[ply].skipNullMove;
-			sd.story[ply].skipNullMove = true;
 			Score temp = alphaBeta<ALL_NODE>(ply, depth/2, rBeta-1, rBeta, childPv);
-			sd.story[ply].skipNullMove = backup;
 			sd.story[ply].excludeMove = NOMOVE;
 
 			if(temp < rBeta)

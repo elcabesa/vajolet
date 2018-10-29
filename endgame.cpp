@@ -20,6 +20,7 @@
 #include "position.h"
 #include "bitops.h"
 #include "movegen.h"
+#include "vajolet.h"
 
   
  
