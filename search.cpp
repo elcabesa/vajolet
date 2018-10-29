@@ -65,8 +65,8 @@ Score Search::futility(int depth, bool improving )
 {
 	return 375 * depth - 2000 * improving;
 }
-Score Search::futilityMargin[7] = {0,10000,20000,30000,40000,50000,60000};
-unsigned int Search::FutilityMoveCounts[16] = {2,3,4,7,11,15,20,26,32,39,46,55,64,73,83,94};
+Score Search::futilityMargin[7] = {0};
+unsigned int Search::FutilityMoveCounts[2][16]= {{0},{0}};
 Score Search::PVreduction[2][LmrLimit*ONE_PLY][64];
 Score Search::nonPVreduction[2][LmrLimit*ONE_PLY][64];
 
@@ -1034,7 +1034,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
-		bool FutilityMoveCountFlag = depth < 16*ONE_PLY && moveNumber >= FutilityMoveCounts[depth >> ONE_PLY_SHIFT];
+		bool FutilityMoveCountFlag = depth < 16*ONE_PLY && moveNumber >= FutilityMoveCounts[improving][depth >> ONE_PLY_SHIFT];
 
 		int ext = 0;
 		if(PVnode && isDangerous )
@@ -1699,8 +1699,17 @@ void Search::setUOI( std::unique_ptr<UciOutput> UOI )
 	std::cout<<sync_noNewLineEndl;
 }
 
-void Search::initLMRreduction(void)
+void Search::initSearchParameters(void)
 {
+	/***************************************************
+	 * LRM
+	 ***************************************************/
+
+	for (int mc = 1; mc < 64; ++mc)
+	{
+		PVreduction[0][0][mc] = 0;
+		nonPVreduction[1][0][mc] = 0;
+	}
 	for (unsigned int d = 1; d < LmrLimit*ONE_PLY; ++d)
 	{
 		for (int mc = 1; mc < 64; ++mc)
@@ -1717,6 +1726,22 @@ void Search::initLMRreduction(void)
 			if(    PVreduction[0][d][mc] > int(ONE_PLY) ){    PVreduction[0][d][mc] += int(ONE_PLY); }
 			if( nonPVreduction[0][d][mc] > int(ONE_PLY) ){ nonPVreduction[0][d][mc] += int(ONE_PLY); }
 		}
+	}
+	/***************************************************
+	 * FUTILITY
+	 ***************************************************/
+	for (unsigned int d = 0; d < 7; ++d)
+	{
+		Search::futilityMargin[d] = d*10000;
+	}
+
+	/***************************************************
+	 * FUTILITY MOVE COUNT
+	 ***************************************************/
+	for (unsigned int d = 0; d < 16; ++d)
+	{
+		Search::FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
+		Search::FutilityMoveCounts[1][d] = int(4.5 + 0.704 * std::pow( d, 2.0));
 	}
 }
 

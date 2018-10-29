@@ -203,7 +203,7 @@ int main()
 	Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();
 
-	Search::initLMRreduction();
+	Search::initSearchParameters();
 	transpositionTable::getInstance().setSize(1);
 	Position::initMaterialKeys();
 	tb_init(uciParameters::SyzygyPath.c_str());
