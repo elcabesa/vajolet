@@ -41,6 +41,7 @@ struct timeManagementStruct
 	volatile bool idLoopIterationFinished;
 	volatile bool idLoopAlpha;
 	volatile bool idLoopBeta;
+	volatile bool extendedTime;
 
 	bool FirstIterationFinished;
 

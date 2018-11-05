@@ -82,6 +82,7 @@ void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruc
 	timeMan.idLoopIterationFinished = false;
 	timeMan.idLoopAlpha = false;
 	timeMan.idLoopBeta = false;
+	timeMan.extendedTime = false;
 
 }
 
@@ -121,8 +122,9 @@ void my_thread::timerThread()
 			if(src.isNotStopped() && time >= timeMan.allocatedTime && ( timeMan.idLoopAlpha || timeMan.idLoopBeta ) )
 			{
 				timeMan.allocatedTime = timeMan.maxAllocatedTime;
+				timeMan.extendedTime = true;
 			}
-			if(src.isNotStopped() && timeMan.maxAllocatedTime == timeMan.allocatedTime /*&& time >= timeMan.allocatedTime */&& ( timeMan.idLoopIterationFinished ) && !(limits.infinite || limits.ponder) )
+			if(src.isNotStopped() && timeMan.extendedTime && ( timeMan.idLoopIterationFinished ) && !(limits.infinite || limits.ponder) )
 			{
 				src.stopSearch();
 			}
