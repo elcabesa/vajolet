@@ -329,8 +329,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 						globalReduction = 0;
 						if( masterThread )
 						{
-							my_thread::timeMan.idLoopAlpha = true;
-							my_thread::timeMan.idLoopBeta = false;
+							my_thread::timeMan.notifyFailLow();
 						}
 						
 						// follow the old PV
@@ -349,8 +348,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 						}
 						if( masterThread )
 						{
-							my_thread::timeMan.idLoopAlpha = false;
-							my_thread::timeMan.idLoopBeta = true;
+							my_thread::timeMan.notifyFailOver();
 						}
 						
 						pvLineToFollow = newPV;
@@ -389,9 +387,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 
 		if( masterThread )
 		{
-			my_thread::timeMan.idLoopIterationFinished = true;
-			my_thread::timeMan.idLoopAlpha = false;
-			my_thread::timeMan.idLoopBeta = false;
+			my_thread::timeMan.notifyIterationHasBeenFinished();
 		}
 
 	}

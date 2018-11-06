@@ -38,13 +38,32 @@ struct timeManagementStruct
 	volatile unsigned int depth;
 	volatile unsigned int singularRootMoveCount;
 	volatile unsigned int resolution;
+	
+	volatile bool extendedTime;
+	bool FirstIterationFinished;
+	
 	volatile bool idLoopIterationFinished;
 	volatile bool idLoopAlpha;
 	volatile bool idLoopBeta;
-	volatile bool extendedTime;
-
-	bool FirstIterationFinished;
-
+	
+	void notifyIterationHasBeenFinished()
+	{
+		idLoopIterationFinished = true;
+		idLoopAlpha = false;
+		idLoopBeta = false;	
+	}
+	
+	void notifyFailLow()
+	{
+		idLoopAlpha = true;
+		idLoopBeta = false;	
+	}
+	
+	void notifyFailOver()
+	{
+		idLoopAlpha = false;
+		idLoopBeta = true;	
+	}
 };
 
 
