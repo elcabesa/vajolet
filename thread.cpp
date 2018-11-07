@@ -24,7 +24,6 @@
 
 void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruct& timeMan)
 {
-	timeMan.FirstIterationFinished = false;
 	if((!lim.btime && !lim.wtime) && !lim.moveTime)
 	{
 		lim.infinite = true;
@@ -76,12 +75,7 @@ void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruc
 		timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(time - buffer ));
 	}
 
-
-
-	timeMan.singularRootMoveCount = 0;
-	timeMan.idLoopIterationFinished = false;
-	timeMan.idLoopAlpha = false;
-	timeMan.idLoopBeta = false;
+	timeMan.resetIterationInformations();
 	timeMan.extendedTime = false;
 
 }
@@ -115,25 +109,21 @@ void my_thread::timerThread()
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
 			long long int time = st.getClockTime();
 
-			if(timeMan.idLoopIterationFinished)
-			{
-				timeMan.FirstIterationFinished = true;
-			}
-			if(src.isNotStopped() && time >= timeMan.allocatedTime && ( timeMan.idLoopAlpha || timeMan.idLoopBeta ) )
+			if(src.isNotStopped() && time >= timeMan.allocatedTime && timeMan.isSearchInFailLowOverState() )
 			{
 				timeMan.allocatedTime = timeMan.maxAllocatedTime;
 				timeMan.extendedTime = true;
 			}
-			if(src.isNotStopped() && timeMan.extendedTime && ( timeMan.idLoopIterationFinished ) && !(limits.infinite || limits.ponder) )
+			if(src.isNotStopped() && timeMan.extendedTime && ( timeMan.isIdLoopIterationFinished() ) && !(limits.infinite || limits.ponder) )
 			{
 				src.stopSearch();
 			}
 
-			if(src.isNotStopped() && time >= timeMan.allocatedTime && timeMan.FirstIterationFinished && !(limits.infinite || limits.ponder))
+			if(src.isNotStopped() && time >= timeMan.allocatedTime && timeMan.hasFirstIterationFinished() && !(limits.infinite || limits.ponder))
 			{
 				src.stopSearch();
 			}
-			if(src.isNotStopped() && timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(limits.infinite || limits.ponder))
+			if(src.isNotStopped() && timeMan.isIdLoopIterationFinished() && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(limits.infinite || limits.ponder))
 			{
 				src.stopSearch();
 			}
@@ -153,24 +143,15 @@ void my_thread::timerThread()
 
 #endif
 
-			if(timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && !(limits.infinite || limits.ponder))
-			{
-				if(timeMan.singularRootMoveCount >=20)
-				{
-					src.stopSearch();
-				}
-			}
-
-
-			if(limits.nodes && timeMan.FirstIterationFinished && src.getVisitedNodes() > limits.nodes)
+			if(limits.nodes && timeMan.hasFirstIterationFinished() && src.getVisitedNodes() > limits.nodes)
 			{
 				src.stopSearch();
 			}
-			if(limits.moveTime && timeMan.FirstIterationFinished && time>=limits.moveTime)
+			if(limits.moveTime && timeMan.hasFirstIterationFinished() && time>=limits.moveTime)
 			{
 				src.stopSearch();
 			}
-			timeMan.idLoopIterationFinished = false;
+			timeMan.clearIdLoopIterationFinished();
 		}
 		lk.unlock();
 	}

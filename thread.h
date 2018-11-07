@@ -30,40 +30,70 @@
 #include "searchTimer.h"
 
 
-struct timeManagementStruct
+class timeManagementStruct
 {
+public:
 	volatile long long allocatedTime;
 	volatile long long minSearchTime;
 	volatile long long maxAllocatedTime;
-	volatile unsigned int depth;
-	volatile unsigned int singularRootMoveCount;
 	volatile unsigned int resolution;
 	
 	volatile bool extendedTime;
-	bool FirstIterationFinished;
 	
-	volatile bool idLoopIterationFinished;
-	volatile bool idLoopAlpha;
-	volatile bool idLoopBeta;
+	void resetIterationInformations()
+	{
+		FirstIterationFinished = false;
+		idLoopIterationFinished = false;
+		idLoopFailLow = false;
+		idLoopFailOver = false;	
+	}
 	
 	void notifyIterationHasBeenFinished()
 	{
 		idLoopIterationFinished = true;
-		idLoopAlpha = false;
-		idLoopBeta = false;	
+		FirstIterationFinished = true;
+		idLoopFailLow = false;
+		idLoopFailOver = false;	
 	}
 	
 	void notifyFailLow()
 	{
-		idLoopAlpha = true;
-		idLoopBeta = false;	
+		idLoopFailLow = true;
+		idLoopFailOver = false;	
 	}
 	
 	void notifyFailOver()
 	{
-		idLoopAlpha = false;
-		idLoopBeta = true;	
+		idLoopFailLow = false;
+		idLoopFailOver = true;	
 	}
+	
+	bool isSearchInFailLowOverState()
+	{
+		return idLoopFailLow || idLoopFailOver;
+	}
+	
+	bool hasFirstIterationFinished()
+	{
+		return FirstIterationFinished;
+	}
+	
+	bool isIdLoopIterationFinished()
+	{
+		return idLoopIterationFinished;
+	}
+	
+	void clearIdLoopIterationFinished()
+	{
+		idLoopIterationFinished = false;
+	}
+
+private:
+	bool FirstIterationFinished;
+	bool idLoopIterationFinished;
+	bool idLoopFailLow;
+	bool idLoopFailOver;
+
 };
 
 
