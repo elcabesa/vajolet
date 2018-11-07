@@ -40,53 +40,16 @@ public:
 	
 	volatile bool extendedTime;
 	
-	void resetIterationInformations()
-	{
-		FirstIterationFinished = false;
-		idLoopIterationFinished = false;
-		idLoopFailLow = false;
-		idLoopFailOver = false;	
-	}
+	void resetIterationInformations();
+	void notifyIterationHasBeenFinished();
+	void notifyFailLow();
+	void notifyFailOver();
+	void clearIdLoopIterationFinished();
 	
-	void notifyIterationHasBeenFinished()
-	{
-		idLoopIterationFinished = true;
-		FirstIterationFinished = true;
-		idLoopFailLow = false;
-		idLoopFailOver = false;	
-	}
+	bool isSearchInFailLowOverState() const;
+	bool hasFirstIterationFinished() const;
+	bool isIdLoopIterationFinished() const;
 	
-	void notifyFailLow()
-	{
-		idLoopFailLow = true;
-		idLoopFailOver = false;	
-	}
-	
-	void notifyFailOver()
-	{
-		idLoopFailLow = false;
-		idLoopFailOver = true;	
-	}
-	
-	bool isSearchInFailLowOverState()
-	{
-		return idLoopFailLow || idLoopFailOver;
-	}
-	
-	bool hasFirstIterationFinished()
-	{
-		return FirstIterationFinished;
-	}
-	
-	bool isIdLoopIterationFinished()
-	{
-		return idLoopIterationFinished;
-	}
-	
-	void clearIdLoopIterationFinished()
-	{
-		idLoopIterationFinished = false;
-	}
 
 private:
 	bool FirstIterationFinished;
