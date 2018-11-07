@@ -170,7 +170,6 @@ public:
 
 	void stopSearch(){ stop = true;}
 	void resetStopCondition(){ stop = false;}
-	bool isNotStopped(){ return stop == false; }
 
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;

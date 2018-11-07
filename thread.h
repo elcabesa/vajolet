@@ -38,24 +38,34 @@ public:
 	volatile long long maxAllocatedTime;
 	volatile unsigned int resolution;
 	
-	volatile bool extendedTime;
 	
-	void resetIterationInformations();
+	
+	void initNewSearchParameters();
 	void notifyIterationHasBeenFinished();
 	void notifyFailLow();
 	void notifyFailOver();
 	void clearIdLoopIterationFinished();
+	void stop();
+	void extendTime();
 	
 	bool isSearchInFailLowOverState() const;
 	bool hasFirstIterationFinished() const;
 	bool isIdLoopIterationFinished() const;
+	bool isSearchTimeExtended() const;
+	bool isSearchStopped() const;
+	
+	
 	
 
 private:
-	bool FirstIterationFinished;
-	bool idLoopIterationFinished;
-	bool idLoopFailLow;
-	bool idLoopFailOver;
+	bool _firstIterationFinished;
+	bool _idLoopIterationFinished;
+	bool _idLoopFailLow;
+	bool _idLoopFailOver;
+	
+	// to be changed
+	bool _stop;
+	bool _extendedTime;
 
 };
 
@@ -257,7 +267,7 @@ public :
 
 	void stopThinking()
 	{
-		src.stopSearch();
+		timeMan.stop();
 		stopPonder();
 	}
 

@@ -22,54 +22,76 @@
 #include "transposition.h"
 #include "uciParameters.h"
 
-void timeManagementStruct::resetIterationInformations()
+void timeManagementStruct::initNewSearchParameters()
 {
-	FirstIterationFinished = false;
-	idLoopIterationFinished = false;
-	idLoopFailLow = false;
-	idLoopFailOver = false;	
+	_firstIterationFinished = false;
+	_idLoopIterationFinished = false;
+	_idLoopFailLow = false;
+	_idLoopFailOver = false;	
+	_stop = false;
+	_extendedTime = false;
 }
 
 void timeManagementStruct::notifyIterationHasBeenFinished()
 {
-	idLoopIterationFinished = true;
-	FirstIterationFinished = true;
-	idLoopFailLow = false;
-	idLoopFailOver = false;	
+	_firstIterationFinished = true;
+	_idLoopIterationFinished = true;
+	_idLoopFailLow = false;
+	_idLoopFailOver = false;	
 }
 
 void timeManagementStruct::notifyFailLow()
 {
-	idLoopFailLow = true;
-	idLoopFailOver = false;	
+	_idLoopFailLow = true;
+	_idLoopFailOver = false;	
 }
 
 void timeManagementStruct::notifyFailOver()
 {
-	idLoopFailLow = false;
-	idLoopFailOver = true;	
+	_idLoopFailLow = false;
+	_idLoopFailOver = true;	
 }
 
 void timeManagementStruct::clearIdLoopIterationFinished()
 {
-	idLoopIterationFinished = false;
+	_idLoopIterationFinished = false;
 }
 
 bool timeManagementStruct::isSearchInFailLowOverState() const
 {
-	return idLoopFailLow || idLoopFailOver;
+	return _idLoopFailLow || _idLoopFailOver;
 }
 
 bool timeManagementStruct::hasFirstIterationFinished() const
 {
-	return FirstIterationFinished;
+	return _firstIterationFinished;
 }
 
 bool timeManagementStruct::isIdLoopIterationFinished() const
 {
-	return idLoopIterationFinished;
+	return _idLoopIterationFinished;
 }
 
+bool timeManagementStruct::isSearchTimeExtended() const
+{
+	return _extendedTime;
+}
+
+void timeManagementStruct::stop()
+{
+	_stop = true;
+}
+
+bool timeManagementStruct::isSearchStopped() const
+{
+	return _stop;
+}
+
+void timeManagementStruct::extendTime()
+{
+	_extendedTime = true;
+	allocatedTime = maxAllocatedTime;
+}
 
 void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruct& timeMan)
 {
@@ -124,8 +146,7 @@ void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruc
 		timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(time - buffer ));
 	}
 
-	timeMan.resetIterationInformations();
-	timeMan.extendedTime = false;
+	timeMan.initNewSearchParameters();
 
 }
 
@@ -149,30 +170,46 @@ void my_thread::timerThread()
 
 		std::unique_lock<std::mutex> lk(mutex);
 
-		timerCond.wait(lk, [&]{return (startThink && src.isNotStopped() ) || quit;} );
+		timerCond.wait(lk, [&]{return (startThink && !timeMan.isSearchStopped() ) || quit;} );
 		if (!quit)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
 			long long int time = st.getClockTime();
 
-			if(src.isNotStopped() && time >= timeMan.allocatedTime && timeMan.isSearchInFailLowOverState() )
+			if( !timeMan.isSearchStopped() )
 			{
-				timeMan.allocatedTime = timeMan.maxAllocatedTime;
-				timeMan.extendedTime = true;
-			}
-			if(src.isNotStopped() && timeMan.extendedTime && ( timeMan.isIdLoopIterationFinished() ) && !(limits.infinite || limits.ponder) )
-			{
-				src.stopSearch();
-			}
+				if( time >= timeMan.allocatedTime && timeMan.isSearchInFailLowOverState() )
+				{
+					timeMan.extendTime();
+				}
+				if( timeMan.isSearchTimeExtended() && ( timeMan.isIdLoopIterationFinished() ) && !(limits.infinite || limits.ponder) )
+				{
+					timeMan.stop();
+					src.stopSearch();
+				}
 
-			if(src.isNotStopped() && time >= timeMan.allocatedTime && timeMan.hasFirstIterationFinished() && !(limits.infinite || limits.ponder))
-			{
-				src.stopSearch();
+				if( time >= timeMan.allocatedTime && timeMan.hasFirstIterationFinished() && !(limits.infinite || limits.ponder))
+				{
+					timeMan.stop();
+					src.stopSearch();
+				}
+				if( timeMan.isIdLoopIterationFinished() && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(limits.infinite || limits.ponder))
+				{
+					timeMan.stop();
+					src.stopSearch();
+				}
+				if(limits.nodes && timeMan.hasFirstIterationFinished() && src.getVisitedNodes() > limits.nodes)
+				{
+					timeMan.stop();
+					src.stopSearch();
+				}
+				if(limits.moveTime && timeMan.hasFirstIterationFinished() && time>=limits.moveTime)
+				{
+					timeMan.stop();
+					src.stopSearch();
+				}
 			}
-			if(src.isNotStopped() && timeMan.isIdLoopIterationFinished() && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(limits.infinite || limits.ponder))
-			{
-				src.stopSearch();
-			}
+			
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			if(time - lastHasfullMessage > 1000)
 			{
@@ -188,15 +225,6 @@ void my_thread::timerThread()
 			}
 
 #endif
-
-			if(limits.nodes && timeMan.hasFirstIterationFinished() && src.getVisitedNodes() > limits.nodes)
-			{
-				src.stopSearch();
-			}
-			if(limits.moveTime && timeMan.hasFirstIterationFinished() && time>=limits.moveTime)
-			{
-				src.stopSearch();
-			}
 			timeMan.clearIdLoopIterationFinished();
 		}
 		lk.unlock();
