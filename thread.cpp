@@ -22,6 +22,55 @@
 #include "transposition.h"
 #include "uciParameters.h"
 
+void timeManagementStruct::resetIterationInformations()
+{
+	FirstIterationFinished = false;
+	idLoopIterationFinished = false;
+	idLoopFailLow = false;
+	idLoopFailOver = false;	
+}
+
+void timeManagementStruct::notifyIterationHasBeenFinished()
+{
+	idLoopIterationFinished = true;
+	FirstIterationFinished = true;
+	idLoopFailLow = false;
+	idLoopFailOver = false;	
+}
+
+void timeManagementStruct::notifyFailLow()
+{
+	idLoopFailLow = true;
+	idLoopFailOver = false;	
+}
+
+void timeManagementStruct::notifyFailOver()
+{
+	idLoopFailLow = false;
+	idLoopFailOver = true;	
+}
+
+void timeManagementStruct::clearIdLoopIterationFinished()
+{
+	idLoopIterationFinished = false;
+}
+
+bool timeManagementStruct::isSearchInFailLowOverState() const
+{
+	return idLoopFailLow || idLoopFailOver;
+}
+
+bool timeManagementStruct::hasFirstIterationFinished() const
+{
+	return FirstIterationFinished;
+}
+
+bool timeManagementStruct::isIdLoopIterationFinished() const
+{
+	return idLoopIterationFinished;
+}
+
+
 void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruct& timeMan)
 {
 	if((!lim.btime && !lim.wtime) && !lim.moveTime)
