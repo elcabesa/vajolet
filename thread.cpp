@@ -134,9 +134,6 @@ volatile bool my_thread::quit = false;
 volatile bool my_thread::startThink = false;
 
 
-timeManagementStruct my_thread::timeMan;
-
-
 long long my_thread::lastHasfullMessage;
 
 

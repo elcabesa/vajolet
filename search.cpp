@@ -247,6 +247,7 @@ startThinkResult Search::manageQsearch(void)
 
 void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , bool masterThread)
 {
+	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
 	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)rootMoves.size());
 	
@@ -329,7 +330,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 						globalReduction = 0;
 						if( masterThread )
 						{
-							my_thread::timeMan.notifyFailLow();
+							thr.timeMan.notifyFailLow();
 						}
 						
 						// follow the old PV
@@ -348,7 +349,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 						}
 						if( masterThread )
 						{
-							my_thread::timeMan.notifyFailOver();
+							thr.timeMan.notifyFailOver();
 						}
 						
 						pvLineToFollow = newPV;
@@ -387,7 +388,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 
 		if( masterThread )
 		{
-			my_thread::timeMan.notifyIterationHasBeenFinished();
+			thr.timeMan.notifyIterationHasBeenFinished();
 		}
 
 	}

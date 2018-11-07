@@ -214,7 +214,7 @@ public :
 
 	static std::mutex  _mutex;
 
-	static my_thread* getInstance()
+	static my_thread& getInstance()
 	{
 		if (!pInstance)
 		{
@@ -227,10 +227,10 @@ public :
 			}
 		}
 
-		return pInstance;
+		return *pInstance;
 	}
 
-	static timeManagementStruct timeMan;
+	timeManagementStruct timeMan;
 
 	~my_thread()
 	{
