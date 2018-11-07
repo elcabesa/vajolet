@@ -53,33 +53,32 @@ public:
 	
 	void initNewSearch( SearchLimits& lim );
 
-	void initNewSearchParameters();
+
 	void notifyIterationHasBeenFinished();
 	void notifyFailLow();
 	void notifyFailOver();
-	void clearIdLoopIterationFinished();
+
 	void stop();
-	void extendTime();
 	
-	bool isSearchInFailLowOverState() const;
-	bool hasFirstIterationFinished() const;
-	bool isIdLoopIterationFinished() const;
-	bool isSearchTimeExtended() const;
-	bool isSearchStopped() const;
+	bool isSearchFinished() const;
 	
 	void chooseSearchType( enum searchState s);
 	void stateMachineStep( long long int time );
 	
 
 private:
+	void _resetSearchvariables();
+	void _clearIdLoopIterationFinished();
+	bool _isSearchInFailLowOverState() const;
+	bool _hasFirstIterationFinished() const;
+	bool _isIdLoopIterationFinished() const;
+
 	bool _firstIterationFinished;
 	bool _idLoopIterationFinished;
 	bool _idLoopFailLow;
 	bool _idLoopFailOver;
 	
-	// to be changed
 	bool _stop;
-	bool _extendedTime;
 
 	searchState _searchState;
 	Search & _src;

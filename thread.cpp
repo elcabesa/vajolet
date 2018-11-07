@@ -24,14 +24,13 @@
 
 #include "io.h"
 
-void timeManagement::initNewSearchParameters()
+void timeManagement::_resetSearchvariables()
 {
 	_firstIterationFinished = false;
 	_idLoopIterationFinished = false;
 	_idLoopFailLow = false;
 	_idLoopFailOver = false;	
 	_stop = false;
-	_extendedTime = false;
 }
 
 void timeManagement::notifyIterationHasBeenFinished()
@@ -54,46 +53,37 @@ void timeManagement::notifyFailOver()
 	_idLoopFailOver = true;	
 }
 
-void timeManagement::clearIdLoopIterationFinished()
+void timeManagement::_clearIdLoopIterationFinished()
 {
 	_idLoopIterationFinished = false;
 }
 
-bool timeManagement::isSearchInFailLowOverState() const
+bool timeManagement::_isSearchInFailLowOverState() const
 {
 	return _idLoopFailLow || _idLoopFailOver;
 }
 
-bool timeManagement::hasFirstIterationFinished() const
+bool timeManagement::_hasFirstIterationFinished() const
 {
 	return _firstIterationFinished;
 }
 
-bool timeManagement::isIdLoopIterationFinished() const
+bool timeManagement::_isIdLoopIterationFinished() const
 {
 	return _idLoopIterationFinished;
 }
 
-bool timeManagement::isSearchTimeExtended() const
-{
-	return _extendedTime;
-}
 
 void timeManagement::stop()
 {
 	_stop = true;
 }
 
-bool timeManagement::isSearchStopped() const
+bool timeManagement::isSearchFinished() const
 {
 	return _searchState == searchFinished;
 }
 
-void timeManagement::extendTime()
-{
-	_extendedTime = true;
-	allocatedTime = maxAllocatedTime;
-}
 
 void timeManagement::chooseSearchType( enum searchState s)
 {
@@ -110,7 +100,7 @@ void timeManagement::initNewSearch( SearchLimits& lim )
 	}
 	else if(lim.moveTime)
 	{
-		maxAllocatedTime = lim.moveTime+1;
+		maxAllocatedTime = lim.moveTime;
 		allocatedTime = lim.moveTime;
 		minSearchTime = lim.moveTime;
 		resolution = std::min((long long int)100, allocatedTime / 100 );
@@ -155,7 +145,7 @@ void timeManagement::initNewSearch( SearchLimits& lim )
 		chooseSearchType( _limits.ponder == true ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
 	}
 
-	initNewSearchParameters();
+	_resetSearchvariables();
 
 }
 
@@ -166,53 +156,52 @@ void timeManagement::stateMachineStep( long long int time )
 	case wait:
 		//sync_cout<<"wait"<<sync_endl;
 		break;
+
 	case infiniteSearch:
 
 		//sync_cout<<"infiniteSearch"<<sync_endl;
-		if( _stop )
-		{
-			_searchState = searchFinished;
-			_src.stopSearch();
-		}
-
-		if( _limits.nodes && hasFirstIterationFinished() && _src.getVisitedNodes() > _limits.nodes )
-		{
-			_searchState = searchFinished;
-			_src.stopSearch();
-		}
-
-		if( _limits.moveTime && hasFirstIterationFinished() && time >= _limits.moveTime )
+		if(
+				_stop
+				|| ( _limits.nodes && _hasFirstIterationFinished() && _src.getVisitedNodes() > _limits.nodes )
+				|| ( _limits.moveTime && _hasFirstIterationFinished() && time >= _limits.moveTime )
+		)
 		{
 			_searchState = searchFinished;
 			_src.stopSearch();
 		}
 		break;
+
+	case fixedTimeSearch:
+
+		//sync_cout<<"fixedTimeSearch"<<sync_endl;
+		if(
+				_stop
+				|| ( time >= allocatedTime && _hasFirstIterationFinished() )
+		)
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+		break;
+
 	case standardSearch:
 
 		//sync_cout<<"standardSearch"<<sync_endl;
-		if( _stop )
+		if(
+				_stop
+				|| ( time >= allocatedTime && _hasFirstIterationFinished() )
+				|| ( _isIdLoopIterationFinished() && time >= minSearchTime && time >= allocatedTime * 0.7 )
+		)
 		{
 			_searchState = searchFinished;
 			_src.stopSearch();
 		}
-
-		if( time >= allocatedTime && isSearchInFailLowOverState() )
+		else if( time >= allocatedTime && _isSearchInFailLowOverState() )
 		{
 			_searchState = standardSearchExtendedTime;
 		}
-
-		if( time >= allocatedTime && hasFirstIterationFinished() )
-		{
-			_searchState = searchFinished;
-			_src.stopSearch();
-		}
-
-		if( isIdLoopIterationFinished() && time >= minSearchTime && time >= allocatedTime * 0.7 )
-		{
-			_searchState = searchFinished;
-			_src.stopSearch();
-		}
 		break;
+
 	case standardSearchPonder:
 		//sync_cout<<"standardSearchPonder"<<sync_endl;
 		if( _stop )
@@ -225,25 +214,27 @@ void timeManagement::stateMachineStep( long long int time )
 			_searchState = standardSearch;
 		}
 		break;
+
 	case standardSearchExtendedTime:
 		//sync_cout<<"standardSearchExtendedTime"<<sync_endl;
-		if( _stop )
-		{
-			_searchState = searchFinished;
-			_src.stopSearch();
-		}
-
-		if( isIdLoopIterationFinished() )
+		if(
+				_stop
+				|| ( time >= maxAllocatedTime && _hasFirstIterationFinished() )
+				|| _isIdLoopIterationFinished()
+		)
 		{
 			_searchState = searchFinished;
 			_src.stopSearch();
 		}
 		break;
+
 	case searchFinished:
 		//sync_cout<<"searchFinished"<<sync_endl;
 	default:
 		break;
 	}
+
+	_clearIdLoopIterationFinished();
 }
 
 
@@ -275,7 +266,7 @@ void my_thread::timerThread()
 	{
 		std::unique_lock<std::mutex> lk(mutex);
 
-		timerCond.wait(lk, [&]{return (startThink && !timeMan.isSearchStopped() ) || quit;} );
+		timerCond.wait(lk, [&]{return (startThink && !timeMan.isSearchFinished() ) || quit;} );
 
 		if (!quit)
 		{
@@ -283,7 +274,7 @@ void my_thread::timerThread()
 			long long int time = st.getClockTime();
 			
 			timeMan.stateMachineStep( time );
-			timeMan.clearIdLoopIterationFinished();
+
 
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			printTimeDependentOutput( time );
