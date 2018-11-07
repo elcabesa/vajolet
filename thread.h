@@ -46,17 +46,15 @@ public:
 
 	timeManagement( Search& s, SearchLimits& limits ):_src(s),_limits(limits){}
 
-	volatile long long allocatedTime;
-	volatile long long minSearchTime;
-	volatile long long maxAllocatedTime;
-	volatile unsigned int resolution;
 	
-	void initNewSearch( SearchLimits& lim );
 
+	void initNewSearch( SearchLimits& lim );
 
 	void notifyIterationHasBeenFinished();
 	void notifyFailLow();
 	void notifyFailOver();
+
+	unsigned int getResolution() const;
 
 	void stop();
 	
@@ -78,6 +76,11 @@ private:
 	bool _idLoopFailLow;
 	bool _idLoopFailOver;
 	
+	long long _allocatedTime;
+	long long _minSearchTime;
+	long long _maxAllocatedTime;
+	unsigned int _resolution;
+
 	bool _stop;
 
 	searchState _searchState;
@@ -198,50 +201,46 @@ public:
 
 class my_thread
 {
-
-	SearchLimits limits; // todo limits belong to threads
-
-	std::unique_ptr<UciOutput> _UOI;
-	my_thread():src(st, limits), timeMan(src, limits)
-	{
-		_UOI = UciOutput::create();
-		initThreads();
-		game.CreateNewGame();
-	};
+private:
+	my_thread();
+	~my_thread();
 
 	static my_thread * pInstance;
+	static std::mutex _mutex;
+
+	SearchLimits _limits; // todo limits belong to threads
+	SearchTimer _st;
+	Search _src;
+	Game _game;
+
+	std::unique_ptr<UciOutput> _UOI;
+
+	volatile static bool _quit;
+	volatile static bool _startThink;
+
+	long long _lastHasfullMessage;
 
 
-	volatile static bool quit;
-	volatile static bool startThink;
+	std::thread _timer;
+	std::thread _searcher;
+	std::mutex _searchMutex;
 
-	SearchTimer st;
-	std::thread timer;
-	std::thread searcher;
-	std::mutex searchMutex;
-	std::condition_variable searchCond;
-	std::condition_variable timerCond;
-	Search src;
+	std::condition_variable _searchCond;
+	std::condition_variable _timerCond;
 
-	long long lastHasfullMessage;
+	void _initThreads();
 
-	Game game;
-	void initThreads();
+	void _timerThread();
+	void _searchThread();
+	void _manageNewSearch();
+	Move _getPonderMoveFromHash( const Move bestMove );
+	Move _getPonderMoveFromBook( const Move bookMove );
+	void _waitStopPondering() const;
+	void _printTimeDependentOutput( long long int time );
 
-	void timerThread();
-	void searchThread();
-	void manageNewSearch();
-	Move getPonderMoveFromHash(const Move bestMove );
-	Move getPonderMoveFromBook(const Move bookMove );
-	void waitStopPondering() const;
-	void printTimeDependentOutput(long long int time);
+
 
 public :
-
-
-	void quitThreads();
-
-	static std::mutex  _mutex;
 
 	static my_thread& getInstance()
 	{
@@ -259,42 +258,13 @@ public :
 		return *pInstance;
 	}
 
+	void quitThreads();
+	void startThinking(Position * p, SearchLimits& l);
+	void stopPonder();
+	void stopThinking();
+	void ponderHit();
+
 	timeManagement timeMan;
-
-	~my_thread()
-	{
-		quitThreads();
-	}
-	void startThinking(Position * p, SearchLimits& l)
-	{
-		src.stopSearch();
-		lastHasfullMessage = 0;
-
-		while(startThink){}
-
-		if(!startThink)
-		{
-			std::lock_guard<std::mutex> lk(searchMutex);
-			limits = l;
-			src.pos = *p;
-			startThink = true;
-			searchCond.notify_one();
-		}
-	}
-
-	void stopPonder(){ limits.ponder = false;}
-
-	void stopThinking()
-	{
-		timeMan.stop();
-		stopPonder();
-	}
-
-	void ponderHit()
-	{
-		st.resetPonderTimer();
-		stopPonder();
-	}
 
 };
 
