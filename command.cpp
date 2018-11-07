@@ -246,7 +246,7 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr)
 			}
         }
     }
-    thr.startThinking(&pos,limits);
+    thr.startThinking( &pos, limits );
 }
 
 
@@ -533,7 +533,6 @@ void uciLoop()
 
 	do
 	{
-		assert(thr);
 		if (!std::getline(std::cin, cmd)) // Block here waiting for input
 			cmd = "quit";
 		std::istringstream is(cmd);

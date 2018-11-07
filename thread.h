@@ -30,16 +30,29 @@
 #include "searchTimer.h"
 
 
-class timeManagementStruct
+class timeManagement
 {
 public:
+	enum searchState
+	{
+		wait,
+		infiniteSearch,
+		fixedTimeSearch,
+		standardSearchPonder,
+		standardSearch,
+		standardSearchExtendedTime,
+		searchFinished
+	};
+
+	timeManagement( Search& s, SearchLimits& limits ):_src(s),_limits(limits){}
+
 	volatile long long allocatedTime;
 	volatile long long minSearchTime;
 	volatile long long maxAllocatedTime;
 	volatile unsigned int resolution;
 	
-	
-	
+	void initNewSearch( SearchLimits& lim );
+
 	void initNewSearchParameters();
 	void notifyIterationHasBeenFinished();
 	void notifyFailLow();
@@ -54,7 +67,8 @@ public:
 	bool isSearchTimeExtended() const;
 	bool isSearchStopped() const;
 	
-	
+	void chooseSearchType( enum searchState s);
+	void stateMachineStep( long long int time );
 	
 
 private:
@@ -66,6 +80,10 @@ private:
 	// to be changed
 	bool _stop;
 	bool _extendedTime;
+
+	searchState _searchState;
+	Search & _src;
+	const SearchLimits& _limits;
 
 };
 
@@ -185,7 +203,7 @@ class my_thread
 	SearchLimits limits; // todo limits belong to threads
 
 	std::unique_ptr<UciOutput> _UOI;
-	my_thread():src(st, limits)
+	my_thread():src(st, limits), timeMan(src, limits)
 	{
 		_UOI = UciOutput::create();
 		initThreads();
@@ -206,7 +224,7 @@ class my_thread
 	std::condition_variable timerCond;
 	Search src;
 
-	static long long lastHasfullMessage;
+	long long lastHasfullMessage;
 
 	Game game;
 	void initThreads();
@@ -217,6 +235,8 @@ class my_thread
 	Move getPonderMoveFromHash(const Move bestMove );
 	Move getPonderMoveFromBook(const Move bookMove );
 	void waitStopPondering() const;
+	void printTimeDependentOutput(long long int time);
+
 public :
 
 
@@ -240,7 +260,7 @@ public :
 		return *pInstance;
 	}
 
-	timeManagementStruct timeMan;
+	timeManagement timeMan;
 
 	~my_thread()
 	{

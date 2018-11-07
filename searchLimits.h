@@ -23,8 +23,8 @@
 class SearchLimits
 {
 public:
-	volatile bool ponder,infinite;
-	unsigned int wtime,btime,winc,binc,movesToGo,nodes,mate,moveTime;
+	volatile bool ponder, infinite;
+	unsigned int wtime, btime, winc, binc, movesToGo, nodes, mate, moveTime;
 	int depth;
 	std::list<Move> searchMoves;
 	SearchLimits()

@@ -22,7 +22,9 @@
 #include "transposition.h"
 #include "uciParameters.h"
 
-void timeManagementStruct::initNewSearchParameters()
+#include "io.h"
+
+void timeManagement::initNewSearchParameters()
 {
 	_firstIterationFinished = false;
 	_idLoopIterationFinished = false;
@@ -32,7 +34,7 @@ void timeManagementStruct::initNewSearchParameters()
 	_extendedTime = false;
 }
 
-void timeManagementStruct::notifyIterationHasBeenFinished()
+void timeManagement::notifyIterationHasBeenFinished()
 {
 	_firstIterationFinished = true;
 	_idLoopIterationFinished = true;
@@ -40,79 +42,86 @@ void timeManagementStruct::notifyIterationHasBeenFinished()
 	_idLoopFailOver = false;	
 }
 
-void timeManagementStruct::notifyFailLow()
+void timeManagement::notifyFailLow()
 {
 	_idLoopFailLow = true;
 	_idLoopFailOver = false;	
 }
 
-void timeManagementStruct::notifyFailOver()
+void timeManagement::notifyFailOver()
 {
 	_idLoopFailLow = false;
 	_idLoopFailOver = true;	
 }
 
-void timeManagementStruct::clearIdLoopIterationFinished()
+void timeManagement::clearIdLoopIterationFinished()
 {
 	_idLoopIterationFinished = false;
 }
 
-bool timeManagementStruct::isSearchInFailLowOverState() const
+bool timeManagement::isSearchInFailLowOverState() const
 {
 	return _idLoopFailLow || _idLoopFailOver;
 }
 
-bool timeManagementStruct::hasFirstIterationFinished() const
+bool timeManagement::hasFirstIterationFinished() const
 {
 	return _firstIterationFinished;
 }
 
-bool timeManagementStruct::isIdLoopIterationFinished() const
+bool timeManagement::isIdLoopIterationFinished() const
 {
 	return _idLoopIterationFinished;
 }
 
-bool timeManagementStruct::isSearchTimeExtended() const
+bool timeManagement::isSearchTimeExtended() const
 {
 	return _extendedTime;
 }
 
-void timeManagementStruct::stop()
+void timeManagement::stop()
 {
 	_stop = true;
 }
 
-bool timeManagementStruct::isSearchStopped() const
+bool timeManagement::isSearchStopped() const
 {
-	return _stop;
+	return _searchState == searchFinished;
 }
 
-void timeManagementStruct::extendTime()
+void timeManagement::extendTime()
 {
 	_extendedTime = true;
 	allocatedTime = maxAllocatedTime;
 }
 
-void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruct& timeMan)
+void timeManagement::chooseSearchType( enum searchState s)
+{
+	_searchState = s;
+}
+
+void timeManagement::initNewSearch( SearchLimits& lim )
 {
 	if((!lim.btime && !lim.wtime) && !lim.moveTime)
 	{
 		lim.infinite = true;
-		timeMan.resolution = 100;
+		resolution = 100;
+		chooseSearchType( timeManagement::infiniteSearch);
 	}
 	else if(lim.moveTime)
 	{
-		timeMan.maxAllocatedTime = lim.moveTime+1;
-		timeMan.allocatedTime = lim.moveTime;
-		timeMan.minSearchTime =lim.moveTime;
-		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
+		maxAllocatedTime = lim.moveTime+1;
+		allocatedTime = lim.moveTime;
+		minSearchTime = lim.moveTime;
+		resolution = std::min((long long int)100, allocatedTime / 100 );
+		chooseSearchType( timeManagement::fixedTimeSearch);
 	}
 	else
 	{
 		unsigned int time;
 		unsigned int increment;
 
-		if(pos.getNextTurn())
+		if(_src.pos.getNextTurn())
 		{
 			time = lim.btime;
 			increment = lim.binc;
@@ -123,109 +132,165 @@ void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruc
 			increment = lim.winc;
 		}
 
-
-
 		if(lim.movesToGo > 0)
 		{
-			timeMan.allocatedTime = time / lim.movesToGo;
-			timeMan.maxAllocatedTime = 10.0 * timeMan.allocatedTime;
-			timeMan.maxAllocatedTime = std::min(10.0 * timeMan.allocatedTime, 0.8 * time);
-			timeMan.maxAllocatedTime = std::max(timeMan.maxAllocatedTime,timeMan.allocatedTime);
+			allocatedTime = time / lim.movesToGo;
+			maxAllocatedTime = 10.0 * allocatedTime;
+			maxAllocatedTime = std::min( 10.0 * allocatedTime, 0.8 * time);
+			maxAllocatedTime = std::max( maxAllocatedTime, allocatedTime );
 		}
 		else
 		{
-			timeMan.allocatedTime = time / 35.0 + increment * 0.98;
-			timeMan.maxAllocatedTime= 10 * timeMan.allocatedTime;
+			allocatedTime = time / 35.0 + increment * 0.98;
+			maxAllocatedTime = 10 * allocatedTime;
 		}
 
-		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
-		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)( time - 2 * timeMan.resolution));
-		timeMan.minSearchTime = timeMan.allocatedTime * 0.3;
-		long long buffer = std::max( 2 * timeMan.resolution, 200u );
-		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(time - buffer ));
-		timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(time - buffer ));
+		resolution = std::min( (long long int)100, allocatedTime / 100 );
+		allocatedTime = std::min( (long long int)allocatedTime ,(long long int)( time - 2 * resolution ) );
+		minSearchTime = allocatedTime * 0.3;
+		long long buffer = std::max( 2 * resolution, 200u );
+		allocatedTime = std::min( (long long int)allocatedTime, (long long int)( time - buffer ) );
+		maxAllocatedTime = std::min( (long long int)maxAllocatedTime, (long long int)( time - buffer ) );
+
+		chooseSearchType( _limits.ponder == true ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
 	}
 
-	timeMan.initNewSearchParameters();
+	initNewSearchParameters();
 
+}
+
+void timeManagement::stateMachineStep( long long int time )
+{
+	switch( _searchState )
+	{
+	case wait:
+		//sync_cout<<"wait"<<sync_endl;
+		break;
+	case infiniteSearch:
+
+		//sync_cout<<"infiniteSearch"<<sync_endl;
+		if( _stop )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+
+		if( _limits.nodes && hasFirstIterationFinished() && _src.getVisitedNodes() > _limits.nodes )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+
+		if( _limits.moveTime && hasFirstIterationFinished() && time >= _limits.moveTime )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+		break;
+	case standardSearch:
+
+		//sync_cout<<"standardSearch"<<sync_endl;
+		if( _stop )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+
+		if( time >= allocatedTime && isSearchInFailLowOverState() )
+		{
+			_searchState = standardSearchExtendedTime;
+		}
+
+		if( time >= allocatedTime && hasFirstIterationFinished() )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+
+		if( isIdLoopIterationFinished() && time >= minSearchTime && time >= allocatedTime * 0.7 )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+		break;
+	case standardSearchPonder:
+		//sync_cout<<"standardSearchPonder"<<sync_endl;
+		if( _stop )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+		else if( _limits.ponder == false )
+		{
+			_searchState = standardSearch;
+		}
+		break;
+	case standardSearchExtendedTime:
+		//sync_cout<<"standardSearchExtendedTime"<<sync_endl;
+		if( _stop )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+
+		if( isIdLoopIterationFinished() )
+		{
+			_searchState = searchFinished;
+			_src.stopSearch();
+		}
+		break;
+	case searchFinished:
+		//sync_cout<<"searchFinished"<<sync_endl;
+	default:
+		break;
+	}
 }
 
 
 volatile bool my_thread::quit = false;
 volatile bool my_thread::startThink = false;
 
-
-long long my_thread::lastHasfullMessage;
-
-
 my_thread * my_thread::pInstance;
 std::mutex  my_thread::_mutex;
 
+void my_thread::printTimeDependentOutput(long long int time) {
+
+	if( time - lastHasfullMessage > 1000 )
+	{
+		lastHasfullMessage = time;
+
+		_UOI->printGeneralInfo(transpositionTable::getInstance().getFullness(),	src.getTbHits(), src.getVisitedNodes(), time);
+
+		if(uciParameters::showCurrentLine)
+		{
+			src.showLine();
+		}
+	}
+}
 
 void my_thread::timerThread()
 {
 	std::mutex mutex;
 	while (!quit)
 	{
-
 		std::unique_lock<std::mutex> lk(mutex);
 
 		timerCond.wait(lk, [&]{return (startThink && !timeMan.isSearchStopped() ) || quit;} );
+
 		if (!quit)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
+
 			long long int time = st.getClockTime();
-
-			if( !timeMan.isSearchStopped() )
-			{
-				if( time >= timeMan.allocatedTime && timeMan.isSearchInFailLowOverState() )
-				{
-					timeMan.extendTime();
-				}
-				if( timeMan.isSearchTimeExtended() && ( timeMan.isIdLoopIterationFinished() ) && !(limits.infinite || limits.ponder) )
-				{
-					timeMan.stop();
-					src.stopSearch();
-				}
-
-				if( time >= timeMan.allocatedTime && timeMan.hasFirstIterationFinished() && !(limits.infinite || limits.ponder))
-				{
-					timeMan.stop();
-					src.stopSearch();
-				}
-				if( timeMan.isIdLoopIterationFinished() && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(limits.infinite || limits.ponder))
-				{
-					timeMan.stop();
-					src.stopSearch();
-				}
-				if(limits.nodes && timeMan.hasFirstIterationFinished() && src.getVisitedNodes() > limits.nodes)
-				{
-					timeMan.stop();
-					src.stopSearch();
-				}
-				if(limits.moveTime && timeMan.hasFirstIterationFinished() && time>=limits.moveTime)
-				{
-					timeMan.stop();
-					src.stopSearch();
-				}
-			}
 			
-#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-			if(time - lastHasfullMessage > 1000)
-			{
-				lastHasfullMessage = time;
-
-				_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), time);
-
-				if( uciParameters::showCurrentLine )
-				{
-					src.showLine();
-				}
-
-			}
-
-#endif
+			timeMan.stateMachineStep( time );
 			timeMan.clearIdLoopIterationFinished();
+
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+			printTimeDependentOutput( time );
+#endif
+
+
+			std::this_thread::sleep_for(std::chrono::milliseconds( timeMan.resolution ));
 		}
 		lk.unlock();
 	}
@@ -241,7 +306,7 @@ void my_thread::searchThread()
 		searchCond.wait(lk, [&]{return startThink||quit;} );
 		if(!quit)
 		{
-			timeManagerInit(src.pos, limits, timeMan);
+			timeMan.initNewSearch( limits );
 			src.resetStopCondition();
 			st.resetStartTimers();
 			timerCond.notify_one();
