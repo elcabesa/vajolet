@@ -44,11 +44,9 @@ public:
 		searchFinished
 	};
 
-	timeManagement( Search& s, SearchLimits& limits ):_src(s),_limits(limits){}
+	timeManagement( SearchLimits& limits ):_limits(limits){}
 
-	
-
-	void initNewSearch( SearchLimits& lim );
+	void initNewSearch( SearchLimits& lim, const Position::eNextMove nm );
 
 	void notifyIterationHasBeenFinished();
 	void notifyFailLow();
@@ -61,7 +59,7 @@ public:
 	bool isSearchFinished() const;
 	
 	void chooseSearchType( enum searchState s);
-	void stateMachineStep( long long int time );
+	bool stateMachineStep( const long long int time, const unsigned long long visitedNodes );
 	
 
 private:
@@ -84,7 +82,6 @@ private:
 	bool _stop;
 
 	searchState _searchState;
-	Search & _src;
 	const SearchLimits& _limits;
 
 };

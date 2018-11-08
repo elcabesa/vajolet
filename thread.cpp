@@ -90,18 +90,18 @@ inline unsigned int timeManagement::getResolution() const
 }
 
 
-void timeManagement::chooseSearchType( enum searchState s)
+void timeManagement::chooseSearchType( enum searchState s )
 {
 	_searchState = s;
 }
 
-void timeManagement::initNewSearch( SearchLimits& lim )
+void timeManagement::initNewSearch( SearchLimits& lim, const Position::eNextMove nm )
 {
 	if((!lim.btime && !lim.wtime) && !lim.moveTime)
 	{
 		lim.infinite = true;
 		_resolution = 100;
-		chooseSearchType( timeManagement::infiniteSearch);
+		chooseSearchType( timeManagement::infiniteSearch );
 	}
 	else if(lim.moveTime)
 	{
@@ -116,7 +116,7 @@ void timeManagement::initNewSearch( SearchLimits& lim )
 		unsigned int time;
 		unsigned int increment;
 
-		if(_src.pos.getNextTurn())
+		if( nm == Position::blackTurn )
 		{
 			time = lim.btime;
 			increment = lim.binc;
@@ -127,7 +127,7 @@ void timeManagement::initNewSearch( SearchLimits& lim )
 			increment = lim.winc;
 		}
 
-		if(lim.movesToGo > 0)
+		if( lim.movesToGo > 0 )
 		{
 			_allocatedTime = time / lim.movesToGo;
 			_maxAllocatedTime = 10.0 * _allocatedTime;
@@ -154,8 +154,10 @@ void timeManagement::initNewSearch( SearchLimits& lim )
 
 }
 
-void timeManagement::stateMachineStep( long long int time )
+bool timeManagement::stateMachineStep( const long long int time, const unsigned long long visitedNodes )
 {
+	bool stopSearch = false;
+	
 	switch( _searchState )
 	{
 	case wait:
@@ -167,12 +169,12 @@ void timeManagement::stateMachineStep( long long int time )
 		//sync_cout<<"infiniteSearch"<<sync_endl;
 		if(
 				_stop
-				|| ( _limits.nodes && _hasFirstIterationFinished() && _src.getVisitedNodes() > _limits.nodes )
+				|| ( _limits.nodes && _hasFirstIterationFinished() && visitedNodes > _limits.nodes )
 				|| ( _limits.moveTime && _hasFirstIterationFinished() && time >= _limits.moveTime )
 		)
 		{
 			_searchState = searchFinished;
-			_src.stopSearch();
+			stopSearch = true;
 		}
 		break;
 
@@ -185,7 +187,7 @@ void timeManagement::stateMachineStep( long long int time )
 		)
 		{
 			_searchState = searchFinished;
-			_src.stopSearch();
+			stopSearch = true;
 		}
 		break;
 
@@ -199,7 +201,7 @@ void timeManagement::stateMachineStep( long long int time )
 		)
 		{
 			_searchState = searchFinished;
-			_src.stopSearch();
+			stopSearch = true;
 		}
 		else if( time >= _allocatedTime && _isSearchInFailLowOverState() )
 		{
@@ -212,7 +214,7 @@ void timeManagement::stateMachineStep( long long int time )
 		if( _stop )
 		{
 			_searchState = searchFinished;
-			_src.stopSearch();
+			stopSearch = true;
 		}
 		else if( _limits.ponder == false )
 		{
@@ -229,7 +231,7 @@ void timeManagement::stateMachineStep( long long int time )
 		)
 		{
 			_searchState = searchFinished;
-			_src.stopSearch();
+			stopSearch = true;
 		}
 		break;
 
@@ -240,6 +242,8 @@ void timeManagement::stateMachineStep( long long int time )
 	}
 
 	_clearIdLoopIterationFinished();
+	
+	return stopSearch;
 }
 
 
@@ -278,7 +282,11 @@ void my_thread::_timerThread()
 
 			long long int time = _st.getClockTime();
 			
-			timeMan.stateMachineStep( time );
+			bool stop = timeMan.stateMachineStep( time, _src.getVisitedNodes() );
+			if( stop )
+			{
+				_src.stopSearch();
+			}
 
 
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
@@ -302,7 +310,7 @@ void my_thread::_searchThread()
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
 		if(!_quit)
 		{
-			timeMan.initNewSearch( _limits );
+			timeMan.initNewSearch( _limits, _src.pos.getNextTurn() );
 			_src.resetStopCondition();
 			_st.resetStartTimers();
 			_timerCond.notify_one();
@@ -499,12 +507,12 @@ void my_thread::ponderHit()
 	stopPonder();
 }
 
-my_thread::my_thread():_src(_st, _limits), timeMan(_src, _limits)
+my_thread::my_thread():_src(_st, _limits), timeMan(_limits)
 {
 	_UOI = UciOutput::create();
 	_initThreads();
 	_game.CreateNewGame();
-};
+}
 
 my_thread::~my_thread()
 {
