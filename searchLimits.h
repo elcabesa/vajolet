@@ -45,6 +45,14 @@ public:
 		moveTime = 0;
 	}
 
+	void checkInfiniteSearch()
+	{
+		if((!btime && !wtime) && !moveTime)
+		{
+			infinite = true;
+		}
+	}
+
 };
 
 #endif

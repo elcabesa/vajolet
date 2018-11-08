@@ -86,11 +86,11 @@ void my_thread::_searchThread()
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
 		if(!_quit)
 		{
+			_limits.checkInfiniteSearch();
 			timeMan.initNewSearch( _src.pos.getNextTurn() );
 			_src.resetStopCondition();
 			_st.resetStartTimers();
 			_timerCond.notify_one();
-			_src.resetStopCondition();
 			_manageNewSearch();
 			_startThink = false;
 		}

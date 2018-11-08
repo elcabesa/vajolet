@@ -73,7 +73,7 @@ private:
 	bool _stop;
 
 	searchState _searchState;
-	SearchLimits& _limits;
+	const SearchLimits& _limits;
 
 };
 
