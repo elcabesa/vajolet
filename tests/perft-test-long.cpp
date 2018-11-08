@@ -19,12 +19,13 @@ static const std::vector<positions> perftPos ={
 	
 };
 
-TEST(MediumPerftTest, perft) {
+
+TEST(PerftTest, perft) {
 	Position pos;
 	for (auto & p : perftPos)
 	{
 		pos.setupFromFen(p.Fen); 
-		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
+		for( unsigned int i = 0; i < p.PerftValue.size(); i++)
 		{
 			EXPECT_EQ(pos.perft(i+1), p.PerftValue[i]);
 		}
