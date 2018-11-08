@@ -20,6 +20,9 @@
 
 #include <list>
 
+#include "move.h"
+
+
 class SearchLimits
 {
 public:

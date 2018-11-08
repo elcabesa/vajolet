@@ -28,63 +28,7 @@
 #include "search.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
-
-
-class timeManagement
-{
-public:
-	enum searchState
-	{
-		wait,
-		infiniteSearch,
-		fixedTimeSearch,
-		standardSearchPonder,
-		standardSearch,
-		standardSearchExtendedTime,
-		searchFinished
-	};
-
-	timeManagement( SearchLimits& limits ):_limits(limits){}
-
-	void initNewSearch( SearchLimits& lim, const Position::eNextMove nm );
-
-	void notifyIterationHasBeenFinished();
-	void notifyFailLow();
-	void notifyFailOver();
-
-	unsigned int getResolution() const;
-
-	void stop();
-	
-	bool isSearchFinished() const;
-	
-	void chooseSearchType( enum searchState s);
-	bool stateMachineStep( const long long int time, const unsigned long long visitedNodes );
-	
-
-private:
-	void _resetSearchvariables();
-	void _clearIdLoopIterationFinished();
-	bool _isSearchInFailLowOverState() const;
-	bool _hasFirstIterationFinished() const;
-	bool _isIdLoopIterationFinished() const;
-
-	bool _firstIterationFinished;
-	bool _idLoopIterationFinished;
-	bool _idLoopFailLow;
-	bool _idLoopFailOver;
-	
-	long long _allocatedTime;
-	long long _minSearchTime;
-	long long _maxAllocatedTime;
-	unsigned int _resolution;
-
-	bool _stop;
-
-	searchState _searchState;
-	const SearchLimits& _limits;
-
-};
+#include "timeManagement.h"
 
 
 class Game
