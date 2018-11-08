@@ -17,7 +17,6 @@
 
 #include "timeManagement.h"
 
-
 void timeManagement::_resetSearchvariables()
 {
 	_firstIterationFinished = false;
@@ -84,7 +83,7 @@ unsigned int timeManagement::getResolution() const
 }
 
 
-void timeManagement::chooseSearchType( enum searchState s )
+void timeManagement::_chooseSearchType( enum searchState s )
 {
 	_searchState = s;
 }
@@ -95,7 +94,7 @@ void timeManagement::initNewSearch( const Position::eNextMove nm )
 	if( _limits.infinite )
 	{
 		_resolution = 100;
-		chooseSearchType( timeManagement::infiniteSearch );
+		_chooseSearchType( timeManagement::infiniteSearch );
 	}
 	else if(_limits.moveTime)
 	{
@@ -103,7 +102,7 @@ void timeManagement::initNewSearch( const Position::eNextMove nm )
 		_allocatedTime = _limits.moveTime;
 		_minSearchTime = _limits.moveTime;
 		_resolution = std::min((long long int)100, _allocatedTime / 100 );
-		chooseSearchType( timeManagement::fixedTimeSearch);
+		_chooseSearchType( timeManagement::fixedTimeSearch);
 	}
 	else
 	{
@@ -141,7 +140,7 @@ void timeManagement::initNewSearch( const Position::eNextMove nm )
 		_allocatedTime = std::min( (long long int)_allocatedTime, (long long int)( time - buffer ) );
 		_maxAllocatedTime = std::min( (long long int)_maxAllocatedTime, (long long int)( time - buffer ) );
 
-		chooseSearchType( _limits.ponder == true ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
+		_chooseSearchType( _limits.ponder == true ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
 	}
 
 	_resetSearchvariables();
@@ -163,7 +162,7 @@ bool timeManagement::stateMachineStep( const long long int time, const unsigned 
 		//sync_cout<<"infiniteSearch"<<sync_endl;
 		if(
 				_stop
-				|| ( _limits.nodes && _hasFirstIterationFinished() && visitedNodes > _limits.nodes )
+				|| ( _limits.nodes && _hasFirstIterationFinished() && visitedNodes >= _limits.nodes )
 				|| ( _limits.moveTime && _hasFirstIterationFinished() && time >= _limits.moveTime )
 		)
 		{
@@ -232,6 +231,7 @@ bool timeManagement::stateMachineStep( const long long int time, const unsigned 
 	case searchFinished:
 		//sync_cout<<"searchFinished"<<sync_endl;
 	default:
+		stopSearch = true;
 		break;
 	}
 

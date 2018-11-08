@@ -42,14 +42,11 @@ public:
 	void notifyIterationHasBeenFinished();
 	void notifyFailLow();
 	void notifyFailOver();
+	void stop();
 
 	unsigned int getResolution() const;
-
-	void stop();
-	
 	bool isSearchFinished() const;
-	
-	void chooseSearchType( enum searchState s);
+
 	bool stateMachineStep( const long long int time, const unsigned long long visitedNodes );
 	
 
@@ -59,6 +56,7 @@ private:
 	bool _isSearchInFailLowOverState() const;
 	bool _hasFirstIterationFinished() const;
 	bool _isIdLoopIterationFinished() const;
+	void _chooseSearchType( enum searchState s);
 
 	bool _firstIterationFinished;
 	bool _idLoopIterationFinished;

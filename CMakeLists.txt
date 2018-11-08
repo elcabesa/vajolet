@@ -77,7 +77,7 @@ target_link_libraries (Vajolet libChess)
 
     enable_testing()
     # Now simply link against gtest or gtest_main as needed. Eg
-    add_executable(Vajolet_unit_test tests/main.cpp tests/perft-test.cpp tests/see-test.cpp )
+    add_executable(Vajolet_unit_test tests/main.cpp tests/perft-test.cpp tests/see-test.cpp tests/timeManagement-test.cpp)
     target_link_libraries(Vajolet_unit_test gtest libChess)
 	
 	add_executable(Vajolet_syzygy_test tests/main.cpp tests/syzygy-test.cpp)
