@@ -17,7 +17,7 @@
 
 #include "timeManagement.h"
 
-void timeManagement::_resetSearchvariables()
+void timeManagement::_resetSearchVariables()
 {
 	_firstIterationFinished = false;
 	_idLoopIterationFinished = false;
@@ -98,9 +98,7 @@ void timeManagement::initNewSearch( const Position::eNextMove nm )
 	}
 	else if(_limits.moveTime)
 	{
-		_maxAllocatedTime = _limits.moveTime;
 		_allocatedTime = _limits.moveTime;
-		_minSearchTime = _limits.moveTime;
 		_resolution = std::min((long long int)100, _allocatedTime / 100 );
 		_chooseSearchType( timeManagement::fixedTimeSearch);
 	}
@@ -123,7 +121,6 @@ void timeManagement::initNewSearch( const Position::eNextMove nm )
 		if( _limits.movesToGo > 0 )
 		{
 			_allocatedTime = time / _limits.movesToGo;
-			_maxAllocatedTime = 10.0 * _allocatedTime;
 			_maxAllocatedTime = std::min( 10.0 * _allocatedTime, 0.8 * time);
 			_maxAllocatedTime = std::max( _maxAllocatedTime, _allocatedTime );
 		}
@@ -143,7 +140,7 @@ void timeManagement::initNewSearch( const Position::eNextMove nm )
 		_chooseSearchType( _limits.ponder == true ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
 	}
 
-	_resetSearchvariables();
+	_resetSearchVariables();
 
 }
 
@@ -189,16 +186,23 @@ bool timeManagement::stateMachineStep( const long long int time, const unsigned 
 		//sync_cout<<"standardSearch"<<sync_endl;
 		if(
 				_stop
-				|| ( time >= _allocatedTime && _hasFirstIterationFinished() )
 				|| ( _isIdLoopIterationFinished() && time >= _minSearchTime && time >= _allocatedTime * 0.7 )
 		)
 		{
 			_searchState = searchFinished;
 			stopSearch = true;
 		}
-		else if( time >= _allocatedTime && _isSearchInFailLowOverState() )
+		else if( time >= _allocatedTime )
 		{
-			_searchState = standardSearchExtendedTime;
+			if( _isSearchInFailLowOverState() )
+			{
+				_searchState = standardSearchExtendedTime;
+			}
+			else if( _hasFirstIterationFinished() )
+			{
+				_searchState = searchFinished;
+				stopSearch = true;
+			}
 		}
 		break;
 

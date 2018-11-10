@@ -51,7 +51,7 @@ public:
 	
 
 private:
-	void _resetSearchvariables();
+	void _resetSearchVariables();
 	void _clearIdLoopIterationFinished();
 	bool _isSearchInFailLowOverState() const;
 	bool _hasFirstIterationFinished() const;
