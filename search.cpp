@@ -330,7 +330,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 						globalReduction = 0;
 						if( masterThread )
 						{
-							thr.timeMan.notifyFailLow();
+							thr.getTimeMan().notifyFailLow();
 						}
 						
 						// follow the old PV
@@ -349,7 +349,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 						}
 						if( masterThread )
 						{
-							thr.timeMan.notifyFailOver();
+							thr.getTimeMan().notifyFailOver();
 						}
 						
 						pvLineToFollow = newPV;
@@ -388,7 +388,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 
 		if( masterThread )
 		{
-			thr.timeMan.notifyIterationHasBeenFinished();
+			thr.getTimeMan().notifyIterationHasBeenFinished();
 		}
 
 	}

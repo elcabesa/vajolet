@@ -90,7 +90,6 @@ void timeManagement::_chooseSearchType( enum searchState s )
 
 void timeManagement::initNewSearch( const Position::eNextMove nm )
 {
-	// todo move thos controls in command or limits class... here we only have to read it
 	if( _limits.infinite )
 	{
 		_resolution = 100;

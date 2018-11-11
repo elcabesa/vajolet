@@ -23,12 +23,12 @@
 #include <mutex>
 #include <thread>
 
-#include "command.h"
 #include "position.h"
-#include "search.h"
-#include "searchLimits.h"
-#include "searchTimer.h"
 #include "timeManagement.h"
+
+class Searc;
+class SearchLimits;
+class SearchTimer;
 
 
 class Game
@@ -43,100 +43,19 @@ public:
 		Score beta;
 		unsigned int depth;
 	};
+
+	void CreateNewGame();
+	void insertNewMoves(Position &pos);
+	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
+	void printGamesInfo();
+
+	bool isNewGame(const Position &pos) const;
+	bool isPonderRight() const;
+	GamePosition getNewSearchParameters() const;
+
 private:
-	std::vector<GamePosition> positions;
+	std::vector<GamePosition> _positions;
 public:
-
-	void CreateNewGame(void)
-	{
-		positions.clear();
-	}
-
-	void insertNewMoves(Position &pos)
-	{
-		unsigned int actualPosition = positions.size();
-		for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
-		{
-			GamePosition p;
-			p.key = pos.getState(i).key;
-			p.m =  pos.getState(i).currentMove;
-			positions.push_back(p);
-		}
-	}
-
-	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta)
-	{
-		positions.back().PV = PV;
-		positions.back().depth = depth;
-		positions.back().alpha = alpha;
-		positions.back().beta = beta;
-	}
-
-
-	void printGamesInfo()
-	{
-		for(auto p : positions)
-		{
-			if( p.m != NOMOVE)
-			{
-				std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
-				for( auto m : p.PV )
-				{
-					std::cout<<displayUci(m)<<" ";
-				}
-
-			}
-			std::cout<<std::endl;
-		}
-
-	}
-
-	~Game()
-	{
-		//printGamesInfo();
-	}
-	bool isNewGame(Position &pos)
-	{
-		if( positions.size() == 0 || pos.getStateSize() < positions.size())
-		{
-			//printGamesInfo();
-			return true;
-		}
-
-		unsigned int n = 0;
-		for(auto p : positions)
-		{
-			if(pos.getState(n).key != p.key)
-			{
-				//printGamesInfo();
-				return true;
-			}
-			n++;
-
-		}
-		return false;
-	}
-
-	bool isPonderRight(void)
-	{
-		if( positions.size() > 2)
-		{
-			GamePosition previous =*(positions.end()-3);
-			if(previous.PV.size()>=1 && previous.PV.getMove(1) == positions.back().m)
-			{
-				return true;
-			}
-
-		}
-		return false;
-	}
-
-	GamePosition getNewSearchParameters(void)
-	{
-		GamePosition previous =*(positions.end()-3);
-		return previous;
-	}
-
 
 };
 
@@ -153,6 +72,7 @@ private:
 	SearchTimer _st;
 	Search _src;
 	Game _game;
+	timeManagement _timeMan;
 
 	std::unique_ptr<UciOutput> _UOI;
 
@@ -204,8 +124,9 @@ public :
 	void stopPonder();
 	void stopThinking();
 	void ponderHit();
+	timeManagement& getTimeMan(){ return _timeMan;}
 
-	timeManagement timeMan;
+
 
 };
 
