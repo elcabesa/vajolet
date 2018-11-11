@@ -33,6 +33,7 @@ CPP_SRCS := \
 ./search.cpp \
 ./see.cpp \
 ./thread.cpp \
+./timeManagement.cpp \
 ./transposition.cpp \
 ./uciParameters.cpp \
 ./vajolet.cpp \
@@ -61,6 +62,7 @@ OBJS :=  \
 ./search.o \
 ./see.o \
 ./thread.o \
+./timeManagement.o \
 ./transposition.o \
 ./uciParameters.o \
 ./vajolet.o \
@@ -84,6 +86,7 @@ CPP_DEPS := \
 ./search.d \
 ./see.d \
 ./thread.d \
+./timeManagement.d \
 ./transposition.d \
 ./uciParameters.cd \
 ./vajolet.d \
