@@ -18,8 +18,11 @@
 #ifndef VERSION_H_
 #define VERSION_H_
 
-#define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.7.0"
-#define PRE_RELEASE		"-PRE-30"
+#include <string>
+
+const std::string programName = "Vajolet2";
+const std::string version = "2.7.0";
+const std::string preRelease = "-PRE-30";
+
 
 #endif

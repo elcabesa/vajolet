@@ -93,10 +93,10 @@ char getPieceName( const unsigned int idx )
 
 std::string getProgramNameAndVersion()
 {
-	std::string s = PROGRAM_NAME;
+	std::string s = programName;
 	s += " ";
-	s += VERSION;
-	s += PRE_RELEASE;
+	s += version;
+	s += preRelease;
 	return s;
 }
 
@@ -421,7 +421,7 @@ void setoption(std::istringstream& is)
 	}
 	else if(name == "UCI_EngineAbout")
 	{
-		sync_cout<< PROGRAM_NAME << " " << VERSION PRE_RELEASE<< " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
+		sync_cout<< programName << " " << version << preRelease << " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
 	}
 	else
 	{
