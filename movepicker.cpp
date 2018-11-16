@@ -15,4 +15,4 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "movepick.h"
+#include "movepicker.h"

@@ -249,7 +249,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -283,7 +283,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -311,7 +311,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -339,7 +339,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -368,7 +368,7 @@ void Movegen::generateMoves()
 
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -399,7 +399,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -419,7 +419,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -442,7 +442,7 @@ void Movegen::generateMoves()
 			{
 				m.bit.to = to;
 				m.bit.from = from;
-				insertMove(m);
+				moveList.insert(m);
 			}
 		}
 
@@ -460,7 +460,7 @@ void Movegen::generateMoves()
 			{
 				m.bit.to = to;
 				m.bit.from = from;
-				insertMove(m);
+				moveList.insert(m);
 			}
 		}
 	}
@@ -483,7 +483,7 @@ void Movegen::generateMoves()
 				for(Move::epromotion prom=Move::promQueen; prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
 				{
 					m.bit.promotion = prom;
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -509,7 +509,7 @@ void Movegen::generateMoves()
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
 				{
 					m.bit.promotion = prom;
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -531,7 +531,7 @@ void Movegen::generateMoves()
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
 				{
 					m.bit.promotion = prom;
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 		}
@@ -559,7 +559,7 @@ void Movegen::generateMoves()
 				{
 					m.bit.to = s.epSquare;
 					m.bit.from = from;
-					insertMove(m);
+					moveList.insert(m);
 				}
 			}
 
@@ -596,7 +596,7 @@ void Movegen::generateMoves()
 					m.bit.to = kingSquare + 2;
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 					{
-						insertMove(m);
+						moveList.insert(m);
 					}
 				}
 
@@ -621,7 +621,7 @@ void Movegen::generateMoves()
 					m.bit.to = kingSquare - 2;
 					if(type != Movegen::quietChecksMg || pos.moveGivesCheck(m))
 					{
-						insertMove(m);
+						moveList.insert(m);
 					}
 				}
 			}
@@ -653,7 +653,7 @@ void Movegen::generateMoves<Movegen::allMg>()
 
 inline unsigned int  Movegen::getGeneratedMoveNumber(void) const
 {
-	return moveListEnd-moveList.begin();
+	return moveList.size();
 }
 
 unsigned int Movegen::getNumberOfLegalMoves()
@@ -677,7 +677,7 @@ Move Movegen::getNextMove()
 		case generateProbCutCaptures:
 
 			generateMoves<Movegen::genType::captureMg>();
-			RemoveMove(ttMove);
+			moveList.ignoreMove(ttMove);
 
 			scoreCaptureMoves();
 
@@ -686,14 +686,14 @@ Move Movegen::getNextMove()
 
 		case generateQuietMoves:
 
-			resetMoveList();
+			moveList.reset();
 
 			generateMoves<Movegen::genType::quietMg>();
-			RemoveMove(ttMove);
-			RemoveMove(killerMoves[0]);
-			RemoveMove(killerMoves[1]);
-			RemoveMove(counterMoves[0]);
-			RemoveMove(counterMoves[1]);
+			moveList.ignoreMove(ttMove);
+			moveList.ignoreMove(killerMoves[0]);
+			moveList.ignoreMove(killerMoves[1]);
+			moveList.ignoreMove(counterMoves[0]);
+			moveList.ignoreMove(counterMoves[1]);
 
 			scoreQuietMoves();
 
@@ -703,7 +703,7 @@ Move Movegen::getNextMove()
 		case generateCaptureEvasionMoves:
 
 			generateMoves<Movegen::captureEvasionMg>();
-			RemoveMove(ttMove);
+			moveList.ignoreMove(ttMove);
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
 			killerMoves[0] = _sd.getKillers(ply,0);
@@ -717,7 +717,7 @@ Move Movegen::getNextMove()
 		case generateQuietEvasionMoves:
 
 			generateMoves<Movegen::quietEvasionMg>();
-			RemoveMove(ttMove);
+			moveList.ignoreMove(ttMove);
 
 			scoreQuietEvasion();
 			stagedGeneratorState = (eStagedGeneratorState)(stagedGeneratorState+1);
@@ -725,9 +725,9 @@ Move Movegen::getNextMove()
 
 		case generateQuietCheks:
 
-			resetMoveList();
+			moveList.reset();
 			generateMoves<Movegen::quietChecksMg>();
-			RemoveMove(ttMove);
+			moveList.ignoreMove(ttMove);
 
 			scoreQuietMoves();
 
@@ -741,7 +741,7 @@ Move Movegen::getNextMove()
 		case iterateQuietChecks:
 		case iterateQuietEvasionMoves:
 
-			if((mm = FindNextBestMove()) != NOMOVE)
+			if((mm = moveList.findNextBestMove()) != NOMOVE)
 			{
 				return mm;
 			}
@@ -752,7 +752,7 @@ Move Movegen::getNextMove()
 			break;
 		case iterateGoodCaptureMoves:
 
-			if((mm = FindNextBestMove()) != NOMOVE)
+			if((mm = moveList.findNextBestMove()) != NOMOVE)
 			{
 				if((pos.seeSign(mm)>=0) || (pos.moveGivesSafeDoubleCheck(mm)))
 				{
@@ -760,8 +760,7 @@ Move Movegen::getNextMove()
 				}
 				else
 				{
-					assert(badCaptureEnd<badCaptureList.end());
-					(badCaptureEnd++)->m = mm;
+					badCaptureList.insert( mm );
 				}
 
 			}
@@ -787,7 +786,7 @@ Move Movegen::getNextMove()
 			}
 			break;
 		case iterateProbCutCaptures:
-			if((mm = FindNextBestMove()) != NOMOVE)
+			if((mm = moveList.findNextBestMove()) != NOMOVE)
 			{
 				if(pos.see(mm) >= captureThreshold)
 				{
@@ -800,14 +799,7 @@ Move Movegen::getNextMove()
 			}
 			break;
 		case iterateBadCaptureMoves:
-			if(badCapturePosition != badCaptureEnd)
-			{
-				return (badCapturePosition++)->m;
-			}
-			else
-			{
-				return NOMOVE;
-			}
+			return badCaptureList.getNextMove();
 			break;
 		case getKillers:
 			if(killerPos < 2)
@@ -865,73 +857,42 @@ Move Movegen::getNextMove()
 
 const Move& Movegen::getMoveFromMoveList(unsigned int n) const
 {
-	return moveList[n].m;
+	return moveList.get(n);
 }
 
-inline void Movegen::insertMove(const Move& m)
-{
-	assert(moveListEnd<moveList.end());
-	(moveListEnd++)->m = m;
-}
 
 inline void Movegen::scoreCaptureMoves()
 {
-	for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
+	for( auto it = moveList.begin(); it != moveList.end(); ++it)
 	{
-		mov->score = pos.getMvvLvaScore(mov->m);
+		it->score = pos.getMvvLvaScore(it->m);
 		// history of capture
-		mov->score += _sd.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)mov->m.bit.from) , mov->m , pos.getPieceAt((tSquare)mov->m.bit.to) ) * 50;
-
+		it->score += _sd.getCaptureHistory().getValue( pos.getPieceAt( (tSquare)it->m.bit.from) , it->m , pos.getPieceAt((tSquare)it->m.bit.to) ) * 50;
 	}
+
 }
 
 inline void Movegen::scoreQuietMoves()
 {
-	for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
+	for( auto it = moveList.begin(); it != moveList.end(); ++it)
 	{
-		mov->score = _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
+		it->score = _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, it->m );
 	}
 }
 
 inline void Movegen::scoreQuietEvasion()
 {
-	for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
+	for( auto it = moveList.begin(); it != moveList.end(); ++it)
 	{
-		mov->score = (pos.getPieceAt((tSquare)mov->m.bit.from));
-		if(pos.getPieceAt((tSquare)mov->m.bit.from) % separationBitmap == King)
+		it->score = (pos.getPieceAt((tSquare)it->m.bit.from));
+		if(pos.getPieceAt((tSquare)it->m.bit.from) % separationBitmap == King)
 		{
-			mov->score = 20;
+			it->score = 20;
 		}
-		mov->score *=500000;
+		it->score *= 500000;
 
-		mov->score += _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, mov->m );
+		it->score += _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, it->m );
 	}
 }
 
-inline void Movegen::resetMoveList()
-{
-	moveListPosition = moveList.begin();
-	moveListEnd = moveList.begin();
-}
-
-
-inline const Move& Movegen::FindNextBestMove()
-{
-	const auto max = std::max_element(moveListPosition,moveListEnd);
-	if( max != moveListEnd)
-	{
-		std::swap(*max, *moveListPosition);
-		return (moveListPosition++)->m;
-	}
-	return NOMOVE;
-}
-inline void Movegen::RemoveMove(Move m)
-{
-	const auto i = std::find(moveListPosition,moveListEnd,m);
-	if( i != moveListEnd)
-	{
-		std::swap(*i, *moveListPosition);
-		++moveListPosition;
-	}
-}
 

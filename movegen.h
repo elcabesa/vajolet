@@ -24,6 +24,7 @@
 
 #include "bitops.h"
 #include "magicmoves.h"
+#include "moveList.h"
 #include "position.h"
 #include "search.h"
 #include "vajolet.h"
@@ -36,13 +37,16 @@ class Movegen
 private:
 	static const int MAX_MOVE_PER_POSITION = 250;
 	static const int MAX_BAD_MOVE_PER_POSITION = 32;
-	std::array<extMove,MAX_MOVE_PER_POSITION> moveList;
-	std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListEnd;
-	std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListPosition;
+	//std::array<extMove,MAX_MOVE_PER_POSITION> moveList;
+	//std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListEnd;
+	//std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListPosition;
 
-	std::array<extMove,MAX_BAD_MOVE_PER_POSITION> badCaptureList;
-	std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCaptureEnd;
-	std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCapturePosition;
+	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION> badCaptureList;
+	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCaptureEnd;
+	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCapturePosition;
+
+	MoveList<MAX_MOVE_PER_POSITION> moveList;
+	MoveList<MAX_BAD_MOVE_PER_POSITION> badCaptureList;
 
 	unsigned int killerPos;
 	Score captureThreshold;
@@ -117,13 +121,9 @@ private:
 	}stagedGeneratorState;
 
 	template<Movegen::genType type>	void generateMoves();
-	void insertMove(const Move& m);
 	void scoreCaptureMoves();
 	void scoreQuietMoves();
 	void scoreQuietEvasion();
-	void resetMoveList();
-	const Move& FindNextBestMove();
-	void RemoveMove(Move m);
 	unsigned int getGeneratedMoveNumber(void)const;
 
 
@@ -148,10 +148,8 @@ public:
 		{
 			stagedGeneratorState = getTT;
 		}
-		moveListPosition =  moveList.begin();
-		moveListEnd =  moveList.begin();
-		badCaptureEnd = badCaptureList.begin();
-		badCapturePosition = badCaptureList.begin();
+		//moveList.reset();
+		//badCaptureList.reset();
 
 	}
 

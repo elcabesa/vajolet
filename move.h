@@ -88,6 +88,7 @@ struct extMove{
 	extMove(){};
 	inline bool operator < (const extMove& d1) const { return score < d1.score;}
 	inline bool operator == (const Move& d1) const { return m == d1;}
+	inline extMove& operator = ( const Move& mm ){ m.packed = mm.packed; return *this; }
 };
 
 /*!	\brief return the offset of a pawn push
