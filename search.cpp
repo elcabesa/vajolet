@@ -33,6 +33,7 @@
 #include "syzygy/tbprobe.h"
 #include "vajolet.h"
 
+
 #ifdef DEBUG_EVAL_SIMMETRY
 	
 	
@@ -546,6 +547,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 
+	std::cout<<"enter alpha beta"<<std::endl;
 	visitedNodes++;
 	sd.clearKillers(ply+1);
 
@@ -1042,11 +1044,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		bool moveGivesCheck = pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
 		bool FutilityMoveCountFlag = (depth < 16*ONE_PLY) && (moveNumber >= FutilityMoveCounts[1][depth >> ONE_PLY_SHIFT]);
-		if( FutilityMoveCountFlag && FutilityMoveCounts[1][depth >> ONE_PLY_SHIFT] < FutilityMoveCounts[0][depth >> ONE_PLY_SHIFT])
+		/*if( FutilityMoveCountFlag && FutilityMoveCounts[1][depth >> ONE_PLY_SHIFT] < FutilityMoveCounts[0][depth >> ONE_PLY_SHIFT])
 		{
 			std::cout<<"depth:"<<(depth >> ONE_PLY_SHIFT)<<" fut0:"<<FutilityMoveCounts[0][depth >> ONE_PLY_SHIFT]<<" fut1:"<<FutilityMoveCounts[1][depth >> ONE_PLY_SHIFT]<<std::endl;
 			std::cout<<"ARGHHHH"<<std::endl;
-		}
+		}*/
 		int ext = 0;
 		if(PVnode && isDangerous )
 		{
@@ -1420,6 +1422,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	visitedNodes++;
 
 
+	std::cout<<"enter quiescent"<<std::endl;
 
 	if(pos.isDraw(PVnode) || stop)
 	{
