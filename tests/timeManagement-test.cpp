@@ -221,10 +221,46 @@ TEST(timeManagement, moveTimeSearch2)
 	ASSERT_EQ( tm.stateMachineStep( 100000, 10000 ), true);
 	ASSERT_EQ( tm.isSearchFinished(), true );
 
+}
 
+TEST(timeManagement, normalSearch)
+{
 
+	SearchLimits s;
+	s.btime = 10000;
+	s.wtime = 20000;
+	s.binc = 0;
+	s.winc = 0;
+	s.checkInfiniteSearch();
 
+	timeManagement tm( s );
 
+	tm.initNewSearch( Position::whiteTurn );
+	ASSERT_EQ( tm.getResolution(), 10 );
+
+	s.moveTime = 100;
+	tm.initNewSearch( Position::whiteTurn );
+	ASSERT_EQ( tm.getResolution(), 1 );
+
+	s.moveTime = 100000;
+	tm.initNewSearch( Position::whiteTurn );
+	ASSERT_EQ( tm.getResolution(), 100);
+
+	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( 1000, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( 100000000, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+
+	tm.notifyIterationHasBeenFinished();
+
+	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( 99999, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( 100000, 10000 ), true);
+	ASSERT_EQ( tm.isSearchFinished(), true );
 
 }
 
