@@ -86,9 +86,13 @@ target_link_libraries (Vajolet libChess)
 	add_executable(Vajolet_long_tests tests/main.cpp tests/perft-test-long.cpp)
     target_link_libraries(Vajolet_long_tests gtest libChess)
 	
+	add_executable(Vajolet_search_integration_test tests/main.cpp tests/search-integration-test.cpp )
+    target_link_libraries(Vajolet_search_integration_test gtest libChess)
+	
     add_test(NAME unit_test COMMAND Vajolet_unit_test)
 	add_test(NAME syzygy_test COMMAND Vajolet_syzygy_test)
 	add_test(NAME long_tests COMMAND Vajolet_long_tests)
+	add_test(NAME search_integration_tests COMMAND Vajolet_search_integration_test)
     
  
-    add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS Vajolet_unit_test Vajolet_syzygy_test Vajolet_long_tests)
+    add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS Vajolet_unit_test Vajolet_syzygy_test Vajolet_long_tests Vajolet_search_integration_test)
