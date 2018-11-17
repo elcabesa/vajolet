@@ -271,6 +271,10 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 		//----------------------------------
 		for (multiPVcounter = 0; multiPVcounter < linesToBeSearched; ++multiPVcounter)
 		{
+			std::cout<<"root moves searched: "<<std::endl;
+			for( auto s : rootMovesSearched)
+			{ std::cout<<"\t "<<displayUci(s.firstMove)<<std::endl;}
+
 
 			//----------------------------------
 			// prepare alpha & beta
@@ -1026,8 +1030,17 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		// Search only the moves in the Search list
-		if( type == Search::nodeType::ROOT_NODE && std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m) && !std::count(rootMoves.begin(), rootMoves.end(), m) )
+		if( type == Search::nodeType::ROOT_NODE)
 		{
+			std::cout<<"check move "<<displayUci(m)<<std::endl;
+			for( auto s : rootMovesSearched)
+			{ std::cout<<"\t "<<displayUci(s.firstMove)<<std::endl;}
+			std::cout<<std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m )<<std::endl;
+
+		}
+		if( type == Search::nodeType::ROOT_NODE && ( std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m ) || !std::count(rootMoves.begin(), rootMoves.end(), m) ) )
+		{
+			std::cout<<"don't search "<<displayUci(m)<<std::endl;
 			continue;
 		}
 		moveNumber++;
