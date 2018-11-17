@@ -1033,7 +1033,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		{
 			continue;
 		}
-		moveNumber++;
+		++moveNumber;
 
 
 		bool captureOrPromotion = pos.isCaptureMoveOrPromotion(m);
@@ -1041,8 +1041,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		bool moveGivesCheck = pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
-		bool FutilityMoveCountFlag = depth < 16*ONE_PLY && moveNumber >= FutilityMoveCounts[improving][depth >> ONE_PLY_SHIFT];
-
+		bool FutilityMoveCountFlag = (depth < 16*ONE_PLY) && (moveNumber >= FutilityMoveCounts[1][depth >> ONE_PLY_SHIFT]);
+		if( FutilityMoveCountFlag && FutilityMoveCounts[1][depth >> ONE_PLY_SHIFT] < FutilityMoveCounts[0][depth >> ONE_PLY_SHIFT])
+		{
+			std::cout<<"depth:"<<(depth >> ONE_PLY_SHIFT)<<" fut0:"<<FutilityMoveCounts[0][depth >> ONE_PLY_SHIFT]<<" fut1:"<<FutilityMoveCounts[1][depth >> ONE_PLY_SHIFT]<<std::endl;
+			std::cout<<"ARGHHHH"<<std::endl;
+		}
 		int ext = 0;
 		if(PVnode && isDangerous )
 		{
@@ -1736,7 +1740,8 @@ void Search::initSearchParameters(void)
 	 ***************************************************/
 	for (unsigned int d = 0; d < 7; ++d)
 	{
-		Search::futilityMargin[d] = d*10000;
+		futilityMargin[d] = d*10000;
+		std::cout<<d<<" "<<futilityMargin[d] <<std::endl;
 	}
 
 	/***************************************************
@@ -1744,8 +1749,10 @@ void Search::initSearchParameters(void)
 	 ***************************************************/
 	for (unsigned int d = 0; d < 16; ++d)
 	{
-		Search::FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
-		Search::FutilityMoveCounts[1][d] = int(4.5 + 0.704 * std::pow( d, 2.0));
+		FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
+		FutilityMoveCounts[1][d] = int(4.5 + 0.704 * std::pow( d, 2.0));
+
+		std::cout<<d<<" "<<FutilityMoveCounts[0][d] <<" "<< FutilityMoveCounts[1][d]<<std::endl;
 	}
 }
 
