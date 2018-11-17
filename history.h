@@ -47,10 +47,8 @@ public :
 		const int D = 500;
 
 		assert(c<=black);
-		const tSquare from = (tSquare)m.bit.from;
-		const tSquare to = (tSquare)m.bit.to;
 		
-		Score & e = table[c][from][to];
+		Score & e = table[c][m.getFrom()][m.getTo()];
 		e += v * W - e * std::abs(v)/ D;
 
 	
@@ -58,9 +56,7 @@ public :
 	inline Score getValue( const Color c, const Move& m ) const
 	{
 		assert(c<=black);
-		const tSquare from = (tSquare)m.bit.from;
-		const tSquare to = (tSquare)m.bit.to;
-		return table[c][from][to];
+		return table[c][m.getFrom()][m.getTo()];
 	}
 
 
@@ -91,7 +87,7 @@ public :
 		
 		assert( isValidPiece( p ));
 		assert( isValidPiece( captured ) || captured == empty );
-		const tSquare to = (tSquare)m.bit.to;
+		const tSquare to = (tSquare)m.getTo();
 
 		Score &e = table[p][to][captured];
 		e += v * W - e * std::abs(v)/ D;
@@ -104,7 +100,7 @@ public :
 		}*/
 		assert( isValidPiece( p ) );
 		assert( isValidPiece( captured ) || captured == empty );
-		const tSquare to = (tSquare)m.bit.to;
+		const tSquare to = (tSquare)m.getTo();
 		return table[p][to][captured];
 	}
 

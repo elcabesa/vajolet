@@ -138,7 +138,7 @@ public:
 	const Move& getMoveFromMoveList(unsigned int n) const;
 	Move getNextMove(void);
 
-	Movegen(const Position & p, const SearchData& sd = defaultSearchData, unsigned int ply = 0, const Move & ttm = NOMOVE): pos(p),_sd(sd),ply(ply), ttMove(ttm)
+	Movegen(const Position & p, const SearchData& sd = defaultSearchData, unsigned int ply = 0, const Move & ttm = Move::NOMOVE): pos(p),_sd(sd),ply(ply), ttMove(ttm)
 	{
 		if(pos.isInCheck())
 		{
@@ -173,9 +173,9 @@ public:
 			{
 				
 				stagedGeneratorState = getQsearchTT;
-				if(ttMove.packed && /*pos.isMoveLegal(ttMove)&&  */!pos.isCaptureMove(ttMove))
+				if( ttMove && /*pos.isMoveLegal(ttMove)&&  */!pos.isCaptureMove(ttMove))
 				{
-					ttMove = NOMOVE;
+					ttMove = Move::NOMOVE;
 				}
 				return -2;
 			}
@@ -196,7 +196,7 @@ public:
 		captureThreshold = Position::pieceValue[capturePiece][0];
 		if(pos.isMoveLegal(ttMove) && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove) < captureThreshold)))
 		{
-			ttMove = NOMOVE;
+			ttMove = Move::NOMOVE;
 		}
 	}
 

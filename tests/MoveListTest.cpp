@@ -103,7 +103,7 @@ namespace {
 		ASSERT_EQ( m1, ml.getNextMove() );
 		ASSERT_EQ( m4, ml.getNextMove() );
 		
-		ASSERT_EQ( NOMOVE, ml.getNextMove() );
+		ASSERT_FALSE( ml.getNextMove() );
 		
 	}
 	
@@ -130,7 +130,7 @@ namespace {
 		ASSERT_EQ( m3, ml.getNextMove() );
 		ASSERT_EQ( m4, ml.getNextMove() );
 		
-		ASSERT_EQ( NOMOVE, ml.getNextMove() );
+		ASSERT_FALSE( ml.getNextMove() );
 		
 	}
 	
@@ -150,13 +150,13 @@ namespace {
 		ASSERT_EQ( 4, ml.size() );
 		
 		auto it = ml.begin();
-		ASSERT_EQ( m1, it->m );
+		ASSERT_EQ( m1, *it );
 		++it;
-		ASSERT_EQ( m2, it->m );
+		ASSERT_EQ( m2, *it );
 		++it;
-		ASSERT_EQ( m3, it->m );
+		ASSERT_EQ( m3, *it );
 		++it;
-		ASSERT_EQ( m4, it->m );
+		ASSERT_EQ( m4, *it );
 
 
 	}
@@ -175,7 +175,7 @@ namespace {
 		unsigned int i= 0;
 		for( auto it = ml.begin(); it != ml.end(); ++it)
 		{
-			ASSERT_EQ( mm[i], it->m );
+			ASSERT_EQ( mm[i], *it );
 			++i;
 		}
 	}
@@ -198,7 +198,7 @@ namespace {
 		
 		for( auto it = ml.actualPosition(); it != ml.end(); ++it)
 		{
-			ASSERT_EQ( mm[i], it->m );
+			ASSERT_EQ( mm[i], *it );
 			++i;
 		}
 	}
@@ -217,7 +217,7 @@ namespace {
 		unsigned int i= 0;
 		for( auto it = ml.actualPosition(); it != ml.end(); ++it)
 		{
-			(*it).score = ss[i];
+			(*it).setScore( ss[i] );
 			++i;
 		}
 		
@@ -225,8 +225,7 @@ namespace {
 		ASSERT_EQ( mm[1], ml.findNextBestMove() );
 		ASSERT_EQ( mm[2], ml.findNextBestMove() );
 		ASSERT_EQ( mm[0], ml.findNextBestMove() );
-		ASSERT_EQ( NOMOVE, ml.findNextBestMove() );
-		
+		ASSERT_FALSE( ml.findNextBestMove());
 		
 	}
 	
@@ -252,7 +251,7 @@ namespace {
 		}
 		ASSERT_EQ( 0, i );
 		
-		ASSERT_EQ( NOMOVE, ml.findNextBestMove() );
+		ASSERT_FALSE( ml.findNextBestMove());
 		
 		
 	}

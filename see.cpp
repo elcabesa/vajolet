@@ -25,8 +25,8 @@
 
 Score Position::seeSign(const Move& m) const
 {
-	assert(m.packed);
-	if ( (pieceValue[getPieceAt((tSquare)m.bit.from)][0] <= pieceValue[getPieceAt((tSquare)m.bit.to)][0])/* ||  m.isEnPassantMove() */)
+	assert( m );
+	if ( (pieceValue[getPieceAt(m.getFrom())][0] <= pieceValue[getPieceAt(m.getTo())][0])/* ||  m.isEnPassantMove() */)
 	{
 		return 1;
 	}
@@ -37,9 +37,9 @@ Score Position::seeSign(const Move& m) const
 Score Position::see(const Move& m) const
 {
 
-	assert(m.packed);
+	assert( m );
 
-	tSquare from = (tSquare)m.bit.from, to = (tSquare)m.bit.to;
+	tSquare from = m.getFrom(), to = m.getTo();
 	const bool canBePromotion = RANKS[to] == 0 ||  RANKS[to] == 7;
 	bitMap occupied = getOccupationBitmap() ^ bitSet(from);
 	eNextMove color = getPieceAt(from) > separationBitmap ? blackTurn : whiteTurn;
@@ -64,8 +64,8 @@ Score Position::see(const Move& m) const
 	}
 	if( m.isPromotionMove() )
 	{
-		captured = bitboardIndex(whiteQueens + m.bit.promotion);
-		swapList[0] += pieceValue[whiteQueens + m.bit.promotion][0] - pieceValue[whitePawns][0];
+		captured = bitboardIndex(whiteQueens + m.getPromotionType());
+		swapList[0] += pieceValue[whiteQueens + m.getPromotionType()][0] - pieceValue[whitePawns][0];
 	}
 
 	// Find all attackers to the destination square, with the moving piece

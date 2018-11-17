@@ -101,7 +101,7 @@ template <std::size_t N>
 const Move& MoveList<N>::get( const unsigned int n ) const
 {
 	assert( n < N );
-	return (*this)[ n ].m;
+	return (*this)[ n ];
 }
 
 template <std::size_t N>
@@ -128,9 +128,9 @@ inline const Move& MoveList<N>::findNextBestMove(void)
 	if( max != _moveListEnd )
 	{
 		std::swap( *max, *_moveListPosition );
-		return ( _moveListPosition++ )->m;
+		return *( _moveListPosition++ );
 	}
-	return NOMOVE;
+	return Move::NOMOVE;
 }
 
 template <std::size_t N>
@@ -138,9 +138,9 @@ inline const Move& MoveList<N>::getNextMove(void)
 {
 	if( _moveListPosition != _moveListEnd )
 	{
-		return ( _moveListPosition++ )->m;
+		return *( _moveListPosition++ );
 	}
-	return NOMOVE;
+	return Move::NOMOVE;
 }
 
 template <std::size_t N>

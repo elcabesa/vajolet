@@ -93,7 +93,7 @@ public:
 	{
 		for(auto p : positions)
 		{
-			if( p.m != NOMOVE)
+			if( p.m != Move::NOMOVE)
 			{
 				std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
 				for( auto m : p.PV )
