@@ -19,7 +19,7 @@ static const std::vector<positions> perftPos ={
 	
 };
 
-TEST(MediumPerftTest, perft) {
+TEST(PerftTest, perft) {
 	Position pos;
 	for (auto & p : perftPos)
 	{
