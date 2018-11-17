@@ -216,7 +216,7 @@ void static doPerft(const unsigned int n, Position & pos)
 }
 
 
-void static go(std::istringstream& is, Position & pos, my_thread * thr)
+void static go(std::istringstream& is, Position & pos, my_thread & thr)
 {
 	SearchLimits limits;
 	std::string token;
@@ -246,7 +246,7 @@ void static go(std::istringstream& is, Position & pos, my_thread * thr)
 			}
         }
     }
-    thr->startThinking(&pos,limits);
+    thr.startThinking( &pos, limits );
 }
 
 
@@ -526,14 +526,13 @@ void setvalue(std::istringstream& is)
 void uciLoop()
 {
 	printStartMessage();
-	my_thread *thr = my_thread::getInstance();
+	my_thread &thr = my_thread::getInstance();
 	Position pos;
 	pos.setupFromFen(StartFEN);
 	std::string token, cmd;
 
 	do
 	{
-		assert(thr);
 		if (!std::getline(std::cin, cmd)) // Block here waiting for input
 			cmd = "quit";
 		std::istringstream is(cmd);
@@ -548,7 +547,7 @@ void uciLoop()
 		}
 		else if (token == "quit" || token == "stop")
 		{
-			thr->stopThinking();
+			thr.stopThinking();
 		}
 		else if (token == "ucinewgame")
 		{
@@ -619,7 +618,7 @@ void uciLoop()
 		}
 		else if (token == "ponderhit")
 		{
-			thr->ponderHit();
+			thr.ponderHit();
 		}
 		else
 		{
@@ -627,7 +626,7 @@ void uciLoop()
 		}
 	}while(token!="quit");
 
-	thr->quitThreads();
+	thr.quitThreads();
 }
 
 /*! \brief return the uci string for a given move

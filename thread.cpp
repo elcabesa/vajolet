@@ -18,185 +18,90 @@
 #include "book.h"
 #include "command.h"
 #include "movegen.h"
+#include "search.h"
+#include "searchLimits.h"
+#include "searchTimer.h"
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"
 
-void timeManagerInit(const Position& pos, SearchLimits& lim, timeManagementStruct& timeMan)
-{
-	timeMan.FirstIterationFinished = false;
-	if((!lim.btime && !lim.wtime) && !lim.moveTime)
-	{
-		lim.infinite = true;
-		timeMan.resolution = 100;
-	}
-	else if(lim.moveTime)
-	{
-		timeMan.maxAllocatedTime = lim.moveTime+1;
-		timeMan.allocatedTime = lim.moveTime;
-		timeMan.minSearchTime =lim.moveTime;
-		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
-	}
-	else
-	{
-		unsigned int time;
-		unsigned int increment;
 
-		if(pos.getNextTurn())
-		{
-			time = lim.btime;
-			increment = lim.binc;
-		}
-		else
-		{
-			time = lim.wtime;
-			increment = lim.winc;
-		}
-
-
-
-		if(lim.movesToGo > 0)
-		{
-			timeMan.allocatedTime = time / lim.movesToGo;
-			timeMan.maxAllocatedTime = 10.0 * timeMan.allocatedTime;
-			timeMan.maxAllocatedTime = std::min(10.0 * timeMan.allocatedTime, 0.8 * time);
-			timeMan.maxAllocatedTime = std::max(timeMan.maxAllocatedTime,timeMan.allocatedTime);
-		}
-		else
-		{
-			timeMan.allocatedTime = time / 35.0 + increment * 0.98;
-			timeMan.maxAllocatedTime= 10 * timeMan.allocatedTime;
-		}
-
-		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
-		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)( time - 2 * timeMan.resolution));
-		timeMan.minSearchTime = timeMan.allocatedTime * 0.3;
-		long long buffer = std::max( 2 * timeMan.resolution, 200u );
-		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(time - buffer ));
-		timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(time - buffer ));
-	}
-
-
-
-	timeMan.singularRootMoveCount = 0;
-	timeMan.idLoopIterationFinished = false;
-	timeMan.idLoopAlpha = false;
-	timeMan.idLoopBeta = false;
-
-}
-
-
-volatile bool my_thread::quit = false;
-volatile bool my_thread::startThink = false;
-
-
-timeManagementStruct my_thread::timeMan;
-
-
-long long my_thread::lastHasfullMessage;
-
+volatile bool my_thread::_quit = false;
+volatile bool my_thread::_startThink = false;
 
 my_thread * my_thread::pInstance;
 std::mutex  my_thread::_mutex;
 
+void my_thread::_printTimeDependentOutput(long long int time) {
 
-void my_thread::timerThread()
+	if( time - _lastHasfullMessage > 1000 )
+	{
+		_lastHasfullMessage = time;
+
+		_UOI->printGeneralInfo(transpositionTable::getInstance().getFullness(),	_src.getTbHits(), _src.getVisitedNodes(), time);
+
+		if(uciParameters::showCurrentLine)
+		{
+			_src.showLine();
+		}
+	}
+}
+
+void my_thread::_timerThread()
 {
 	std::mutex mutex;
-	while (!quit)
+	while (!_quit)
 	{
-
 		std::unique_lock<std::mutex> lk(mutex);
 
-		timerCond.wait(lk, [&]{return (startThink && src.isNotStopped() ) || quit;} );
-		if (!quit)
+		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan.isSearchFinished() ) || _quit;} );
+
+		if (!_quit)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
-			long long int time = st.getClockTime();
 
-			if(timeMan.idLoopIterationFinished)
+			long long int time = _st.getClockTime();
+			
+			bool stop = _timeMan.stateMachineStep( time, _src.getVisitedNodes() );
+			if( stop )
 			{
-				timeMan.FirstIterationFinished = true;
-			}
-			if(src.isNotStopped() && time >= timeMan.allocatedTime && ( timeMan.idLoopAlpha || timeMan.idLoopBeta ) )
-			{
-				timeMan.allocatedTime = timeMan.maxAllocatedTime;
-			}
-			if(src.isNotStopped() && timeMan.maxAllocatedTime == timeMan.allocatedTime /*&& time >= timeMan.allocatedTime */&& ( timeMan.idLoopIterationFinished ) && !(limits.infinite || limits.ponder) )
-			{
-				src.stopSearch();
+				_src.stopSearch();
 			}
 
-			if(src.isNotStopped() && time >= timeMan.allocatedTime && timeMan.FirstIterationFinished && !(limits.infinite || limits.ponder))
-			{
-				src.stopSearch();
-			}
-			if(src.isNotStopped() && timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(limits.infinite || limits.ponder))
-			{
-				src.stopSearch();
-			}
+
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-			if(time - lastHasfullMessage > 1000)
-			{
-				lastHasfullMessage = time;
-
-				_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), time);
-
-				if( uciParameters::showCurrentLine )
-				{
-					src.showLine();
-				}
-
-			}
-
+			_printTimeDependentOutput( time );
 #endif
 
-			if(timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && !(limits.infinite || limits.ponder))
-			{
-				if(timeMan.singularRootMoveCount >=20)
-				{
-					src.stopSearch();
-				}
-			}
 
-
-			if(limits.nodes && timeMan.FirstIterationFinished && src.getVisitedNodes() > limits.nodes)
-			{
-				src.stopSearch();
-			}
-			if(limits.moveTime && timeMan.FirstIterationFinished && time>=limits.moveTime)
-			{
-				src.stopSearch();
-			}
-			timeMan.idLoopIterationFinished = false;
+			std::this_thread::sleep_for(std::chrono::milliseconds( _timeMan.getResolution() ));
 		}
 		lk.unlock();
 	}
 }
 
-void my_thread::searchThread()
+void my_thread::_searchThread()
 {
 	std::mutex mutex;
-	while (!quit)
+	while (!_quit)
 	{
 
 		std::unique_lock<std::mutex> lk(mutex);
-		searchCond.wait(lk, [&]{return startThink||quit;} );
-		if(!quit)
+		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
+		if(!_quit)
 		{
-			timeManagerInit(src.pos, limits, timeMan);
-			src.resetStopCondition();
-			st.resetStartTimers();
-			timerCond.notify_one();
-			src.resetStopCondition();
-			manageNewSearch();
-			startThink = false;
+			_limits.checkInfiniteSearch();
+			_timeMan.initNewSearch( _src.pos.getNextTurn() );
+			_src.resetStopCondition();
+			_st.resetStartTimers();
+			_timerCond.notify_one();
+			_manageNewSearch();
+			_startThink = false;
 		}
 		lk.unlock();
 	}
 }
 
-void my_thread::manageNewSearch()
+void my_thread::_manageNewSearch()
 {
 
 
@@ -206,15 +111,15 @@ void my_thread::manageNewSearch()
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
 
-	if( game.isNewGame(src.pos))
+	if( _game.isNewGame(_src.pos))
 	{
-		game.CreateNewGame();
+		_game.CreateNewGame();
 
 	}
-	game.insertNewMoves(src.pos);
+	_game.insertNewMoves(_src.pos);
 
 
-	Movegen mg(src.pos);
+	Movegen mg(_src.pos);
 	unsigned int legalMoves = mg.getNumberOfLegalMoves();
 
 	if(legalMoves == 0)
@@ -222,14 +127,14 @@ void my_thread::manageNewSearch()
 		PVline PV( 1, Move(0) );
 		_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 		
-		waitStopPondering();
+		_waitStopPondering();
 
 		_UOI->printBestMove( Move(0) );
 
 		return;
 	}
 	
-	if( legalMoves == 1 && !limits.infinite)
+	if( legalMoves == 1 && !_limits.infinite)
 	{
 		
 		Move bestMove = mg.getMoveFromMoveList(0);
@@ -237,9 +142,9 @@ void my_thread::manageNewSearch()
 		PVline PV( 1, bestMove );
 		_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 		
-		waitStopPondering();
+		_waitStopPondering();
 		
-		Move ponderMove = getPonderMoveFromHash( bestMove );
+		Move ponderMove = _getPonderMoveFromHash( bestMove );
 		
 		_UOI->printBestMove(bestMove, ponderMove);
 
@@ -250,19 +155,19 @@ void my_thread::manageNewSearch()
 	//----------------------------------------------
 	//	book probing
 	//----------------------------------------------
-	if( uciParameters::useOwnBook && !limits.infinite )
+	if( uciParameters::useOwnBook && !_limits.infinite )
 	{
 		PolyglotBook pol;
-		Move bookM = pol.probe(src.pos, uciParameters::bestMoveBook);
+		Move bookM = pol.probe(_src.pos, uciParameters::bestMoveBook);
 		if(bookM.packed)
 		{
 			PVline PV( 1, bookM );
 			
 			_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
 			
-			waitStopPondering();
+			_waitStopPondering();
 			
-			Move ponderMove = getPonderMoveFromBook( bookM );
+			Move ponderMove = _getPonderMoveFromBook( bookM );
 			
 			_UOI->printBestMove(bookM, ponderMove);
 			
@@ -284,86 +189,216 @@ void my_thread::manageNewSearch()
 	}
 	else
 */	
-	startThinkResult res = src.startThinking( );
+	startThinkResult res = _src.startThinking( );
 	
 	PVline PV = res.PV;
 
-	waitStopPondering();
+	_waitStopPondering();
 
 	//-----------------------------
 	// print out the choosen line
 	//-----------------------------
 
-	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), src.getTbHits(), src.getVisitedNodes(), st.getElapsedTime());
+	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), _src.getTbHits(), _src.getVisitedNodes(), _st.getElapsedTime());
 	
 	Move bestMove = PV.getMove(0);
 	Move ponderMove = PV.getMove(1);
 	if( ponderMove == NOMOVE )
 	{
-		ponderMove = getPonderMoveFromHash( bestMove );
+		ponderMove = _getPonderMoveFromHash( bestMove );
 	}
 	
 	_UOI->printBestMove( bestMove, ponderMove );
 
-	game.savePV(PV, res.depth, res.alpha, res.beta);
+	_game.savePV(PV, res.depth, res.alpha, res.beta);
 
 }
 
 
 
-void my_thread::initThreads()
+void my_thread::_initThreads()
 {
-	timer = std::thread(&my_thread::timerThread, this);
-	searcher = std::thread(&my_thread::searchThread, this);
-	src.stopSearch();
+	_timer = std::thread(&my_thread::_timerThread, this);
+	_searcher = std::thread(&my_thread::_searchThread, this);
+	_src.stopSearch();
 }
 
 void my_thread::quitThreads()
 {
-	quit = true;
-	searchCond.notify_one();
-	timerCond.notify_one();
-	timer.join();
-	searcher.join();
+	_quit = true;
+	_searchCond.notify_one();
+	_timerCond.notify_one();
+	_timer.join();
+	_searcher.join();
 }
 
-Move my_thread::getPonderMoveFromHash(const Move bestMove )
+Move my_thread::_getPonderMoveFromHash(const Move bestMove )
 {
 	Move ponderMove(0);
-	src.pos.doMove( bestMove );
+	_src.pos.doMove( bestMove );
 	
-	const ttEntry* const tte = transpositionTable::getInstance().probe(src.pos.getKey());
+	const ttEntry* const tte = transpositionTable::getInstance().probe(_src.pos.getKey());
 	
 	Move m;
 	m.packed = tte->getPackedMove();
-	if( src.pos.isMoveLegal(m) )
+	if( _src.pos.isMoveLegal(m) )
 	{
 		ponderMove = m;
 	}
-	src.pos.undoMove();
+	_src.pos.undoMove();
 	
 	return ponderMove;
 }
 
-Move my_thread::getPonderMoveFromBook(const Move bookMove )
+Move my_thread::_getPonderMoveFromBook(const Move bookMove )
 {
 	Move ponderMove(0);
-	src.pos.doMove( bookMove );
+	_src.pos.doMove( bookMove );
 	PolyglotBook pol;
-	Move m = pol.probe(src.pos, uciParameters::bestMoveBook);
+	Move m = pol.probe(_src.pos, uciParameters::bestMoveBook);
 	
-	if( src.pos.isMoveLegal(m) )
+	if( _src.pos.isMoveLegal(m) )
 	{
 		ponderMove = m;
 	}
-	src.pos.undoMove();
+	_src.pos.undoMove();
 	
 	return ponderMove;
 }
 
-void my_thread::waitStopPondering() const
+void my_thread::_waitStopPondering() const
 {
-	while(limits.ponder){}
+	while(_limits.ponder){}
 }
 
 
+inline void my_thread::stopPonder(){ _limits.ponder = false;}
+
+void my_thread::stopThinking()
+{
+	_timeMan.stop();
+	stopPonder();
+}
+
+void my_thread::ponderHit()
+{
+	_st.resetPonderTimer();
+	stopPonder();
+}
+
+my_thread::my_thread():_src(_st, _limits), _timeMan(_limits)
+{
+	_UOI = UciOutput::create();
+	_initThreads();
+	_game.CreateNewGame();
+}
+
+my_thread::~my_thread()
+{
+	quitThreads();
+}
+
+void my_thread::startThinking(Position * p, SearchLimits& l)
+{
+	_src.stopSearch();
+	_lastHasfullMessage = 0;
+
+	while(_startThink){}
+
+	if(!_startThink)
+	{
+		std::lock_guard<std::mutex> lk(_searchMutex);
+		_limits = l;
+		_src.pos = *p;
+		_startThink = true;
+		_searchCond.notify_one();
+	}
+}
+
+
+
+void Game::CreateNewGame(void)
+{
+	_positions.clear();
+}
+
+void Game::insertNewMoves(Position &pos)
+{
+	unsigned int actualPosition = _positions.size();
+	for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
+	{
+		GamePosition p;
+		p.key = pos.getState(i).key;
+		p.m =  pos.getState(i).currentMove;
+		_positions.push_back(p);
+	}
+}
+
+void Game::savePV(PVline PV,unsigned int depth, Score alpha, Score beta)
+{
+	_positions.back().PV = PV;
+	_positions.back().depth = depth;
+	_positions.back().alpha = alpha;
+	_positions.back().beta = beta;
+}
+
+
+void Game::printGamesInfo()
+{
+	for(auto p : _positions)
+	{
+		if( p.m != NOMOVE)
+		{
+			std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
+			for( auto m : p.PV )
+			{
+				std::cout<<displayUci(m)<<" ";
+			}
+
+		}
+		std::cout<<std::endl;
+	}
+
+}
+
+bool Game::isNewGame(const Position &pos) const
+{
+	if( _positions.size() == 0 || pos.getStateSize() < _positions.size())
+	{
+		//printGamesInfo();
+		return true;
+	}
+
+	unsigned int n = 0;
+	for(auto p : _positions)
+	{
+		if(pos.getState(n).key != p.key)
+		{
+			//printGamesInfo();
+			return true;
+		}
+		n++;
+
+	}
+	return false;
+}
+
+bool Game:: isPonderRight() const
+{
+	if( _positions.size() > 2)
+	{
+		GamePosition previous =*(_positions.end()-3);
+		if(previous.PV.size()>=1 && previous.PV.getMove(1) == _positions.back().m)
+		{
+			return true;
+		}
+
+	}
+	return false;
+}
+
+Game::GamePosition Game::getNewSearchParameters() const
+{
+	GamePosition previous =*(_positions.end()-3);
+	return previous;
+}
