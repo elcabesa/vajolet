@@ -1106,7 +1106,10 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				Score localEval = eval + futilityMargin[newDepth >> ONE_PLY_SHIFT];
 				if(localEval<beta)
 				{
-					//bestScore = std::max(bestScore, localEval);
+					if( !PVnode )
+					{
+						bestScore = std::max(bestScore, localEval);
+					}
 					assert((newDepth>>ONE_PLY_SHIFT)<7);
 					continue;
 				}
