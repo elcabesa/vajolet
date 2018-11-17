@@ -547,7 +547,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 
-	std::cout<<"enter alpha beta"<<std::endl;
+
 	visitedNodes++;
 	sd.clearKillers(ply+1);
 
@@ -557,6 +557,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	sd.story[ply].inCheck = inCheck;
 	//Move threatMove(NOMOVE);
 
+	if (PVnode )
+	{
+		for( int i = 0; i < ply; ++i)
+			std::cout<<" ";
+		std::cout<<"enter alpha beta "<<ply<<" "<<depth<<" "<<alpha<<" "<<beta<<std::endl;
+	}
 
 	//--------------------------------------
 	// show current line if needed
@@ -585,6 +591,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				pvLine.reset();
 			}
 			int contemptSign = (pos.getActualStateConst().nextMove == initialNextMove) ? 1 : -1;
+
+			if (PVnode )
+			{
+				for( int i = 0; i < ply; ++i)
+					std::cout<<" ";
+				std::cout<<"DRAW"<<std::endl;
+			}
+
 			return contemptSign * std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
 		}
 
@@ -595,6 +609,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		beta = std::min(mateIn(ply+1), beta);
 		if (alpha >= beta)
 		{
+
+			if (PVnode )
+			{
+				for( int i = 0; i < ply; ++i)
+					std::cout<<" ";
+				std::cout<<"mate distance pruning "<<alpha<<std::endl;
+			}
+
 			return alpha;
 		}
 
@@ -647,6 +669,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				pvLine.reset();
 			}
 		}
+
+		if (PVnode )
+		{
+			for( int i = 0; i < ply; ++i)
+				std::cout<<" ";
+			std::cout<<"return TT "<<ttValue<<std::endl;
+		}
+
 		return ttValue;
 	}
 	
@@ -804,6 +834,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	if(!PVnode && !inCheck )
 	{
 
+		if (PVnode )
+		{
+			for( int i = 0; i < ply; ++i)
+				std::cout<<" ";
+			std::cout<<"ARGHHHHHHH"<<std::endl;
+		}
 		//------------------------
 		// razoring
 		//------------------------
@@ -981,6 +1017,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		&& ttMove.packed == 0
 		&& (PVnode || staticEval + 10000 >= beta))
 	{
+		if (PVnode )
+		{
+			for( int i = 0; i < ply; ++i)
+				std::cout<<" ";
+			std::cout<<"start iid"<<std::endl;
+		}
 		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
 
 		bool skipBackup = sd.story[ply].skipNullMove;
@@ -1027,12 +1069,24 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		assert(m.packed);
 		if(m == excludedMove)
 		{
+			if (PVnode )
+			{
+				for( int i = 0; i < ply; ++i)
+					std::cout<<" ";
+				std::cout<<"exclude move "<<displayUci(m)<<std::endl;
+			}
 			continue;
 		}
 
 		// Search only the moves in the Search list
 		if( type == Search::nodeType::ROOT_NODE && std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m) && !std::count(rootMoves.begin(), rootMoves.end(), m) )
 		{
+			if (PVnode )
+			{
+				for( int i = 0; i < ply; ++i)
+					std::cout<<" ";
+				std::cout<<"exclude root move "<<displayUci(m)<<std::endl;
+			}
 			continue;
 		}
 		++moveNumber;
@@ -1102,6 +1156,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			if(FutilityMoveCountFlag)
 			{
+				if (PVnode )
+				{
+					for( int i = 0; i < ply; ++i)
+						std::cout<<" ";
+					std::cout<<"exclude move futility "<<displayUci(m)<<std::endl;
+				}
 				assert((newDepth>>ONE_PLY_SHIFT)<11);
 				continue;
 			}
@@ -1112,14 +1172,26 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				Score localEval = eval + futilityMargin[newDepth >> ONE_PLY_SHIFT];
 				if(localEval<beta)
 				{
-					bestScore = std::max(bestScore, localEval);
+					//bestScore = std::max(bestScore, localEval);
 					assert((newDepth>>ONE_PLY_SHIFT)<7);
+					if (PVnode )
+					{
+						for( int i = 0; i < ply; ++i)
+							std::cout<<" ";
+						std::cout<<"exclude move futility2 "<<displayUci(m)<<std::endl;
+					}
 					continue;
 				}
 			}
 
 			if(newDepth < 4 * ONE_PLY && pos.seeSign(m) < 0)
 			{
+				if (PVnode )
+				{
+					for( int i = 0; i < ply; ++i)
+						std::cout<<" ";
+					std::cout<<"exclude move futility3 "<<displayUci(m)<<std::endl;
+				}
 				continue;
 			}
 
@@ -1141,6 +1213,13 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			}
 		}
 
+
+		if (PVnode )
+		{
+			for( int i = 0; i < ply; ++i)
+				std::cout<<" ";
+			std::cout<<"TRY MOVE "<<displayUci(m)<<std::endl;
+		}
 
 		pos.doMove(m);
 		Score val;
@@ -1274,7 +1353,15 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		if(!stop && val > bestScore)
 		{
+
 			bestScore = val;
+
+			if (PVnode )
+			{
+				for( int i = 0; i < ply; ++i)
+					std::cout<<" ";
+				std::cout<<"increase bestScore "<<bestScore<<std::endl;
+			}
 
 			if(bestScore > alpha)
 			{
@@ -1282,6 +1369,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				if(PVnode)
 				{
 					alpha = bestScore;
+
+					if (PVnode )
+					{
+						for( int i = 0; i < ply; ++i)
+							std::cout<<" ";
+						std::cout<<"increase alpha "<<alpha<<" new best move "<<displayUci(bestMove)<< std::endl;
+					}
+
 					pvLine.appendNewPvLine( bestMove, childPV);
 					if(type == Search::nodeType::ROOT_NODE && uciParameters::multiPVLines == 1 )
 					{
@@ -1325,6 +1420,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	{
 		if( excludedMove.packed)
 		{
+			if (PVnode )
+			{
+				for( int i = 0; i < ply; ++i)
+					std::cout<<" ";
+				std::cout<<"iexcluded return alpha "<<alpha<< std::endl;
+			}
 			return alpha;
 		}
 		else if(!inCheck)
@@ -1398,6 +1499,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		
 
 	}
+
+	if (PVnode )
+	{
+		for( int i = 0; i < ply; ++i)
+			std::cout<<" ";
+		std::cout<<"return bestscore "<<bestScore<< std::endl;
+	}
+
 	return bestScore;
 
 }
@@ -1422,7 +1531,12 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	visitedNodes++;
 
 
-	std::cout<<"enter quiescent"<<std::endl;
+	if (PVnode )
+	{
+		for( int i = 0; i < ply; ++i)
+			std::cout<<" ";
+		std::cout<<"enter quiescent "<<ply<<" "<<depth<<" "<<alpha<<" "<<beta<<std::endl;
+	}
 
 	if(pos.isDraw(PVnode) || stop)
 	{
@@ -1432,6 +1546,14 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			pvLine.reset();
 		}
 		int contemptSign = (pos.getActualStateConst().nextMove == initialNextMove) ? 1 : -1;
+
+		if (PVnode )
+		{
+			for( int i = 0; i < ply; ++i)
+				std::cout<<" ";
+			std::cout<<"DRAW"<<std::endl;
+		}
+
 		return contemptSign * std::min((int)0,(int)(-5000 + pos.getPly()*250));
 	}
 /*	//---------------------------------------
@@ -1477,6 +1599,14 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				pvLine.reset();
 			}
 		}
+
+		if (PVnode )
+		{
+			for( int i = 0; i < ply; ++i)
+				std::cout<<" ";
+			std::cout<<"return TT"<<std::endl;
+		}
+
 		return ttValue;
 	}
 
@@ -1494,6 +1624,12 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	testSimmetry(pos);
 #endif
 
+	if (PVnode )
+	{
+		for( int i = 0; i < ply; ++i)
+			std::cout<<" ";
+		std::cout<<"staticEval: "<<staticEval<<std::endl;
+	}
 
 	//----------------------------
 	//	stand pat score
@@ -1539,6 +1675,14 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				{
 					transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.packed, staticEval);
 				}
+
+				if (PVnode )
+				{
+					for( int i = 0; i < ply; ++i)
+						std::cout<<" ";
+					std::cout<<"standpat"<<std::endl;
+				}
+
 				return bestScore;
 			}
 			alpha = bestScore;
@@ -1642,6 +1786,13 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			}
 
 		}
+
+		if (PVnode )
+		{
+			for( int i = 0; i < ply; ++i)
+				std::cout<<" ";
+			std::cout<<"try move: "<<displayUci(m)<<std::endl;
+		}
 		pos.doMove(m);
 		Score val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
 
@@ -1686,6 +1837,13 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		{
 			pvLine.reset();
 		}
+
+		if (PVnode )
+		{
+			for( int i = 0; i < ply; ++i)
+				std::cout<<" ";
+			std::cout<<"mated: "<<matedIn(ply)<<std::endl;
+		}
 		return matedIn(ply);
 	}
 
@@ -1698,6 +1856,14 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	{
 		transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove.packed, staticEval);
 	}
+
+	if (PVnode )
+	{
+		for( int i = 0; i < ply; ++i)
+			std::cout<<" ";
+		std::cout<<"return: "<<bestScore<<std::endl;
+	}
+
 	return bestScore;
 
 }
