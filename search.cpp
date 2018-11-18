@@ -1026,7 +1026,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		// Search only the moves in the Search list
-		if( type == Search::nodeType::ROOT_NODE && std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m) && !std::count(rootMoves.begin(), rootMoves.end(), m) )
+		if( type == Search::nodeType::ROOT_NODE && ( std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m ) || !std::count(rootMoves.begin(), rootMoves.end(), m) ) )
 		{
 			continue;
 		}
