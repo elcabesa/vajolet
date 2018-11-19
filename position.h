@@ -17,10 +17,13 @@
 #ifndef POSITION_H_
 #define POSITION_H_
 
+#include <array>
 #include <cstdint>
 #include <map>
 #include <unordered_map>
 #include <vector>
+
+#include <iostream>
 
 #include "bitBoardIndex.h"
 #include "data.h"
@@ -85,10 +88,8 @@ public:
 
 		unsigned int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
 			pliesFromNull;	/*!<  plies from null move*/
-		//	ply;			/*!<  ply from the start*/
 
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
-		//Score material[2];	/*!<  two values for opening/endgame score*/
 		simdScore material;
 		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
@@ -121,6 +122,7 @@ public:
 	Position(const Position& other);
 	Position& operator=(const Position& other);
 	
+
 	inline bitMap getOccupationBitmap() const
 	{
 		return bitBoard[occupiedSquares];
@@ -249,12 +251,12 @@ public:
 	*/
 	inline const state& getActualStateConst(void)const
 	{
-		return *actualState;
+		return stateInfo.back();
 	}
 	
 	inline state& getActualState(void)
 	{
-		return *actualState;
+		return stateInfo.back();
 	}
 
 	inline const state& getState(unsigned int n)const
@@ -341,6 +343,11 @@ public:
 	static simdScore pieceValue[lastBitboard];
 
 private:
+
+
+	Position& operator=(Position&& ) noexcept = delete;
+	Position(Position&& ) noexcept = delete;
+
 	//--------------------------------------------------------
 	// private struct
 	//--------------------------------------------------------
@@ -381,7 +388,6 @@ private:
 
 	/*used for search*/
 	pawnTable pawnHashTable;
-	state* actualState;
 
 	std::vector<state> stateInfo;
 
@@ -390,8 +396,8 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	bitboardIndex squares[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
-	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
+	std::array<bitboardIndex,squareNumber> squares;		// board square rapresentation to speed up, it contain pieces indexed by square
+	std::array<bitMap,lastBitboard> bitBoard;			// bitboards indexed by bitboardIndex enum
 	bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 
 	//--------------------------------------------------------
@@ -407,7 +413,6 @@ private:
 	inline void insertState(state & s)
 	{
 		stateInfo.emplace_back(s);
-		actualState = &stateInfo.back();
 	}
 
 	/*! \brief  remove the last state
@@ -419,8 +424,9 @@ private:
 	inline void removeState()
 	{
 		stateInfo.pop_back();
-		actualState = &stateInfo.back();
 	}
+
+	inline void updateUsThem();
 
 
 	uint64_t calcKey(void) const;

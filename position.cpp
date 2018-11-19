@@ -230,10 +230,7 @@ void Position::setupFromFen(const std::string& fenStr)
 	ss >> token;
 	x.nextMove = (token == 'w' ? whiteTurn : blackTurn);
 
-
-
-	Us=&bitBoard[x.nextMove];
-	Them=&bitBoard[(blackTurn-x.nextMove)];
+	updateUsThem();
 
 	ss >> token;
 
@@ -367,7 +364,6 @@ void Position::clear()
 	}
 	stateInfo.clear();
 	stateInfo.emplace_back(state());
-	actualState = &stateInfo.back();
 
 }
 
@@ -1854,67 +1850,46 @@ bool Position::isMoveLegal(const Move &m)const
 }
 
 
-Position::Position()
+Position::Position():ply(0)
 {
 	stateInfo.clear();
 	stateInfo.emplace_back(state());
-	actualState = &stateInfo.back();
+	stateInfo[0].nextMove = whiteTurn;
 
+	updateUsThem();
 
-	actualState->nextMove = whiteTurn;
-
-	Us=&bitBoard[ getNextTurn() ];
-	Them=&bitBoard[blackTurn - getNextTurn()];
 }
 
 
-Position::Position(const Position& other)// calls the copy constructor of the age
+Position::Position(const Position& other):ply(other.ply), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
 {
-	stateInfo = other.stateInfo;
-	actualState = &stateInfo.back();
-
-
-
-	for(int i=0; i<squareNumber; i++)
-	{
-		squares[i] = other.squares[i];
-	}
-	for(int i = 0; i < lastBitboard; i++)
-	{
-		bitBoard[i] = other.bitBoard[i];
-	}
-
-
-	Us=&bitBoard[ getNextTurn() ];
-	Them=&bitBoard[blackTurn - getNextTurn()];
-
-	ply = other.ply;
+	updateUsThem();
 }
+
 
 Position& Position::operator=(const Position& other)
 {
 	if (this == &other)
+	{
 		return *this;
-
-	stateInfo = other.stateInfo;
-	actualState = &stateInfo.back();
-
-
-	for(int i = 0; i < squareNumber; i++)
-	{
-		squares[i] = other.squares[i];
 	}
-	for(int i=0;i<lastBitboard;i++)
-	{
-		bitBoard[i] = other.bitBoard[i];
-	}
-
-	Us = &bitBoard[ getNextTurn() ];
-	Them = &bitBoard[blackTurn-getNextTurn()];
 
 	ply = other.ply;
 
+	stateInfo = other.stateInfo;
+	squares = other.squares;
+	bitBoard = other.bitBoard;
+
+	updateUsThem();
+
 	return *this;
+}
+
+inline void Position::updateUsThem()
+{
+	auto turn = getNextTurn();
+	Us = &bitBoard[ turn ];
+	Them = &bitBoard[ blackTurn - turn ];
 }
 
 /*! \brief put a piece on the board

@@ -1,3 +1,4 @@
+
 /*
 	This file is part of Vajolet.
 
@@ -37,13 +38,6 @@ class Movegen
 private:
 	static const int MAX_MOVE_PER_POSITION = 250;
 	static const int MAX_BAD_MOVE_PER_POSITION = 32;
-	//std::array<extMove,MAX_MOVE_PER_POSITION> moveList;
-	//std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListEnd;
-	//std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListPosition;
-
-	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION> badCaptureList;
-	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCaptureEnd;
-	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCapturePosition;
 
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
 	MoveList<MAX_BAD_MOVE_PER_POSITION> badCaptureList;
