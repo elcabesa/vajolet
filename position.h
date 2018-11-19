@@ -23,8 +23,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <iostream>
-
 #include "bitBoardIndex.h"
 #include "data.h"
 #include "hashKeys.h"
