@@ -1030,7 +1030,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		{
 			continue;
 		}
-		moveNumber++;
+		++moveNumber;
 
 
 		bool captureOrPromotion = pos.isCaptureMoveOrPromotion(m);
@@ -1103,7 +1103,10 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				Score localEval = eval + futilityMargin[newDepth >> ONE_PLY_SHIFT];
 				if(localEval<beta)
 				{
-					bestScore = std::max(bestScore, localEval);
+					if( !PVnode )
+					{
+						bestScore = std::max(bestScore, localEval);
+					}
 					assert((newDepth>>ONE_PLY_SHIFT)<7);
 					continue;
 				}
@@ -1733,7 +1736,7 @@ void Search::initSearchParameters(void)
 	 ***************************************************/
 	for (unsigned int d = 0; d < 7; ++d)
 	{
-		Search::futilityMargin[d] = d*10000;
+		futilityMargin[d] = d*10000;
 	}
 
 	/***************************************************
@@ -1741,8 +1744,8 @@ void Search::initSearchParameters(void)
 	 ***************************************************/
 	for (unsigned int d = 0; d < 16; ++d)
 	{
-		Search::FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
-		Search::FutilityMoveCounts[1][d] = int(4.5 + 0.704 * std::pow( d, 2.0));
+		FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
+		FutilityMoveCounts[1][d] = int(4.5 + 0.704 * std::pow( d, 2.0));
 	}
 }
 
