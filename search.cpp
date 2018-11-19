@@ -517,17 +517,17 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		}
 	}
 	
-	/*std::cout<<"-------main thread----------"<<std::endl;
-	std::cout<<"bestMove "<<displayUci(bestMove.firstMove)<<std::endl;
-	std::cout<<"score "<<bestMove.score<<std::endl;
-	std::cout<<"depth "<<bestMove.depth<<std::endl;
-	for(unsigned int i = 0; i< (threads - 1); i++)
-	{
-		std::cout<<"-------helper thread----------"<<std::endl;
-		std::cout<<"bestMove "<<displayUci(helperResults[i].firstMove)<<std::endl;
-		std::cout<<"score "<<helperResults[i].score<<std::endl;
-		std::cout<<"depth "<<helperResults[i].depth<<std::endl;
-	}*/
+	//std::cout<<"-------main thread----------"<<std::endl;
+	//std::cout<<"bestMove "<<displayUci(bestMove.firstMove)<<std::endl;
+	//std::cout<<"score "<<bestMove.score<<std::endl;
+	//std::cout<<"depth "<<bestMove.depth<<std::endl;
+	//for(unsigned int i = 0; i< (threads - 1); i++)
+	//{
+	//	std::cout<<"-------helper thread----------"<<std::endl;
+	//	std::cout<<"bestMove "<<displayUci(helperResults[i].firstMove)<<std::endl;
+	//	std::cout<<"score "<<helperResults[i].score<<std::endl;
+	//	std::cout<<"depth "<<helperResults[i].depth<<std::endl;
+	//}
 	
 	
 	return startThinkResult( alpha, beta, bestMove->depth, bestMove->PV, bestMove->score);
@@ -898,14 +898,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				sd.story[ply].skipNullMove = true;
 				assert(depth - red >= ONE_PLY);
 				Score val;
-				/*if(depth-red < ONE_PLY)
-				{
-					val = qsearch<childNodesType>(ply, depth-red, beta-1, beta,childPV);
-				}
-				else
-				{*/
 					val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
-				/*}*/
 				sd.story[ply].skipNullMove = false;
 				if (val >= beta)
 				{
@@ -913,11 +906,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				}
 
 			}
-			/*else
-			{
-				const ttEntry * const tteNull = transpositionTable::getInstance().probe(nullKey);
-				threatMove = tteNull != nullptr ? tteNull->getPackedMove() : Move::NOMOVE;
-			}*/
 
 		}
 
@@ -1081,7 +1069,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		//---------------------------------------
 		//	FUTILITY PRUNING
 		//---------------------------------------
-		if( /*!PVnode*/type != Search::nodeType::ROOT_NODE
+		if( type != Search::nodeType::ROOT_NODE
 			&& !captureOrPromotion
 			&& !inCheck
 			&& m != ttMove
@@ -1426,13 +1414,13 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		int contemptSign = (pos.getActualStateConst().nextMove == initialNextMove) ? 1 : -1;
 		return contemptSign * std::min((int)0,(int)(-5000 + pos.getPly()*250));
 	}
-/*	//---------------------------------------
+	//---------------------------------------
 	//	MATE DISTANCE PRUNING
 	//---------------------------------------
+	//
+	//alpha = std::max(matedIn(ply), alpha);
+	//beta = std::min(mateIn(ply+1), beta);
 
-	alpha = std::max(matedIn(ply), alpha);
-	beta = std::min(mateIn(ply+1), beta);
-	*/
 
 	//----------------------------
 	//	next node type
@@ -1557,7 +1545,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 	PVline childPV;
 
-	while (/*bestScore < beta  &&  */( m = mg.getNextMove() ) )
+	while ( ( m = mg.getNextMove() ) )
 	{
 		assert(alpha < beta);
 		assert(beta <= SCORE_INFINITE);

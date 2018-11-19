@@ -367,8 +367,8 @@ bool Position::kingsDirectOpposition()
 {
 	if(
 			(getSquareOfThePiece(whiteKing) + 16 == getSquareOfThePiece(blackKing) )
-			/*||
-			(getSquareOfThePiece(whiteKing) == getSquareOfThePiece(blackKing) +16 )*/
+			//||
+			//(getSquareOfThePiece(whiteKing) == getSquareOfThePiece(blackKing) +16 )
 	)
 	{
 		return true;

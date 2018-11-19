@@ -156,10 +156,6 @@ void Position::initPstValues(void)
 		}
 	}
 
-	/*for(tSquare s=(tSquare)(squareNumber-1);s>=0;s--){
-		std::cout<<pstValue[whiteBishops][s][0]/10000.0<<" ";
-		if(s%8==0)std::cout<<std::endl;
-	}*/
 }
 
 
@@ -860,7 +856,7 @@ void Position::doMove(const Move & m){
 			assert(captureSquare<squareNumber);
 			x.pawnKey ^= HashKeys::keys[captureSquare][capture];
 		}
-		x.nonPawnMaterial -= nonPawnValue[capture]/*[captureSquare]*/;
+		x.nonPawnMaterial -= nonPawnValue[capture];
 
 
 		// remove piece
@@ -918,7 +914,7 @@ void Position::doMove(const Move & m){
 			putPiece(promotedPiece,to);
 
 			x.material += pstValue[promotedPiece][to]-pstValue[piece][to];
-			x.nonPawnMaterial += nonPawnValue[promotedPiece]/*[to]*/;
+			x.nonPawnMaterial += nonPawnValue[promotedPiece];
 
 
 			x.key ^= HashKeys::keys[to][piece]^ HashKeys::keys[to][promotedPiece];
@@ -1638,7 +1634,7 @@ bool Position::isMoveLegal(const Move &m)const
 			if( !isKing(piece)
 				&& !(
 					((bitSet((tSquare)(m.getTo()-( m.isEnPassantMove() ? pawnPush(s.nextMove) : 0)))) & s.checkers)
-					|| ((bitSet(m.getTo()) & SQUARES_BETWEEN[getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove))][firstOne(s.checkers)]) /*& ~Us[Pieces]*/)
+					|| ((bitSet(m.getTo()) & SQUARES_BETWEEN[getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove))][firstOne(s.checkers)]))
 				)
 			)
 			{
@@ -1659,10 +1655,10 @@ bool Position::isMoveLegal(const Move &m)const
 	}
 
 	// mossa mal formata
-	/*if( !m.isPromotionMove() && m.bit.promotion!=0)
-	{
-		return false;
-	}*/
+	//if( !m.isPromotionMove() && m.bit.promotion!=0)
+	//{
+	//	return false;
+	//}
 	//arrocco impossibile
 	if( m.isCastleMove() )
 	{

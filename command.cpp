@@ -928,7 +928,7 @@ std::unique_ptr<UciOutput> UciOutput::create( const UciOutput::type t )
 	{
 		return std::make_unique<UciStandardOutput>();
 	}
-	else/* if(t == mute)*/
+	else// if(t == mute)
 	{
 		return std::make_unique<UciMuteOutput>();
 	}

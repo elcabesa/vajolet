@@ -184,14 +184,14 @@ public:
 
 	void setupProbCutSearch(bitboardIndex capturePiece)
 	{
-		/*if(pos.isInCheck())
-		{
-			stagedGeneratorState = getTTevasion;
-		}
-		else*/
-		{
+		//if(pos.isInCheck())
+		//{
+		//	stagedGeneratorState = getTTevasion;
+		//}
+		//else
+		//{
 			stagedGeneratorState = getProbCutTT;
-		}
+		//}
 
 		captureThreshold = Position::pieceValue[capturePiece][0];
 		if(pos.isMoveLegal(ttMove) && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove) < captureThreshold)))
