@@ -141,7 +141,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 {
 
 	if (!open("book.bin"))
-		return NOMOVE;
+		return Move::NOMOVE;
 
 	std::mt19937_64 rnd;
 	std::uniform_int_distribution<unsigned int> uint_dist;
@@ -149,7 +149,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 	// use current time (in seconds) as random seed:
 	rnd.seed(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count());
 
-	Move m(NOMOVE);
+	Move m(Move::NOMOVE);
 	Entry e;
 	uint16_t best = 0;
 	unsigned sum = 0;
@@ -171,7 +171,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 		}
 	}
 
-	if (!m.packed )
+	if ( m )
 	{
 		return m;
 	}
@@ -190,37 +190,37 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 
 	Move tempMove(m);
 
-	m.bit.to = tempMove.bit.from;
-	m.bit.from = tempMove.bit.to;
+	m.setTo( tempMove.getFrom() );
+	m.setFrom( tempMove.getTo() );
 
-	int pt = (tempMove.packed >> 12) & 7;
+	int pt = (tempMove.getPacked() >> 12) & 7;
 	if (pt)
 	{
-		m.bit.flags = Move::fpromotion;
-		m.bit.promotion = 3-pt;
+		m.setFlag( Move::fpromotion );
+		m.setPromotion( (Move::epromotion)(3-pt) );
 	}
 
 
 	Move mm;
 	Movegen mg(pos);
-	while((mm = mg.getNextMove()).packed)
+	while( ( mm = mg.getNextMove() ) )
 	{
-		if(m.bit.from == mm.bit.from && m.bit.to == mm.bit.to)
+		if(m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo())
 		{
-			if(m.bit.flags != Move::fpromotion)
+			if( !m.isPromotionMove() )
 			{
 				return mm;
 			}
 			else
 			{
-				if(m.bit.promotion == mm.bit.promotion){
+				if( m.getPromotionType() == mm.getPromotionType() ){
 					return mm;
 				}
 			}
 		}
 	}
 
-	return NOMOVE;
+	return Move::NOMOVE;
 }
 
 

@@ -63,7 +63,7 @@ public:
 		}
 		else
 		{
-			return NOMOVE;
+			return Move::NOMOVE;
 		}
 	}
 	
@@ -97,7 +97,7 @@ public:
 	unsigned long long nodes = 0u;
 	long long int time = 0ll;
 	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
-	bool operator==(const Move& m) const { return firstMove.packed == m.packed; }
+	bool operator==(const Move& m) const { return firstMove == m; }
 
 	rootMove(Move & m) : firstMove{m}
 	{

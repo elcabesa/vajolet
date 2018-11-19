@@ -15,13 +15,12 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VERSION_H_
-#define VERSION_H_
+#ifndef MOVEPICK_H_
+#define MOVEPICK_H_
 
-#include <string>
-
-const std::string programName = "Vajolet2";
-const std::string version = "2.7.0";
-const std::string preRelease = "-PRE-34";
+class MovePicker
+{
+	
+};
 
 #endif

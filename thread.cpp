@@ -159,7 +159,7 @@ void my_thread::_manageNewSearch()
 	{
 		PolyglotBook pol;
 		Move bookM = pol.probe(_src.pos, uciParameters::bestMoveBook);
-		if(bookM.packed)
+		if( bookM )
 		{
 			PVline PV( 1, bookM );
 			
@@ -203,7 +203,7 @@ void my_thread::_manageNewSearch()
 	
 	Move bestMove = PV.getMove(0);
 	Move ponderMove = PV.getMove(1);
-	if( ponderMove == NOMOVE )
+	if( !ponderMove )
 	{
 		ponderMove = _getPonderMoveFromHash( bestMove );
 	}
@@ -239,8 +239,7 @@ Move my_thread::_getPonderMoveFromHash(const Move bestMove )
 	
 	const ttEntry* const tte = transpositionTable::getInstance().probe(_src.pos.getKey());
 	
-	Move m;
-	m.packed = tte->getPackedMove();
+	Move m( tte->getPackedMove() );
 	if( _src.pos.isMoveLegal(m) )
 	{
 		ponderMove = m;
@@ -347,7 +346,7 @@ void Game::printGamesInfo()
 {
 	for(auto p : _positions)
 	{
-		if( p.m != NOMOVE)
+		if( p.m )
 		{
 			std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
 			for( auto m : p.PV )

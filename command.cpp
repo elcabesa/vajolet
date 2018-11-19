@@ -93,10 +93,10 @@ char getPieceName( const unsigned int idx )
 
 std::string getProgramNameAndVersion()
 {
-	std::string s = PROGRAM_NAME;
+	std::string s = programName;
 	s += " ";
-	s += VERSION;
-	s += PRE_RELEASE;
+	s += version;
+	s += preRelease;
 	return s;
 }
 
@@ -149,7 +149,7 @@ Move moveFromUci(const Position& pos,const  std::string& str)
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
 	Move m;
 	Movegen mg(pos);
-	while( (m = mg.getNextMove()).packed)
+	while( (m = mg.getNextMove() ) )
 	{
 		if(str == displayUci(m))
 		{
@@ -157,7 +157,7 @@ Move moveFromUci(const Position& pos,const  std::string& str)
 		}
 	}
 	// move not found
-	return NOMOVE;
+	return Move::NOMOVE;
 }
 
 
@@ -191,7 +191,7 @@ void static position(std::istringstream& is, Position & pos)
 
 	Move m;
 	// Parse move list (if any)
-	while (is >> token && ((m = moveFromUci(pos, token)) != NOMOVE))
+	while( is >> token && (m = moveFromUci(pos, token) ) )
 	{
 		pos.doMove(m);
 	}
@@ -240,9 +240,9 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr)
         else if (searchMovesCommand == true)
         {
         	Move m = moveFromUci(pos, token);
-			if(m.packed)
+			if( m )
 			{
-				limits.searchMoves.push_back( moveFromUci(pos, token) );
+				limits.searchMoves.push_back( m );
 			}
         }
     }
@@ -421,7 +421,7 @@ void setoption(std::istringstream& is)
 	}
 	else if(name == "UCI_EngineAbout")
 	{
-		sync_cout<< PROGRAM_NAME << " " << VERSION PRE_RELEASE<< " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
+		sync_cout<< programName << " " << version << preRelease << " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
 	}
 	else
 	{
@@ -639,24 +639,24 @@ std::string displayUci(const Move & m){
 
 	std::string s;
 
-	if(m.packed==0)
+	if( !m )
 	{
 		s = "0000";
 		return s;
 	}
 
 	//from
-	s += char('a'+FILES[m.bit.from]);
-	s += char('1'+RANKS[m.bit.from]);
+	s += char('a'+FILES[m.getFrom()]);
+	s += char('1'+RANKS[m.getFrom()]);
 
 
 	//to
-	s += char('a'+FILES[m.bit.to]);
-	s += char('1'+RANKS[m.bit.to]);
+	s += char('a'+FILES[m.getTo()]);
+	s += char('1'+RANKS[m.getTo()]);
 	//promotion
-	if(m.bit.flags == Move::fpromotion)
+	if( m.isPromotionMove() )
 	{
-		s += getPieceName( m.bit.promotion + blackQueens );
+		s += getPieceName( m.getPromotionType() + blackQueens );
 	}
 	return s;
 
@@ -676,7 +676,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	bool check = pos.moveGivesCheck(m);
 	bool doubleCheck = pos.moveGivesDoubleCheck(m);
 	unsigned int legalMoves;
-	bitboardIndex piece = pos.getPieceAt((tSquare)m.bit.from);
+	bitboardIndex piece = pos.getPieceAt((tSquare)m.getFrom());
 	bool pawnMove = isPawn(piece);
 	bool isPromotion = m.isPromotionMove();
 	bool isEnPassant = m.isEnPassantMove();
@@ -705,14 +705,14 @@ std::string displayMove(const Position& pos, const Move & m)
 		for (unsigned int i = 0; i < lm; i++)
 		{
 			Move mm = mg.getMoveFromMoveList(i);
-			if( pos.getPieceAt((tSquare)mm.bit.from) == piece && (mm.bit.to == m.bit.to) && (mm.bit.from != m.bit.from))
+			if( pos.getPieceAt((tSquare)mm.getFrom()) == piece && (mm.getTo() == m.getTo()) && (mm.getFrom() != m.getFrom()))
 			{
 				disambigusFlag = true;
-				if(FILES[mm.bit.from] == FILES[m.bit.from])
+				if(FILES[mm.getFrom()] == FILES[m.getFrom()])
 				{
 					rankFlag = true;
 				}
-				if(RANKS[mm.bit.from] == RANKS[m.bit.from])
+				if(RANKS[mm.getFrom()] == RANKS[m.getFrom()])
 				{
 					fileFlag = true;
 				}
@@ -730,8 +730,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	// castle move
 	if (isCastle)
 	{
-		bool kingSide = m.bit.to > m.bit.from;
-		if( kingSide)
+		if( m.isKingsideCastle() )
 		{
 			s = "O-O";
 		}
@@ -751,11 +750,11 @@ std::string displayMove(const Position& pos, const Move & m)
 	}
 	if( fileFlag )
 	{
-		s += char('a'+FILES[ m.bit.from ]);
+		s += char('a'+FILES[ m.getFrom() ]);
 	}
 	if( rankFlag )
 	{
-		s += char('1'+RANKS[ m.bit.from ]);
+		s += char('1'+RANKS[ m.getFrom() ]);
 	}
 
 
@@ -764,14 +763,14 @@ std::string displayMove(const Position& pos, const Move & m)
 	{
 		if(pawnMove)
 		{
-			s+=char('a'+FILES[m.bit.from]);
+			s+=char('a'+FILES[m.getFrom()]);
 		}
 		// capture add x before to square
 		s+="x";
 	}
 	// to square
-	s += char('a'+FILES[ m.bit.to ]);
-	s += char('1'+RANKS[ m.bit.to ]);
+	s += char('a'+FILES[ m.getTo() ]);
+	s += char('1'+RANKS[ m.getTo() ]);
 	// add en passant info
 	if ( isEnPassant )
 	{
@@ -781,7 +780,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	if(isPromotion)
 	{
 		s += "=";
-		s +=  getPieceName( m.bit.promotion + whiteQueens);
+		s +=  getPieceName( m.getPromotionType() + whiteQueens);
 	}
 	// add check information
 	if( check  )
@@ -890,7 +889,7 @@ void UciStandardOutput::printScore(const signed int cp) const
 void UciStandardOutput::printBestMove( const Move bm, const Move ponder ) const
 {
 	sync_cout<<"bestmove "<< displayUci(bm);
-	if( ponder.packed != 0 )
+	if( ponder )
 	{
 		std::cout<<" ponder " << displayUci(ponder);
 	}

@@ -284,7 +284,7 @@ public:
 	*/
 	inline Score getMvvLvaScore(const Move & m) const
 	{
-		Score s = pieceValue[ squares[m.bit.to] ][0] + (squares[m.bit.from]);
+		Score s = pieceValue[ squares[m.getTo()] ][0] + (squares[m.getFrom()]);
 		/*if ( m.isPromotionMove() )
 		{
 			s += (pieceValue[ whiteQueens +m.bit.promotion ] - pieceValue[whitePawns])[0];
@@ -320,7 +320,7 @@ public:
 
 	inline bool isCaptureMove(const Move & m) const
 	{
-		return squares[m.bit.to] !=empty || m.isEnPassantMove() ;
+		return squares[m.getTo()] !=empty || m.isEnPassantMove() ;
 	}
 	inline bool isCaptureMoveOrPromotion(const Move & m) const
 	{
@@ -328,12 +328,12 @@ public:
 	}
 	inline bool isPassedPawnMove(const Move & m) const
 	{
-		if(isPawn(getPieceAt((tSquare)m.bit.from)))
+		if(isPawn(getPieceAt(m.getFrom())))
 		{
-			bool color = squares[m.bit.from] >= separationBitmap;
+			bool color = squares[m.getFrom()] >= separationBitmap;
 			bitMap theirPawns = color? bitBoard[whitePawns]:bitBoard[blackPawns];
 			bitMap ourPawns = color? bitBoard[blackPawns]:bitBoard[whitePawns];
-			return !(theirPawns & PASSED_PAWN[color][m.bit.from]) && !(ourPawns & SQUARES_IN_FRONT_OF[color][m.bit.from]);
+			return !(theirPawns & PASSED_PAWN[color][m.getFrom()]) && !(ourPawns & SQUARES_IN_FRONT_OF[color][m.getFrom()]);
 		}
 		return false;
 	}

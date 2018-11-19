@@ -37,7 +37,7 @@ endif()
 
 set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 
-add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp endgame.cpp eval.cpp hashKeys.cpp io.cpp magicmoves.cpp movegen.cpp parameters.cpp position.cpp search.cpp see.cpp thread.cpp timeManagement.cpp transposition.cpp uciParameters.cpp syzygy/tbprobe.cpp)
+add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp endgame.cpp eval.cpp hashKeys.cpp io.cpp magicmoves.cpp Move.cpp movegen.cpp movepicker.cpp parameters.cpp position.cpp search.cpp see.cpp thread.cpp timeManagement.cpp transposition.cpp uciParameters.cpp syzygy/tbprobe.cpp)
 
 add_executable(tuner tuner.cpp )
 target_link_libraries (tuner libChess)
@@ -77,7 +77,7 @@ target_link_libraries (Vajolet libChess)
 
     enable_testing()
     # Now simply link against gtest or gtest_main as needed. Eg
-    add_executable(Vajolet_unit_test tests/main.cpp tests/perft-test.cpp tests/see-test.cpp tests/timeManagement-test.cpp)
+    add_executable(Vajolet_unit_test tests/main.cpp tests/MoveTest.cpp tests/MoveListTest.cpp tests/perft-test.cpp tests/see-test.cpp tests/timeManagement-test.cpp)
     target_link_libraries(Vajolet_unit_test gtest libChess)
 	
 	add_executable(Vajolet_syzygy_test tests/main.cpp tests/syzygy-test.cpp)
@@ -93,6 +93,7 @@ target_link_libraries (Vajolet libChess)
 	add_test(NAME syzygy_test COMMAND Vajolet_syzygy_test)
 	add_test(NAME long_tests COMMAND Vajolet_long_tests)
 	add_test(NAME search_integration_tests COMMAND Vajolet_search_integration_test)
+
     
  
     add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS Vajolet_unit_test Vajolet_syzygy_test Vajolet_long_tests Vajolet_search_integration_test)

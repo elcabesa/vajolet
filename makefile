@@ -27,6 +27,7 @@ CPP_SRCS := \
 ./hashKeys.cpp \
 ./io.cpp \
 ./magicmoves.cpp \
+./Move.cpp \
 ./movegen.cpp \
 ./parameters.cpp \
 ./position.cpp \
@@ -56,6 +57,7 @@ OBJS :=  \
 ./hashKeys.o \
 ./io.o \
 ./magicmoves.o \
+./Move.o \
 ./movegen.o \
 ./parameters.o \
 ./position.o \
@@ -80,6 +82,7 @@ CPP_DEPS := \
 ./hashKeys.d \
 ./io.d \
 ./magicmoves.d \
+./Move.d \
 ./movegen.d \
 ./parameters.d \
 ./position.d \
