@@ -51,7 +51,8 @@ public:
 	*	constructors
 	******************************************************************/
 	Move(){}
-	Move(const Move& m): _u( m._u._packed ){}
+	//~Move(){}
+	//Move(const Move& m): _u( m._u._packed ){}
 	explicit Move( const unsigned short i ):_u(i){}
 	Move( const tSquare _from, const tSquare _to, const eflags _flag=fnone, const epromotion _prom=promQueen ):_u(_from, _to, _flag, _prom){}
 
@@ -61,7 +62,7 @@ public:
 	inline bool operator == (const Move& d1) const { return _u._packed == d1._u._packed; }
 	inline bool operator != (const Move& d1) const { return _u._packed != d1._u._packed; }
 	inline Move& operator = (const unsigned short b) { _u._packed = b; return *this; }
-	inline Move& operator = (const Move&m){ _u._packed = m._u._packed; return *this; }
+	//inline Move& operator = (const Move&m){ _u._packed = m._u._packed; return *this; }
 	explicit operator bool() const { return _u._packed; }
 
 	/*****************************************************************
@@ -185,6 +186,7 @@ public:
 	*	constructors
 	******************************************************************/
 	extMove(){};
+	~extMove(){};
 	explicit extMove( const Move& m ): Move(m){}
 	explicit extMove( const unsigned short i ): Move(i){}
 	extMove( const tSquare _from, const tSquare _to, const eflags _flag=fnone, const epromotion _prom=promQueen): Move( _from, _to, _flag, _prom ){}
