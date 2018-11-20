@@ -569,6 +569,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			type == Search::nodeType::ALL_NODE ?
 					Search::nodeType::CUT_NODE :
 					type == Search::nodeType::CUT_NODE ? Search::nodeType::ALL_NODE : Search::nodeType::PV_NODE;
+					
+	(void)childNodesType;	// to suppress warning in root node and PV nodes
 
 	if(type != Search::nodeType::ROOT_NODE )
 	{
