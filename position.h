@@ -64,6 +64,7 @@ public:
 		bCastleOOO=8,
 	};
 	
+
 	//--------------------------------------------------------
 	// struct
 	//--------------------------------------------------------
@@ -74,6 +75,8 @@ public:
 	*/
 	struct state
 	{
+
+	public:
 		uint64_t key,		/*!<  hashkey identifying the position*/
 			pawnKey,	/*!<  hashkey identifying the pawn formation*/
 			materialKey;/*!<  hashkey identifying the material signature*/
@@ -81,7 +84,7 @@ public:
 		simdScore nonPawnMaterial; /*!< four score used for white/black opening/endgame non pawn material sum*/
 
 		eNextMove nextMove; /*!< who is the active player*/
-		eCastle castleRights; /*!<  actual castle rights*/
+
 		tSquare epSquare;	/*!<  en passant square*/
 
 		unsigned int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
@@ -96,6 +99,44 @@ public:
 		Move currentMove;
 
 		state(){}
+
+		inline bool hasCastleRight( const eCastle cr )const
+		{
+			return _castleRights & cr;
+		};
+
+		inline bool hasCastleRight( const eCastle cr, const Color c )const
+		{
+			return _castleRights & (cr << (2 * c ) );
+		};
+
+		inline const eCastle& getCastleRights() const
+		{
+			return _castleRights;
+		}
+
+		inline bool hasCastleRights() const
+		{
+			return _castleRights;
+		}
+
+		inline void clearCastleRight()
+		{
+			_castleRights = (eCastle)0;
+		}
+
+		inline void clearCastleRight( const eCastle c)
+		{
+			_castleRights = (eCastle)(_castleRights & ( ~c ) );
+		}
+
+		inline void setCastleRight( const eCastle c)
+		{
+			_castleRights = (eCastle)( _castleRights | c );
+		}
+
+	private:
+		eCastle _castleRights; /*!<  actual castle rights*/
 
 	};
 
@@ -223,7 +264,7 @@ public:
 
 	eCastle getCastleRights(void) const
 	{
-		return getActualStateConst().castleRights;
+		return getActualStateConst().getCastleRights();
 	}
 
 	unsigned int getPly(void) const
@@ -374,7 +415,7 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	static int castleRightsMask[squareNumber];
+	static eCastle castleRightsMask[squareNumber];
 	static simdScore pstValue[lastBitboard][squareNumber];
 	static simdScore nonPawnValue[lastBitboard];
 	std::unordered_map<uint64_t, materialStruct> static materialKeyMap;
@@ -466,5 +507,7 @@ private:
 	bool evalKNPvsK(Score& res);
 
 };
+
+inline Position::eCastle operator|(const Position::eCastle c1, const Position::eCastle c2) { return Position::eCastle(int(c1) | int(c2)); }
 
 #endif /* POSITION_H_ */

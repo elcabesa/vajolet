@@ -86,7 +86,8 @@ public:
 	bool isCastleMove() const;
 	bool isEnPassantMove() const;
 	bool isStandardMove() const;
-	bool isKingsideCastle() const;
+	bool isKingSideCastle() const;
+	bool isQueenSideCastle() const;
 
 	/*****************************************************************
 	*	static methods
@@ -161,9 +162,15 @@ inline unsigned short Move::getPacked()const
 {
 	return _u._packed;
 }
-inline bool Move::isKingsideCastle() const
+
+inline bool Move::isKingSideCastle() const
 {
 	return _u._bit._to > _u._bit._from;
+}
+
+inline bool Move::isQueenSideCastle() const
+{
+	return _u._bit._to < _u._bit._from;
 }
 
 

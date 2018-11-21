@@ -34,7 +34,12 @@ extern SearchData defaultSearchData;
 
 class Movegen
 {
-
+public:
+	enum CastleSide
+	{
+		kingSideCastle,
+		queenSideCastle
+	};
 private:
 	static const int MAX_MOVE_PER_POSITION = 250;
 	static const int MAX_BAD_MOVE_PER_POSITION = 32;
@@ -56,11 +61,7 @@ private:
 
 
 
-	enum CastleSide
-	{
-		kingSideCastle,
-		queenSideCastle
-	};
+
 
 	enum genType
 	{
@@ -252,11 +253,7 @@ public:
 		assert(from<squareNumber);
 		return attackFromBishop(from,0);
 	}
-	// todo transform in is castle legal
-	inline static bitMap getCastlePath(const int x, const int y)
-	{
-		return castlePath[x][y];
-	}
+	bool isCastlePathFree( const Color c, const CastleSide side) const;
 
 private:
 

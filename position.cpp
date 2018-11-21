@@ -32,7 +32,7 @@ const int KRank[8]	= { +1, +0, -2, -3, -4, -5, -6, -7};
 simdScore Position::pieceValue[lastBitboard];
 simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
-int Position::castleRightsMask[squareNumber];
+Position::eCastle Position::castleRightsMask[squareNumber];
 
 bool Position::perftUseHash = false;
 
@@ -234,21 +234,21 @@ void Position::setupFromFen(const std::string& fenStr)
 
 	ss >> token;
 
-	x.castleRights=(eCastle)0;
+	x.clearCastleRight();
 	while ((ss >> token) && !isspace(token))
 	{
 		switch(token){
 		case 'K':
-			x.castleRights =(eCastle)(x.castleRights|wCastleOO);
+			x.setCastleRight( wCastleOO );
 			break;
 		case 'Q':
-			x.castleRights =(eCastle)(x.castleRights|wCastleOOO);
+			x.setCastleRight( wCastleOOO );
 			break;
 		case 'k':
-			x.castleRights =(eCastle)(x.castleRights|bCastleOO);
+			x.setCastleRight( bCastleOO );
 			break;
 		case 'q':
-			x.castleRights =(eCastle)(x.castleRights|bCastleOOO);
+			x.setCastleRight( bCastleOOO );
 			break;
 		}
 	}
@@ -398,11 +398,11 @@ void Position::display()const
 	std::cout <<(st.nextMove?"BLACK TO MOVE":"WHITE TO MOVE") <<std::endl;
 	std::cout <<"50 move counter "<<st.fiftyMoveCnt<<std::endl;
 	std::cout <<"castleRights ";
-	if(st.castleRights&wCastleOO) std::cout<<"K";
-	if(st.castleRights&wCastleOOO) std::cout<<"Q";
-	if(st.castleRights&bCastleOO) std::cout<<"k";
-	if(st.castleRights&bCastleOOO) std::cout<<"q";
-	if(st.castleRights==0) std::cout<<"-";
+	if( st.hasCastleRight(wCastleOO) ) std::cout<<"K";
+	if( st.hasCastleRight(wCastleOOO) ) std::cout<<"Q";
+	if( st.hasCastleRight(bCastleOO) ) std::cout<<"k";
+	if( st.hasCastleRight(bCastleOOO) ) std::cout<<"q";
+	if( !st.hasCastleRights() ) std::cout<<"-";
 	std::cout<<std::endl;
 	std::cout <<"epsquare ";
 
@@ -473,23 +473,23 @@ std::string  Position::getFen() const {
 	}
 	s += ' ';
 
-	if(st.castleRights&wCastleOO)
+	if( st.hasCastleRight(wCastleOO) )
 	{
 		s += "K";
 	}
-	if(st.castleRights&wCastleOOO)
+	if( st.hasCastleRight(wCastleOOO) )
 	{
 		s += "Q";
 	}
-	if(st.castleRights&bCastleOO)
+	if( st.hasCastleRight(bCastleOO) )
 	{
 		s += "k";
 	}
-	if(st.castleRights&bCastleOOO)
+	if( st.hasCastleRight(bCastleOOO) )
 	{
 		s += "q";
 	}
-	if(st.castleRights==0){
+	if( !st.hasCastleRights() ){
 		s += "-";
 	}
 	s += ' ';
@@ -564,23 +564,23 @@ std::string Position::getSymmetricFen() const {
 	}
 	s += ' ';
 
-	if(st.castleRights&wCastleOO)
+	if( st.hasCastleRight(wCastleOO) )
 	{
 		s += "k";
 	}
-	if(st.castleRights&wCastleOOO)
+	if( st.hasCastleRight(wCastleOOO) )
 	{
 		s += "q";
 	}
-	if(st.castleRights&bCastleOO)
+	if( st.hasCastleRight(bCastleOO) )
 	{
 		s += "K";
 	}
-	if(st.castleRights&bCastleOOO)
+	if( st.hasCastleRight(bCastleOOO) )
 	{
 		s += "Q";
 	}
-	if(st.castleRights==0)
+	if( !st.hasCastleRights() )
 	{
 		s += "-";
 	}
@@ -623,7 +623,7 @@ uint64_t Position::calcKey(void) const
 	{
 		hash ^= HashKeys::side;
 	}
-	hash ^= HashKeys::castlingRight[st.castleRights];
+	hash ^= HashKeys::castlingRight[st.getCastleRights()];
 
 
 	if(st.epSquare != squareNone)
@@ -822,7 +822,7 @@ void Position::doMove(const Move & m){
 	// do castle additional instruction
 	if( m.isCastleMove() )
 	{
-		bool kingSide = m.isKingsideCastle();
+		bool kingSide = m.isKingSideCastle();
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		assert(rFrom<squareNumber);
 		bitboardIndex rook = squares[rFrom];
@@ -881,12 +881,12 @@ void Position::doMove(const Move & m){
 
 
 	// Update castle rights if needed
-	if (x.castleRights && (castleRightsMask[from] | castleRightsMask[to]))
+	if ( x.hasCastleRights() && (castleRightsMask[from] | castleRightsMask[to]))
 	{
-		int cr = castleRightsMask[from] | castleRightsMask[to];
-		assert((x.castleRights & cr)<16);
-		x.key ^= HashKeys::castlingRight[x.castleRights & cr];
-		x.castleRights = (eCastle)(x.castleRights &(~cr));
+		eCastle cr = castleRightsMask[from] | castleRightsMask[to];
+		assert((x.getCastleRights() & cr)<16);
+		x.key ^= HashKeys::castlingRight[ x.getCastleRights() & cr ];
+		x.clearCastleRight( cr );
 	}
 
 
@@ -1004,7 +1004,7 @@ void Position::undoMove()
 
 	if( m.isCastleMove() )
 	{
-		bool kingSide = m.isKingsideCastle();
+		bool kingSide = m.isKingSideCastle();
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		tSquare rTo = kingSide? to+ovest: to+est;
 		assert(rFrom<squareNumber);
@@ -1049,7 +1049,7 @@ void Position::initCastleRightsMask(void)
 {
 	for(int i=0;i<squareNumber;i++)
 	{
-		castleRightsMask[i]=0;
+		castleRightsMask[i] = eCastle(0);
 	}
 	castleRightsMask[E1] = wCastleOO | wCastleOOO;
 	castleRightsMask[A1] = wCastleOOO;
@@ -1469,7 +1469,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	{
 		tSquare kFrom = from;
 		tSquare kTo = to;
-		bool kingSide = m.isKingsideCastle();
+		bool kingSide = m.isKingSideCastle();
 		tSquare rFrom = kingSide ? to + est : to + ovest + ovest;
 		tSquare rTo = kingSide ? to + ovest : to + est;
 		assert(rFrom<squareNumber);
@@ -1686,9 +1686,13 @@ bool Position::isMoveLegal(const Move &m)const
 		{
 			if( m.isCastleMove() )
 			{
-				int color = s.nextMove?1:0;
-				if(!(s.castleRights &  bitSet( (tSquare)( ( !m.isKingsideCastle() ) + 2 * color ) ) )
-					|| (Movegen::getCastlePath(color,((int)m.getFrom()-(int)m.getTo())>0) & bitBoard[occupiedSquares])
+				Color color = s.nextMove? black : white;
+				// todo unify eCastle & castleSide
+				Position::eCastle cs = (Position::eCastle)m.isQueenSideCastle();
+				Movegen::CastleSide css = (Movegen::CastleSide)m.isQueenSideCastle();
+				Movegen mg(*this);
+				if( !s.hasCastleRight( cs , color )
+					|| !mg.isCastlePathFree( color, css )
 				)
 				{
 					return false;

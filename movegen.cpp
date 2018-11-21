@@ -489,7 +489,7 @@ void Movegen::generateMoves()
 		}
 	}
 
-	int color = s.nextMove?1:0;
+	Color color = s.nextMove? black : white;
 
 	if( type!= Movegen::quietMg && type!= Movegen::quietChecksMg && type!= Movegen::quietEvasionMg)
 	{
@@ -573,10 +573,10 @@ void Movegen::generateMoves()
 	if(type !=Movegen::allEvasionMg && type!=Movegen::captureEvasionMg && type!=Movegen::quietEvasionMg && type!= Movegen::captureMg)
 	{
 		m.setPromotion( Move::promQueen );
-		if(s.castleRights & ((Position::wCastleOO |Position::wCastleOOO)<<(2*color)))
+		if( !s.checkers && s.hasCastleRight( Position::eCastle( Position::wCastleOO | Position::wCastleOOO ), color ) )
 		{
 
-			if((s.castleRights &((Position::wCastleOO)<<(2*color))) &&!s.checkers &&!(castlePath[color][kingSideCastle] & pos.getOccupationBitmap()))
+			if( s.hasCastleRight( Position::wCastleOO, color ) && isCastlePathFree( color, kingSideCastle ) )
 			{
 
 				bool castleDenied = false;
@@ -602,7 +602,7 @@ void Movegen::generateMoves()
 
 
 			}
-			if((s.castleRights &((Position::wCastleOOO)<<(2*color))) && !s.checkers && !(castlePath[color][queenSideCastle] & pos.getOccupationBitmap()))
+			if( s.hasCastleRight( Position::wCastleOOO, color ) && isCastlePathFree( color, queenSideCastle ) )
 			{
 				bool castleDenied = false;
 				for( tSquare x = (tSquare)1 ;x<3 ;x++)
@@ -889,6 +889,11 @@ inline void Movegen::scoreQuietEvasion()
 
 		m.setScore( s );
 	}
+}
+
+bool Movegen::isCastlePathFree( const Color c, const CastleSide side ) const
+{
+	return !(castlePath[c][side] & pos.getOccupationBitmap());
 }
 
 

@@ -55,7 +55,7 @@ TEST(Syzygy, test)
 			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 			0,//pos.getActualState().fiftyMoveCnt,
-			pos.getActualState().castleRights,
+			pos.getActualState().getCastleRights(),
 			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
 			pos.getActualState().nextMove== Position::whiteTurn);
 
@@ -73,7 +73,7 @@ TEST(Syzygy, test)
 			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 			pos.getActualState().fiftyMoveCnt,
-			pos.getActualState().castleRights,
+			pos.getActualState().getCastleRights(),
 			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
 			pos.getActualState().nextMove== Position::whiteTurn,
 			results);

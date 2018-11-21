@@ -345,7 +345,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 					const Position::state & st = getActualStateConst();
 					if(piece > separationBitmap)
 					{
-						if( !( st.castleRights & (Position::bCastleOO | Position::bCastleOOO) ) )
+						if( !st.hasCastleRight( eCastle( Position::bCastleOO | Position::bCastleOOO ) ) )
 						{
 							res -= rookTrappedKingWithoutCastling * (int)( 3 - mobility );
 						}
@@ -353,7 +353,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 					}
 					else
 					{
-						if( !(st.castleRights & (Position::wCastleOO | Position::wCastleOOO) ) )
+						if( !st.hasCastleRight( eCastle( Position::wCastleOO | Position::wCastleOOO ) ) )
 						{
 							res -= rookTrappedKingWithoutCastling * (int)( 3 - mobility ) ;
 						}
@@ -1189,7 +1189,7 @@ Score Position::eval(void)
 
 	kingSafety[white] = evalShieldStorm<white>(getSquareOfThePiece(whiteKing));
 
-	if((st.castleRights & wCastleOO)
+	if( st.hasCastleRight( wCastleOO )
 		&& !(attackedSquares[blackPieces] & (bitSet(E1) | bitSet(F1) | bitSet(G1) ))
 		&& bitCnt(getOccupationBitmap() & (bitSet(F1) | bitSet(G1))) <= 1
 		)
@@ -1197,7 +1197,7 @@ Score Position::eval(void)
 		kingSafety[white] = std::max( evalShieldStorm<white>(G1), kingSafety[white]);
 	}
 
-	if((st.castleRights & wCastleOOO)
+	if( st.hasCastleRight( wCastleOOO )
 		&& !(attackedSquares[blackPieces] & (bitSet(E1) | bitSet(D1) | bitSet(C1) ))
 		&& bitCnt(getOccupationBitmap() & (bitSet(D1) | bitSet(C1) | bitSet(B1) )) <=1
 		)
@@ -1211,7 +1211,7 @@ Score Position::eval(void)
 
 	kingSafety[black] = evalShieldStorm<black>(getSquareOfThePiece(blackKing));
 
-	if((st.castleRights & bCastleOO)
+	if( st.hasCastleRight( bCastleOO )
 		&& !(attackedSquares[whitePieces] & (bitSet(E8) | bitSet(F8) | bitSet(G8) ))
 		&& bitCnt(getOccupationBitmap() & (bitSet(F8) | bitSet(G8))) <=1
 		)
@@ -1219,7 +1219,7 @@ Score Position::eval(void)
 		kingSafety[black] = std::max( evalShieldStorm<black>(G8), kingSafety[black]);
 	}
 
-	if((st.castleRights & bCastleOOO)
+	if( st.hasCastleRight( bCastleOOO )
 		&& !(attackedSquares[whitePieces] & (bitSet(E8) | bitSet(D8) | bitSet(C8) ))
 		&& bitCnt(getOccupationBitmap() & (bitSet(D8) | bitSet(C8) | bitSet(B8))) <=1
 		)

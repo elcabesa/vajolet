@@ -730,7 +730,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	// castle move
 	if (isCastle)
 	{
-		if( m.isKingsideCastle() )
+		if( m.isKingSideCastle() )
 		{
 			s = "O-O";
 		}
