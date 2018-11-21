@@ -855,47 +855,39 @@ Move Movegen::getNextMove()
 }
 
 
-const Move& Movegen::getMoveFromMoveList(unsigned int n) const
-{
-	return moveList.get(n);
-}
-
-
 inline void Movegen::scoreCaptureMoves()
 {
-	for( auto it = moveList.begin(); it != moveList.end(); ++it)
+	for( auto& m : moveList )
 	{
-		Score s = pos.getMvvLvaScore( *it )
-				+ _sd.getCaptureHistory().getValue( pos.getPieceAt( it->getFrom()) , *it , pos.getPieceAt(it->getTo()) ) * 50; // history of capture
-		it->setScore( s );
-
-
+		Score s = pos.getMvvLvaScore( m )
+				+ _sd.getCaptureHistory().getValue( pos.getPieceAt( m.getFrom()) , m , pos.getPieceAt( m.getTo() ) ) * 50; // history of capture
+		m.setScore( s );
 	}
 
 }
 
 inline void Movegen::scoreQuietMoves()
 {
-	for( auto it = moveList.begin(); it != moveList.end(); ++it)
+	for( auto& m : moveList )
 	{
-		it->setScore( _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, *it ) );
+		m.setScore( _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, m ) );
 	}
 }
 
 inline void Movegen::scoreQuietEvasion()
 {
-	for( auto it = moveList.begin(); it != moveList.end(); ++it)
+	for( auto& m : moveList )
 	{
-		Score s = (pos.getPieceAt(it->getFrom()));
-		if(pos.getPieceAt(it->getFrom()) % separationBitmap == King)
+		Score s = ( pos.getPieceAt( m.getFrom() ) );
+		if( pos.getPieceAt( m.getFrom()) % separationBitmap == King )
 		{
 			s = 20;
 		}
 		s *= 500000;
 
-		s += _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, *it );
+		s += _sd.getHistory().getValue(pos.getNextTurn() == Position::whiteTurn ? white : black, m );
 
-		it->setScore( s );
+		m.setScore( s );
 	}
 }
 

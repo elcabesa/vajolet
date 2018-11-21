@@ -128,8 +128,6 @@ public:
 	{
 		return m == killerMoves[0] || m == killerMoves[1];
 	}
-
-	const Move& getMoveFromMoveList(unsigned int n) const;
 	Move getNextMove(void);
 
 	Movegen(const Position & p, const SearchData& sd = defaultSearchData, unsigned int ply = 0, const Move & ttm = Move::NOMOVE): pos(p),_sd(sd),ply(ply), ttMove(ttm)

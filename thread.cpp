@@ -119,7 +119,7 @@ void my_thread::_manageNewSearch()
 	_game.insertNewMoves(_src.pos);
 
 
-	Movegen mg(_src.pos);
+	Movegen mg( _src.pos );
 	unsigned int legalMoves = mg.getNumberOfLegalMoves();
 
 	if(legalMoves == 0)
@@ -134,19 +134,18 @@ void my_thread::_manageNewSearch()
 		return;
 	}
 	
-	if( legalMoves == 1 && !_limits.infinite)
+	if( legalMoves == 1 && !_limits.infinite )
 	{
-		
-		Move bestMove = mg.getMoveFromMoveList(0);
+		Move bestMove = mg.getNextMove();
 		
 		PVline PV( 1, bestMove );
-		_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+		_UOI->printPV( 0, 0, 0, -1, 1, 0, 0, PV, 0 );
 		
 		_waitStopPondering();
 		
 		Move ponderMove = _getPonderMoveFromHash( bestMove );
 		
-		_UOI->printBestMove(bestMove, ponderMove);
+		_UOI->printBestMove( bestMove, ponderMove );
 
 		return;
 

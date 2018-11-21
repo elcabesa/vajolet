@@ -18,9 +18,92 @@
 #ifndef MOVEPICK_H_
 #define MOVEPICK_H_
 
+#include "moveList.h"
+#include "Move.h"
+#include "score.h"
+
+class Position;
+class SearchData;
+
+
 class MovePicker
 {
+	private:
+
+	//--------------------------------------------------------
+	// static const
+	//--------------------------------------------------------
+	static const int MAX_MOVE_PER_POSITION = 250;
+	static const int MAX_BAD_MOVE_PER_POSITION = 32;
 	
+	//--------------------------------------------------------
+	// enum
+	//--------------------------------------------------------
+	enum eStagedGeneratorState
+	{
+		getTT,
+		generateCaptureMoves,
+		iterateGoodCaptureMoves,
+		getKillers,
+		getCounters,
+		generateQuietMoves,
+		iterateQuietMoves,
+		iterateBadCaptureMoves,
+		finishedNormalStage,
+
+		getTTevasion,
+		generateCaptureEvasionMoves,
+		iterateCaptureEvasionMoves,
+		generateQuietEvasionMoves,
+		iterateQuietEvasionMoves,
+		finishedEvasionStage,
+
+		getQsearchTT,
+		generateQuiescentMoves,
+		iterateQuiescentMoves,
+		finishedQuiescentStage,
+
+		getProbCutTT,
+		generateProbCutCaptures,
+		iterateProbCutCaptures,
+		finishedProbCutStage,
+
+		getQsearchTTquiet,
+		generateQuiescentCaptures,
+		iterateQuiescentCaptures,
+		generateQuietCheks,
+		iterateQuietChecks,
+		finishedQuiescentQuietStage,
+
+	};
+
+	//--------------------------------------------------------
+	// private members
+	//--------------------------------------------------------
+	eStagedGeneratorState stagedGeneratorState;
+	
+	MoveList<MAX_MOVE_PER_POSITION> _moveList;
+	MoveList<MAX_BAD_MOVE_PER_POSITION> _badCaptureList;
+	
+	unsigned int _killerPos;
+	Score _captureThreshold;
+	
+	const Position &_pos;
+	const SearchData &_sd;
+	
+	unsigned int _ply;
+	Move _ttMove;
+	
+	Move _killerMoves[2];
+	Move _counterMoves[2];
+	
+	//--------------------------------------------------------
+	// private methods
+	//--------------------------------------------------------
+	void _scoreCaptureMoves();
+	void _scoreQuietMoves();
+	void _scoreQuietEvasion();
+
 };
 
 #endif

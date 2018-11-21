@@ -698,29 +698,29 @@ std::string displayMove(const Position& pos, const Move & m)
 
 
 	{
-		Movegen mg(pos);
-		unsigned int lm = mg.getNumberOfLegalMoves();
-
 		// calc disambigus data
-		for (unsigned int i = 0; i < lm; i++)
+		Movegen mg( pos );
+		Move mm;
+		
+		while ( ( mm = mg.getNextMove() ) )
 		{
-			Move mm = mg.getMoveFromMoveList(i);
-			if( pos.getPieceAt((tSquare)mm.getFrom()) == piece && (mm.getTo() == m.getTo()) && (mm.getFrom() != m.getFrom()))
+			if( pos.getPieceAt( mm.getFrom() ) == piece 
+				&& ( mm.getTo() == m.getTo() ) 
+				&& ( mm.getFrom() != m.getFrom() )
+			)
 			{
 				disambigusFlag = true;
-				if(FILES[mm.getFrom()] == FILES[m.getFrom()])
+				if( FILES[ mm.getFrom() ] == FILES[ m.getFrom() ] )
 				{
 					rankFlag = true;
 				}
-				if(RANKS[mm.getFrom()] == RANKS[m.getFrom()])
+				if( RANKS[ mm.getFrom() ] == RANKS[ m.getFrom() ] )
 				{
 					fileFlag = true;
 				}
-
 			}
-
 		}
-		if( disambigusFlag && !rankFlag && !fileFlag)
+		if( disambigusFlag && !rankFlag && !fileFlag )
 		{
 			fileFlag = true;
 		}
