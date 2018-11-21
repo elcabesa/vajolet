@@ -394,7 +394,7 @@ bool Position::evalKPvsK(Score& res)
 		tSquare promotionSquare = BOARDINDEX[ FILES[pawnSquare] ][7];
 		const int relativeRank = RANKS[pawnSquare];
 		// Rule of the square
-		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (getNextTurn() == whiteTurn? 0 : 1) , 0) )
+		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - ( isWhiteTurn() ? 0 : 1) , 0) )
 		{
 			res = SCORE_KNOWN_WIN + relativeRank;
 			return true;
@@ -402,7 +402,7 @@ bool Position::evalKPvsK(Score& res)
 		if(FILES[pawnSquare] !=0 && FILES[pawnSquare] != 7)
 		{
 
-			if(SQUARE_DISTANCE[enemySquare][pawnSquare] >= 2 || getNextTurn() == Position::whiteTurn )
+			if(SQUARE_DISTANCE[enemySquare][pawnSquare] >= 2 || isWhiteTurn() )
 			{
 				//winning king on a key square
 				if(relativeRank < 4)
@@ -434,7 +434,7 @@ bool Position::evalKPvsK(Score& res)
 				// 3 rules for winning, if  conditions are met -> it's won
 				unsigned int count = 0;
 				if(kingSquare == pawnSquare + 8) count++;
-				if(getNextTurn() == blackTurn && kingsDirectOpposition()) count++;
+				if(isBlackTurn() && kingsDirectOpposition()) count++;
 				if(RANKS[kingSquare] == 5) count++;
 
 				if(count > 1)
@@ -473,14 +473,14 @@ bool Position::evalKPvsK(Score& res)
 		tSquare promotionSquare = BOARDINDEX[FILES[pawnSquare]][0];
 		const int relativeRank = 7 - RANKS[pawnSquare];
 		// Rule of the square
-		if ( std::min( 5, (int)( 7 - relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (getNextTurn() == blackTurn ? 0 : 1 ), 0) )
+		if ( std::min( 5, (int)( 7 - relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - ( isBlackTurn() ? 0 : 1 ), 0) )
 		{
 			res = -SCORE_KNOWN_WIN - relativeRank;
 			return true;
 		}
 		if(FILES[pawnSquare] != 0 && FILES[pawnSquare] != 7)
 		{
-			if(SQUARE_DISTANCE[enemySquare][pawnSquare] >= 2 || getNextTurn() == blackTurn)
+			if(SQUARE_DISTANCE[enemySquare][pawnSquare] >= 2 || isBlackTurn() )
 			{
 				//winning king on a key square
 				if(relativeRank < 4)
@@ -510,7 +510,7 @@ bool Position::evalKPvsK(Score& res)
 				// 3 rules for winning, if  conditions are met -> it's won
 				unsigned int count = 0;
 				if(kingSquare == pawnSquare - 8) count++;
-				if(getNextTurn() == whiteTurn && kingsDirectOpposition()) count++;
+				if( isWhiteTurn() && kingsDirectOpposition()) count++;
 				if(RANKS[kingSquare] == 2) count++;
 
 				if(count > 1)

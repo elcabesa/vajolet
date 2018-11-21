@@ -57,7 +57,7 @@ TEST(Syzygy, test)
 			0,//pos.getActualState().fiftyMoveCnt,
 			pos.getActualState().getCastleRights(),
 			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-			pos.getActualState().nextMove== Position::whiteTurn);
+			pos.isWhiteTurn() );
 
 		//EXPECT_NE(result1, TB_RESULT_FAILED);
 		int wdl_res = TB_GET_WDL(result1)-2;
@@ -75,7 +75,7 @@ TEST(Syzygy, test)
 			pos.getActualState().fiftyMoveCnt,
 			pos.getActualState().getCastleRights(),
 			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-			pos.getActualState().nextMove== Position::whiteTurn,
+			pos.isWhiteTurn(),
 			results);
 			
 		//EXPECT_NE(result2, TB_RESULT_FAILED);

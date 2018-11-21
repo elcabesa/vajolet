@@ -151,7 +151,7 @@ void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 			pos.getActualState().fiftyMoveCnt,
 			pos.getActualState().getCastleRights(),
 			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-			pos.getActualState().nextMove == Position::whiteTurn,
+			pos.isWhiteTurn(),
 			results);
 
 		if (result != TB_RESULT_FAILED)
@@ -435,7 +435,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		filterRootMovesByTablebase( rootMoves );
 	}
 	
-	initialNextMove = pos.getActualStateConst().nextMove;
+	initialNextMove = pos.getNextTurn();
 	//----------------------------------
 	// we can start the real search
 	//----------------------------------
@@ -580,8 +580,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			{
 				pvLine.reset();
 			}
-			int contemptSign = (pos.getActualStateConst().nextMove == initialNextMove) ? 1 : -1;
-			return contemptSign * std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
+			return getDrawValue();
 		}
 
 		//---------------------------------------
@@ -673,8 +672,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 					pos.getActualState().fiftyMoveCnt,
 					pos.getActualState().getCastleRights(),
-					pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-					pos.getActualState().nextMove == Position::whiteTurn);
+					pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare,
+					pos.isWhiteTurn() );
 
 				if(result != TB_RESULT_FAILED)
 				{
@@ -839,7 +838,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				&& depth < 8 * ONE_PLY
 				&& eval - futility( depth, improving ) >= beta
 				&& eval < SCORE_KNOWN_WIN
-				&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0])))
+				&& ( ( pos.isBlackTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0])))
 			{
 				assert((depth>>ONE_PLY_SHIFT)<8);
 				return eval;
@@ -856,7 +855,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			if( depth >= ONE_PLY
 				&& eval >= beta
 				&& !sd.story[ply].skipNullMove
-				&& ((pos.getNextTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || (!pos.getNextTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0]))
+				&& ( ( pos.isBlackTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0]))
 			){
 				// Null move dynamic reduction based on depth
 				int red = 3 * ONE_PLY + depth / 4;
@@ -1349,12 +1348,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
 			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-			sd.history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, bestMove, bonus);
+			sd.history.update( pos.isWhiteTurn() ? white: black, bestMove, bonus);
 
 			for (unsigned int i = 0; i < quietMoveCount; i++)
 			{
 				Move m = quietMoveList[i];
-				sd.history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
+				sd.history.update( pos.isWhiteTurn() ? white: black, m, -bonus);
 			}
 			
 			if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
@@ -1418,8 +1417,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		{
 			pvLine.reset();
 		}
-		int contemptSign = (pos.getActualStateConst().nextMove == initialNextMove) ? 1 : -1;
-		return contemptSign * std::min((int)0,(int)(-5000 + pos.getPly()*250));
+		return getDrawValue();
 	}
 	//---------------------------------------
 	//	MATE DISTANCE PRUNING
@@ -1698,6 +1696,12 @@ void Search::setUOI( std::unique_ptr<UciOutput> UOI )
 	sync_cout;
 	_UOI = std::move(UOI);
 	std::cout<<sync_noNewLineEndl;
+}
+
+inline Score Search::getDrawValue() const
+{
+	int contemptSign = ( pos.getNextTurn() == initialNextMove) ? 1 : -1;
+	return contemptSign * std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
 }
 
 void Search::initSearchParameters(void)

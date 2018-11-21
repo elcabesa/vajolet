@@ -54,7 +54,7 @@ uint64_t PolyglotBook::polyglotKey(const Position& pos) const
 		k ^= PG.Zobrist.enpassant[FILES[pos.getEpSquare()]];
 	}
 
-	if (pos.getNextTurn() == Position::whiteTurn)
+	if ( pos.isWhiteTurn() )
 	{
 		k ^= PG.Zobrist.turn;
 	}

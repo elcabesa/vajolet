@@ -253,6 +253,7 @@ private:
 
 	void setUOI( std::unique_ptr<UciOutput> UOI );
 	static Score futility(int depth, bool improving );
+	Score getDrawValue() const;
 	
 
 };

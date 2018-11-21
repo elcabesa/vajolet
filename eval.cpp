@@ -549,7 +549,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 		if( st.nonPawnMaterial[ c ? 0 : 2 ] == 0 )
 		{
 			tSquare promotionSquare = BOARDINDEX[ FILES[ ppSq ] ][ c ? 0 : 7 ];
-			if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[ enemyKingSquare ][ promotionSquare ] - (st.nextMove == (c ? blackTurn : whiteTurn) ? 0 : 1 ), 0) )
+			if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[ enemyKingSquare ][ promotionSquare ] - ( (c ? isBlackTurn() : isWhiteTurn() ) ? 0 : 1 ), 0) )
 			{
 				passedPawnsBonus += unstoppablePassed * rr;
 			}
@@ -693,7 +693,7 @@ Score Position::eval(void)
 		switch(materialData->type)
 		{
 			case materialStruct::exact:
-				return st.nextMove? -materialData->val : materialData->val;
+				return isBlackTurn() ? -materialData->val : materialData->val;
 				break;
 			case materialStruct::multiplicativeFunction:
 			{
@@ -709,7 +709,7 @@ Score Position::eval(void)
 				Score r = 0;
 				if( (this->*pointer)(r))
 				{
-					return st.nextMove? -r : r;
+					return isBlackTurn() ? -r : r;
 				}
 				break;
 			}
@@ -728,7 +728,7 @@ Score Position::eval(void)
 		{
 			Score r;
 			evalKxvsK(r);
-			return st.nextMove? -r : r;
+			return isBlackTurn() ? -r : r;
 		}
 	}
 
@@ -736,7 +736,7 @@ Score Position::eval(void)
 	//---------------------------------------------
 	//	tempo
 	//---------------------------------------------
-	res += st.nextMove ? -tempo : tempo;
+	res += isBlackTurn() ? -tempo : tempo;
 
 	if(trace)
 	{
@@ -1316,7 +1316,7 @@ Score Position::eval(void)
 	score = std::min(highSat,score);
 	score = std::max(lowSat,score);
 
-	return st.nextMove ? -score : score;
+	return isBlackTurn() ? -score : score;
 
 }
 

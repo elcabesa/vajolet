@@ -218,7 +218,7 @@ void inline extMove::setScore( const Score  s){ _score = s;}
 	\version 1.0
 	\date 08/11/2013
  */
-inline tSquare pawnPush(int color){
+inline tSquare pawnPush(bool color){
 	return color? sud:north;
 }
 

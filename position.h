@@ -86,7 +86,7 @@ public:
 
 		simdScore nonPawnMaterial; /*!< four score used for white/black opening/endgame non pawn material sum*/
 
-		eNextMove nextMove; /*!< who is the active player*/
+
 
 		tSquare epSquare;	/*!<  en passant square*/
 
@@ -97,7 +97,7 @@ public:
 		simdScore material;
 		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
-		bitMap pinnedPieces;	/*!< pinned pieces*/
+
 
 
 		state(){}
@@ -132,12 +132,12 @@ public:
 			_castleRights = (eCastle)0;
 		}
 
-		inline void clearCastleRight( const eCastle c)
+		inline void clearCastleRight( const eCastle c )
 		{
 			_castleRights = (eCastle)(_castleRights & ( ~c ) );
 		}
 
-		inline void setCastleRight( const eCastle c)
+		inline void setCastleRight( const eCastle c )
 		{
 			_castleRights = (eCastle)( _castleRights | c );
 		}
@@ -147,19 +147,19 @@ public:
 			return _currentMove;
 		}
 
-		inline void setCurrentMove( const Move & m)
+		inline void setCurrentMove( const Move & m )
 		{
 			_currentMove = m;
 		}
 
-		inline bool isInCheck(void) const
+		inline bool isInCheck() const
 		{
 			return _checkers;
 		}
 
-		inline bool isInDoubleCheck(void) const
+		inline bool isInDoubleCheck() const
 		{
-			return moreThanOneBit(_checkers);
+			return moreThanOneBit( _checkers );
 		}
 
 		inline const bitMap& getCheckers(void) const
@@ -167,21 +167,109 @@ public:
 			return _checkers;
 		}
 
-		inline void setCheckers( const bitMap & b)
+		inline void setCheckers( const bitMap & b )
 		{
 			_checkers = b;
 		}
 
-		inline void addCheckers( const bitMap & b)
+		inline void addCheckers( const bitMap & b )
 		{
 			_checkers |= b;
 		}
+
+		inline void setPinnedPieces( const bitMap & b )
+		{
+			_pinnedPieces = b;
+		}
+
+		inline bool isPinned( const tSquare& sq ) const
+		{
+			return _pinnedPieces & bitSet( sq );
+		}
+
+		inline void setNextTurn( const eNextMove nm )
+		{
+			_nextMove = nm;
+		}
+
+		inline eNextMove getNextTurn(void) const
+		{
+			return _nextMove;
+		}
+
+		inline bitboardIndex getPiecesOfActivePlayer(void) const
+		{
+			return (bitboardIndex)(whitePieces + _nextMove);
+		}
+
+		inline bitboardIndex getPiecesOfOtherPlayer(void) const
+		{
+			return (bitboardIndex)(blackPieces - _nextMove);
+		}
+
+		inline bitboardIndex getKingOfActivePlayer(void) const
+		{
+			return (bitboardIndex)(whiteKing + _nextMove);
+		}
+
+		inline bitboardIndex getKingOfOtherPlayer(void) const
+		{
+			return (bitboardIndex)(blackKing - _nextMove);
+		}
+
+		inline bitboardIndex getPawnsOfActivePlayer(void) const
+		{
+			return (bitboardIndex)(whitePawns + _nextMove);
+		}
+
+		inline bitboardIndex getPawnsOfOtherPlayer(void) const
+		{
+			return (bitboardIndex)(blackPawns - _nextMove);
+		}
+
+		inline bool isBlackTurn() const
+		{
+			return _nextMove;
+		}
+
+		inline bool isWhiteTurn() const
+		{
+			return !isBlackTurn();
+		}
+
+		inline void changeNextTurn()
+		{
+			_nextMove = getswitchedTurn();
+		}
+
+		inline eNextMove getswitchedTurn()
+		{
+			return (eNextMove)( blackTurn - _nextMove );
+		}
+
+		inline bool thereAreHiddenCheckers() const
+		{
+			return hiddenCheckersCandidate;
+		}
+		inline void setHiddenCheckers( const bitMap & b )
+		{
+			hiddenCheckersCandidate = b;
+		}
+
+		inline bool isHiddenChecker( const tSquare& sq ) const
+		{
+			return hiddenCheckersCandidate & bitSet( sq );
+		}
+
+
 
 
 	private:
 		eCastle _castleRights; /*!<  actual castle rights*/
 		Move _currentMove;
+		bitMap _pinnedPieces;	/*!< pinned pieces*/
 		bitMap _checkers;	/*!< checking pieces*/
+		eNextMove _nextMove; /*!< who is the active player*/
 
 	};
 
@@ -299,7 +387,17 @@ public:
 
 	eNextMove getNextTurn(void) const
 	{
-		return getActualStateConst().nextMove;
+		return getActualStateConst().getNextTurn();
+	}
+
+	inline bool isBlackTurn() const
+	{
+		return getActualStateConst().isBlackTurn();
+	}
+
+	inline bool isWhiteTurn() const
+	{
+		return getActualStateConst().isWhiteTurn();
 	}
 
 	tSquare getEpSquare(void) const
