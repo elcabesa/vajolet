@@ -24,7 +24,7 @@
 
 #include "bitops.h"
 #include "magicmoves.h"
-#include "moveList.h"
+#include "MoveList.h"
 #include "position.h"
 #include "search.h"
 #include "vajolet.h"

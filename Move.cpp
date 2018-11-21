@@ -16,7 +16,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "Move.h"
+#include "move.h"
 
 
 
