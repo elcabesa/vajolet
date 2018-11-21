@@ -241,14 +241,6 @@ public:
 
 	}
 
-
-
-
-
-
-
-
-
 	inline static bitMap getRookPseudoAttack(const tSquare& from)
 	{
 		assert(from<squareNumber);
@@ -260,13 +252,13 @@ public:
 		assert(from<squareNumber);
 		return attackFromBishop(from,0);
 	}
+	// todo transform in is castle legal
 	inline static bitMap getCastlePath(const int x, const int y)
 	{
 		return castlePath[x][y];
 	}
 
 private:
-
 
 	inline static bitMap attackFromRook(const tSquare& from,const bitMap & occupancy)
 	{
