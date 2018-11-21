@@ -184,20 +184,20 @@ void Movegen::generateMoves()
 	if(type==Movegen::allEvasionMg)
 	{
 		assert(s.checkers);
-		target = ( s.checkers | SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.getOurBitmap(Pieces);
+		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
 		kingTarget = ~pos.getOurBitmap(Pieces);
 	}
 	else if(type==Movegen::captureEvasionMg)
 	{
 		assert(s.checkers);
-		target = ( s.checkers ) &~ pos.getOurBitmap(Pieces);
+		target = ( s.getCheckers() ) & ~pos.getOurBitmap(Pieces);
 		kingTarget = target | pos.getTheirBitmap(Pieces);
 		//displayBitmap(target);
 	}
 	else if(type==Movegen::quietEvasionMg)
 	{
-		assert(s.checkers);
-		target = ( SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.getOurBitmap(Pieces);
+		assert( s.getCheckers() );
+		target = ( SQUARES_BETWEEN[kingSquare] [firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
 		kingTarget = ~pos.getOccupationBitmap();
 		//displayBitmap(target);
 		//displayBitmap(kingTarget);
@@ -225,7 +225,7 @@ void Movegen::generateMoves()
 	{
 		assert(false);
 		assert(s.checkers);
-		target = ( s.checkers | SQUARES_BETWEEN[kingSquare][firstOne(s.checkers)]) &~ pos.getOurBitmap(Pieces);
+		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
 		kingTarget = ~pos.getOurBitmap(Pieces);
 	}
 
@@ -258,8 +258,8 @@ void Movegen::generateMoves()
 			}
 		}
 	}
-	// if the king is in check from 2 enemy, it can only run away, we sohld not search any other move
-	if((type == Movegen::allEvasionMg || type == Movegen::captureEvasionMg || type == Movegen::quietEvasionMg) && moreThanOneBit(s.checkers))
+	// if the king is in check from 2 enemy, it can only run away, we should not search any other move
+	if((type == Movegen::allEvasionMg || type == Movegen::captureEvasionMg || type == Movegen::quietEvasionMg) && s.isInDoubleCheck() )
 	{
 		return;
 	}
@@ -574,7 +574,7 @@ void Movegen::generateMoves()
 	if(type !=Movegen::allEvasionMg && type!=Movegen::captureEvasionMg && type!=Movegen::quietEvasionMg && type!= Movegen::captureMg)
 	{
 		m.setPromotion( Move::promQueen );
-		if( !s.checkers && s.hasCastleRight( Position::castleOO | Position::castleOOO, color ) )
+		if( !s.isInCheck() && s.hasCastleRight( Position::castleOO | Position::castleOOO, color ) )
 		{
 			Position::eCastle cr = Position::state::calcCastleRight( Position::castleOO, color );
 			if( s.hasCastleRight( cr ) && isCastlePathFree( cr ) )

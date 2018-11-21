@@ -292,7 +292,7 @@ void Position::setupFromFen(const std::string& fenStr)
 
 	x.hiddenCheckersCandidate=getHiddenCheckers(getSquareOfThePiece((bitboardIndex)(blackKing-x.nextMove)),x.nextMove);
 	x.pinnedPieces=getHiddenCheckers(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),eNextMove(blackTurn-x.nextMove));
-	x.checkers= getAttackersTo(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))) & bitBoard[blackPieces-x.nextMove];
+	x.setCheckers( getAttackersTo(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))) & bitBoard[blackPieces-x.nextMove] );
 
 
 
@@ -931,32 +931,32 @@ void Position::doMove(const Move & m){
 	std::swap(Us,Them);
 
 
-	x.checkers=0;
+	x.setCheckers( 0 );
 	if(moveIsCheck)
 	{
 
 		if( !m.isStandardMove() )
 		{
 			assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
-			x.checkers |= getAttackersTo(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))) & Them[Pieces];
+			x.addCheckers( getAttackersTo(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))) & Them[Pieces] );
 		}
 		else
 		{
 			if(x.checkingSquares[piece] & bitSet(to)) // should be old state, but checkingSquares has not been changed so far
 			{
-				x.checkers |= bitSet(to);
+				x.addCheckers( bitSet(to) );
 			}
 			if(x.hiddenCheckersCandidate && (x.hiddenCheckersCandidate & bitSet(from)))	// should be old state, but hiddenCheckersCandidate has not been changed so far
 			{
 				if(!isRook(piece))
 				{
 					assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
-					x.checkers |= Movegen::attackFrom<whiteRooks>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]);
+					x.addCheckers( Movegen::attackFrom<whiteRooks>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Rooks]) );
 				}
 				if(!isBishop(piece))
 				{
 					assert(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove))<squareNumber);
-					x.checkers |= Movegen::attackFrom<whiteBishops>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]);
+					x.addCheckers( Movegen::attackFrom<whiteBishops>(getSquareOfThePiece((bitboardIndex)(whiteKing+x.nextMove)),bitBoard[occupiedSquares]) & (Them[Queens] |Them[Bishops]) );
 				}
 			}
 		}
@@ -1615,9 +1615,9 @@ bool Position::isMoveLegal(const Move &m)const
 	}
 
 	//scacco
-	if(s.checkers)
+	if( s.isInCheck() )
 	{
-		if( moreThanOneBit(s.checkers))  //scacco doppio posso solo muovere il re
+		if( s.isInDoubleCheck() )  //scacco doppio posso solo muovere il re
 		{
 			if(!isKing(piece))
 			{
@@ -1629,8 +1629,8 @@ bool Position::isMoveLegal(const Move &m)const
 
 			if( !isKing(piece)
 				&& !(
-					((bitSet((tSquare)(m.getTo()-( m.isEnPassantMove() ? pawnPush(s.nextMove) : 0)))) & s.checkers)
-					|| ((bitSet(m.getTo()) & SQUARES_BETWEEN[getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove))][firstOne(s.checkers)]))
+					((bitSet((tSquare)(m.getTo()-( m.isEnPassantMove() ? pawnPush(s.nextMove) : 0)))) & s.getCheckers() )
+					|| ((bitSet(m.getTo()) & SQUARES_BETWEEN[getSquareOfThePiece((bitboardIndex)(whiteKing+s.nextMove))][ firstOne( s.getCheckers() ) ] ) )
 				)
 			)
 			{

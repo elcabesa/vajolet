@@ -98,7 +98,7 @@ public:
 		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
-		bitMap checkers;	/*!< checking pieces*/
+
 
 		state(){}
 
@@ -152,9 +152,36 @@ public:
 			_currentMove = m;
 		}
 
+		inline bool isInCheck(void) const
+		{
+			return _checkers;
+		}
+
+		inline bool isInDoubleCheck(void) const
+		{
+			return moreThanOneBit(_checkers);
+		}
+
+		inline const bitMap& getCheckers(void) const
+		{
+			return _checkers;
+		}
+
+		inline void setCheckers( const bitMap & b)
+		{
+			_checkers = b;
+		}
+
+		inline void addCheckers( const bitMap & b)
+		{
+			_checkers |= b;
+		}
+
+
 	private:
 		eCastle _castleRights; /*!<  actual castle rights*/
 		Move _currentMove;
+		bitMap _checkers;	/*!< checking pieces*/
 
 	};
 
@@ -297,7 +324,7 @@ public:
 
 	bool isInCheck(void) const
 	{
-		return getActualStateConst().checkers;
+		return getActualStateConst().getCheckers();
 	}
 	
 	/*! \brief return a reference to the actual state
