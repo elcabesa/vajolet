@@ -1687,12 +1687,10 @@ bool Position::isMoveLegal(const Move &m)const
 			if( m.isCastleMove() )
 			{
 				Color color = s.nextMove? black : white;
-				// todo unify eCastle & castleSide
-				Position::eCastle cs = (Position::eCastle)m.isQueenSideCastle();
-				Movegen::CastleSide css = (Movegen::CastleSide)m.isQueenSideCastle();
+				Position::eCastle cs = Position::state::calcCastleRight( m.isKingSideCastle() ? castleOO: castleOOO, color );
 				Movegen mg(*this);
-				if( !s.hasCastleRight( cs , color )
-					|| !mg.isCastlePathFree( color, css )
+				if( !s.hasCastleRight( cs )
+					|| !mg.isCastlePathFree( cs )
 				)
 				{
 					return false;

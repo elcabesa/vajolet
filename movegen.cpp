@@ -34,16 +34,20 @@ bitMap Movegen::PAWN_ATTACK[2][squareNumber];
 bitMap Movegen::ROOK_PSEUDO_ATTACK[squareNumber];
 bitMap Movegen::BISHOP_PSEUDO_ATTACK[squareNumber];
 
-bitMap Movegen::castlePath[2][2];
+std::array<bitMap,9> Movegen::castlePath;
 
 
 
 void Movegen::initMovegenConstant(void){
 
-	castlePath[0][kingSideCastle]=bitSet(F1)|bitSet(G1);
-	castlePath[0][queenSideCastle]=bitSet(D1)|bitSet(C1)|bitSet(B1);
-	castlePath[1][kingSideCastle]=bitSet(F8)|bitSet(G8);
-	castlePath[1][queenSideCastle]=bitSet(D8)|bitSet(C8)|bitSet(B8);
+	for( auto& x : castlePath )
+	{
+		x = 0;
+	}
+	castlePath.at( Position::wCastleOO  ) = bitSet(F1) | bitSet(G1);
+	castlePath.at( Position::wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
+	castlePath.at( Position::bCastleOO  ) = bitSet(F8) | bitSet(G8);
+	castlePath.at( Position::bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
 
 	initmagicmoves();
 
@@ -566,17 +570,14 @@ void Movegen::generateMoves()
 		}
 	}
 
-
-
-
 	//king castle
 	if(type !=Movegen::allEvasionMg && type!=Movegen::captureEvasionMg && type!=Movegen::quietEvasionMg && type!= Movegen::captureMg)
 	{
 		m.setPromotion( Move::promQueen );
-		if( !s.checkers && s.hasCastleRight( Position::eCastle( Position::wCastleOO | Position::wCastleOOO ), color ) )
+		if( !s.checkers && s.hasCastleRight( Position::castleOO | Position::castleOOO, color ) )
 		{
-
-			if( s.hasCastleRight( Position::wCastleOO, color ) && isCastlePathFree( color, kingSideCastle ) )
+			Position::eCastle cr = Position::state::calcCastleRight( Position::castleOO, color );
+			if( s.hasCastleRight( cr ) && isCastlePathFree( cr ) )
 			{
 
 				bool castleDenied = false;
@@ -602,7 +603,8 @@ void Movegen::generateMoves()
 
 
 			}
-			if( s.hasCastleRight( Position::wCastleOOO, color ) && isCastlePathFree( color, queenSideCastle ) )
+			cr = Position::state::calcCastleRight( Position::castleOOO, color );
+			if( s.hasCastleRight( cr ) && isCastlePathFree( cr ) )
 			{
 				bool castleDenied = false;
 				for( tSquare x = (tSquare)1 ;x<3 ;x++)
@@ -891,9 +893,10 @@ inline void Movegen::scoreQuietEvasion()
 	}
 }
 
-bool Movegen::isCastlePathFree( const Color c, const CastleSide side ) const
+bool Movegen::isCastlePathFree( const Position::eCastle c ) const
 {
-	return !(castlePath[c][side] & pos.getOccupationBitmap());
+	assert( c < 9);
+	return !( castlePath[c] & pos.getOccupationBitmap() );
 }
 
 

@@ -34,12 +34,6 @@ extern SearchData defaultSearchData;
 
 class Movegen
 {
-public:
-	enum CastleSide
-	{
-		kingSideCastle,
-		queenSideCastle
-	};
 private:
 	static const int MAX_MOVE_PER_POSITION = 250;
 	static const int MAX_BAD_MOVE_PER_POSITION = 32;
@@ -253,7 +247,7 @@ public:
 		assert(from<squareNumber);
 		return attackFromBishop(from,0);
 	}
-	bool isCastlePathFree( const Color c, const CastleSide side) const;
+	bool isCastlePathFree( const Position::eCastle c ) const;
 
 private:
 
@@ -300,7 +294,7 @@ private:
 	static bitMap PAWN_ATTACK[2][squareNumber];
 	static bitMap ROOK_PSEUDO_ATTACK[squareNumber];
 	static bitMap BISHOP_PSEUDO_ATTACK[squareNumber];
-	static bitMap castlePath[2][2];
+	static std::array<bitMap,9> castlePath;
 
 
 

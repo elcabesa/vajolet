@@ -58,10 +58,13 @@ public:
 
 	enum eCastle	// castleRights
 	{
-		wCastleOO=1,
-		wCastleOOO=2,
-		bCastleOO=4,
-		bCastleOOO=8,
+
+		wCastleOO  = 1,
+		wCastleOOO = 2,
+		bCastleOO  = 4,
+		bCastleOOO = 8,
+		castleOO = wCastleOO,
+		castleOOO = wCastleOOO
 	};
 	
 
@@ -100,6 +103,11 @@ public:
 
 		state(){}
 
+		static eCastle calcCastleRight( const eCastle cr, const Color c )
+		{
+			return eCastle( cr << (2 * c ) );
+		}
+
 		inline bool hasCastleRight( const eCastle cr )const
 		{
 			return _castleRights & cr;
@@ -107,7 +115,7 @@ public:
 
 		inline bool hasCastleRight( const eCastle cr, const Color c )const
 		{
-			return _castleRights & (cr << (2 * c ) );
+			return _castleRights & calcCastleRight( cr, c );
 		};
 
 		inline const eCastle& getCastleRights() const
