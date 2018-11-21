@@ -771,8 +771,7 @@ Move Movegen::getNextMove()
 				killerMoves[0] = _sd.getKillers(ply, 0);
 				killerMoves[1] = _sd.getKillers(ply, 1);
 
-				Move previousMove = pos.getActualStateConst().currentMove;
-				if( previousMove )
+				if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
 				{
 					counterMoves[0] = _sd.getCounterMove().getMove(pos.getPieceAt(previousMove.getTo()), previousMove.getTo(), 0);
 					counterMoves[1] = _sd.getCounterMove().getMove(pos.getPieceAt(previousMove.getTo()), previousMove.getTo(), 1);

@@ -99,7 +99,6 @@ public:
 		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		bitMap pinnedPieces;	/*!< pinned pieces*/
 		bitMap checkers;	/*!< checking pieces*/
-		Move currentMove;
 
 		state(){}
 
@@ -143,8 +142,19 @@ public:
 			_castleRights = (eCastle)( _castleRights | c );
 		}
 
+		inline const Move& getCurrentMove() const
+		{
+			return _currentMove;
+		}
+
+		inline void setCurrentMove( const Move & m)
+		{
+			_currentMove = m;
+		}
+
 	private:
 		eCastle _castleRights; /*!<  actual castle rights*/
+		Move _currentMove;
 
 	};
 

@@ -871,7 +871,7 @@ void UciStandardOutput::showCurrLine(const Position & pos, const unsigned int pl
 
 	for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
 	{
-		std::cout << " " << displayUci(pos.getState(i).currentMove);
+		std::cout << " " << displayUci(pos.getState(i).getCurrentMove());
 	}
 	std::cout << sync_endl;
 

@@ -275,7 +275,7 @@ void Position::setupFromFen(const std::string& fenStr)
 	}
 
 	x.pliesFromNull = 0;
-	x.currentMove = Move::NOMOVE;
+	x.setCurrentMove( Move::NOMOVE );
 	x.capturedPiece = empty;
 
 
@@ -739,7 +739,7 @@ void Position::doNullMove(void)
 	insertState(getActualState());
 	state &x = getActualState();
 
-	x.currentMove = 0;
+	x.setCurrentMove( Move::NOMOVE );
 	if(x.epSquare != squareNone)
 	{
 		assert(x.epSquare<squareNumber);
@@ -783,7 +783,7 @@ void Position::doMove(const Move & m){
 	insertState(getActualState());
 	state &x = getActualState();
 
-	x.currentMove = m;
+	x.setCurrentMove( m );
 
 
 
@@ -986,7 +986,7 @@ void Position::undoMove()
 	--ply;
 
 	state x = getActualStateConst();
-	Move &m = x.currentMove;
+	const Move &m = x.getCurrentMove();
 	assert( m );
 	tSquare to = m.getTo();
 	tSquare from = m.getFrom();

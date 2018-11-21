@@ -624,8 +624,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		{
 			sd.saveKillers(ply, ttMove);
 			
-			Move previousMove = pos.getActualState().currentMove;
-			if( previousMove )
+			if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
 			{
 				sd.counterMoves.update(pos.getPieceAt(previousMove.getTo()), previousMove.getTo(), ttMove);
 			}
@@ -1358,8 +1357,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				sd.history.update(pos.getNextTurn() == Position::whiteTurn ? white: black, m, -bonus);
 			}
 			
-			Move previousMove = pos.getActualState().currentMove;
-			if( previousMove )
+			if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
 			{
 				sd.counterMoves.update(pos.getPieceAt(previousMove.getTo()), previousMove.getTo(), bestMove);
 			}
@@ -1571,7 +1569,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			}
 
 			// at very deep search allow only recapture
-			if(depth < -7 * ONE_PLY && pos.getActualStateConst().currentMove.getTo() != m.getTo())
+			if(depth < -7 * ONE_PLY && pos.getActualStateConst().getCurrentMove().getTo() != m.getTo())
 			{
 				continue;
 			}

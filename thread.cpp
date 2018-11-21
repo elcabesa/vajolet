@@ -327,7 +327,7 @@ void Game::insertNewMoves(Position &pos)
 	{
 		GamePosition p;
 		p.key = pos.getState(i).key;
-		p.m =  pos.getState(i).currentMove;
+		p.m =  pos.getState(i).getCurrentMove();
 		_positions.push_back(p);
 	}
 }
