@@ -290,11 +290,9 @@ void Position::setupFromFen(const std::string& fenStr)
 
 	calcCheckingSquares();
 
-	x.setHiddenCheckers( getHiddenCheckers(getSquareOfThePiece( x.getKingOfOtherPlayer() ), x.getNextTurn()) );
-	x.setPinnedPieces( getHiddenCheckers( getSquareOfThePiece( x.getKingOfActivePlayer() ), x.getswitchedTurn() ) );
+	x.setHiddenCheckers( getHiddenCheckers<true>() );
+	x.setPinnedPieces( getHiddenCheckers<false>() );
 	x.setCheckers( getAttackersTo(getSquareOfThePiece( x.getKingOfActivePlayer() ) ) & bitBoard[x.getPiecesOfOtherPlayer()] );
-
-
 
 	checkPosConsistency(1);
 }
@@ -761,8 +759,8 @@ void Position::doNullMove(void)
 	calcCheckingSquares();
 	assert(getSquareOfThePiece( x.getKingOfOtherPlayer() )!=squareNone);
 	assert(getSquareOfThePiece( x.getKingOfActivePlayer() )!=squareNone);
-	x.setHiddenCheckers( getHiddenCheckers(getSquareOfThePiece( x.getKingOfOtherPlayer() ), x.getNextTurn() ) );
-	x.setPinnedPieces( getHiddenCheckers( getSquareOfThePiece( x.getKingOfActivePlayer() ), x.getswitchedTurn() ) );
+	x.setHiddenCheckers( getHiddenCheckers<true>() );
+	x.setPinnedPieces( getHiddenCheckers<false>() );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(1);
@@ -904,7 +902,7 @@ void Position::doMove(const Move & m){
 		}
 		if( m.isPromotionMove() )
 		{
-			bitboardIndex promotedPiece = (bitboardIndex)(whiteQueens + x.getNextTurn() + m.getPromotionType() );
+			bitboardIndex promotedPiece = getPieceOfPlayer( m.getPromotedPiece(), x.getNextTurn() );
 			assert( isValidPiece(promotedPiece) );
 			removePiece(piece,to);
 			putPiece(promotedPiece,to);
@@ -960,9 +958,9 @@ void Position::doMove(const Move & m){
 
 	calcCheckingSquares();
 	assert(getSquareOfThePiece( x.getKingOfOtherPlayer() )<squareNumber);
-	x.setHiddenCheckers( getHiddenCheckers(getSquareOfThePiece( x.getKingOfOtherPlayer() ), x.getNextTurn() ) );
+	x.setHiddenCheckers( getHiddenCheckers<true>() );
 	assert(getSquareOfThePiece(x.getKingOfActivePlayer() )<squareNumber);
-	x.setPinnedPieces( getHiddenCheckers( getSquareOfThePiece( x.getKingOfActivePlayer() ), x.getswitchedTurn() ) );
+	x.setPinnedPieces( getHiddenCheckers<false>() );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(1);
@@ -1354,20 +1352,25 @@ inline void Position::calcCheckingSquares(void)
 	\version 1.0
 	\date 08/11/2013
 */
-bitMap Position::getHiddenCheckers(const tSquare kingSquare,const eNextMove next) const
+template<bool our>
+bitMap Position::getHiddenCheckers() const
 {
+	const state &x  = getActualStateConst();
+	const tSquare kingSquare = getSquareOfThePiece( our ? x.getKingOfOtherPlayer(): x.getKingOfActivePlayer() );
+	const eNextMove next = our ? x.getNextTurn(): x.getSwitchedTurn();
+	
 	assert(kingSquare<squareNumber);
-	assert( isValidPiece( (bitboardIndex)( whitePawns + next ) ) );
+	assert( isValidPiece( getPieceOfPlayer( Pawns, next ) ) );
 	bitMap result = 0;
-	bitMap pinners = Movegen::getBishopPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteBishops+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
-	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(bitBoard[(bitboardIndex)(whiteRooks+next)]| bitBoard[(bitboardIndex)(whiteQueens+next)]);
+	bitMap pinners = Movegen::getBishopPseudoAttack(kingSquare) &(bitBoard[ getPieceOfPlayer( Bishops, next )]| bitBoard[getPieceOfPlayer( Queens, next) ] );
+	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(bitBoard[getPieceOfPlayer( Rooks, next )]| bitBoard[getPieceOfPlayer( Queens, next ) ] );
 
 	while(pinners)
 	{
 		bitMap b = SQUARES_BETWEEN[kingSquare][iterateBit(pinners)] & bitBoard[occupiedSquares];
 		if ( !moreThanOneBit(b) )
 		{
-			result |= b & bitBoard[(bitboardIndex)(whitePieces + getNextTurn())];
+			result |= b & bitBoard[ x.getPiecesOfActivePlayer() ];
 		}
 	}
 	return result;
@@ -1436,8 +1439,8 @@ bool Position::moveGivesCheck(const Move& m)const
 
 	if( m.isPromotionMove() )
 	{
-		assert( isValidPiece( (bitboardIndex)(whiteQueens + s.getNextTurn() + m.getPromotionType() ) ) );
-		if (s.checkingSquares[whiteQueens+s.getNextTurn()+m.getPromotionType()] & bitSet(to))
+		assert( isValidPiece( getPieceOfPlayer( m.getPromotedPiece(), s.getNextTurn() ) ) );
+		if( s.checkingSquares[ getPieceOfPlayer( m.getPromotedPiece(), s.getNextTurn() )] & bitSet(to))
 		{
 			return true;
 		}

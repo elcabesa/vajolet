@@ -213,7 +213,7 @@ private:
 	unsigned int multiPVcounter = 0;
 	bool followPV;
 	PVline pvLineToFollow;
-	Position::eNextMove initialNextMove;
+	eNextMove initialNextMove;
 	bool _showLine = false;
 
 

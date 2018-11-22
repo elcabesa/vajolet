@@ -50,11 +50,6 @@ public:
 	//--------------------------------------------------------
 	// enums
 	//--------------------------------------------------------
-	enum eNextMove	// color turn. ( it's also used as offset to access bitmaps by index)
-	{
-		whiteTurn = 0,
-		blackTurn=blackKing-whiteKing
-	};
 
 	enum eCastle	// castleRights
 	{
@@ -162,7 +157,7 @@ public:
 			return moreThanOneBit( _checkers );
 		}
 
-		inline const bitMap& getCheckers(void) const
+		inline const bitMap& getCheckers() const
 		{
 			return _checkers;
 		}
@@ -192,37 +187,37 @@ public:
 			_nextMove = nm;
 		}
 
-		inline eNextMove getNextTurn(void) const
+		inline eNextMove getNextTurn() const
 		{
 			return _nextMove;
 		}
 
-		inline bitboardIndex getPiecesOfActivePlayer(void) const
+		inline bitboardIndex getPiecesOfActivePlayer() const
 		{
 			return (bitboardIndex)(whitePieces + _nextMove);
 		}
 
-		inline bitboardIndex getPiecesOfOtherPlayer(void) const
+		inline bitboardIndex getPiecesOfOtherPlayer() const
 		{
 			return (bitboardIndex)(blackPieces - _nextMove);
 		}
 
-		inline bitboardIndex getKingOfActivePlayer(void) const
+		inline bitboardIndex getKingOfActivePlayer() const
 		{
 			return (bitboardIndex)(whiteKing + _nextMove);
 		}
 
-		inline bitboardIndex getKingOfOtherPlayer(void) const
+		inline bitboardIndex getKingOfOtherPlayer() const
 		{
 			return (bitboardIndex)(blackKing - _nextMove);
 		}
 
-		inline bitboardIndex getPawnsOfActivePlayer(void) const
+		inline bitboardIndex getPawnsOfActivePlayer() const
 		{
 			return (bitboardIndex)(whitePawns + _nextMove);
 		}
 
-		inline bitboardIndex getPawnsOfOtherPlayer(void) const
+		inline bitboardIndex getPawnsOfOtherPlayer() const
 		{
 			return (bitboardIndex)(blackPawns - _nextMove);
 		}
@@ -239,10 +234,10 @@ public:
 
 		inline void changeNextTurn()
 		{
-			_nextMove = getswitchedTurn();
+			_nextMove = getSwitchedTurn();
 		}
 
-		inline eNextMove getswitchedTurn()
+		inline eNextMove getSwitchedTurn() const
 		{
 			return (eNextMove)( blackTurn - _nextMove );
 		}
@@ -260,10 +255,6 @@ public:
 		{
 			return hiddenCheckersCandidate & bitSet( sq );
 		}
-
-
-
-
 	private:
 		eCastle _castleRights; /*!<  actual castle rights*/
 		Move _currentMove;
@@ -619,7 +610,8 @@ private:
 	bool checkPosConsistency(int nn) const;
 	void clear();
 	inline void calcCheckingSquares(void);
-	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next) const;
+	template<bool our>
+	bitMap getHiddenCheckers() const;
 
 	void putPiece(const bitboardIndex piece,const tSquare s);
 	void movePiece(const bitboardIndex piece,const tSquare from,const tSquare to);

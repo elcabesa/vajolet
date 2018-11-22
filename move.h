@@ -19,6 +19,7 @@
 #define MOVE_H_
 #include <string>
 
+#include "bitBoardIndex.h"
 #include "score.h"
 #include "tSquare.h"
 
@@ -78,6 +79,7 @@ public:
 	tSquare getFrom() const;
 	tSquare getTo() const;
 	unsigned short getPacked() const;
+	bitboardIndex getPromotedPiece() const;
 
 	/*****************************************************************
 	*	other methods
@@ -171,6 +173,11 @@ inline bool Move::isKingSideCastle() const
 inline bool Move::isQueenSideCastle() const
 {
 	return _u._bit._to < _u._bit._from;
+}
+
+inline bitboardIndex Move::getPromotedPiece() const
+{
+	return bitboardIndex( whiteQueens + getPromotionType() );
 }
 
 

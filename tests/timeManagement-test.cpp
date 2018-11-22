@@ -10,7 +10,7 @@ TEST(timeManagement, infiniteSearch)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	ASSERT_EQ( tm.getResolution(), 100 );
 
@@ -51,7 +51,7 @@ TEST(timeManagement, NodesSearchStop)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	ASSERT_EQ( tm.getResolution(), 100 );
 
@@ -93,7 +93,7 @@ TEST(timeManagement, NodesSearch)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	ASSERT_EQ( tm.getResolution(), 100 );
 
@@ -122,7 +122,7 @@ TEST(timeManagement, moveTimeSearchStop)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	ASSERT_EQ( tm.getResolution(), 100 );
 
@@ -164,7 +164,7 @@ TEST(timeManagement, moveTimeSearch)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	ASSERT_EQ( tm.getResolution(), 100 );
 
@@ -194,15 +194,15 @@ TEST(timeManagement, moveTimeSearch2)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 10 );
 
 	s.moveTime = 100;
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 1 );
 
 	s.moveTime = 100000;
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 100);
 
 	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
@@ -237,7 +237,7 @@ TEST(timeManagement, normalSearch)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
 	ASSERT_EQ( tm.isSearchFinished(), false );
@@ -272,7 +272,7 @@ TEST(timeManagement, normalSearchEarlyStop)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	tm.notifyIterationHasBeenFinished();
 
@@ -296,7 +296,7 @@ TEST(timeManagement, normalSearchStop)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	ASSERT_EQ( tm.stateMachineStep( allocatedTime -2, 10000 ), false);
 	ASSERT_EQ( tm.isSearchFinished(), false );
@@ -320,7 +320,7 @@ TEST(timeManagement, normalSearchNoExtend)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	tm.notifyIterationHasBeenFinished();
 	ASSERT_EQ( tm.stateMachineStep( 5, 10000 ), false);
@@ -357,7 +357,7 @@ TEST(timeManagement, normalSearchExtend)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	tm.notifyIterationHasBeenFinished();
 	ASSERT_EQ( tm.stateMachineStep( 5, 10000 ), false);
@@ -395,7 +395,7 @@ TEST(timeManagement, normalSearchExtend2)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	tm.notifyIterationHasBeenFinished();
 	ASSERT_EQ( tm.stateMachineStep( 5, 10000 ), false);
@@ -435,7 +435,7 @@ TEST(timeManagement, normalSearchExtendStop)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	tm.notifyIterationHasBeenFinished();
 	ASSERT_EQ( tm.stateMachineStep( 5, 10000 ), false);
@@ -476,7 +476,7 @@ TEST(timeManagement, PonderSearch)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	tm.notifyIterationHasBeenFinished();
 
@@ -512,7 +512,7 @@ TEST(timeManagement, PonderSearchStop)
 
 	timeManagement tm( s );
 
-	tm.initNewSearch( Position::whiteTurn );
+	tm.initNewSearch( whiteTurn );
 
 	tm.notifyIterationHasBeenFinished();
 

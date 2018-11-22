@@ -56,6 +56,12 @@ enum bitboardIndex
 
 };
 
+enum eNextMove	// color turn. ( it's also used as offset to access bitmaps by index)
+{
+	whiteTurn = 0,
+	blackTurn=blackKing-whiteKing
+};
+
 /*! \brief tell if the piece is a pawn
 	\author Marco Belli
 	\version 1.0
@@ -118,6 +124,11 @@ inline static bool isblack(bitboardIndex piece)
 inline static bool isValidPiece(bitboardIndex piece)
 {
 	return piece < lastBitboard && piece != occupiedSquares && piece != whitePieces && piece != separationBitmap && piece != blackPieces;
+}
+
+inline bitboardIndex getPieceOfPlayer( const bitboardIndex piece, const eNextMove nM)
+{
+	return (bitboardIndex)( piece + nM );
 }
 
 

@@ -37,7 +37,7 @@ public:
 
 	timeManagement( SearchLimits& limits ):_limits(limits){}
 
-	void initNewSearch( const Position::eNextMove nm );
+	void initNewSearch( const eNextMove nm );
 
 	void notifyIterationHasBeenFinished();
 	void notifyFailLow();
