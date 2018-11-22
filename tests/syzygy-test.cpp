@@ -72,7 +72,7 @@ TEST(Syzygy, test)
 			pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
 			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
-			pos.getActualState().fiftyMoveCnt,
+			pos.getActualState().getIrreversibleMoveCount(),
 			pos.getActualState().getCastleRights(),
 			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
 			pos.isWhiteTurn(),

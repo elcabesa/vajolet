@@ -79,25 +79,68 @@ public:
 			pawnKey,	/*!<  hashkey identifying the pawn formation*/
 			materialKey;/*!<  hashkey identifying the material signature*/
 
-		simdScore nonPawnMaterial; /*!< four score used for white/black opening/endgame non pawn material sum*/
-
-
-
 		tSquare epSquare;	/*!<  en passant square*/
+
+
 
 		unsigned int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
 			pliesFromNull;	/*!<  plies from null move*/
 
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
-		simdScore material;
 		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
-		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
+
 
 
 
 		state(){}
 
-		static eCastle calcCastleRight( const eCastle cr, const Color c )
+		inline unsigned int getIrreversibleMoveCount() const
+		{
+			return fiftyMoveCnt;
+		}
+
+		inline simdScore getNonPawnValue() const
+		{
+			return _nonPawnMaterial;
+		}
+
+		inline void setNonPawnValue( const simdScore& sc)
+		{
+			_nonPawnMaterial = sc;
+		}
+
+		inline void addNonPawnMaterial( const simdScore& sc)
+		{
+			_nonPawnMaterial += sc;
+		}
+
+		inline void removeNonPawnMaterial( const simdScore& sc)
+		{
+			_nonPawnMaterial -= sc;
+		}
+
+
+		inline simdScore getMaterialValue() const
+		{
+			return _material;
+		}
+
+		inline void setMaterialValue( const simdScore& sc)
+		{
+			_material = sc;
+		}
+
+		inline void addMaterial( const simdScore& sc)
+		{
+			_material += sc;
+		}
+
+		inline void removeMaterial( const simdScore& sc)
+		{
+			_material -= sc;
+		}
+
+		static inline eCastle calcCastleRight( const eCastle cr, const Color c )
 		{
 			return eCastle( cr << (2 * c ) );
 		}
@@ -244,23 +287,27 @@ public:
 
 		inline bool thereAreHiddenCheckers() const
 		{
-			return hiddenCheckersCandidate;
+			return _hiddenCheckersCandidate;
 		}
 		inline void setHiddenCheckers( const bitMap & b )
 		{
-			hiddenCheckersCandidate = b;
+			_hiddenCheckersCandidate = b;
 		}
 
 		inline bool isHiddenChecker( const tSquare& sq ) const
 		{
-			return hiddenCheckersCandidate & bitSet( sq );
+			return _hiddenCheckersCandidate & bitSet( sq );
 		}
+
 	private:
 		eCastle _castleRights; /*!<  actual castle rights*/
 		Move _currentMove;
 		bitMap _pinnedPieces;	/*!< pinned pieces*/
 		bitMap _checkers;	/*!< checking pieces*/
 		eNextMove _nextMove; /*!< who is the active player*/
+		bitMap _hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
+		simdScore _material;
+		simdScore _nonPawnMaterial; /*!< four score used for white/black opening/endgame non pawn material sum*/
 
 	};
 
@@ -472,11 +519,12 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline unsigned int getGamePhase() const
+	inline unsigned int getGamePhase( const state& s ) const
 	{
 		const int opening = 700000;
 		const int endgame = 100000;
-		Score tot = getActualStateConst().nonPawnMaterial[0]+getActualStateConst().nonPawnMaterial[2];
+
+		Score tot = s.getNonPawnValue()[0] + s.getNonPawnValue()[2];
 		if(tot>opening) //opening
 		{
 			return 0;

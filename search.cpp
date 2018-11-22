@@ -148,9 +148,9 @@ void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 			pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
 			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
-			pos.getActualState().fiftyMoveCnt,
-			pos.getActualState().getCastleRights(),
-			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
+			pos.getActualStateConst().getIrreversibleMoveCount(),
+			pos.getActualStateConst().getCastleRights(),
+			pos.getActualStateConst().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
 			pos.isWhiteTurn(),
 			results);
 
@@ -660,7 +660,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			if (    piecesCnt <= TB_LARGEST
 				&& (piecesCnt <  TB_LARGEST || depth >= (int)( uciParameters::SyzygyProbeDepth * ONE_PLY ) )
-				&&  pos.getActualState().fiftyMoveCnt == 0)
+				&&  pos.getActualStateConst().getIrreversibleMoveCount() == 0)
 			{
 				unsigned result = tb_probe_wdl(pos.getBitmap(whitePieces),
 					pos.getBitmap(blackPieces),
@@ -670,9 +670,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
 					pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
 					pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
-					pos.getActualState().fiftyMoveCnt,
-					pos.getActualState().getCastleRights(),
-					pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare,
+					pos.getActualStateConst().getIrreversibleMoveCount(),
+					pos.getActualStateConst().getCastleRights(),
+					pos.getActualStateConst().epSquare == squareNone? 0 : pos.getActualState().epSquare,
 					pos.isWhiteTurn() );
 
 				if(result != TB_RESULT_FAILED)
@@ -838,7 +838,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				&& depth < 8 * ONE_PLY
 				&& eval - futility( depth, improving ) >= beta
 				&& eval < SCORE_KNOWN_WIN
-				&& ( ( pos.isBlackTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0])))
+				&& ( ( pos.isBlackTurn() && st.getNonPawnValue()[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.getNonPawnValue()[0] >= Position::pieceValue[whiteKnights][0])))
 			{
 				assert((depth>>ONE_PLY_SHIFT)<8);
 				return eval;
@@ -855,7 +855,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			if( depth >= ONE_PLY
 				&& eval >= beta
 				&& !sd.story[ply].skipNullMove
-				&& ( ( pos.isBlackTurn() && st.nonPawnMaterial[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.nonPawnMaterial[0] >= Position::pieceValue[whiteKnights][0]))
+				&& ( ( pos.isBlackTurn() && st.getNonPawnValue()[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.getNonPawnValue()[0] >= Position::pieceValue[whiteKnights][0]))
 			){
 				// Null move dynamic reduction based on depth
 				int red = 3 * ONE_PLY + depth / 4;

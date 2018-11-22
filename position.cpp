@@ -278,11 +278,8 @@ void Position::setupFromFen(const std::string& fenStr)
 	x.setCurrentMove( Move::NOMOVE );
 	x.capturedPiece = empty;
 
-
-
-	x.nonPawnMaterial = calcNonPawnMaterialValue();
-
-	x.material = calcMaterialValue();
+	x.setMaterialValue( calcMaterialValue() );
+	x.setNonPawnValue( calcNonPawnMaterialValue() );
 
 	x.key=calcKey();
 	x.pawnKey=calcPawnKey();
@@ -411,9 +408,9 @@ void Position::display()const
 		std::cout<<'-';
 	}
 	std::cout<<std::endl;
-	std::cout<<"material "<<st.material[0]/10000.0<<std::endl;
-	std::cout<<"white material "<<st.nonPawnMaterial[0]/10000.0<<std::endl;
-	std::cout<<"black material "<<st.nonPawnMaterial[2]/10000.0<<std::endl;
+	std::cout<<"material "<<st.getMaterialValue()[0]/10000.0<<std::endl;
+	std::cout<<"white material "<<st.getNonPawnValue()[0]/10000.0<<std::endl;
+	std::cout<<"black material "<<st.getNonPawnValue()[2]/10000.0<<std::endl;
 
 	std::cout<<sync_endl;
 
@@ -828,9 +825,7 @@ void Position::doMove(const Move & m){
 		tSquare rTo = kingSide? to+ovest: to+est;
 		assert(rTo<squareNumber);
 		movePiece(rook,rFrom,rTo);
-		x.material += pstValue[rook][rTo] - pstValue[rook][rFrom];
-
-		//npm+=nonPawnValue[rook][rTo]-nonPawnValue[rook][rFrom];
+		x.addMaterial( pstValue[rook][rTo] - pstValue[rook][rFrom] );
 
 		x.key ^= HashKeys::keys[rFrom][rook];
 		x.key ^= HashKeys::keys[rTo][rook];
@@ -850,13 +845,12 @@ void Position::doMove(const Move & m){
 			assert(captureSquare<squareNumber);
 			x.pawnKey ^= HashKeys::keys[captureSquare][capture];
 		}
-		x.nonPawnMaterial -= nonPawnValue[capture];
-
 
 		// remove piece
 		removePiece(capture,captureSquare);
 		// update material
-		x.material -= pstValue[capture][captureSquare];
+		x.removeMaterial( pstValue[capture][captureSquare] );
+		x.removeNonPawnMaterial( nonPawnValue[capture] );
 
 		// update keys
 		x.key ^= HashKeys::keys[captureSquare][capture];
@@ -871,12 +865,7 @@ void Position::doMove(const Move & m){
 	x.key ^= HashKeys::keys[from][piece] ^ HashKeys::keys[to][piece];
 	movePiece(piece,from,to);
 
-	x.material += pstValue[piece][to] - pstValue[piece][from];
-	//npm+=nonPawnValue[piece][to]-nonPawnValue[piece][from];
-	// update non pawn material
-
-
-
+	x.addMaterial( pstValue[piece][to] - pstValue[piece][from] );
 
 	// Update castle rights if needed
 	if ( x.hasCastleRights() && (castleRightsMask[from] | castleRightsMask[to]))
@@ -904,11 +893,12 @@ void Position::doMove(const Move & m){
 		{
 			bitboardIndex promotedPiece = getPieceOfPlayer( m.getPromotedPiece(), x.getNextTurn() );
 			assert( isValidPiece(promotedPiece) );
+
 			removePiece(piece,to);
 			putPiece(promotedPiece,to);
 
-			x.material += pstValue[promotedPiece][to]-pstValue[piece][to];
-			x.nonPawnMaterial += nonPawnValue[promotedPiece];
+			x.addMaterial( pstValue[promotedPiece][to] - pstValue[piece][to] );
+			x.addNonPawnMaterial( nonPawnValue[promotedPiece] );
 
 
 			x.key ^= HashKeys::keys[to][piece]^ HashKeys::keys[to][promotedPiece];
@@ -1186,27 +1176,27 @@ bool Position::checkPosConsistency(int nn) const
 	}
 
 	simdScore sc=calcMaterialValue();
-	if((sc[0]!=x.material[0]) || (sc[1]!=x.material[1]))
+	if((sc[0]!=x.getMaterialValue()[0]) || (sc[1]!=x.getMaterialValue()[1]))
 	{
 		display();
-		sync_cout<<sc[0]<<":"<<x.material[0]<<sync_endl;
-		sync_cout<<sc[1]<<":"<<x.material[1]<<sync_endl;
+		sync_cout<<sc[0]<<":"<<x.getMaterialValue()[0]<<sync_endl;
+		sync_cout<<sc[1]<<":"<<x.getMaterialValue()[1]<<sync_endl;
 		sync_cout<<"material error"<<sync_endl;
 		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
 		while(1){}
 		return false;
 	}
 	simdScore score = calcNonPawnMaterialValue();
-	if(score[0]!= x.nonPawnMaterial[0] ||
-		score[1]!= x.nonPawnMaterial[1] ||
-		score[2]!= x.nonPawnMaterial[2] ||
-		score[3]!= x.nonPawnMaterial[3]
+	if(score[0]!= x.getNonPawnValue()[0] ||
+		score[1]!= x.getNonPawnValue()[1] ||
+		score[2]!= x.getNonPawnValue()[2] ||
+		score[3]!= x.getNonPawnValue()[3]
 	){
 		display();
-		sync_cout<<score[0]<<":"<<x.nonPawnMaterial[0]<<sync_endl;
-		sync_cout<<score[1]<<":"<<x.nonPawnMaterial[1]<<sync_endl;
-		sync_cout<<score[2]<<":"<<x.nonPawnMaterial[2]<<sync_endl;
-		sync_cout<<score[3]<<":"<<x.nonPawnMaterial[3]<<sync_endl;
+		sync_cout<<score[0]<<":"<<x.getNonPawnValue()[0]<<sync_endl;
+		sync_cout<<score[1]<<":"<<x.getNonPawnValue()[1]<<sync_endl;
+		sync_cout<<score[2]<<":"<<x.getNonPawnValue()[2]<<sync_endl;
+		sync_cout<<score[3]<<":"<<x.getNonPawnValue()[3]<<sync_endl;
 		sync_cout<<"non pawn material error"<<sync_endl;
 		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
 		while(1){}
@@ -1521,7 +1511,7 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 	assert(piece!=separationBitmap);
 	assert(piece!=whitePieces);
 	assert(piece!=blackPieces);
-	const state & s=getActualStateConst();
+	const state& s = getActualStateConst();
 
 	tSquare kingSquare = getSquareOfThePiece( s.getKingOfOtherPlayer() );
 	return (!(Movegen::attackFrom<whiteKing>(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.thereAreHiddenCheckers() && s.isHiddenChecker(from)));
@@ -1535,16 +1525,17 @@ bool Position::isDraw(bool isPVline) const
 
 	// Draw by material?
 
+	const state & s = getActualStateConst();
 	if (  !bitBoard[whitePawns] && !bitBoard[blackPawns]
-		&&( ( (getActualStateConst().nonPawnMaterial[0]<= pieceValue[whiteBishops][0]) && getActualStateConst().nonPawnMaterial[2] == 0)
-		|| ( (getActualStateConst().nonPawnMaterial[2]<= pieceValue[whiteBishops][0]) && getActualStateConst().nonPawnMaterial[0] == 0) )
+		&&( ( (s.getNonPawnValue()[0]<= pieceValue[whiteBishops][0]) && s.getNonPawnValue()[2] == 0)
+		|| ( (s.getNonPawnValue()[2]<= pieceValue[whiteBishops][0]) && s.getNonPawnValue()[0] == 0)
+		)
 	)
 	{
 		return true;
 	}
-
 	// Draw by the 50 moves rule?
-	if (getActualStateConst().fiftyMoveCnt>  99)
+	if ( s.fiftyMoveCnt > 99 )
 	{
 		if(!isInCheck())
 		{
@@ -1560,11 +1551,11 @@ bool Position::isDraw(bool isPVline) const
 
 	// Draw by repetition?
 	unsigned int counter=1;
-	uint64_t actualkey = getActualStateConst().key;
+	uint64_t actualkey = s.key;
 	auto it = stateInfo.rbegin();
 	
 
-	int e = std::min(getActualStateConst().fiftyMoveCnt, getActualStateConst().pliesFromNull);
+	int e = std::min( s.fiftyMoveCnt, s.pliesFromNull );
 	if( e >= 4)
 	{
 		std::advance( it,2);

@@ -572,7 +572,7 @@ void uciLoop()
 		{
 			Score s = pos.eval<true>();
 			sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
-			sync_cout << "gamePhase:"  << pos.getGamePhase()/65536.0*100 << "%" << sync_endl;
+			sync_cout << "gamePhase:"  << pos.getGamePhase( pos.getActualStateConst() )/65536.0*100 << "%" << sync_endl;
 
 		}
 		else if (token == "isready")

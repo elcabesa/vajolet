@@ -546,7 +546,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 		}
 		//std::cout<<passedPawnsBonus[0]<<" "<<passedPawnsBonus[1]<<std::endl;
 
-		if( st.nonPawnMaterial[ c ? 0 : 2 ] == 0 )
+		if( st.getNonPawnValue()[ c ? 0 : 2 ] == 0 )
 		{
 			tSquare promotionSquare = BOARDINDEX[ FILES[ ppSq ] ][ c ? 0 : 7 ];
 			if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[ enemyKingSquare ][ promotionSquare ] - ( (c ? isBlackTurn() : isWhiteTurn() ) ? 0 : 1 ), 0) )
@@ -678,7 +678,7 @@ Score Position::eval(void)
 	// todo modificare valori material value & pst
 	// material + pst
 
-	simdScore res = st.material;
+	simdScore res = st.getMaterialValue();
 
 
 	//-----------------------------------------------------
@@ -1273,11 +1273,12 @@ Score Position::eval(void)
 	}
 
 	//todo scaling
-	if(mulCoeff == 256 && (getPieceCount(whitePawns) + getPieceCount(blackPawns) == 0 ) && (abs( st.material[0] )< 40000) )
+	const simdScore& npv = st.getNonPawnValue();
+	if(mulCoeff == 256 && (getPieceCount(whitePawns) + getPieceCount(blackPawns) == 0 ) && (abs( st.getMaterialValue()[0] )< 40000) )
 	{
 		//Score sumMaterial = st.nonPawnMaterial[0] + st.nonPawnMaterial[2];
 		//mulCoeff = std::max(std::min((Score) (sumMaterial* 0.0003 - 14), 256), 40);
-		if( (st.nonPawnMaterial[0]< 90000) && (st.nonPawnMaterial[2] < 90000) )
+		if( (npv[0]< 90000) && (npv[2] < 90000) )
 		{
 			mulCoeff = 40;
 		}
@@ -1288,7 +1289,7 @@ Score Position::eval(void)
 
 	}
 
-	if(mulCoeff == 256  && st.nonPawnMaterial[0] + st.nonPawnMaterial[2] < 40000  &&  (st.nonPawnMaterial[0] + st.nonPawnMaterial[2] !=0) && (getPieceCount(whitePawns) == getPieceCount(blackPawns)) && !passedPawns )
+	if(mulCoeff == 256  && npv[0] + npv[2] < 40000  &&  (npv[0] + npv[2] !=0) && (getPieceCount(whitePawns) == getPieceCount(blackPawns)) && !passedPawns )
 	{
 		mulCoeff = std::min((unsigned int)256, getPieceCount(whitePawns) * 80);
 	}
@@ -1302,7 +1303,7 @@ Score Position::eval(void)
 	//--------------------------------------
 	//	finalizing
 	//--------------------------------------
-	signed int gamePhase = getGamePhase();
+	signed int gamePhase = getGamePhase( st );
 	signed long long r = ( (signed long long)res[0] ) * ( 65536 - gamePhase ) + ( (signed long long)res[1] ) * gamePhase;
 
 	Score score = (Score)( (r) / 65536 );
