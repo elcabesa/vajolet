@@ -80,12 +80,6 @@ public:
 			materialKey;/*!<  hashkey identifying the material signature*/
 
 		tSquare epSquare;	/*!<  en passant square*/
-
-
-
-
-
-
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
 		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 

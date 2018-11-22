@@ -1319,21 +1319,16 @@ inline void Position::calcCheckingSquares(void)
 	s.checkingSquares[ getPieceOfPlayer( Queens, attackingPieces ) ] = s.checkingSquares[getPieceOfPlayer( Rooks, attackingPieces) ]|s.checkingSquares[getPieceOfPlayer( Bishops, attackingPieces)];
 	s.checkingSquares[ getPieceOfPlayer( Knights, attackingPieces ) ] = Movegen::attackFrom<whiteKnights>(kingSquare);
 
-	if(attackingPieces)
-	{
-		s.checkingSquares[getPieceOfPlayer( Pawns, attackingPieces ) ] = Movegen::attackFrom<whitePawns>(kingSquare);
-	}else
-	{
-		s.checkingSquares[getPieceOfPlayer( Pawns, attackingPieces ) ] = Movegen::attackFrom<blackPawns>(kingSquare,1);
-	}
+
+	s.checkingSquares[getPieceOfPlayer( Pawns, attackingPieces ) ] = attackingPieces? Movegen::attackFrom<whitePawns>(kingSquare) : Movegen::attackFrom<blackPawns>(kingSquare);
 
 	assert( getPieceOfOpponent( Pawns, attackingPieces ) >=0 );
-	s.checkingSquares[ getPieceOfOpponent( King, attackingPieces ) ] = 0;
-	s.checkingSquares[ getPieceOfOpponent( Rooks, attackingPieces ) ] = 0;
+	s.checkingSquares[ getPieceOfOpponent( King,    attackingPieces ) ] = 0;
+	s.checkingSquares[ getPieceOfOpponent( Rooks,   attackingPieces ) ] = 0;
 	s.checkingSquares[ getPieceOfOpponent( Bishops, attackingPieces ) ] = 0;
-	s.checkingSquares[ getPieceOfOpponent( Queens, attackingPieces ) ] = 0;
+	s.checkingSquares[ getPieceOfOpponent( Queens,  attackingPieces ) ] = 0;
 	s.checkingSquares[ getPieceOfOpponent( Knights, attackingPieces ) ] = 0;
-	s.checkingSquares[ getPieceOfOpponent( Pawns, attackingPieces ) ]  =0;
+	s.checkingSquares[ getPieceOfOpponent( Pawns,   attackingPieces ) ] = 0;
 
 }
 
