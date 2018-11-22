@@ -263,18 +263,19 @@ void Position::setupFromFen(const std::string& fenStr)
 	}
 
 
-
-	ss >> std::skipws >> x.fiftyMoveCnt;
+	unsigned int _50moveCount;
+	ss >> std::skipws >> _50moveCount;
+	x.setIrreversibleMoveCount( _50moveCount );
 	if(ss.eof()){
 		ply = int( x.isBlackTurn() );
-		x.fiftyMoveCnt=0;
+		x.resetIrreversibleMoveCount();
 
 	}else{
 		ss>> ply;
 		ply = std::max(2 * (ply - 1), (unsigned int)0) + int( x.isBlackTurn() );
 	}
 
-	x.pliesFromNull = 0;
+	x.resetPliesFromNullCount();
 	x.setCurrentMove( Move::NOMOVE );
 	x.capturedPiece = empty;
 
@@ -391,7 +392,7 @@ void Position::display()const
 
 	}
 	std::cout <<(st.isBlackTurn() ? "BLACK TO MOVE" : "WHITE TO MOVE" ) <<std::endl;
-	std::cout <<"50 move counter "<<st.fiftyMoveCnt<<std::endl;
+	std::cout <<"50 move counter "<<st.getIrreversibleMoveCount()<<std::endl;
 	std::cout <<"castleRights ";
 	if( st.hasCastleRight(wCastleOO) ) std::cout<<"K";
 	if( st.hasCastleRight(wCastleOOO) ) std::cout<<"Q";
@@ -498,7 +499,7 @@ std::string  Position::getFen() const {
 		s += '-';
 	}
 	s += ' ';
-	s += std::to_string(st.fiftyMoveCnt);
+	s += std::to_string(st.getIrreversibleMoveCount());
 	s += " " + std::to_string(1 + ( ply - int( st.isBlackTurn() ) ) / 2);
 
 
@@ -590,7 +591,7 @@ std::string Position::getSymmetricFen() const {
 		s += '-';
 	}
 	s += ' ';
-	s += std::to_string(st.fiftyMoveCnt);
+	s += std::to_string(st.getIrreversibleMoveCount());
 	s += " " + std::to_string(1 + ( ply - int( st.isBlackTurn() ) ) / 2);
 
 	return s;
@@ -742,8 +743,8 @@ void Position::doNullMove(void)
 		x.epSquare = squareNone;
 	}
 	x.key ^= HashKeys::side;
-	x.fiftyMoveCnt++;
-	x.pliesFromNull = 0;
+	x.incrementIrreversibleMoveCount();
+	x.resetPliesFromNullCount();
 	x.changeNextTurn();
 
 
@@ -803,8 +804,8 @@ void Position::doMove(const Move & m){
 	++ply;
 
 	// update counter
-	x.fiftyMoveCnt++;
-	x.pliesFromNull++;
+	x.incrementIrreversibleMoveCount();
+	x.incrementPliesFromNullCount();
 
 	// reset ep square
 	if(x.epSquare!=squareNone)
@@ -858,7 +859,7 @@ void Position::doMove(const Move & m){
 		x.materialKey ^= HashKeys::keys[capture][getPieceCount(capture)]; // ->after removing the piece
 
 		// reset fifty move counter
-		x.fiftyMoveCnt = 0;
+		x.resetIrreversibleMoveCount();
 	}
 
 	// update hashKey
@@ -906,7 +907,7 @@ void Position::doMove(const Move & m){
 			x.materialKey ^= HashKeys::keys[promotedPiece][getPieceCount(promotedPiece)-1] ^ HashKeys::keys[piece][getPieceCount(piece)];
 		}
 		x.pawnKey ^= HashKeys::keys[from][piece] ^ HashKeys::keys[to][piece];
-		x.fiftyMoveCnt = 0;
+		x.resetIrreversibleMoveCount();
 	}
 
 	x.capturedPiece = capture;
@@ -1303,37 +1304,36 @@ inline void Position::calcCheckingSquares(void)
 	state &s = getActualState();
 	bitboardIndex opponentKing = s.getKingOfOtherPlayer();
 	assert( isKing(opponentKing));
-	bitboardIndex attackingPieces = (bitboardIndex)(s.getNextTurn());
-	//assert( isValidPiece(attackingPieces));
+	const eNextMove& attackingPieces = s.getNextTurn();
 
 
 	tSquare kingSquare = getSquareOfThePiece(opponentKing);
 
 	bitMap occupancy = bitBoard[occupiedSquares];
 
-	s.checkingSquares[whiteKing+attackingPieces]=0;
+	s.checkingSquares[ getPieceOfPlayer(King, attackingPieces) ]=0;
 	assert(kingSquare<squareNumber);
-	assert( isValidPiece( (bitboardIndex)( whitePawns + attackingPieces ) ) );
-	s.checkingSquares[whiteRooks+attackingPieces] = Movegen::attackFrom<whiteRooks>(kingSquare,occupancy);
-	s.checkingSquares[whiteBishops+attackingPieces] = Movegen::attackFrom<whiteBishops>(kingSquare,occupancy);
-	s.checkingSquares[whiteQueens+attackingPieces] = s.checkingSquares[whiteRooks+attackingPieces]|s.checkingSquares[whiteBishops+attackingPieces];
-	s.checkingSquares[whiteKnights+attackingPieces] = Movegen::attackFrom<whiteKnights>(kingSquare);
+	assert( isValidPiece( getPieceOfPlayer( whitePawns, attackingPieces ) ) );
+	s.checkingSquares[ getPieceOfPlayer( Rooks, attackingPieces ) ] = Movegen::attackFrom<whiteRooks>(kingSquare,occupancy);
+	s.checkingSquares[ getPieceOfPlayer( Bishops, attackingPieces ) ] = Movegen::attackFrom<whiteBishops>(kingSquare,occupancy);
+	s.checkingSquares[ getPieceOfPlayer( Queens, attackingPieces ) ] = s.checkingSquares[getPieceOfPlayer( Rooks, attackingPieces) ]|s.checkingSquares[getPieceOfPlayer( Bishops, attackingPieces)];
+	s.checkingSquares[ getPieceOfPlayer( Knights, attackingPieces ) ] = Movegen::attackFrom<whiteKnights>(kingSquare);
 
 	if(attackingPieces)
 	{
-		s.checkingSquares[whitePawns+attackingPieces] = Movegen::attackFrom<whitePawns>(kingSquare);
+		s.checkingSquares[getPieceOfPlayer( Pawns, attackingPieces ) ] = Movegen::attackFrom<whitePawns>(kingSquare);
 	}else
 	{
-		s.checkingSquares[whitePawns+attackingPieces] = Movegen::attackFrom<blackPawns>(kingSquare,1);
+		s.checkingSquares[getPieceOfPlayer( Pawns, attackingPieces ) ] = Movegen::attackFrom<blackPawns>(kingSquare,1);
 	}
 
-	assert(blackPawns-attackingPieces>=0);
-	s.checkingSquares[blackKing-attackingPieces] = 0;
-	s.checkingSquares[blackRooks-attackingPieces] = 0;
-	s.checkingSquares[blackBishops-attackingPieces] = 0;
-	s.checkingSquares[blackQueens-attackingPieces] = 0;
-	s.checkingSquares[blackKnights-attackingPieces] = 0;
-	s.checkingSquares[blackPawns-attackingPieces]  =0;
+	assert( getPieceOfOpponent( Pawns, attackingPieces ) >=0 );
+	s.checkingSquares[ getPieceOfOpponent( King, attackingPieces ) ] = 0;
+	s.checkingSquares[ getPieceOfOpponent( Rooks, attackingPieces ) ] = 0;
+	s.checkingSquares[ getPieceOfOpponent( Bishops, attackingPieces ) ] = 0;
+	s.checkingSquares[ getPieceOfOpponent( Queens, attackingPieces ) ] = 0;
+	s.checkingSquares[ getPieceOfOpponent( Knights, attackingPieces ) ] = 0;
+	s.checkingSquares[ getPieceOfOpponent( Pawns, attackingPieces ) ]  =0;
 
 }
 
@@ -1535,7 +1535,7 @@ bool Position::isDraw(bool isPVline) const
 		return true;
 	}
 	// Draw by the 50 moves rule?
-	if ( s.fiftyMoveCnt > 99 )
+	if ( s.getIrreversibleMoveCount() > 99 )
 	{
 		if(!isInCheck())
 		{
@@ -1555,7 +1555,7 @@ bool Position::isDraw(bool isPVline) const
 	auto it = stateInfo.rbegin();
 	
 
-	int e = std::min( s.fiftyMoveCnt, s.pliesFromNull );
+	int e = std::min( s.getIrreversibleMoveCount(), s.getPliesFromNullCount() );
 	if( e >= 4)
 	{
 		std::advance( it,2);

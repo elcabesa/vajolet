@@ -131,5 +131,9 @@ inline bitboardIndex getPieceOfPlayer( const bitboardIndex piece, const eNextMov
 	return (bitboardIndex)( piece + nM );
 }
 
+inline bitboardIndex getPieceOfOpponent( const bitboardIndex piece, const eNextMove nM)
+{
+	return (bitboardIndex)( separationBitmap + piece - nM );
+}
 
 #endif /* BITBOARDINDEX_H_ */

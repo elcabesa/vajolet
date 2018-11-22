@@ -83,8 +83,8 @@ public:
 
 
 
-		unsigned int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
-			pliesFromNull;	/*!<  plies from null move*/
+
+
 
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
 		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
@@ -94,9 +94,39 @@ public:
 
 		state(){}
 
+
+		inline unsigned int getPliesFromNullCount() const
+		{
+			return _pliesFromNull;
+		}
+		inline void resetPliesFromNullCount()
+		{
+			_pliesFromNull = 0;
+		}
+
+		inline void incrementPliesFromNullCount()
+		{
+			++_pliesFromNull;
+		}
+
 		inline unsigned int getIrreversibleMoveCount() const
 		{
-			return fiftyMoveCnt;
+			return _pliesFromNull;
+		}
+
+		inline void setIrreversibleMoveCount(unsigned int x)
+		{
+			_fiftyMoveCnt = x;
+		}
+
+		inline void resetIrreversibleMoveCount()
+		{
+			_fiftyMoveCnt = 0;
+		}
+
+		inline void incrementIrreversibleMoveCount()
+		{
+			++_fiftyMoveCnt;
 		}
 
 		inline simdScore getNonPawnValue() const
@@ -308,6 +338,8 @@ public:
 		bitMap _hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
 		simdScore _material;
 		simdScore _nonPawnMaterial; /*!< four score used for white/black opening/endgame non pawn material sum*/
+		unsigned int _fiftyMoveCnt;	/*!<  50 move count used for draw rule*/
+		unsigned int _pliesFromNull;	/*!<  plies from null move*/
 
 	};
 
