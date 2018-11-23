@@ -927,11 +927,11 @@ void Position::doMove(const Move & m){
 		}
 		else
 		{
-			if(x.checkingSquares[piece] & bitSet(to)) // should be old state, but checkingSquares has not been changed so far
+			if( isSquareSet( x.getCheckingSquares( piece ), to ) ) // should be old state, but checkingSquares has not been changed so far
 			{
 				x.addCheckers( bitSet(to) );
 			}
-			if(x.thereAreHiddenCheckers() && (x.isHiddenChecker( from ) ) )	// should be old state, but hiddenCheckersCandidate has not been changed so far
+			if( x.thereAreHiddenCheckers() && (x.isHiddenChecker( from ) ) )	// should be old state, but hiddenCheckersCandidate has not been changed so far
 			{
 				if(!isRook(piece))
 				{
@@ -1083,11 +1083,11 @@ bool Position::checkPosConsistency(int nn) const
 		while(1){}
 		return false;
 	}
-	for(tSquare i=square0;i<squareNumber;i++)
+	for(tSquare sq = square0; sq < squareNumber; sq++)
 	{
-		bitboardIndex id=squares[i];
+		bitboardIndex id = squares[sq];
 
-		if(id != empty && (bitBoard[id] & bitSet(i))==0)
+		if( id != empty && !isSquareSet( bitBoard[id], sq ) )
 		{
 			sync_cout<<"board inconsistency"<<sync_endl;
 			sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
@@ -1311,24 +1311,26 @@ inline void Position::calcCheckingSquares(void)
 
 	bitMap occupancy = bitBoard[occupiedSquares];
 
-	s.checkingSquares[ getPieceOfPlayer(King, attackingPieces) ]=0;
+	s.resetCheckingSquares( getPieceOfPlayer(King, attackingPieces) );
 	assert(kingSquare<squareNumber);
 	assert( isValidPiece( getPieceOfPlayer( whitePawns, attackingPieces ) ) );
-	s.checkingSquares[ getPieceOfPlayer( Rooks, attackingPieces ) ] = Movegen::attackFrom<whiteRooks>(kingSquare,occupancy);
-	s.checkingSquares[ getPieceOfPlayer( Bishops, attackingPieces ) ] = Movegen::attackFrom<whiteBishops>(kingSquare,occupancy);
-	s.checkingSquares[ getPieceOfPlayer( Queens, attackingPieces ) ] = s.checkingSquares[getPieceOfPlayer( Rooks, attackingPieces) ]|s.checkingSquares[getPieceOfPlayer( Bishops, attackingPieces)];
-	s.checkingSquares[ getPieceOfPlayer( Knights, attackingPieces ) ] = Movegen::attackFrom<whiteKnights>(kingSquare);
+	s.setCheckingSquares( getPieceOfPlayer( Rooks, attackingPieces ), Movegen::attackFrom<whiteRooks>(kingSquare,occupancy) );
+	s.setCheckingSquares( getPieceOfPlayer( Bishops, attackingPieces ), Movegen::attackFrom<whiteBishops>(kingSquare,occupancy) );
+	s.setCheckingSquares( getPieceOfPlayer( Queens, attackingPieces ), 
+		s.getCheckingSquares( getPieceOfPlayer( Rooks, attackingPieces) ) 
+		| s.getCheckingSquares( getPieceOfPlayer( Bishops, attackingPieces) ) );
+	s.setCheckingSquares( getPieceOfPlayer( Knights, attackingPieces ), Movegen::attackFrom<whiteKnights>(kingSquare) );
 
 
-	s.checkingSquares[getPieceOfPlayer( Pawns, attackingPieces ) ] = attackingPieces? Movegen::attackFrom<whitePawns>(kingSquare) : Movegen::attackFrom<blackPawns>(kingSquare);
+	s.setCheckingSquares( getPieceOfPlayer( Pawns, attackingPieces ), attackingPieces? Movegen::attackFrom<whitePawns>(kingSquare) : Movegen::attackFrom<blackPawns>(kingSquare) );
 
 	assert( getPieceOfOpponent( Pawns, attackingPieces ) >=0 );
-	s.checkingSquares[ getPieceOfOpponent( King,    attackingPieces ) ] = 0;
-	s.checkingSquares[ getPieceOfOpponent( Rooks,   attackingPieces ) ] = 0;
-	s.checkingSquares[ getPieceOfOpponent( Bishops, attackingPieces ) ] = 0;
-	s.checkingSquares[ getPieceOfOpponent( Queens,  attackingPieces ) ] = 0;
-	s.checkingSquares[ getPieceOfOpponent( Knights, attackingPieces ) ] = 0;
-	s.checkingSquares[ getPieceOfOpponent( Pawns,   attackingPieces ) ] = 0;
+	s.resetCheckingSquares( getPieceOfOpponent( King,    attackingPieces ) );
+	s.resetCheckingSquares( getPieceOfOpponent( Rooks,   attackingPieces ) );
+	s.resetCheckingSquares( getPieceOfOpponent( Bishops, attackingPieces ) );
+	s.resetCheckingSquares( getPieceOfOpponent( Queens,  attackingPieces ) );
+	s.resetCheckingSquares( getPieceOfOpponent( Knights, attackingPieces ) );
+	s.resetCheckingSquares( getPieceOfOpponent( Pawns,   attackingPieces ) );
 
 }
 
@@ -1401,7 +1403,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	const state &s = getActualStateConst();
 
 	// Direct check ?
-	if (s.checkingSquares[piece] & bitSet(to))
+	if( isSquareSet( s.getCheckingSquares( piece ), to ) )
 	{
 		return true;
 	}
@@ -1425,7 +1427,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	if( m.isPromotionMove() )
 	{
 		assert( isValidPiece( getPieceOfPlayer( m.getPromotedPiece(), s.getNextTurn() ) ) );
-		if( s.checkingSquares[ getPieceOfPlayer( m.getPromotedPiece(), s.getNextTurn() )] & bitSet(to))
+		if( isSquareSet( s.getCheckingSquares( getPieceOfPlayer( m.getPromotedPiece(), s.getNextTurn() ) ), to ) )
 		{
 			return true;
 		}
@@ -1434,19 +1436,16 @@ bool Position::moveGivesCheck(const Move& m)const
 		switch(m.getPromotionType())
 		{
 			case Move::promQueen:
-				return Movegen::attackFrom<whiteQueens>(to, occ) & bitSet(kingSquare);
+				return isSquareSet( Movegen::attackFrom<whiteQueens>(to, occ), kingSquare );
 
 			case Move::promRook:
-				return Movegen::attackFrom<whiteRooks>(to, occ) & bitSet(kingSquare);
+				return isSquareSet( Movegen::attackFrom<whiteRooks>(to, occ), kingSquare );
 
 			case Move::promBishop:
-				return Movegen::attackFrom<whiteBishops>(to, occ) & bitSet(kingSquare);
+				return isSquareSet( Movegen::attackFrom<whiteBishops>(to, occ), kingSquare );
 
 			case Move::promKnight:
-				return Movegen::attackFrom<whiteKnights>(to, occ) & bitSet(kingSquare);
-
-
-
+				return isSquareSet( Movegen::attackFrom<whiteKnights>(to, occ), kingSquare );
 		}
 
 	}
@@ -1461,8 +1460,8 @@ bool Position::moveGivesCheck(const Move& m)const
 		assert(rTo<squareNumber);
 
 		bitMap occ = (bitBoard[occupiedSquares] ^ bitSet(kFrom) ^ bitSet(rFrom)) | bitSet(rTo) | bitSet(kTo);
-		return   (Movegen::getRookPseudoAttack(rTo) & bitSet(kingSquare))
-			     && (Movegen::attackFrom<whiteRooks>(rTo,occ) & bitSet(kingSquare));
+		return   isSquareSet( Movegen::getRookPseudoAttack(rTo), kingSquare )
+			     && isSquareSet( Movegen::attackFrom<whiteRooks>(rTo,occ), kingSquare );
 	}
 	else if( m.isEnPassantMove() )
 	{
@@ -1491,7 +1490,7 @@ bool Position::moveGivesDoubleCheck(const Move& m)const
 
 
 	// Direct check ?
-	return ((s.checkingSquares[piece] & bitSet(to)) && (s.thereAreHiddenCheckers() && s.isHiddenChecker( from ) ) );
+	return isSquareSet( s.getCheckingSquares( piece ), to) && ( s.thereAreHiddenCheckers() && s.isHiddenChecker( from ) );
 
 
 }
@@ -1499,9 +1498,7 @@ bool Position::moveGivesDoubleCheck(const Move& m)const
 bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 {
 	assert( m );
-	tSquare from = m.getFrom();
 	tSquare to = m.getTo();
-	bitboardIndex piece = squares[from];
 	assert(piece!=occupiedSquares);
 	assert(piece!=separationBitmap);
 	assert(piece!=whitePieces);
@@ -1509,7 +1506,7 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 	const state& s = getActualStateConst();
 
 	tSquare kingSquare = getSquareOfThePiece( s.getKingOfOtherPlayer() );
-	return (!(Movegen::attackFrom<whiteKing>(kingSquare) & bitSet(to)) &&  (s.checkingSquares[piece] & bitSet(to)) && (s.thereAreHiddenCheckers() && s.isHiddenChecker(from)));
+	return !isSquareSet( Movegen::attackFrom<whiteKing>(kingSquare), to ) && moveGivesDoubleCheck(m);
 
 
 }
@@ -1595,7 +1592,7 @@ bool Position::isMoveLegal(const Move &m)const
 	}
 
 	//casa di destinazione irraggiungibile
-	if(bitSet(m.getTo()) & Us[Pieces])
+	if( isSquareSet( Us[Pieces], m.getTo() ) )
 	{
 		return false;
 	}
@@ -1615,8 +1612,8 @@ bool Position::isMoveLegal(const Move &m)const
 
 			if( !isKing(piece)
 				&& !(
-					((bitSet((tSquare)(m.getTo()-( m.isEnPassantMove() ? pawnPush( isBlackTurn() ) : 0)))) & s.getCheckers() )
-					|| ((bitSet(m.getTo()) & SQUARES_BETWEEN[getSquareOfThePiece( s.getKingOfActivePlayer() ) ][ firstOne( s.getCheckers() ) ] ) )
+					isSquareSet( s.getCheckers(), (tSquare)(m.getTo()-( m.isEnPassantMove() ? pawnPush( isBlackTurn() ) : 0) ) )
+					|| isSquareSet( SQUARES_BETWEEN[ getSquareOfThePiece( s.getKingOfActivePlayer() ) ][ firstOne( s.getCheckers() ) ], m.getTo() )
 				)
 			)
 			{
@@ -1624,7 +1621,7 @@ bool Position::isMoveLegal(const Move &m)const
 			}
 		}
 	}
-	if( (s.isPinned( m.getFrom() ) && !squaresAligned(m.getFrom(), m.getTo(), getSquareOfThePiece( s.getKingOfActivePlayer()  ) ) ) )
+	if( s.isPinned( m.getFrom() ) && !squaresAligned(m.getFrom(), m.getTo(), getSquareOfThePiece( s.getKingOfActivePlayer()  ) ) )
 	{
 		return false;
 	}
@@ -1700,7 +1697,7 @@ bool Position::isMoveLegal(const Move &m)const
 				}
 			}
 			else{
-				if(!(Movegen::attackFrom<whiteKing>((tSquare)m.getFrom()) &bitSet(m.getTo())) || (bitSet(m.getTo())&Us[Pieces]))
+				if(! isSquareSet( Movegen::attackFrom<whiteKing>((tSquare)m.getFrom()), m.getTo() ) || isSquareSet( Us[Pieces], m.getTo() ) )
 				{
 					return false;
 				}
@@ -1710,18 +1707,13 @@ bool Position::isMoveLegal(const Move &m)const
 					return false;
 				}
 			}
-
-
-
-
-
 		}
 			break;
 
 		case whiteRooks:
 		case blackRooks:
 			assert(m.getFrom()<squareNumber);
-			if(!(Movegen::getRookPseudoAttack(m.getFrom()) & bitSet(m.getTo())) || !(Movegen::attackFrom<whiteRooks>(m.getFrom(),bitBoard[occupiedSquares])& bitSet(m.getTo())))
+			if( !isSquareSet( Movegen::getRookPseudoAttack( m.getFrom() ), m.getTo() ) || !isSquareSet( Movegen::attackFrom<whiteRooks>( m.getFrom(), bitBoard[occupiedSquares] ), m.getTo() ) )
 			{
 				return false;
 			}
@@ -1730,19 +1722,11 @@ bool Position::isMoveLegal(const Move &m)const
 		case whiteQueens:
 		case blackQueens:
 			assert(m.getFrom()<squareNumber);
-			if(
-				!(
-					(Movegen::getBishopPseudoAttack(m.getFrom()) | Movegen::getRookPseudoAttack(m.getFrom()))
-					& bitSet(m.getTo())
-				)
+			if( !isSquareSet( Movegen::getBishopPseudoAttack( m.getFrom() ) | Movegen::getRookPseudoAttack( m.getFrom() ), m.getTo() )
 				||
-				!(
-					(
-
-						Movegen::attackFrom<whiteBishops>(m.getFrom(),bitBoard[occupiedSquares])
-						| Movegen::attackFrom<whiteRooks>(m.getFrom(),bitBoard[occupiedSquares])
-					)
-					& bitSet(m.getTo())
+				!isSquareSet( 
+					Movegen::attackFrom<whiteBishops>(m.getFrom(),bitBoard[occupiedSquares]) 
+					| Movegen::attackFrom<whiteRooks>(m.getFrom(),bitBoard[occupiedSquares]), m.getTo()
 				)
 			)
 			{
@@ -1752,7 +1736,9 @@ bool Position::isMoveLegal(const Move &m)const
 
 		case whiteBishops:
 		case blackBishops:
-			if(!(Movegen::getBishopPseudoAttack(m.getFrom()) & bitSet(m.getTo())) || !(Movegen::attackFrom<whiteBishops>(m.getFrom(),bitBoard[occupiedSquares])& bitSet(m.getTo())))
+			if( !isSquareSet(Movegen::getBishopPseudoAttack(m.getFrom()), m.getTo() )
+				|| !isSquareSet(Movegen::attackFrom<whiteBishops>(m.getFrom(),bitBoard[occupiedSquares]), m.getTo() )
+			)
 			{
 				return false;
 			}
@@ -1760,7 +1746,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 		case whiteKnights:
 		case blackKnights:
-			if(!(Movegen::attackFrom<whiteKnights>(m.getFrom())& bitSet(m.getTo())))
+			if( !isSquareSet( Movegen::attackFrom<whiteKnights>( m.getFrom() ), m.getTo() ) )
 			{
 				return false;
 			}
@@ -1771,11 +1757,11 @@ bool Position::isMoveLegal(const Move &m)const
 
 			if(
 				// not valid pawn push
-				(m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || (bitSet(m.getTo())&bitBoard[occupiedSquares]))
+				( m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || isSquareSet( bitBoard[occupiedSquares], m.getTo() ) )
 				// not valid pawn double push
 				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (RANKS[m.getFrom()]!=1) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()-8)))&bitBoard[occupiedSquares]))
 				// not valid pawn attack
-				&& (!(Movegen::attackFrom<whitePawns>(m.getFrom())&bitSet(m.getTo())) || !((bitSet(m.getTo())) &(Them[Pieces]|bitSet(s.epSquare))))
+				&& ( !isSquareSet( Movegen::attackFrom<whitePawns>( m.getFrom() ), m.getTo() ) || !isSquareSet( Them[Pieces] | bitSet(s.epSquare), m.getTo() ) )
 			){
 				return false;
 			}
@@ -1801,11 +1787,11 @@ bool Position::isMoveLegal(const Move &m)const
 		case blackPawns:
 			if(
 				// not valid pawn push
-				(m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || (bitSet(m.getTo())&bitBoard[occupiedSquares]))
+				( m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || isSquareSet(bitBoard[occupiedSquares], m.getTo() ) )
 				// not valid pawn double push
 				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (RANKS[m.getFrom()]!=6) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()+8)))&bitBoard[occupiedSquares]))
 				// not valid pawn attack
-				&& (!(Movegen::attackFrom<blackPawns>(m.getFrom())&bitSet(m.getTo())) || !((bitSet(m.getTo())) &(Them[Pieces]| bitSet(s.epSquare))))
+				&& ( !isSquareSet( Movegen::attackFrom<blackPawns>( m.getFrom() ), m.getTo() ) || !isSquareSet( Them[Pieces] | bitSet(s.epSquare), m.getTo() ) )
 			){
 				return false;
 			}

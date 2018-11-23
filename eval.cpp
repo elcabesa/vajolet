@@ -253,7 +253,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		res += mobilityBonus[ piece % separationBitmap ][ mobility ];
 		if(piece != whiteKnights && piece != blackKnights)
 		{
-			if( !(attack & ~(threatenSquares | ourPieces) )  && ( threatenSquares & bitSet(sq) ) ) // zero mobility && attacked by pawn
+			if( !(attack & ~(threatenSquares | ourPieces) ) && isSquareSet( threatenSquares, sq ) ) // zero mobility && attacked by pawn
 			{
 				res -= ( pieceValue[piece] / 4 );
 			}
@@ -364,14 +364,14 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		}
 		case whiteBishops:
 		case blackBishops:
-			if(relativeRank >= 4 && (enemyWeakSquares & bitSet( sq )))
+			if( relativeRank >= 4 && isSquareSet( enemyWeakSquares, sq ) )
 			{
 				res += bishopOnOutpost;
-				if(supportedSquares & bitSet( sq ))
+				if( isSquareSet( supportedSquares, sq ) )
 				{
 					res += bishopOnOutpostSupported;
 				}
-				if(enemyHoles & bitSet( sq ))
+				if( isSquareSet( enemyHoles, sq ) )
 				{
 					res += bishopOnHole;
 				}
@@ -390,14 +390,14 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 			break;
 		case whiteKnights:
 		case blackKnights:
-			if(enemyWeakSquares & bitSet( sq ))
+			if( isSquareSet( enemyWeakSquares, sq ) )
 			{
 				res += knightOnOutpost * ( 5 - std::abs( (int)relativeRank - 5 ));
-				if(supportedSquares & bitSet( sq ))
+				if( isSquareSet( supportedSquares, sq ) )
 				{
 					res += knightOnOutpostSupported;
 				}
-				if(enemyHoles & bitSet( sq ))
+				if( isSquareSet( enemyHoles, sq ) )
 				{
 					res += knightOnHole;
 				}
@@ -472,7 +472,6 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 		
 		simdScore passedPawnsBonus;
 		tSquare ppSq = iterateBit(pp);
-		//displayBitmap(bitSet(ppSq));
 		unsigned int relativeRank = c ? 7-RANKS[ppSq] : RANKS[ppSq];
 		
 		int r = relativeRank - 1;
@@ -503,7 +502,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 				bitMap defendedSquares = forwardSquares & attackedSquares[ ourPieces ];
 
 			
-				if ( unsafeSquares & bitSet(blockingSquare) )
+				if ( isSquareSet( unsafeSquares, blockingSquare ) )
 				{
 					passedPawnsBonus -= passedPawnBlockedSquares * rr;
 				}
@@ -512,7 +511,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 				if(defendedSquares)
 				{
 					passedPawnsBonus += passedPawnDefendedSquares * rr * (int)bitCnt( defendedSquares );
-					if(defendedSquares & bitSet(blockingSquare) )
+					if( isSquareSet( defendedSquares, blockingSquare ) )
 					{
 						passedPawnsBonus += passedPawnDefendedBlockingSquare * rr;
 					}
@@ -1100,13 +1099,13 @@ Score Position::eval(void)
 	bitMap weakPieces = getBitmap(whitePieces) & attackedSquares[blackPieces] & ~attackedSquares[whitePawns];
 	while(weakPieces)
 	{
-		tSquare p = iterateBit(weakPieces);
+		tSquare sq = iterateBit(weakPieces);
 
-		bitboardIndex attackedPiece = getPieceAt(p);
+		bitboardIndex attackedPiece = getPieceAt(sq);
 		bitboardIndex attackingPiece = blackPawns;
 		for(; attackingPiece >= blackKing; attackingPiece = (bitboardIndex)(attackingPiece - 1) )
 		{
-			if(attackedSquares[ attackingPiece ] & bitSet(p))
+			if( isSquareSet( attackedSquares[ attackingPiece ], sq ) )
 			{
 				wScore -= weakPiecePenalty[attackedPiece % separationBitmap][ attackingPiece % separationBitmap];
 				break;
@@ -1138,13 +1137,13 @@ Score Position::eval(void)
 	weakPieces = getBitmap(blackPieces) & attackedSquares[whitePieces] & ~attackedSquares[blackPawns];
 	while(weakPieces)
 	{
-		tSquare p = iterateBit(weakPieces);
+		tSquare sq = iterateBit(weakPieces);
 
-		bitboardIndex attackedPiece = getPieceAt(p);
+		bitboardIndex attackedPiece = getPieceAt(sq);
 		bitboardIndex attackingPiece = whitePawns;
 		for(; attackingPiece >= whiteKing; attackingPiece = (bitboardIndex)(attackingPiece - 1) )
 		{
-			if(attackedSquares[ attackingPiece ] & bitSet(p))
+			if( isSquareSet( attackedSquares[ attackingPiece ], sq ) )
 			{
 				bScore -= weakPiecePenalty[attackedPiece % separationBitmap][attackingPiece % separationBitmap];
 				break;

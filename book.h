@@ -28,7 +28,7 @@
 #include "position.h"
 
 //forward declaration
-struct Move;
+class Move;
 
 
 

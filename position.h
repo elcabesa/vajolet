@@ -81,7 +81,7 @@ public:
 
 		tSquare epSquare;	/*!<  en passant square*/
 		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
-		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
+		
 
 
 
@@ -246,7 +246,7 @@ public:
 
 		inline bool isPinned( const tSquare& sq ) const
 		{
-			return _pinnedPieces & bitSet( sq );
+			return isSquareSet( _pinnedPieces, sq );
 		}
 
 		inline void setNextTurn( const eNextMove nm )
@@ -320,8 +320,30 @@ public:
 
 		inline bool isHiddenChecker( const tSquare& sq ) const
 		{
-			return _hiddenCheckersCandidate & bitSet( sq );
+			return isSquareSet(_hiddenCheckersCandidate, sq );
 		}
+		
+		inline void setHiddenChecker( const bitMap & b )
+		{
+			_hiddenCheckersCandidate = b;
+		}
+		
+		inline void setCheckingSquares( const bitboardIndex piece, const bitMap & b )
+		{
+			_checkingSquares[ piece ] = b;
+		}
+		
+		inline void resetCheckingSquares( const bitboardIndex piece )
+		{
+			_checkingSquares[ piece ] = 0;
+		}
+		
+		inline const bitMap& getCheckingSquares( const bitboardIndex piece ) const
+		{
+			return _checkingSquares[ piece ];
+		}
+		
+		
 
 	private:
 		eCastle _castleRights; /*!<  actual castle rights*/
@@ -334,6 +356,7 @@ public:
 		simdScore _nonPawnMaterial; /*!< four score used for white/black opening/endgame non pawn material sum*/
 		unsigned int _fiftyMoveCnt;	/*!<  50 move count used for draw rule*/
 		unsigned int _pliesFromNull;	/*!<  plies from null move*/
+		bitMap _checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 
 	};
 
