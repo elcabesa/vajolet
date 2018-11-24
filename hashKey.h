@@ -45,9 +45,9 @@ private:
 public:
 	static void init();       // initialize the random data
 
-	inline tKey getExclusionKey() const
+	inline HashKey getExclusionKey() const
 	{
-		return _key ^ _exclusion;
+		return HashKey( _key ^ _exclusion );
 	}
 
 	inline tKey getKey() const
@@ -77,7 +77,7 @@ public:
 	}
 
 	HashKey(){}
-	explicit HashKey(unsigned int k):_key(k){}
+	explicit HashKey(tKey k):_key(k){}
 
 	bool operator==(HashKey const & r) const {return (_key == r._key);}
 	bool operator!=(HashKey const & r) const {return !(*this == r);}

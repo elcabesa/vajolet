@@ -506,9 +506,9 @@ public:
 		return getActualStateConst().getKey();
 	}
 
-	const HashKey& getExclusionKey(void) const
+	const HashKey getExclusionKey(void) const
 	{
-		return getActualStateConst().getKey();
+		return getActualStateConst().getKey().getExclusionKey();
 	}
 
 	const HashKey& getPawnKey(void) const
