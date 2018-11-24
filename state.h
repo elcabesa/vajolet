@@ -127,7 +127,7 @@ public:
 
 	inline unsigned int getIrreversibleMoveCount() const
 	{
-		return _pliesFromNull;
+		return _fiftyMoveCnt;
 	}
 
 	inline void setIrreversibleMoveCount(unsigned int x)
