@@ -26,6 +26,8 @@
 #include "score.h"
 #include "vajolet.h"
 
+class HashKey;
+
 enum ttType
 {
 	typeExact,
@@ -141,9 +143,9 @@ public:
 		tte.setGeneration(generation);
 	}
 
-	ttEntry* probe(const uint64_t key);
+	ttEntry* probe(const HashKey& k);
 
-	void store(const uint64_t key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
+	void store(const HashKey& k, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
 	
 	
 
@@ -200,8 +202,8 @@ class PerftTranspositionTable
 public:
 	PerftTranspositionTable(){}
 	
-	void store(const uint64_t key, signed short int depth, unsigned long long v);
-	bool retrieve(const uint64_t key, unsigned int depth, unsigned long long& res);
+	void store(const HashKey& key, signed short int depth, unsigned long long v);
+	bool retrieve(const HashKey& key, unsigned int depth, unsigned long long& res);
 };
 
 

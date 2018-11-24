@@ -21,7 +21,6 @@
 #include "io.h"
 #include "bitops.h"
 #include "data.h"
-#include "hashKeys.h"
 #include "position.h"
 #include "movegen.h"
 #include "transposition.h"
@@ -34,6 +33,7 @@
 #include "eval.h"
 
 #include <fstream>
+#include "hashKey.h"
 
 const int arraySize = 200;
 //const int arrayScaling = 300;
@@ -198,7 +198,7 @@ int main()
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
 	initData();
-	HashKeys::init();
+	HashKey::init();
 	Position::initScoreValues();
 	Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();

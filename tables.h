@@ -29,7 +29,7 @@
 class pawnEntry
 {
 public:
-	uint64_t key;
+	HashKey key;
 	bitMap weakPawns;
 	bitMap passedPawns;
 	bitMap pawnAttacks[2];
@@ -42,10 +42,11 @@ class pawnTable
 {
 static const int size = 8192;
 public:
-	void insert(uint64_t key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
-		pawnEntry& x=pawnTable[((unsigned int)key) %size];
+	void insert(const HashKey& key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
 
-		x.key=key;
+		pawnEntry& x=pawnTable[ _getIndex( key ) ];
+
+		x.key = key;
 		x.res[0]=res[0];
 		x.res[1]=res[1];
 
@@ -60,11 +61,12 @@ public:
 		x.holes[1]=blackHoles;
 	}
 
-	pawnEntry& probe(uint64_t key)
+	pawnEntry& probe(const HashKey& key)
 	{
-		return pawnTable[((unsigned int)key) %size];
+		return pawnTable[ _getIndex( key ) ];
 	}
 private:
+	unsigned int _getIndex( const HashKey& key ) const { return ( (unsigned int)key.getKey() ) % size; }
 	std::array<pawnEntry,size> pawnTable;
 };
 

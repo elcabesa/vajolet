@@ -326,8 +326,8 @@ void Game::insertNewMoves(Position &pos)
 	for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
 	{
 		GamePosition p;
-		p.key = pos.getState(i).key;
-		p.m =  pos.getState(i).getCurrentMove();
+		p.key = pos.getState(i).getKey();
+		p.m = pos.getState(i).getCurrentMove();
 		_positions.push_back(p);
 	}
 }
@@ -370,7 +370,7 @@ bool Game::isNewGame(const Position &pos) const
 	unsigned int n = 0;
 	for(auto p : _positions)
 	{
-		if(pos.getState(n).key != p.key)
+		if(pos.getState(n).getKey() != p.key)
 		{
 			//printGamesInfo();
 			return true;

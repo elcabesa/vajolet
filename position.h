@@ -25,17 +25,17 @@
 
 #include "bitBoardIndex.h"
 #include "data.h"
-#include "hashKeys.h"
+#include "hashKey.h"
 #include "move.h"
 #include "tables.h"
 #include "score.h"
 #include "vajolet.h"
 
-typedef enum
+using Color = enum
 {
 	white = 0,
 	black = 1
-}Color;
+};
 
 //---------------------------------------------------
 //	class
@@ -75,13 +75,50 @@ public:
 	{
 
 	public:
-		uint64_t key,		/*!<  hashkey identifying the position*/
+		// todo modifiche a keys inseririle dentro alle altre chiamate
+
+		HashKey key,		/*!<  hashkey identifying the position*/
 			pawnKey,	/*!<  hashkey identifying the pawn formation*/
 			materialKey;/*!<  hashkey identifying the material signature*/
 
-		tSquare epSquare;	/*!<  en passant square*/
+
 		state(){}
 
+		inline const HashKey& getKey() const
+		{
+			return key;
+		}
+
+		inline void setKey( const HashKey& k )
+		{
+			key = k;
+		}
+
+
+		inline bool hasEpSquare() const
+		{
+			return _epSquare != squareNone;
+		}
+
+		inline bool isEpSquare( const tSquare s) const
+		{
+			return _epSquare == s;
+		}
+
+		inline tSquare getEpSquare() const
+		{
+			return _epSquare;
+		}
+
+		inline void resetEpSquare()
+		{
+			_epSquare = squareNone;
+		}
+
+		inline void setEpSquare( const tSquare s )
+		{
+			_epSquare = s;
+		}
 
 		inline unsigned int getPliesFromNullCount() const
 		{
@@ -368,6 +405,7 @@ public:
 		unsigned int _pliesFromNull;	/*!<  plies from null move*/
 		bitMap _checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 		bitboardIndex _capturedPiece; /*!<  index of the captured piece for unmakeMove*/
+		tSquare _epSquare;	/*!<  en passant square*/
 
 	};
 
@@ -463,22 +501,22 @@ public:
 	Score see(const Move& m) const;
 	Score seeSign(const Move& m) const;
 	
-	uint64_t getKey(void) const
+	const HashKey& getKey(void) const
 	{
-		return getActualStateConst().key;
+		return getActualStateConst().getKey();
 	}
 
-	uint64_t getExclusionKey(void) const
+	const HashKey& getExclusionKey(void) const
 	{
-		return getActualStateConst().key^HashKeys::exclusion;
+		return getActualStateConst().getKey();
 	}
 
-	uint64_t getPawnKey(void) const
+	const HashKey& getPawnKey(void) const
 	{
 		return getActualStateConst().pawnKey;
 	}
 
-	uint64_t getMaterialKey(void) const
+	const HashKey& getMaterialKey(void) const
 	{
 		return getActualStateConst().materialKey;
 	}
@@ -500,7 +538,12 @@ public:
 
 	tSquare getEpSquare(void) const
 	{
-		return getActualStateConst().epSquare;
+		return getActualStateConst().getEpSquare();
+	}
+
+	bool hasEpSquare(void) const
+	{
+		return getActualStateConst().hasEpSquare();
 	}
 
 	eCastle getCastleRights(void) const
@@ -634,14 +677,14 @@ private:
 	//--------------------------------------------------------
 	struct materialStruct
 	{
-		typedef enum
+		using tType = enum
 		{
 			exact,
 			multiplicativeFunction,
 			exactFunction,
 			saturationH,
 			saturationL,
-		} tType ;
+		};
 		tType type;
 		bool (Position::*pointer)(Score &);
 		Score val;
@@ -660,7 +703,7 @@ private:
 	static eCastle castleRightsMask[squareNumber];
 	static simdScore pstValue[lastBitboard][squareNumber];
 	static simdScore nonPawnValue[lastBitboard];
-	std::unordered_map<uint64_t, materialStruct> static materialKeyMap;
+	std::unordered_map<tKey, materialStruct> static materialKeyMap;
 	
 	//--------------------------------------------------------
 	// private members
@@ -710,9 +753,9 @@ private:
 	inline void updateUsThem();
 
 
-	uint64_t calcKey(void) const;
-	uint64_t calcPawnKey(void) const;
-	uint64_t calcMaterialKey(void) const;
+	HashKey calcKey(void) const;
+	HashKey calcPawnKey(void) const;
+	HashKey calcMaterialKey(void) const;
 	simdScore calcMaterialValue(void) const;
 	simdScore calcNonPawnMaterialValue(void) const;
 	bool checkPosConsistency(int nn) const;
@@ -748,6 +791,8 @@ private:
 	bool evalKRvsKm(Score& res);
 	bool evalKNNvsK(Score& res);
 	bool evalKNPvsK(Score& res);
+
+	static std::string _printEpSquare( const state& st);
 
 };
 

@@ -24,7 +24,7 @@ CPP_SRCS := \
 ./data.cpp \
 ./endgame.cpp \
 ./eval.cpp \
-./hashKeys.cpp \
+./hashKey.cpp \
 ./io.cpp \
 ./magicmoves.cpp \
 ./Move.cpp \
@@ -54,7 +54,7 @@ OBJS :=  \
 ./data.o \
 ./endgame.o \
 ./eval.o \
-./hashKeys.o \
+./hashKey.o \
 ./io.o \
 ./magicmoves.o \
 ./Move.o \
@@ -79,7 +79,7 @@ CPP_DEPS := \
 ./data.d \
 ./endgame.d \
 ./eval.d \
-./hashKeys.d \
+./hashKey.d \
 ./io.d \
 ./magicmoves.d \
 ./Move.d \

@@ -545,23 +545,24 @@ void Movegen::generateMoves()
 
 		// ep capture
 
-		if(s.epSquare != squareNone)
+		if( s.hasEpSquare() )
 		{
+			auto epSquare = s.getEpSquare();
 			m.setFlag( Move::fenpassant );
-			bitMap epAttacker = nonPromotionPawns & attackFromPawn(s.epSquare,1-color);
+			bitMap epAttacker = nonPromotionPawns & attackFromPawn( epSquare, 1-color );
 
 			while(epAttacker)
 			{
 				tSquare from = iterateBit(epAttacker);
 
-				bitMap captureSquare= FILEMASK[s.epSquare] & RANKMASK[from];
-				bitMap occ = occupiedSquares^bitSet(from)^bitSet(s.epSquare)^captureSquare;
+				bitMap captureSquare= FILEMASK[ epSquare ] & RANKMASK[from];
+				bitMap occ = occupiedSquares^bitSet(from)^bitSet( epSquare )^captureSquare;
 
 				if(	!((attackFromRook(kingSquare, occ) & (pos.getTheirBitmap(Queens) | pos.getTheirBitmap(Rooks))) |
 						(Movegen::attackFromBishop(kingSquare, occ) & (pos.getTheirBitmap(Queens) | pos.getTheirBitmap(Bishops))))
 				)
 				{
-					m.setTo( s.epSquare );
+					m.setTo( epSquare );
 					m.setFrom( from );
 					moveList.insert(m);
 				}

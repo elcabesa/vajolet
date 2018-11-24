@@ -56,7 +56,7 @@ TEST(Syzygy, test)
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 			0,//pos.getActualState().fiftyMoveCnt,
 			pos.getActualState().getCastleRights(),
-			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
+			pos.hasEpSquare() ? pos.getEpSquare(): 0,
 			pos.isWhiteTurn() );
 
 		//EXPECT_NE(result1, TB_RESULT_FAILED);
@@ -74,7 +74,7 @@ TEST(Syzygy, test)
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 			pos.getActualState().getIrreversibleMoveCount(),
 			pos.getActualState().getCastleRights(),
-			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
+			pos.hasEpSquare() ? pos.getEpSquare(): 0,
 			pos.isWhiteTurn(),
 			results);
 			

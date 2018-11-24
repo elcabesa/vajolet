@@ -31,7 +31,7 @@
 
 
 
-std::unordered_map<uint64_t, Position::materialStruct> Position::materialKeyMap;
+std::unordered_map<tKey, Position::materialStruct> Position::materialKeyMap;
 
 
 bool Position::evalKxvsK(Score& res)
@@ -671,8 +671,6 @@ void Position::initMaterialKeys(void)
 
 
 	Position p;
-	uint64_t key;
-
 	static const struct{
 		std::string fen;
 		materialStruct::tType type;
@@ -812,7 +810,7 @@ void Position::initMaterialKeys(void)
 	for (auto& eg : Endgames)
 	{
 		p.setupFromFen(eg.fen);
-		key = p.getMaterialKey();
+		tKey key = p.getMaterialKey().getKey();
 		t.type = eg.type;
 		t.pointer = eg.pointer;
 		t.val = eg.val;
@@ -837,7 +835,7 @@ void Position::initMaterialKeys(void)
 				if(wp!=8){s+=std::to_string(8-wp);}
 				s+="/6BK w - -";
 				p.setupFromFen(s);
-				key = p.getMaterialKey();
+				tKey key = p.getMaterialKey().getKey();
 				t.type=materialStruct::multiplicativeFunction;
 				t.pointer=&Position::evalOppositeBishopEndgame;
 				t.val=0;

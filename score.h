@@ -24,7 +24,9 @@
 //	typedefs
 //---------------------------------------------
 typedef int simdScore __attribute__ ((vector_size (16)));
-typedef int32_t Score;					/*!< score saved as a single signed int value*/
+//using simdScore = int __attribute__ ((vector_size (16)));
+using Score = int32_t;
+
 
 //---------------------------------------------
 //SCORE DEFINITION

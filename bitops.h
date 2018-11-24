@@ -22,8 +22,7 @@
 
 #include "tSquare.h"
 
-
-typedef uint64_t bitMap;			/*!< 64 bit bitMap*/
+using bitMap = uint64_t; /*!< 64 bit bitMap*/
 
 //-----------------------------------------------------------------------------
 //	inline function

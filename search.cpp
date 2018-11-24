@@ -150,7 +150,7 @@ void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 			pos.getActualStateConst().getIrreversibleMoveCount(),
 			pos.getActualStateConst().getCastleRights(),
-			pos.getActualStateConst().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
+			pos.hasEpSquare() ? pos.getEpSquare(): 0,
 			pos.isWhiteTurn(),
 			results);
 
@@ -597,12 +597,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	const Move& excludedMove = sd.story[ply].excludeMove;
 
-	uint64_t posKey = excludedMove ? pos.getExclusionKey() : pos.getKey();
+	const HashKey& posKey = excludedMove ? pos.getExclusionKey() : pos.getKey();
 
 	//--------------------------------------
 	// test the transposition table
 	//--------------------------------------
-	ttEntry* tte = transpositionTable::getInstance().probe(posKey);
+	ttEntry* tte = transpositionTable::getInstance().probe( posKey );
 	Move ttMove( tte->getPackedMove() );
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
@@ -672,7 +672,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 					pos.getActualStateConst().getIrreversibleMoveCount(),
 					pos.getActualStateConst().getCastleRights(),
-					pos.getActualStateConst().epSquare == squareNone? 0 : pos.getActualState().epSquare,
+					pos.hasEpSquare() ? pos.getEpSquare(): 0,
 					pos.isWhiteTurn() );
 
 				if(result != TB_RESULT_FAILED)

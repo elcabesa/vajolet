@@ -48,7 +48,7 @@ simdScore traceRes={0,0,0,0};
 //---------------------------------------------
 const Position::materialStruct * Position::getMaterialData()
 {
-	uint64_t key = getMaterialKey();
+	tKey key = getMaterialKey().getKey();
 
 	auto got= materialKeyMap.find(key);
 
@@ -805,9 +805,9 @@ Score Position::eval(void)
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
 	simdScore pawnResult;
-	uint64_t pawnKey = getPawnKey();
-	pawnEntry& probePawn = pawnHashTable.probe(pawnKey);
-	if( enablePawnHash && (probePawn.key == pawnKey) )
+	const HashKey& pawnKey = getPawnKey();
+	pawnEntry& probePawn = pawnHashTable.probe( pawnKey );
+	if( enablePawnHash && ( probePawn.key == pawnKey ) )
 	{
 		pawnResult = simdScore{probePawn.res[0], probePawn.res[1], 0, 0};
 		weakPawns = probePawn.weakPawns;

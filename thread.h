@@ -36,7 +36,7 @@ class Game
 public:
 	struct GamePosition
 	{
-		uint64_t key;
+		HashKey key;
 		Move m;
 		PVline PV;
 		Score alpha;
