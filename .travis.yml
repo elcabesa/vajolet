@@ -9,12 +9,12 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gcc-6
-      - g++-6
+      - gcc-8
+      - g++-8
       - cmake
 script:
-  - export CC=/usr/bin/gcc-6
-  - export CXX=/usr/bin/g++-6
+  - export CC=/usr/bin/gcc-8
+  - export CXX=/usr/bin/g++-8
   - gcc -v && g++ -v && cmake --version
   - mkdir build
   - cd build
