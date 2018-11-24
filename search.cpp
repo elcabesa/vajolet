@@ -832,7 +832,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//	at very low deep and with an evaluation well above beta, bet that we can found a move with a result above beta
 			//---------------------------
 
-			const Position::state& st = pos.getActualStateConst();
+			const state& st = pos.getActualStateConst();
 
 			if (!sd.story[ply].skipNullMove
 				&& depth < 8 * ONE_PLY

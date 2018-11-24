@@ -44,10 +44,10 @@ void Movegen::initMovegenConstant(void){
 	{
 		x = 0;
 	}
-	castlePath.at( Position::wCastleOO  ) = bitSet(F1) | bitSet(G1);
-	castlePath.at( Position::wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
-	castlePath.at( Position::bCastleOO  ) = bitSet(F8) | bitSet(G8);
-	castlePath.at( Position::bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
+	castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
+	castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
+	castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
+	castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
 
 	initmagicmoves();
 
@@ -164,7 +164,7 @@ void Movegen::generateMoves()
 {
 
 	// initialize constants
-	const Position::state &s =pos.getActualStateConst();
+	const state &s =pos.getActualStateConst();
 	const bitMap& enemy = pos.getTheirBitmap(Pieces);
 	const bitMap& occupiedSquares = pos.getOccupationBitmap();
 
@@ -575,9 +575,9 @@ void Movegen::generateMoves()
 	if(type !=Movegen::allEvasionMg && type!=Movegen::captureEvasionMg && type!=Movegen::quietEvasionMg && type!= Movegen::captureMg)
 	{
 		m.setPromotion( Move::promQueen );
-		if( !s.isInCheck() && s.hasCastleRight( Position::castleOO | Position::castleOOO, color ) )
+		if( !s.isInCheck() && s.hasCastleRight( castleOO | castleOOO, color ) )
 		{
-			Position::eCastle cr = Position::state::calcCastleRight( Position::castleOO, color );
+			eCastle cr = state::calcCastleRight( castleOO, color );
 			if( s.hasCastleRight( cr ) && isCastlePathFree( cr ) )
 			{
 
@@ -604,7 +604,7 @@ void Movegen::generateMoves()
 
 
 			}
-			cr = Position::state::calcCastleRight( Position::castleOOO, color );
+			cr = state::calcCastleRight( castleOOO, color );
 			if( s.hasCastleRight( cr ) && isCastlePathFree( cr ) )
 			{
 				bool castleDenied = false;
@@ -893,7 +893,7 @@ inline void Movegen::scoreQuietEvasion()
 	}
 }
 
-bool Movegen::isCastlePathFree( const Position::eCastle c ) const
+bool Movegen::isCastlePathFree( const eCastle c ) const
 {
 	assert( c < 9);
 	return !( castlePath[c] & pos.getOccupationBitmap() );

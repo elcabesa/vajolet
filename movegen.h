@@ -24,6 +24,7 @@
 #include <array>
 
 #include "bitops.h"
+#include "eCastle.h"
 #include "magicmoves.h"
 #include "MoveList.h"
 #include "position.h"
@@ -247,7 +248,7 @@ public:
 		assert(from<squareNumber);
 		return attackFromBishop(from,0);
 	}
-	bool isCastlePathFree( const Position::eCastle c ) const;
+	bool isCastlePathFree( const eCastle c ) const;
 
 private:
 

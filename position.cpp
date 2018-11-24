@@ -32,7 +32,7 @@ const int KRank[8]	= { +1, +0, -2, -3, -4, -5, -6, -7};
 simdScore Position::pieceValue[lastBitboard];
 simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
-Position::eCastle Position::castleRightsMask[squareNumber];
+eCastle Position::castleRightsMask[squareNumber];
 
 bool Position::perftUseHash = false;
 
@@ -1649,7 +1649,7 @@ bool Position::isMoveLegal(const Move &m)const
 			if( m.isCastleMove() )
 			{
 				Color color = s.isBlackTurn()? black : white;
-				Position::eCastle cs = Position::state::calcCastleRight( m.isKingSideCastle() ? castleOO: castleOOO, color );
+				eCastle cs = state::calcCastleRight( m.isKingSideCastle() ? castleOO: castleOOO, color );
 				Movegen mg(*this);
 				if( !s.hasCastleRight( cs )
 					|| !mg.isCastlePathFree( cs )

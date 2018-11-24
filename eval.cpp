@@ -342,10 +342,10 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 				{
 
 					res -= rookTrapped*(int)(3-mobility);
-					const Position::state & st = getActualStateConst();
+					const state & st = getActualStateConst();
 					if(piece > separationBitmap)
 					{
-						if( !st.hasCastleRight( Position::bCastleOO | Position::bCastleOOO ) )
+						if( !st.hasCastleRight( bCastleOO | bCastleOOO ) )
 						{
 							res -= rookTrappedKingWithoutCastling * (int)( 3 - mobility );
 						}
@@ -353,7 +353,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 					}
 					else
 					{
-						if( !st.hasCastleRight( Position::wCastleOO | Position::wCastleOOO ) )
+						if( !st.hasCastleRight( wCastleOO | wCastleOOO ) )
 						{
 							res -= rookTrappedKingWithoutCastling * (int)( 3 - mobility ) ;
 						}
