@@ -277,7 +277,7 @@ void Position::setupFromFen(const std::string& fenStr)
 
 	x.resetPliesFromNullCount();
 	x.setCurrentMove( Move::NOMOVE );
-	x.capturedPiece = empty;
+	x.resetCapturedPiece();
 
 	x.setMaterialValue( calcMaterialValue() );
 	x.setNonPawnValue( calcNonPawnMaterialValue() );
@@ -749,7 +749,7 @@ void Position::doNullMove(void)
 
 
 	++ply;
-	x.capturedPiece = empty;
+	x.resetCapturedPiece();
 
 	std::swap(Us,Them);
 
@@ -910,7 +910,7 @@ void Position::doMove(const Move & m){
 		x.resetIrreversibleMoveCount();
 	}
 
-	x.capturedPiece = capture;
+	x.setCapturedPiece( capture );
 	x.changeNextTurn();
 
 	std::swap(Us,Them);
@@ -1003,17 +1003,16 @@ void Position::undoMove()
 	movePiece(piece,to,from);
 
 
-	assert( isValidPiece(x.capturedPiece) || x.capturedPiece == empty);
-	if(x.capturedPiece)
+	assert( isValidPiece( x.getCapturedPiece() ) || x.getCapturedPiece() == empty );
+	if( x.getCapturedPiece() )
 	{
-		
 		tSquare capSq = to;
 		if( m.isEnPassantMove() )
 		{
 			capSq += pawnPush( x.isBlackTurn() );
 		}
-		assert(capSq<squareNumber);
-		putPiece(x.capturedPiece,capSq);
+		assert( capSq < squareNumber );
+		putPiece( x.getCapturedPiece(), capSq );
 	}
 	removeState();
 

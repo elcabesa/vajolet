@@ -80,12 +80,6 @@ public:
 			materialKey;/*!<  hashkey identifying the material signature*/
 
 		tSquare epSquare;	/*!<  en passant square*/
-		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
-		
-
-
-
-
 		state(){}
 
 
@@ -343,6 +337,22 @@ public:
 			return _checkingSquares[ piece ];
 		}
 		
+		inline const bitboardIndex& getCapturedPiece() const
+		{
+			return _capturedPiece;
+		}
+		
+		inline void setCapturedPiece( const bitboardIndex p )
+		{
+			_capturedPiece = p;
+		}
+		
+		inline void resetCapturedPiece()
+		{
+			_capturedPiece = empty;
+		}
+		
+		
 		
 
 	private:
@@ -357,6 +367,7 @@ public:
 		unsigned int _fiftyMoveCnt;	/*!<  50 move count used for draw rule*/
 		unsigned int _pliesFromNull;	/*!<  plies from null move*/
 		bitMap _checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
+		bitboardIndex _capturedPiece; /*!<  index of the captured piece for unmakeMove*/
 
 	};
 
@@ -504,7 +515,7 @@ public:
 
 	bitboardIndex getCapturedPiece(void) const
 	{
-		return getActualStateConst().capturedPiece;
+		return getActualStateConst().getCapturedPiece();
 	}
 
 	bool isInCheck(void) const
