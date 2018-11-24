@@ -183,13 +183,13 @@ void Movegen::generateMoves()
 	bitMap target;
 	if(type==Movegen::allEvasionMg)
 	{
-		assert(s.checkers);
+		assert(s.getCheckers());
 		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
 		kingTarget = ~pos.getOurBitmap(Pieces);
 	}
 	else if(type==Movegen::captureEvasionMg)
 	{
-		assert(s.checkers);
+		assert(s.getCheckers());
 		target = ( s.getCheckers() ) & ~pos.getOurBitmap(Pieces);
 		kingTarget = target | pos.getTheirBitmap(Pieces);
 		//displayBitmap(target);
@@ -224,7 +224,7 @@ void Movegen::generateMoves()
 	}else
 	{
 		assert(false);
-		assert(s.checkers);
+		assert(s.getCheckers());
 		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
 		kingTarget = ~pos.getOurBitmap(Pieces);
 	}

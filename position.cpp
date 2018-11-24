@@ -1482,10 +1482,6 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 {
 	assert( m );
 	tSquare to = m.getTo();
-	assert(piece!=occupiedSquares);
-	assert(piece!=separationBitmap);
-	assert(piece!=whitePieces);
-	assert(piece!=blackPieces);
 	const state& s = getActualStateConst();
 
 	tSquare kingSquare = getSquareOfThePiece( s.getKingOfOtherPlayer() );
