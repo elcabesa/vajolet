@@ -77,21 +77,51 @@ public:
 	public:
 		// todo modifiche a keys inseririle dentro alle altre chiamate
 
-		HashKey key,		/*!<  hashkey identifying the position*/
-			pawnKey,	/*!<  hashkey identifying the pawn formation*/
-			materialKey;/*!<  hashkey identifying the material signature*/
-
-
 		state(){}
+
+		inline HashKey& getKey()
+		{
+			return _key;
+		}
 
 		inline const HashKey& getKey() const
 		{
-			return key;
+			return _key;
 		}
 
 		inline void setKey( const HashKey& k )
 		{
-			key = k;
+			_key = k;
+		}
+
+		inline HashKey& getPawnKey()
+		{
+			return _pawnKey;
+		}
+
+		inline const HashKey& getPawnKey() const
+		{
+			return _pawnKey;
+		}
+
+		inline void setPawnKey( const HashKey& k )
+		{
+			_pawnKey = k;
+		}
+
+		inline HashKey& getMaterialKey()
+		{
+			return _materialKey;
+		}
+
+		inline const HashKey& getMaterialKey() const
+		{
+			return _materialKey;
+		}
+
+		inline void setMaterialKey( const HashKey& k )
+		{
+			_materialKey = k;
 		}
 
 
@@ -406,6 +436,9 @@ public:
 		bitMap _checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 		bitboardIndex _capturedPiece; /*!<  index of the captured piece for unmakeMove*/
 		tSquare _epSquare;	/*!<  en passant square*/
+		HashKey _key,		/*!<  hashkey identifying the position*/
+				_pawnKey,	/*!<  hashkey identifying the pawn formation*/
+				_materialKey;/*!<  hashkey identifying the material signature*/
 
 	};
 
@@ -513,12 +546,12 @@ public:
 
 	const HashKey& getPawnKey(void) const
 	{
-		return getActualStateConst().pawnKey;
+		return getActualStateConst().getPawnKey();
 	}
 
 	const HashKey& getMaterialKey(void) const
 	{
-		return getActualStateConst().materialKey;
+		return getActualStateConst().getMaterialKey();
 	}
 
 	eNextMove getNextTurn(void) const

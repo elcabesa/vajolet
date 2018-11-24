@@ -285,8 +285,8 @@ void Position::setupFromFen(const std::string& fenStr)
 	x.setNonPawnValue( calcNonPawnMaterialValue() );
 
 	x.setKey( calcKey() );
-	x.pawnKey=calcPawnKey();
-	x.materialKey=calcMaterialKey();
+	x.setPawnKey( calcPawnKey() );
+	x.setMaterialKey( calcMaterialKey() );
 
 	calcCheckingSquares();
 
@@ -722,10 +722,10 @@ void Position::doNullMove(void)
 	if( x.hasEpSquare() )
 	{
 		assert( x.getEpSquare() < squareNumber );
-		x.key.changeEp( x.getEpSquare() );
+		x.getKey().changeEp( x.getEpSquare() );
 		x.resetEpSquare();
 	}
-	x.key.changeSide();
+	x.getKey().changeSide();
 	x.incrementIrreversibleMoveCount();
 	x.resetPliesFromNullCount();
 	x.changeNextTurn();
@@ -783,7 +783,7 @@ void Position::doMove(const Move & m){
 
 
 	// change side
-	x.key.changeSide();
+	x.getKey().changeSide();
 	++ply;
 
 	// update counter
@@ -794,7 +794,7 @@ void Position::doMove(const Move & m){
 	if( x.hasEpSquare() )
 	{
 		assert( x.getEpSquare() < squareNumber );
-		x.key.changeEp( x.getEpSquare() );
+		x.getKey().changeEp( x.getEpSquare() );
 		x.resetEpSquare();
 	}
 
@@ -811,8 +811,8 @@ void Position::doMove(const Move & m){
 		movePiece(rook,rFrom,rTo);
 		x.addMaterial( pstValue[rook][rTo] - pstValue[rook][rFrom] );
 
-		x.key.updatePiece( rFrom, rook );
-		x.key.updatePiece( rTo, rook );
+		x.getKey().updatePiece( rFrom, rook );
+		x.getKey().updatePiece( rTo, rook );
 
 	}
 
@@ -827,7 +827,7 @@ void Position::doMove(const Move & m){
 				captureSquare-=pawnPush( x.isBlackTurn() );
 			}
 			assert(captureSquare<squareNumber);
-			x.pawnKey.updatePiece( captureSquare, capture );
+			x.getPawnKey().updatePiece( captureSquare, capture );
 		}
 
 		// remove piece
@@ -837,17 +837,17 @@ void Position::doMove(const Move & m){
 		x.removeNonPawnMaterial( nonPawnValue[capture] );
 
 		// update keys
-		x.key.updatePiece( captureSquare, capture);
+		x.getKey().updatePiece( captureSquare, capture);
 		assert(getPieceCount(capture)<30);
-		x.materialKey.updatePiece( (tSquare)capture, (bitboardIndex)getPieceCount(capture) ); // ->after removing the piece
+		x.getMaterialKey().updatePiece( (tSquare)capture, (bitboardIndex)getPieceCount(capture) ); // ->after removing the piece
 
 		// reset fifty move counter
 		x.resetIrreversibleMoveCount();
 	}
 
 	// update hashKey
-	x.key.updatePiece( from, piece );
-	x.key.updatePiece( to, piece );
+	x.getKey().updatePiece( from, piece );
+	x.getKey().updatePiece( to, piece );
 	movePiece(piece,from,to);
 
 	x.addMaterial( pstValue[piece][to] - pstValue[piece][from] );
@@ -857,7 +857,7 @@ void Position::doMove(const Move & m){
 	{
 		eCastle cr = castleRightsMask[from] | castleRightsMask[to];
 		assert((x.getCastleRights() & cr)<16);
-		x.key.setCastlingRight( x.getCastleRights() & cr );
+		x.getKey().setCastlingRight( x.getCastleRights() & cr );
 		x.clearCastleRight( cr );
 	}
 
@@ -872,7 +872,7 @@ void Position::doMove(const Move & m){
 		{
 			x.setEpSquare( (tSquare)((from+to)>>1) );
 			assert(x.getEpSquare()<squareNumber);
-			x.key.changeEp( x.getEpSquare() );
+			x.getKey().changeEp( x.getEpSquare() );
 		}
 		if( m.isPromotionMove() )
 		{
@@ -886,14 +886,14 @@ void Position::doMove(const Move & m){
 			x.addNonPawnMaterial( nonPawnValue[promotedPiece] );
 
 
-			x.key.updatePiece( to, piece );
-			x.key.updatePiece( to, promotedPiece );
-			x.pawnKey.updatePiece( to,piece );
-			x.materialKey.updatePiece( (tSquare)promotedPiece, (bitboardIndex)( getPieceCount(promotedPiece) - 1 ) );
-			x.materialKey.updatePiece( (tSquare)piece, (bitboardIndex)getPieceCount(piece) );
+			x.getKey().updatePiece( to, piece );
+			x.getKey().updatePiece( to, promotedPiece );
+			x.getPawnKey().updatePiece( to,piece );
+			x.getMaterialKey().updatePiece( (tSquare)promotedPiece, (bitboardIndex)( getPieceCount(promotedPiece) - 1 ) );
+			x.getMaterialKey().updatePiece( (tSquare)piece, (bitboardIndex)getPieceCount(piece) );
 		}
-		x.pawnKey.updatePiece( from, piece );
-		x.pawnKey.updatePiece( to, piece );
+		x.getPawnKey().updatePiece( from, piece );
+		x.getPawnKey().updatePiece( to, piece );
 		x.resetIrreversibleMoveCount();
 	}
 
@@ -1143,7 +1143,7 @@ bool Position::checkPosConsistency(int nn) const
 		while(1){}
 		return false;
 	}
-	if(x.pawnKey != calcPawnKey())
+	if(x.getPawnKey() != calcPawnKey())
 	{
 		display();
 		sync_cout<<"pawnKey error"<<sync_endl;
@@ -1151,7 +1151,7 @@ bool Position::checkPosConsistency(int nn) const
 		while(1){}
 		return false;
 	}
-	if(x.materialKey != calcMaterialKey())
+	if(x.getMaterialKey() != calcMaterialKey())
 	{
 		sync_cout<<"materialKey error"<<sync_endl;
 		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
@@ -1534,7 +1534,7 @@ bool Position::isDraw(bool isPVline) const
 	for(int i = 4 ;	i<=e; i+=2 )
 	{
 		std::advance( it,2);
-		if(it->key == actualkey)
+		if(it->getKey() == actualkey)
 		{
 			counter++;
 			if(!isPVline || counter>=3)
