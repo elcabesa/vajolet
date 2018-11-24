@@ -20,7 +20,7 @@
 
 #include "bitBoardIndex.h"
 #include "MoveList.h"
-#include "Move.h"
+#include "move.h"
 #include "score.h"
 
 
