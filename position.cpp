@@ -1039,7 +1039,6 @@ void Position::initCastleRightsMask(void)
 */
 bool Position::checkPosConsistency(int nn) const
 {
-	return true;
 	const state &x = getActualStateConst();
 	if( x.getNextTurn() !=whiteTurn && x.getNextTurn() !=blackTurn)
 	{

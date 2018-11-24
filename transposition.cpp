@@ -17,6 +17,7 @@
 
 #include <iostream>
 
+#include "hashKey.h"
 #include "transposition.h"
 #include "vajolet.h"
 

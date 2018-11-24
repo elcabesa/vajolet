@@ -79,7 +79,7 @@ public:
 	HashKey(){}
 	explicit HashKey(unsigned int k):_key(k){}
 
-	bool operator==(HashKey const & r) const {return !(_key == r._key);}
+	bool operator==(HashKey const & r) const {return (_key == r._key);}
 	bool operator!=(HashKey const & r) const {return !(*this == r);}
 };
 

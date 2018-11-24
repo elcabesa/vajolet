@@ -23,8 +23,7 @@
 //---------------------------------------------
 //	typedefs
 //---------------------------------------------
-typedef int simdScore __attribute__ ((vector_size (16)));
-//using simdScore = int __attribute__ ((vector_size (16)));
+using simdScore = int __attribute__ ((vector_size (16)));
 using Score = int32_t;
 
 
