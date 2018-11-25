@@ -398,7 +398,9 @@ private:
 	HashKey calcMaterialKey(void) const;
 	simdScore calcMaterialValue(void) const;
 	simdScore calcNonPawnMaterialValue(void) const;
+#ifdef	ENABLE_CHECK_CONSISTENCY
 	bool checkPosConsistency(int nn) const;
+#endif
 	void clear();
 	inline void calcCheckingSquares(void);
 	template<bool our>

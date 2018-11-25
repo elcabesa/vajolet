@@ -294,7 +294,9 @@ void Position::setupFromFen(const std::string& fenStr)
 	x.setPinnedPieces( getHiddenCheckers<false>() );
 	x.setCheckers( getAttackersTo(getSquareOfThePiece( x.getKingOfActivePlayer() ) ) & bitBoard[x.getPiecesOfOtherPlayer()] );
 
+#ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(1);
+#endif
 }
 
 // todo remove?
@@ -774,10 +776,7 @@ void Position::doMove(const Move & m){
 
 	assert( isValidPiece( piece ));
 	bitboardIndex capture = ( m.isEnPassantMove() ? (x.isBlackTurn() ? whitePawns : blackPawns ) : squares[to] );
-	assert(capture!=separationBitmap);
-	assert(capture!=whitePieces);
-	assert(capture!=blackPieces);
-
+	assert( isValidPiece( piece ) || piece == empty );
 
 	// change side
 	x.getKey().changeSide();
@@ -1026,6 +1025,15 @@ void Position::initCastleRightsMask(void)
 }
 
 
+#ifdef	ENABLE_CHECK_CONSISTENCY
+static bool block( std::string errorString, unsigned int type )
+{
+	sync_cout<< errorString <<sync_endl;
+	sync_cout<<( type ? "DO error" : "undoError" ) <<sync_endl;
+	while(1){}
+	return false;
+}
+
 /*! \brief do a sanity check on the board
 	\author Marco Belli
 	\version 1.0
@@ -1034,21 +1042,15 @@ void Position::initCastleRightsMask(void)
 bool Position::checkPosConsistency(int nn) const
 {
 	const state &x = getActualStateConst();
-	if( x.getNextTurn() !=whiteTurn && x.getNextTurn() !=blackTurn)
+	if( x.getNextTurn() != whiteTurn && x.getNextTurn() != blackTurn)
 	{
-		sync_cout<<"nextMove error" <<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
+		return block( "nextMove error", nn );
 	}
 
 	// check board
 	if(bitBoard[whitePieces] & bitBoard[blackPieces])
 	{
-		sync_cout<<"white piece & black piece intersected"<<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
+		return block( "white piece & black piece intersected", nn );
 	}
 	if((bitBoard[whitePieces] | bitBoard[blackPieces]) !=bitBoard[occupiedSquares])
 	{
@@ -1057,10 +1059,7 @@ bool Position::checkPosConsistency(int nn) const
 		displayBitmap(bitBoard[blackPieces]);
 		displayBitmap(bitBoard[occupiedSquares]);
 
-		sync_cout<<"all piece problem"<<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
+		return block( "all piece problem", nn );
 	}
 	for(tSquare sq = square0; sq < squareNumber; sq++)
 	{
@@ -1068,10 +1067,7 @@ bool Position::checkPosConsistency(int nn) const
 
 		if( id != empty && !isSquareSet( bitBoard[id], sq ) )
 		{
-			sync_cout<<"board inconsistency"<<sync_endl;
-			sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-			while(1){}
-			return false;
+			return block( "board inconsistency", nn );
 		}
 	}
 
@@ -1081,10 +1077,7 @@ bool Position::checkPosConsistency(int nn) const
 		{
 			if(i!=j && i!= whitePieces && i!= separationBitmap && j!= whitePieces && j!= separationBitmap && (bitBoard[i] & bitBoard[j]))
 			{
-				sync_cout<<"bitboard intersection"<<sync_endl;
-				sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-				while(1){}
-				return false;
+				return block( "bitboard intersection", nn );
 			}
 		}
 	}
@@ -1094,10 +1087,7 @@ bool Position::checkPosConsistency(int nn) const
 		{
 			if(getPieceCount((bitboardIndex)i) != bitCnt(bitBoard[i]))
 			{
-				sync_cout<<"pieceCount Error"<<sync_endl;
-				sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-				while(1){}
-				return false;
+				return block( "pieceCount Error", nn );
 			}
 		}
 	}
@@ -1110,11 +1100,7 @@ bool Position::checkPosConsistency(int nn) const
 	}
 	if(test!= bitBoard[whitePieces])
 	{
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		sync_cout<<"white piece error"<<sync_endl;
-		while(1){}
-		return false;
-
+		return block( "white piece error", nn );
 	}
 	test=0;
 	for (int i = blackKing; i < blackPieces; i++)
@@ -1123,34 +1109,21 @@ bool Position::checkPosConsistency(int nn) const
 	}
 	if(test!= bitBoard[blackPieces])
 	{
-		sync_cout<<"black piece error"<<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
-
+		return block( "black piece error", nn );
 	}
 	if( x.getKey() != calcKey() )
 	{
 		display();
-		sync_cout<<"hashKey error"<<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
+		return block( "hashKey error", nn );
 	}
 	if(x.getPawnKey() != calcPawnKey())
 	{
 		display();
-		sync_cout<<"pawnKey error"<<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
+		return block( "pawnKey error", nn );
 	}
 	if(x.getMaterialKey() != calcMaterialKey())
 	{
-		sync_cout<<"materialKey error"<<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
+		return block( "materialKey error", nn );
 	}
 
 	simdScore sc=calcMaterialValue();
@@ -1159,10 +1132,7 @@ bool Position::checkPosConsistency(int nn) const
 		display();
 		sync_cout<<sc[0]<<":"<<x.getMaterialValue()[0]<<sync_endl;
 		sync_cout<<sc[1]<<":"<<x.getMaterialValue()[1]<<sync_endl;
-		sync_cout<<"material error"<<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
+		return block( "material error", nn );
 	}
 	simdScore score = calcNonPawnMaterialValue();
 	if(score[0]!= x.getNonPawnValue()[0] ||
@@ -1175,18 +1145,11 @@ bool Position::checkPosConsistency(int nn) const
 		sync_cout<<score[1]<<":"<<x.getNonPawnValue()[1]<<sync_endl;
 		sync_cout<<score[2]<<":"<<x.getNonPawnValue()[2]<<sync_endl;
 		sync_cout<<score[3]<<":"<<x.getNonPawnValue()[3]<<sync_endl;
-		sync_cout<<"non pawn material error"<<sync_endl;
-		sync_cout<<(nn?"DO error":"undoError") <<sync_endl;
-		while(1){}
-		return false;
+		return block( "non pawn material error", nn );
 	}
-
-
-
-
-
 	return true;
 }
+#endif
 
 
 /*! \brief calculate the perft result
