@@ -199,9 +199,6 @@ private:
 	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
 	static std::vector<Move> rootMoves;
 
-	static Score mateIn(int ply) { return SCORE_MATE - ply; }
-	static Score matedIn(int ply) { return SCORE_MATED + ply; }
-
 	//--------------------------------------------------------
 	// private members
 	//--------------------------------------------------------

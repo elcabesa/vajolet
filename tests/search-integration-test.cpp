@@ -7,9 +7,10 @@
 
 enum resType
 {
-	draw,
-	won,
-	lost
+	near,
+	bigger,
+	smaller,
+	equal
 };
 
 typedef struct _positions
@@ -17,17 +18,30 @@ typedef struct _positions
      const std::string Fen;
      unsigned int depth;
      Move bm;
+     Move am;
      resType res;
+     Score score;
 
 }positions;
 
 static const std::vector<positions> endgames =
 {
-	{"8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1", 30, Move(A1,B1), won},
-	{"6k1/8/7P/7K/8/8/2B5/8 w - - 0 30", 15, Move::NOMOVE, draw},
-	{"4k3/4P3/4K3/8/8/8/8/8 b - - 0 1", 15, Move::NOMOVE, lost},
-	{"4k3/4P3/4K3/8/8/8/8/8 w - - 0 1", 15, Move::NOMOVE, won},
-	{"8/3k4/8/3K4/8/3P4/8/8 w - - 0 1", 15, Move(D3,D4), won},
+	{"8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1", 30, Move(A1,B1), Move::NOMOVE,bigger, 20000}, // fine 70
+	{"6k1/8/7P/7K/8/8/2B5/8 w - - 0 30", 15, Move::NOMOVE, Move::NOMOVE,equal, 0},
+	{"8/8/5k2/5P2/5K2/8/8/8 w - - 0 60", 20, Move::NOMOVE, Move::NOMOVE,equal, 0},
+	{"4k3/4P3/4K3/8/8/8/8/8 w - - 0 1", 15, Move::NOMOVE, Move::NOMOVE,bigger, 90000},
+	{"8/3k4/8/3K4/8/3P4/8/8 w - - 0 1", 15, Move(D3,D4), Move::NOMOVE,bigger, 90000},
+	// texel search tests
+	{"3k4/8/3K2R1/8/8/8/8/8 w - - 0 1", 2, Move(G6,G8), Move::NOMOVE,equal, mateIn(1)},
+	{"8/1P6/k7/2K5/8/8/8/8 w - - 0 1", 4, Move(B7,B8, Move::fpromotion, Move::promQueen),Move::NOMOVE, equal, mateIn(3)}, // it's not sure, promotion to rook is equal good
+	{"8/5P1k/5K2/8/8/8/8/8 w - - 0 1", 4, Move(F7,F8, Move::fpromotion, Move::promRook),Move::NOMOVE, equal, mateIn(3)},
+	{"3kB3/8/1N1K4/8/8/8/8/8 w - - 0 50",4, Move::NOMOVE,Move::NOMOVE, equal, 0}, //stale mate
+	{"8/8/2K5/3QP3/P6P/1q6/8/k7 w - - 31 51", 10, Move::NOMOVE,Move(D5,B3), bigger, 40000 },
+
+	{"2r2rk1/6p1/p3pq1p/1p1b1p2/3P1n2/PP3N2/3N1PPP/1Q2RR1K b - - 0 1", 15, Move(F4,G2),Move::NOMOVE, bigger, 30000 },  //WAC 174
+	{"r1bq2rk/pp3pbp/2p1p1pQ/7P/3P4/2PB1N2/PP3PPR/2KR4 w - -", 10, Move(H6,H7),Move::NOMOVE, equal, mateIn(3) }, //WAC 004
+	{"7k/1P3R1P/6r1/5K2/8/8/6R1/8 b - - 98 194", 10, Move(G6,G5),Move::NOMOVE, equal, 0 },
+	{"7K/6R1/5k2/3q4/8/8/8/8 b - - 0 1",20, Move::NOMOVE,Move::NOMOVE, equal, mateIn(17)},// D5D8 or D5A8 are equal winning
 };
 
 TEST(PerftTest, endgames) {
@@ -52,17 +66,25 @@ TEST(PerftTest, endgames) {
 		{
 			EXPECT_EQ( res.PV.getMove(0), p.bm);
 		}
+
+		if( p.am != Move::NOMOVE)
+		{
+			EXPECT_NE( res.PV.getMove(0), p.am);
+		}
 		switch( p.res )
 		{
-		case won:
-			EXPECT_GT( res.Res, 30000) << "problem with position: '"<< p.Fen <<"' expected win";
+		case bigger:
+			EXPECT_GT( res.Res, p.score) << "problem with position: '"<< p.Fen <<"' expected bigger";
 			break;
-		case lost:
-			EXPECT_LT( res.Res, -30000) << "problem with position: '"<< p.Fen <<"' expected lost";
+		case smaller:
+			EXPECT_LT( res.Res, p.score) << "problem with position: '"<< p.Fen <<"' expected smaller";
 			break;
-		case draw:
-			EXPECT_GT( res.Res, -200) << "problem with position: '"<< p.Fen <<"' expected draw";
-			EXPECT_LT( res.Res, +200) << "problem with position: '"<< p.Fen <<"' expected draw";
+		case near:
+			EXPECT_GT( res.Res, p.score - 200) << "problem with position: '"<< p.Fen <<"' expected similar";
+			EXPECT_LT( res.Res, p.score + 200) << "problem with position: '"<< p.Fen <<"' expected similar";
+			break;
+		case equal:
+			EXPECT_EQ( res.Res, p.score) << "problem with position: '"<< p.Fen <<"' expected equal";
 			break;
 		}
 

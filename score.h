@@ -39,4 +39,7 @@ const Score SCORE_MATE_IN_MAX_PLY = 1690000;
 const Score SCORE_KNOWN_WIN = 1500000;
 const Score SCORE_MATED_IN_MAX_PLY = -SCORE_MATE_IN_MAX_PLY;
 
+inline Score mateIn(int ply) { return SCORE_MATE - ply; }
+inline Score matedIn(int ply) { return SCORE_MATED + ply; }
+
 #endif
