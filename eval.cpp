@@ -174,27 +174,28 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 {
 	simdScore res = {0,0,0,0};
 	bitMap tempPieces = getBitmap(piece);
-	bitMap enemyKing = (piece > separationBitmap)? getBitmap(whiteKing) : getBitmap(blackKing);
-	tSquare enemyKingSquare = (piece > separationBitmap)? getSquareOfThePiece(whiteKing) : getSquareOfThePiece(blackKing);
-	bitMap enemyKingRing = (piece > separationBitmap) ? kingRing[white] : kingRing[black];
-	unsigned int * pKingAttackersCount = (piece > separationBitmap) ? &kingAttackersCount[black] : &kingAttackersCount[white];
-	unsigned int * pkingAttackersWeight = (piece > separationBitmap) ? &kingAttackersWeight[black] : &kingAttackersWeight[white];
-	unsigned int * pkingAdjacentZoneAttacksCount = (piece > separationBitmap) ? &kingAdjacentZoneAttacksCount[black] : &kingAdjacentZoneAttacksCount[white];
-	const bitMap & enemyWeakSquares = (piece > separationBitmap) ? weakSquares[white] : weakSquares[black];
-	const bitMap & enemyHoles = (piece > separationBitmap) ? holes[white] : holes[black];
-	const bitMap & supportedSquares = (piece > separationBitmap) ? attackedSquares[blackPawns] : attackedSquares[whitePawns];
-	const bitMap & threatenSquares = (piece > separationBitmap) ? attackedSquares[whitePawns] : attackedSquares[blackPawns];
-	const bitMap ourPieces = (piece > separationBitmap) ? getBitmap(blackPieces) : getBitmap(whitePieces);
-	const bitMap ourPawns = (piece > separationBitmap) ? getBitmap(blackPawns) : getBitmap(whitePawns);
-	const bitMap theirPieces = (piece > separationBitmap) ? getBitmap(whitePieces) : getBitmap(blackPieces);
-	const bitMap theirPawns = (piece > separationBitmap) ? getBitmap(whitePawns) : getBitmap(blackPawns);
+	bitMap enemyKing = isBlackPiece(piece)? getBitmap(whiteKing) : getBitmap(blackKing);
+	tSquare enemyKingSquare = isBlackPiece(piece)? getSquareOfThePiece(whiteKing) : getSquareOfThePiece(blackKing);
+	bitMap enemyKingRing = isBlackPiece(piece) ? kingRing[white] : kingRing[black];
+	unsigned int * pKingAttackersCount = isBlackPiece(piece) ? &kingAttackersCount[black] : &kingAttackersCount[white];
+	unsigned int * pkingAttackersWeight = isBlackPiece(piece) ? &kingAttackersWeight[black] : &kingAttackersWeight[white];
+	unsigned int * pkingAdjacentZoneAttacksCount = isBlackPiece(piece) ? &kingAdjacentZoneAttacksCount[black] : &kingAdjacentZoneAttacksCount[white];
+	const bitMap & enemyWeakSquares = isBlackPiece(piece) ? weakSquares[white] : weakSquares[black];
+	const bitMap & enemyHoles = isBlackPiece(piece) ? holes[white] : holes[black];
+	const bitMap & supportedSquares = isBlackPiece(piece) ? attackedSquares[blackPawns] : attackedSquares[whitePawns];
+	const bitMap & threatenSquares = isBlackPiece(piece) ? attackedSquares[whitePawns] : attackedSquares[blackPawns];
+	const bitMap ourPieces = isBlackPiece(piece) ? getBitmap(blackPieces) : getBitmap(whitePieces);
+	const bitMap ourPawns = isBlackPiece(piece) ? getBitmap(blackPawns) : getBitmap(whitePawns);
+	const bitMap theirPieces = isBlackPiece(piece) ? getBitmap(whitePieces) : getBitmap(blackPieces);
+	const bitMap theirPawns = isBlackPiece(piece) ? getBitmap(whitePawns) : getBitmap(blackPawns);
+	const bitboardIndex pieceType = getPieceType( piece );
 
 	(void)theirPawns;
 
 	while(tempPieces)
 	{
 		tSquare sq = iterateBit(tempPieces);
-		unsigned int relativeRank =(piece > separationBitmap) ? 7 - RANKS[sq] : RANKS[sq];
+		unsigned int relativeRank = isBlackPiece(piece) ? 7 - RANKS[sq] : RANKS[sq];
 
 		//---------------------------
 		//	MOBILITY
@@ -232,7 +233,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		if(attack & enemyKingRing)
 		{
 			(*pKingAttackersCount)++;
-			(*pkingAttackersWeight) += KingAttackWeights[ ( piece % separationBitmap ) -2 ];
+			(*pkingAttackersWeight) += KingAttackWeights[ pieceType -2 ];
 			bitMap adjacent = attack & Movegen::attackFrom<whiteKing>(enemyKingSquare);
 			if(adjacent)
 			{
@@ -244,13 +245,13 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 
 		bitMap defendedPieces = attack & ourPieces & ~ourPawns;
 		// piece coordination
-		res += (int)bitCnt( defendedPieces ) * pieceCoordination[piece % separationBitmap];
+		res += (int)bitCnt( defendedPieces ) * pieceCoordination[ pieceType ];
 
 
 		//unsigned int mobility = (bitCnt(attack&~(threatenSquares|ourPieces))+ bitCnt(attack&~(ourPieces)))/2;
 		unsigned int mobility = bitCnt( attack & ~(threatenSquares | ourPieces));
 
-		res += mobilityBonus[ piece % separationBitmap ][ mobility ];
+		res += mobilityBonus[ pieceType ][ mobility ];
 		if(piece != whiteKnights && piece != blackKnights)
 		{
 			if( !(attack & ~(threatenSquares | ourPieces) ) && isSquareSet( threatenSquares, sq ) ) // zero mobility && attacked by pawn
@@ -263,11 +264,11 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		/////////////////////////////////////////
 		if(attack & centerBitmap)
 		{
-			res += (int)bitCnt(attack & centerBitmap) * piecesCenterControl[piece % separationBitmap];
+			res += (int)bitCnt(attack & centerBitmap) * piecesCenterControl[ pieceType ];
 		}
 		if(attack & bigCenterBitmap)
 		{
-			res += (int)bitCnt(attack & bigCenterBitmap) * piecesBigCenterControl[piece % separationBitmap];
+			res += (int)bitCnt(attack & bigCenterBitmap) * piecesBigCenterControl[ pieceType ];
 		}
 
 		switch(piece)
@@ -275,8 +276,8 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		case whiteQueens:
 		case blackQueens:
 		{
-			bitMap enemyBackRank = (piece > separationBitmap) ? RANKMASK[A1] : RANKMASK[A8];
-			bitMap enemyPawns = (piece > separationBitmap) ? getBitmap(whitePawns) : getBitmap(blackPawns);
+			bitMap enemyBackRank = isBlackPiece(piece) ? RANKMASK[A1] : RANKMASK[A8];
+			bitMap enemyPawns = isBlackPiece(piece) ? getBitmap(whitePawns) : getBitmap(blackPawns);
 			//--------------------------------
 			// donna in 7a con re in 8a
 			//--------------------------------
@@ -296,9 +297,9 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		case whiteRooks:
 		case blackRooks:
 		{
-			bitMap enemyBackRank = (piece > separationBitmap) ? RANKMASK[A1] : RANKMASK[A8];
-			bitMap enemyPawns = (piece > separationBitmap) ?  getBitmap(whitePawns) : getBitmap(blackPawns);
-			bitMap ourPawns = (piece > separationBitmap) ? getBitmap(blackPawns) : getBitmap(whitePawns);
+			bitMap enemyBackRank = isBlackPiece(piece) ? RANKMASK[A1] : RANKMASK[A8];
+			bitMap enemyPawns = isBlackPiece(piece) ?  getBitmap(whitePawns) : getBitmap(blackPawns);
+			bitMap ourPawns = isBlackPiece(piece) ? getBitmap(blackPawns) : getBitmap(whitePawns);
 			//--------------------------------
 			// torre in 7a con re in 8a
 			//--------------------------------
@@ -332,8 +333,8 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 			else if( mobility < 3 )
 			{
 
-				tSquare ksq = (piece > separationBitmap) ?  getSquareOfThePiece(blackKing) : getSquareOfThePiece(whiteKing);
-				unsigned int relativeRankKing = (piece > separationBitmap) ? 7 - RANKS[ksq] : RANKS[ksq];
+				tSquare ksq = isBlackPiece(piece) ?  getSquareOfThePiece(blackKing) : getSquareOfThePiece(whiteKing);
+				unsigned int relativeRankKing = isBlackPiece(piece) ? 7 - RANKS[ksq] : RANKS[ksq];
 
 				if(
 					((FILES[ksq] < 4) == (FILES[sq] < FILES[ksq])) &&
@@ -343,7 +344,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 
 					res -= rookTrapped*(int)(3-mobility);
 					const state & st = getActualStateConst();
-					if(piece > separationBitmap)
+					if( isBlackPiece(piece) )
 					{
 						if( !st.hasCastleRight( bCastleOO | bCastleOOO ) )
 						{
@@ -567,8 +568,8 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 {
 	simdScore res = {0,0,0,0};
 	bitMap AttackingPieces = c ? getBitmap(whitePieces) : getBitmap(blackPieces);
-	bitMap * DefendedSquaresBy = c ? &attackedSquares[separationBitmap] : &attackedSquares[occupiedSquares];
-	bitMap * AttackedSquaresBy = c ? &attackedSquares[occupiedSquares] : &attackedSquares[separationBitmap];
+	bitMap * DefendedSquaresBy = c ? &attackedSquares[blacks] : &attackedSquares[whites];
+	bitMap * AttackedSquaresBy = c ? &attackedSquares[whites] : &attackedSquares[blacks];
 	tSquare kingSquare = c ? getSquareOfThePiece(blackKing) : getSquareOfThePiece(whiteKing);
 
 	if( kingAttackersCount )// se il re e' attaccato
@@ -1086,7 +1087,7 @@ Score Position::eval(void)
 	while(pawnAttackedPieces)
 	{
 		tSquare attacked = iterateBit( pawnAttackedPieces );
-		wScore -= attackedByPawnPenalty[ getPieceAt(attacked) % separationBitmap ];
+		wScore -= attackedByPawnPenalty[ getPieceTypeAt(attacked) ];
 	}
 
 	// todo fare un weak piece migliore:qualsiasi pezzo attaccato riceve un malus dipendente dal suo più debole attaccante e dal suo valore.
@@ -1101,13 +1102,13 @@ Score Position::eval(void)
 	{
 		tSquare sq = iterateBit(weakPieces);
 
-		bitboardIndex attackedPiece = getPieceAt(sq);
+		bitboardIndex attackedPieceType = getPieceTypeAt(sq);
 		bitboardIndex attackingPiece = blackPawns;
 		for(; attackingPiece >= blackKing; attackingPiece = (bitboardIndex)(attackingPiece - 1) )
 		{
 			if( isSquareSet( attackedSquares[ attackingPiece ], sq ) )
 			{
-				wScore -= weakPiecePenalty[attackedPiece % separationBitmap][ attackingPiece % separationBitmap];
+				wScore -= weakPiecePenalty[ attackedPieceType ][ getPieceType( attackingPiece ) ];
 				break;
 			}
 		}
@@ -1126,7 +1127,7 @@ Score Position::eval(void)
 	while(pawnAttackedPieces)
 	{
 		tSquare attacked = iterateBit( pawnAttackedPieces );
-		bScore -= attackedByPawnPenalty[ getPieceAt(attacked) % separationBitmap ];
+		bScore -= attackedByPawnPenalty[ getPieceTypeAt(attacked) ];
 	}
 
 	undefendedMinors =  (getBitmap(blackKnights) | getBitmap(blackBishops))  & ~attackedSquares[blackPieces];
@@ -1139,13 +1140,13 @@ Score Position::eval(void)
 	{
 		tSquare sq = iterateBit(weakPieces);
 
-		bitboardIndex attackedPiece = getPieceAt(sq);
+		bitboardIndex attackedPieceType = getPieceTypeAt(sq);
 		bitboardIndex attackingPiece = whitePawns;
 		for(; attackingPiece >= whiteKing; attackingPiece = (bitboardIndex)(attackingPiece - 1) )
 		{
 			if( isSquareSet( attackedSquares[ attackingPiece ], sq ) )
 			{
-				bScore -= weakPiecePenalty[attackedPiece % separationBitmap][attackingPiece % separationBitmap];
+				bScore -= weakPiecePenalty[ attackedPieceType ][ getPieceType(attackingPiece) ];
 				break;
 			}
 		}

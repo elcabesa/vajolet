@@ -75,13 +75,19 @@ public:
 	}
 	inline unsigned int getPieceCount(const bitboardIndex in) const
 	{
-		return bitCnt(getBitmap(in));
+		return bitCnt( getBitmap( in ) );
 	}
 
 	inline bitboardIndex getPieceAt(const tSquare sq) const
 	{
 		return squares[sq];
 	}
+
+	inline bitboardIndex getPieceTypeAt(const tSquare sq) const
+	{
+		return getPieceType( squares[sq] );
+	}
+
 	inline tSquare getSquareOfThePiece(const bitboardIndex piece) const
 	{
 		return firstOne(getBitmap(piece));
@@ -286,7 +292,7 @@ public:
 	{
 		if(isPawn(getPieceAt(m.getFrom())))
 		{
-			bool color = squares[m.getFrom()] >= separationBitmap;
+			bool color = isBlackPiece( squares[m.getFrom()] );
 			bitMap theirPawns = color? bitBoard[whitePawns]:bitBoard[blackPawns];
 			bitMap ourPawns = color? bitBoard[blackPawns]:bitBoard[whitePawns];
 			return !(theirPawns & PASSED_PAWN[color][m.getFrom()]) && !(ourPawns & SQUARES_IN_FRONT_OF[color][m.getFrom()]);
@@ -426,7 +432,7 @@ private:
 	bool evalKNNvsK(Score& res);
 	bool evalKNPvsK(Score& res);
 
-	static std::string _printEpSquare( const state& st);
+	static std::string _printEpSquare( const state& st );
 
 };
 

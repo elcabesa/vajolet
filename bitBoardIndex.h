@@ -51,10 +51,14 @@ enum bitboardIndex
 	Knights,
 	Pawns,
 	Pieces,
+	whites = occupiedSquares,
+	blacks = separationBitmap,
 
 	empty=occupiedSquares
 
 };
+
+inline bitboardIndex operator++(bitboardIndex& d, int) { d = bitboardIndex(int(d) + 1); return d; }
 
 enum eNextMove	// color turn. ( it's also used as offset to access bitmaps by index)
 {
@@ -106,6 +110,15 @@ inline static bool isRook(bitboardIndex piece)
 inline static bool isBishop(bitboardIndex piece){
 	return (piece&7) == Bishops;
 }
+
+/*! \brief tell if the piece is a bishop
+	\author Marco Belli
+	\version 1.0
+	\date 04/11/2013
+*/
+inline static bool isKnight(bitboardIndex piece){
+	return (piece&7) == Knights;
+}
 /*! \brief tell the color of a piece
 	\author Marco Belli
 	\version 1.0
@@ -134,6 +147,16 @@ inline bitboardIndex getPieceOfPlayer( const bitboardIndex piece, const eNextMov
 inline bitboardIndex getPieceOfOpponent( const bitboardIndex piece, const eNextMove nM)
 {
 	return (bitboardIndex)( separationBitmap + piece - nM );
+}
+
+inline bitboardIndex getPieceType( const bitboardIndex piece )
+{
+	return bitboardIndex(piece % separationBitmap);
+}
+
+inline bool isBlackPiece( const bitboardIndex piece )
+{
+	return piece >= separationBitmap;
 }
 
 #endif /* BITBOARDINDEX_H_ */

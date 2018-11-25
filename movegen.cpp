@@ -881,7 +881,7 @@ inline void Movegen::scoreQuietEvasion()
 	for( auto& m : moveList )
 	{
 		Score s = ( pos.getPieceAt( m.getFrom() ) );
-		if( pos.getPieceAt( m.getFrom()) % separationBitmap == King )
+		if( pos.getPieceTypeAt( m.getFrom() ) == King )
 		{
 			s = 20;
 		}

@@ -39,7 +39,7 @@ bool Position::perftUseHash = false;
 
 void Position::initPstValues(void)
 {
-	for(int piece = 0; piece < lastBitboard; piece++)
+	for(bitboardIndex piece = occupiedSquares; piece < lastBitboard; piece++)
 	{
 		for(tSquare s = (tSquare)0; s < squareNumber; s++)
 		{
@@ -52,7 +52,7 @@ void Position::initPstValues(void)
 			if(piece > occupiedSquares && piece < whitePieces )
 			{
 
-				if(piece == Pawns)
+				if( isPawn( piece ) )
 				{
 					pstValue[piece][s] = simdScore{0,0,0,0};
 					if(s==D3)
@@ -82,7 +82,7 @@ void Position::initPstValues(void)
 					pstValue[piece][s] += PawnRankBonus * (rank - 2);
 					pstValue[piece][s] += Center[file] * PawnCentering;
 				}
-				if(piece == Knights)
+				if( isKnight( piece ) )
 				{
 					pstValue[piece][s] = KnightPST * (Center[file] + Center[rank]);
 					if(rank==0)
@@ -90,7 +90,7 @@ void Position::initPstValues(void)
 						pstValue[piece][s] -= KnightBackRankOpening;
 					}
 				}
-				if(piece == Bishops)
+				if( isBishop( piece ) )
 				{
 					pstValue[piece][s] = BishopPST * (Center[file] + Center[rank]);
 					if(rank==0)
@@ -102,7 +102,7 @@ void Position::initPstValues(void)
 						pstValue[piece][s] += BishopOnBigDiagonals;
 					}
 				}
-				if(piece == Rooks)
+				if( isRook( piece ) )
 				{
 					pstValue[piece][s] = RookPST * (Center[file]);
 					if(rank==0)
@@ -110,7 +110,7 @@ void Position::initPstValues(void)
 						pstValue[piece][s] -= RookBackRankOpening;
 					}
 				}
-				if(piece == Queens)
+				if( isQueen( piece) )
 				{
 					pstValue[piece][s] = QueenPST * (Center[file] + Center[rank]);
 					if(rank==0)
@@ -118,33 +118,33 @@ void Position::initPstValues(void)
 						pstValue[piece][s] -= QueenBackRankOpening;
 					}
 				}
-				if(piece == King)
+				if( isKing( piece ) )
 				{
 					pstValue[piece][s] = simdScore{
 							(KFile[file]+KRank[rank]) * KingPST[0],
 							(Center[file]+Center[rank]) * KingPST[1],
 							0,0};
 				}
-				if(!isKing((bitboardIndex)piece))
+				if(!isKing( piece ) )
 				{
 					pstValue[piece][s] += pieceValue[piece];
 				}
 
-				if( !isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece))
+				if( !isPawn( piece ) && !isKing( piece ) )
 				{
 					nonPawnValue[piece][0] = pieceValue[piece][0];
 					nonPawnValue[piece][1] = pieceValue[piece][1];
 				}
 
 			}
-			else if(piece >separationBitmap && piece <blackPieces )
+			else if( isBlackPiece( piece ) && piece <blackPieces )
 			{
 				int r = 7 - rank;
 				//int f = 7 - file;
 				int f = file;
 				pstValue[piece][s] = -pstValue[ piece - separationBitmap ][BOARDINDEX[f][r]];
 
-				if( !isPawn((bitboardIndex)piece) && !isKing((bitboardIndex)piece))
+				if( !isPawn( piece ) && !isKing( piece ) )
 				{
 					nonPawnValue[piece][2] = pieceValue[piece][0];
 					nonPawnValue[piece][3] = pieceValue[piece][1];
@@ -516,7 +516,7 @@ std::string Position::getSymmetricFen() const {
 				}
 				emptyFiles = 0;
 				bitboardIndex xx = squares[BOARDINDEX[file][rank]];
-				if(xx >= separationBitmap)
+				if( isBlackPiece(xx) )
 				{
 					xx = (bitboardIndex)(xx - separationBitmap);
 				}
@@ -644,11 +644,11 @@ HashKey Position::calcPawnKey(void) const
 HashKey Position::calcMaterialKey(void) const
 {
 	HashKey hash(0);
-	for (int i = whiteKing; i < lastBitboard; i++)
+	for ( bitboardIndex i = whiteKing; i < lastBitboard; i++)
 	{
-		if ( i != occupiedSquares && i != whitePieces && i != blackPieces)
+		if ( isValidPiece( i ) )
 		{
-			for (unsigned int cnt = 0; cnt < getPieceCount((bitboardIndex)i); cnt++)
+			for (unsigned int cnt = 0; cnt < getPieceCount( i ); cnt++)
 			{
 				// todo invertire? hash.add( cnt, i );
 				hash.updatePiece( (tSquare)i, (bitboardIndex)cnt );
@@ -694,7 +694,7 @@ simdScore Position::calcNonPawnMaterialValue() const
 		bitboardIndex val = squares[n];
 		if(!isPawn(val) && !isKing(val) )
 		{
-			if(val > separationBitmap)
+			if( isBlackPiece( val ) )
 			{
 				t[1] += pieceValue[val];
 			}
@@ -771,11 +771,8 @@ void Position::doMove(const Move & m){
 	tSquare to = m.getTo();
 	tSquare captureSquare = m.getTo();
 	bitboardIndex piece = squares[from];
-	assert(piece!=occupiedSquares);
-	assert(piece!=separationBitmap);
-	assert(piece!=whitePieces);
-	assert(piece!=blackPieces);
 
+	assert( isValidPiece( piece ));
 	bitboardIndex capture = ( m.isEnPassantMove() ? (x.isBlackTurn() ? whitePawns : blackPawns ) : squares[to] );
 	assert(capture!=separationBitmap);
 	assert(capture!=whitePieces);
@@ -963,14 +960,11 @@ void Position::undoMove()
 	tSquare to = m.getTo();
 	tSquare from = m.getFrom();
 	bitboardIndex piece = squares[to];
-	assert(piece!=occupiedSquares);
-	assert(piece!=separationBitmap);
-	assert(piece!=whitePieces);
-	assert(piece!=blackPieces);
+	assert( isValidPiece( piece ) );
 
 	if( m.isPromotionMove() ){
 		removePiece(piece,to);
-		piece = (bitboardIndex)(piece > separationBitmap ? blackPawns : whitePawns);
+		piece = isBlackPiece( piece) ? blackPawns : whitePawns;
 		putPiece(piece,to);
 	}
 
@@ -1379,10 +1373,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	tSquare from = m.getFrom();
 	tSquare to = m.getTo();
 	bitboardIndex piece = squares[from];
-	assert(piece!=occupiedSquares);
-	assert(piece!=separationBitmap);
-	assert(piece!=whitePieces);
-	assert(piece!=blackPieces);
+	assert( isValidPiece( piece ) );
 	const state &s = getActualStateConst();
 
 	// Direct check ?
@@ -1465,10 +1456,7 @@ bool Position::moveGivesDoubleCheck(const Move& m)const
 	tSquare from = m.getFrom();
 	tSquare to = m.getTo();
 	bitboardIndex piece = squares[from];
-	assert(piece!=occupiedSquares);
-	assert(piece!=separationBitmap);
-	assert(piece!=whitePieces);
-	assert(piece!=blackPieces);
+	assert( isValidPiece( piece ) );
 	const state &s = getActualStateConst();
 
 
@@ -1857,7 +1845,7 @@ inline void Position::putPiece(const bitboardIndex piece,const tSquare s)
 {
 	assert(s<squareNumber);
 	assert( isValidPiece( piece ) );
-	bitboardIndex color = piece > separationBitmap ? blackPieces : whitePieces;
+	bitboardIndex color = isBlackPiece( piece )? blackPieces: whitePieces;
 	bitMap b=bitSet(s);
 
 	assert(squares[s]==empty);
@@ -1883,7 +1871,7 @@ inline void Position::movePiece(const bitboardIndex piece,const tSquare from,con
 	assert(squares[from]!=empty);
 	assert(squares[to]==empty);
 	bitMap fromTo = bitSet(from) ^ bitSet(to);
-	bitboardIndex color = piece > separationBitmap ? blackPieces : whitePieces;
+	bitboardIndex color = isBlackPiece( piece ) ? blackPieces : whitePieces;
 	bitBoard[occupiedSquares] ^= fromTo;
 	bitBoard[piece] ^= fromTo;
 	bitBoard[color] ^= fromTo;
@@ -1909,7 +1897,7 @@ inline void Position::removePiece(const bitboardIndex piece,const tSquare s)
 	// do_move() and then replace it in undo_move() we will put it at the end of
 	// the list and not in its original place, it means index[] and pieceList[]
 	// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
-	bitboardIndex color = piece  > separationBitmap ? blackPieces : whitePieces;
+	bitboardIndex color = isBlackPiece( piece ) ? blackPieces : whitePieces;
 	bitMap b = bitSet(s);
 	bitBoard[occupiedSquares] ^= b;
 	bitBoard[piece] ^= b;
