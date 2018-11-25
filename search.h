@@ -255,6 +255,8 @@ private:
 	static Score futility(int depth, bool improving );
 	Score getDrawValue() const;
 	
+	void _updateCounterMove( const Move& m );
+
 
 };
 

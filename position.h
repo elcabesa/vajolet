@@ -92,6 +92,18 @@ public:
 	{
 		return firstOne(getBitmap(piece));
 	}
+
+	inline tSquare getSquareOfOurKing() const
+	{
+		return firstOne( getOurBitmap( King ) );
+	}
+
+	inline tSquare getSquareOfTheirKing() const
+	{
+		return firstOne( getTheirBitmap( King ) );
+	}
+
+
 	inline bitMap getOurBitmap(const bitboardIndex piece)const { return Us[piece];}
 	inline bitMap getTheirBitmap(const bitboardIndex piece)const { return Them[piece];}
 
@@ -103,32 +115,20 @@ public:
 	
 	void display(void) const;
 	std::string getFen(void) const;
+#ifdef DEBUG_EVAL_SIMMETRY
 	std::string getSymmetricFen() const;
+#endif
 
 	void setupFromFen(const std::string& fenStr);
-	void setup(const std::string& code, Color c);
+	//void setup(const std::string& code, Color c);
 
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 
-	void doNullMove(void);
+	void doNullMove();
 	void doMove(const Move &m);
 	void undoMove();
-	/*! \brief undo a null move
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	inline void undoNullMove(void)
-	{
-		--ply;
-		removeState();
-		std::swap( Us , Them );
-
-#ifdef ENABLE_CHECK_CONSISTENCY
-		checkPosConsistency(0);
-#endif
-	}
+	void undoNullMove(void);
 
 
 	template<bool trace>Score eval(void);
@@ -193,7 +193,7 @@ public:
 
 	unsigned int getPly(void) const
 	{
-		return ply;
+		return _ply;
 	}
 
 	bitboardIndex getCapturedPiece(void) const
@@ -249,7 +249,7 @@ public:
 	*/
 	inline Score getMvvLvaScore(const Move & m) const
 	{
-		Score s = pieceValue[ squares[m.getTo()] ][0] + (squares[m.getFrom()]);
+		Score s = pieceValue[ getPieceAt( m.getTo() ) ][0] + getPieceAt( m.getFrom() );
 		if( m.isEnPassantMove() )
 		{
 			s += pieceValue[ whitePawns ][0];
@@ -282,7 +282,7 @@ public:
 
 	inline bool isCaptureMove(const Move & m) const
 	{
-		return squares[m.getTo()] !=empty || m.isEnPassantMove() ;
+		return getPieceAt( m.getTo() ) !=empty || m.isEnPassantMove() ;
 	}
 	inline bool isCaptureMoveOrPromotion(const Move & m) const
 	{
@@ -292,7 +292,7 @@ public:
 	{
 		if(isPawn(getPieceAt(m.getFrom())))
 		{
-			bool color = isBlackPiece( squares[m.getFrom()] );
+			bool color = isBlackPiece( getPieceAt( m.getFrom() ) );
 			bitMap theirPawns = color? bitBoard[whitePawns]:bitBoard[blackPawns];
 			bitMap ourPawns = color? bitBoard[blackPawns]:bitBoard[whitePawns];
 			return !(theirPawns & PASSED_PAWN[color][m.getFrom()]) && !(ourPawns & SQUARES_IN_FRONT_OF[color][m.getFrom()]);
@@ -348,7 +348,7 @@ private:
 	//--------------------------------------------------------
 	// private members
 	//--------------------------------------------------------	
-	unsigned int ply;
+	unsigned int _ply;
 
 	/*used for search*/
 	pawnTable pawnHashTable;
@@ -368,29 +368,10 @@ private:
 	// private methods
 	//--------------------------------------------------------
 
-	/*! \brief insert a new state in memory
-		\author Marco Belli
-		\version 1.0
-		\version 1.1 get rid of continuos malloc/free
-		\date 21/11/2013
-	*/
-	inline void insertState(state & s)
-	{
-		stateInfo.emplace_back(s);
-	}
+	inline void insertState( state & s );
+	inline void removeState();
 
-	/*! \brief  remove the last state
-		\author Marco Belli
-		\version 1.0
-		\version 1.1 get rid of continuos malloc/free
-		\date 21/11/2013
-	*/
-	inline void removeState()
-	{
-		stateInfo.pop_back();
-	}
-
-	inline void updateUsThem();
+	void updateUsThem();
 
 
 	HashKey calcKey(void) const;
@@ -406,14 +387,14 @@ private:
 	template<bool our>
 	bitMap getHiddenCheckers() const;
 
-	void putPiece(const bitboardIndex piece,const tSquare s);
-	void movePiece(const bitboardIndex piece,const tSquare from,const tSquare to);
-	void removePiece(const bitboardIndex piece,const tSquare s);
+	void putPiece(const bitboardIndex piece, const tSquare s);
+	void movePiece(const bitboardIndex piece, const tSquare from, const tSquare to);
+	void removePiece(const bitboardIndex piece, const tSquare s);
 
 
 	template<Color c> simdScore evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const;
 	template<Color c> simdScore evalPassedPawn(bitMap pp, bitMap * attackedSquares) const;
-	template<bitboardIndex piece>	simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
+	template<bitboardIndex piece> simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
 
 	template<Color c> Score evalShieldStorm(tSquare ksq) const;
 	template<Color c> simdScore evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;

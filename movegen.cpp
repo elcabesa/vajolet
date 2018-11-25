@@ -175,7 +175,7 @@ void Movegen::generateMoves()
 	bitMap promotionPawns =  pos.getOurBitmap(Pawns) & seventhRankMask ;
 	bitMap nonPromotionPawns =  pos.getOurBitmap(Pawns)^ promotionPawns;
 
-	const tSquare kingSquare = pos.getSquareOfThePiece( s.getKingOfActivePlayer() );
+	const tSquare kingSquare = pos.getSquareOfOurKing();
 	assert(kingSquare<squareNumber);
 
 	// populate the target squares bitmaps
@@ -198,7 +198,7 @@ void Movegen::generateMoves()
 	{
 		assert( s.getCheckers() );
 		target = ( SQUARES_BETWEEN[kingSquare] [firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
-		kingTarget = ~pos.getOccupationBitmap();
+		kingTarget = ~occupiedSquares;
 		//displayBitmap(target);
 		//displayBitmap(kingTarget);
 	}
@@ -214,12 +214,12 @@ void Movegen::generateMoves()
 	}
 	else if(type== Movegen::quietMg)
 	{
-		target = ~pos.getOccupationBitmap();
+		target = ~occupiedSquares;
 		kingTarget = target;
 	}
 	else if(type== Movegen::quietChecksMg)
 	{
-		target = ~pos.getOccupationBitmap();
+		target = ~occupiedSquares;
 		kingTarget = target;
 	}else
 	{
@@ -249,7 +249,7 @@ void Movegen::generateMoves()
 			tSquare to = iterateBit(moves);
 			m.setTo( to );
 
-			if( !(pos.getAttackersTo(to, pos.getOccupationBitmap() & ~pos.getOurBitmap(King)) & enemy) )
+			if( !(pos.getAttackersTo(to, occupiedSquares & ~pos.getOurBitmap(King)) & enemy) )
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
@@ -585,7 +585,7 @@ void Movegen::generateMoves()
 				for( tSquare x = (tSquare)1; x<3; x++)
 				{
 					assert(kingSquare+x<squareNumber);
-					if(pos.getAttackersTo(kingSquare+x,pos.getOccupationBitmap()) & pos.getTheirBitmap(Pieces))
+					if(pos.getAttackersTo(kingSquare+x,occupiedSquares) & pos.getTheirBitmap(Pieces))
 					{
 						castleDenied = true;
 						break;
@@ -611,7 +611,7 @@ void Movegen::generateMoves()
 				for( tSquare x = (tSquare)1 ;x<3 ;x++)
 				{
 					assert(kingSquare-x<squareNumber);
-					if(pos.getAttackersTo(kingSquare-x, pos.getOccupationBitmap()) & pos.getTheirBitmap(Pieces))
+					if(pos.getAttackersTo(kingSquare-x, occupiedSquares) & pos.getTheirBitmap(Pieces))
 					{
 						castleDenied = true;
 						break;

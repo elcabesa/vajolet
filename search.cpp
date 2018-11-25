@@ -534,6 +534,14 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 
 }
 
+inline void Search::_updateCounterMove(const Move& m)
+{
+	if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
+	{
+		sd.counterMoves.update( pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
+	}
+}
+
 template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
 
@@ -622,11 +630,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&& !inCheck)
 		{
 			sd.saveKillers(ply, ttMove);
-			
-			if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
-			{
-				sd.counterMoves.update(pos.getPieceAt(previousMove.getTo()), previousMove.getTo(), ttMove);
-			}
+			_updateCounterMove( ttMove );
 		}
 		
 
@@ -931,7 +935,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				int rDepth = depth -ONE_PLY- 3*ONE_PLY;
 
 				Movegen mg(pos, sd, ply, ttMove);
-				mg.setupProbCutSearch(pos.getCapturedPiece());
+				mg.setupProbCutSearch( pos.getCapturedPiece() );
 
 				Move m;
 				PVline childPV;
@@ -1356,10 +1360,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				sd.history.update( pos.isWhiteTurn() ? white: black, m, -bonus);
 			}
 			
-			if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
-			{
-				sd.counterMoves.update(pos.getPieceAt(previousMove.getTo()), previousMove.getTo(), bestMove);
-			}
+			_updateCounterMove( bestMove );
 		}
 		else
 		{
