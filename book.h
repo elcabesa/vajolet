@@ -28,7 +28,7 @@
 #include "position.h"
 
 //forward declaration
-struct Move;
+class Move;
 
 
 
@@ -41,6 +41,12 @@ public:
 	~PolyglotBook();
 	Move probe(const Position& pos, bool pickBest);
 private:
+
+	PolyglotBook(const PolyglotBook& other);
+	PolyglotBook& operator=(const PolyglotBook& other);
+	PolyglotBook(PolyglotBook&& other) noexcept;
+	PolyglotBook& operator=(PolyglotBook&& other) noexcept;
+
 
 	// A Polyglot book is a series of "entries" of 16 bytes. All integers are
 	// stored in big-endian format, with highest byte first (regardless of size).

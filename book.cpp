@@ -33,7 +33,7 @@ uint64_t PolyglotBook::polyglotKey(const Position& pos) const
 	uint64_t k = 0;
 	bitMap b = pos.getOccupationBitmap();
 
-	while (b)
+	while( b )
 	{
 		tSquare s = iterateBit(b);
 		bitboardIndex p = pos.getPieceAt(s);
@@ -49,12 +49,12 @@ uint64_t PolyglotBook::polyglotKey(const Position& pos) const
 		k ^= PG.Zobrist.castle[iterateBit(b)];
 	}
 
-	if (pos.getEpSquare() != squareNone)
+	if( pos.hasEpSquare() )
 	{
 		k ^= PG.Zobrist.enpassant[FILES[pos.getEpSquare()]];
 	}
 
-	if (pos.getNextTurn() == Position::whiteTurn)
+	if( pos.isWhiteTurn() )
 	{
 		k ^= PG.Zobrist.turn;
 	}

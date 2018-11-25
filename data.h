@@ -69,6 +69,11 @@ inline bitMap bitSet(tSquare n)
 	return BITSET[n];
 }
 
+inline bool isSquareSet( const bitMap b, const tSquare sq )
+{
+	return b & bitSet( sq );
+}
+
 /*	\brief return true if the 3 squares are aligned
 	\author Marco Belli
 	\version 1.0
@@ -77,10 +82,10 @@ inline bitMap bitSet(tSquare n)
 inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3)
 {
 	extern bitMap LINES[squareNumber][squareNumber];
-	return LINES[s1][s2] & bitSet(s3);
-	/*return  (SQUARES_BETWEEN[s1][s2] | SQUARES_BETWEEN[s1][s3] | SQUARES_BETWEEN[s2][s3])
-			& (     bitSet(s1) |        bitSet(s2) |        bitSet(s3));*/
+	return isSquareSet( LINES[s1][s2], s3 );
 }
+
+
 //------------------------------------------------
 //	function prototype
 //------------------------------------------------

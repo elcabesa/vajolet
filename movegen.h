@@ -1,3 +1,4 @@
+
 /*
 	This file is part of Vajolet.
 
@@ -23,6 +24,7 @@
 #include <array>
 
 #include "bitops.h"
+#include "eCastle.h"
 #include "magicmoves.h"
 #include "MoveList.h"
 #include "position.h"
@@ -33,17 +35,9 @@ extern SearchData defaultSearchData;
 
 class Movegen
 {
-
 private:
 	static const int MAX_MOVE_PER_POSITION = 250;
 	static const int MAX_BAD_MOVE_PER_POSITION = 32;
-	//std::array<extMove,MAX_MOVE_PER_POSITION> moveList;
-	//std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListEnd;
-	//std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListPosition;
-
-	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION> badCaptureList;
-	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCaptureEnd;
-	//std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCapturePosition;
 
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
 	MoveList<MAX_BAD_MOVE_PER_POSITION> badCaptureList;
@@ -62,11 +56,7 @@ private:
 
 
 
-	enum CastleSide
-	{
-		kingSideCastle,
-		queenSideCastle
-	};
+
 
 	enum genType
 	{
@@ -134,8 +124,6 @@ public:
 	{
 		return m == killerMoves[0] || m == killerMoves[1];
 	}
-
-	const Move& getMoveFromMoveList(unsigned int n) const;
 	Move getNextMove(void);
 
 	Movegen(const Position & p, const SearchData& sd = defaultSearchData, unsigned int ply = 0, const Move & ttm = Move::NOMOVE): pos(p),_sd(sd),ply(ply), ttMove(ttm)
@@ -184,14 +172,14 @@ public:
 
 	void setupProbCutSearch(bitboardIndex capturePiece)
 	{
-		/*if(pos.isInCheck())
-		{
-			stagedGeneratorState = getTTevasion;
-		}
-		else*/
-		{
+		//if(pos.isInCheck())
+		//{
+		//	stagedGeneratorState = getTTevasion;
+		//}
+		//else
+		//{
 			stagedGeneratorState = getProbCutTT;
-		}
+		//}
 
 		captureThreshold = Position::pieceValue[capturePiece][0];
 		if(pos.isMoveLegal(ttMove) && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove) < captureThreshold)))
@@ -249,14 +237,6 @@ public:
 
 	}
 
-
-
-
-
-
-
-
-
 	inline static bitMap getRookPseudoAttack(const tSquare& from)
 	{
 		assert(from<squareNumber);
@@ -268,13 +248,9 @@ public:
 		assert(from<squareNumber);
 		return attackFromBishop(from,0);
 	}
-	inline static bitMap getCastlePath(const int x, const int y)
-	{
-		return castlePath[x][y];
-	}
+	bool isCastlePathFree( const eCastle c ) const;
 
 private:
-
 
 	inline static bitMap attackFromRook(const tSquare& from,const bitMap & occupancy)
 	{
@@ -319,7 +295,7 @@ private:
 	static bitMap PAWN_ATTACK[2][squareNumber];
 	static bitMap ROOK_PSEUDO_ATTACK[squareNumber];
 	static bitMap BISHOP_PSEUDO_ATTACK[squareNumber];
-	static bitMap castlePath[2][2];
+	static std::array<bitMap,9> castlePath;
 
 
 

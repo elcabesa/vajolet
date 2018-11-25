@@ -42,7 +42,7 @@ Score Position::see(const Move& m) const
 	tSquare from = m.getFrom(), to = m.getTo();
 	const bool canBePromotion = RANKS[to] == 0 ||  RANKS[to] == 7;
 	bitMap occupied = getOccupationBitmap() ^ bitSet(from);
-	eNextMove color = getPieceAt(from) > separationBitmap ? blackTurn : whiteTurn;
+	eNextMove color = isBlackPiece( getPieceAt(from) ) ? blackTurn : whiteTurn;
 
 	Score swapList[64];
 	unsigned int slIndex = 1;
@@ -51,7 +51,7 @@ Score Position::see(const Move& m) const
 
 	swapList[0] = pieceValue[getPieceAt(to)][0];
 	//std::cout<<"DEBUG inital capture: "<<swapList[0]<<std::endl;
-	captured = bitboardIndex(getPieceAt(from) % separationBitmap);
+	captured = getPieceTypeAt(from);
 
 	if( m.isEnPassantMove() )
 	{

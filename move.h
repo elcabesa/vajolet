@@ -19,6 +19,7 @@
 #define MOVE_H_
 #include <string>
 
+#include "bitBoardIndex.h"
 #include "score.h"
 #include "tSquare.h"
 
@@ -51,7 +52,6 @@ public:
 	*	constructors
 	******************************************************************/
 	Move(){}
-	Move(const Move& m): _u( m._u._packed ){}
 	explicit Move( const unsigned short i ):_u(i){}
 	Move( const tSquare _from, const tSquare _to, const eflags _flag=fnone, const epromotion _prom=promQueen ):_u(_from, _to, _flag, _prom){}
 
@@ -61,7 +61,6 @@ public:
 	inline bool operator == (const Move& d1) const { return _u._packed == d1._u._packed; }
 	inline bool operator != (const Move& d1) const { return _u._packed != d1._u._packed; }
 	inline Move& operator = (const unsigned short b) { _u._packed = b; return *this; }
-	inline Move& operator = (const Move&m){ _u._packed = m._u._packed; return *this; }
 	explicit operator bool() const { return _u._packed; }
 
 	/*****************************************************************
@@ -80,6 +79,7 @@ public:
 	tSquare getFrom() const;
 	tSquare getTo() const;
 	unsigned short getPacked() const;
+	bitboardIndex getPromotedPiece() const;
 
 	/*****************************************************************
 	*	other methods
@@ -88,7 +88,8 @@ public:
 	bool isCastleMove() const;
 	bool isEnPassantMove() const;
 	bool isStandardMove() const;
-	bool isKingsideCastle() const;
+	bool isKingSideCastle() const;
+	bool isQueenSideCastle() const;
 
 	/*****************************************************************
 	*	static methods
@@ -163,9 +164,20 @@ inline unsigned short Move::getPacked()const
 {
 	return _u._packed;
 }
-inline bool Move::isKingsideCastle() const
+
+inline bool Move::isKingSideCastle() const
 {
 	return _u._bit._to > _u._bit._from;
+}
+
+inline bool Move::isQueenSideCastle() const
+{
+	return _u._bit._to < _u._bit._from;
+}
+
+inline bitboardIndex Move::getPromotedPiece() const
+{
+	return bitboardIndex( whiteQueens + getPromotionType() );
 }
 
 
@@ -195,7 +207,6 @@ public:
 	inline bool operator < ( const extMove& d1 ) const { return _score < d1._score;}
 	inline extMove& operator = ( const Move& m ){ _u._packed = m.getPacked(); return *this; }
 	
-	/*Score inline getScore() const { return _score;}*/
 	
 	/*****************************************************************
 	*	setter methods
@@ -214,7 +225,7 @@ void inline extMove::setScore( const Score  s){ _score = s;}
 	\version 1.0
 	\date 08/11/2013
  */
-inline tSquare pawnPush(int color){
+inline tSquare pawnPush(bool color){
 	return color? sud:north;
 }
 

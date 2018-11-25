@@ -17,6 +17,7 @@
 
 #include <iostream>
 
+#include "hashKey.h"
 #include "transposition.h"
 #include "vajolet.h"
 
@@ -44,9 +45,10 @@ unsigned long int transpositionTable::setSize(unsigned long int mbSize)
 
 
 static ttEntry null(0,SCORE_NONE, typeVoid, -100, 0, 0, 0);
-ttEntry* transpositionTable::probe(const uint64_t key)
+ttEntry* transpositionTable::probe( const HashKey& k )
 {
 
+	const auto key = k.getKey();
 
 	ttCluster& ttc = findCluster(key);
 	unsigned int keyH = (unsigned int)(key >> 32);
@@ -61,10 +63,10 @@ ttEntry* transpositionTable::probe(const uint64_t key)
 }
 
 
-void transpositionTable::store(const uint64_t key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
+void transpositionTable::store(const HashKey& k, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
 {
 
-
+	const auto key = k.getKey();
 	ttEntry *candidate;
 	unsigned int keyH = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
 
@@ -106,16 +108,16 @@ void transpositionTable::clear()
 	std::fill(table.begin(), table.end(), ttc);
 }
 
-void PerftTranspositionTable::store(const uint64_t key, signed short int depth, unsigned long long v)
+void PerftTranspositionTable::store(const HashKey& key, signed short int depth, unsigned long long v)
 {
-	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, 0, (v>>23)&0x7FFFFF);	
+	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, 0, (v>>23)&0x7FFFFF);
 }
 
-bool PerftTranspositionTable::retrieve(const uint64_t key, unsigned int depth, unsigned long long& res)
+bool PerftTranspositionTable::retrieve(const HashKey& key, unsigned int depth, unsigned long long& res)
 {
 	ttEntry* tte = transpositionTable::getInstance().probe( key );
 	
-	if( tte->getKey() == (key>>32) && (unsigned int)tte->getDepth() == depth )
+	if( tte->getKey() == (key.getKey()>>32) && (unsigned int)tte->getDepth() == depth )
 	{
 		res = (unsigned long long)(((unsigned int)tte->getValue())&0x7FFFFF) + (((unsigned long long)((unsigned int)tte->getStaticValue())&0x7FFFFF)<<23);
 

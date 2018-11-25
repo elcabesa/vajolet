@@ -213,7 +213,7 @@ private:
 	unsigned int multiPVcounter = 0;
 	bool followPV;
 	PVline pvLineToFollow;
-	Position::eNextMove initialNextMove;
+	eNextMove initialNextMove;
 	bool _showLine = false;
 
 
@@ -253,7 +253,10 @@ private:
 
 	void setUOI( std::unique_ptr<UciOutput> UOI );
 	static Score futility(int depth, bool improving );
+	Score getDrawValue() const;
 	
+	void _updateCounterMove( const Move& m );
+
 
 };
 

@@ -1,7 +1,22 @@
-language: cpp
-sudo: required
 dist: trusty
-
-compiler: gcc
-
-script: make clean && make all
+sudo: required
+language:
+  - cpp
+compiler:
+  - gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-8
+      - g++-8
+      - cmake
+script:
+  - export CC=/usr/bin/gcc-8
+  - export CXX=/usr/bin/g++-8
+  - gcc -v && g++ -v && cmake --version
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make VERBOSE=1

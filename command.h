@@ -35,7 +35,7 @@ class PVline;
 //	function prototype
 //--------------------------------------------------------------------
 void uciLoop(void);
-char getPieceName( const unsigned int idx );
+char getPieceName( const bitboardIndex idx );
 std::string displayUci( const Move& m );
 std::string displayMove( const Position& pos, const Move& m );
 

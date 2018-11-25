@@ -55,9 +55,9 @@ TEST(Syzygy, test)
 			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 			0,//pos.getActualState().fiftyMoveCnt,
-			pos.getActualState().castleRights,
-			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-			pos.getActualState().nextMove== Position::whiteTurn);
+			pos.getActualState().getCastleRights(),
+			pos.hasEpSquare() ? pos.getEpSquare(): 0,
+			pos.isWhiteTurn() );
 
 		//EXPECT_NE(result1, TB_RESULT_FAILED);
 		int wdl_res = TB_GET_WDL(result1)-2;
@@ -72,10 +72,10 @@ TEST(Syzygy, test)
 			pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
 			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
 			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
-			pos.getActualState().fiftyMoveCnt,
-			pos.getActualState().castleRights,
-			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-			pos.getActualState().nextMove== Position::whiteTurn,
+			pos.getActualState().getIrreversibleMoveCount(),
+			pos.getActualState().getCastleRights(),
+			pos.hasEpSquare() ? pos.getEpSquare(): 0,
+			pos.isWhiteTurn(),
 			results);
 			
 		//EXPECT_NE(result2, TB_RESULT_FAILED);

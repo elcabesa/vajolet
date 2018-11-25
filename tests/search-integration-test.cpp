@@ -55,14 +55,14 @@ TEST(PerftTest, endgames) {
 		switch( p.res )
 		{
 		case won:
-			EXPECT_GT( res.Res, 30000);
+			EXPECT_GT( res.Res, 30000) << "problem with position: '"<< p.Fen <<"' expected win";
 			break;
 		case lost:
-			EXPECT_LT( res.Res, -30000);
+			EXPECT_LT( res.Res, -30000) << "problem with position: '"<< p.Fen <<"' expected lost";
 			break;
 		case draw:
-			EXPECT_GT( res.Res, -200);
-			EXPECT_LT( res.Res, +200);
+			EXPECT_GT( res.Res, -200) << "problem with position: '"<< p.Fen <<"' expected draw";
+			EXPECT_LT( res.Res, +200) << "problem with position: '"<< p.Fen <<"' expected draw";
 			break;
 		}
 

@@ -88,7 +88,7 @@ void timeManagement::_chooseSearchType( enum searchState s )
 	_searchState = s;
 }
 
-void timeManagement::initNewSearch( const Position::eNextMove nm )
+void timeManagement::initNewSearch( const eNextMove nm )
 {
 	if( _limits.infinite )
 	{
@@ -106,7 +106,7 @@ void timeManagement::initNewSearch( const Position::eNextMove nm )
 		unsigned int time;
 		unsigned int increment;
 
-		if( nm == Position::blackTurn )
+		if( nm == blackTurn )
 		{
 			time = _limits.btime;
 			increment = _limits.binc;

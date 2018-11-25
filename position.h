@@ -17,6 +17,7 @@
 #ifndef POSITION_H_
 #define POSITION_H_
 
+#include <array>
 #include <cstdint>
 #include <map>
 #include <unordered_map>
@@ -24,17 +25,13 @@
 
 #include "bitBoardIndex.h"
 #include "data.h"
-#include "hashKeys.h"
+#include "eCastle.h"
+#include "hashKey.h"
 #include "move.h"
 #include "tables.h"
 #include "score.h"
+#include "state.h"
 #include "vajolet.h"
-
-typedef enum
-{
-	white = 0,
-	black = 1
-}Color;
 
 //---------------------------------------------------
 //	class
@@ -45,60 +42,6 @@ typedef enum
 class Position
 {
 public:
-
-	//--------------------------------------------------------
-	// enums
-	//--------------------------------------------------------
-	enum eNextMove	// color turn. ( it's also used as offset to access bitmaps by index)
-	{
-		whiteTurn = 0,
-		blackTurn=blackKing-whiteKing
-	};
-
-	enum eCastle	// castleRights
-	{
-		wCastleOO=1,
-		wCastleOOO=2,
-		bCastleOO=4,
-		bCastleOOO=8,
-	};
-	
-	//--------------------------------------------------------
-	// struct
-	//--------------------------------------------------------
-	/*! \brief define the state of the board
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	struct state
-	{
-		uint64_t key,		/*!<  hashkey identifying the position*/
-			pawnKey,	/*!<  hashkey identifying the pawn formation*/
-			materialKey;/*!<  hashkey identifying the material signature*/
-
-		simdScore nonPawnMaterial; /*!< four score used for white/black opening/endgame non pawn material sum*/
-
-		eNextMove nextMove; /*!< who is the active player*/
-		eCastle castleRights; /*!<  actual castle rights*/
-		tSquare epSquare;	/*!<  en passant square*/
-
-		unsigned int fiftyMoveCnt,	/*!<  50 move count used for draw rule*/
-			pliesFromNull;	/*!<  plies from null move*/
-		//	ply;			/*!<  ply from the start*/
-
-		bitboardIndex capturedPiece; /*!<  index of the captured piece for unmakeMove*/
-		//Score material[2];	/*!<  two values for opening/endgame score*/
-		simdScore material;
-		bitMap checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
-		bitMap hiddenCheckersCandidate;	/*!< pieces who can make a discover check moving*/
-		bitMap pinnedPieces;	/*!< pinned pieces*/
-		bitMap checkers;	/*!< checking pieces*/
-		Move currentMove;
-
-		state(){}
-
-	};
 
 	//--------------------------------------------------------
 	// public static methods
@@ -121,6 +64,7 @@ public:
 	Position(const Position& other);
 	Position& operator=(const Position& other);
 	
+
 	inline bitMap getOccupationBitmap() const
 	{
 		return bitBoard[occupiedSquares];
@@ -131,17 +75,35 @@ public:
 	}
 	inline unsigned int getPieceCount(const bitboardIndex in) const
 	{
-		return bitCnt(getBitmap(in));
+		return bitCnt( getBitmap( in ) );
 	}
 
 	inline bitboardIndex getPieceAt(const tSquare sq) const
 	{
 		return squares[sq];
 	}
+
+	inline bitboardIndex getPieceTypeAt(const tSquare sq) const
+	{
+		return getPieceType( squares[sq] );
+	}
+
 	inline tSquare getSquareOfThePiece(const bitboardIndex piece) const
 	{
 		return firstOne(getBitmap(piece));
 	}
+
+	inline tSquare getSquareOfOurKing() const
+	{
+		return firstOne( getOurBitmap( King ) );
+	}
+
+	inline tSquare getSquareOfTheirKing() const
+	{
+		return firstOne( getTheirBitmap( King ) );
+	}
+
+
 	inline bitMap getOurBitmap(const bitboardIndex piece)const { return Us[piece];}
 	inline bitMap getTheirBitmap(const bitboardIndex piece)const { return Them[piece];}
 
@@ -153,32 +115,20 @@ public:
 	
 	void display(void) const;
 	std::string getFen(void) const;
+#ifdef DEBUG_EVAL_SIMMETRY
 	std::string getSymmetricFen() const;
+#endif
 
 	void setupFromFen(const std::string& fenStr);
-	void setup(const std::string& code, Color c);
+	//void setup(const std::string& code, Color c);
 
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 
-	void doNullMove(void);
+	void doNullMove();
 	void doMove(const Move &m);
 	void undoMove();
-	/*! \brief undo a null move
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	inline void undoNullMove(void)
-	{
-		--ply;
-		removeState();
-		std::swap( Us , Them );
-
-#ifdef ENABLE_CHECK_CONSISTENCY
-		checkPosConsistency(0);
-#endif
-	}
+	void undoNullMove();
 
 
 	template<bool trace>Score eval(void);
@@ -191,54 +141,69 @@ public:
 	Score see(const Move& m) const;
 	Score seeSign(const Move& m) const;
 	
-	uint64_t getKey(void) const
+	const HashKey& getKey(void) const
 	{
-		return getActualStateConst().key;
+		return getActualStateConst().getKey();
 	}
 
-	uint64_t getExclusionKey(void) const
+	const HashKey getExclusionKey(void) const
 	{
-		return getActualStateConst().key^HashKeys::exclusion;
+		return getActualStateConst().getKey().getExclusionKey();
 	}
 
-	uint64_t getPawnKey(void) const
+	const HashKey& getPawnKey(void) const
 	{
-		return getActualStateConst().pawnKey;
+		return getActualStateConst().getPawnKey();
 	}
 
-	uint64_t getMaterialKey(void) const
+	const HashKey& getMaterialKey(void) const
 	{
-		return getActualStateConst().materialKey;
+		return getActualStateConst().getMaterialKey();
 	}
 
 	eNextMove getNextTurn(void) const
 	{
-		return getActualStateConst().nextMove;
+		return getActualStateConst().getNextTurn();
+	}
+
+	inline bool isBlackTurn() const
+	{
+		return getActualStateConst().isBlackTurn();
+	}
+
+	inline bool isWhiteTurn() const
+	{
+		return getActualStateConst().isWhiteTurn();
 	}
 
 	tSquare getEpSquare(void) const
 	{
-		return getActualStateConst().epSquare;
+		return getActualStateConst().getEpSquare();
+	}
+
+	bool hasEpSquare(void) const
+	{
+		return getActualStateConst().hasEpSquare();
 	}
 
 	eCastle getCastleRights(void) const
 	{
-		return getActualStateConst().castleRights;
+		return getActualStateConst().getCastleRights();
 	}
 
 	unsigned int getPly(void) const
 	{
-		return ply;
+		return _ply;
 	}
 
 	bitboardIndex getCapturedPiece(void) const
 	{
-		return getActualStateConst().capturedPiece;
+		return getActualStateConst().getCapturedPiece();
 	}
 
 	bool isInCheck(void) const
 	{
-		return getActualStateConst().checkers;
+		return getActualStateConst().getCheckers();
 	}
 	
 	/*! \brief return a reference to the actual state
@@ -249,12 +214,12 @@ public:
 	*/
 	inline const state& getActualStateConst(void)const
 	{
-		return *actualState;
+		return stateInfo.back();
 	}
 	
 	inline state& getActualState(void)
 	{
-		return *actualState;
+		return stateInfo.back();
 	}
 
 	inline const state& getState(unsigned int n)const
@@ -284,12 +249,8 @@ public:
 	*/
 	inline Score getMvvLvaScore(const Move & m) const
 	{
-		Score s = pieceValue[ squares[m.getTo()] ][0] + (squares[m.getFrom()]);
-		/*if ( m.isPromotionMove() )
-		{
-			s += (pieceValue[ whiteQueens +m.bit.promotion ] - pieceValue[whitePawns])[0];
-		}
-		else */if( m.isEnPassantMove() )
+		Score s = pieceValue[ getPieceAt( m.getTo() ) ][0] + getPieceAt( m.getFrom() );
+		if( m.isEnPassantMove() )
 		{
 			s += pieceValue[ whitePawns ][0];
 		}
@@ -301,11 +262,12 @@ public:
 		\version 1.0
 		\date 08/11/2013
 	*/
-	inline unsigned int getGamePhase() const
+	inline unsigned int getGamePhase( const state& s ) const
 	{
 		const int opening = 700000;
 		const int endgame = 100000;
-		Score tot = getActualStateConst().nonPawnMaterial[0]+getActualStateConst().nonPawnMaterial[2];
+
+		Score tot = s.getNonPawnValue()[0] + s.getNonPawnValue()[2];
 		if(tot>opening) //opening
 		{
 			return 0;
@@ -320,7 +282,7 @@ public:
 
 	inline bool isCaptureMove(const Move & m) const
 	{
-		return squares[m.getTo()] !=empty || m.isEnPassantMove() ;
+		return getPieceAt( m.getTo() ) !=empty || m.isEnPassantMove() ;
 	}
 	inline bool isCaptureMoveOrPromotion(const Move & m) const
 	{
@@ -330,7 +292,7 @@ public:
 	{
 		if(isPawn(getPieceAt(m.getFrom())))
 		{
-			bool color = squares[m.getFrom()] >= separationBitmap;
+			bool color = isBlackPiece( getPieceAt( m.getFrom() ) );
 			bitMap theirPawns = color? bitBoard[whitePawns]:bitBoard[blackPawns];
 			bitMap ourPawns = color? bitBoard[blackPawns]:bitBoard[whitePawns];
 			return !(theirPawns & PASSED_PAWN[color][m.getFrom()]) && !(ourPawns & SQUARES_IN_FRONT_OF[color][m.getFrom()]);
@@ -345,19 +307,24 @@ public:
 	static simdScore pieceValue[lastBitboard];
 
 private:
+
+
+	Position& operator=(Position&& ) noexcept = delete;
+	Position(Position&& ) noexcept = delete;
+
 	//--------------------------------------------------------
 	// private struct
 	//--------------------------------------------------------
 	struct materialStruct
 	{
-		typedef enum
+		using tType = enum
 		{
 			exact,
 			multiplicativeFunction,
 			exactFunction,
 			saturationH,
 			saturationL,
-		} tType ;
+		};
 		tType type;
 		bool (Position::*pointer)(Score &);
 		Score val;
@@ -373,19 +340,18 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	static int castleRightsMask[squareNumber];
+	static eCastle castleRightsMask[squareNumber];
 	static simdScore pstValue[lastBitboard][squareNumber];
 	static simdScore nonPawnValue[lastBitboard];
-	std::unordered_map<uint64_t, materialStruct> static materialKeyMap;
+	std::unordered_map<tKey, materialStruct> static materialKeyMap;
 	
 	//--------------------------------------------------------
 	// private members
 	//--------------------------------------------------------	
-	unsigned int ply;
+	unsigned int _ply;
 
 	/*used for search*/
 	pawnTable pawnHashTable;
-	state* actualState;
 
 	std::vector<state> stateInfo;
 
@@ -394,57 +360,41 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	bitboardIndex squares[squareNumber];		// board square rapresentation to speed up, it contain pieces indexed by square
-	bitMap bitBoard[lastBitboard];			// bitboards indexed by bitboardIndex enum
+	std::array<bitboardIndex,squareNumber> squares;		// board square rapresentation to speed up, it contain pieces indexed by square
+	std::array<bitMap,lastBitboard> bitBoard;			// bitboards indexed by bitboardIndex enum
 	bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
 
 	//--------------------------------------------------------
 	// private methods
 	//--------------------------------------------------------
 
-	/*! \brief insert a new state in memory
-		\author Marco Belli
-		\version 1.0
-		\version 1.1 get rid of continuos malloc/free
-		\date 21/11/2013
-	*/
-	inline void insertState(state & s)
-	{
-		stateInfo.emplace_back(s);
-		actualState = &stateInfo.back();
-	}
+	inline void insertState( state & s );
+	inline void removeState();
 
-	/*! \brief  remove the last state
-		\author Marco Belli
-		\version 1.0
-		\version 1.1 get rid of continuos malloc/free
-		\date 21/11/2013
-	*/
-	inline void removeState()
-	{
-		stateInfo.pop_back();
-		actualState = &stateInfo.back();
-	}
+	void updateUsThem();
 
 
-	uint64_t calcKey(void) const;
-	uint64_t calcPawnKey(void) const;
-	uint64_t calcMaterialKey(void) const;
+	HashKey calcKey(void) const;
+	HashKey calcPawnKey(void) const;
+	HashKey calcMaterialKey(void) const;
 	simdScore calcMaterialValue(void) const;
 	simdScore calcNonPawnMaterialValue(void) const;
+#ifdef	ENABLE_CHECK_CONSISTENCY
 	bool checkPosConsistency(int nn) const;
+#endif
 	void clear();
 	inline void calcCheckingSquares(void);
-	bitMap getHiddenCheckers(tSquare kingSquare,eNextMove next) const;
+	template<bool our>
+	bitMap getHiddenCheckers() const;
 
-	void putPiece(const bitboardIndex piece,const tSquare s);
-	void movePiece(const bitboardIndex piece,const tSquare from,const tSquare to);
-	void removePiece(const bitboardIndex piece,const tSquare s);
+	void putPiece(const bitboardIndex piece, const tSquare s);
+	void movePiece(const bitboardIndex piece, const tSquare from, const tSquare to);
+	void removePiece(const bitboardIndex piece, const tSquare s);
 
 
 	template<Color c> simdScore evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const;
 	template<Color c> simdScore evalPassedPawn(bitMap pp, bitMap * attackedSquares) const;
-	template<bitboardIndex piece>	simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
+	template<bitboardIndex piece> simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
 
 	template<Color c> Score evalShieldStorm(tSquare ksq) const;
 	template<Color c> simdScore evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
@@ -465,6 +415,9 @@ private:
 	bool evalKNNvsK(Score& res);
 	bool evalKNPvsK(Score& res);
 
+	static std::string _printEpSquare( const state& st );
+
 };
+
 
 #endif /* POSITION_H_ */

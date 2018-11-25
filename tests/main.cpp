@@ -4,9 +4,9 @@
 #include "./../io.h"
 #include "./../bitops.h"
 #include "./../data.h"
-#include "./../hashKeys.h"
 #include "./../position.h"
 #include "./../movegen.h"
+#include "../hashKey.h"
 
 using ::testing::Environment;
 
@@ -15,7 +15,7 @@ protected:
 	virtual void SetUp()
 	{
 		initData();
-		HashKeys::init();
+		HashKey::init();
 		Position::initScoreValues();
 		Position::initCastleRightsMask();
 		Movegen::initMovegenConstant();

@@ -20,7 +20,7 @@
 #include "benchmark.h"
 #include "command.h"
 #include "data.h"
-#include "hashKeys.h"
+#include "hashKey.h"
 #include "movegen.h"
 #include "position.h"
 #include "search.h"
@@ -39,7 +39,7 @@ static void init()
 	
 	
 	initData();
-	HashKeys::init();
+	HashKey::init();
 	Position::initScoreValues();
 	Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();

@@ -119,7 +119,7 @@ void my_thread::_manageNewSearch()
 	_game.insertNewMoves(_src.pos);
 
 
-	Movegen mg(_src.pos);
+	Movegen mg( _src.pos );
 	unsigned int legalMoves = mg.getNumberOfLegalMoves();
 
 	if(legalMoves == 0)
@@ -134,19 +134,18 @@ void my_thread::_manageNewSearch()
 		return;
 	}
 	
-	if( legalMoves == 1 && !_limits.infinite)
+	if( legalMoves == 1 && !_limits.infinite )
 	{
-		
-		Move bestMove = mg.getMoveFromMoveList(0);
+		Move bestMove = mg.getNextMove();
 		
 		PVline PV( 1, bestMove );
-		_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+		_UOI->printPV( 0, 0, 0, -1, 1, 0, 0, PV, 0 );
 		
 		_waitStopPondering();
 		
 		Move ponderMove = _getPonderMoveFromHash( bestMove );
 		
-		_UOI->printBestMove(bestMove, ponderMove);
+		_UOI->printBestMove( bestMove, ponderMove );
 
 		return;
 
@@ -175,20 +174,20 @@ void my_thread::_manageNewSearch()
 		}
 	}
 	
-/*	if( game.isPonderRight() )
-	{
-		Game::GamePosition gp = game.getNewSearchParameters();
-
-		PVline newPV;
-		std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
-		
-		newPV.resize(gp.depth/2 + 1);
-		newPV.pop_front();
-		newPV.pop_front();
-		res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
-	}
-	else
-*/	
+	//if( game.isPonderRight() )
+	//{
+	//	Game::GamePosition gp = game.getNewSearchParameters();
+	//
+	//	PVline newPV;
+	//	std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
+	//	
+	//	newPV.resize(gp.depth/2 + 1);
+	//	newPV.pop_front();
+	//	newPV.pop_front();
+	//	res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
+	//}
+	//else
+	
 	startThinkResult res = _src.startThinking( );
 	
 	PVline PV = res.PV;
@@ -327,8 +326,8 @@ void Game::insertNewMoves(Position &pos)
 	for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
 	{
 		GamePosition p;
-		p.key = pos.getState(i).key;
-		p.m =  pos.getState(i).currentMove;
+		p.key = pos.getState(i).getKey();
+		p.m = pos.getState(i).getCurrentMove();
 		_positions.push_back(p);
 	}
 }
@@ -371,7 +370,7 @@ bool Game::isNewGame(const Position &pos) const
 	unsigned int n = 0;
 	for(auto p : _positions)
 	{
-		if(pos.getState(n).key != p.key)
+		if(pos.getState(n).getKey() != p.key)
 		{
 			//printGamesInfo();
 			return true;

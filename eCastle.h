@@ -14,31 +14,28 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef HASHKEYS_H_
-#define HASHKEYS_H_
+#ifndef ECASTLE_H_
+#define ECASTLE_H_
 
 
-//---------------------------------
-//	includes
-//---------------------------------
-#include <cstdint>
-#include "tSquare.h"
-
-//---------------------------------
-//	structure
-//---------------------------------
-struct HashKeys
+using Color = enum
 {
-	static uint64_t keys[squareNumber][30];	// position, piece (not all the keys are used)
-	static uint64_t side;					// side to move (black)
-	static uint64_t ep[squareNumber];		// ep targets (only 16 used)
-	static uint64_t castlingRight[16];		// white king-side castling right
-	static uint64_t exclusion;
-
-
-	static void init();       // initialize the random data
+	white = 0,
+	black = 1
 };
 
+enum eCastle	// castleRights
+{
+
+	wCastleOO  = 1,
+	wCastleOOO = 2,
+	bCastleOO  = 4,
+	bCastleOOO = 8,
+	castleOO = wCastleOO,
+	castleOOO = wCastleOOO
+};
+
+inline eCastle operator|(const eCastle c1, eCastle c2) { return eCastle(int(c1) | int(c2)); }
 
 
-#endif /* HASHKEYS_H_ */
+#endif
