@@ -1421,7 +1421,7 @@ bool Position::moveGivesDoubleCheck(const Move& m)const
 	assert( m );
 	tSquare from = m.getFrom();
 	tSquare to = m.getTo();
-	bitboardIndex piece = getPieceTypeAt( from );
+	bitboardIndex piece = getPieceAt( from );
 	const state &s = getActualStateConst();
 
 	// Direct check ?
