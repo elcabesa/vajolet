@@ -128,7 +128,7 @@ public:
 	void doNullMove();
 	void doMove(const Move &m);
 	void undoMove();
-	void undoNullMove(void);
+	void undoNullMove();
 
 
 	template<bool trace>Score eval(void);

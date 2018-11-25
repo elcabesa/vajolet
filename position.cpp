@@ -715,7 +715,7 @@ simdScore Position::calcNonPawnMaterialValue() const
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::doNullMove(void)
+void Position::doNullMove()
 {
 
 	insertState(getActualState());
@@ -1005,7 +1005,7 @@ void Position::undoMove()
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::undoNullMove(void)
+void Position::undoNullMove()
 {
 	--_ply;
 	removeState();
