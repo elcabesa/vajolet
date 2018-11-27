@@ -60,7 +60,7 @@ OBJS :=  \
 ./magicmoves.o \
 ./Move.o \
 ./movegen.o \
-./movegen.o \
+./movepicker.o \
 ./parameters.o \
 ./position.o \
 ./search.o \
@@ -86,7 +86,7 @@ CPP_DEPS := \
 ./magicmoves.d \
 ./Move.d \
 ./movegen.d \
-./movegen.d \
+./movepicker.d \
 ./parameters.d \
 ./position.d \
 ./search.d \
