@@ -160,7 +160,7 @@ void Movegen::initMovegenConstant(void){
 
 
 template<Movegen::genType type>
-void Movegen::generateMoves()
+void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 {
 
 	// initialize constants
@@ -253,7 +253,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -287,7 +287,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -315,7 +315,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -343,7 +343,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -372,7 +372,7 @@ void Movegen::generateMoves()
 
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -403,7 +403,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -423,7 +423,7 @@ void Movegen::generateMoves()
 			{
 				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 				{
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -446,7 +446,7 @@ void Movegen::generateMoves()
 			{
 				m.setTo( to );
 				m.setFrom( from );
-				moveList.insert(m);
+				ml.insert(m);
 			}
 		}
 
@@ -464,7 +464,7 @@ void Movegen::generateMoves()
 			{
 				m.setTo( to );
 				m.setFrom( from );
-				moveList.insert(m);
+				ml.insert(m);
 			}
 		}
 	}
@@ -487,7 +487,7 @@ void Movegen::generateMoves()
 				for(Move::epromotion prom=Move::promQueen; prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
 				{
 					m.setPromotion( prom );
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -513,7 +513,7 @@ void Movegen::generateMoves()
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
 				{
 					m.setPromotion( prom );
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -535,7 +535,7 @@ void Movegen::generateMoves()
 				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
 				{
 					m.setPromotion( prom );
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 		}
@@ -564,7 +564,7 @@ void Movegen::generateMoves()
 				{
 					m.setTo( epSquare );
 					m.setFrom( from );
-					moveList.insert(m);
+					ml.insert(m);
 				}
 			}
 
@@ -598,7 +598,7 @@ void Movegen::generateMoves()
 					m.setTo( (tSquare)(kingSquare + 2) );
 					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
 					{
-						moveList.insert(m);
+						ml.insert(m);
 					}
 				}
 
@@ -624,45 +624,46 @@ void Movegen::generateMoves()
 					m.setTo( (tSquare)(kingSquare - 2) );
 					if(type != Movegen::quietChecksMg || pos.moveGivesCheck(m))
 					{
-						moveList.insert(m);
+						ml.insert(m);
 					}
 				}
 			}
 		}
 	}
 }
-template void Movegen::generateMoves<Movegen::captureMg>();
-template void Movegen::generateMoves<Movegen::quietMg>();
-template void Movegen::generateMoves<Movegen::quietChecksMg>();
+template void Movegen::generateMoves<Movegen::captureMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
+template void Movegen::generateMoves<Movegen::quietMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
+template void Movegen::generateMoves<Movegen::quietChecksMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
 
 
 
 template<>
-void Movegen::generateMoves<Movegen::allMg>()
+void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 {
 
 	if(pos.isInCheck())
 	{
-		generateMoves<Movegen::captureEvasionMg>();
-		generateMoves<Movegen::quietEvasionMg>();
+		generateMoves<Movegen::captureEvasionMg>( ml);
+		generateMoves<Movegen::quietEvasionMg>( ml );
 	}
 	else
 	{
-		generateMoves<Movegen::genType::captureMg>();
-		generateMoves<Movegen::genType::quietMg>();
+		generateMoves<Movegen::genType::captureMg>( ml );
+		generateMoves<Movegen::genType::quietMg>( ml );
 	}
 
 }
 
-inline unsigned int  Movegen::getGeneratedMoveNumber(void) const
+inline unsigned int  Movegen::getGeneratedMoveNumber( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 {
-	return moveList.size();
+	return ml.size();
 }
 
 unsigned int Movegen::getNumberOfLegalMoves()
 {
-	generateMoves<Movegen::allMg>();
-	return getGeneratedMoveNumber();
+	MoveList<MAX_MOVE_PER_POSITION> moveList;
+	generateMoves<Movegen::allMg>( moveList );
+	return getGeneratedMoveNumber(moveList);
 }
 
 
@@ -679,7 +680,7 @@ Move Movegen::getNextMove()
 		case generateQuiescentCaptures:
 		case generateProbCutCaptures:
 
-			generateMoves<Movegen::genType::captureMg>();
+			generateMoves<Movegen::genType::captureMg>(moveList);
 			moveList.ignoreMove(ttMove);
 
 			scoreCaptureMoves();
@@ -691,7 +692,7 @@ Move Movegen::getNextMove()
 
 			moveList.reset();
 
-			generateMoves<Movegen::genType::quietMg>();
+			generateMoves<Movegen::genType::quietMg>(moveList);
 			moveList.ignoreMove(ttMove);
 			moveList.ignoreMove(killerMoves[0]);
 			moveList.ignoreMove(killerMoves[1]);
@@ -705,7 +706,7 @@ Move Movegen::getNextMove()
 
 		case generateCaptureEvasionMoves:
 
-			generateMoves<Movegen::captureEvasionMg>();
+			generateMoves<Movegen::captureEvasionMg>(moveList);
 			moveList.ignoreMove(ttMove);
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
@@ -719,7 +720,7 @@ Move Movegen::getNextMove()
 
 		case generateQuietEvasionMoves:
 
-			generateMoves<Movegen::quietEvasionMg>();
+			generateMoves<Movegen::quietEvasionMg>(moveList);
 			moveList.ignoreMove(ttMove);
 
 			scoreQuietEvasion();
@@ -729,7 +730,7 @@ Move Movegen::getNextMove()
 		case generateQuietCheks:
 
 			moveList.reset();
-			generateMoves<Movegen::quietChecksMg>();
+			generateMoves<Movegen::quietChecksMg>(moveList);
 			moveList.ignoreMove(ttMove);
 
 			scoreQuietMoves();

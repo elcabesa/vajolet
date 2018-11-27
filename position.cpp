@@ -19,6 +19,7 @@
 
 #include "io.h"
 #include "movegen.h"
+#include "movepicker.h"
 #include "parameters.h"
 #include "position.h"
 #include "transposition.h"
@@ -1183,8 +1184,9 @@ unsigned long long Position::perft(unsigned int depth)
 	{
 		return tot;
 	}
-	Movegen mg(*this);
+	
 #ifdef FAST_PERFT
+	Movegen mg(*this);
 	if(depth==1)
 	{
 		return mg.getNumberOfLegalMoves();
@@ -1192,7 +1194,8 @@ unsigned long long Position::perft(unsigned int depth)
 #endif
 
 	Move m;
-	while ( ( m = mg.getNextMove() ) )
+	MovePicker mp(*this);
+	while ( ( m = mp.getNextMove() ) )
 	{
 		doMove(m);
 		tot += perft(depth - 1);

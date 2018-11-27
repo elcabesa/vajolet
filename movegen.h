@@ -57,7 +57,7 @@ private:
 
 
 
-
+public:
 	enum genType
 	{
 		captureMg,			// generate capture moves
@@ -71,7 +71,7 @@ private:
 
 
 	};
-
+private:
 	enum eStagedGeneratorState
 	{
 		getTT,
@@ -110,11 +110,13 @@ private:
 
 	}stagedGeneratorState;
 
-	template<Movegen::genType type>	void generateMoves();
+public: 
+	template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
+private:
 	void scoreCaptureMoves();
 	void scoreQuietMoves();
 	void scoreQuietEvasion();
-	unsigned int getGeneratedMoveNumber(void)const;
+	unsigned int getGeneratedMoveNumber( MoveList<MAX_MOVE_PER_POSITION>& ml )const;
 
 
 public:

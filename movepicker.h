@@ -21,11 +21,12 @@
 #include "bitBoardIndex.h"
 #include "MoveList.h"
 #include "move.h"
+#include "search.h"
 #include "score.h"
 
 
 class Position;
-class SearchData;
+class Movegen;
 
 class MovePicker
 {
@@ -45,15 +46,6 @@ public:
 	bool isKillerMove( Move &m ) const;
 	// todo return type const move&
 	Move getNextMove(void);
-private:
-
-	//--------------------------------------------------------
-	// static const
-	//--------------------------------------------------------
-	static const int MAX_MOVE_PER_POSITION = 250;
-	static const int MAX_BAD_MOVE_PER_POSITION = 32;
-	
-	static const SearchData _defaultSearchData;
 	
 	//--------------------------------------------------------
 	// enum
@@ -95,11 +87,20 @@ private:
 		finishedQuiescentQuietStage,
 
 	};
+	
+private:
 
+	//--------------------------------------------------------
+	// static const
+	//--------------------------------------------------------
+	static const int MAX_MOVE_PER_POSITION = 250;
+	static const int MAX_BAD_MOVE_PER_POSITION = 32;
+	
+	static SearchData _defaultSearchData; // convert to const
 	//--------------------------------------------------------
 	// private members
 	//--------------------------------------------------------
-	eStagedGeneratorState stagedGeneratorState;
+	eStagedGeneratorState _stagedGeneratorState;
 	
 	MoveList<MAX_MOVE_PER_POSITION> _moveList;
 	MoveList<MAX_BAD_MOVE_PER_POSITION> _badCaptureList;
@@ -107,8 +108,9 @@ private:
 	unsigned int _killerPos;
 	Score _captureThreshold;
 	
-	const Position &_pos;
-	const SearchData &_sd;
+	const Position& _pos;
+	const SearchData& _sd;
+	const Movegen _mg;
 	
 	unsigned int _ply;
 	Move _ttMove;
@@ -125,4 +127,5 @@ private:
 
 };
 
+inline MovePicker::eStagedGeneratorState operator++(MovePicker::eStagedGeneratorState& d, int) { d = MovePicker::eStagedGeneratorState(int(d) + 1); return d; }
 #endif
