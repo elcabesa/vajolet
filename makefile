@@ -29,6 +29,7 @@ CPP_SRCS := \
 ./magicmoves.cpp \
 ./Move.cpp \
 ./movegen.cpp \
+./movepicker.cpp \
 ./parameters.cpp \
 ./position.cpp \
 ./search.cpp \
@@ -59,6 +60,7 @@ OBJS :=  \
 ./magicmoves.o \
 ./Move.o \
 ./movegen.o \
+./movegen.o \
 ./parameters.o \
 ./position.o \
 ./search.o \
@@ -83,6 +85,7 @@ CPP_DEPS := \
 ./io.d \
 ./magicmoves.d \
 ./Move.d \
+./movegen.d \
 ./movegen.d \
 ./parameters.d \
 ./position.d \
