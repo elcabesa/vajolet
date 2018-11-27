@@ -43,10 +43,17 @@
 #include "move.h"
 #include "vajolet.h"
 
+/*****************************************************************
+* static const
+******************************************************************/
+static const int MAX_MOVE_PER_POSITION = 250;
+static const int MAX_BAD_MOVE_PER_POSITION = 32;
+
 template <std::size_t N> class MoveList: private std::array< extMove, N >
 {
 	
 public:
+
 /*****************************************************************
 *	constructors
 ******************************************************************/

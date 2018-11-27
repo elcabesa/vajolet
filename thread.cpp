@@ -18,6 +18,7 @@
 #include "book.h"
 #include "command.h"
 #include "movegen.h"
+#include "movepicker.h"
 #include "search.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
@@ -118,9 +119,7 @@ void my_thread::_manageNewSearch()
 	}
 	_game.insertNewMoves(_src.pos);
 
-
-	Movegen mg( _src.pos );
-	unsigned int legalMoves = mg.getNumberOfLegalMoves();
+	unsigned int legalMoves = Movegen( _src.pos ).getNumberOfLegalMoves();
 
 	if(legalMoves == 0)
 	{
@@ -136,7 +135,7 @@ void my_thread::_manageNewSearch()
 	
 	if( legalMoves == 1 && !_limits.infinite )
 	{
-		Move bestMove = mg.getNextMove();
+		Move bestMove = MovePicker( _src.pos ).getNextMove();
 		
 		PVline PV( 1, bestMove );
 		_UOI->printPV( 0, 0, 0, -1, 1, 0, 0, PV, 0 );

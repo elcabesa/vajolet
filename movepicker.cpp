@@ -264,3 +264,48 @@ bool MovePicker::isKillerMove(Move &m) const
 {
 	return m == _killerMoves[0] || m == _killerMoves[1];
 }
+
+int MovePicker::setupQuiescentSearch( const bool inCheck, const int depth )
+{
+	if( inCheck)
+	{
+		_stagedGeneratorState = getTTevasion;
+		return -1;
+	}
+	else
+	{
+		if( depth >= 0 )
+		{
+			_stagedGeneratorState = getQsearchTTquiet;
+			return -1;
+		}
+		else
+		{
+			
+			_stagedGeneratorState = getQsearchTT;
+			if( _ttMove && /*_pos.isMoveLegal(ttMove)&& */ !_pos.isCaptureMove( _ttMove ) )
+			{
+				_ttMove = Move::NOMOVE;
+			}
+			return -2;
+		}
+	}
+}
+
+void MovePicker::setupProbCutSearch( const bitboardIndex capturePiece )
+{
+	//if( _pos.isInCheck() )
+	//{
+	//	_stagedGeneratorState = getTTevasion;
+	//}
+	//else
+	//{
+		_stagedGeneratorState = getProbCutTT;
+	//}
+
+	_captureThreshold = Position::pieceValue[capturePiece][0];
+	if( _pos.isMoveLegal( _ttMove) && ( ( !_pos.isCaptureMove( _ttMove ) ) || ( _pos.see( _ttMove ) < _captureThreshold ) ) )
+	{
+		_ttMove = Move::NOMOVE;
+	}
+}

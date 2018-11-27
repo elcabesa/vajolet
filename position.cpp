@@ -1186,10 +1186,10 @@ unsigned long long Position::perft(unsigned int depth)
 	}
 	
 #ifdef FAST_PERFT
-	Movegen mg(*this);
+	
 	if(depth==1)
 	{
-		return mg.getNumberOfLegalMoves();
+		return Movegen(*this).getNumberOfLegalMoves();
 	}
 #endif
 
@@ -1220,11 +1220,11 @@ unsigned long long Position::divide(unsigned int depth)
 {
 
 
-	Movegen mg(*this);
+	MovePicker mp(*this);
 	unsigned long long tot = 0;
 	unsigned int mn=0;
 	Move m;
-	while ( ( m = mg.getNextMove() ) )
+	while ( ( m = mp.getNextMove() ) )
 	{
 		mn++;
 		doMove(m);
@@ -1464,8 +1464,7 @@ bool Position::isDraw(bool isPVline) const
 			return true;
 		}
 
-		Movegen mg(*this);
-		if(mg.getNumberOfLegalMoves())
+		if( Movegen mg(*this); mg.getNumberOfLegalMoves() )
 		{
 			return true;
 		}
