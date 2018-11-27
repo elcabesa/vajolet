@@ -119,7 +119,7 @@ void my_thread::_manageNewSearch()
 	}
 	_game.insertNewMoves(_src.pos);
 
-	unsigned int legalMoves = Movegen( _src.pos ).getNumberOfLegalMoves();
+	unsigned int legalMoves = _src.pos.mg.getNumberOfLegalMoves();
 
 	if(legalMoves == 0)
 	{

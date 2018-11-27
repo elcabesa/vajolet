@@ -692,7 +692,7 @@ std::string displayMove(const Position& pos, const Move & m)
 	{
 		Position p = pos;
 		p.doMove(m);
-		legalMoves = Movegen(p).getNumberOfLegalMoves();
+		legalMoves = p.mg.getNumberOfLegalMoves();
 		p.undoMove();
 	}
 

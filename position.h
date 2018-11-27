@@ -27,6 +27,7 @@
 #include "data.h"
 #include "eCastle.h"
 #include "hashKey.h"
+#include "movegen.h"
 #include "move.h"
 #include "tables.h"
 #include "score.h"
@@ -306,6 +307,9 @@ public:
 	static bool perftUseHash;
 	static simdScore pieceValue[lastBitboard];
 
+	// todo private?
+	Movegen mg;
+
 private:
 
 
@@ -349,6 +353,7 @@ private:
 	// private members
 	//--------------------------------------------------------	
 	unsigned int _ply;
+
 
 	/*used for search*/
 	pawnTable pawnHashTable;

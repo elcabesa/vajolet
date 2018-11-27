@@ -1189,7 +1189,7 @@ unsigned long long Position::perft(unsigned int depth)
 	
 	if(depth==1)
 	{
-		return Movegen(*this).getNumberOfLegalMoves();
+		return mg.getNumberOfLegalMoves();
 	}
 #endif
 
@@ -1464,7 +1464,7 @@ bool Position::isDraw(bool isPVline) const
 			return true;
 		}
 
-		if( Movegen mg(*this); mg.getNumberOfLegalMoves() )
+		if( mg.getNumberOfLegalMoves() )
 		{
 			return true;
 		}
@@ -1600,7 +1600,6 @@ bool Position::isMoveLegal(const Move &m)const
 			{
 				Color color = s.isBlackTurn()? black : white;
 				eCastle cs = state::calcCastleRight( m.isKingSideCastle() ? castleOO: castleOOO, color );
-				Movegen mg(*this);
 				if( !s.hasCastleRight( cs )
 					|| !mg.isCastlePathFree( cs )
 				)
@@ -1756,7 +1755,7 @@ bool Position::isMoveLegal(const Move &m)const
 }
 
 
-Position::Position():_ply(0)
+Position::Position():mg(*this),_ply(0)
 {
 	stateInfo.clear();
 	stateInfo.emplace_back(state());
@@ -1767,7 +1766,7 @@ Position::Position():_ply(0)
 }
 
 
-Position::Position(const Position& other):_ply(other._ply), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
+Position::Position(const Position& other): mg(*this), _ply(other._ply), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
 {
 	updateUsThem();
 }

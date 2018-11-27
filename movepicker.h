@@ -104,7 +104,6 @@ private:
 	
 	const Position& _pos;
 	const SearchData& _sd;
-	const Movegen _mg;
 	
 	unsigned int _ply;
 	Move _ttMove;

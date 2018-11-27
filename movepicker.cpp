@@ -21,7 +21,7 @@
 
 SearchData MovePicker::_defaultSearchData;
 
-MovePicker::MovePicker( const Position& p, const SearchData& sd, unsigned int ply, const Move& ttm ): _pos(p), _sd(sd),_mg(_pos), _ply(ply), _ttMove(ttm)
+MovePicker::MovePicker( const Position& p, const SearchData& sd, unsigned int ply, const Move& ttm ): _pos(p), _sd(sd), _ply(ply), _ttMove(ttm)
 {
 	if( _pos.isInCheck() )
 	{
@@ -45,7 +45,7 @@ Move MovePicker::getNextMove()
 		case generateQuiescentCaptures:
 		case generateProbCutCaptures:
 
-			_mg.generateMoves<Movegen::genType::captureMg>( _moveList );
+			_pos.mg.generateMoves<Movegen::genType::captureMg>( _moveList );
 			
 			_moveList.ignoreMove( _ttMove );
 			
@@ -58,7 +58,7 @@ Move MovePicker::getNextMove()
 
 			_moveList.reset();
 
-			_mg.generateMoves<Movegen::genType::quietMg>( _moveList );
+			_pos.mg.generateMoves<Movegen::genType::quietMg>( _moveList );
 			
 			_moveList.ignoreMove( _ttMove);
 			_moveList.ignoreMove( _killerMoves[0] );
@@ -73,7 +73,7 @@ Move MovePicker::getNextMove()
 
 		case generateCaptureEvasionMoves:
 
-			_mg.generateMoves<Movegen::captureEvasionMg>( _moveList );
+			_pos.mg.generateMoves<Movegen::captureEvasionMg>( _moveList );
 			_moveList.ignoreMove( _ttMove );
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
@@ -87,7 +87,7 @@ Move MovePicker::getNextMove()
 
 		case generateQuietEvasionMoves:
 
-			_mg.generateMoves<Movegen::quietEvasionMg>( _moveList );
+			_pos.mg.generateMoves<Movegen::quietEvasionMg>( _moveList );
 			_moveList.ignoreMove( _ttMove );
 
 			_scoreQuietEvasion();
@@ -98,7 +98,7 @@ Move MovePicker::getNextMove()
 		case generateQuietCheks:
 
 			_moveList.reset();
-			_mg.generateMoves<Movegen::quietChecksMg>( _moveList );
+			_pos.mg.generateMoves<Movegen::quietChecksMg>( _moveList );
 			_moveList.ignoreMove( _ttMove );
 
 			_scoreQuietMoves();

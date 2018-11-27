@@ -21,6 +21,7 @@
 #include "bitops.h"
 #include "data.h"
 #include "movegen.h"
+#include "position.h"
 #include "vajolet.h"
 
 
@@ -654,7 +655,7 @@ void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml
 }
 
 
-unsigned int Movegen::getNumberOfLegalMoves()
+unsigned int Movegen::getNumberOfLegalMoves() const
 {
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
 	generateMoves<Movegen::allMg>( moveList );

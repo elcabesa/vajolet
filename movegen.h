@@ -27,11 +27,9 @@
 #include "eCastle.h"
 #include "magicmoves.h"
 #include "MoveList.h"
-#include "position.h"
-#include "search.h"
 #include "vajolet.h"
 
-extern SearchData defaultSearchData;
+class Position;
 
 class Movegen
 {
@@ -56,7 +54,7 @@ public:
 
 	template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
 
-	unsigned int getNumberOfLegalMoves();
+	unsigned int getNumberOfLegalMoves() const;
 	Movegen(const Position & p): pos(p){}
 
 	static void initMovegenConstant(void);
