@@ -480,6 +480,8 @@ inline void Movegen::generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 template<Movegen::genType type>
 inline void Movegen::generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&), const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target, const bitMap enemy )const
 {
+	(void)enemy; // suppress warning
+	
 	Move m(Move::NOMOVE);
 	bitMap bFrom = _pos.getBitmap(piece);
 	while(bFrom)
