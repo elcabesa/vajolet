@@ -105,7 +105,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	const bitMap& occupiedSquares = _pos.getOccupationBitmap();
 
 	//divide pawns
-	const bitMap& thirdRankMask = RANKMASK[ s.isBlackTurn() ? A6:A3];
+	
 	const bitMap& seventhRankMask = RANKMASK[ s.isBlackTurn() ? A2:A7];
 
 	bitMap promotionPawns =  _pos.getOurBitmap(Pawns) & seventhRankMask ;
@@ -163,102 +163,40 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	}
 
 
-	bitMap moves;
-	Move m(Move::NOMOVE);
+	
+
 	//------------------------------------------------------
 	// king
 	//------------------------------------------------------
 	bitboardIndex piece = s.getKingOfActivePlayer();
-	assert( isKing(piece) );
-	assert( isValidPiece(piece) );
-
-	{
-		m.setFrom( kingSquare );
-
-		moves = _attackFromKing(kingSquare) & kingTarget;
-
-		while(moves)
-		{
-			tSquare to = iterateBit(moves);
-			m.setTo( to );
-
-			if( !(_pos.getAttackersTo(to, occupiedSquares & ~_pos.getOurBitmap(King)) & enemy) )
-			{
-				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-				{
-					ml.insert(m);
-				}
-			}
-		}
-	}
+	generateKingMoves<type>( ml, kingSquare, occupiedSquares, kingTarget, enemy );
+	
 	// if the king is in check from 2 enemy, it can only run away, we should not search any other move
 	if((type == Movegen::allEvasionMg || type == Movegen::captureEvasionMg || type == Movegen::quietEvasionMg) && s.isInDoubleCheck() )
 	{
 		return;
 	}
-
+	
+	bitMap moves;
+	Move m(Move::NOMOVE);
 
 	//------------------------------------------------------
 	// queen
 	//------------------------------------------------------
 	piece++;
-	bitMap bFrom = _pos.getBitmap(piece);
-	while(bFrom)
-	{
-		tSquare from = iterateBit(bFrom);
-		assert(from < squareNumber);
-		m.setFrom( from );
-
-		moves = _attackFromQueen(from,occupiedSquares) & target;
-
-		while(moves)
-		{
-			tSquare to = iterateBit(moves);
-			m.setTo( to );
-
-			if( !s.isPinned( from ) || squaresAligned(from, to, kingSquare))
-			{
-				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-				{
-					ml.insert(m);
-				}
-			}
-		}
-	}
-
+	generatePieceMoves<type>( ml, &_attackFromQueen, piece, kingSquare, occupiedSquares, target, enemy );
 	//------------------------------------------------------
 	// rook
 	//------------------------------------------------------
 	piece++;
-	bFrom = _pos.getBitmap(piece);
-	while(bFrom)
-	{
-		tSquare from = iterateBit(bFrom);
-		assert(from < squareNumber);
-		m.setFrom( from );
-
-		moves = _attackFromRook(from,occupiedSquares) & target;
-
-		while(moves)
-		{
-			tSquare to = iterateBit(moves);
-			m.setTo( to );
-
-			if( !s.isPinned( from ) || squaresAligned(from, to, kingSquare))
-			{
-				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-				{
-					ml.insert(m);
-				}
-			}
-		}
-	}
+	generatePieceMoves<type>( ml, &_attackFromRook, piece, kingSquare, occupiedSquares, target, enemy );
+	
 
 	//------------------------------------------------------
 	// bishop
 	//------------------------------------------------------
 	piece++;
-	bFrom = _pos.getBitmap(piece);
+	bitMap bFrom = _pos.getBitmap(piece);
 	while(bFrom)
 	{
 		tSquare from = iterateBit(bFrom);
@@ -296,19 +234,22 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 		assert(from<squareNumber);
 		m.setFrom( from );
 
-		if( !s.isPinned( from ) )
+		moves = _attackFromKnight(from,occupiedSquares) & target;
+		
+		while (moves)
 		{
-			moves = _attackFromKnight(from) & target;
-			while (moves)
-			{
-				m.setTo( iterateBit(moves) );
+			tSquare to = iterateBit(moves);
+			m.setTo( to );
 
+			if( !s.isPinned( from ) || squaresAligned(from,to,kingSquare))
+			{
 				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 				{
 					ml.insert(m);
 				}
 			}
 		}
+		
 	}
 
 	//------------------------------------------------------
@@ -322,7 +263,6 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 		moves = (s.isBlackTurn()? (nonPromotionPawns>>8):(nonPromotionPawns<<8)) & ~occupiedSquares;
 		pawnPushed = moves;
 		moves &= target;
-		//displayBitmap(moves);
 
 		while(moves)
 		{
@@ -342,9 +282,9 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 		}
 
 		//double push
+		const bitMap& thirdRankMask = RANKMASK[ s.isBlackTurn() ? A6:A3];
 		moves = (s.isBlackTurn()? ((pawnPushed & thirdRankMask)>>8):((pawnPushed & thirdRankMask)<<8)) & ~occupiedSquares & target;
 
-		//displayBitmap(moves);
 		while(moves)
 		{
 			tSquare to = iterateBit(moves);
@@ -568,6 +508,57 @@ template void Movegen::generateMoves<Movegen::captureMg>( MoveList<MAX_MOVE_PER_
 template void Movegen::generateMoves<Movegen::quietMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
 template void Movegen::generateMoves<Movegen::quietChecksMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
 
+template<Movegen::genType type>
+inline void Movegen::generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap kingTarget, const bitMap enemy )const
+{
+	Move m(Move::NOMOVE);
+	
+	m.setFrom( kingSquare );
+
+	bitMap moves = _attackFromKing(kingSquare,occupiedSquares) & kingTarget;
+
+	while(moves)
+	{
+		tSquare to = iterateBit(moves);
+		m.setTo( to );
+
+		if( !(_pos.getAttackersTo(to, occupiedSquares & ~_pos.getOurBitmap(King)) & enemy) )
+		{
+			if( type !=Movegen::quietChecksMg || _pos.moveGivesCheck( m ) )
+			{
+				ml.insert(m);
+			}
+		}
+	}
+}
+template<Movegen::genType type>
+inline void Movegen::generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&), const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target, const bitMap enemy )const
+{
+	Move m(Move::NOMOVE);
+	bitMap bFrom = _pos.getBitmap(piece);
+	while(bFrom)
+	{
+		tSquare from = iterateBit(bFrom);
+		assert(from < squareNumber);
+		m.setFrom( from );
+
+		bitMap moves = attack(from,occupiedSquares) & target;
+
+		while(moves)
+		{
+			tSquare to = iterateBit(moves);
+			m.setTo( to );
+
+			if( !_pos.getActualStateConst().isPinned( from ) || squaresAligned(from, to, kingSquare))
+			{
+				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
+				{
+					ml.insert(m);
+				}
+			}
+		}
+	}
+}
 
 
 template<>

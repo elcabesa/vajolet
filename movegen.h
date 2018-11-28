@@ -51,6 +51,9 @@ public:
 	Movegen(const Position & p): _pos(p){}
 	
 	template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
+	template<Movegen::genType type>	void generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap kingTarget, const bitMap enemy )const;
+	
+	template<Movegen::genType type>	void generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&),const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target, const bitMap enemy )const;
 	
 	static void initMovegenConstant(void);
 	
@@ -62,7 +65,7 @@ public:
 		{
 		case whiteKing:
 		case blackKing:
-			return _attackFromKing(from);
+			return _attackFromKing(from, occupancy);
 			break;
 		case whiteQueens:
 		case blackQueens:
@@ -80,7 +83,7 @@ public:
 			break;
 		case whiteKnights:
 		case blackKnights:
-			return _attackFromKnight(from);
+			return _attackFromKnight(from,occupancy);
 			break;
 		case whitePawns:
 			return _attackFromPawn(from,0);
@@ -118,7 +121,7 @@ private:
 	static bitMap _PAWN_ATTACK[2][squareNumber];
 	static std::array<bitMap,9> _castlePath;
 
-	inline static bitMap _attackFromRook(const tSquare& from,const bitMap & occupancy)
+	inline static bitMap _attackFromRook(const tSquare from,const bitMap & occupancy)
 	{
 		assert(from <squareNumber);
 		return *(magicmoves_r_indices[from]+(((occupancy&magicmoves_r_mask[from])*magicmoves_r_magics[from])>>magicmoves_r_shift[from]));
@@ -135,13 +138,13 @@ private:
 		return _attackFromRook(from,occupancy) | _attackFromBishop(from,occupancy);
 	}
 	
-	inline static const bitMap& _attackFromKnight(const tSquare& from)
+	inline static const bitMap& _attackFromKnight(const tSquare from,const bitMap&)
 	{
 		assert(from <squareNumber);
 		return _KNIGHT_MOVE[from];
 	}
 	
-	inline static const bitMap& _attackFromKing(const tSquare& from)
+	inline static const bitMap& _attackFromKing(const tSquare from,const bitMap&)
 	{
 		assert(from <squareNumber);
 		return _KING_MOVE[from];
