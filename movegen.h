@@ -155,6 +155,7 @@ private:
 	}
 	
 	static bool _isValidCoordinate( const int tofile, const int torank );
+	static void _setBit( bitMap& b, int file, int rank );
 
 
 

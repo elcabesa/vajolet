@@ -36,6 +36,14 @@ bool Movegen::_isValidCoordinate( const int tofile, const int torank )
 	return (tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7);
 }
 
+void Movegen::_setBit( bitMap& b, int file, int rank )
+{
+	if( _isValidCoordinate( file, rank ) )
+	{
+		b |= bitSet(BOARDINDEX[file][rank]);
+	}
+}
+
 void Movegen::initMovegenConstant(void){
 
 	for( auto& x : _castlePath )
@@ -54,8 +62,7 @@ void Movegen::initMovegenConstant(void){
 	std::list<coord> knightAttack ={{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2},{-1,-2},{-2,-1}};
 	std::list<coord> kingAttack ={{-1,0},{-1,1},{-1,-1},{0,1},{0,-1},{1,0},{1,-1},{1,1}};
 	
-	
-	for ( int square = 0; square < squareNumber; ++square)
+	for ( int square = 0; square < squareNumber; ++square )
 	{
 		int file = FILES[square];
 		int rank = RANKS[square];
@@ -66,12 +73,7 @@ void Movegen::initMovegenConstant(void){
 			_PAWN_ATTACK[color][square] = 0x0;
 			for( auto c: pawnsAttack[color] )
 			{
-				int tofile = file + c.x;
-				int torank = rank + c.y;
-				if( _isValidCoordinate( tofile, torank ) )
-				{
-					_PAWN_ATTACK[color][square] |= bitSet(BOARDINDEX[tofile][torank]);
-				}
+				_setBit( _PAWN_ATTACK[color][square], file + c.x, rank + c.y );
 			}
 		}
 		
@@ -79,24 +81,14 @@ void Movegen::initMovegenConstant(void){
 		_KNIGHT_MOVE[square] = 0x0;
 		for( auto c: knightAttack )
 		{
-			int tofile = file + c.x;
-			int torank = rank + c.y;
-			if( _isValidCoordinate( tofile, torank ) )
-			{
-				_KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[tofile][torank]);
-			}
+			_setBit( _KNIGHT_MOVE[square], file + c.x, rank + c.y );
 		}
 		
 		// king moves;
 		_KING_MOVE[square]= 0x0;
 		for( auto c: kingAttack )
 		{
-			int tofile = file + c.x;
-			int torank = rank + c.y;
-			if( _isValidCoordinate( tofile, torank ) )
-			{
-				_KING_MOVE[square] |= bitSet(BOARDINDEX[tofile][torank]);
-			}
+			_setBit( _KING_MOVE[square], file + c.x, rank + c.y );
 		}
 	}
 }
