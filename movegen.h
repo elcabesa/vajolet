@@ -121,36 +121,36 @@ private:
 	static bitMap _PAWN_ATTACK[2][squareNumber];
 	static std::array<bitMap,9> _castlePath;
 
-	inline static bitMap _attackFromRook(const tSquare from,const bitMap & occupancy)
+	inline static bitMap _attackFromRook(const tSquare from, const bitMap& occupancy)
 	{
 		assert(from <squareNumber);
 		return *(magicmoves_r_indices[from]+(((occupancy&magicmoves_r_mask[from])*magicmoves_r_magics[from])>>magicmoves_r_shift[from]));
 	}
 
-	inline static bitMap _attackFromBishop(const tSquare from,const bitMap & occupancy)
+	inline static bitMap _attackFromBishop(const tSquare from, const bitMap& occupancy)
 	{
 		assert(from <squareNumber);
 		return *(magicmoves_b_indices[from]+(((occupancy&magicmoves_b_mask[from])*magicmoves_b_magics[from])>>magicmoves_b_shift[from]));
 	}
 	
-	inline static bitMap _attackFromQueen(const tSquare from,const bitMap & occupancy)
+	inline static bitMap _attackFromQueen(const tSquare from, const bitMap& occupancy)
 	{
 		return _attackFromRook(from,occupancy) | _attackFromBishop(from,occupancy);
 	}
 	
-	inline static const bitMap& _attackFromKnight(const tSquare from,const bitMap&)
+	inline static bitMap _attackFromKnight(const tSquare from, const bitMap&)
 	{
 		assert(from <squareNumber);
 		return _KNIGHT_MOVE[from];
 	}
 	
-	inline static const bitMap& _attackFromKing(const tSquare from,const bitMap&)
+	inline static bitMap _attackFromKing(const tSquare from, const bitMap&)
 	{
 		assert(from <squareNumber);
 		return _KING_MOVE[from];
 	}
 	
-	inline static const bitMap& _attackFromPawn(const tSquare& from,const unsigned int& color )
+	inline static bitMap _attackFromPawn(const tSquare from ,const unsigned int& color )
 	{
 		assert(color <=1);
 		assert(from <squareNumber);

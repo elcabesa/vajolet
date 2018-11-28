@@ -120,5 +120,6 @@ private:
 
 };
 
-inline MovePicker::eStagedGeneratorState operator++(MovePicker::eStagedGeneratorState& d, int) { d = MovePicker::eStagedGeneratorState(int(d) + 1); return d; }
+inline MovePicker::eStagedGeneratorState& operator++(MovePicker::eStagedGeneratorState& d) { d = MovePicker::eStagedGeneratorState(int(d) + 1); return d; }
+inline MovePicker::eStagedGeneratorState operator++(MovePicker::eStagedGeneratorState& d, int) { MovePicker::eStagedGeneratorState r = d; d = MovePicker::eStagedGeneratorState(int(d) + 1); return r; }
 #endif

@@ -45,8 +45,10 @@ inline tSquare& operator+=(tSquare& d1, const tSquare d2) { d1 = d1 + d2; return
 inline tSquare& operator-=(tSquare& d1, const tSquare d2) { d1 = d1 - d2; return d1; }
 inline tSquare& operator*=(tSquare& d, int i) { d = tSquare(int(d) * i); return d; }
 
-inline tSquare operator++(tSquare& d, int) { d = tSquare(int(d) + 1); return d; }
-inline tSquare operator--(tSquare& d, int) { d = tSquare(int(d) - 1); return d; }
+inline tSquare operator++(tSquare& d, int) { tSquare r = d; d = tSquare(int(d) + 1); return r; }
+inline tSquare operator--(tSquare& d, int) { tSquare r = d; d = tSquare(int(d) - 1); return r; }
+inline tSquare& operator++(tSquare& d) { d = tSquare(int(d) + 1); return d; }
+inline tSquare& operator--(tSquare& d) { d = tSquare(int(d) - 1); return d; }
 inline tSquare operator/(const tSquare d, int i) { return tSquare(int(d) / i); }
 inline tSquare& operator/=(tSquare& d, int i) { d = tSquare(int(d) / i); return d; }
 
