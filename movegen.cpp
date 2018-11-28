@@ -17,6 +17,7 @@
 
 
 #include <functional>
+#include <list>
 
 #include "bitops.h"
 #include "data.h"
@@ -25,135 +26,78 @@
 #include "vajolet.h"
 
 
+bitMap Movegen::_KNIGHT_MOVE[squareNumber];
+bitMap Movegen::_KING_MOVE[squareNumber];
+bitMap Movegen::_PAWN_ATTACK[2][squareNumber];
+std::array<bitMap,9> Movegen::_castlePath;
 
-
-bitMap Movegen::KNIGHT_MOVE[squareNumber];
-bitMap Movegen::KING_MOVE[squareNumber];
-bitMap Movegen::PAWN_ATTACK[2][squareNumber];
-
-bitMap Movegen::ROOK_PSEUDO_ATTACK[squareNumber];
-bitMap Movegen::BISHOP_PSEUDO_ATTACK[squareNumber];
-
-std::array<bitMap,9> Movegen::castlePath;
-
-
+bool Movegen::_isValidCoordinate( const int tofile, const int torank )
+{
+	return (tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7);
+}
 
 void Movegen::initMovegenConstant(void){
 
-	for( auto& x : castlePath )
+	for( auto& x : _castlePath )
 	{
 		x = 0;
 	}
-	castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
-	castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
-	castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
-	castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
+	_castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
+	_castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
+	_castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
+	_castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
 
 	initmagicmoves();
-
-
-	for (int square = 0; square < squareNumber; square++)
-	{
-		KNIGHT_MOVE[square] = 0x0;
-		KING_MOVE[square]= 0x0;
-		PAWN_ATTACK[0][square] = 0x0;
-		PAWN_ATTACK[1][square] = 0x0;
-
-	}
-
-	// pawn attacks
-	for (int square = 0; square < squareNumber; square++)
+	
+	struct coord{ int x; int y;};
+	std::list<coord> pawnsAttack[2] ={{{-1,1},{1,1}},{{-1,-1},{1,-1}}};
+	std::list<coord> knightAttack ={{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2},{-1,-2},{-2,-1}};
+	std::list<coord> kingAttack ={{-1,0},{-1,1},{-1,-1},{0,1},{0,-1},{1,0},{1,-1},{1,1}};
+	
+	
+	for ( int square = 0; square < squareNumber; ++square)
 	{
 		int file = FILES[square];
 		int rank = RANKS[square];
-		int tofile = file - 1;
-		int torank = rank + 1;
-		if ((tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7)){
-			PAWN_ATTACK[0][square] |= bitSet(BOARDINDEX[tofile][torank]);
+		
+		// pawn attacks
+		for( int color = 0; color < 2; ++color)
+		{
+			_PAWN_ATTACK[color][square] = 0x0;
+			for( auto c: pawnsAttack[color] )
+			{
+				int tofile = file + c.x;
+				int torank = rank + c.y;
+				if( _isValidCoordinate( tofile, torank ) )
+				{
+					_PAWN_ATTACK[color][square] |= bitSet(BOARDINDEX[tofile][torank]);
+				}
+			}
 		}
-		tofile = file + 1;
-		torank = rank + 1;
-		if ((tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7))
-			PAWN_ATTACK[0][square] |= bitSet(BOARDINDEX[tofile][torank]);
-		tofile = file - 1;
-		torank = rank - 1;
-		if ((tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7))
-			PAWN_ATTACK[1][square] |= bitSet(BOARDINDEX[tofile][torank]);
-		tofile = file + 1;
-		torank = rank - 1;
-		if ((tofile >= 0) & (tofile <= 7) & (torank >= 0) & (torank <= 7))
-			PAWN_ATTACK[1][square] |= bitSet(BOARDINDEX[tofile][torank]);
-	}
-
-
-	// KNIGHT attacks;
-	for (int square = 0; square < squareNumber; square++)
-	{
-		int file = FILES[square];
-		int rank = RANKS[square];
-		int toFile = file - 2;
-		int toRank = rank + 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file - 1; toRank = rank + 2;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file + 1; toRank = rank + 2;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file + 2; toRank = rank + 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file + 2; toRank = rank - 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file + 1; toRank = rank - 2;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file - 1; toRank = rank - 2;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file - 2; toRank = rank - 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-	}
-
-	// KING attacks;
-	for (int square = 0; square < squareNumber; square++)
-	{
-		int file = FILES[square];
-		int rank = RANKS[square];
-		int toFile = file - 1;
-		int toRank = rank;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KING_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file - 1; toRank = rank + 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KING_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file; toRank = rank + 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KING_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file + 1; toRank = rank + 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KING_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file + 1; toRank = rank;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KING_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file + 1; toRank = rank - 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KING_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file; toRank = rank - 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KING_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-		toFile = file - 1; toRank = rank - 1;
-		if ((toFile >= 0) & (toFile <= 7) & (toRank >= 0) & (toRank <= 7))
-			KING_MOVE[square] |= bitSet(BOARDINDEX[toFile][toRank]);
-	}
-
-	for (unsigned int square = 0; square < squareNumber; square++){
-		bitMap x=0;
-		ROOK_PSEUDO_ATTACK[square] = attackFromRook((tSquare)square,x);
-		BISHOP_PSEUDO_ATTACK[square] = attackFromBishop((tSquare)square,x);
+		
+		// knight moves
+		_KNIGHT_MOVE[square] = 0x0;
+		for( auto c: knightAttack )
+		{
+			int tofile = file + c.x;
+			int torank = rank + c.y;
+			if( _isValidCoordinate( tofile, torank ) )
+			{
+				_KNIGHT_MOVE[square] |= bitSet(BOARDINDEX[tofile][torank]);
+			}
+		}
+		
+		// king moves;
+		_KING_MOVE[square]= 0x0;
+		for( auto c: kingAttack )
+		{
+			int tofile = file + c.x;
+			int torank = rank + c.y;
+			if( _isValidCoordinate( tofile, torank ) )
+			{
+				_KING_MOVE[square] |= bitSet(BOARDINDEX[tofile][torank]);
+			}
+		}
 	}
 }
 
@@ -164,60 +108,57 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 {
 
 	// initialize constants
-	const state &s =pos.getActualStateConst();
-	const bitMap& enemy = pos.getTheirBitmap(Pieces);
-	const bitMap& occupiedSquares = pos.getOccupationBitmap();
+	const state &s =_pos.getActualStateConst();
+	const bitMap& enemy = _pos.getTheirBitmap(Pieces);
+	const bitMap& occupiedSquares = _pos.getOccupationBitmap();
 
 	//divide pawns
 	const bitMap& thirdRankMask = RANKMASK[ s.isBlackTurn() ? A6:A3];
 	const bitMap& seventhRankMask = RANKMASK[ s.isBlackTurn() ? A2:A7];
 
-	bitMap promotionPawns =  pos.getOurBitmap(Pawns) & seventhRankMask ;
-	bitMap nonPromotionPawns =  pos.getOurBitmap(Pawns)^ promotionPawns;
+	bitMap promotionPawns =  _pos.getOurBitmap(Pawns) & seventhRankMask ;
+	bitMap nonPromotionPawns =  _pos.getOurBitmap(Pawns)^ promotionPawns;
 
-	const tSquare kingSquare = pos.getSquareOfOurKing();
+	const tSquare kingSquare = _pos.getSquareOfOurKing();
 	assert(kingSquare<squareNumber);
 
 	// populate the target squares bitmaps
 	bitMap kingTarget;
 	bitMap target;
-	if(type==Movegen::allEvasionMg)
+	if constexpr (type==Movegen::allEvasionMg)
 	{
 		assert(s.getCheckers());
-		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
-		kingTarget = ~pos.getOurBitmap(Pieces);
+		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~_pos.getOurBitmap(Pieces);
+		kingTarget = ~_pos.getOurBitmap(Pieces);
 	}
-	else if(type==Movegen::captureEvasionMg)
+	else if constexpr (type==Movegen::captureEvasionMg)
 	{
 		assert(s.getCheckers());
-		target = ( s.getCheckers() ) & ~pos.getOurBitmap(Pieces);
-		kingTarget = target | pos.getTheirBitmap(Pieces);
-		//displayBitmap(target);
+		target = ( s.getCheckers() ) & ~_pos.getOurBitmap(Pieces);
+		kingTarget = target | _pos.getTheirBitmap(Pieces);
 	}
-	else if(type==Movegen::quietEvasionMg)
+	else if constexpr (type==Movegen::quietEvasionMg)
 	{
 		assert( s.getCheckers() );
-		target = ( SQUARES_BETWEEN[kingSquare] [firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
+		target = ( SQUARES_BETWEEN[kingSquare] [firstOne( s.getCheckers() ) ]) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = ~occupiedSquares;
-		//displayBitmap(target);
-		//displayBitmap(kingTarget);
 	}
-	else if(type== Movegen::allNonEvasionMg)
+	else if constexpr (type== Movegen::allNonEvasionMg)
 	{
-		target= ~pos.getOurBitmap(Pieces);
+		target= ~_pos.getOurBitmap(Pieces);
 		kingTarget= target;
 	}
-	else if(type== Movegen::captureMg)
+	else if constexpr (type== Movegen::captureMg)
 	{
-		target = pos.getTheirBitmap(Pieces);
+		target = _pos.getTheirBitmap(Pieces);
 		kingTarget = target;
 	}
-	else if(type== Movegen::quietMg)
+	else if constexpr (type== Movegen::quietMg)
 	{
 		target = ~occupiedSquares;
 		kingTarget = target;
 	}
-	else if(type== Movegen::quietChecksMg)
+	else if constexpr (type== Movegen::quietChecksMg)
 	{
 		target = ~occupiedSquares;
 		kingTarget = target;
@@ -225,8 +166,8 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	{
 		assert(false);
 		assert(s.getCheckers());
-		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~pos.getOurBitmap(Pieces);
-		kingTarget = ~pos.getOurBitmap(Pieces);
+		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~_pos.getOurBitmap(Pieces);
+		kingTarget = ~_pos.getOurBitmap(Pieces);
 	}
 
 
@@ -242,16 +183,16 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	{
 		m.setFrom( kingSquare );
 
-		moves = attackFromKing(kingSquare) & kingTarget;
+		moves = _attackFromKing(kingSquare) & kingTarget;
 
 		while(moves)
 		{
 			tSquare to = iterateBit(moves);
 			m.setTo( to );
 
-			if( !(pos.getAttackersTo(to, occupiedSquares & ~pos.getOurBitmap(King)) & enemy) )
+			if( !(_pos.getAttackersTo(to, occupiedSquares & ~_pos.getOurBitmap(King)) & enemy) )
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 				{
 					ml.insert(m);
 				}
@@ -268,15 +209,15 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	//------------------------------------------------------
 	// queen
 	//------------------------------------------------------
-	piece = (bitboardIndex)( piece+1 );
-	bitMap bFrom = pos.getBitmap(piece);
+	piece++;
+	bitMap bFrom = _pos.getBitmap(piece);
 	while(bFrom)
 	{
 		tSquare from = iterateBit(bFrom);
 		assert(from < squareNumber);
 		m.setFrom( from );
 
-		moves = attackFromQueen(from,occupiedSquares) & target;
+		moves = _attackFromQueen(from,occupiedSquares) & target;
 
 		while(moves)
 		{
@@ -285,7 +226,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 
 			if( !s.isPinned( from ) || squaresAligned(from, to, kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 				{
 					ml.insert(m);
 				}
@@ -296,15 +237,15 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	//------------------------------------------------------
 	// rook
 	//------------------------------------------------------
-	piece= (bitboardIndex)(piece+1);
-	bFrom = pos.getBitmap(piece);
+	piece++;
+	bFrom = _pos.getBitmap(piece);
 	while(bFrom)
 	{
 		tSquare from = iterateBit(bFrom);
 		assert(from < squareNumber);
 		m.setFrom( from );
 
-		moves = attackFromRook(from,occupiedSquares) & target;
+		moves = _attackFromRook(from,occupiedSquares) & target;
 
 		while(moves)
 		{
@@ -313,7 +254,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 
 			if( !s.isPinned( from ) || squaresAligned(from, to, kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 				{
 					ml.insert(m);
 				}
@@ -324,15 +265,15 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	//------------------------------------------------------
 	// bishop
 	//------------------------------------------------------
-	piece = (bitboardIndex)(piece+1);
-	bFrom = pos.getBitmap(piece);
+	piece++;
+	bFrom = _pos.getBitmap(piece);
 	while(bFrom)
 	{
 		tSquare from = iterateBit(bFrom);
 		assert(from < squareNumber);
 		m.setFrom( from );
 
-		moves = attackFromBishop(from,occupiedSquares) & target;
+		moves = _attackFromBishop(from,occupiedSquares) & target;
 
 		while (moves)
 		{
@@ -341,7 +282,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 
 			if( !s.isPinned( from ) || squaresAligned(from,to,kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 				{
 					ml.insert(m);
 				}
@@ -355,8 +296,8 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	//------------------------------------------------------
 	// knight
 	//------------------------------------------------------
-	piece = (bitboardIndex)(piece+1);
-	bFrom = pos.getBitmap(piece);
+	piece++;
+	bFrom = _pos.getBitmap(piece);
 	while(bFrom)
 	{
 		tSquare from = iterateBit(bFrom);
@@ -365,12 +306,12 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 
 		if( !s.isPinned( from ) )
 		{
-			moves = attackFromKnight(from) & target;
+			moves = _attackFromKnight(from) & target;
 			while (moves)
 			{
 				m.setTo( iterateBit(moves) );
 
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 				{
 					ml.insert(m);
 				}
@@ -381,7 +322,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	//------------------------------------------------------
 	// Pawns
 	//------------------------------------------------------
-	piece = (bitboardIndex)(piece+1);
+	piece++;
 	if(type != Movegen::captureMg && type != Movegen::captureEvasionMg)
 	{
 		bitMap pawnPushed;
@@ -401,7 +342,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 
 			if( !s.isPinned( from ) || squaresAligned(from,to,kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 				{
 					ml.insert(m);
 				}
@@ -421,7 +362,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 			m.setFrom( from );
 			if( !s.isPinned( from ) || squaresAligned(from ,to ,kingSquare))
 			{
-				if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 				{
 					ml.insert(m);
 				}
@@ -549,7 +490,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 		{
 			auto epSquare = s.getEpSquare();
 			m.setFlag( Move::fenpassant );
-			bitMap epAttacker = nonPromotionPawns & attackFromPawn( epSquare, 1-color );
+			bitMap epAttacker = nonPromotionPawns & _attackFromPawn( epSquare, 1-color );
 
 			while(epAttacker)
 			{
@@ -558,8 +499,8 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 				bitMap captureSquare= FILEMASK[ epSquare ] & RANKMASK[from];
 				bitMap occ = occupiedSquares^bitSet(from)^bitSet( epSquare )^captureSquare;
 
-				if(	!((attackFromRook(kingSquare, occ) & (pos.getTheirBitmap(Queens) | pos.getTheirBitmap(Rooks))) |
-						(Movegen::attackFromBishop(kingSquare, occ) & (pos.getTheirBitmap(Queens) | pos.getTheirBitmap(Bishops))))
+				if(	!((_attackFromRook(kingSquare, occ) & (_pos.getTheirBitmap(Queens) | _pos.getTheirBitmap(Rooks))) |
+						(Movegen::_attackFromBishop(kingSquare, occ) & (_pos.getTheirBitmap(Queens) | _pos.getTheirBitmap(Bishops))))
 				)
 				{
 					m.setTo( epSquare );
@@ -585,7 +526,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 				for( tSquare x = (tSquare)1; x<3; x++)
 				{
 					assert(kingSquare+x<squareNumber);
-					if(pos.getAttackersTo(kingSquare+x,occupiedSquares) & pos.getTheirBitmap(Pieces))
+					if(_pos.getAttackersTo(kingSquare+x,occupiedSquares) & _pos.getTheirBitmap(Pieces))
 					{
 						castleDenied = true;
 						break;
@@ -596,7 +537,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 					m.setFlag( Move::fcastle );
 					m.setFrom( kingSquare );
 					m.setTo( (tSquare)(kingSquare + 2) );
-					if(type !=Movegen::quietChecksMg || pos.moveGivesCheck(m))
+					if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 					{
 						ml.insert(m);
 					}
@@ -611,7 +552,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 				for( tSquare x = (tSquare)1 ;x<3 ;x++)
 				{
 					assert(kingSquare-x<squareNumber);
-					if(pos.getAttackersTo(kingSquare-x, occupiedSquares) & pos.getTheirBitmap(Pieces))
+					if(_pos.getAttackersTo(kingSquare-x, occupiedSquares) & _pos.getTheirBitmap(Pieces))
 					{
 						castleDenied = true;
 						break;
@@ -622,7 +563,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 					m.setFlag( Move::fcastle );
 					m.setFrom( kingSquare );
 					m.setTo( (tSquare)(kingSquare - 2) );
-					if(type != Movegen::quietChecksMg || pos.moveGivesCheck(m))
+					if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 					{
 						ml.insert(m);
 					}
@@ -641,7 +582,7 @@ template<>
 void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 {
 
-	if(pos.isInCheck())
+	if(_pos.isInCheck())
 	{
 		generateMoves<Movegen::captureEvasionMg>( ml);
 		generateMoves<Movegen::quietEvasionMg>( ml );
@@ -654,18 +595,9 @@ void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml
 
 }
 
-
-unsigned int Movegen::getNumberOfLegalMoves() const
-{
-	MoveList<MAX_MOVE_PER_POSITION> moveList;
-	generateMoves<Movegen::allMg>( moveList );
-	return moveList.size();
-}
-
 bool Movegen::isCastlePathFree( const eCastle c ) const
 {
 	assert( c < 9);
-	return !( castlePath[c] & pos.getOccupationBitmap() );
+	return !( _castlePath[c] & _pos.getOccupationBitmap() );
 }
-
 

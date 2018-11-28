@@ -114,6 +114,8 @@ public:
 		return stateInfo.size();
 	}
 	
+	unsigned int getNumberOfLegalMoves() const;
+	
 	void display(void) const;
 	std::string getFen(void) const;
 #ifdef DEBUG_EVAL_SIMMETRY

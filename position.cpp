@@ -1189,7 +1189,7 @@ unsigned long long Position::perft(unsigned int depth)
 	
 	if(depth==1)
 	{
-		return mg.getNumberOfLegalMoves();
+		return getNumberOfLegalMoves();
 	}
 #endif
 
@@ -1464,7 +1464,7 @@ bool Position::isDraw(bool isPVline) const
 			return true;
 		}
 
-		if( mg.getNumberOfLegalMoves() )
+		if( getNumberOfLegalMoves() )
 		{
 			return true;
 		}
@@ -1903,4 +1903,11 @@ inline void Position::insertState( state & s )
 inline void  Position::removeState()
 {
 	stateInfo.pop_back();
+}
+
+unsigned int Position::getNumberOfLegalMoves() const
+{
+	MoveList<MAX_MOVE_PER_POSITION> moveList;
+	mg.generateMoves<Movegen::allMg>( moveList );
+	return moveList.size();
 }
