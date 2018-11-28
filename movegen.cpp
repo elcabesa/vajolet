@@ -176,82 +176,28 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	{
 		return;
 	}
-	
-	bitMap moves;
-	Move m(Move::NOMOVE);
-
 	//------------------------------------------------------
 	// queen
 	//------------------------------------------------------
-	piece++;
-	generatePieceMoves<type>( ml, &_attackFromQueen, piece, kingSquare, occupiedSquares, target, enemy );
+	generatePieceMoves<type>( ml, &_attackFromQueen, ++piece, kingSquare, occupiedSquares, target, enemy );
+	
 	//------------------------------------------------------
 	// rook
 	//------------------------------------------------------
-	piece++;
-	generatePieceMoves<type>( ml, &_attackFromRook, piece, kingSquare, occupiedSquares, target, enemy );
+	generatePieceMoves<type>( ml, &_attackFromRook, ++piece, kingSquare, occupiedSquares, target, enemy );
 	
-
 	//------------------------------------------------------
 	// bishop
 	//------------------------------------------------------
-	piece++;
-	bitMap bFrom = _pos.getBitmap(piece);
-	while(bFrom)
-	{
-		tSquare from = iterateBit(bFrom);
-		assert(from < squareNumber);
-		m.setFrom( from );
-
-		moves = _attackFromBishop(from,occupiedSquares) & target;
-
-		while (moves)
-		{
-			tSquare to = iterateBit(moves);
-			m.setTo( to );
-
-			if( !s.isPinned( from ) || squaresAligned(from,to,kingSquare))
-			{
-				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-				{
-					ml.insert(m);
-				}
-			}
-		}
-	}
-
-
-
+	generatePieceMoves<type>( ml, &_attackFromBishop, ++piece, kingSquare, occupiedSquares, target, enemy );
 
 	//------------------------------------------------------
 	// knight
 	//------------------------------------------------------
-	piece++;
-	bFrom = _pos.getBitmap(piece);
-	while(bFrom)
-	{
-		tSquare from = iterateBit(bFrom);
-		assert(from<squareNumber);
-		m.setFrom( from );
+	generatePieceMoves<type>( ml, &_attackFromKnight, ++piece, kingSquare, occupiedSquares, target, enemy );
 
-		moves = _attackFromKnight(from,occupiedSquares) & target;
-		
-		while (moves)
-		{
-			tSquare to = iterateBit(moves);
-			m.setTo( to );
-
-			if( !s.isPinned( from ) || squaresAligned(from,to,kingSquare))
-			{
-				if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-				{
-					ml.insert(m);
-				}
-			}
-		}
-		
-	}
-
+	bitMap moves;
+	Move m(Move::NOMOVE);
 	//------------------------------------------------------
 	// Pawns
 	//------------------------------------------------------
