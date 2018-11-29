@@ -51,9 +51,6 @@ public:
 	Movegen(const Position & p): _pos(p){}
 	
 	template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
-	template<Movegen::genType type>	void generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap kingTarget, const bitMap enemy )const;
-	
-	template<Movegen::genType type>	void generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&),const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target, const bitMap enemy )const;
 	
 	static void initMovegenConstant(void);
 	
@@ -159,6 +156,12 @@ private:
 	
 	static bool _isValidCoordinate( const int tofile, const int torank );
 	static void _setBit( bitMap& b, int file, int rank );
+	
+	template<Movegen::genType type>	void insertStandardMove( MoveList<MAX_MOVE_PER_POSITION>& ml, const Move& m ) const;
+	
+	template<Movegen::genType type>	void generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap kingTarget, const bitMap enemy )const;
+	
+	template<Movegen::genType type>	void generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&),const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target, const bitMap enemy )const;
 
 
 
