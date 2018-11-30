@@ -161,7 +161,17 @@ private:
 	
 	template<Movegen::genType type>	void generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap kingTarget, const bitMap enemy )const;
 	
-	template<Movegen::genType type>	void generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&),const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target, const bitMap enemy )const;
+	template<Movegen::genType type>	void generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&),const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target)const;
+	
+	template<Movegen::genType type> bitMap generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const;
+	
+	template<Movegen::genType type> void generatePawnDoublePushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const;
+	
+	template<Movegen::genType type> void generatePawnCaptureLeft( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const;
+	
+	template<Movegen::genType type> void generatePawnCaptureRight( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const;
+	
+	template<Movegen::genType type> void generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, int delta, bitMap moves, const tSquare kingSquare)const;
 
 
 
