@@ -206,185 +206,47 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	if constexpr ( type != Movegen::captureMg && type != Movegen::captureEvasionMg )
 	{
 		//push
-		bitMap pawnPushed = generatePawnPushes<type>( ml, color, nonPromotionPawns, kingSquare, occupiedSquares, target );
+		bitMap pawnPushed = generatePawnPushes<type,false>( ml, color, nonPromotionPawns, kingSquare, occupiedSquares, target );
 		//double push
 		generatePawnDoublePushes<type>( ml, color, pawnPushed, kingSquare, occupiedSquares, target );
 	}
 
-
-
 	if constexpr (type!= Movegen::quietMg && type!=Movegen::quietChecksMg && type != Movegen::quietEvasionMg)
 	{
 		//left capture
-		generatePawnCaptureLeft<type>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
+		generatePawnCaptureLeft<type,false>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
 
 		//right capture
-		generatePawnCaptureRight<type>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
+		generatePawnCaptureRight<type,false>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
 
 	}
-
-	bitMap moves;
-	Move m(Move::NOMOVE);
-	int delta;
+	
 	// PROMOTIONS
-	m.setFlag( Move::fpromotion );
 	if(type != Movegen::captureMg && type != Movegen::captureEvasionMg)
 	{
-		moves = (s.isBlackTurn()? (promotionPawns>>8):(promotionPawns<<8))& ~occupiedSquares & target;
-		while(moves)
-		{
-			tSquare to = iterateBit(moves);
-			tSquare from = to - pawnPush(s.isBlackTurn());
-
-			m.setTo( to );
-			m.setFrom( from );
-
-			if( !s.isPinned( from ) ||	squaresAligned(from,to,kingSquare))
-			{
-				for(Move::epromotion prom=Move::promQueen; prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
-				{
-					m.setPromotion( prom );
-					ml.insert(m);
-				}
-			}
-		}
+		//push
+		generatePawnPushes<type,true>( ml, color, promotionPawns, kingSquare, occupiedSquares, target );
 	}
-
-	
 
 	if( type!= Movegen::quietMg && type!= Movegen::quietChecksMg && type!= Movegen::quietEvasionMg)
 	{
 		//left capture
-		delta = s.isBlackTurn()?-9:7;
-		moves = (s.isBlackTurn()?(promotionPawns&(~FILEMASK[A1]))>>9:(promotionPawns&(~FILEMASK[A1]))<<7) & enemy & target;
-		while(moves)
-		{
-			tSquare to = iterateBit(moves);
-			tSquare from = (tSquare)(to -delta);
-
-			m.setTo( to );
-			m.setFrom( from );
-
-			if( !s.isPinned( from ) || squaresAligned(from,to,kingSquare))
-			{
-				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
-				{
-					m.setPromotion( prom );
-					ml.insert(m);
-				}
-			}
-		}
+		generatePawnCaptureLeft<type,true>( ml, color, promotionPawns, kingSquare, target, enemy );
 
 		//right capture
-		delta=s.isBlackTurn()?-7:9;
-		moves = (s.isBlackTurn()?(promotionPawns&(~FILEMASK[H1]))>>7:(promotionPawns&(~FILEMASK[H1]))<<9) & enemy & target;
-		while(moves)
-		{
-
-			tSquare to = iterateBit(moves);
-			tSquare from = (tSquare)(to -delta);
-
-			m.setTo( to );
-			m.setFrom( from );
-
-			if( !s.isPinned( from ) || squaresAligned(from,to,kingSquare))
-			{
-				for(Move::epromotion prom=Move::promQueen;prom<= Move::promKnight; prom=(Move::epromotion)(prom+1))
-				{
-					m.setPromotion( prom );
-					ml.insert(m);
-				}
-			}
-		}
-
-		m.setPromotion( Move::promQueen );
-		m.setFlag( Move::fnone );
+		generatePawnCaptureRight<type,true>( ml, color, promotionPawns, kingSquare, target, enemy );
 
 		// ep capture
-
-		if( s.hasEpSquare() )
-		{
-			auto epSquare = s.getEpSquare();
-			m.setFlag( Move::fenpassant );
-			bitMap epAttacker = nonPromotionPawns & _attackFromPawn( epSquare, 1-color );
-
-			while(epAttacker)
-			{
-				tSquare from = iterateBit(epAttacker);
-
-				bitMap captureSquare= FILEMASK[ epSquare ] & RANKMASK[from];
-				bitMap occ = occupiedSquares^bitSet(from)^bitSet( epSquare )^captureSquare;
-
-				if(	!((_attackFromRook(kingSquare, occ) & (_pos.getTheirBitmap(Queens) | _pos.getTheirBitmap(Rooks))) |
-						(Movegen::_attackFromBishop(kingSquare, occ) & (_pos.getTheirBitmap(Queens) | _pos.getTheirBitmap(Bishops))))
-				)
-				{
-					m.setTo( epSquare );
-					m.setFrom( from );
-					ml.insert(m);
-				}
-			}
-
-		}
+		generateEpMove( ml, color, nonPromotionPawns, occupiedSquares, kingSquare );
 	}
 
 	//king castle
 	if(type !=Movegen::allEvasionMg && type!=Movegen::captureEvasionMg && type!=Movegen::quietEvasionMg && type!= Movegen::captureMg)
 	{
-		m.setPromotion( Move::promQueen );
 		if( !s.isInCheck() && s.hasCastleRight( castleOO | castleOOO, color ) )
 		{
-			eCastle cr = state::calcCastleRight( castleOO, color );
-			if( s.hasCastleRight( cr ) && isCastlePathFree( cr ) )
-			{
-
-				bool castleDenied = false;
-				for( tSquare x = (tSquare)1; x<3; x++)
-				{
-					assert(kingSquare+x<squareNumber);
-					if(_pos.getAttackersTo(kingSquare+x,occupiedSquares) & _pos.getTheirBitmap(Pieces))
-					{
-						castleDenied = true;
-						break;
-					}
-				}
-				if(!castleDenied)
-				{
-					m.setFlag( Move::fcastle );
-					m.setFrom( kingSquare );
-					m.setTo( (tSquare)(kingSquare + 2) );
-					if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-					{
-						ml.insert(m);
-					}
-				}
-
-
-			}
-			cr = state::calcCastleRight( castleOOO, color );
-			if( s.hasCastleRight( cr ) && isCastlePathFree( cr ) )
-			{
-				bool castleDenied = false;
-				for( tSquare x = (tSquare)1 ;x<3 ;x++)
-				{
-					assert(kingSquare-x<squareNumber);
-					if(_pos.getAttackersTo(kingSquare-x, occupiedSquares) & _pos.getTheirBitmap(Pieces))
-					{
-						castleDenied = true;
-						break;
-					}
-				}
-				if(!castleDenied)
-				{
-					m.setFlag( Move::fcastle );
-					m.setFrom( kingSquare );
-					m.setTo( (tSquare)(kingSquare - 2) );
-					if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-					{
-						ml.insert(m);
-					}
-				}
-			}
+			generateCastleOO<type>( ml, color, kingSquare, occupiedSquares );
+			generateCastleOOO<type>( ml, color, kingSquare, occupiedSquares );
 		}
 	}
 }
@@ -398,6 +260,15 @@ inline void Movegen::insertStandardMove( MoveList<MAX_MOVE_PER_POSITION>& ml, co
 	if( type !=Movegen::quietChecksMg || _pos.moveGivesCheck( m ) )
 	{
 		ml.insert( m );
+	}
+}
+
+void Movegen::insertPromotionMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, Move& m ) const
+{
+	for(Move::epromotion prom=Move::promQueen; prom<= Move::promKnight; prom=(Move::epromotion)( prom+1) )
+	{
+		m.setPromotion( prom );
+		ml.insert(m);
 	}
 }
 
@@ -447,7 +318,7 @@ inline void Movegen::generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bi
 	}
 }
 
-template<Movegen::genType type>
+template<Movegen::genType type, bool promotion>
 inline bitMap Movegen::generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const
 {
 	bitMap pawnPushed;
@@ -457,6 +328,10 @@ inline bitMap Movegen::generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, 
 	moves &= target;
 	
 	Move m(Move::NOMOVE);
+	if( promotion )
+	{
+		m.setFlag( Move::fpromotion );
+	}
 
 	while(moves)
 	{
@@ -467,7 +342,14 @@ inline bitMap Movegen::generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, 
 		{
 			m.setTo( to );
 			m.setFrom( from );
-			insertStandardMove<type>( ml, m );
+			if( promotion )
+			{
+				insertPromotionMoves( ml, m );
+			}
+			else
+			{
+				insertStandardMove<type>( ml, m );
+			}
 		}
 	}
 	return pawnPushed;
@@ -493,28 +375,32 @@ inline void Movegen::generatePawnDoublePushes( MoveList<MAX_MOVE_PER_POSITION>& 
 		}
 	}
 }
-template<Movegen::genType type>
+template<Movegen::genType type, bool promotion>
 inline void Movegen::generatePawnCaptureLeft( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const
 {
 	//left capture
 	int delta = color? -9: 7;
 	bitMap moves = ( color? (pawns&(~FILEMASK[A1]))>>9: (pawns&(~FILEMASK[A1]))<<7) & enemy & target;
-	generatePawnCapture<type>( ml, delta, moves, kingSquare );
+	generatePawnCapture<type, promotion>( ml, delta, moves, kingSquare );
 }
 
-template<Movegen::genType type>
+template<Movegen::genType type, bool promotion>
 inline void Movegen::generatePawnCaptureRight( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const
 {
 	//right capture
 	int delta= color? -7: 9;
 	bitMap moves = ( color? (pawns&(~FILEMASK[H1]))>>7: (pawns&(~FILEMASK[H1]))<<9) & enemy & target;
-	generatePawnCapture<type>( ml, delta, moves, kingSquare );
+	generatePawnCapture<type, promotion>( ml, delta, moves, kingSquare );
 }
 
-template<Movegen::genType type>
+template<Movegen::genType type, bool promotion>
 inline void Movegen::generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, int delta, bitMap moves, const tSquare kingSquare)const
 {
 	Move m(Move::NOMOVE);
+	if( promotion )
+	{
+		m.setFlag( Move::fpromotion );
+	}
 	while(moves)
 	{
 		tSquare to = iterateBit(moves);
@@ -524,8 +410,45 @@ inline void Movegen::generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, i
 		{
 			m.setTo( to );
 			m.setFrom( from );
-			ml.insert(m);
+			
+			if( promotion )
+			{
+				insertPromotionMoves( ml, m );
+			}
+			else
+			{
+				ml.insert(m);
+			}
 		}
+	}
+}
+
+inline void Movegen::generateEpMove(MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const bitMap occupiedSquares, const tSquare kingSquare) const
+{
+	if( _pos.getActualStateConst().hasEpSquare() )
+	{
+		auto epSquare = _pos.getActualStateConst().getEpSquare();
+		Move m(Move::NOMOVE);
+		m.setFlag( Move::fenpassant );
+		bitMap epAttacker = pawns & _attackFromPawn( epSquare, 1 - color );
+
+		while(epAttacker)
+		{
+			tSquare from = iterateBit(epAttacker);
+
+			bitMap captureSquare= FILEMASK[ epSquare ] & RANKMASK[from];
+			bitMap occ = occupiedSquares^bitSet(from)^bitSet( epSquare )^captureSquare;
+
+			if(	!((_attackFromRook(kingSquare, occ) & (_pos.getTheirBitmap(Queens) | _pos.getTheirBitmap(Rooks))) |
+				(_attackFromBishop(kingSquare, occ) & (_pos.getTheirBitmap(Queens) | _pos.getTheirBitmap(Bishops))))
+			)
+			{
+				m.setTo( epSquare );
+				m.setFrom( from );
+				ml.insert(m);
+			}
+		}
+
 	}
 }
 
@@ -552,3 +475,63 @@ bool Movegen::isCastlePathFree( const eCastle c ) const
 	return !( _castlePath[c] & _pos.getOccupationBitmap() );
 }
 
+template<Movegen::genType type>
+inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
+{
+	eCastle cr = state::calcCastleRight( castleOO, color );
+	if( _pos.getActualStateConst().hasCastleRight( cr ) && isCastlePathFree( cr ) )
+	{
+
+		bool castleDenied = false;
+		for( tSquare x = (tSquare)1; x<3; x++)
+		{
+			assert(kingSquare+x<squareNumber);
+			if(_pos.getAttackersTo(kingSquare+x,occupiedSquares) & _pos.getTheirBitmap(Pieces))
+			{
+				castleDenied = true;
+				break;
+			}
+		}
+		if(!castleDenied)
+		{
+			Move m(Move::NOMOVE);
+			m.setFlag( Move::fcastle );
+			m.setFrom( kingSquare );
+			m.setTo( (tSquare)(kingSquare + 2) );
+			if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
+			{
+				ml.insert(m);
+			}
+		}
+	}
+}
+
+template<Movegen::genType type>
+inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
+{
+	eCastle cr = state::calcCastleRight( castleOOO, color );
+	if( _pos.getActualStateConst().hasCastleRight( cr ) && isCastlePathFree( cr ) )
+	{
+		bool castleDenied = false;
+		for( tSquare x = (tSquare)1 ;x<3 ;x++)
+		{
+			assert(kingSquare-x<squareNumber);
+			if(_pos.getAttackersTo(kingSquare-x, occupiedSquares) & _pos.getTheirBitmap(Pieces))
+			{
+				castleDenied = true;
+				break;
+			}
+		}
+		if(!castleDenied)
+		{
+			Move m(Move::NOMOVE);
+			m.setFlag( Move::fcastle );
+			m.setFrom( kingSquare );
+			m.setTo( (tSquare)(kingSquare - 2) );
+			if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
+			{
+				ml.insert(m);
+			}
+		}
+	}
+}
