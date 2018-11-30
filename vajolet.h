@@ -20,7 +20,7 @@
 
 
 // disable assert define
-//#define NDEBUG
+#define NDEBUG
 #include <cassert>
 
 //---------------------------------------------
@@ -32,7 +32,7 @@
 //---------------------------------------------
 
 #define PROGRAM_NAME	"Vajolet2"
-#define VERSION			"2.6.1"
+#define VERSION			"2.6.2"
 #define HW_BITCOUNT
 
 
