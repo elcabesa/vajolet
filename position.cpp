@@ -19,6 +19,7 @@
 
 #include "io.h"
 #include "movegen.h"
+#include "movepicker.h"
 #include "parameters.h"
 #include "position.h"
 #include "transposition.h"
@@ -1183,16 +1184,18 @@ unsigned long long Position::perft(unsigned int depth)
 	{
 		return tot;
 	}
-	Movegen mg(*this);
+	
 #ifdef FAST_PERFT
+	
 	if(depth==1)
 	{
-		return mg.getNumberOfLegalMoves();
+		return getNumberOfLegalMoves();
 	}
 #endif
 
 	Move m;
-	while ( ( m = mg.getNextMove() ) )
+	MovePicker mp(*this);
+	while ( ( m = mp.getNextMove() ) )
 	{
 		doMove(m);
 		tot += perft(depth - 1);
@@ -1217,11 +1220,11 @@ unsigned long long Position::divide(unsigned int depth)
 {
 
 
-	Movegen mg(*this);
+	MovePicker mp(*this);
 	unsigned long long tot = 0;
 	unsigned int mn=0;
 	Move m;
-	while ( ( m = mg.getNextMove() ) )
+	while ( ( m = mp.getNextMove() ) )
 	{
 		mn++;
 		doMove(m);
@@ -1461,8 +1464,7 @@ bool Position::isDraw(bool isPVline) const
 			return true;
 		}
 
-		Movegen mg(*this);
-		if(mg.getNumberOfLegalMoves())
+		if( getNumberOfLegalMoves() )
 		{
 			return true;
 		}
@@ -1598,7 +1600,6 @@ bool Position::isMoveLegal(const Move &m)const
 			{
 				Color color = s.isBlackTurn()? black : white;
 				eCastle cs = state::calcCastleRight( m.isKingSideCastle() ? castleOO: castleOOO, color );
-				Movegen mg(*this);
 				if( !s.hasCastleRight( cs )
 					|| !mg.isCastlePathFree( cs )
 				)
@@ -1754,7 +1755,7 @@ bool Position::isMoveLegal(const Move &m)const
 }
 
 
-Position::Position():_ply(0)
+Position::Position():mg(*this),_ply(0)
 {
 	stateInfo.clear();
 	stateInfo.emplace_back(state());
@@ -1765,7 +1766,7 @@ Position::Position():_ply(0)
 }
 
 
-Position::Position(const Position& other):_ply(other._ply), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
+Position::Position(const Position& other): mg(*this), _ply(other._ply), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
 {
 	updateUsThem();
 }
@@ -1902,4 +1903,11 @@ inline void Position::insertState( state & s )
 inline void  Position::removeState()
 {
 	stateInfo.pop_back();
+}
+
+unsigned int Position::getNumberOfLegalMoves() const
+{
+	MoveList<MAX_MOVE_PER_POSITION> moveList;
+	mg.generateMoves<Movegen::allMg>( moveList );
+	return moveList.size();
 }

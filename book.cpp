@@ -23,7 +23,7 @@
 #include "bitops.h"
 #include "book.h"
 #include "move.h"
-#include "movegen.h"
+#include "movepicker.h"
 #include "vajolet.h"
 
 
@@ -202,8 +202,8 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 
 
 	Move mm;
-	Movegen mg(pos);
-	while( ( mm = mg.getNextMove() ) )
+	MovePicker mp(pos);
+	while( ( mm = mp.getNextMove() ) )
 	{
 		if(m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo())
 		{

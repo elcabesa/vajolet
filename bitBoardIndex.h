@@ -58,7 +58,8 @@ enum bitboardIndex
 
 };
 
-inline bitboardIndex operator++(bitboardIndex& d, int) { d = bitboardIndex(int(d) + 1); return d; }
+inline bitboardIndex operator++(bitboardIndex& d, int) { bitboardIndex r = d; d = bitboardIndex(int(d) + 1); return r; }
+inline bitboardIndex& operator++(bitboardIndex& d) { d = bitboardIndex(int(d) + 1); return d; }
 
 enum eNextMove	// color turn. ( it's also used as offset to access bitmaps by index)
 {

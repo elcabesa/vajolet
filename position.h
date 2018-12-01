@@ -27,6 +27,7 @@
 #include "data.h"
 #include "eCastle.h"
 #include "hashKey.h"
+#include "movegen.h"
 #include "move.h"
 #include "tables.h"
 #include "score.h"
@@ -112,6 +113,8 @@ public:
 	{
 		return stateInfo.size();
 	}
+	
+	unsigned int getNumberOfLegalMoves() const;
 	
 	void display(void) const;
 	std::string getFen(void) const;
@@ -306,6 +309,9 @@ public:
 	static bool perftUseHash;
 	static simdScore pieceValue[lastBitboard];
 
+	// todo private?
+	Movegen mg;
+
 private:
 
 
@@ -349,6 +355,7 @@ private:
 	// private members
 	//--------------------------------------------------------	
 	unsigned int _ply;
+
 
 	/*used for search*/
 	pawnTable pawnHashTable;

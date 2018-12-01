@@ -24,6 +24,7 @@
 #include "command.h"
 #include "io.h"
 #include "movegen.h"
+#include "movepicker.h"
 #include "parameters.h"
 #include "position.h"
 #include "search.h"
@@ -148,8 +149,8 @@ Move moveFromUci(const Position& pos,const  std::string& str)
 
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
 	Move m;
-	Movegen mg(pos);
-	while( (m = mg.getNextMove() ) )
+	MovePicker mp(pos);
+	while( ( m = mp.getNextMove() ) )
 	{
 		if(str == displayUci(m))
 		{
@@ -691,18 +692,16 @@ std::string displayMove(const Position& pos, const Move & m)
 	{
 		Position p = pos;
 		p.doMove(m);
-		Movegen mg(p);
-		legalMoves = mg.getNumberOfLegalMoves();
+		legalMoves = p.getNumberOfLegalMoves();
 		p.undoMove();
 	}
 
 
 	{
 		// calc disambigus data
-		Movegen mg( pos );
 		Move mm;
-		
-		while ( ( mm = mg.getNextMove() ) )
+		MovePicker mp( pos );
+		while ( ( mm = mp.getNextMove() ) )
 		{
 			if( pos.getPieceAt( mm.getFrom() ) == piece 
 				&& ( mm.getTo() == m.getTo() ) 

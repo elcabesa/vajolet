@@ -24,7 +24,7 @@
 #include "command.h"
 #include "history.h"
 #include "io.h"
-#include "movegen.h"
+#include "movepicker.h"
 #include "position.h"
 #include "search.h"
 #include "transposition.h"
@@ -221,8 +221,8 @@ void Search::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
 	if( ml.size() == 0 )	// all the legal moves
 	{
 		Move m;
-		Movegen mg(pos);
-		while( ( m = mg.getNextMove() ) )
+		MovePicker mp( pos );
+		while( ( m = mp.getNextMove() ) )
 		{
 			rm.emplace_back( m );
 		}
@@ -934,13 +934,13 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				Score rBeta = std::min(beta + 8000, SCORE_INFINITE);
 				int rDepth = depth -ONE_PLY- 3*ONE_PLY;
 
-				Movegen mg(pos, sd, ply, ttMove);
-				mg.setupProbCutSearch( pos.getCapturedPiece() );
+				MovePicker mp(pos, sd, ply, ttMove);
+				mp.setupProbCutSearch( pos.getCapturedPiece() );
 
 				Move m;
 				PVline childPV;
 				unsigned int pbCount = 0u;
-				while( ( m = mg.getNextMove() ) && ( pbCount < 3 ) )
+				while( ( m = mp.getNextMove() ) && ( pbCount < 3 ) )
 				{
 					if( m == excludedMove )
 					{
@@ -998,7 +998,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Move bestMove(Move::NOMOVE);
 
 	Move m;
-	Movegen mg(pos, sd, ply, ttMove);
+	MovePicker mp(pos, sd, ply, ttMove);
 	unsigned int moveNumber = 0;
 	unsigned int quietMoveCount = 0;
 	Move quietMoveList[64];
@@ -1014,7 +1014,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		&& tte->isTypeGoodForBetaCutoff()
 		&&  tte->getDepth() >= depth - 3 * ONE_PLY;
 
-	while (bestScore <beta  && ( m = mg.getNextMove() ) )
+	while (bestScore <beta  && ( m = mp.getNextMove() ) )
 	{
 
 		assert( m );
@@ -1162,7 +1162,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					&& (!captureOrPromotion || FutilityMoveCountFlag )
 					&& !isDangerous
 					&& m != ttMove
-					&& !mg.isKillerMove(m)
+					&& !mp.isKillerMove(m)
 				)
 				{
 					assert(moveNumber!=0);
@@ -1218,7 +1218,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				&& (!captureOrPromotion || FutilityMoveCountFlag )
 				&& !isDangerous
 				&& m != ttMove
-				&& !mg.isKillerMove(m)
+				&& !mp.isKillerMove(m)
 			)
 			{
 				int reduction = nonPVreduction[improving][std::min(depth, int(LmrLimit*ONE_PLY-1))][std::min(moveNumber, (unsigned int)63)];
@@ -1441,8 +1441,8 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
 	Move ttMove( tte->getPackedMove() );
 
-	Movegen mg(pos, sd, ply, ttMove);
-	int TTdepth = mg.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
+	MovePicker mp(pos, sd, ply, ttMove);
+	int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(),ply);
 	if (tte->getDepth() >= TTdepth
 	    && ttValue != SCORE_NONE // Only in case of TT access race
@@ -1551,7 +1551,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 	PVline childPV;
 
-	while ( ( m = mg.getNextMove() ) )
+	while ( ( m = mp.getNextMove() ) )
 	{
 		assert(alpha < beta);
 		assert(beta <= SCORE_INFINITE);

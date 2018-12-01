@@ -58,8 +58,8 @@ bool Position::evalKxvsK(Score& res)
 
 		mul = -1;
 	}
-	Movegen mg(*this);
-	if( mg.getNumberOfLegalMoves() == 0 )
+	
+	if( getNumberOfLegalMoves() == 0 )
 	{
 		res = 0;
 		return true;
@@ -297,8 +297,7 @@ bool Position::evalKQvsK(Score& res)
 	tSquare kingSquare;
 	tSquare enemySquare;
 	
-	Movegen mg(*this);
-	if( mg.getNumberOfLegalMoves() == 0 )
+	if( getNumberOfLegalMoves() == 0 )
 	{
 		res = 0;
 		return true;
@@ -333,8 +332,7 @@ bool Position::evalKRvsK(Score& res)
 	tSquare kingSquare;
 	tSquare enemySquare;
 
-	Movegen mg(*this);
-	if( mg.getNumberOfLegalMoves() == 0 )
+	if( getNumberOfLegalMoves() == 0 )
 	{
 		res = 0;
 		return true;
