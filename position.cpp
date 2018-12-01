@@ -301,7 +301,7 @@ void Position::setupFromFen(const std::string& fenStr)
 }
 
 // todo remove?
-/*void Position::setup(const std::string& code, Color c)
+void Position::setup(const std::string& code, Color c)
 {
 
   assert(code.length() > 0 && code.length() < 8);
@@ -317,7 +317,7 @@ void Position::setupFromFen(const std::string& fenStr)
 
   sync_cout<<fenStr<<sync_endl;
   setupFromFen(fenStr);
-}*/
+}
 
 
 

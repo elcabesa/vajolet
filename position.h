@@ -123,7 +123,7 @@ public:
 #endif
 
 	void setupFromFen(const std::string& fenStr);
-	//void setup(const std::string& code, Color c);
+	void setup(const std::string& code, Color c);
 
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
