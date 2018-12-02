@@ -40,7 +40,7 @@ Score Position::see(const Move& m) const
 	assert( m );
 
 	tSquare from = m.getFrom(), to = m.getTo();
-	const bool canBePromotion = RANKS[to] == 0 ||  RANKS[to] == 7;
+	const bool canBePromotion = getRankOf(to) == RANK1 ||  getRankOf(to) == RANK8;
 	bitMap occupied = getOccupationBitmap() ^ bitSet(from);
 	eNextMove color = isBlackPiece( getPieceAt(from) ) ? blackTurn : whiteTurn;
 

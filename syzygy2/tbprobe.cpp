@@ -87,7 +87,7 @@ int LeadPawnsSize[6][4];       // [leadPawnsCnt][FILE_A..FILE_D]
 
 // Comparison function to sort leading pawns in ascending MapPawns[] order
 bool pawns_comp(tSquare i, tSquare j) { return MapPawns[i] < MapPawns[j]; }
-int off_A1H8(tSquare sq) { return int(RANKS[sq]) - FILES[sq]; }
+int off_A1H8(tSquare sq) { return int(getRankOf(sq) - getFileOf(sq)); }
 
 constexpr Score WDL_to_value[] = {
     SCORE_MATED_IN_MAX_PLY +100,
@@ -692,9 +692,9 @@ Ret do_probe_table(const Position& pos, T* entry, WDLScore wdl, ProbeState* resu
 
         std::swap(squares[0], *std::max_element(squares, squares + leadPawnsCnt, pawns_comp));
 
-        tbFile = FILES[squares[0]];
+        tbFile = getFileOf(squares[0]);
         if (tbFile > FILED)
-            tbFile = FILES[squares[0] ^ 7]; // Horizontal flip: SQ_H1 -> SQ_A1
+            tbFile = getFileOf(squares[0] ^ 7); // Horizontal flip: SQ_H1 -> SQ_A1
     }
 
     // DTZ tables are one-sided, i.e. they store positions only for white to
@@ -729,7 +729,7 @@ Ret do_probe_table(const Position& pos, T* entry, WDLScore wdl, ProbeState* resu
 
     // Now we map again the squares so that the square of the lead piece is in
     // the triangle A1-D1-D4.
-    if (FILES[squares[0]] > FILED)
+    if (getFileOf(squares[0]) > FILED)
         for (int i = 0; i < size; ++i)
             squares[i] ^= 7; // Horizontal flip: SQ_H1 -> SQ_A1
 
@@ -748,7 +748,7 @@ Ret do_probe_table(const Position& pos, T* entry, WDLScore wdl, ProbeState* resu
 
     // In positions withouth pawns, we further flip the squares to ensure leading
     // piece is below RANK_5.
-    if (RANKS[squares[0]] > RANK4)
+    if (getRankOf(squares[0]) > RANK4)
         for (int i = 0; i < size; ++i)
             squares[i] ^= 070; // Vertical flip: SQ_A8 -> SQ_A1
 
@@ -808,23 +808,23 @@ Ret do_probe_table(const Position& pos, T* entry, WDLScore wdl, ProbeState* resu
         // 6 to differentiate from the above case, rank_of() maps a1-d4 diagonal
         // to 0...3 and finally MapB1H1H7[] maps the b1-h1-h7 triangle to 0..27.
         else if (off_A1H8(squares[1]))
-            idx = (  6 * 63 + RANKS[squares[0]] * 28
+            idx = (  6 * 63 + getRankOf(squares[0]) * 28
                    + MapB1H1H7[squares[1]])       * 62
                    + squares[2] - adjust2;
 
         // First two pieces are on a1-h8 diagonal, third below
         else if (off_A1H8(squares[2]))
             idx =  6 * 63 * 62 + 4 * 28 * 62
-                 +  RANKS[squares[0]]        * 7 * 28
-                 + (RANKS[squares[1]] - adjust1) * 28
+                 +  getRankOf(squares[0])        * 7 * 28
+                 + (getRankOf(squares[1]) - adjust1) * 28
                  +  MapB1H1H7[squares[2]];
 
         // All 3 pieces on the diagonal a1-h8
         else
             idx = 6 * 63 * 62 + 4 * 28 * 62 + 4 * 7 * 28
-                 +  RANKS[squares[0]]         * 7 * 6
-                 + (RANKS[squares[1]] - adjust1)  * 6
-                 + (RANKS[squares[2]] - adjust2);
+                 +  getRankOf(squares[0])         * 7 * 6
+                 + (getRankOf(squares[1]) - adjust1)  * 6
+                 + (getRankOf(squares[2]) - adjust2);
     } else
         // We don't have at least 3 unique pieces, like in KRRvKBB, just map
         // the kings.
@@ -1071,7 +1071,9 @@ void set(T& e, uint8_t* data) {
 
         for (int k = 0; k < e.pieceCount; ++k, ++data)
             for (int i = 0; i < sides; i++)
+			{
                 e.get(i, f)->pieces[k] = bitboardIndex(i ? *data >>  4 : *data & 0xF);
+			}
 
         for (int i = 0; i < sides; ++i)
             set_groups(e, e.get(i, f), order[i], f);
@@ -1257,10 +1259,10 @@ void Tablebases::init(const std::string& paths) {
     std::vector<tSquare> diagonal;
     code = 0;
     for (tSquare s = A1; s <= D4; ++s)
-        if (off_A1H8(s) < 0 && FILES[s] <= FILED)
+        if (off_A1H8(s) < 0 && getFileOf(s) <= FILED)
             MapA1D1D4[s] = code++;
 
-        else if (!off_A1H8(s) && FILES[s] <= FILED)
+        else if (!off_A1H8(s) && getFileOf(s) <= FILED)
             diagonal.push_back(s);
 
     // Diagonal squares are encoded as last ones
@@ -1322,7 +1324,7 @@ void Tablebases::init(const std::string& paths) {
             // the leading pawn on rank 2 and increasing the rank.
             for (Rank r = RANK2; r <= RANK7; ++r)
             {
-                tSquare sq = BOARDINDEX[f][r];
+                tSquare sq = getSquare((tFile)f,(tRank)r);
 
                 // Compute MapPawns[] at first pass.
                 // If sq is the leading pawn square, any other pawn cannot be

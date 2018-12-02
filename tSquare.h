@@ -73,5 +73,27 @@ inline tFile& operator++(tFile& d) { d = tFile(int(d) + 1); return d; }
 inline tFile& operator--(tFile& d) { d = tFile(int(d) - 1); return d; }
 
 
+inline tRank getRankOf( const tSquare s )
+{
+	extern const volatile tRank RANKS[squareNumber];
+	return RANKS[s];
+}
+
+inline tFile getFileOf( const tSquare s )
+{
+	extern const volatile tFile FILES[squareNumber];
+	return FILES[s];
+}
+
+inline tSquare getSquare( const tFile f, const tRank r)
+{
+	return tSquare(f + 8 * r);
+}
+
+inline int getSquareColor( const tSquare sq )
+{
+	return sq % 2;
+}
+
 
 #endif

@@ -36,16 +36,12 @@
 //------------------------------------------------
 //	extern variables
 //------------------------------------------------
-extern tSquare BOARDINDEX[8][8];
-extern const int FILES[squareNumber];
-extern const int RANKS[squareNumber];
 extern bitMap RANKMASK[squareNumber];
 extern bitMap FILEMASK[squareNumber];
 extern bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
 extern bitMap ISOLATED_PAWN[squareNumber];
 extern bitMap PASSED_PAWN[2][squareNumber];
 extern bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
-extern const int SQUARE_COLOR[squareNumber];
 extern bitMap BITMAP_COLOR[2];
 extern int SQUARE_DISTANCE[squareNumber][squareNumber];
 extern bitMap centerBitmap;
@@ -65,8 +61,9 @@ extern bitMap spaceMask;
 */
 inline bitMap bitSet(tSquare n)
 {
-	extern bitMap BITSET[squareNumber+1];
-	return BITSET[n];
+	//extern bitMap BITSET[squareNumber+1];
+	//return BITSET[n];
+	return (1ull) << n;
 }
 
 inline bool isSquareSet( const bitMap b, const tSquare sq )
@@ -84,6 +81,7 @@ inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3)
 	extern bitMap LINES[squareNumber][squareNumber];
 	return isSquareSet( LINES[s1][s2], s3 );
 }
+
 
 
 //------------------------------------------------

@@ -47,8 +47,8 @@ void Position::initPstValues(void)
 			assert(s<squareNumber);
 			nonPawnValue[piece] = simdScore{0,0,0,0};
 			pstValue[piece][s] = simdScore{0,0,0,0};
-			int rank = RANKS[s];
-			int file = FILES[s];
+			tRank rank = getRankOf(s);
+			tFile file = getFileOf(s);
 
 			if(piece > occupiedSquares && piece < whitePieces )
 			{
@@ -86,7 +86,7 @@ void Position::initPstValues(void)
 				if( isKnight( piece ) )
 				{
 					pstValue[piece][s] = KnightPST * (Center[file] + Center[rank]);
-					if(rank==0)
+					if(rank==RANK1)
 					{
 						pstValue[piece][s] -= KnightBackRankOpening;
 					}
@@ -94,11 +94,11 @@ void Position::initPstValues(void)
 				if( isBishop( piece ) )
 				{
 					pstValue[piece][s] = BishopPST * (Center[file] + Center[rank]);
-					if(rank==0)
+					if(rank==RANK1)
 					{
 						pstValue[piece][s] -= BishopBackRankOpening;
 					}
-					if((file==rank) || (file+rank==7))
+					if(((int)file==(int)rank) || (file+rank==7))
 					{
 						pstValue[piece][s] += BishopOnBigDiagonals;
 					}
@@ -106,7 +106,7 @@ void Position::initPstValues(void)
 				if( isRook( piece ) )
 				{
 					pstValue[piece][s] = RookPST * (Center[file]);
-					if(rank==0)
+					if(rank==RANK1)
 					{
 						pstValue[piece][s] -= RookBackRankOpening;
 					}
@@ -114,7 +114,7 @@ void Position::initPstValues(void)
 				if( isQueen( piece) )
 				{
 					pstValue[piece][s] = QueenPST * (Center[file] + Center[rank]);
-					if(rank==0)
+					if(rank==RANK1)
 					{
 						pstValue[piece][s] -= QueenBackRankOpening;
 					}
@@ -140,10 +140,9 @@ void Position::initPstValues(void)
 			}
 			else if( isBlackPiece( piece ) && piece <blackPieces )
 			{
-				int r = 7 - rank;
-				//int f = 7 - file;
-				int f = file;
-				pstValue[piece][s] = -pstValue[ piece - separationBitmap ][BOARDINDEX[f][r]];
+				tRank r = tRank(7 - rank);
+				tFile f = file;
+				pstValue[piece][s] = -pstValue[ piece - separationBitmap ][getSquare(f,r)];
 
 				if( !isPawn( piece ) && !isKing( piece ) )
 				{
@@ -378,17 +377,16 @@ void Position::display()const
 {
 	sync_cout<<getFen()<<sync_endl;
 
-	int rank, file;
 	const state& st =getActualStateConst();
 	sync_cout;
 	{
-		for (rank = 7; rank >= 0; rank--)
+		for (tRank rank = RANK8; rank >= RANK1; rank--)
 		{
 			std::cout << "  +---+---+---+---+---+---+---+---+" << std::endl;
 			std::cout << rank+1 <<  " |";
-			for (file = 0; file <= 7; file++)
+			for (tFile file = FILEA; file <= FILEH; file++)
 			{
-				std::cout << " " << getPieceName(squares[BOARDINDEX[file][rank]] ) << " |";
+				std::cout << " " << getPieceName(getPieceAt(getSquare(file,rank))) << " |";
 			}
 			std::cout << std::endl;
 		}
@@ -426,23 +424,21 @@ void Position::display()const
 std::string  Position::getFen() const {
 
 	std::string s;
-
-	int file,rank;
 	int emptyFiles = 0;
 	const state& st = getActualStateConst();
-	for (rank = 7; rank >= 0; rank--)
+	for ( tRank rank = RANK8; rank >= RANK1; rank--)
 	{
 		emptyFiles = 0;
-		for (file = 0; file <= 7; file++)
+		for ( tFile file = FILEA; file <= FILEH; file++)
 		{
-			if(squares[BOARDINDEX[file][rank]] != 0)
+			if(getPieceAt(getSquare(file,rank)) != empty)
 			{
 				if(emptyFiles!=0)
 				{
 					s+=std::to_string(emptyFiles);
 				}
 				emptyFiles=0;
-				s += getPieceName( squares[BOARDINDEX[file][rank]] );
+				s += getPieceName( getPieceAt(getSquare(file,rank)) );
 			}
 			else
 			{
@@ -505,19 +501,19 @@ std::string Position::getSymmetricFen() const {
 	int file,rank;
 	int emptyFiles=0;
 	const state& st =getActualStateConst();
-	for (rank = 0; rank <=7 ; rank++)
+	for (rank = RANK1; rank <=RANK8 ; rank++)
 	{
 		emptyFiles=0;
-		for (file = 0; file <=7; file++)
+		for (file = FILEA; file <=FILEH; file++)
 		{
-			if(squares[BOARDINDEX[file][rank]]!=0)
+			if(getPieceAt(getSquare(file,rank))!=empty)
 			{
 				if(emptyFiles!=0)
 				{
 					s += std::to_string(emptyFiles);
 				}
 				emptyFiles = 0;
-				bitboardIndex xx = squares[BOARDINDEX[file][rank]];
+				bitboardIndex xx = getPieceAt(getSquare(file,rank));
 				if( isBlackPiece(xx) )
 				{
 					xx = (bitboardIndex)(xx - separationBitmap);
@@ -1561,7 +1557,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 
 	// promozione impossibile!!
-	if(m.isPromotionMove() && ((RANKS[m.getFrom()]!=(s.isBlackTurn() ? 1 : 6 )) || !(isPawn(piece))))
+	if(m.isPromotionMove() && ((getRankOf(m.getFrom())!=(s.isBlackTurn() ? RANK2 : RANK7 )) || !(isPawn(piece))))
 	{
 		return false;
 	}
@@ -1574,7 +1570,7 @@ bool Position::isMoveLegal(const Move &m)const
 	//arrocco impossibile
 	if( m.isCastleMove() )
 	{
-		if(!isKing(piece) || (FILES[m.getFrom()]!=FILES[E1]) || (abs(m.getFrom()-m.getTo())!=2 ) || (RANKS[m.getFrom()]!=RANKS[A1] && RANKS[m.getFrom()]!=RANKS[A8]))
+		if(!isKing(piece) || (getFileOf(m.getFrom())!=FILEE) || (abs(m.getFrom()-m.getTo())!=2 ) || (getRankOf(m.getFrom())!=RANK1 && getRankOf(m.getFrom())!=RANK8))
 		{
 			return false;
 		}
@@ -1691,13 +1687,13 @@ bool Position::isMoveLegal(const Move &m)const
 				// not valid pawn push
 				( m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || isSquareSet( bitBoard[occupiedSquares], m.getTo() ) )
 				// not valid pawn double push
-				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (RANKS[m.getFrom()]!=1) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()-8)))&bitBoard[occupiedSquares]))
+				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (getRankOf(m.getFrom())!=RANK2) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()-8)))&bitBoard[occupiedSquares]))
 				// not valid pawn attack
 				&& ( !isSquareSet( Movegen::attackFrom<whitePawns>( m.getFrom() ), m.getTo() ) || !isSquareSet( Them[Pieces] | bitSet( s.getEpSquare() ), m.getTo() ) )
 			){
 				return false;
 			}
-			if(RANKS[m.getFrom()]==6 && !m.isPromotionMove())
+			if(getRankOf(m.getFrom())==RANK7 && !m.isPromotionMove())
 			{
 				return false;
 
@@ -1722,14 +1718,14 @@ bool Position::isMoveLegal(const Move &m)const
 				// not valid pawn push
 				( m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || isSquareSet(bitBoard[occupiedSquares], m.getTo() ) )
 				// not valid pawn double push
-				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (RANKS[m.getFrom()]!=6) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()+8)))&bitBoard[occupiedSquares]))
+				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (getRankOf(m.getFrom())!=RANK7) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()+8)))&bitBoard[occupiedSquares]))
 				// not valid pawn attack
 				&& ( !isSquareSet( Movegen::attackFrom<blackPawns>( m.getFrom() ), m.getTo() ) || !isSquareSet( Them[Pieces] | bitSet(s.getEpSquare()), m.getTo() ) )
 			){
 				return false;
 			}
 
-			if(RANKS[m.getFrom()]==1 && !
+			if(getRankOf(m.getFrom())==RANK2 && !
 
 					m.isPromotionMove()){
 				return false;
@@ -1877,8 +1873,9 @@ std::string Position::_printEpSquare( const state& st)
 	std::string s;
 	if( st.hasEpSquare() )
 	{
-		s += char('a'+FILES[ st.getEpSquare() ] );
-		s += char('1'+RANKS[ st.getEpSquare() ] );
+		// todo we have a similar method in command
+		s += char('a'+getFileOf( st.getEpSquare() ) );
+		s += char('1'+getRankOf( st.getEpSquare() ) );
 	}
 	else
 	{

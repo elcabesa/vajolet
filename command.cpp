@@ -33,6 +33,7 @@
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"
+#include "tSquare.h"
 #include "vajolet.h"
 #include "version.h"
 
@@ -632,6 +633,16 @@ void uciLoop()
 	thr.quitThreads();
 }
 
+char printFileOf( const tSquare& sq )
+{
+	return char( 'a' + getFileOf( sq ) );
+}
+
+char printRankOf( const tSquare& sq )
+{
+	return char( '1' + getRankOf( sq ) );
+}
+
 /*! \brief return the uci string for a given move
 	\author Marco Belli
 	\version 1.0
@@ -649,13 +660,13 @@ std::string displayUci(const Move & m){
 	}
 
 	//from
-	s += char('a'+FILES[m.getFrom()]);
-	s += char('1'+RANKS[m.getFrom()]);
+	s += printFileOf( m.getFrom() );
+	s += printRankOf( m.getFrom() );
 
 
 	//to
-	s += char('a'+FILES[m.getTo()]);
-	s += char('1'+RANKS[m.getTo()]);
+	s += printFileOf( m.getTo() );
+	s += printRankOf( m.getTo() );
 	//promotion
 	if( m.isPromotionMove() )
 	{
@@ -711,11 +722,11 @@ std::string displayMove(const Position& pos, const Move & m)
 			)
 			{
 				disambigusFlag = true;
-				if( FILES[ mm.getFrom() ] == FILES[ m.getFrom() ] )
+				if( getFileOf( mm.getFrom() ) == getFileOf( m.getFrom() ) )
 				{
 					rankFlag = true;
 				}
-				if( RANKS[ mm.getFrom() ] == RANKS[ m.getFrom() ] )
+				if( getRankOf( mm.getFrom() ) == getRankOf( m.getFrom() ) )
 				{
 					fileFlag = true;
 				}
@@ -751,11 +762,11 @@ std::string displayMove(const Position& pos, const Move & m)
 	}
 	if( fileFlag )
 	{
-		s += char('a'+FILES[ m.getFrom() ]);
+		s += printFileOf( m.getFrom() );
 	}
 	if( rankFlag )
 	{
-		s += char('1'+RANKS[ m.getFrom() ]);
+		s += printRankOf( m.getFrom() );
 	}
 
 
@@ -764,14 +775,14 @@ std::string displayMove(const Position& pos, const Move & m)
 	{
 		if(pawnMove)
 		{
-			s+=char('a'+FILES[m.getFrom()]);
+			s += printFileOf( m.getFrom() );
 		}
 		// capture add x before to square
 		s+="x";
 	}
 	// to square
-	s += char('a'+FILES[ m.getTo() ]);
-	s += char('1'+RANKS[ m.getTo() ]);
+	s += printFileOf( m.getTo() );
+	s += printRankOf( m.getTo() );
 	// add en passant info
 	if ( isEnPassant )
 	{

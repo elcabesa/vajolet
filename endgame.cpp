@@ -84,9 +84,9 @@ bool Position::evalKNPvsK(Score& res)
 	if(Pcolor == white)
 	{
 		pawnSquare = getSquareOfThePiece(whitePawns);
-		int pawnFile = FILES[pawnSquare];
-		int pawnRank = RANKS[pawnSquare];
-		if( (pawnFile ==0 || pawnFile ==7) && pawnRank == 6 )
+		int pawnFile = getFileOf(pawnSquare);
+		int pawnRank = getRankOf(pawnSquare);
+		if( (pawnFile ==FILEA || pawnFile ==FILEH) && pawnRank == RANK7 )
 		{
 
 			res = 0;
@@ -97,9 +97,9 @@ bool Position::evalKNPvsK(Score& res)
 	else
 	{
 		pawnSquare = getSquareOfThePiece(blackPawns);
-		int pawnFile = FILES[pawnSquare];
-		int pawnRank = RANKS[pawnSquare];
-		if( (pawnFile ==0 || pawnFile ==7) && pawnRank == 1 )
+		int pawnFile = getFileOf(pawnSquare);
+		int pawnRank = getRankOf(pawnSquare);
+		if( (pawnFile ==FILEA || pawnFile ==FILEH) && pawnRank == RANK2 )
 		{
 			res = 10;
 			return true;
@@ -122,15 +122,15 @@ bool Position::evalKBPsvsK(Score& res)
 	if(Pcolor == white)
 	{	
 		pawns = getBitmap(whitePawns);
-		int pawnFile = FILES[firstOne( pawns )];
+		tFile pawnFile = getFileOf(firstOne( pawns ));
 		
 		if(  0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
 		{
 			bishopSquare = getSquareOfThePiece(whiteBishops);
-			if( SQUARE_COLOR[BOARDINDEX[pawnFile][7]] != SQUARE_COLOR[bishopSquare])
+			if( getSquareColor(getSquare(pawnFile,RANK8)) != getSquareColor(bishopSquare))
 			{
 				tSquare kingSquare = getSquareOfThePiece(blackKing);
-				if(RANKS[kingSquare] >= 6  && abs( pawnFile - FILES[kingSquare] ) <= 1 )
+				if(getRankOf(kingSquare) >= RANK7  && abs( pawnFile - getFileOf(kingSquare) ) <= 1 )
 				{
 					res = 0;
 					return true;
@@ -141,14 +141,14 @@ bool Position::evalKBPsvsK(Score& res)
 	else
 	{
 		pawns = getBitmap(blackPawns);
-		int pawnFile = FILES[firstOne( pawns )];
+		tFile pawnFile = getFileOf(firstOne( pawns ));
 		if( 0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
 		{
 			bishopSquare = getSquareOfThePiece(blackBishops);
-			if( SQUARE_COLOR[BOARDINDEX[pawnFile][0]] != SQUARE_COLOR[ bishopSquare ])
+			if( getSquareColor(getSquare(pawnFile,RANK1)) != getSquareColor(bishopSquare))
 			{
 				tSquare kingSquare = getSquareOfThePiece(whiteKing);
-				if(RANKS[kingSquare] <= 1  && abs(pawnFile - FILES[kingSquare]) <= 1)
+				if(getRankOf(kingSquare) <= RANK2  && abs(pawnFile - getFileOf(kingSquare)) <= 1)
 				{
 					res = 0;
 					return true;
@@ -174,14 +174,14 @@ bool Position::evalKQvsKP(Score& res)
 		winningKingSquare = getSquareOfThePiece(blackKing);
 		losingKingSquare = getSquareOfThePiece(whiteKing);
 
-		int pawnFile = FILES[pawnSquare];
-		int pawnRank = RANKS[pawnSquare];
+		int pawnFile = getFileOf(pawnSquare);
+		int pawnRank = getRankOf(pawnSquare);
 		res = -100 * ( 7 - SQUARE_DISTANCE[winningKingSquare][losingKingSquare] );
 
 		if(
 				pawnRank != 6
 				|| SQUARE_DISTANCE[losingKingSquare][pawnSquare] != 1
-				|| (pawnFile == 1 || pawnFile == 3 || pawnFile == 4 || pawnFile == 6) )
+				|| (pawnFile == FILEB || pawnFile == FILED || pawnFile == FILEE || pawnFile == FILEG) )
 		{
 			res -= 90000;
 		}
@@ -194,14 +194,14 @@ bool Position::evalKQvsKP(Score& res)
 		winningKingSquare = getSquareOfThePiece(whiteKing);
 		losingKingSquare = getSquareOfThePiece(blackKing);
 
-		int pawnFile = FILES[pawnSquare];
-		int pawnRank = RANKS[pawnSquare];
+		int pawnFile = getFileOf(pawnSquare);
+		int pawnRank = getRankOf(pawnSquare);
 		res = 100 * ( 7 - SQUARE_DISTANCE[winningKingSquare][losingKingSquare] );
 
 		if(
 				pawnRank != 1
 				|| SQUARE_DISTANCE[losingKingSquare][pawnSquare] != 1
-				|| (pawnFile == 1 || pawnFile == 3 || pawnFile == 4 || pawnFile == 6) )
+				|| (pawnFile == FILEB || pawnFile == FILED || pawnFile == FILEE || pawnFile == FILEG) )
 		{
 			res += 90000;
 		}
@@ -220,9 +220,9 @@ bool Position::evalKRPvsKr(Score& res)
 	if( Pcolor == white )
 	{
 		pawnSquare = getSquareOfThePiece(whitePawns);
-		if(	FILES[pawnSquare] == FILES[getSquareOfThePiece(blackKing)]
-		    && RANKS[pawnSquare] <= 6
-		    && RANKS[pawnSquare] < RANKS[getSquareOfThePiece(blackKing)]
+		if(	getFileOf(pawnSquare) == getFileOf(getSquareOfThePiece(blackKing))
+		    && getRankOf(pawnSquare) <= RANK7
+		    && getRankOf(pawnSquare) < getRankOf(getSquareOfThePiece(blackKing))
 		)
 		{
 			res = 128;
@@ -232,9 +232,9 @@ bool Position::evalKRPvsKr(Score& res)
 	else
 	{
 		pawnSquare = getSquareOfThePiece(blackPawns);
-		if(	FILES[pawnSquare] == FILES[getSquareOfThePiece(whiteKing)]
-			&& RANKS[pawnSquare] >= 1
-			&& RANKS[pawnSquare] > RANKS[getSquareOfThePiece(whiteKing)]
+		if(	getFileOf(pawnSquare) == getFileOf(getSquareOfThePiece(whiteKing))
+			&& getRankOf(pawnSquare) >= RANK2
+			&& getRankOf(pawnSquare) > getRankOf(getSquareOfThePiece(whiteKing))
 		)
 		{
 			res=128;
@@ -269,7 +269,7 @@ bool Position::evalKBNvsK( Score& res)
 		enemySquare = getSquareOfThePiece(whiteKing);
 	}
 
-	int mateColor = SQUARE_COLOR[bishopSquare];
+	int mateColor = getSquareColor(bishopSquare);
 	if(mateColor == 0)
 	{
 		mateSquare1 = A1;
@@ -389,21 +389,21 @@ bool Position::evalKPvsK(Score& res)
 		enemySquare = getSquareOfThePiece(blackKing);
 
 
-		tSquare promotionSquare = BOARDINDEX[ FILES[pawnSquare] ][7];
-		const int relativeRank = RANKS[pawnSquare];
+		tSquare promotionSquare = getSquare(getFileOf(pawnSquare),RANK8);
+		const int relativeRank = getRankOf(pawnSquare);
 		// Rule of the square
 		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - ( isWhiteTurn() ? 0 : 1) , 0) )
 		{
 			res = SCORE_KNOWN_WIN + relativeRank;
 			return true;
 		}
-		if(FILES[pawnSquare] !=0 && FILES[pawnSquare] != 7)
+		if(getFileOf(pawnSquare) !=FILEA && getFileOf(pawnSquare) != FILEH)
 		{
 
 			if(SQUARE_DISTANCE[enemySquare][pawnSquare] >= 2 || isWhiteTurn() )
 			{
 				//winning king on a key square
-				if(relativeRank < 4)
+				if(relativeRank < RANK5)
 				{
 					if(kingSquare >= pawnSquare + 15 && kingSquare <= pawnSquare + 17 )
 					{
@@ -411,7 +411,7 @@ bool Position::evalKPvsK(Score& res)
 						return true;
 					}
 				}
-				else if(relativeRank < 6)
+				else if(relativeRank < RANK7)
 				{
 					if((kingSquare >= pawnSquare + 15 && kingSquare <= pawnSquare + 17) || (kingSquare >= pawnSquare + 7 && kingSquare <= pawnSquare + 9))
 					{
@@ -433,7 +433,7 @@ bool Position::evalKPvsK(Score& res)
 				unsigned int count = 0;
 				if(kingSquare == pawnSquare + 8) count++;
 				if(isBlackTurn() && kingsDirectOpposition()) count++;
-				if(RANKS[kingSquare] == 5) count++;
+				if(getRankOf(kingSquare) == RANK6) count++;
 
 				if(count > 1)
 				{
@@ -443,7 +443,7 @@ bool Position::evalKPvsK(Score& res)
 
 			}
 			//draw rule
-			if((enemySquare==pawnSquare+8) || (enemySquare==pawnSquare+16 && RANKS[enemySquare]!=7))
+			if((enemySquare==pawnSquare+8) || (enemySquare==pawnSquare+16 && getRankOf(enemySquare)!=RANK8))
 			{
 				res = 0;
 				return true;
@@ -452,7 +452,7 @@ bool Position::evalKPvsK(Score& res)
 		else
 		{
 			//ROOKS PAWN
-			if(abs(FILES[enemySquare] - FILES[pawnSquare]) <= 1  && RANKS[enemySquare] > 5 )
+			if(abs(getFileOf(enemySquare) - getFileOf(pawnSquare)) <= 1  && getRankOf(enemySquare) > RANK6 )
 			{
 				res = 0;
 				return true;
@@ -468,20 +468,20 @@ bool Position::evalKPvsK(Score& res)
 
 
 
-		tSquare promotionSquare = BOARDINDEX[FILES[pawnSquare]][0];
-		const int relativeRank = 7 - RANKS[pawnSquare];
+		tSquare promotionSquare = getSquare(getFileOf(pawnSquare),RANK1);
+		const int relativeRank = 7 - getRankOf(pawnSquare);
 		// Rule of the square
 		if ( std::min( 5, (int)( 7 - relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - ( isBlackTurn() ? 0 : 1 ), 0) )
 		{
 			res = -SCORE_KNOWN_WIN - relativeRank;
 			return true;
 		}
-		if(FILES[pawnSquare] != 0 && FILES[pawnSquare] != 7)
+		if(getFileOf(pawnSquare) != FILEA && getFileOf(pawnSquare) != FILEH)
 		{
 			if(SQUARE_DISTANCE[enemySquare][pawnSquare] >= 2 || isBlackTurn() )
 			{
 				//winning king on a key square
-				if(relativeRank < 4)
+				if(relativeRank < RANK5)
 				{
 					if(kingSquare >= pawnSquare - 17 && kingSquare <= pawnSquare - 15 )
 					{
@@ -489,7 +489,7 @@ bool Position::evalKPvsK(Score& res)
 						return true;
 					}
 				}
-				else if(relativeRank < 6)
+				else if(relativeRank < RANK7)
 				{
 					if((kingSquare >= pawnSquare - 17 && kingSquare <= pawnSquare - 15) || (kingSquare >= pawnSquare - 9 && kingSquare <= pawnSquare - 7 ) )
 					{
@@ -509,7 +509,7 @@ bool Position::evalKPvsK(Score& res)
 				unsigned int count = 0;
 				if(kingSquare == pawnSquare - 8) count++;
 				if( isWhiteTurn() && kingsDirectOpposition()) count++;
-				if(RANKS[kingSquare] == 2) count++;
+				if(getRankOf(kingSquare) == 2) count++;
 
 				if(count > 1)
 				{
@@ -518,7 +518,7 @@ bool Position::evalKPvsK(Score& res)
 				}
 			}
 			//draw rule
-			if((enemySquare == pawnSquare - 8) || (enemySquare == pawnSquare - 16 && RANKS[enemySquare] != 0) )
+			if((enemySquare == pawnSquare - 8) || (enemySquare == pawnSquare - 16 && getRankOf(enemySquare) != RANK1) )
 			{
 				res = 0;
 				return true;
@@ -527,7 +527,7 @@ bool Position::evalKPvsK(Score& res)
 		else
 		{
 			//ROOKS PAWN
-			if(abs(FILES[enemySquare] - FILES[pawnSquare]) <= 1  && RANKS[enemySquare] < 2)
+			if(abs(getFileOf(enemySquare) - getFileOf(pawnSquare)) <= 1  && getRankOf(enemySquare) < RANK3)
 			{
 				res = 0;
 				return true;
@@ -566,7 +566,7 @@ bool Position::evalKPsvsK(Score& res)
 	
 	if( 
 			// re e pedoni sono al massimo su colonne adiacenti
-			(std::abs(FILES[ firstOne( pawns ) ] - FILES[ kingSquare ])<=1 )
+			(std::abs(getFileOf( firstOne( pawns ) ) - getFileOf( kingSquare ))<=1 )
 			// se tutti i pedoni sono sulla colonna A oppure tutti i pedoni sono sulla colonna H
 			&&(  0 ==( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
 			// se tutti i pedoni sono davanti al re
@@ -582,7 +582,7 @@ bool Position::evalKPsvsK(Score& res)
 
 bool Position::evalOppositeBishopEndgame(Score& res)
 {
-	if(SQUARE_COLOR[getSquareOfThePiece(blackBishops)] != SQUARE_COLOR[ getSquareOfThePiece(whiteBishops)])
+	if( getSquareColor(getSquareOfThePiece(blackBishops)) != getSquareColor(getSquareOfThePiece(whiteBishops)))
 	{
 		unsigned int pawnCount = 0;
 		int pawnDifference = 0;

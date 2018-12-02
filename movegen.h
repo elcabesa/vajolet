@@ -155,7 +155,7 @@ private:
 	}
 	
 	static bool _isValidCoordinate( const int tofile, const int torank );
-	static void _setBit( bitMap& b, int file, int rank );
+	static void _setBit( bitMap& b, tFile file, tRank rank );
 	
 	template<Movegen::genType type>	void insertStandardMove( MoveList<MAX_MOVE_PER_POSITION>& ml, const Move& m ) const;
 	void insertPromotionMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, Move& m ) const;
