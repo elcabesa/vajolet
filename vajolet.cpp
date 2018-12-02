@@ -27,7 +27,6 @@
 #include "transposition.h"
 #include "uciParameters.h"
 #include "syzygy/tbprobe.h"
-#include "syzygy2/tbprobe.h"
 
 
 static void init()
@@ -49,7 +48,6 @@ static void init()
 	transpositionTable::getInstance().setSize(1);
 	Position::initMaterialKeys();
 	tb_init(uciParameters::SyzygyPath.c_str());
-	Tablebases::init(uciParameters::SyzygyPath);
 }
 
 static bool manageCommandLine( int argc, char* argv[] )

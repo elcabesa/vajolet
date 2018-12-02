@@ -31,7 +31,6 @@
 #include "thread.h"
 #include "uciParameters.h"
 #include "syzygy/tbprobe.h"
-#include "syzygy2/tbprobe.h"
 #include "vajolet.h"
 
 #ifdef DEBUG_EVAL_SIMMETRY
@@ -679,8 +678,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					pos.getActualStateConst().getCastleRights(),
 					pos.hasEpSquare() ? pos.getEpSquare(): 0,
 					pos.isWhiteTurn() );
-				Tablebases::ProbeState ps;
-				Tablebases::WDLScore result2 = Tablebases::probe_wdl(pos, &ps);
+
 				if(result != TB_RESULT_FAILED)
 				{
 					tbHits++;

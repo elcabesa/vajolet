@@ -29,7 +29,6 @@
 #include "position.h"
 #include "search.h"
 #include "syzygy/tbprobe.h"
-#include "syzygy2/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"
@@ -395,7 +394,6 @@ void setoption(std::istringstream& is)
 	{
 		uciParameters::SyzygyPath = value;
 		tb_init(uciParameters::SyzygyPath.c_str());
-		Tablebases::init(uciParameters::SyzygyPath);
 		sync_cout<<"info string TB_LARGEST = "<<TB_LARGEST<<sync_endl;
 	}
 	else if(name == "SyzygyProbeDepth")
