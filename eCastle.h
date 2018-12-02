@@ -18,7 +18,7 @@
 #define ECASTLE_H_
 
 
-using Color = enum
+using Color = enum eColor
 {
 	white = 0,
 	black = 1

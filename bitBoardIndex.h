@@ -61,11 +61,17 @@ enum bitboardIndex
 inline bitboardIndex operator++(bitboardIndex& d, int) { bitboardIndex r = d; d = bitboardIndex(int(d) + 1); return r; }
 inline bitboardIndex& operator++(bitboardIndex& d) { d = bitboardIndex(int(d) + 1); return d; }
 
+inline bitboardIndex operator--(bitboardIndex& d, int) { bitboardIndex r = d; d = bitboardIndex(int(d) - 1); return r; }
+inline bitboardIndex& operator--(bitboardIndex& d) { d = bitboardIndex(int(d) - 1); return d; }
+
 enum eNextMove	// color turn. ( it's also used as offset to access bitmaps by index)
 {
 	whiteTurn = 0,
 	blackTurn=blackKing-whiteKing
 };
+
+inline eNextMove operator++(eNextMove& d, int) { eNextMove r = d; d = eNextMove(int(d) + 1); return r; }
+inline eNextMove& operator++(eNextMove& d) { d = eNextMove(int(d) + 1); return d; }
 
 /*! \brief tell if the piece is a pawn
 	\author Marco Belli

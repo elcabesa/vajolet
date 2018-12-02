@@ -122,8 +122,8 @@ public:
 	std::string getSymmetricFen() const;
 #endif
 
-	void setupFromFen(const std::string& fenStr);
-	void setup(const std::string& code, Color c);
+	const Position& setupFromFen(const std::string& fenStr);
+	const Position& setup(const std::string& code, const Color c);
 
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
@@ -136,6 +136,7 @@ public:
 
 	template<bool trace>Score eval(void);
 	bool isDraw(bool isPVline) const;
+	bool hasRepeated(bool isPVline = false) const;
 
 
 	bool moveGivesCheck(const Move& m)const ;

@@ -807,8 +807,7 @@ void Position::initMaterialKeys(void)
 
 	for (auto& eg : Endgames)
 	{
-		p.setupFromFen(eg.fen);
-		tKey key = p.getMaterialKey().getKey();
+		tKey key = p.setupFromFen(eg.fen).getMaterialKey().getKey();
 		t.type = eg.type;
 		t.pointer = eg.pointer;
 		t.val = eg.val;
@@ -832,8 +831,7 @@ void Position::initMaterialKeys(void)
 				}
 				if(wp!=8){s+=std::to_string(8-wp);}
 				s+="/6BK w - -";
-				p.setupFromFen(s);
-				tKey key = p.getMaterialKey().getKey();
+				tKey key = p.setupFromFen(s).getMaterialKey().getKey();
 				t.type=materialStruct::multiplicativeFunction;
 				t.pointer=&Position::evalOppositeBishopEndgame;
 				t.val=0;

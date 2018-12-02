@@ -165,7 +165,7 @@ void Position::initPstValues(void)
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::setupFromFen(const std::string& fenStr)
+const Position& Position::setupFromFen(const std::string& fenStr)
 {
 	char col,row,token;
 	tSquare sq = A8;
@@ -298,10 +298,10 @@ void Position::setupFromFen(const std::string& fenStr)
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(1);
 #endif
+	return *this;
 }
 
-// todo remove?
-void Position::setup(const std::string& code, Color c)
+const Position& Position::setup(const std::string& code, const Color c)
 {
 
   assert(code.length() > 0 && code.length() < 8);
@@ -315,8 +315,7 @@ void Position::setup(const std::string& code, Color c)
   std::string fenStr =  sides[0] + char(8 - sides[0].length() + '0') + "/8/8/8/8/8/8/"
                  + sides[1] + char(8 - sides[1].length() + '0') + " w - - 0 10";
 
-  sync_cout<<fenStr<<sync_endl;
-  setupFromFen(fenStr);
+  return setupFromFen(fenStr);
 }
 
 
@@ -1441,6 +1440,33 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 	return !isSquareSet( Movegen::attackFrom<whiteKing>(kingSquare), to ) && moveGivesDoubleCheck(m);
 }
 
+bool Position::hasRepeated(bool isPVline) const
+{
+	const state & s = getActualStateConst();
+	unsigned int counter = 1;
+	const HashKey& actualkey = s.getKey();
+	auto it = stateInfo.rbegin();
+	
+
+	int e = std::min( s.getIrreversibleMoveCount(), s.getPliesFromNullCount() );
+	if( e >= 4)
+	{
+		std::advance( it, 2 );
+	}
+	for(int i = 4 ;	i<=e; i+=2 )
+	{
+		std::advance( it, 2 );
+		if(it->getKey() == actualkey)
+		{
+			counter++;
+			if(!isPVline || counter>=3)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 bool Position::isDraw(bool isPVline) const
 {
@@ -1471,29 +1497,7 @@ bool Position::isDraw(bool isPVline) const
 	}
 
 	// Draw by repetition?
-	unsigned int counter = 1;
-	const HashKey& actualkey = s.getKey();
-	auto it = stateInfo.rbegin();
-	
-
-	int e = std::min( s.getIrreversibleMoveCount(), s.getPliesFromNullCount() );
-	if( e >= 4)
-	{
-		std::advance( it,2);
-	}
-	for(int i = 4 ;	i<=e; i+=2 )
-	{
-		std::advance( it,2);
-		if(it->getKey() == actualkey)
-		{
-			counter++;
-			if(!isPVline || counter>=3)
-			{
-				return true;
-			}
-		}
-	}
-	return false;
+	return hasRepeated(isPVline);
 }
 
 bool Position::isMoveLegal(const Move &m)const

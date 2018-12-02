@@ -52,4 +52,26 @@ inline tSquare& operator--(tSquare& d) { d = tSquare(int(d) - 1); return d; }
 inline tSquare operator/(const tSquare d, int i) { return tSquare(int(d) / i); }
 inline tSquare& operator/=(tSquare& d, int i) { d = tSquare(int(d) / i); return d; }
 
+enum tRank								
+{
+	RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8, rankNumber
+};
+
+inline tRank operator++(tRank& d, int) { tRank r = d; d = tRank(int(d) + 1); return r; }
+inline tRank operator--(tRank& d, int) { tRank r = d; d = tRank(int(d) - 1); return r; }
+inline tRank& operator++(tRank& d) { d = tRank(int(d) + 1); return d; }
+inline tRank& operator--(tRank& d) { d = tRank(int(d) - 1); return d; }
+
+enum tFile								
+{
+	FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH, fileNumber
+};
+
+inline tFile operator++(tFile& d, int) { tFile r = d; d = tFile(int(d) + 1); return r; }
+inline tFile operator--(tFile& d, int) { tFile r = d; d = tFile(int(d) - 1); return r; }
+inline tFile& operator++(tFile& d) { d = tFile(int(d) + 1); return d; }
+inline tFile& operator--(tFile& d) { d = tFile(int(d) - 1); return d; }
+
+
+
 #endif
