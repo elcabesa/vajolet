@@ -1156,7 +1156,7 @@ unsigned long long Position::perft(unsigned int depth)
 #endif
 	PerftTranspositionTable tt;
 	
-	unsigned long long tot = 0;
+	unsigned long long tot;
 	if( perftUseHash && tt.retrieve(getKey(), depth, tot) )
 	{
 		return tot;
@@ -1170,9 +1170,10 @@ unsigned long long Position::perft(unsigned int depth)
 	}
 #endif
 
+	tot = 0;
 	Move m;
 	MovePicker mp(*this);
-	while ( ( m = mp.getNextMove() ) )
+	while( ( m = mp.getNextMove() ) )
 	{
 		doMove(m);
 		tot += perft(depth - 1);
@@ -1235,7 +1236,7 @@ inline void Position::calcCheckingSquares(void)
 	const eNextMove& attackingPieces = s.getNextTurn();
 	tSquare kingSquare = getSquareOfTheirKing();
 
-	bitMap occupancy = getOccupationBitmap();
+	const bitMap occupancy = getOccupationBitmap();
 
 	s.resetCheckingSquares( getPieceOfPlayer(King, attackingPieces) );
 	assert(kingSquare<squareNumber);
@@ -1246,7 +1247,6 @@ inline void Position::calcCheckingSquares(void)
 		s.getCheckingSquares( getPieceOfPlayer( Rooks, attackingPieces) ) 
 		| s.getCheckingSquares( getPieceOfPlayer( Bishops, attackingPieces) ) );
 	s.setCheckingSquares( getPieceOfPlayer( Knights, attackingPieces ), Movegen::attackFrom<whiteKnights>(kingSquare) );
-
 
 	s.setCheckingSquares( getPieceOfPlayer( Pawns, attackingPieces ), attackingPieces? Movegen::attackFrom<whitePawns>(kingSquare) : Movegen::attackFrom<blackPawns>(kingSquare) );
 
@@ -1406,8 +1406,6 @@ bool Position::moveGivesDoubleCheck(const Move& m)const
 
 	// Direct check ?
 	return isSquareSet( s.getCheckingSquares( piece ), to) && ( s.thereAreHiddenCheckers() && s.isHiddenChecker( from ) );
-
-
 }
 
 bool Position::moveGivesSafeDoubleCheck(const Move& m)const
@@ -1420,7 +1418,7 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 
 bool Position::hasRepeated(bool isPVline) const
 {
-	const state & s = getActualStateConst();
+	const state &s = getActualStateConst();
 	unsigned int counter = 1;
 	const HashKey& actualkey = s.getKey();
 	auto it = stateInfo.rbegin();
