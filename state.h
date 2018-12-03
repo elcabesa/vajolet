@@ -98,6 +98,7 @@ public:
 
 	inline tSquare getEpSquare() const
 	{
+		assert( _epSquare < squareNumber );
 		return _epSquare;
 	}
 

@@ -40,9 +40,9 @@ bool Position::perftUseHash = false;
 
 void Position::initPstValues(void)
 {
-	for(bitboardIndex piece = occupiedSquares; piece < lastBitboard; piece++)
+	for(bitboardIndex piece = occupiedSquares; piece < lastBitboard; ++piece)
 	{
-		for(tSquare s = (tSquare)0; s < squareNumber; s++)
+		for(tSquare s = A1; s < squareNumber; ++s)
 		{
 			assert(s<squareNumber);
 			nonPawnValue[piece] = simdScore{0,0,0,0};
@@ -327,7 +327,7 @@ const Position& Position::setup(const std::string& code, const Color c)
 */
 void Position::initScoreValues(void)
 {
-	for(auto &val :pieceValue)
+	for(auto &val: pieceValue)
 	{
 		val = simdScore{0,0,0,0};
 	}
@@ -498,13 +498,12 @@ std::string  Position::getFen() const {
 std::string Position::getSymmetricFen() const {
 
 	std::string s;
-	int file,rank;
 	int emptyFiles=0;
 	const state& st =getActualStateConst();
-	for (rank = RANK1; rank <=RANK8 ; rank++)
+	for (tRank rank = RANK1; rank <=RANK8 ; rank++)
 	{
 		emptyFiles=0;
-		for (file = FILEA; file <=FILEH; file++)
+		for (tFile file = FILEA; file <=FILEH; file++)
 		{
 			if(getPieceAt(getSquare(file,rank))!=empty)
 			{
@@ -588,11 +587,11 @@ HashKey Position::calcKey(void) const
 	HashKey hash(0);
 	const state& st =getActualStateConst();
 
-	for ( tSquare sq = A1; sq < squareNumber; sq++)
+	for( tSquare sq = A1; sq < squareNumber; sq++)
 	{
-		if( squares[ sq ] != empty )
+		if( bitboardIndex p = getPieceAt( sq ); p != empty )
 		{
-			hash.updatePiece( sq, squares[ sq ] );
+			hash.updatePiece( sq, p );
 		}
 	}
 
@@ -669,7 +668,7 @@ simdScore Position::calcMaterialValue(void) const{
 	while(b)
 	{
 		tSquare s = iterateBit(b);
-		bitboardIndex val = squares[s];
+		bitboardIndex val = getPieceAt(s);
 		score += pstValue[val][s];
 	}
 	return score;
@@ -690,16 +689,10 @@ simdScore Position::calcNonPawnMaterialValue() const
 	while(b)
 	{
 		tSquare n = iterateBit(b);
-		bitboardIndex val = squares[n];
+		bitboardIndex val = getPieceAt(n);
 		if(!isPawn(val) && !isKing(val) )
 		{
-			if( isBlackPiece( val ) )
-			{
-				t[1] += pieceValue[val];
-			}
-			else{
-				t[0] += pieceValue[val];
-			}
+			t[ isBlackPiece( val ) ] += pieceValue[val];
 		}
 	}
 	res = simdScore{t[0][0],t[0][1],t[1][0],t[1][1]};
@@ -720,7 +713,6 @@ void Position::doNullMove()
 	x.setCurrentMove( Move::NOMOVE );
 	if( x.hasEpSquare() )
 	{
-		assert( x.getEpSquare() < squareNumber );
 		x.getKey().changeEp( x.getEpSquare() );
 		x.resetEpSquare();
 	}
@@ -751,27 +743,24 @@ void Position::doNullMove()
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::doMove(const Move & m){
-	assert( m );
+void Position::doMove(const Move & m)
+{
+	assert( m != Move::NOMOVE );
 
-	bool moveIsCheck = moveGivesCheck(m);
+	const bool moveIsCheck = moveGivesCheck(m);
 
 	insertState(getActualState());
 	state &x = getActualState();
 
 	x.setCurrentMove( m );
 
-
-
-
-	tSquare from = m.getFrom();
-	tSquare to = m.getTo();
-	tSquare captureSquare = m.getTo();
-	bitboardIndex piece = squares[from];
-
+	const tSquare from = m.getFrom();
+	const tSquare to = m.getTo();
+	const bitboardIndex piece = getPieceAt(from);
 	assert( isValidPiece( piece ));
-	bitboardIndex capture = ( m.isEnPassantMove() ? (x.isBlackTurn() ? whitePawns : blackPawns ) : squares[to] );
-	assert( isValidPiece( piece ) || piece == empty );
+
+	bitboardIndex captured = ( m.isEnPassantMove() ? (x.isBlackTurn() ? whitePawns : blackPawns ) : getPieceAt(to) );
+	assert( isValidPiece( captured ) || captured == empty );
 
 	// change side
 	x.getKey().changeSide();
@@ -784,7 +773,6 @@ void Position::doMove(const Move & m){
 	// reset ep square
 	if( x.hasEpSquare() )
 	{
-		assert( x.getEpSquare() < squareNumber );
 		x.getKey().changeEp( x.getEpSquare() );
 		x.resetEpSquare();
 	}
@@ -795,7 +783,7 @@ void Position::doMove(const Move & m){
 		bool kingSide = m.isKingSideCastle();
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		assert(rFrom<squareNumber);
-		bitboardIndex rook = squares[rFrom];
+		bitboardIndex rook = getPieceAt(rFrom);
 		assert( isRook(rook) );
 		tSquare rTo = kingSide? to+ovest: to+est;
 		assert(rTo<squareNumber);
@@ -806,11 +794,10 @@ void Position::doMove(const Move & m){
 		x.getKey().updatePiece( rTo, rook );
 
 	}
-
-	// do capture
-	if( capture )
+	else if( captured ) // do capture
 	{
-		if(isPawn(capture))
+		tSquare captureSquare = to;
+		if(isPawn(captured))
 		{
 
 			if( m.isEnPassantMove() )
@@ -818,19 +805,19 @@ void Position::doMove(const Move & m){
 				captureSquare-=pawnPush( x.isBlackTurn() );
 			}
 			assert(captureSquare<squareNumber);
-			x.getPawnKey().updatePiece( captureSquare, capture );
+			x.getPawnKey().updatePiece( captureSquare, captured );
 		}
 
 		// remove piece
-		removePiece(capture,captureSquare);
+		removePiece(captured,captureSquare);
 		// update material
-		x.removeMaterial( pstValue[capture][captureSquare] );
-		x.removeNonPawnMaterial( nonPawnValue[capture] );
+		x.removeMaterial( pstValue[captured][captureSquare] );
+		x.removeNonPawnMaterial( nonPawnValue[captured] );
 
 		// update keys
-		x.getKey().updatePiece( captureSquare, capture);
-		assert(getPieceCount(capture)<30);
-		x.getMaterialKey().updatePiece( (tSquare)capture, (bitboardIndex)getPieceCount(capture) ); // ->after removing the piece
+		x.getKey().updatePiece( captureSquare, captured);
+		assert(getPieceCount(captured)<30);
+		x.getMaterialKey().updatePiece( (tSquare)captured, (bitboardIndex)getPieceCount(captured) ); // ->after removing the piece
 
 		// reset fifty move counter
 		x.resetIrreversibleMoveCount();
@@ -839,7 +826,7 @@ void Position::doMove(const Move & m){
 	// update hashKey
 	x.getKey().updatePiece( from, piece );
 	x.getKey().updatePiece( to, piece );
-	movePiece(piece,from,to);
+	movePiece(piece, from, to);
 
 	x.addMaterial( pstValue[piece][to] - pstValue[piece][from] );
 
@@ -852,20 +839,18 @@ void Position::doMove(const Move & m){
 		x.clearCastleRight( cr );
 	}
 
-
-
 	if(isPawn(piece))
 	{
+		// set en-passant
 		if(
-				abs(from-to)==16
+				abs(from-to)==16	// double push
 				&& (getAttackersTo((tSquare)((from+to)>>1))  & Them[Pawns])
 		)
 		{
 			x.setEpSquare( (tSquare)((from+to)>>1) );
-			assert(x.getEpSquare()<squareNumber);
 			x.getKey().changeEp( x.getEpSquare() );
 		}
-		if( m.isPromotionMove() )
+		else if( m.isPromotionMove() )
 		{
 			bitboardIndex promotedPiece = getPieceOfPlayer( m.getPromotedPiece(), x.getNextTurn() );
 			assert( isValidPiece(promotedPiece) );
@@ -888,7 +873,7 @@ void Position::doMove(const Move & m){
 		x.resetIrreversibleMoveCount();
 	}
 
-	x.setCapturedPiece( capture );
+	x.setCapturedPiece( captured );
 	x.changeNextTurn();
 
 	std::swap(Us,Them);
@@ -941,31 +926,28 @@ void Position::doMove(const Move & m){
 */
 void Position::undoMove()
 {
-
 	--_ply;
 
-	state x = getActualStateConst();
+	const state& x = getActualStateConst();
 	const Move &m = x.getCurrentMove();
 	assert( m );
-	tSquare to = m.getTo();
-	tSquare from = m.getFrom();
-	bitboardIndex piece = squares[to];
+	const tSquare to = m.getTo();
+	const tSquare from = m.getFrom();
+	const bitboardIndex piece = getPieceAt(to);
 	assert( isValidPiece( piece ) );
 
 	if( m.isPromotionMove() ){
 		removePiece(piece,to);
-		piece = isBlackPiece( piece) ? blackPawns : whitePawns;
-		putPiece(piece,to);
+		putPiece( isBlackPiece( piece) ? blackPawns : whitePawns, to);
 	}
-
-	if( m.isCastleMove() )
+	else if( m.isCastleMove() )
 	{
 		bool kingSide = m.isKingSideCastle();
 		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
 		tSquare rTo = kingSide? to+ovest: to+est;
 		assert(rFrom<squareNumber);
 		assert(rTo<squareNumber);
-		bitboardIndex rook = squares[rTo];
+		bitboardIndex rook = getPieceAt(rTo);
 		assert( isRook(rook) );
 		movePiece(rook,rTo,rFrom);
 
@@ -973,9 +955,8 @@ void Position::undoMove()
 
 	movePiece(piece,to,from);
 
-
 	assert( isValidPiece( x.getCapturedPiece() ) || x.getCapturedPiece() == empty );
-	if( x.getCapturedPiece() )
+	if( bitboardIndex p = x.getCapturedPiece() )
 	{
 		tSquare capSq = to;
 		if( m.isEnPassantMove() )
@@ -983,7 +964,7 @@ void Position::undoMove()
 			capSq += pawnPush( x.isBlackTurn() );
 		}
 		assert( capSq < squareNumber );
-		putPiece( x.getCapturedPiece(), capSq );
+		putPiece( p, capSq );
 	}
 	removeState();
 
@@ -1069,7 +1050,7 @@ bool Position::checkPosConsistency(int nn) const
 	}
 	for(tSquare sq = square0; sq < squareNumber; sq++)
 	{
-		bitboardIndex id = squares[sq];
+		bitboardIndex id = getPieceAt(sq);
 
 		if( id != empty && !isSquareSet( bitBoard[id], sq ) )
 		{
@@ -1339,7 +1320,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	assert( m );
 	tSquare from = m.getFrom();
 	tSquare to = m.getTo();
-	bitboardIndex piece = squares[from];
+	bitboardIndex piece = getPieceAt(from);
 	assert( isValidPiece( piece ) );
 	const state &s = getActualStateConst();
 
@@ -1505,7 +1486,7 @@ bool Position::isMoveLegal(const Move &m)const
 	}
 
 	const state &s = getActualStateConst();
-	const bitboardIndex piece = squares[m.getFrom()];
+	const bitboardIndex piece = getPieceAt(m.getFrom());
 	assert( isValidPiece( piece ) || piece == empty );
 
 	// pezzo inesistente
@@ -1829,8 +1810,8 @@ inline void Position::movePiece(const bitboardIndex piece,const tSquare from,con
 	assert( isValidPiece( piece ) );
 	// index[from] is not updated and becomes stale. This works as long
 	// as index[] is accessed just by known occupied squares.
-	assert(squares[from]!=empty);
-	assert(squares[to]==empty);
+	assert(getPieceAt(from)!=empty);
+	assert(getPieceAt(to)==empty);
 	bitMap fromTo = bitSet(from) ^ bitSet(to);
 	bitboardIndex color = isBlackPiece( piece ) ? blackPieces : whitePieces;
 	bitBoard[occupiedSquares] ^= fromTo;
@@ -1852,7 +1833,7 @@ inline void Position::removePiece(const bitboardIndex piece,const tSquare s)
 	assert(!isKing(piece));
 	assert(s<squareNumber);
 	assert( isValidPiece( piece) );
-	assert(squares[s]!=empty);
+	assert(getPieceAt(s)!=empty);
 
 	// WARNING: This is not a reversible operation. If we remove a piece in
 	// do_move() and then replace it in undo_move() we will put it at the end of
