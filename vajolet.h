@@ -25,7 +25,7 @@
 //---------------------------------------------
 //	configuration defines
 //---------------------------------------------
-#define DEBUG_EVAL_SIMMETRY
+//#define DEBUG_EVAL_SIMMETRY
 //#define DISABLE_TIME_DIPENDENT_OUTPUT
 #define ENABLE_CHECK_CONSISTENCY
 

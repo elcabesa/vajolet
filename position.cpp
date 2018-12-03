@@ -933,12 +933,13 @@ void Position::undoMove()
 	assert( m );
 	const tSquare to = m.getTo();
 	const tSquare from = m.getFrom();
-	const bitboardIndex piece = getPieceAt(to);
+	bitboardIndex piece = getPieceAt(to);
 	assert( isValidPiece( piece ) );
 
 	if( m.isPromotionMove() ){
 		removePiece(piece,to);
-		putPiece( isBlackPiece( piece) ? blackPawns : whitePawns, to);
+		piece = isBlackPiece( piece) ? blackPawns : whitePawns;
+		putPiece(piece,to);
 	}
 	else if( m.isCastleMove() )
 	{
