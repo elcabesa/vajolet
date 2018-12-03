@@ -306,7 +306,7 @@ const Position& Position::setup(const std::string& code, const Color c)
   assert(code.length() > 0 && code.length() < 8);
   assert(code[0] == 'K');
 
-  std::string sides[] = { code.substr(code.find('K', 1)),      // Weak
+  std::string sides[] = { code.substr(code.find('K', 1)), // Weak
                      code.substr(0, code.find('K', 1)) }; // Strong
 
   std::transform(sides[c].begin(), sides[c].end(), sides[c].begin(), tolower);
@@ -357,8 +357,8 @@ void Position::clear()
 	for (tSquare i = square0; i < squareNumber; i++)
 	{
 		squares[i] = empty;
-	};
-	for (int i = 0; i < lastBitboard; i++)
+	}
+	for (bitboardIndex i = occupiedSquares; i < lastBitboard; i++)
 	{
 		bitBoard[i] = 0;
 	}
@@ -377,7 +377,7 @@ void Position::display()const
 {
 	sync_cout<<getFen()<<sync_endl;
 
-	const state& st =getActualStateConst();
+	const state& st = getActualStateConst();
 	sync_cout;
 	{
 		for (tRank rank = RANK8; rank >= RANK1; rank--)
@@ -665,7 +665,7 @@ HashKey Position::calcMaterialKey(void) const
 */
 simdScore Position::calcMaterialValue(void) const{
 	simdScore score = {0,0,0,0};
-	bitMap b= getOccupationBitmap();
+	bitMap b = getOccupationBitmap();
 	while(b)
 	{
 		tSquare s = iterateBit(b);
@@ -686,7 +686,7 @@ simdScore Position::calcNonPawnMaterialValue() const
 	simdScore t[2] ={{0,0,0,0},{0,0,0,0}};
 	simdScore res;
 
-	bitMap b= getOccupationBitmap();
+	bitMap b = getOccupationBitmap();
 	while(b)
 	{
 		tSquare n = iterateBit(b);
@@ -1807,9 +1807,9 @@ inline void Position::putPiece(const bitboardIndex piece,const tSquare s)
 	assert(s<squareNumber);
 	assert( isValidPiece( piece ) );
 	bitboardIndex color = isBlackPiece( piece )? blackPieces: whitePieces;
-	bitMap b=bitSet(s);
+	bitMap b = bitSet(s);
 
-	assert(squares[s]==empty);
+	assert( squares[s] == empty );
 
 	squares[s] = piece;
 	bitBoard[piece] |= b;
