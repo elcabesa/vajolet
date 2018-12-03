@@ -19,6 +19,7 @@
 #define DATA_H_
 
 #include "bitops.h"
+#include "eCastle.h"
 #include "tSquare.h"
 
 
@@ -26,8 +27,6 @@
 //------------------------------------------------
 //enum
 //------------------------------------------------
-
-
 
 //------------------------------------------------
 //	const
@@ -38,12 +37,11 @@
 //------------------------------------------------
 extern bitMap RANKMASK[squareNumber];
 extern bitMap FILEMASK[squareNumber];
-extern bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
+
+// todo move them in position, eval or endgame
 extern bitMap ISOLATED_PAWN[squareNumber];
 extern bitMap PASSED_PAWN[2][squareNumber];
 extern bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
-extern bitMap BITMAP_COLOR[2];
-extern int SQUARE_DISTANCE[squareNumber][squareNumber];
 extern bitMap centerBitmap;
 extern bitMap bigCenterBitmap;
 extern bitMap spaceMask;
@@ -82,6 +80,23 @@ inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3)
 	return isSquareSet( LINES[s1][s2], s3 );
 }
 
+inline const bitMap& getSquaresBetween( const tSquare sq1, const tSquare sq2 )
+{
+	extern bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
+	return SQUARES_BETWEEN[sq1][sq2];
+}
+
+inline const bitMap& getColorBitmap( const Color c )
+{
+	extern bitMap BITMAP_COLOR[2];
+	return BITMAP_COLOR[c];
+}
+
+inline unsigned int distance( const tSquare sq1, const tSquare sq2 )
+{
+	extern unsigned int SQUARE_DISTANCE[squareNumber][squareNumber];
+	return SQUARE_DISTANCE[sq1][sq2];
+}
 
 
 //------------------------------------------------

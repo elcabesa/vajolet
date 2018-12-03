@@ -1298,7 +1298,7 @@ bitMap Position::getHiddenCheckers() const
 
 	while(pinners)
 	{
-		bitMap b = SQUARES_BETWEEN[kingSquare][iterateBit(pinners)] & bitBoard[occupiedSquares];
+		bitMap b = getSquaresBetween( kingSquare, iterateBit(pinners) ) & getOccupationBitmap();
 		if ( !moreThanOneBit(b) )
 		{
 			result |= b & bitBoard[ x.getPiecesOfActivePlayer() ];
@@ -1542,7 +1542,7 @@ bool Position::isMoveLegal(const Move &m)const
 			if( !isKing(piece)
 				&& !(
 					isSquareSet( s.getCheckers(), (tSquare)(m.getTo()-( m.isEnPassantMove() ? pawnPush( isBlackTurn() ) : 0) ) )
-					|| isSquareSet( SQUARES_BETWEEN[ getSquareOfOurKing() ][ firstOne( s.getCheckers() ) ], m.getTo() )
+					|| isSquareSet( getSquaresBetween( getSquareOfOurKing(), firstOne( s.getCheckers() ) ), m.getTo() )
 				)
 			)
 			{

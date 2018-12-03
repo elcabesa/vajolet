@@ -61,7 +61,7 @@ bitMap ISOLATED_PAWN[squareNumber];
 bitMap PASSED_PAWN[2][squareNumber];
 bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
 
-int SQUARE_DISTANCE[squareNumber][squareNumber];
+unsigned int SQUARE_DISTANCE[squareNumber][squareNumber];
 
 bitMap centerBitmap;
 bitMap bigCenterBitmap;
@@ -78,15 +78,8 @@ bitMap spaceMask;
 */
 void initData(void)
 {
-/*	for(tSquare i=(tSquare)0; i<squareNumber; i++)
+	for(tSquare i = A1; i<squareNumber; i++)
 	{
-		BITSET[i] = (1ull) << i;
-	}
-	BITSET[squareNone]=(1ull) << 64;*/
-
-	for(tSquare i = (tSquare)0; i<squareNumber; i++)
-	{
-		//BOARDINDEX[i%8][i/8] = i;
 		DIAGA1H8MASK[i] = 0;
 		DIAGA8H1MASK[i] = 0;
 	}
@@ -156,15 +149,7 @@ void initData(void)
 
 		}
 	}
-
-	for(int square=0; square<squareNumber; square++)
-	{
-		for(int i=0; i<squareNumber; i++)
-		{
-			SQUARES_BETWEEN[square][i] = 0;
-		}
-	}
-
+	
 	for(tSquare square=A1; square<squareNumber; square++)
 	{
 		for(tSquare i=A1; i<squareNumber; i++)
@@ -223,7 +208,7 @@ void initData(void)
 					}
 				}
 			}
-			if(DIAGA1H8MASK[square] & bitSet(i))
+			if( isSquareSet( DIAGA1H8MASK[square], i ) )
 			{
 				LINES[square][i] = DIAGA1H8MASK[square];
 				if(getFileOf(i) > getFileOf(square)) // in salita
@@ -249,7 +234,7 @@ void initData(void)
 					}
 				}
 			}
-			if(DIAGA8H1MASK[square] & bitSet(i))
+			if( isSquareSet( DIAGA8H1MASK[square], i ) )
 			{
 				LINES[square][i] = DIAGA8H1MASK[square];
 				if(getFileOf(i) > getFileOf(square)) // in salita

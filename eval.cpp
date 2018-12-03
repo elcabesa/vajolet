@@ -380,8 +380,8 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 			}
 			// alfiere cattivo
 			{
-				int color = getSquareColor(sq);
-				bitMap blockingPawns = ourPieces & blockedPawns & BITMAP_COLOR[color];
+				Color color = getSquareColor(sq);
+				bitMap blockingPawns = ourPieces & blockedPawns & getColorBitmap(color);
 				if( moreThanOneBit(blockingPawns) )
 				{
 					res -= (int)bitCnt(blockingPawns) * badBishop;
@@ -450,7 +450,7 @@ Score Position::evalShieldStorm(tSquare ksq) const
 	while(pawnStorm)
 	{
 		tSquare p = iterateBit(pawnStorm);
-		ks -= ( 7 - SQUARE_DISTANCE[p][ksq] ) * kingStormBonus[0];
+		ks -= ( 7 - distance(p,ksq) ) * kingStormBonus[0];
 	}
 	return ks;
 }
@@ -492,8 +492,8 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 			tSquare blockingSquare = ppSq + pawnPush(c);
 
 			// bonus for king proximity to blocking square
-			passedPawnsBonus += enemyKingNearPassedPawn * ( SQUARE_DISTANCE[ blockingSquare ][ enemyKingSquare ] * rr );
-			passedPawnsBonus -= ownKingNearPassedPawn * ( SQUARE_DISTANCE[ blockingSquare ][ kingSquare ] * rr );
+			passedPawnsBonus += enemyKingNearPassedPawn * ( distance( blockingSquare, enemyKingSquare ) * rr );
+			passedPawnsBonus -= ownKingNearPassedPawn * ( distance( blockingSquare, kingSquare ) * rr );
 			//std::cout<<passedPawnsBonus[0]<<" "<<passedPawnsBonus[1]<<std::endl;
 			if( getPieceAt(blockingSquare) == empty )
 			{
@@ -549,7 +549,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 		if( st.getNonPawnValue()[ c ? 0 : 2 ] == 0 )
 		{
 			tSquare promotionSquare =  getSquare(getFileOf(ppSq),c ? RANK1 : RANK8);
-			if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[ enemyKingSquare ][ promotionSquare ] - ( (c ? isBlackTurn() : isWhiteTurn() ) ? 0 : 1 ), 0) )
+			if( std::min( 5, (int)(7- relativeRank)) <  std::max((int)distance( enemyKingSquare, promotionSquare ) - ( (c ? isBlackTurn() : isWhiteTurn() ) ? 0 : 1 ), 0) )
 			{
 				passedPawnsBonus += unstoppablePassed * rr;
 			}
@@ -754,7 +754,7 @@ Score Position::eval(void)
 
 	if( getPieceCount(whiteBishops) >= 2 )
 	{
-		if( (getBitmap(whiteBishops) & BITMAP_COLOR [0]) && (getBitmap(whiteBishops) & BITMAP_COLOR [1]) )
+		if( (getBitmap(whiteBishops) & getColorBitmap(white)) && (getBitmap(whiteBishops) & getColorBitmap(black) ) )
 		{
 			res += bishopPair;
 		}
@@ -762,7 +762,7 @@ Score Position::eval(void)
 
 	if( getPieceCount(blackBishops) >= 2 )
 	{
-		if( (getBitmap(blackBishops) & BITMAP_COLOR [0]) && (getBitmap(blackBishops) & BITMAP_COLOR [1]) )
+		if( (getBitmap(blackBishops) & getColorBitmap(white)) && (getBitmap(blackBishops) & getColorBitmap(black) ) )
 		{
 			res -= bishopPair;
 		}

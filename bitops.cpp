@@ -28,15 +28,15 @@ void displayBitmap(bitMap b)
 {
 	char boardc[squareNumber];
 
-	for ( tSquare i = A1; i < squareNumber; i++)
+	for ( tSquare sq = A1; sq < squareNumber; sq++)
 	{
-		if (b & bitSet(i))
+		if ( isSquareSet( b, sq ) )
 		{
-			boardc[i] = '1';
+			boardc[sq] = '1';
 		}
 		else
 		{
-			boardc[i] = '.';
+			boardc[sq] = '.';
 		}
 	}
 

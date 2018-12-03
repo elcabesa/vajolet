@@ -123,7 +123,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	if constexpr (type==Movegen::allEvasionMg)
 	{
 		assert(s.getCheckers());
-		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~_pos.getOurBitmap(Pieces);
+		target = ( s.getCheckers() | getSquaresBetween(kingSquare, firstOne( s.getCheckers() ) ) ) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = ~_pos.getOurBitmap(Pieces);
 	}
 	else if constexpr (type==Movegen::captureEvasionMg)
@@ -135,7 +135,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	else if constexpr (type==Movegen::quietEvasionMg)
 	{
 		assert( s.getCheckers() );
-		target = ( SQUARES_BETWEEN[kingSquare] [firstOne( s.getCheckers() ) ]) & ~_pos.getOurBitmap(Pieces);
+		target = ( getSquaresBetween( kingSquare, firstOne( s.getCheckers() ) ) ) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = ~occupiedSquares;
 	}
 	else if constexpr (type== Movegen::allNonEvasionMg)
@@ -161,7 +161,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	{
 		assert(false);
 		assert(s.getCheckers());
-		target = ( s.getCheckers() | SQUARES_BETWEEN[kingSquare][ firstOne( s.getCheckers() ) ]) & ~_pos.getOurBitmap(Pieces);
+		target = ( s.getCheckers() | getSquaresBetween( kingSquare, firstOne( s.getCheckers() ) ) ) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = ~_pos.getOurBitmap(Pieces);
 	}
 

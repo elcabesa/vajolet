@@ -17,6 +17,8 @@
 #ifndef TSQUARE_H_
 #define TSQUARE_H_
 
+#include "eCastle.h"
+
 enum tSquare								/*!< square name and directions*/
 {
 	A1,	B1,	C1,	D1,	E1,	F1,	G1,	H1,
@@ -90,9 +92,9 @@ inline tSquare getSquare( const tFile f, const tRank r)
 	return tSquare(f + 8 * r);
 }
 
-inline int getSquareColor( const tSquare sq )
+inline Color getSquareColor( const tSquare sq )
 {
-	return sq % 2;
+	return Color(sq % 2);
 }
 
 
