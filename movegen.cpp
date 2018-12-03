@@ -107,7 +107,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	Color color = s.isBlackTurn()? black : white;
 
 	//divide pawns
-	const bitMap& seventhRankMask = RANKMASK[ color ? A2:A7];
+	const bitMap& seventhRankMask = rankMask( color ? A2:A7);
 
 	bitMap promotionPawns =  _pos.getOurBitmap(Pawns) & seventhRankMask ;
 	bitMap nonPromotionPawns =  _pos.getOurBitmap(Pawns)^ promotionPawns;
@@ -359,7 +359,7 @@ template<Movegen::genType type>
 inline void Movegen::generatePawnDoublePushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const
 {
 	//double push
-	const bitMap& thirdRankMask = RANKMASK[ color ? A6:A3];
+	const bitMap& thirdRankMask = rankMask( color ? A6:A3);
 	bitMap moves = ( color? ((pawns & thirdRankMask)>>8):((pawns & thirdRankMask)<<8)) & ~occupiedSquares & target;
 	Move m(Move::NOMOVE);
 	while(moves)
@@ -380,7 +380,7 @@ inline void Movegen::generatePawnCaptureLeft( MoveList<MAX_MOVE_PER_POSITION>& m
 {
 	//left capture
 	int delta = color? -9: 7;
-	bitMap moves = ( color? (pawns&(~FILEMASK[A1]))>>9: (pawns&(~FILEMASK[A1]))<<7) & enemy & target;
+	bitMap moves = ( color? (pawns&~fileMask(A1))>>9: (pawns&~fileMask(A1))<<7) & enemy & target;
 	generatePawnCapture<type, promotion>( ml, delta, moves, kingSquare );
 }
 
@@ -389,7 +389,7 @@ inline void Movegen::generatePawnCaptureRight( MoveList<MAX_MOVE_PER_POSITION>& 
 {
 	//right capture
 	int delta= color? -7: 9;
-	bitMap moves = ( color? (pawns&(~FILEMASK[H1]))>>7: (pawns&(~FILEMASK[H1]))<<9) & enemy & target;
+	bitMap moves = ( color? (pawns&~fileMask(H1))>>7: (pawns&~fileMask(H1))<<9) & enemy & target;
 	generatePawnCapture<type, promotion>( ml, delta, moves, kingSquare );
 }
 
@@ -436,7 +436,7 @@ inline void Movegen::generateEpMove(MoveList<MAX_MOVE_PER_POSITION>& ml, const C
 		{
 			tSquare from = iterateBit(epAttacker);
 
-			bitMap captureSquare= FILEMASK[ epSquare ] & RANKMASK[from];
+			bitMap captureSquare= fileMask( epSquare ) & rankMask(from);
 			bitMap occ = occupiedSquares^bitSet(from)^bitSet( epSquare )^captureSquare;
 
 			if(	!((_attackFromRook(kingSquare, occ) & (_pos.getTheirBitmap(Queens) | _pos.getTheirBitmap(Rooks))) |

@@ -166,7 +166,7 @@ void initData(void)
 			{
 				// stessa colonna
 
-				LINES[square][i] = FILEMASK[square];
+				LINES[square][i] = fileMask(square);
 				if(getRankOf(i) > getRankOf(square)) // in salita
 				{
 					tRank temp = tRank(getRankOf(square) + 1);
@@ -188,7 +188,7 @@ void initData(void)
 			}
 			if(getRankOf(square) == getRankOf(i)) // stessa riga
 			{
-				LINES[square][i] = RANKMASK[square];
+				LINES[square][i] = rankMask(square);
 				if(getFileOf(i) > getFileOf(square)) // in salita
 				{
 					tFile temp = tFile(getFileOf(square) + 1);
@@ -275,11 +275,11 @@ void initData(void)
 
 		if(file>FILEA)
 		{
-			ISOLATED_PAWN[square] |= FILEMASK[getSquare(tFile(file-1),RANK1)];
+			ISOLATED_PAWN[square] |= fileMask(getSquare(tFile(file-1),RANK1));
 		}
 		if(file<FILEH)
 		{
-			ISOLATED_PAWN[square] |= FILEMASK[getSquare(tFile(file+1),RANK1)];
+			ISOLATED_PAWN[square] |= fileMask(getSquare(tFile(file+1),RANK1));
 		}
 	}
 
@@ -344,6 +344,6 @@ void initData(void)
 		}
 	}
 	
-	spaceMask = FILEMASK[C1] | FILEMASK[D1] | FILEMASK[E1] | FILEMASK[F1];
+	spaceMask = fileMask(C1) | fileMask(D1) | fileMask(E1) | fileMask(F1);
 }
 

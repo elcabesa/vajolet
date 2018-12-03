@@ -1403,7 +1403,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	}
 	else if( m.isEnPassantMove() )
 	{
-		bitMap captureSquare = FILEMASK[m.getTo()] & RANKMASK[m.getFrom()];
+		bitMap captureSquare = fileMask(m.getTo()) & rankMask(m.getFrom());
 		bitMap occ = bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(m.getTo())^captureSquare;
 		return
 				(Movegen::attackFrom<whiteRooks>(kingSquare, occ) & (Us[Queens] |Us[Rooks]))
@@ -1701,7 +1701,7 @@ bool Position::isMoveLegal(const Move &m)const
 			if( m.isEnPassantMove() )
 			{
 				auto epSq = s.getEpSquare();
-				bitMap captureSquare= FILEMASK[epSq] & RANKMASK[m.getFrom()];
+				bitMap captureSquare= fileMask(epSq) & rankMask(m.getFrom());
 				bitMap occ= bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(epSq)^captureSquare;
 				tSquare kingSquare = getSquareOfOurKing();
 				assert(kingSquare<squareNumber);
@@ -1734,7 +1734,7 @@ bool Position::isMoveLegal(const Move &m)const
 			if( m.isEnPassantMove() )
 			{
 				auto epSq = s.getEpSquare();
-				bitMap captureSquare = FILEMASK[epSq] & RANKMASK[m.getFrom()];
+				bitMap captureSquare = fileMask(epSq) & rankMask(m.getFrom());
 				bitMap occ = bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(epSq)^captureSquare;
 				tSquare kingSquare = getSquareOfOurKing();
 				assert(kingSquare<squareNumber);

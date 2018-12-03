@@ -116,8 +116,8 @@ bool Position::evalKBPsvsK(Score& res)
 	bitMap pawns;
 	tSquare bishopSquare;
 	
-	bitMap HFile = FILEMASK[H1];
-	bitMap AFile = FILEMASK[A1];
+	bitMap HFile = fileMask(H1);
+	bitMap AFile = fileMask(A1);
 	
 	if(Pcolor == white)
 	{	
@@ -548,8 +548,8 @@ bool Position::evalKPsvsK(Score& res)
 	tSquare kingSquare;
 	bitMap pawns;
 	
-	bitMap HFile = FILEMASK[H1];
-	bitMap AFile = FILEMASK[A1];
+	bitMap HFile = fileMask(H1);
+	bitMap AFile = fileMask(A1);
 	
 	// If all pawns are ahead of the king, on a single rook file and
 	// the king is within one file of the pawns, it's a draw.

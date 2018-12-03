@@ -77,7 +77,7 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 	const int relativeRank = c ? 7 - getRankOf(sq) : getRankOf(sq);
 
 	// Our rank plus previous one. Used for chain detection
-	bitMap b = RANKMASK[sq] | RANKMASK[sq - pawnPush(c)];
+	bitMap b = rankMask(sq) | rankMask(sq - pawnPush(c));
 
 	// Flag the pawn as passed, isolated, doubled or member of a pawn
     // chain (but not the backward one).
@@ -92,7 +92,7 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 		!(passed | isolated | chain) &&
 		!(ourPawns & PASSED_PAWN[ 1 - c ][ sq + pawnPush( c )] & ISOLATED_PAWN[ sq ]))// non ci sono nostri pedoni dietro a noi
 	{
-		b = RANKMASK[ sq + pawnPush( c )] & ISOLATED_PAWN[ sq ];
+		b = rankMask( sq + pawnPush( c )) & ISOLATED_PAWN[ sq ];
 		while ( !(b & (ourPawns | theirPawns)))
 		{
 			if(!c)
@@ -276,19 +276,19 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		case whiteQueens:
 		case blackQueens:
 		{
-			bitMap enemyBackRank = isBlackPiece(piece) ? RANKMASK[A1] : RANKMASK[A8];
+			bitMap enemyBackRank = isBlackPiece(piece) ? rankMask(A1) : rankMask(A8);
 			bitMap enemyPawns = isBlackPiece(piece) ? getBitmap(whitePawns) : getBitmap(blackPawns);
 			//--------------------------------
 			// donna in 7a con re in 8a
 			//--------------------------------
-			if(relativeRank == 6 && (enemyKing & enemyBackRank) )
+			if(relativeRank == RANK7 && (enemyKing & enemyBackRank) )
 			{
 				res += queenOn7Bonus;
 			}
 			//--------------------------------
 			// donna su traversa che contiene pedoni
 			//--------------------------------
-			if(relativeRank > 4 && (RANKMASK[sq] & enemyPawns))
+			if(relativeRank > RANK5 && (rankMask(sq) & enemyPawns))
 			{
 				res += queenOnPawns;
 			}
@@ -297,29 +297,29 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		case whiteRooks:
 		case blackRooks:
 		{
-			bitMap enemyBackRank = isBlackPiece(piece) ? RANKMASK[A1] : RANKMASK[A8];
+			bitMap enemyBackRank = isBlackPiece(piece) ? rankMask(A1) : rankMask(A8);
 			bitMap enemyPawns = isBlackPiece(piece) ?  getBitmap(whitePawns) : getBitmap(blackPawns);
 			bitMap ourPawns = isBlackPiece(piece) ? getBitmap(blackPawns) : getBitmap(whitePawns);
 			//--------------------------------
 			// torre in 7a con re in 8a
 			//--------------------------------
-			if(relativeRank == 6 && (enemyKing & enemyBackRank) )
+			if(relativeRank == RANK7 && (enemyKing & enemyBackRank) )
 			{
 				res += rookOn7Bonus;
 			}
 			//--------------------------------
 			// torre su traversa che contiene pedoni
 			//--------------------------------
-			if(relativeRank > 4 && (RANKMASK[sq] & enemyPawns))
+			if(relativeRank > RANK5 && (rankMask(sq) & enemyPawns))
 			{
 				res += rookOnPawns;
 			}
 			//--------------------------------
 			// torre su colonna aperta/semiaperta
 			//--------------------------------
-			if( !(FILEMASK[sq] & ourPawns) )
+			if( !(fileMask(sq) & ourPawns) )
 			{
-				if( !(FILEMASK[sq] & enemyPawns) )
+				if( !(fileMask(sq) & enemyPawns) )
 				{
 					res += rookOnOpen;
 				}else
@@ -536,11 +536,11 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 		}
 
 		bitMap supportingPawns = getBitmap( ourPawns ) & ISOLATED_PAWN[ ppSq ];
-		if( supportingPawns & RANKMASK[ppSq] )
+		if( supportingPawns & rankMask(ppSq) )
 		{
 			passedPawnsBonus+=passedPawnSupportedBonus*rr;
 		}
-		if( supportingPawns & RANKMASK[ ppSq - pawnPush(c) ] )
+		if( supportingPawns & rankMask( ppSq - pawnPush(c) ) )
 		{
 			passedPawnsBonus += passedPawnSupportedBonus * ( rr / 2 );
 		}
@@ -844,8 +844,8 @@ Score Position::eval(void)
 
 
 		bitMap temp = getBitmap(whitePawns);
-		bitMap pawnAttack = (temp & ~(FILEMASK[H1])) << 9;
-		pawnAttack |= (temp & ~(FILEMASK[A1]) ) << 7;
+		bitMap pawnAttack = (temp & ~fileMask(H1) ) << 9;
+		pawnAttack |= (temp & ~fileMask(A1) ) << 7;
 
 		attackedSquares[whitePawns] = pawnAttack;
 		pawnAttack |= pawnAttack << 8;
@@ -856,8 +856,8 @@ Score Position::eval(void)
 
 
 		temp = getBitmap(blackPawns);
-		pawnAttack = ( temp & ~(FILEMASK[H1]) ) >> 7;
-		pawnAttack |= ( temp & ~(FILEMASK[A1]) ) >> 9;
+		pawnAttack = ( temp & ~fileMask(H1) ) >> 7;
+		pawnAttack |= ( temp & ~fileMask(A1) ) >> 9;
 
 		attackedSquares[blackPawns] = pawnAttack;
 

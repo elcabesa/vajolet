@@ -35,9 +35,6 @@
 //------------------------------------------------
 //	extern variables
 //------------------------------------------------
-extern bitMap RANKMASK[squareNumber];
-extern bitMap FILEMASK[squareNumber];
-
 // todo move them in position, eval or endgame
 extern bitMap ISOLATED_PAWN[squareNumber];
 extern bitMap PASSED_PAWN[2][squareNumber];
@@ -97,6 +94,19 @@ inline unsigned int distance( const tSquare sq1, const tSquare sq2 )
 	extern unsigned int SQUARE_DISTANCE[squareNumber][squareNumber];
 	return SQUARE_DISTANCE[sq1][sq2];
 }
+
+inline const bitMap& rankMask( const tSquare sq )
+{
+	extern bitMap RANKMASK[squareNumber];
+	return RANKMASK[sq];
+}
+
+inline const bitMap& fileMask( const tSquare sq )
+{
+	extern bitMap FILEMASK[squareNumber];
+	return FILEMASK[sq];
+}
+
 
 
 //------------------------------------------------
