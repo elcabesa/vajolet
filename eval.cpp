@@ -492,8 +492,8 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 			tSquare blockingSquare = ppSq + pawnPush(c);
 
 			// bonus for king proximity to blocking square
-			passedPawnsBonus += enemyKingNearPassedPawn * ( distance( blockingSquare, enemyKingSquare ) * rr );
-			passedPawnsBonus -= ownKingNearPassedPawn * ( distance( blockingSquare, kingSquare ) * rr );
+			passedPawnsBonus += enemyKingNearPassedPawn * int( distance( blockingSquare, enemyKingSquare ) * rr );
+			passedPawnsBonus -= ownKingNearPassedPawn * int( distance( blockingSquare, kingSquare ) * rr );
 			//std::cout<<passedPawnsBonus[0]<<" "<<passedPawnsBonus[1]<<std::endl;
 			if( getPieceAt(blockingSquare) == empty )
 			{
