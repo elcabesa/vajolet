@@ -94,7 +94,8 @@ inline tSquare getSquare( const tFile f, const tRank r)
 
 inline Color getSquareColor( const tSquare sq )
 {
-	return Color(sq % 2);
+	extern int SQUARE_COLOR[squareNumber];
+	return SQUARE_COLOR[sq];
 }
 
 

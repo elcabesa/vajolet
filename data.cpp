@@ -47,6 +47,18 @@ const volatile tRank RANKS[squareNumber] = {		//!< precalculated rank from squar
 
 };
 
+int SQUARE_COLOR[squareNumber]=
+{
+	0,1,0,1,0,1,0,1,
+	1,0,1,0,1,0,1,0,
+	0,1,0,1,0,1,0,1,
+	1,0,1,0,1,0,1,0,
+	0,1,0,1,0,1,0,1,
+	1,0,1,0,1,0,1,0,
+	0,1,0,1,0,1,0,1,
+	1,0,1,0,1,0,1,0
+};
+
 bitMap BITMAP_COLOR[2];
 
 bitMap RANKMASK[squareNumber];			//!< bitmask of a rank given a square on the rank

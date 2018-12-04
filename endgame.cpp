@@ -509,7 +509,7 @@ bool Position::evalKPvsK(Score& res)
 				unsigned int count = 0;
 				if(kingSquare == pawnSquare - 8) count++;
 				if( isWhiteTurn() && kingsDirectOpposition()) count++;
-				if(getRankOf(kingSquare) == 2) count++;
+				if(getRankOf(kingSquare) == RANK3) count++;
 
 				if(count > 1)
 				{
