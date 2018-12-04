@@ -16,6 +16,7 @@
 */
 
 #include "data.h"
+#include "eCastle.h"
 #include "bitops.h"
 #include "tSquare.h"
 #include <algorithm>
@@ -47,16 +48,16 @@ const volatile tRank RANKS[squareNumber] = {		//!< precalculated rank from squar
 
 };
 
-int SQUARE_COLOR[squareNumber]=
+Color SQUARE_COLOR[squareNumber]=
 {
-	0,1,0,1,0,1,0,1,
-	1,0,1,0,1,0,1,0,
-	0,1,0,1,0,1,0,1,
-	1,0,1,0,1,0,1,0,
-	0,1,0,1,0,1,0,1,
-	1,0,1,0,1,0,1,0,
-	0,1,0,1,0,1,0,1,
-	1,0,1,0,1,0,1,0
+	white,black,white,black,white,black,white,black,
+	black,white,black,white,black,white,black,white,
+	white,black,white,black,white,black,white,black,
+	black,white,black,white,black,white,black,white,
+	white,black,white,black,white,black,white,black,
+	black,white,black,white,black,white,black,white,
+	white,black,white,black,white,black,white,black,
+	black,white,black,white,black,white,black,white
 };
 
 bitMap BITMAP_COLOR[2];
