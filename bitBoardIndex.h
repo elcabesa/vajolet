@@ -166,4 +166,5 @@ inline bool isBlackPiece( const bitboardIndex piece )
 	return piece >= separationBitmap;
 }
 
+
 #endif /* BITBOARDINDEX_H_ */

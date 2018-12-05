@@ -81,6 +81,12 @@ inline tRank getRankOf( const tSquare s )
 	return RANKS[s];
 }
 
+inline tRank getRelativeRankOf( const tSquare s, const Color c )
+{
+	extern const volatile tRank RANKS[squareNumber];
+	return c ? tRank(7 - RANKS[s]) : RANKS[s];
+}
+
 inline tFile getFileOf( const tSquare s )
 {
 	extern const volatile tFile FILES[squareNumber];

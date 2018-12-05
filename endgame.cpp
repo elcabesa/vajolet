@@ -27,16 +27,13 @@
 //---------------------------------------------
 //	MATERIAL KEYS
 //---------------------------------------------
-
-
-
-
 std::unordered_map<tKey, Position::materialStruct> Position::materialKeyMap;
 
-
+/**********************************************
+eval king and pieces vs lone king
+**********************************************/
 bool Position::evalKxvsK(Score& res)
 {
-	//display();
 	Color StrongColor = bitCnt(getBitmap(whitePieces))>1  ? white : black;
 	tSquare winKingSquare;
 	tSquare losKingSquare;
@@ -77,33 +74,21 @@ bool Position::evalKxvsK(Score& res)
 
 }
 
+/**********************************************
+eval king Knight and pawn vs lone king, 
+it looks drawish if the pawn is on seventh and on the edge of the board
+**********************************************/
 bool Position::evalKNPvsK(Score& res)
 {
 	Color Pcolor = getBitmap(whitePawns) ? white : black;
-	tSquare pawnSquare;
-	if(Pcolor == white)
+	tSquare pawnSquare = getSquareOfThePiece( Pcolor ? blackPawns: whitePawns);
+	tRank relativeRank = getRelativeRankOf( pawnSquare, Pcolor);	
+	int pawnFile = getFileOf(pawnSquare);
+	
+	if( ( pawnFile ==FILEA || pawnFile ==FILEH ) && relativeRank == RANK7 )
 	{
-		pawnSquare = getSquareOfThePiece(whitePawns);
-		int pawnFile = getFileOf(pawnSquare);
-		int pawnRank = getRankOf(pawnSquare);
-		if( (pawnFile ==FILEA || pawnFile ==FILEH) && pawnRank == RANK7 )
-		{
-
-			res = 0;
-			return true;
-
-		}
-	}
-	else
-	{
-		pawnSquare = getSquareOfThePiece(blackPawns);
-		int pawnFile = getFileOf(pawnSquare);
-		int pawnRank = getRankOf(pawnSquare);
-		if( (pawnFile ==FILEA || pawnFile ==FILEH) && pawnRank == RANK2 )
-		{
-			res = 10;
-			return true;
-		}
+		res = 10;
+		return true;
 	}
 	return false;
 
