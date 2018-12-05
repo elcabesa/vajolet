@@ -18,7 +18,7 @@
 #define ECASTLE_H_
 
 
-using Color = enum
+using Color = enum eColor
 {
 	white = 0,
 	black = 1
@@ -36,6 +36,9 @@ enum eCastle	// castleRights
 };
 
 inline eCastle operator|(const eCastle c1, eCastle c2) { return eCastle(int(c1) | int(c2)); }
+
+inline Color operator++(Color& d, int) { Color r = d; d = Color(int(d) + 1); return r; }
+inline Color& operator++(Color& d) { d = Color(int(d) + 1); return d; }
 
 
 #endif

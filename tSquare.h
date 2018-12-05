@@ -17,6 +17,8 @@
 #ifndef TSQUARE_H_
 #define TSQUARE_H_
 
+#include "eCastle.h"
+
 enum tSquare								/*!< square name and directions*/
 {
 	A1,	B1,	C1,	D1,	E1,	F1,	G1,	H1,
@@ -51,5 +53,50 @@ inline tSquare& operator++(tSquare& d) { d = tSquare(int(d) + 1); return d; }
 inline tSquare& operator--(tSquare& d) { d = tSquare(int(d) - 1); return d; }
 inline tSquare operator/(const tSquare d, int i) { return tSquare(int(d) / i); }
 inline tSquare& operator/=(tSquare& d, int i) { d = tSquare(int(d) / i); return d; }
+
+enum tRank								
+{
+	RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8, rankNumber
+};
+
+inline tRank operator++(tRank& d, int) { tRank r = d; d = tRank(int(d) + 1); return r; }
+inline tRank operator--(tRank& d, int) { tRank r = d; d = tRank(int(d) - 1); return r; }
+inline tRank& operator++(tRank& d) { d = tRank(int(d) + 1); return d; }
+inline tRank& operator--(tRank& d) { d = tRank(int(d) - 1); return d; }
+
+enum tFile								
+{
+	FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH, fileNumber
+};
+
+inline tFile operator++(tFile& d, int) { tFile r = d; d = tFile(int(d) + 1); return r; }
+inline tFile operator--(tFile& d, int) { tFile r = d; d = tFile(int(d) - 1); return r; }
+inline tFile& operator++(tFile& d) { d = tFile(int(d) + 1); return d; }
+inline tFile& operator--(tFile& d) { d = tFile(int(d) - 1); return d; }
+
+
+inline tRank getRankOf( const tSquare s )
+{
+	extern const volatile tRank RANKS[squareNumber];
+	return RANKS[s];
+}
+
+inline tFile getFileOf( const tSquare s )
+{
+	extern const volatile tFile FILES[squareNumber];
+	return FILES[s];
+}
+
+inline tSquare getSquare( const tFile f, const tRank r)
+{
+	return tSquare(f + 8 * r);
+}
+
+inline Color getSquareColor( const tSquare sq )
+{
+	extern Color SQUARE_COLOR[squareNumber];
+	return SQUARE_COLOR[sq];
+}
+
 
 #endif

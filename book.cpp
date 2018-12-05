@@ -24,6 +24,7 @@
 #include "book.h"
 #include "move.h"
 #include "movepicker.h"
+#include "tSquare.h"
 #include "vajolet.h"
 
 
@@ -51,7 +52,7 @@ uint64_t PolyglotBook::polyglotKey(const Position& pos) const
 
 	if( pos.hasEpSquare() )
 	{
-		k ^= PG.Zobrist.enpassant[FILES[pos.getEpSquare()]];
+		k ^= PG.Zobrist.enpassant[getFileOf(pos.getEpSquare())];
 	}
 
 	if( pos.isWhiteTurn() )

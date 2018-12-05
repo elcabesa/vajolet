@@ -28,25 +28,25 @@ void displayBitmap(bitMap b)
 {
 	char boardc[squareNumber];
 
-	for ( int i = 0; i < squareNumber; i++)
+	for ( tSquare sq = A1; sq < squareNumber; sq++)
 	{
-		if (b & bitSet((tSquare)i))
+		if ( isSquareSet( b, sq ) )
 		{
-			boardc[i] = '1';
+			boardc[sq] = '1';
 		}
 		else
 		{
-			boardc[i] = '.';
+			boardc[sq] = '.';
 		}
 	}
 
 	sync_cout;
-	for (int rank = 7 ; rank >= 0; rank--)
+	for (tRank rank = RANK8 ; rank >= RANK1; rank--)
 	{
 		std::cout <<rank +1<< " ";
-		for (int file = 0 ; file <= 7; file++)
+		for (tFile file = FILEA ; file <= FILEH; file++)
 		{
-			std::cout << boardc[BOARDINDEX[file][rank]];
+			std::cout << boardc[getSquare(file,rank)];
 		}
 		std::cout << std::endl;
 	}
