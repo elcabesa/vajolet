@@ -87,7 +87,7 @@ bool Position::evalKNPvsK(Score& res)
 	
 	if( ( pawnFile ==FILEA || pawnFile ==FILEH ) && relativeRank == RANK7 )
 	{
-		res = 10;
+		res = 0;
 		return true;
 	}
 	return false;

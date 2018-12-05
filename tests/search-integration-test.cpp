@@ -44,7 +44,12 @@ static const std::vector<positions> _p =
 	{"7K/6R1/5k2/3q4/8/8/8/8 b - - 0 1",20, Move::NOMOVE,Move::NOMOVE, equal, mateIn(17)},// D5D8 or D5A8 are equal winning
 
 	{"7k/5RR1/8/8/8/8/q3q3/2K5 w - - 0 20",6, Move(G7,H7),Move::NOMOVE, equal, 0},
-
+	//kpn vs k
+	{"8/6k1/8/6NP/8/8/6K1/8 w - - 50 1", 10, Move::NOMOVE,Move::NOMOVE, bigger, 50000},
+	{"8/6kP/8/6N1/8/8/6K1/8 b - - 50 80", 10, Move(G7,H8),Move::NOMOVE, equal, 0},
+	{"8/8/8/8/k7/2n5/p7/K7 w - - 50 80", 10, Move(A1,B2),Move::NOMOVE, equal, 0},
+	{"8/1k6/7n/8/8/4p3/4K3/8 w - - 50 50", 3, Move(E2,E3),Move::NOMOVE, equal, 0}, 
+	{"8/1k6/7n/8/8/4pK2/8/8 b - - 50 50", 10, Move(H6,F5),Move::NOMOVE, bigger, 50000}, 
 
 };
 
