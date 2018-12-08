@@ -156,13 +156,14 @@ public:
 public:
 
 	Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st){}
-	Search( const Search& other ):_UOI(UciOutput::create()), _sl(other._sl), _st(other._st){ /* todo fare la copia*/}
+	Search( const Search& other ):_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMoves(other._rootMoves);{ /* todo fare la copia*/}
 	Search& operator=(const Search& other)
 	{
 		// todo fare una copia fatta bene
 		_sl = other._sl;
 		_st = other._st;
 		_UOI= UciOutput::create();
+		_rootMoves = other._rootMoves;
 		return * this;
 	}
 
@@ -197,7 +198,6 @@ private:
 	static unsigned int FutilityMoveCounts[2][16];
 	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
 	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
-	static std::vector<Move> rootMoves;
 
 	//--------------------------------------------------------
 	// private members
@@ -224,6 +224,7 @@ private:
 
 	SearchLimits& _sl; // todo limits belong to threads
 	SearchTimer& _st;
+	std::vector<Move> _rootMoves;
 
 
 	volatile bool stop = false;

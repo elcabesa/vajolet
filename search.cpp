@@ -58,9 +58,6 @@
 const int Search::ONE_PLY;
 const int Search::ONE_PLY_SHIFT;
 
-std::vector<Move> Search::rootMoves;
-
-
 Score Search::futility(int depth, bool improving )
 {
 	return 375 * depth - 2000 * improving;
@@ -248,12 +245,12 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 {
 	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
-	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)rootMoves.size());
+	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMoves.size());
 	
 	Score delta = 800;
 	
 	// ramdomly initialize the bestmove
-	bestMove = rootMoves[0];
+	bestMove = _rootMoves[0];
 	
 	do
 	{
@@ -425,14 +422,14 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//--------------------------------
 	// generate the list of root moves to be searched
 	//--------------------------------
-	generateRootMovesList( rootMoves, _sl.searchMoves );
+	generateRootMovesList( _rootMoves, _sl.searchMoves );
 	
 	//--------------------------------
 	//	tablebase probing, filtering rootmoves to be searched
 	//--------------------------------
 	if(_sl.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
 	{
-		filterRootMovesByTablebase( rootMoves );
+		filterRootMovesByTablebase( _rootMoves );
 	}
 	
 	initialNextMove = pos.getNextTurn();
@@ -1024,7 +1021,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		// Search only the moves in the Search list
-		if( type == Search::nodeType::ROOT_NODE && ( std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m ) || !std::count(rootMoves.begin(), rootMoves.end(), m) ) )
+		if( type == Search::nodeType::ROOT_NODE && ( std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m ) || !std::count(_rootMoves.begin(), _rootMoves.end(), m) ) )
 		{
 			continue;
 		}
