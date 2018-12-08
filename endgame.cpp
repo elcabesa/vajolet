@@ -100,6 +100,7 @@ bool Position::evalKBPsvsK(Score& res)
 	Color Pcolor = getBitmap(whitePawns) ? white : black;
 	bitMap pawns;
 	tSquare bishopSquare;
+	tSquare kingSquare;
 	
 	bitMap HFile = fileMask(H1);
 	bitMap AFile = fileMask(A1);
@@ -107,40 +108,30 @@ bool Position::evalKBPsvsK(Score& res)
 	if(Pcolor == white)
 	{	
 		pawns = getBitmap(whitePawns);
-		tFile pawnFile = getFileOf(firstOne( pawns ));
-		
-		if(  0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
-		{
-			bishopSquare = getSquareOfThePiece(whiteBishops);
-			if( getSquareColor(getSquare(pawnFile,RANK8)) != getSquareColor(bishopSquare))
-			{
-				tSquare kingSquare = getSquareOfThePiece(blackKing);
-				if(getRankOf(kingSquare) >= RANK7  && abs( pawnFile - getFileOf(kingSquare) ) <= 1 )
-				{
-					res = 0;
-					return true;
-				}
-			}
-		}
+		bishopSquare = getSquareOfThePiece(whiteBishops);
+		kingSquare = getSquareOfThePiece(blackKing);
 	}
 	else
 	{
 		pawns = getBitmap(blackPawns);
-		tFile pawnFile = getFileOf(firstOne( pawns ));
-		if( 0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
-		{
-			bishopSquare = getSquareOfThePiece(blackBishops);
-			if( getSquareColor(getSquare(pawnFile,RANK1)) != getSquareColor(bishopSquare))
-			{
-				tSquare kingSquare = getSquareOfThePiece(whiteKing);
-				if(getRankOf(kingSquare) <= RANK2  && abs(pawnFile - getFileOf(kingSquare)) <= 1)
-				{
-					res = 0;
-					return true;
-				}
-			}
-		}
+		bishopSquare = getSquareOfThePiece(blackBishops);
+		kingSquare = getSquareOfThePiece(whiteKing);
 	}
+	
+	tFile pawnFile = getFileOf( firstOne( pawns ) );
+	// all the pawn are on the A file or on the H file
+	if(  
+		// all the pawn are on the A file or on the H file
+		(0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
+		// the square of promotion is not protected by bishop
+		&& ( getSquareColor( getSquare( pawnFile, getRelativeRankOf(  A8, Pcolor ) ) ) != getSquareColor(bishopSquare) )
+		// the defending king is near the promotion square
+		&& ( getRankOf(kingSquare) >= getRelativeRankOf(A7, Pcolor) && abs( pawnFile - getFileOf(kingSquare) ) <= 1 )
+	)
+	{
+		res = 0;
+		return true;
+	}	
 	return false;
 
 }
