@@ -72,44 +72,44 @@ static std::vector<Search> helperSearch;
 
 unsigned long long Search::getVisitedNodes() const
 {
-	unsigned long long n = visitedNodes;
+	unsigned long long n = _visitedNodes;
 	for (auto& hs : helperSearch)
-		n += hs.visitedNodes;
+		n += hs._visitedNodes;
 	return n;
 }
 
 unsigned long long Search::getTbHits() const
 {
-	unsigned long long n = tbHits;
+	unsigned long long n = _tbHits;
 	for (auto& hs : helperSearch)
-		n += hs.tbHits;
+		n += hs._tbHits;
 	return n;
 }
 
 void Search::cleanMemoryBeforeStartingNewSearch(void)
 {
-	sd.history.clear();
-	sd.captureHistory.clear();
-	sd.counterMoves.clear();
-	sd.cleanData();
-	visitedNodes = 0;
-	tbHits = 0;
-	rootMovesSearched.clear();
+	_sd.history.clear();
+	_sd.captureHistory.clear();
+	_sd.counterMoves.clear();
+	_sd.cleanData();
+	_visitedNodes = 0;
+	_tbHits = 0;
+	_rootMovesSearched.clear();
 }
 inline void Search::enableFollowPv()
 {
-	followPV = true;
+	_followPV = true;
 }
 inline void Search::disableFollowPv()
 {
-	followPV = false;
+	_followPV = false;
 }
 inline void Search::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 {
-	if (followPV)
+	if (_followPV)
 	{
-		unsigned int lastElementIndex = pvLineToFollow.size() - 1;
-		// if line is already finished, stop following PV
+		unsigned int lastElementIndex = _pvLineToFollow.size() - 1;
+		// if line is already finished, _stop following PV
 		if( ply > lastElementIndex )
 		{
 			disableFollowPv();
@@ -117,10 +117,10 @@ inline void Search::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 		else
 		{
 			// overwrite the ttMove
-			PVline::iterator it = pvLineToFollow.begin();
+			PVline::iterator it = _pvLineToFollow.begin();
 			std::advance(it, ply);
 			ttMove = *it;
-			// if this is the last move of the PVline, stop following it
+			// if this is the last move of the PVline, _stop following it
 			if( ply == lastElementIndex )
 			{
 				disableFollowPv();
@@ -240,17 +240,33 @@ startThinkResult Search::manageQsearch(void)
 	
 	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, res );
 }
+/*
+void Search::_printRootMoveList() const
+{
+	unsigned int i = 0;
+	sync_cout;
+	std::cout<<"move list"<<std::endl;
+	for( auto m: _rootMovesToBeSearched)
+	{
+		++i;
+		std::cout<<i<<": "<<displayUci(m)<<std::endl;
+		
+	}
+	std::cout<<sync_endl;
+}*/
 
 void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , bool masterThread)
 {
+	//_printRootMoveList();
+	
 	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
-	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMoves.size());
+	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size());
 	
 	Score delta = 800;
 	
 	// ramdomly initialize the bestmove
-	bestMove = _rootMoves[0];
+	bestMove = _rootMovesToBeSearched[0];
 	
 	do
 	{
@@ -259,13 +275,13 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 		// iterative loop
 		//----------------------------
 
-		std::vector<rootMove> previousIterationResults = rootMovesSearched;
-		rootMovesSearched.clear();
+		std::vector<rootMove> previousIterationResults = _rootMovesSearched;
+		_rootMovesSearched.clear();
 		
 		//----------------------------------
 		// multi PV loop
 		//----------------------------------
-		for (multiPVcounter = 0; multiPVcounter < linesToBeSearched; ++multiPVcounter)
+		for (_multiPVcounter = 0; _multiPVcounter < linesToBeSearched; ++_multiPVcounter)
 		{
 
 			//----------------------------------
@@ -274,25 +290,25 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 			if (depth >= 5)
 			{
 				delta = 800;
-				alpha = (Score) std::max((signed long long int)(previousIterationResults[multiPVcounter].score) - delta,(signed long long int) SCORE_MATED);
-				beta  = (Score) std::min((signed long long int)(previousIterationResults[multiPVcounter].score) + delta,(signed long long int) SCORE_MATE);
+				alpha = (Score) std::max((signed long long int)(previousIterationResults[_multiPVcounter].score) - delta,(signed long long int) SCORE_MATED);
+				beta  = (Score) std::min((signed long long int)(previousIterationResults[_multiPVcounter].score) + delta,(signed long long int) SCORE_MATE);
 			}
 
-			Search::globalReduction = 0;
+			int globalReduction = 0;
 
 			//----------------------------------
 			// reload PV
 			//----------------------------------
-			if( previousIterationResults.size() > multiPVcounter )
+			if( previousIterationResults.size() > _multiPVcounter )
 			{
-				ExpectedValue = previousIterationResults[multiPVcounter].score;
-				pvLineToFollow = previousIterationResults[multiPVcounter].PV;
+				_expectedValue = previousIterationResults[_multiPVcounter].score;
+				_pvLineToFollow = previousIterationResults[_multiPVcounter].PV;
 				enableFollowPv();
 			}
 			else
 			{
-				ExpectedValue = -SCORE_INFINITE;
-				pvLineToFollow.reset();
+				_expectedValue = -SCORE_INFINITE;
+				_pvLineToFollow.reset();
 				disableFollowPv();
 			}
 			
@@ -303,8 +319,8 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 			do
 			{
 
-				maxPlyReached = 0;
-				validIteration = false;
+				_maxPlyReached = 0;
+				_validIteration = false;
 				enableFollowPv();
 
 				PVline newPV;
@@ -312,14 +328,14 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 				
 				Score res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
-				if(validIteration ||!stop)
+				if(_validIteration ||!_stop)
 				{
 					long long int elapsedTime = _st.getElapsedTime();
 
 					if (res <= alpha)
 					{
 
-						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, multiPVcounter, newPV, getVisitedNodes());
+						_UOI->printPV(res, depth-globalReduction, _maxPlyReached, alpha, beta, elapsedTime, _multiPVcounter, newPV, getVisitedNodes());
 
 						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
@@ -336,7 +352,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 					else if (res >= beta)
 					{
 
-						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, multiPVcounter, newPV, getVisitedNodes());
+						_UOI->printPV(res, depth-globalReduction, _maxPlyReached, alpha, beta, elapsedTime, _multiPVcounter, newPV, getVisitedNodes());
 
 						beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 						if(depth > 1)
@@ -348,16 +364,16 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 							thr.getTimeMan().notifyFailOver();
 						}
 						
-						pvLineToFollow = newPV;
+						_pvLineToFollow = newPV;
 						enableFollowPv();
 												
-						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+						bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 					}
 					else
 					{
-						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+						bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 						
-						rootMovesSearched.push_back(bestMove);
+						_rootMovesSearched.push_back(bestMove);
 
 						break;
 					}
@@ -368,16 +384,16 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 
 
 
-			}while(!stop);
+			}while(!_stop);
 
-			if((!stop || validIteration) && (linesToBeSearched > 1 || depth == 1) )
+			if((!_stop || _validIteration) && (linesToBeSearched > 1 || depth == 1) )
 			{
 
 				// Sort the PV lines searched so far and update the GUI				
-				std::stable_sort(rootMovesSearched.begin(), rootMovesSearched.end());
-				bestMove = rootMovesSearched[0];
+				std::stable_sort(_rootMovesSearched.begin(), _rootMovesSearched.end());
+				bestMove = _rootMovesSearched[0];
 				
-				_UOI->printPVs( rootMovesSearched );
+				_UOI->printPVs( _rootMovesSearched );
 			}
 		}
 
@@ -388,7 +404,7 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 		}
 
 	}
-	while( ++depth <= (_sl.depth != -1 ? _sl.depth : 100) && !stop);
+	while( ++depth <= (_sl.depth != -1 ? _sl.depth : 100) && !_stop);
 
 }
 
@@ -401,7 +417,21 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//clean transposition table
 	transpositionTable::getInstance().newSearch();
 	
-	pvLineToFollow = pvToBeFollowed;
+	_pvLineToFollow = pvToBeFollowed;
+	
+	//--------------------------------
+	// generate the list of root moves to be searched
+	//--------------------------------
+	generateRootMovesList( _rootMovesToBeSearched, _sl.searchMoves );
+	
+	//--------------------------------
+	//	tablebase probing, filtering rootmoves to be searched
+	//--------------------------------
+	if(_sl.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
+	{
+		filterRootMovesByTablebase( _rootMovesToBeSearched );
+	}
+	
 
 	// setup main thread
 	cleanMemoryBeforeStartingNewSearch();
@@ -418,21 +448,8 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		// setup helper thread
 		hs.cleanMemoryBeforeStartingNewSearch();
 	}
-
-	//--------------------------------
-	// generate the list of root moves to be searched
-	//--------------------------------
-	generateRootMovesList( _rootMoves, _sl.searchMoves );
 	
-	//--------------------------------
-	//	tablebase probing, filtering rootmoves to be searched
-	//--------------------------------
-	if(_sl.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
-	{
-		filterRootMovesByTablebase( _rootMoves );
-	}
-	
-	initialNextMove = pos.getNextTurn();
+	_initialTurn = pos.getNextTurn();
 	//----------------------------------
 	// we can start the real search
 	//----------------------------------
@@ -458,11 +475,9 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	{
 
 		helperResults[i].firstMove = m;
-		
-		helperSearch[i].cleanMemoryBeforeStartingNewSearch();
 		helperSearch[i].resetStopCondition();
 		helperSearch[i].pos = pos;
-		helperSearch[i].pvLineToFollow = pvLineToFollow;
+		helperSearch[i]._pvLineToFollow = _pvLineToFollow;
 		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, false));
 	}
 
@@ -472,7 +487,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	rootMove MainThreadMove(m);
 	idLoop(MainThreadMove, depth, alpha, beta, true);
 	
-	// stop helper threads
+	// _stop helper threads
 	for(unsigned int i = 0; i< ( uciParameters::threads - 1); i++)
 	{
 		helperSearch[i].stopSearch();
@@ -535,7 +550,7 @@ inline void Search::_updateCounterMove(const Move& m)
 {
 	if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
 	{
-		sd.counterMoves.update( pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
+		_sd.counterMoves.update( pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
 	}
 }
 
@@ -547,13 +562,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 
-	visitedNodes++;
-	sd.clearKillers(ply+1);
+	++_visitedNodes;
+	_maxPlyReached = std::max(ply, _maxPlyReached);
+	_sd.clearKillers(ply+1);
 
 	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
 	const bool inCheck = pos.isInCheck();
 	bool improving = false;
-	sd.story[ply].inCheck = inCheck;
+	_sd.story[ply].inCheck = inCheck;
 	//Move threatMove(Move::NOMOVE);
 
 
@@ -579,7 +595,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	if(type != Search::nodeType::ROOT_NODE )
 	{
-		if(pos.isDraw(PVnode) || stop)
+		if(pos.isDraw(PVnode) || _stop)
 		{
 			if constexpr (PVnode)
 			{
@@ -600,7 +616,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	}
 
-	const Move& excludedMove = sd.story[ply].excludeMove;
+	const Move& excludedMove = _sd.story[ply].excludeMove;
 
 	const HashKey& posKey = excludedMove ? pos.getExclusionKey() : pos.getKey();
 
@@ -626,7 +642,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&& !pos.isCaptureMoveOrPromotion(ttMove)
 			&& !inCheck)
 		{
-			sd.saveKillers(ply, ttMove);
+			_sd.saveKillers(ply, ttMove);
 			_updateCounterMove( ttMove );
 		}
 		
@@ -678,7 +694,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 				if(result != TB_RESULT_FAILED)
 				{
-					tbHits++;
+					++_tbHits;
 
 					Score value;
 					unsigned wdl = TB_GET_WDL(result);
@@ -789,9 +805,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 	}
 	
-	sd.story[ply].staticEval = staticEval;
+	_sd.story[ply].staticEval = staticEval;
 	
-	if( ply <2 || inCheck || ( ply >=2 && sd.story[ply-2].inCheck ) || ( ply >=2 && sd.story[ply].staticEval >= sd.story[ply-2].staticEval ) )
+	if( ply <2 || inCheck || ( ply >=2 && _sd.story[ply-2].inCheck ) || ( ply >=2 && _sd.story[ply].staticEval >= _sd.story[ply-2].staticEval ) )
 	{
 		improving = true;
 	}
@@ -809,7 +825,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//------------------------
 			// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
 			//------------------------
-			if (!sd.story[ply].skipNullMove
+			if (!_sd.story[ply].skipNullMove
 				&&  depth < 4 * ONE_PLY
 				&&  eval + razorMargin(depth,type==CUT_NODE) <= alpha
 				&&  alpha >= -SCORE_INFINITE+razorMargin(depth,type==CUT_NODE)
@@ -835,7 +851,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			const state& st = pos.getActualStateConst();
 
-			if (!sd.story[ply].skipNullMove
+			if (!_sd.story[ply].skipNullMove
 				&& depth < 8 * ONE_PLY
 				&& eval - futility( depth, improving ) >= beta
 				&& eval < SCORE_KNOWN_WIN
@@ -855,7 +871,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			if( depth >= ONE_PLY
 				&& eval >= beta
-				&& !sd.story[ply].skipNullMove
+				&& !_sd.story[ply].skipNullMove
 				&& ( ( pos.isBlackTurn() && st.getNonPawnValue()[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.getNonPawnValue()[0] >= Position::pieceValue[whiteKnights][0]))
 			){
 				// Null move dynamic reduction based on depth
@@ -868,7 +884,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				}
 
 				pos.doNullMove();
-				sd.story[ply+1].skipNullMove = true;
+				_sd.story[ply+1].skipNullMove = true;
 
 				//uint64_t nullKey = pos.getKey();
 				Score nullVal;
@@ -883,7 +899,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				}
 
 				pos.undoNullMove();
-				sd.story[ply+1].skipNullMove = false;
+				_sd.story[ply+1].skipNullMove = false;
 
 				if (nullVal >= beta)
 				{
@@ -901,11 +917,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					}
 
 					// Do verification search at high depths
-					sd.story[ply].skipNullMove = true;
+					_sd.story[ply].skipNullMove = true;
 					assert(depth - red >= ONE_PLY);
 					Score val;
 						val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
-					sd.story[ply].skipNullMove = false;
+					_sd.story[ply].skipNullMove = false;
 					if (val >= beta)
 					{
 						return nullVal;
@@ -922,7 +938,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//------------------------
 
 			if( depth >= 5*ONE_PLY
-				&&  !sd.story[ply].skipNullMove
+				&&  !_sd.story[ply].skipNullMove
 				// && abs(beta)<SCORE_KNOWN_WIN
 				// && eval> beta-40000
 				&& abs(beta) < SCORE_MATE_IN_MAX_PLY
@@ -931,7 +947,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				Score rBeta = std::min(beta + 8000, SCORE_INFINITE);
 				int rDepth = depth -ONE_PLY- 3*ONE_PLY;
 
-				MovePicker mp(pos, sd, ply, ttMove);
+				MovePicker mp(pos, _sd, ply, ttMove);
 				mp.setupProbCutSearch( pos.getCapturedPiece() );
 
 				Move m;
@@ -973,15 +989,15 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	{
 		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
 
-		bool skipBackup = sd.story[ply].skipNullMove;
-		sd.story[ply].skipNullMove = true;
+		bool skipBackup = _sd.story[ply].skipNullMove;
+		_sd.story[ply].skipNullMove = true;
 
 		PVline childPV;
 		const Search::nodeType iidType = type;
 		assert(d >= ONE_PLY);
 		alphaBeta<iidType>(ply, d, alpha, beta, childPV);
 
-		sd.story[ply].skipNullMove = skipBackup;
+		_sd.story[ply].skipNullMove = skipBackup;
 
 		tte = transpositionTable::getInstance().probe(posKey);
 		ttMove = tte->getPackedMove();
@@ -995,7 +1011,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Move bestMove(Move::NOMOVE);
 
 	Move m;
-	MovePicker mp(pos, sd, ply, ttMove);
+	MovePicker mp(pos, _sd, ply, ttMove);
 	unsigned int moveNumber = 0;
 	unsigned int quietMoveCount = 0;
 	Move quietMoveList[64];
@@ -1021,7 +1037,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		// Search only the moves in the Search list
-		if( type == Search::nodeType::ROOT_NODE && ( std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m ) || !std::count(_rootMoves.begin(), _rootMoves.end(), m) ) )
+		if( type == Search::nodeType::ROOT_NODE && ( std::count(_rootMovesSearched.begin(), _rootMovesSearched.end(), m ) || !std::count(_rootMovesToBeSearched.begin(), _rootMovesToBeSearched.end(), m) ) )
 		{
 			continue;
 		}
@@ -1061,9 +1077,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score rBeta = ttValue - int(depth*20);
 			rBeta = std::max( rBeta, -SCORE_MATE + 1 );
 
-			sd.story[ply].excludeMove = m;
+			_sd.story[ply].excludeMove = m;
 			Score temp = alphaBeta<ALL_NODE>(ply, depth/2, rBeta-1, rBeta, childPv);
-			sd.story[ply].excludeMove = Move::NOMOVE;
+			_sd.story[ply].excludeMove = Move::NOMOVE;
 
 			if(temp < rBeta)
 			{
@@ -1123,7 +1139,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 				elapsed>3000 &&
 #endif
-				!stop
+				!_stop
 				)
 			{
 				_UOI->printCurrMoveNumber(moveNumber, m, getVisitedNodes(), elapsed);
@@ -1261,7 +1277,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		pos.undoMove();
 
-		if(!stop && val > bestScore)
+		if(!_stop && val > bestScore)
 		{
 			bestScore = val;
 
@@ -1276,11 +1292,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 						if(val < beta && depth > 1*ONE_PLY)
 						{
-							_UOI->printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, _st.getElapsedTime(), multiPVcounter, pvLine, getVisitedNodes());
+							_UOI->printPV(val, depth / ONE_PLY, _maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, _st.getElapsedTime(), _multiPVcounter, pvLine, getVisitedNodes());
 						}
-						if(val > ExpectedValue - 800)
+						if(val > _expectedValue - 800)
 						{
-							validIteration = true;
+							_validIteration = true;
 						}
 					}
 				}
@@ -1329,7 +1345,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	if (bestScore == -SCORE_INFINITE)
 		bestScore = alpha;
 
-	if(!stop)
+	if(!_stop)
 	{
 		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta  ? typeScoreHigherThanBeta :
@@ -1343,18 +1359,18 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	{
 		if (!pos.isCaptureMoveOrPromotion(bestMove))
 		{
-			sd.saveKillers(ply, bestMove);
+			_sd.saveKillers(ply, bestMove);
 
 			// update history
 			int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
 			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-			sd.history.update( pos.isWhiteTurn() ? white: black, bestMove, bonus);
+			_sd.history.update( pos.isWhiteTurn() ? white: black, bestMove, bonus);
 
 			for (unsigned int i = 0; i < quietMoveCount; i++)
 			{
 				Move m = quietMoveList[i];
-				sd.history.update( pos.isWhiteTurn() ? white: black, m, -bonus);
+				_sd.history.update( pos.isWhiteTurn() ? white: black, m, -bonus);
 			}
 			
 			_updateCounterMove( bestMove );
@@ -1367,14 +1383,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
 				Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-				sd.captureHistory.update( pos.getPieceAt(bestMove.getFrom()), bestMove, pos.getPieceAt(bestMove.getTo()), bonus);
+				_sd.captureHistory.update( pos.getPieceAt(bestMove.getFrom()), bestMove, pos.getPieceAt(bestMove.getTo()), bonus);
 
 				for (unsigned int i = 0; i < captureMoveCount; i++)
 				{
 					Move m = captureMoveList[i];
 					//if( pos.isCaptureMove( m ) )
 					{
-						sd.captureHistory.update( pos.getPieceAt(m.getFrom()), m, pos.getPieceAt(m.getTo()), -bonus);
+						_sd.captureHistory.update( pos.getPieceAt(m.getFrom()), m, pos.getPieceAt(m.getTo()), -bonus);
 					}
 				}
 			}
@@ -1401,14 +1417,14 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	assert(PVnode || alpha+1==beta);
 
 	bool inCheck = pos.isInCheck();
-	sd.story[ply].inCheck = inCheck;
+	_sd.story[ply].inCheck = inCheck;
 
-	maxPlyReached = std::max(ply, maxPlyReached);
-	visitedNodes++;
+	_maxPlyReached = std::max(ply, _maxPlyReached);
+	++_visitedNodes;
 
 
 
-	if(pos.isDraw(PVnode) || stop)
+	if(pos.isDraw(PVnode) || _stop)
 	{
 
 		if constexpr (PVnode)
@@ -1438,7 +1454,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
 	Move ttMove( tte->getPackedMove() );
 
-	MovePicker mp(pos, sd, ply, ttMove);
+	MovePicker mp(pos, _sd, ply, ttMove);
 	int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(),ply);
 	if (tte->getDepth() >= TTdepth
@@ -1516,9 +1532,9 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			{
 				if( !pos.isCaptureMoveOrPromotion(ttMove) )
 				{
-					sd.saveKillers(ply, ttMove);
+					_sd.saveKillers(ply, ttMove);
 				}
-				if(!stop)
+				if(!_stop)
 				{
 					transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.getPacked(), staticEval);
 				}
@@ -1644,7 +1660,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				TTtype = typeExact;
 				alpha = bestScore;
 
-				if(PVnode && !stop)
+				if(PVnode && !_stop)
 				{
 					pvLine.appendNewPvLine( bestMove, childPV ); 
 
@@ -1653,9 +1669,9 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				{
 					if( !pos.isCaptureMoveOrPromotion(bestMove) && !inCheck )
 					{
-						sd.saveKillers(ply, bestMove);
+						_sd.saveKillers(ply, bestMove);
 					}
-					if(!stop)
+					if(!_stop)
 					{
 						transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove.getPacked(), staticEval);
 					}
@@ -1680,7 +1696,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 
 
-	if( !stop )
+	if( !_stop )
 	{
 		transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove.getPacked(), staticEval);
 	}
@@ -1698,7 +1714,7 @@ void Search::setUOI( std::unique_ptr<UciOutput> UOI )
 
 inline Score Search::getDrawValue() const
 {
-	int contemptSign = ( pos.getNextTurn() == initialNextMove) ? 1 : -1;
+	int contemptSign = ( pos.getNextTurn() == _initialTurn) ? 1 : -1;
 	return contemptSign * std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
 }
 

@@ -107,7 +107,6 @@ public:
 	rootMove( const Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
 };
 
-
 class SearchData
 {
 public:
@@ -156,21 +155,21 @@ public:
 public:
 
 	Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st){}
-	Search( const Search& other ):_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMoves(other._rootMoves);{ /* todo fare la copia*/}
+	Search( const Search& other ):_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMovesToBeSearched(other._rootMovesToBeSearched){ /* todo fare la copia*/}
 	Search& operator=(const Search& other)
 	{
 		// todo fare una copia fatta bene
 		_sl = other._sl;
 		_st = other._st;
 		_UOI= UciOutput::create();
-		_rootMoves = other._rootMoves;
+		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return * this;
 	}
 
 	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
 
-	void stopSearch(){ stop = true;}
-	void resetStopCondition(){ stop = false;}
+	void stopSearch(){ _stop = true;}
+	void resetStopCondition(){ _stop = false;}
 
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
@@ -204,30 +203,28 @@ private:
 	//--------------------------------------------------------
 	std::unique_ptr<UciOutput> _UOI;
 
-	int globalReduction;
-	bool validIteration = false;
-	Score ExpectedValue = 0;
-	unsigned int multiPVcounter = 0;
-	bool followPV;
-	PVline pvLineToFollow;
-	eNextMove initialNextMove;
+	bool _validIteration = false;
+	Score _expectedValue = 0;
+	unsigned int _multiPVcounter = 0;
+	bool _followPV;
+	PVline _pvLineToFollow;
+	eNextMove _initialTurn;
 	bool _showLine = false;
 
 
-	SearchData sd;
+	SearchData _sd;
+	unsigned long long _visitedNodes;
+	unsigned long long _tbHits;
+	unsigned int _maxPlyReached;
 
-	unsigned long long visitedNodes;
-	unsigned long long tbHits;
-	unsigned int maxPlyReached;
-
-	std::vector<rootMove> rootMovesSearched;
+	std::vector<rootMove> _rootMovesSearched;
 
 	SearchLimits& _sl; // todo limits belong to threads
 	SearchTimer& _st;
-	std::vector<Move> _rootMoves;
+	std::vector<Move> _rootMovesToBeSearched;
 
 
-	volatile bool stop = false;
+	volatile bool _stop = false;
 
 	//--------------------------------------------------------
 	// private methods
@@ -254,6 +251,7 @@ private:
 	Score getDrawValue() const;
 	
 	void _updateCounterMove( const Move& m );
+	//void _printRootMoveList() const;
 
 
 };
