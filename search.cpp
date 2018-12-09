@@ -58,6 +58,78 @@
 const int Search::ONE_PLY;
 const int Search::ONE_PLY_SHIFT;
 
+class voteSystem
+{
+public:
+	voteSystem( const std::vector<rootMove>& res):_results(res){}
+
+	void print( const std::map<unsigned short, int>& votes, const Score minScore, const rootMove& bm ) const
+	{
+		std::cout<<"minScore: "<<minScore<<std::endl;
+
+		for (auto &res : _results)
+		{
+			if( res == bm)
+			{
+				std::cout<<"bestMove: "<<displayUci(res.firstMove)<<" *****"<<std::endl;
+			}
+			else
+			{
+				std::cout<<"bestMove: "<<displayUci(res.firstMove)<<std::endl;
+			}
+			std::cout<<"score: "<<res.score<<std::endl;
+			std::cout<<"depth: "<<res.depth<<std::endl;
+			std::cout<<"votes: "<<votes.at( res.firstMove.getPacked() )<<std::endl;
+		}
+	}
+
+	const rootMove& getBestMove( bool verbose = false) const
+	{
+
+		std::map<unsigned short, int> votes;
+
+		//////////////////////////////////////////
+		// calc the min value
+		//////////////////////////////////////////
+		Score minScore = _results[0].score;
+		for (auto &res : _results)
+		{
+			minScore = std::min( minScore, res.score );
+			votes[ res.firstMove.getPacked() ] = 0;
+		}
+
+		//////////////////////////////////////////
+		// calc votes
+		//////////////////////////////////////////
+		for (auto &res : _results)
+		{
+			votes[ res.firstMove.getPacked() ] += (int)( res.score - minScore ) + 40 * res.depth;
+		}
+
+		//////////////////////////////////////////
+		// find the maximum
+		//////////////////////////////////////////
+		const rootMove* bestMove = &_results[0];
+		int bestResult = votes[ _results[0].firstMove.getPacked() ];
+
+		for ( auto &res : _results )
+		{
+			if( votes[ res.firstMove.getPacked() ] > bestResult )
+			{
+				bestResult = votes[ res.firstMove.getPacked() ];
+				bestMove = &res;
+			}
+		}
+
+		if( verbose ) print( votes, minScore, *bestMove);
+
+		return *bestMove;
+	}
+
+private:
+	const std::vector<rootMove>& _results;
+};
+
 Score Search::futility(int depth, bool improving )
 {
 	return 375 * depth - 2000 * improving;
@@ -259,9 +331,9 @@ void Search::_printRootMoveList() const
 
 rootMove Search::aspirationWindow( const int depth, Score alpha, Score beta, const bool masterThread)
 {
-	rootMove bestMove(Move::NOMOVE);
+	timeManagement &tm = my_thread::getInstance().getTimeMan();
 
-	my_thread &thr = my_thread::getInstance();
+	rootMove bestMove(Move::NOMOVE);
 	Score delta = 800;
 	//----------------------------------
 	// prepare alpha & beta
@@ -295,21 +367,21 @@ rootMove Search::aspirationWindow( const int depth, Score alpha, Score beta, con
 			if (res <= alpha)
 			{
 
-				_UOI->printPV(res, depth-globalReduction, _maxPlyReached, alpha, beta, elapsedTime, _multiPVcounter, newPV, getVisitedNodes());
+				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound);
 
 				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
 				globalReduction = 0;
 				if( masterThread )
 				{
-					thr.getTimeMan().notifyFailLow();
+					tm.notifyFailLow();
 				}
 
 			}
 			else if (res >= beta)
 			{
 
-				_UOI->printPV(res, depth-globalReduction, _maxPlyReached, alpha, beta, elapsedTime, _multiPVcounter, newPV, getVisitedNodes());
+				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound);
 
 				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 				if(depth > 1)
@@ -318,7 +390,7 @@ rootMove Search::aspirationWindow( const int depth, Score alpha, Score beta, con
 				}
 				if( masterThread )
 				{
-					thr.getTimeMan().notifyFailOver();
+					tm.notifyFailOver();
 				}
 				_pvLineToFollow = newPV;
 
@@ -350,28 +422,29 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, bool
 	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
 	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size());
-	
-	Score delta = 800;
-	
+
 	// ramdomly initialize the bestmove
 	bestMove = _rootMovesToBeSearched[0];
 	
 	do
 	{
-		_UOI->printDepth(depth);
+		_UOI->setDepth(depth);
+		_UOI->printDepth();
 		//----------------------------
 		// iterative loop
 		//----------------------------
 
-		std::vector<rootMove> previousIterationResults = _multiPVresult;
+		const auto previousIterationResults = _multiPVresult;
+
 		_multiPVresult.clear();
 		_rootMovesAlreadySearched.clear();
 		
 		//----------------------------------
 		// multi PV loop
 		//----------------------------------
-		for (_multiPVcounter = 0; _multiPVcounter < linesToBeSearched; ++_multiPVcounter)
+		for ( unsigned int _multiPVcounter = 0; _multiPVcounter < linesToBeSearched; ++_multiPVcounter )
 		{
+			_UOI->setPVlineIndex(_multiPVcounter);
 			//----------------------------------
 			// reload PV
 			//----------------------------------
@@ -387,6 +460,9 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, bool
 
 			}
 
+			//----------------------------------
+			// aspiration window
+			//----------------------------------
 			rootMove res = aspirationWindow( depth, alpha, beta, masterThread);
 			if( res.firstMove != Move::NOMOVE )
 			{
@@ -509,49 +585,11 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	// gather results
 	//----------------------------------
-	
 	helperResults.push_back(MainThreadMove);
 	
-	std::map<unsigned short, int> votes;
+	const rootMove& bestMove = voteSystem(helperResults).getBestMove(true);
 	
-	Score minScore = MainThreadMove.score;
-	for (auto &res : helperResults)
-	{
-		minScore = std::min( minScore, res.score );
-		votes[ res.firstMove.getPacked() ] = 0;
-	}
-	
-	for (auto &res : helperResults)
-	{
-		votes[ res.firstMove.getPacked() ] += (int)( res.score - minScore ) + 40 * res.depth;
-	}
-	
-	rootMove* bestMove = &MainThreadMove;
-	int bestResult = votes[ MainThreadMove.firstMove.getPacked() ];
-	
-	for ( auto &res : helperResults )
-	{
-		if( votes[ res.firstMove.getPacked() ] > bestResult )
-		{
-			bestResult = votes[ res.firstMove.getPacked() ];
-			bestMove = &res;
-		}
-	}
-	
-	//std::cout<<"-------main thread----------"<<std::endl;
-	//std::cout<<"bestMove "<<displayUci(bestMove.firstMove)<<std::endl;
-	//std::cout<<"score "<<bestMove.score<<std::endl;
-	//std::cout<<"depth "<<bestMove.depth<<std::endl;
-	//for(unsigned int i = 0; i< (threads - 1); i++)
-	//{
-	//	std::cout<<"-------helper thread----------"<<std::endl;
-	//	std::cout<<"bestMove "<<displayUci(helperResults[i].firstMove)<<std::endl;
-	//	std::cout<<"score "<<helperResults[i].score<<std::endl;
-	//	std::cout<<"depth "<<helperResults[i].depth<<std::endl;
-	//}
-	
-	
-	return startThinkResult( alpha, beta, bestMove->depth, bestMove->PV, bestMove->score);
+	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 
 }
 
@@ -1301,7 +1339,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					{
 						if(val < beta && depth > 1*ONE_PLY)
 						{
-							_UOI->printPV(val, depth / ONE_PLY, _maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, _st.getElapsedTime(), _multiPVcounter, pvLine, getVisitedNodes());
+							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes());
 						}
 						if(val > _expectedValue - 800)
 						{

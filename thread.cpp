@@ -123,12 +123,11 @@ void my_thread::_manageNewSearch()
 
 	if(legalMoves == 0)
 	{
-		PVline PV( 1, Move(0) );
-		_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+		_UOI->printPV( Move::NOMOVE );
 		
 		_waitStopPondering();
 
-		_UOI->printBestMove( Move(0) );
+		_UOI->printBestMove( Move::NOMOVE );
 
 		return;
 	}
@@ -137,8 +136,7 @@ void my_thread::_manageNewSearch()
 	{
 		Move bestMove = MovePicker( _src.pos ).getNextMove();
 		
-		PVline PV( 1, bestMove );
-		_UOI->printPV( 0, 0, 0, -1, 1, 0, 0, PV, 0 );
+		_UOI->printPV(bestMove);
 		
 		_waitStopPondering();
 		
@@ -159,9 +157,7 @@ void my_thread::_manageNewSearch()
 		Move bookM = pol.probe(_src.pos, uciParameters::bestMoveBook);
 		if( bookM )
 		{
-			PVline PV( 1, bookM );
-			
-			_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
+			_UOI->printPV(bookM);
 			
 			_waitStopPondering();
 			

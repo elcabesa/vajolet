@@ -53,6 +53,7 @@ public:
 	long long int time = 0ll;
 	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
 	bool operator==(const Move& m) const { return firstMove == m; }
+	bool operator==(const rootMove& m) const { return firstMove == m.firstMove; }
 
 	rootMove(const Move& m) : firstMove{m}
 	{
@@ -161,7 +162,6 @@ private:
 
 	bool _validIteration = false;
 	Score _expectedValue = 0;
-	unsigned int _multiPVcounter = 0;
 	bool _followPV;
 	PVline _pvLineToFollow;
 	eNextMove _initialTurn;
