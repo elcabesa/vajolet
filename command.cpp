@@ -27,7 +27,7 @@
 #include "movepicker.h"
 #include "parameters.h"
 #include "position.h"
-#include "search.h"
+#include "pvLine.h"
 #include "syzygy/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"
@@ -248,7 +248,7 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr)
 			}
         }
     }
-    thr.startThinking( &pos, limits );
+    thr.startThinking( pos, limits );
 }
 
 

@@ -23,13 +23,10 @@
 #include <mutex>
 #include <thread>
 
-#include "position.h"
+#include "search.h"
 #include "timeManagement.h"
 
-class Searc;
-class SearchLimits;
-class SearchTimer;
-
+class Position;
 
 class Game
 {
@@ -120,7 +117,7 @@ public :
 	}
 
 	void quitThreads();
-	void startThinking(Position * p, SearchLimits& l);
+	void startThinking( const Position& p, SearchLimits& l);
 	void stopPonder();
 	void stopThinking();
 	void ponderHit();

@@ -94,7 +94,8 @@ void Search::cleanMemoryBeforeStartingNewSearch(void)
 	_sd.cleanData();
 	_visitedNodes = 0;
 	_tbHits = 0;
-	_rootMovesSearched.clear();
+	_multiPVresult.clear();
+	_rootMovesAlreadySearched.clear();
 }
 inline void Search::enableFollowPv()
 {
@@ -255,7 +256,94 @@ void Search::_printRootMoveList() const
 	std::cout<<sync_endl;
 }*/
 
-void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , bool masterThread)
+
+rootMove Search::aspirationWindow( const int depth, Score alpha, Score beta, const bool masterThread)
+{
+	rootMove bestMove(Move::NOMOVE);
+
+	my_thread &thr = my_thread::getInstance();
+	Score delta = 800;
+	//----------------------------------
+	// prepare alpha & beta
+	//----------------------------------
+	if (depth >= 5)
+	{
+		delta = 800;
+		alpha = (Score) std::max((signed long long int)_expectedValue - delta,(signed long long int) SCORE_MATED);
+		beta  = (Score) std::min((signed long long int)_expectedValue + delta,(signed long long int) SCORE_MATE);
+	}
+
+	int globalReduction = 0;
+
+	//----------------------------------
+	// aspiration window
+	//----------------------------------
+	do
+	{
+		_maxPlyReached = 0;
+		_validIteration = false;
+		enableFollowPv();
+		PVline newPV;
+		newPV.clear();
+
+		Score res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
+
+		if(_validIteration || !_stop)
+		{
+			long long int elapsedTime = _st.getElapsedTime();
+
+			if (res <= alpha)
+			{
+
+				_UOI->printPV(res, depth-globalReduction, _maxPlyReached, alpha, beta, elapsedTime, _multiPVcounter, newPV, getVisitedNodes());
+
+				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
+
+				globalReduction = 0;
+				if( masterThread )
+				{
+					thr.getTimeMan().notifyFailLow();
+				}
+
+			}
+			else if (res >= beta)
+			{
+
+				_UOI->printPV(res, depth-globalReduction, _maxPlyReached, alpha, beta, elapsedTime, _multiPVcounter, newPV, getVisitedNodes());
+
+				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
+				if(depth > 1)
+				{
+					globalReduction = 1;
+				}
+				if( masterThread )
+				{
+					thr.getTimeMan().notifyFailOver();
+				}
+				_pvLineToFollow = newPV;
+
+				bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+			}
+			else
+			{
+				bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+				return bestMove;
+				break;
+			}
+
+
+			delta += delta / 2;
+		}
+
+
+
+	}while(!_stop);
+
+	return bestMove;
+
+}
+
+void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, bool masterThread)
 {
 	//_printRootMoveList();
 	
@@ -275,27 +363,15 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 		// iterative loop
 		//----------------------------
 
-		std::vector<rootMove> previousIterationResults = _rootMovesSearched;
-		_rootMovesSearched.clear();
+		std::vector<rootMove> previousIterationResults = _multiPVresult;
+		_multiPVresult.clear();
+		_rootMovesAlreadySearched.clear();
 		
 		//----------------------------------
 		// multi PV loop
 		//----------------------------------
 		for (_multiPVcounter = 0; _multiPVcounter < linesToBeSearched; ++_multiPVcounter)
 		{
-
-			//----------------------------------
-			// prepare alpha & beta
-			//----------------------------------
-			if (depth >= 5)
-			{
-				delta = 800;
-				alpha = (Score) std::max((signed long long int)(previousIterationResults[_multiPVcounter].score) - delta,(signed long long int) SCORE_MATED);
-				beta  = (Score) std::min((signed long long int)(previousIterationResults[_multiPVcounter].score) + delta,(signed long long int) SCORE_MATE);
-			}
-
-			int globalReduction = 0;
-
 			//----------------------------------
 			// reload PV
 			//----------------------------------
@@ -303,97 +379,30 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , boo
 			{
 				_expectedValue = previousIterationResults[_multiPVcounter].score;
 				_pvLineToFollow = previousIterationResults[_multiPVcounter].PV;
-				enableFollowPv();
 			}
 			else
 			{
 				_expectedValue = -SCORE_INFINITE;
-				_pvLineToFollow.reset();
-				disableFollowPv();
+				_pvLineToFollow.clear();
+
 			}
-			
-			
-			//----------------------------------
-			// aspiration window
-			//----------------------------------
-			do
+
+			rootMove res = aspirationWindow( depth, alpha, beta, masterThread);
+			if( res.firstMove != Move::NOMOVE )
 			{
-
-				_maxPlyReached = 0;
-				_validIteration = false;
-				enableFollowPv();
-
-				PVline newPV;
-				newPV.reset();
-				
-				Score res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
-
-				if(_validIteration ||!_stop)
-				{
-					long long int elapsedTime = _st.getElapsedTime();
-
-					if (res <= alpha)
-					{
-
-						_UOI->printPV(res, depth-globalReduction, _maxPlyReached, alpha, beta, elapsedTime, _multiPVcounter, newPV, getVisitedNodes());
-
-						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
-
-						globalReduction = 0;
-						if( masterThread )
-						{
-							thr.getTimeMan().notifyFailLow();
-						}
-						
-						// follow the old PV
-						enableFollowPv();
-
-					}
-					else if (res >= beta)
-					{
-
-						_UOI->printPV(res, depth-globalReduction, _maxPlyReached, alpha, beta, elapsedTime, _multiPVcounter, newPV, getVisitedNodes());
-
-						beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
-						if(depth > 1)
-						{
-							globalReduction = 1;
-						}
-						if( masterThread )
-						{
-							thr.getTimeMan().notifyFailOver();
-						}
-						
-						_pvLineToFollow = newPV;
-						enableFollowPv();
-												
-						bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
-					}
-					else
-					{
-						bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
-						
-						_rootMovesSearched.push_back(bestMove);
-
-						break;
-					}
-
-
-					delta += delta / 2;
-				}
-
-
-
-			}while(!_stop);
+				bestMove = res;
+				_multiPVresult.push_back(bestMove);
+				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
+			}
 
 			if((!_stop || _validIteration) && (linesToBeSearched > 1 || depth == 1) )
 			{
 
 				// Sort the PV lines searched so far and update the GUI				
-				std::stable_sort(_rootMovesSearched.begin(), _rootMovesSearched.end());
-				bestMove = _rootMovesSearched[0];
+				std::stable_sort(_multiPVresult.begin(), _multiPVresult.end());
+				bestMove = _multiPVresult[0];
 				
-				_UOI->printPVs( _rootMovesSearched );
+				_UOI->printPVs( _multiPVresult );
 			}
 		}
 
@@ -599,7 +608,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		{
 			if constexpr (PVnode)
 			{
-				pvLine.reset();
+				pvLine.clear();
 			}
 			return getDrawValue();
 		}
@@ -655,7 +664,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			}
 			else
 			{
-				pvLine.reset();
+				pvLine.clear();
 			}
 		}
 		return ttValue;
@@ -1037,7 +1046,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		// Search only the moves in the Search list
-		if( type == Search::nodeType::ROOT_NODE && ( std::count(_rootMovesSearched.begin(), _rootMovesSearched.end(), m ) || !std::count(_rootMovesToBeSearched.begin(), _rootMovesToBeSearched.end(), m) ) )
+		if( type == Search::nodeType::ROOT_NODE && ( std::count(_rootMovesAlreadySearched.begin(), _rootMovesAlreadySearched.end(), m ) || !std::count(_rootMovesToBeSearched.begin(), _rootMovesToBeSearched.end(), m) ) )
 		{
 			continue;
 		}
@@ -1429,7 +1438,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 		if constexpr (PVnode)
 		{
-			pvLine.reset();
+			pvLine.clear();
 		}
 		return getDrawValue();
 	}
@@ -1473,7 +1482,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			}
 			else
 			{
-				pvLine.reset();
+				pvLine.clear();
 			}
 		}
 		return ttValue;
@@ -1525,7 +1534,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			// TODO testare se la riga TTtype=typeExact; ha senso
 			if constexpr (PVnode)
 			{
-				pvLine.reset();
+				pvLine.clear();
 			}
 
 			if( bestScore >= beta)
@@ -1686,7 +1695,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		assert(inCheck);
 		if constexpr (PVnode)
 		{
-			pvLine.reset();
+			pvLine.clear();
 		}
 		return matedIn(ply);
 	}

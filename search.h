@@ -23,57 +23,12 @@
 
 #include "command.h"
 #include "history.h"
-#include "move.h"
 #include "position.h"
+#include "pvLine.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
 
-class PVline : private std::list<Move>
-{
-public:
-	inline unsigned int size() const
-	{
-		return std::list<Move>::size();
-	}
-	inline void reset()
-	{
-		clear();
-	}
-	
-	inline void appendNewPvLine( Move bestMove, PVline childPV )
-	{
-		clear();
-		emplace_back( bestMove );
-		splice( end(), childPV );
-	}
-	
-	inline void appendNewMove( Move move )
-	{
-		clear();
-		emplace_back( move );
-	}
-	
-	inline const Move& getMove( unsigned int n ) const
-	{
-		if( size() > n )
-		{
-			auto it = begin();
-			std::advance(it, n);
-			return *it;
-		}
-		else
-		{
-			return Move::NOMOVE;
-		}
-	}
-	
-	using std::list<Move>::iterator;
-	using std::list<Move>::begin;
-	using std::list<Move>::end;
-	PVline( unsigned int n, const Move m ) : std::list<Move>(n,m){}
-	PVline(){}
-	
-};
+
 
 class startThinkResult
 {
@@ -99,9 +54,9 @@ public:
 	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
 	bool operator==(const Move& m) const { return firstMove == m; }
 
-	rootMove(Move & m) : firstMove{m}
+	rootMove(const Move& m) : firstMove{m}
 	{
-		PV.reset();
+		PV.clear();
 	}
 	
 	rootMove( const Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
@@ -141,6 +96,7 @@ public:
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
+	// make it private
 	Position pos;
 
 
@@ -217,11 +173,12 @@ private:
 	unsigned long long _tbHits;
 	unsigned int _maxPlyReached;
 
-	std::vector<rootMove> _rootMovesSearched;
+	std::vector<rootMove> _multiPVresult;
 
 	SearchLimits& _sl; // todo limits belong to threads
 	SearchTimer& _st;
 	std::vector<Move> _rootMovesToBeSearched;
+	std::vector<Move> _rootMovesAlreadySearched;
 
 
 	volatile bool _stop = false;
@@ -244,6 +201,7 @@ private:
 	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
 
+	rootMove aspirationWindow(const int depth, Score alpha, Score beta, const bool masterThread);
 	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
 
 	void setUOI( std::unique_ptr<UciOutput> UOI );

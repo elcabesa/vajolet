@@ -295,7 +295,7 @@ my_thread::~my_thread()
 	quitThreads();
 }
 
-void my_thread::startThinking(Position * p, SearchLimits& l)
+void my_thread::startThinking( const Position& p, SearchLimits& l)
 {
 	_src.stopSearch();
 	_lastHasfullMessage = 0;
@@ -306,7 +306,7 @@ void my_thread::startThinking(Position * p, SearchLimits& l)
 	{
 		std::lock_guard<std::mutex> lk(_searchMutex);
 		_limits = l;
-		_src.pos = *p;
+		_src.pos = p;
 		_startThink = true;
 		_searchCond.notify_one();
 	}
