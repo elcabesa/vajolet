@@ -65,7 +65,17 @@ public:
 
 	void print( const std::map<unsigned short, int>& votes, const Score minScore, const rootMove& bm ) const
 	{
+		std::cout<<"----------VOTE SYSTEM-------------"<<std::endl;
 		std::cout<<"minScore: "<<minScore<<std::endl;
+		std::cout<<"----------------------------------"<<std::endl;
+		for (auto &res : votes)
+		{
+			Move m(res.first);
+			std::cout<<"Move: "<<displayUci(m)<<" votes: "<<res.second;
+			if( bm == m ) std::cout<<" *****";
+			std::cout<<std::endl;
+		}
+		std::cout<<"----------------------------------"<<std::endl;
 
 		for (auto &res : _results)
 		{
