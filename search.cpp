@@ -58,6 +58,8 @@
 const int Search::ONE_PLY;
 const int Search::ONE_PLY_SHIFT;
 
+std::mutex  Search::_mutex;
+
 class voteSystem
 {
 public:
@@ -425,21 +427,82 @@ rootMove Search::aspirationWindow( const int depth, Score alpha, Score beta, con
 
 }
 
-void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, bool masterThread)
+void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index,std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
 {
 	//_printRootMoveList();
+	rootMove& bestMove = temporaryResults[index];
 	
 	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
 	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size());
 
 	// ramdomly initialize the bestmove
+
 	bestMove = _rootMovesToBeSearched[0];
 	
 	do
 	{
 		_UOI->setDepth(depth);
 		_UOI->printDepth();
+
+		if( masterThread )
+		{
+			std::lock_guard<std::mutex> lock(_mutex);
+			sync_cout<<"------------------MASTER THREAD--------------------"<<std::endl;
+			std::cout<<"depth: "<<depth<<std::endl;
+
+			// get temporary results from all the threads
+			std::map<unsigned short, unsigned int> tempBestMoves;
+			for( auto& m: temporaryResults)
+			{
+				tempBestMoves[m.firstMove.getPacked()]++;
+			}
+
+			Move mostSearchedMove = Move(tempBestMoves.begin()->first);
+			unsigned int max = tempBestMoves.begin()->second;
+			for( const auto& m: tempBestMoves )
+			{
+				if( m.second > max)
+				{
+					max = m.second;
+					mostSearchedMove = Move(m.first);
+				}
+
+				std::cout<<displayUci(Move(m.first))<<":"<<m.second<<std::endl;
+			}
+
+			std::cout<<"Most Searched Move: "<<displayUci(mostSearchedMove)<<std::endl;
+
+			unsigned int threshold = uciParameters::threads * 0.75;
+			// and make some of search alternative moves
+			for( unsigned int i = 1; i < uciParameters::threads; ++i)
+			{
+
+				std::cout<<"threshold:" << threshold <<std::endl;
+				if( i >= threshold)
+				{
+					toBeExcludedMove[i] = mostSearchedMove;
+				}
+				else
+				{
+					toBeExcludedMove[i] = Move::NOMOVE;
+				}
+				std::cout<<"set excluded move for thread "<<i<<" "<<displayUci(toBeExcludedMove[i])<<std::endl;
+			}
+
+			std::cout<<sync_endl;
+		}
+		else
+		{
+			std::lock_guard<std::mutex> lock(_mutex);
+			sync_cout<<"------------------HELPER THREAD "<<index<<"--------------------"<<std::endl;
+			std::cout<<"depth: "<<depth<<std::endl;
+			// filter out some root move to search alternatives
+			std::cout<<"excluding from search "<<displayUci(toBeExcludedMove[index])<<std::endl;
+			_sd.story[0].excludeMove = toBeExcludedMove[index];
+			std::cout<<sync_endl;
+		}
+
 		//----------------------------
 		// iterative loop
 		//----------------------------
@@ -497,7 +560,6 @@ void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta, bool
 		{
 			thr.getTimeMan().notifyIterationHasBeenFinished();
 		}
-
 	}
 	while( ++depth <= (_sl.depth != -1 ? _sl.depth : 100) && !_stop);
 
@@ -563,24 +625,25 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	std::vector<std::thread> helperThread;
 	Move m(0);
 	rootMove rm(m);
-	std::vector<rootMove> helperResults( uciParameters::threads - 1, rm);
+	std::vector<rootMove> helperResults( uciParameters::threads, rm);
+	std::vector<Move> toBeExcludedMove( uciParameters::threads, Move::NOMOVE);
 
 	// launch helper threads
-	for( unsigned int i = 0; i < ( uciParameters::threads - 1); ++i)
+	for( unsigned int i = 1; i < ( uciParameters::threads); ++i)
 	{
 
 		helperResults[i].firstMove = m;
-		helperSearch[i].resetStopCondition();
-		helperSearch[i].pos = pos;
-		helperSearch[i]._pvLineToFollow = _pvLineToFollow;
-		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, false));
+		helperSearch[i-1].resetStopCondition();
+		helperSearch[i-1].pos = pos;
+		helperSearch[i-1]._pvLineToFollow = _pvLineToFollow;
+		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i-1], std::ref(helperResults), i, std::ref(toBeExcludedMove),depth, alpha, beta, false));
 	}
 
 	//----------------------------------
 	// iterative deepening loop
 	//----------------------------------
-	rootMove MainThreadMove(m);
-	idLoop(MainThreadMove, depth, alpha, beta, true);
+	helperResults[0].firstMove = m;
+	idLoop(helperResults, 0, toBeExcludedMove,depth, alpha, beta, true);
 	
 	// _stop helper threads
 	for(unsigned int i = 0; i< ( uciParameters::threads - 1); i++)
@@ -595,9 +658,7 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	// gather results
 	//----------------------------------
-	helperResults.push_back(MainThreadMove);
-	
-	const rootMove& bestMove = voteSystem(helperResults).getBestMove(true);
+	const rootMove& bestMove = voteSystem(helperResults).getBestMove();
 	
 	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 

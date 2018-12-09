@@ -19,6 +19,7 @@
 
 
 #include <list>
+#include <mutex>
 #include <vector>
 
 #include "command.h"
@@ -54,6 +55,7 @@ public:
 	bool operator<(const rootMove& m) const { return score > m.score; } // Ascending sort
 	bool operator==(const Move& m) const { return firstMove == m; }
 	bool operator==(const rootMove& m) const { return firstMove == m.firstMove; }
+	//Move toBeExcludedMove = Move::NOMOVE;
 
 	rootMove(const Move& m) : firstMove{m}
 	{
@@ -202,7 +204,7 @@ private:
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
 
 	rootMove aspirationWindow(const int depth, Score alpha, Score beta, const bool masterThread);
-	void idLoop(rootMove& bestMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false);
+	void idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false );
 
 	void setUOI( std::unique_ptr<UciOutput> UOI );
 	static Score futility(int depth, bool improving );
@@ -210,6 +212,8 @@ private:
 	
 	void _updateCounterMove( const Move& m );
 	//void _printRootMoveList() const;
+
+	static std::mutex _mutex;
 
 
 };
