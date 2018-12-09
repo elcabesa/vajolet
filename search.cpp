@@ -448,8 +448,8 @@ void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index,
 		if( masterThread )
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
-			sync_cout<<"------------------MASTER THREAD--------------------"<<std::endl;
-			std::cout<<"depth: "<<depth<<std::endl;
+			//sync_cout<<"------------------MASTER THREAD--------------------"<<std::endl;
+			//std::cout<<"depth: "<<depth<<std::endl;
 
 			// get temporary results from all the threads
 			std::map<unsigned short, unsigned int> tempBestMoves;
@@ -468,17 +468,17 @@ void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index,
 					mostSearchedMove = Move(m.first);
 				}
 
-				std::cout<<displayUci(Move(m.first))<<":"<<m.second<<std::endl;
+				//std::cout<<displayUci(Move(m.first))<<":"<<m.second<<std::endl;
 			}
 
-			std::cout<<"Most Searched Move: "<<displayUci(mostSearchedMove)<<std::endl;
+			//std::cout<<"Most Searched Move: "<<displayUci(mostSearchedMove)<<std::endl;
 
 			unsigned int threshold = uciParameters::threads * 0.75;
 			// and make some of search alternative moves
 			for( unsigned int i = 1; i < uciParameters::threads; ++i)
 			{
 
-				std::cout<<"threshold:" << threshold <<std::endl;
+				//std::cout<<"threshold:" << threshold <<std::endl;
 				if( i >= threshold)
 				{
 					toBeExcludedMove[i] = mostSearchedMove;
@@ -487,20 +487,20 @@ void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index,
 				{
 					toBeExcludedMove[i] = Move::NOMOVE;
 				}
-				std::cout<<"set excluded move for thread "<<i<<" "<<displayUci(toBeExcludedMove[i])<<std::endl;
+				//std::cout<<"set excluded move for thread "<<i<<" "<<displayUci(toBeExcludedMove[i])<<std::endl;
 			}
 
-			std::cout<<sync_endl;
+			//std::cout<<sync_endl;
 		}
 		else
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
-			sync_cout<<"------------------HELPER THREAD "<<index<<"--------------------"<<std::endl;
-			std::cout<<"depth: "<<depth<<std::endl;
+			//sync_cout<<"------------------HELPER THREAD "<<index<<"--------------------"<<std::endl;
+			//std::cout<<"depth: "<<depth<<std::endl;
 			// filter out some root move to search alternatives
-			std::cout<<"excluding from search "<<displayUci(toBeExcludedMove[index])<<std::endl;
+			//std::cout<<"excluding from search "<<displayUci(toBeExcludedMove[index])<<std::endl;
 			_sd.story[0].excludeMove = toBeExcludedMove[index];
-			std::cout<<sync_endl;
+			//std::cout<<sync_endl;
 		}
 
 		//----------------------------
