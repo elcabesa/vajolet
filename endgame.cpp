@@ -94,7 +94,10 @@ bool Position::evalKNPvsK(Score& res)
 
 }
 
-
+/**********************************************
+eval king Bishop and pawns vs lone king, 
+it looks drawish if all the pawns are on the edge of the board and the bishop is of the wrong color
+**********************************************/
 bool Position::evalKBPsvsK(Score& res)
 {
 	Color Pcolor = getBitmap(whitePawns) ? white : black;
