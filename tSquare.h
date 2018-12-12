@@ -93,6 +93,11 @@ inline tFile getFileOf( const tSquare s )
 	return FILES[s];
 }
 
+inline bool isLateralFile( const tFile f )
+{
+	return f == FILEA || f == FILEH;
+}
+
 inline tSquare getSquare( const tFile f, const tRank r)
 {
 	return tSquare(f + 8 * r);
@@ -103,6 +108,11 @@ inline Color getSquareColor( const tSquare sq )
 	extern Color SQUARE_COLOR[squareNumber];
 	return SQUARE_COLOR[sq];
 }
+
+inline tSquare getPromotionSquareOf( tSquare sq, Color c)
+{
+	return getSquare( getFileOf( sq ), ( c ? RANK1 : RANK8 ) );
+} 
 
 
 #endif

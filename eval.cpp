@@ -530,7 +530,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 			}
 		}
 
-		if(getFileOf( ppSq ) == FILEA || getFileOf( ppSq )== FILEH)
+		if( isLateralFile( getFileOf( ppSq ) ) )
 		{
 			passedPawnsBonus -= passedPawnFileAHPenalty;
 		}
@@ -548,7 +548,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 
 		if( st.getNonPawnValue()[ c ? 0 : 2 ] == 0 )
 		{
-			tSquare promotionSquare =  getSquare(getFileOf(ppSq),c ? RANK1 : RANK8);
+			tSquare promotionSquare = getPromotionSquareOf( ppSq, c );
 			if( std::min( 5, (int)(7- relativeRank)) <  std::max((int)distance( enemyKingSquare, promotionSquare ) - ( (c ? isBlackTurn() : isWhiteTurn() ) ? 0 : 1 ), 0) )
 			{
 				passedPawnsBonus += unstoppablePassed * rr;
