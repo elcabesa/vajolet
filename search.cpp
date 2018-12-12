@@ -660,27 +660,6 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	const rootMove& bestMove = voteSystem(helperResults).getBestMove();
 	
-	/*unsigned int i = 0;
-	int mult = 1;
-	for( auto &m: bestMove.PV )
-	{
-		//std::cout<<displayUci(m)<<std::endl;
-		pos.doMove(m);
-		mult *= -1;
-		++i;
-	}
-	sync_cout<<pos.getFen()<<sync_endl;
-	sync_cout<<bestMove.score<<sync_endl;
-	sync_cout<<mult * pos.eval<false>()<<sync_endl;
-	if( mult *pos.eval<false>() != bestMove.score && !pos.isDraw(true))
-	{
-		sync_cout<<"ARGHHHHHHHHHHHHHHHHHH"<<sync_endl;
-	}
-
-	for( unsigned int n = 0; n<i; ++n)
-	{
-		pos.undoMove();
-	}*/
 	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 
 }
@@ -1538,10 +1517,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		
 
 	}
-	/*if(PVnode )
-	{
-		std::cout<<"ply: "<<ply<<" returnScore: "<<bestScore<<std::endl;
-	}*/
 	return bestScore;
 
 }
@@ -1549,13 +1524,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
-
-	/*bool verbose = false;
-	if( pos.getFen() == "r2qkbnr/pp2pppp/2n5/3pP3/3p2b1/2P2N2/PP3PPP/RNBQKB1R w KQkq - 0 6")
-	{
-		verbose = true;
-		sync_cout<<"ECCOMI"<<sync_endl;
-	}*/
 
 	assert(ply>0);
 	assert(depth<ONE_PLY);
@@ -1644,10 +1612,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 #endif
 
 
-	/*if( verbose )
-	{
-		std::cout<<"static eval "<<staticEval<<std::endl;
-	}*/
 	//----------------------------
 	//	stand pat score
 	//----------------------------
@@ -1665,10 +1629,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 					|| (tte->isTypeGoodForAlphaCutoff() && (ttValue < staticEval) )
 			)
 			{
-				/*if( verbose )
-				{
-					std::cout<<"uso ttValue "<< ttValue<<std::endl;
-				}*/
 				bestScore = ttValue;
 			}
 		}
@@ -1799,11 +1759,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			}
 
 		}
-
-		/*if( verbose )
-		{
-			std::cout<<"trying move"<< displayUci(m)<<std::endl;
-		}*/
 		pos.doMove(m);
 		Score val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
 
@@ -1860,12 +1815,6 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	{
 		transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove.getPacked(), staticEval);
 	}
-
-	/*if(PVnode )
-	{
-		std::cout<<"qply: "<<ply<<" returnScore: "<<bestScore<<std::endl;
-	}*/
-
 	return bestScore;
 
 }
