@@ -688,6 +688,27 @@ inline bool Search::_MateDistancePruning( const unsigned int ply, Score& alpha, 
 	}
 	return false;
 }
+void Search::_appendTTmoveIfLegal( const Move& ttm, PVline& pvLine ) const
+{
+	if( pos.isMoveLegal(ttm) )
+	{
+		pvLine.appendNewMove( ttm );
+	}
+	else
+	{
+		pvLine.clear();
+	}
+}
+
+inline bool Search::_canUseTTeValue( const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte ) const
+{
+	return 	ttValue != SCORE_NONE // Only in case of TT access race
+			&& ( PVnode ?  false
+					: ttValue >= beta ? 
+						tte->isTypeGoodForBetaCutoff():
+						tte->isTypeGoodForAlphaCutoff() 
+			);
+}
 
 template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
@@ -744,12 +765,15 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 	if (	type != Search::nodeType::ROOT_NODE
 			&& tte->getDepth() >= (depth +1 - ONE_PLY)
-		    && ttValue != SCORE_NONE // Only in case of TT access race
-		    && (	PVnode ?  false
-		            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
-		                              : tte->isTypeGoodForAlphaCutoff()))
+			&& _canUseTTeValue( PVnode, beta, ttValue, tte )
+		)
 	{
 		transpositionTable::getInstance().refresh(*tte);
+		
+		if constexpr (PVnode)
+		{
+			_appendTTmoveIfLegal( ttMove, pvLine);
+		}
 
 		//save killers
 		if (ttValue >= beta
@@ -759,19 +783,6 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		{
 			_sd.saveKillers(ply, ttMove);
 			_updateCounterMove( ttMove );
-		}
-		
-
-		if constexpr (PVnode)
-		{
-			if(pos.isMoveLegal(ttMove))
-			{
-				pvLine.appendNewMove( ttMove );
-			}
-			else
-			{
-				pvLine.clear();
-			}
 		}
 		return ttValue;
 	}
@@ -1528,12 +1539,17 @@ inline void Search::_updateNodeStatistics(const unsigned int ply)
 
 template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
+	//---------------------------------------
+	//	node asserts
+	//---------------------------------------
 	assert(ply>0);
 	assert(depth<ONE_PLY);
 	assert(alpha<beta);
 	assert(beta<=SCORE_INFINITE);
 	assert(alpha>=-SCORE_INFINITE);
-
+	//---------------------------------------
+	//	initialize constants
+	//---------------------------------------
 	const bool PVnode = (type == Search::nodeType::PV_NODE);
 	assert( PVnode || alpha + 1 == beta );
 
@@ -1559,30 +1575,22 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			Search::nodeType::PV_NODE;
 
 
-	ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
+	ttEntry* const tte = transpositionTable::getInstance().probe( pos.getKey() );
 	Move ttMove( tte->getPackedMove() );
 
 	MovePicker mp(pos, _sd, ply, ttMove);
+	
 	int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(),ply);
 	if (tte->getDepth() >= TTdepth
 	    && ttValue != SCORE_NONE // Only in case of TT access race
-	    && (	PVnode ?  false
-	            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
-	                              : tte->isTypeGoodForAlphaCutoff()))
+	    && _canUseTTeValue( PVnode, beta, ttValue, tte )
+	)
 	{
 		transpositionTable::getInstance().refresh(*tte);
-
 		if constexpr (PVnode)
 		{
-			if(pos.isMoveLegal(ttMove))
-			{
-				pvLine.appendNewMove(ttMove);
-			}
-			else
-			{
-				pvLine.clear();
-			}
+			_appendTTmoveIfLegal( ttMove, pvLine);
 		}
 		return ttValue;
 	}

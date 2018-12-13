@@ -29,7 +29,7 @@
 #include "searchLimits.h"
 #include "searchTimer.h"
 
-
+class ttEntry;
 
 class startThinkResult
 {
@@ -218,6 +218,8 @@ private:
 	bool _manageDraw(const bool PVnode, PVline& pvLine);
 	void _showCurrenLine( const unsigned int ply, const int depth );
 	bool _MateDistancePruning( const unsigned int ply, Score& alpha, Score& beta) const;
+	void _appendTTmoveIfLegal(  const Move& ttm, PVline& pvLine ) const;
+	bool _canUseTTeValue( const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte ) const;
 
 	static std::mutex _mutex;
 
