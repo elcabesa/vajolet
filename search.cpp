@@ -378,7 +378,6 @@ rootMove Search::aspirationWindow( const int depth, Score alpha, Score beta, con
 
 			if (res <= alpha)
 			{
-
 				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound);
 
 				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
@@ -388,11 +387,9 @@ rootMove Search::aspirationWindow( const int depth, Score alpha, Score beta, con
 				{
 					tm.notifyFailLow();
 				}
-
 			}
 			else if (res >= beta)
 			{
-
 				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound);
 
 				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
@@ -414,20 +411,63 @@ rootMove Search::aspirationWindow( const int depth, Score alpha, Score beta, con
 				return bestMove;
 				break;
 			}
-
-
+			
 			delta += delta / 2;
 		}
-
-
-
-	}while(!_stop);
+	}
+	while(!_stop);
 
 	return bestMove;
 
 }
 
-void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index,std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
+void Search::excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread )
+{
+	if( masterThread )
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+
+		// get temporary results from all the threads
+		std::map<unsigned short, unsigned int> tempBestMoves;
+		for( auto& m: temporaryResults)
+		{
+			tempBestMoves[m.firstMove.getPacked()]++;
+		}
+
+		Move mostSearchedMove = Move(tempBestMoves.begin()->first);
+		unsigned int max = tempBestMoves.begin()->second;
+		for( const auto& m: tempBestMoves )
+		{
+			if( m.second > max)
+			{
+				max = m.second;
+				mostSearchedMove = Move(m.first);
+			}
+		}
+
+		unsigned int threshold = uciParameters::threads * 0.75;
+		// and make some of search alternative moves
+		for( unsigned int i = 1; i < uciParameters::threads; ++i)
+		{
+			if( i >= threshold)
+			{
+				toBeExcludedMove[i] = mostSearchedMove;
+			}
+			else
+			{
+				toBeExcludedMove[i] = Move::NOMOVE;
+			}
+		}
+	}
+	else
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		// filter out some root move to search alternatives
+		_sd.story[0].excludeMove = toBeExcludedMove[index];
+	}
+}
+
+void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
 {
 	//_printRootMoveList();
 	rootMove& bestMove = temporaryResults[index];
@@ -437,7 +477,6 @@ void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index,
 	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size());
 
 	// ramdomly initialize the bestmove
-
 	bestMove = _rootMovesToBeSearched[0];
 	
 	do
@@ -445,68 +484,14 @@ void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index,
 		_UOI->setDepth(depth);
 		_UOI->printDepth();
 
-		if( masterThread )
-		{
-			std::lock_guard<std::mutex> lock(_mutex);
-			//sync_cout<<"------------------MASTER THREAD--------------------"<<std::endl;
-			//std::cout<<"depth: "<<depth<<std::endl;
-
-			// get temporary results from all the threads
-			std::map<unsigned short, unsigned int> tempBestMoves;
-			for( auto& m: temporaryResults)
-			{
-				tempBestMoves[m.firstMove.getPacked()]++;
-			}
-
-			Move mostSearchedMove = Move(tempBestMoves.begin()->first);
-			unsigned int max = tempBestMoves.begin()->second;
-			for( const auto& m: tempBestMoves )
-			{
-				if( m.second > max)
-				{
-					max = m.second;
-					mostSearchedMove = Move(m.first);
-				}
-
-				//std::cout<<displayUci(Move(m.first))<<":"<<m.second<<std::endl;
-			}
-
-			//std::cout<<"Most Searched Move: "<<displayUci(mostSearchedMove)<<std::endl;
-
-			unsigned int threshold = uciParameters::threads * 0.75;
-			// and make some of search alternative moves
-			for( unsigned int i = 1; i < uciParameters::threads; ++i)
-			{
-
-				//std::cout<<"threshold:" << threshold <<std::endl;
-				if( i >= threshold)
-				{
-					toBeExcludedMove[i] = mostSearchedMove;
-				}
-				else
-				{
-					toBeExcludedMove[i] = Move::NOMOVE;
-				}
-				//std::cout<<"set excluded move for thread "<<i<<" "<<displayUci(toBeExcludedMove[i])<<std::endl;
-			}
-
-			//std::cout<<sync_endl;
-		}
-		else
-		{
-			std::lock_guard<std::mutex> lock(_mutex);
-			//sync_cout<<"------------------HELPER THREAD "<<index<<"--------------------"<<std::endl;
-			//std::cout<<"depth: "<<depth<<std::endl;
-			// filter out some root move to search alternatives
-			//std::cout<<"excluding from search "<<displayUci(toBeExcludedMove[index])<<std::endl;
-			_sd.story[0].excludeMove = toBeExcludedMove[index];
-			//std::cout<<sync_endl;
-		}
+		//----------------------------
+		// exclude root moves in multithread search
+		//----------------------------
+		excludeRootMoves(temporaryResults, index, toBeExcludedMove, masterThread);
 
 		//----------------------------
 		// iterative loop
 		//----------------------------
-
 		const auto previousIterationResults = _multiPVresult;
 
 		_multiPVresult.clear();
@@ -554,7 +539,6 @@ void Search::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index,
 				_UOI->printPVs( _multiPVresult );
 			}
 		}
-
 
 		if( masterThread )
 		{
@@ -680,15 +664,15 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	assert(beta<=SCORE_INFINITE);
 	assert(depth>=ONE_PLY);
 
-	++_visitedNodes;
-	_maxPlyReached = std::max(ply, _maxPlyReached);
-	_sd.clearKillers(ply+1);
+
 
 	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
+
 	const bool inCheck = pos.isInCheck();
-	bool improving = false;
 	_sd.story[ply].inCheck = inCheck;
-	//Move threatMove(Move::NOMOVE);
+
+	_updateNodeStatistics(ply);
+	_sd.clearKillers(ply+1);
 
 
 	//--------------------------------------
@@ -925,6 +909,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	
 	_sd.story[ply].staticEval = staticEval;
 	
+	bool improving = false;
 	if( ply <2 || inCheck || ( ply >=2 && _sd.story[ply-2].inCheck ) || ( ply >=2 && _sd.story[ply].staticEval >= _sd.story[ply-2].staticEval ) )
 	{
 		improving = true;
@@ -1521,10 +1506,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 }
 
+inline void Search::_updateNodeStatistics(const unsigned int ply)
+{
+	_maxPlyReached = std::max(ply, _maxPlyReached);
+	++_visitedNodes;
+}
 
 template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
-
 	assert(ply>0);
 	assert(depth<ONE_PLY);
 	assert(alpha<beta);
@@ -1532,15 +1521,12 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	assert(alpha>=-SCORE_INFINITE);
 
 	const bool PVnode = (type == Search::nodeType::PV_NODE);
-	assert(PVnode || alpha+1==beta);
+	assert( PVnode || alpha + 1 == beta );
 
 	bool inCheck = pos.isInCheck();
 	_sd.story[ply].inCheck = inCheck;
 
-	_maxPlyReached = std::max(ply, _maxPlyReached);
-	++_visitedNodes;
-
-
+	_updateNodeStatistics(ply);
 
 	if(pos.isDraw(PVnode) || _stop)
 	{

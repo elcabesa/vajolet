@@ -204,6 +204,7 @@ private:
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
 
 	rootMove aspirationWindow(const int depth, Score alpha, Score beta, const bool masterThread);
+	void excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread);
 	void idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false );
 
 	void setUOI( std::unique_ptr<UciOutput> UOI );
@@ -211,6 +212,7 @@ private:
 	Score getDrawValue() const;
 	
 	void _updateCounterMove( const Move& m );
+	void _updateNodeStatistics(const unsigned int ply);
 	//void _printRootMoveList() const;
 
 	static std::mutex _mutex;
