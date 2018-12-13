@@ -678,6 +678,17 @@ void Search::_showCurrenLine( const unsigned int ply, const int depth )
 	}
 }
 
+inline bool Search::_MateDistancePruning( const unsigned int ply, Score& alpha, Score& beta) const
+{
+	alpha = std::max(matedIn(ply), alpha);
+	beta = std::min(mateIn(ply+1), beta);
+	if (alpha >= beta)
+	{
+		return true;
+	}
+	return false;
+}
+
 template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
 	//--------------------------------------
@@ -718,17 +729,10 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		//---------------------------------------
 		//	MATE DISTANCE PRUNING
 		//---------------------------------------
-		alpha = std::max(matedIn(ply), alpha);
-		beta = std::min(mateIn(ply+1), beta);
-		if (alpha >= beta)
-		{
-			return alpha;
-		}
-
+		if( _MateDistancePruning( ply, alpha, beta) ) return alpha;
 	}
 
 	const Move& excludedMove = _sd.story[ply].excludeMove;
-
 	const HashKey& posKey = excludedMove ? pos.getExclusionKey() : pos.getKey();
 
 	//--------------------------------------
@@ -1542,10 +1546,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	//---------------------------------------
 	//	MATE DISTANCE PRUNING
 	//---------------------------------------
-	//
-	//alpha = std::max(matedIn(ply), alpha);
-	//beta = std::min(mateIn(ply+1), beta);
-
+	//if( _MateDistancePruning( ply, alpha, beta) ) return alpha;
 
 	//----------------------------
 	//	next node type

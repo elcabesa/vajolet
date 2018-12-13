@@ -217,6 +217,7 @@ private:
 	
 	bool _manageDraw(const bool PVnode, PVline& pvLine);
 	void _showCurrenLine( const unsigned int ply, const int depth );
+	bool _MateDistancePruning( const unsigned int ply, Score& alpha, Score& beta) const;
 
 	static std::mutex _mutex;
 
