@@ -214,6 +214,9 @@ private:
 	void _updateCounterMove( const Move& m );
 	void _updateNodeStatistics(const unsigned int ply);
 	//void _printRootMoveList() const;
+	
+	bool _manageDraw(const bool PVnode, PVline& pvLine);
+	void _showCurrenLine( const unsigned int ply, const int depth );
 
 	static std::mutex _mutex;
 

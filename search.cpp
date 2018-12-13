@@ -656,56 +656,65 @@ inline void Search::_updateCounterMove(const Move& m)
 	}
 }
 
-template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
+bool Search::_manageDraw(const bool PVnode, PVline& pvLine)
 {
+	if(pos.isDraw(PVnode) || _stop)
+	{
+		if(PVnode)
+		{
+			pvLine.clear();
+		}
+		return true;
+	}
+	return false;
+}
 
-	assert(alpha <beta);
-	assert(alpha>=-SCORE_INFINITE);
-	assert(beta<=SCORE_INFINITE);
-	assert(depth>=ONE_PLY);
-
-
-
-	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
-
-	const bool inCheck = pos.isInCheck();
-	_sd.story[ply].inCheck = inCheck;
-
-	_updateNodeStatistics(ply);
-	_sd.clearKillers(ply+1);
-
-
-	//--------------------------------------
-	// show current line if needed
-	//--------------------------------------
+void Search::_showCurrenLine( const unsigned int ply, const int depth )
+{
 	if( _showLine && depth <= ONE_PLY)
 	{
 		_showLine = false;
 		_UOI->showCurrLine(pos,ply);
 	}
+}
 
+template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
+{
+	//--------------------------------------
+	// node asserts
+	//--------------------------------------
+	assert(alpha <beta);
+	assert(alpha>=-SCORE_INFINITE);
+	assert(beta<=SCORE_INFINITE);
+	assert(depth>=ONE_PLY);
+
+	//--------------------------------------
+	// initialize node constants
+	//--------------------------------------
+	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
+	const bool inCheck = pos.isInCheck();
+	_sd.story[ply].inCheck = inCheck;
+
+	_updateNodeStatistics(ply);
+	_sd.clearKillers(ply+1);
+	//--------------------------------------
+	// show current line if needed
+	//--------------------------------------
+	_showCurrenLine( ply, depth );
 	//--------------------------------------
 	// choose node type
 	//--------------------------------------
-
 	const Search::nodeType childNodesType =
-			type == Search::nodeType::ALL_NODE ?
-					Search::nodeType::CUT_NODE :
-					type == Search::nodeType::CUT_NODE ? Search::nodeType::ALL_NODE : Search::nodeType::PV_NODE;
-					
+		type == Search::nodeType::ALL_NODE ?
+			Search::nodeType::CUT_NODE :
+		type == Search::nodeType::CUT_NODE ? 
+			Search::nodeType::ALL_NODE :
+			Search::nodeType::PV_NODE;			
 	(void)childNodesType;	// to suppress warning in root node and PV nodes
 
 	if(type != Search::nodeType::ROOT_NODE )
 	{
-		if(pos.isDraw(PVnode) || _stop)
-		{
-			if constexpr (PVnode)
-			{
-				pvLine.clear();
-			}
-			return getDrawValue();
-		}
-
+		if( _manageDraw( PVnode, pvLine) ) return getDrawValue();
 		//---------------------------------------
 		//	MATE DISTANCE PRUNING
 		//---------------------------------------
@@ -1512,6 +1521,7 @@ inline void Search::_updateNodeStatistics(const unsigned int ply)
 	++_visitedNodes;
 }
 
+
 template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
 	assert(ply>0);
@@ -1528,15 +1538,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 	_updateNodeStatistics(ply);
 
-	if(pos.isDraw(PVnode) || _stop)
-	{
-
-		if constexpr (PVnode)
-		{
-			pvLine.clear();
-		}
-		return getDrawValue();
-	}
+	if( _manageDraw( PVnode, pvLine) ) return getDrawValue();
 	//---------------------------------------
 	//	MATE DISTANCE PRUNING
 	//---------------------------------------
@@ -1549,10 +1551,11 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 	//	next node type
 	//----------------------------
 	const Search::nodeType childNodesType =
-		type == Search::nodeType::ALL_NODE?
-			Search::nodeType::CUT_NODE:
-			type == Search::nodeType::CUT_NODE ? Search::nodeType::ALL_NODE:
-				Search::nodeType::PV_NODE;
+		type == Search::nodeType::ALL_NODE ?
+			Search::nodeType::CUT_NODE :
+		type == Search::nodeType::CUT_NODE ? 
+			Search::nodeType::ALL_NODE :
+			Search::nodeType::PV_NODE;
 
 
 	ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
