@@ -27,6 +27,7 @@
 #include "vajolet.h"
 
 class HashKey;
+class Move;
 
 enum ttType
 {
@@ -145,7 +146,7 @@ public:
 
 	ttEntry* probe(const HashKey& k);
 
-	void store(const HashKey& k, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue);
+	void store(const HashKey& k, Score value, unsigned char type, signed short int depth, const Move& move, Score statValue);
 	
 	
 

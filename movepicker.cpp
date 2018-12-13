@@ -265,7 +265,7 @@ bool MovePicker::isKillerMove(Move &m) const
 	return m == _killerMoves[0] || m == _killerMoves[1];
 }
 
-int MovePicker::setupQuiescentSearch( const bool inCheck, const int depth )
+short int MovePicker::setupQuiescentSearch( const bool inCheck, const int depth )
 {
 	if( inCheck)
 	{

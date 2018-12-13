@@ -304,6 +304,11 @@ public:
 		return false;
 	}
 	
+	inline bool hasActivePlayerNonPawnMaterial() const
+	{
+		return getActualStateConst().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= Position::pieceValue[whiteKnights][0];
+	}
+
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------

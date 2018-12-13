@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "hashKey.h"
+#include "move.h"
 #include "transposition.h"
 #include "vajolet.h"
 
@@ -63,7 +64,7 @@ ttEntry* transpositionTable::probe( const HashKey& k )
 }
 
 
-void transpositionTable::store(const HashKey& k, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
+void transpositionTable::store(const HashKey& k, Score value, unsigned char type, signed short int depth, const Move& move, Score statValue)
 {
 
 	const auto key = k.getKey();
@@ -98,7 +99,7 @@ void transpositionTable::store(const HashKey& k, Score value, unsigned char type
 		}
 	}
 	assert(candidate != nullptr);
-	candidate->save(keyH, value, type, depth, move, statValue, generation);
+	candidate->save(keyH, value, type, depth, move.getPacked(), statValue, generation);
 
 }
 void transpositionTable::clear()
@@ -110,7 +111,7 @@ void transpositionTable::clear()
 
 void PerftTranspositionTable::store(const HashKey& key, signed short int depth, unsigned long long v)
 {
-	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, 0, (v>>23)&0x7FFFFF);
+	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, Move::NOMOVE, (v>>23)&0x7FFFFF);
 }
 
 bool PerftTranspositionTable::retrieve(const HashKey& key, unsigned int depth, unsigned long long& res)

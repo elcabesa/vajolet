@@ -36,7 +36,7 @@ public:
 	//--------------------------------------------------------
 	MovePicker(const Position & p, const SearchData& sd = _defaultSearchData, unsigned int ply = 0, const Move & ttm = Move::NOMOVE);
 	// todo transform them into constructor? create base class and derived?
-	int setupQuiescentSearch( const bool inCheck, const int depth );
+	short int setupQuiescentSearch( const bool inCheck, const int depth );
 	void setupProbCutSearch( const bitboardIndex capturePiece );
 	
 	//--------------------------------------------------------

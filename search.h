@@ -28,8 +28,8 @@
 #include "pvLine.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
+#include "transposition.h"
 
-class ttEntry;
 
 class startThinkResult
 {
@@ -219,7 +219,11 @@ private:
 	void _showCurrenLine( const unsigned int ply, const int depth );
 	bool _MateDistancePruning( const unsigned int ply, Score& alpha, Score& beta) const;
 	void _appendTTmoveIfLegal(  const Move& ttm, PVline& pvLine ) const;
-	bool _canUseTTeValue( const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte ) const;
+	bool _canUseTTeValue( const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte, short int depth ) const;
+	const HashKey _getSearchKey( const bool excludedMove = false ) const;
+
+	using tableBaseRes = struct{ ttType TTtype; Score value;};
+	tableBaseRes _checkTablebase( const unsigned int ply, const int depth );
 
 	static std::mutex _mutex;
 
