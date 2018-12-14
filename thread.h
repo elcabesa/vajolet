@@ -28,39 +28,13 @@
 
 class Position;
 
-class Game
-{
-public:
-	struct GamePosition
-	{
-		HashKey key;
-		Move m;
-		PVline PV;
-		Score alpha;
-		Score beta;
-		unsigned int depth;
-	};
-
-	void CreateNewGame();
-	void insertNewMoves(Position &pos);
-	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
-	void printGamesInfo();
-
-	bool isNewGame(const Position &pos) const;
-	bool isPonderRight() const;
-	GamePosition getNewSearchParameters() const;
-
-private:
-	std::vector<GamePosition> _positions;
-public:
-
-};
-
 class my_thread
 {
 private:
 	my_thread();
 	~my_thread();
+	//my_thread(my_thread&&);
+	//my_thread& operator=(my_thread&&);
 
 	static my_thread * pInstance;
 	static std::mutex _mutex;
@@ -68,7 +42,6 @@ private:
 	SearchLimits _limits; // todo limits belong to threads
 	SearchTimer _st;
 	Search _src;
-	Game _game;
 	timeManagement _timeMan;
 
 	std::unique_ptr<UciOutput> _UOI;
@@ -90,10 +63,6 @@ private:
 
 	void _timerThread();
 	void _searchThread();
-	void _manageNewSearch();
-	Move _getPonderMoveFromHash( const Move bestMove );
-	Move _getPonderMoveFromBook( const Move bookMove );
-	void _waitStopPondering() const;
 	void _printTimeDependentOutput( long long int time );
 
 
@@ -102,17 +71,13 @@ public :
 
 	static my_thread& getInstance()
 	{
+
+		std::lock_guard<std::mutex> lock(_mutex);
 		if (!pInstance)
 		{
-			std::lock_guard<std::mutex> lock(_mutex);
-
-			if (!pInstance)
-			{
-				my_thread * temp = new my_thread;
-			    pInstance = temp;
-			}
+			my_thread * temp = new my_thread;
+			pInstance = temp;
 		}
-
 		return *pInstance;
 	}
 

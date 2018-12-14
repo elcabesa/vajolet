@@ -21,6 +21,7 @@
 
 
 #include "bitops.h"
+#include "book.h"
 #include "command.h"
 #include "history.h"
 #include "io.h"
@@ -1918,5 +1919,238 @@ inline void SearchData::saveKillers(unsigned int ply, Move& m)
 		tempKillers[1] = tempKillers[0];
 		tempKillers[0] = m;
 	}
+
+}
+
+
+
+void Game::CreateNewGame(void)
+{
+	_positions.clear();
+}
+
+void Game::insertNewMoves(Position &pos)
+{
+	unsigned int actualPosition = _positions.size();
+	for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
+	{
+		GamePosition p;
+		p.key = pos.getState(i).getKey();
+		p.m = pos.getState(i).getCurrentMove();
+		_positions.push_back(p);
+	}
+}
+
+void Game::savePV(PVline PV,unsigned int depth, Score alpha, Score beta)
+{
+	_positions.back().PV = PV;
+	_positions.back().depth = depth;
+	_positions.back().alpha = alpha;
+	_positions.back().beta = beta;
+}
+
+
+void Game::printGamesInfo()
+{
+	for(auto p : _positions)
+	{
+		if( p.m )
+		{
+			std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
+			for( auto m : p.PV )
+			{
+				std::cout<<displayUci(m)<<" ";
+			}
+
+		}
+		std::cout<<std::endl;
+	}
+
+}
+
+bool Game::isNewGame(const Position &pos) const
+{
+	if( _positions.size() == 0 || pos.getStateSize() < _positions.size())
+	{
+		//printGamesInfo();
+		return true;
+	}
+
+	unsigned int n = 0;
+	for(auto p : _positions)
+	{
+		if(pos.getState(n).getKey() != p.key)
+		{
+			//printGamesInfo();
+			return true;
+		}
+		n++;
+
+	}
+	return false;
+}
+
+bool Game::isPonderRight() const
+{
+	if( _positions.size() > 2)
+	{
+		GamePosition previous =*(_positions.end()-3);
+		if(previous.PV.size()>=1 && previous.PV.getMove(1) == _positions.back().m)
+		{
+			return true;
+		}
+
+	}
+	return false;
+}
+
+Game::GamePosition Game::getNewSearchParameters() const
+{
+	GamePosition previous =*(_positions.end()-3);
+	return previous;
+}
+
+
+Move Search::_getPonderMoveFromHash(const Move bestMove )
+{
+	Move ponderMove(0);
+	pos.doMove( bestMove );
+	
+	const ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
+	
+	Move m( tte->getPackedMove() );
+	if( pos.isMoveLegal(m) )
+	{
+		ponderMove = m;
+	}
+	pos.undoMove();
+	
+	return ponderMove;
+}
+
+Move Search::_getPonderMoveFromBook(const Move bookMove )
+{
+	Move ponderMove(0);
+	pos.doMove( bookMove );
+	PolyglotBook pol;
+	Move m = pol.probe( pos, uciParameters::bestMoveBook);
+	
+	if( pos.isMoveLegal(m) )
+	{
+		ponderMove = m;
+	}
+	pos.undoMove();
+	
+	return ponderMove;
+}
+
+void Search::_waitStopPondering() const
+{
+	while(_sl.ponder){}
+}
+
+void Search::manageNewSearch()
+{
+
+
+	/*************************************************
+	 *	first of all check the number of legal moves
+	 *	if there is only 1 moves do it
+	 *	if there is 0 legal moves return null move
+	 *************************************************/
+
+	if( _game.isNewGame(pos))
+	{
+		_game.CreateNewGame();
+
+	}
+	_game.insertNewMoves(pos);
+
+	unsigned int legalMoves = pos.getNumberOfLegalMoves();
+
+	if(legalMoves == 0)
+	{
+		_UOI->printPV( Move::NOMOVE );
+		
+		_waitStopPondering();
+
+		_UOI->printBestMove( Move::NOMOVE );
+
+		return;
+	}
+	
+	if( legalMoves == 1 && !_sl.infinite )
+	{
+		Move bestMove = MovePicker( pos ).getNextMove();
+		
+		_UOI->printPV(bestMove);
+		
+		_waitStopPondering();
+		
+		Move ponderMove = _getPonderMoveFromHash( bestMove );
+		
+		_UOI->printBestMove( bestMove, ponderMove );
+
+		return;
+
+	}
+
+	//----------------------------------------------
+	//	book probing
+	//----------------------------------------------
+	if( uciParameters::useOwnBook && !_sl.infinite )
+	{
+		PolyglotBook pol;
+		Move bookM = pol.probe( pos, uciParameters::bestMoveBook);
+		if( bookM )
+		{
+			_UOI->printPV(bookM);
+			
+			_waitStopPondering();
+			
+			Move ponderMove = _getPonderMoveFromBook( bookM );
+			
+			_UOI->printBestMove(bookM, ponderMove);
+			
+			return;
+		}
+	}
+	
+	//if( game.isPonderRight() )
+	//{
+	//	Game::GamePosition gp = game.getNewSearchParameters();
+	//
+	//	PVline newPV;
+	//	std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
+	//	
+	//	newPV.resize(gp.depth/2 + 1);
+	//	newPV.pop_front();
+	//	newPV.pop_front();
+	//	res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
+	//}
+	//else
+	
+	startThinkResult res = startThinking( );
+	
+	PVline PV = res.PV;
+
+	_waitStopPondering();
+
+	//-----------------------------
+	// print out the choosen line
+	//-----------------------------
+
+	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime());
+	
+	Move bestMove = PV.getMove(0);
+	Move ponderMove = PV.getMove(1);
+	if( !ponderMove )
+	{
+		ponderMove = _getPonderMoveFromHash( bestMove );
+	}
+	
+	_UOI->printBestMove( bestMove, ponderMove );
+
+	_game.savePV(PV, res.depth, res.alpha, res.beta);
 
 }

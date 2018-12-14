@@ -31,6 +31,34 @@
 #include "transposition.h"
 
 
+class Game
+{
+public:
+	struct GamePosition
+	{
+		HashKey key;
+		Move m;
+		PVline PV;
+		Score alpha;
+		Score beta;
+		unsigned int depth;
+	};
+
+	void CreateNewGame();
+	void insertNewMoves(Position &pos);
+	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
+	void printGamesInfo();
+
+	bool isNewGame(const Position &pos) const;
+	bool isPonderRight() const;
+	GamePosition getNewSearchParameters() const;
+
+private:
+	std::vector<GamePosition> _positions;
+public:
+
+};
+
 class startThinkResult
 {
 public:
@@ -111,8 +139,6 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-public:
-
 	Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st){}
 	Search( const Search& other ):_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMovesToBeSearched(other._rootMovesToBeSearched){ /* todo fare la copia*/}
 	Search& operator=(const Search& other)
@@ -133,6 +159,7 @@ public:
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 	void showLine(){ _showLine= true;}
+	void manageNewSearch();
 
 private:
 	//--------------------------------------------------------
@@ -226,6 +253,13 @@ private:
 	tableBaseRes _checkTablebase( const unsigned int ply, const int depth );
 
 	static std::mutex _mutex;
+	
+	Game _game;
+	
+	
+	Move _getPonderMoveFromHash( const Move bestMove );
+	Move _getPonderMoveFromBook( const Move bookMove );
+	void _waitStopPondering() const;
 
 
 };
