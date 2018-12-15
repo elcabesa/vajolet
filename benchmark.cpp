@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "io.h"
+#include "position.h"
 #include "search.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
@@ -74,7 +75,7 @@ void benchmark(void)
 	{
 		++i;
 		
-		src.pos.setupFromFen( pos );
+		src.getPosition().setupFromFen( pos );
 		
 		sync_cout << "Position: " << i << '/' << positions.size() << sync_endl;
 		

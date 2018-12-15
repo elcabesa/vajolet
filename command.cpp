@@ -28,6 +28,8 @@
 #include "parameters.h"
 #include "position.h"
 #include "pvLine.h"
+#include "searchTimer.h"
+#include "searchLimits.h"
 #include "syzygy/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"

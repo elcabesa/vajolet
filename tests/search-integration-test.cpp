@@ -2,6 +2,8 @@
 #include "gtest/gtest.h"
 #include "./../position.h"
 #include "./../search.h"
+#include "./../searchLimits.h"
+#include "./../searchTimer.h"
 #include "./../transposition.h"
 
 
@@ -63,7 +65,7 @@ TEST(search, search) {
 
 	for (auto & p : _p)
 	{
-		src.pos.setupFromFen(p.Fen);
+		src.getPosition().setupFromFen(p.Fen);
 		sl.depth = p.depth;
 		auto res = src.startThinking();
 		if( p.bm != Move::NOMOVE)

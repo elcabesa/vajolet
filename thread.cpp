@@ -23,6 +23,7 @@
 #include "searchTimer.h"
 #include "timeManagement.h"
 #include "thread.h"
+#include "transposition.h"
 #include "uciParameters.h"
 
 
@@ -142,7 +143,7 @@ void my_thread::impl::_searchThread()
 		if(!_quit)
 		{
 			_limits.checkInfiniteSearch();
-			_timeMan.initNewSearch( _src.pos.getNextTurn() );
+			_timeMan.initNewSearch( _src.getPosition().getNextTurn() );
 			_src.resetStopCondition();
 			_st.resetStartTimers();
 			_timerCond.notify_one();
@@ -180,7 +181,7 @@ inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 	{
 		std::lock_guard<std::mutex> lk(_searchMutex);
 		_limits = l;
-		_src.pos = p;
+		_src.getPosition() = p;
 		_startThink = true;
 		_searchCond.notify_one();
 	}

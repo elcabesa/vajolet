@@ -17,48 +17,19 @@
 #ifndef SEARCH_H_
 #define SEARCH_H_
 
-
-#include <list>
-#include <mutex>
-#include <vector>
+#include <memory>
 
 #include "command.h"
+
 #include "history.h"
-#include "position.h"
 #include "pvLine.h"
-#include "searchLimits.h"
-#include "searchTimer.h"
-#include "transposition.h"
+#include "score.h"
 
+class Position;
+class SearchTimer;
+class SearchLimits;
 
-class Game
-{
-public:
-	struct GamePosition
-	{
-		HashKey key;
-		Move m;
-		PVline PV;
-		Score alpha;
-		Score beta;
-		unsigned int depth;
-	};
-
-	void CreateNewGame();
-	void insertNewMoves(Position &pos);
-	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
-	void printGamesInfo();
-
-	bool isNewGame(const Position &pos) const;
-	bool isPonderRight() const;
-	GamePosition getNewSearchParameters() const;
-
-private:
-	std::vector<GamePosition> _positions;
-public:
-
-};
-
+// may be moved to another file.. used by search and benchmark
 class startThinkResult
 {
 public:
@@ -70,6 +41,7 @@ public:
 	startThinkResult( Score Alpha, Score Beta, unsigned int Depth, PVline pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
 };
 
+// may be moved to another file.. used by search and command to print
 class rootMove
 {
 public:
@@ -93,6 +65,7 @@ public:
 	rootMove( const Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
 };
 
+// may be moved to another file.. used by search and movePicker to order
 class SearchData
 {
 public:
@@ -123,145 +96,36 @@ public:
 class Search
 {
 public:
-
-	//--------------------------------------------------------
-	// public members
-	//--------------------------------------------------------
-	// make it private
-	Position pos;
-
-
 	//--------------------------------------------------------
 	// public static methods
 	//--------------------------------------------------------
-	static void initSearchParameters(void);
+	static void initSearchParameters();
 
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st){}
-	Search( const Search& other ):_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMovesToBeSearched(other._rootMovesToBeSearched){ /* todo fare la copia*/}
-	Search& operator=(const Search& other)
-	{
-		// todo fare una copia fatta bene
-		_sl = other._sl;
-		_st = other._st;
-		_UOI= UciOutput::create();
-		_rootMovesToBeSearched = other._rootMovesToBeSearched;
-		return * this;
-	}
+	Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) );
+	~Search();
+
+	Search( const Search& other ) = delete;
+	Search& operator=(const Search& other) = delete;
+	Search(Search&&) =delete;
+	Search& operator=(Search&&) = delete;
 
 	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
 
-	void stopSearch(){ _stop = true;}
-	void resetStopCondition(){ _stop = false;}
+	void stopSearch();
+	void resetStopCondition();
 
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
-	void showLine(){ _showLine= true;}
+	void showLine();
 	void manageNewSearch();
+	Position& getPosition();
 
 private:
-	//--------------------------------------------------------
-	// private enum definition
-	//--------------------------------------------------------
-	enum nodeType
-	{
-		ROOT_NODE,
-		PV_NODE,
-		ALL_NODE,
-		CUT_NODE
-	};
-
-	//--------------------------------------------------------
-	// private static members
-	//--------------------------------------------------------
-	static const int ONE_PLY = 16;
-	static const int ONE_PLY_SHIFT = 4;
-	static const unsigned int LmrLimit = 32;
-	static Score futilityMargin[7];
-	static unsigned int FutilityMoveCounts[2][16];
-	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
-	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
-
-	//--------------------------------------------------------
-	// private members
-	//--------------------------------------------------------
-	std::unique_ptr<UciOutput> _UOI;
-
-	bool _validIteration = false;
-	Score _expectedValue = 0;
-	bool _followPV;
-	PVline _pvLineToFollow;
-	eNextMove _initialTurn;
-	bool _showLine = false;
-
-
-	SearchData _sd;
-	unsigned long long _visitedNodes;
-	unsigned long long _tbHits;
-	unsigned int _maxPlyReached;
-
-	std::vector<rootMove> _multiPVresult;
-
-	SearchLimits& _sl; // todo limits belong to threads
-	SearchTimer& _st;
-	std::vector<Move> _rootMovesToBeSearched;
-	std::vector<Move> _rootMovesAlreadySearched;
-
-
-	volatile bool _stop = false;
-
-	//--------------------------------------------------------
-	// private methods
-	//--------------------------------------------------------
-	void cleanMemoryBeforeStartingNewSearch(void);
-	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
-	void filterRootMovesByTablebase( std::vector<Move>& rm );
-	startThinkResult manageQsearch(void);
-	
-	void enableFollowPv();
-	void disableFollowPv();
-	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
-
-
-	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*78+cut*20000; }
-
-	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
-	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
-
-	rootMove aspirationWindow(const int depth, Score alpha, Score beta, const bool masterThread);
-	void excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread);
-	void idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false );
-
-	void setUOI( std::unique_ptr<UciOutput> UOI );
-	static Score futility(int depth, bool improving );
-	Score getDrawValue() const;
-	
-	void _updateCounterMove( const Move& m );
-	void _updateNodeStatistics(const unsigned int ply);
-	//void _printRootMoveList() const;
-	
-	bool _manageDraw(const bool PVnode, PVline& pvLine);
-	void _showCurrenLine( const unsigned int ply, const int depth );
-	bool _MateDistancePruning( const unsigned int ply, Score& alpha, Score& beta) const;
-	void _appendTTmoveIfLegal(  const Move& ttm, PVline& pvLine ) const;
-	bool _canUseTTeValue( const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte, short int depth ) const;
-	const HashKey _getSearchKey( const bool excludedMove = false ) const;
-
-	using tableBaseRes = struct{ ttType TTtype; Score value;};
-	tableBaseRes _checkTablebase( const unsigned int ply, const int depth );
-
-	static std::mutex _mutex;
-	
-	Game _game;
-	
-	
-	Move _getPonderMoveFromHash( const Move bestMove );
-	Move _getPonderMoveFromBook( const Move bookMove );
-	void _waitStopPondering() const;
-
-
+	class impl;
+	std::unique_ptr<impl> pimpl;
 };
 
 #endif /* SEARCH_H_ */
