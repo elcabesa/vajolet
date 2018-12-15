@@ -33,11 +33,11 @@ class my_thread
 private:
 	my_thread();
 	~my_thread();
-	//my_thread(my_thread&&);
-	//my_thread& operator=(my_thread&&);
-
-	static my_thread * pInstance;
-	static std::mutex _mutex;
+	//my_thread(const my_thread&) = delete;
+	//my_thread& operator=(const my_thread&) = delete;
+	
+	class impl;
+	std::unique_ptr<impl> pimpl;
 
 	SearchLimits _limits; // todo limits belong to threads
 	SearchTimer _st;
@@ -65,20 +65,12 @@ private:
 	void _searchThread();
 	void _printTimeDependentOutput( long long int time );
 
-
-
 public :
 
 	static my_thread& getInstance()
 	{
-
-		std::lock_guard<std::mutex> lock(_mutex);
-		if (!pInstance)
-		{
-			my_thread * temp = new my_thread;
-			pInstance = temp;
-		}
-		return *pInstance;
+		static my_thread pInstance;
+		return pInstance;
 	}
 
 	void quitThreads();
@@ -87,9 +79,6 @@ public :
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan(){ return _timeMan;}
-
-
-
 };
 
 

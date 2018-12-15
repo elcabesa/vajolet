@@ -25,11 +25,21 @@
 #include "uciParameters.h"
 
 
+class my_thread::impl
+{
+public:
+	void do_internal_work()
+	{
+		internal_data = 5;
+	}
+private:
+	int internal_data = 0;
+};
+
+
 volatile bool my_thread::_quit = false;
 volatile bool my_thread::_startThink = false;
 
-my_thread * my_thread::pInstance;
-std::mutex  my_thread::_mutex;
 
 void my_thread::_printTimeDependentOutput(long long int time) {
 
@@ -130,7 +140,7 @@ void my_thread::ponderHit()
 	stopPonder();
 }
 
-my_thread::my_thread():_src(_st, _limits), _timeMan(_limits)
+my_thread::my_thread(): pimpl{std::make_unique<impl>()}, _src(_st, _limits), _timeMan(_limits)
 {
 	_UOI = UciOutput::create();
 	_initThreads();
