@@ -18,53 +18,22 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
-#include <cstdint>
-#include <condition_variable>
-#include <mutex>
-#include <thread>
-
-#include "search.h"
-#include "timeManagement.h"
-
 class Position;
+class timeManagement;
+class SearchLimits;
 
 class my_thread
 {
 private:
 	my_thread();
 	~my_thread();
-	//my_thread(const my_thread&) = delete;
-	//my_thread& operator=(const my_thread&) = delete;
+	my_thread(const my_thread&) = delete;
+	my_thread& operator=(const my_thread&) = delete;
+	my_thread(const my_thread&&) = delete;
+	my_thread& operator=(const my_thread&&) = delete;
 	
 	class impl;
 	std::unique_ptr<impl> pimpl;
-
-	SearchLimits _limits; // todo limits belong to threads
-	SearchTimer _st;
-	Search _src;
-	timeManagement _timeMan;
-
-	std::unique_ptr<UciOutput> _UOI;
-
-	volatile static bool _quit;
-	volatile static bool _startThink;
-
-	long long _lastHasfullMessage;
-
-
-	std::thread _timer;
-	std::thread _searcher;
-	std::mutex _searchMutex;
-
-	std::condition_variable _searchCond;
-	std::condition_variable _timerCond;
-
-	void _initThreads();
-
-	void _timerThread();
-	void _searchThread();
-	void _printTimeDependentOutput( long long int time );
-
 public :
 
 	static my_thread& getInstance()
@@ -78,10 +47,6 @@ public :
 	void stopPonder();
 	void stopThinking();
 	void ponderHit();
-	timeManagement& getTimeMan(){ return _timeMan;}
+	timeManagement& getTimeMan();
 };
-
-
-
-
 #endif /* THREAD_H_ */

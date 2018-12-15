@@ -627,8 +627,6 @@ void uciLoop()
 			sync_cout << "unknown command" << sync_endl;
 		}
 	}while(token!="quit");
-
-	thr.quitThreads();
 }
 
 char printFileOf( const tSquare& sq )

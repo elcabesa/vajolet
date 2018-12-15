@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <map>
+#include <thread>
 
 
 #include "bitops.h"
@@ -28,6 +29,7 @@
 #include "movepicker.h"
 #include "position.h"
 #include "search.h"
+#include "timeManagement.h"
 #include "transposition.h"
 #include "thread.h"
 #include "uciParameters.h"

@@ -14,34 +14,77 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#include "command.h"
-#include "movegen.h"
-#include "movepicker.h"
+
+#include <condition_variable>
+#include <thread>
+
 #include "search.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
+#include "timeManagement.h"
 #include "thread.h"
-#include "transposition.h"
 #include "uciParameters.h"
 
 
+/*********************************************
+* implementation
+**********************************************/
 class my_thread::impl
 {
-public:
-	void do_internal_work()
-	{
-		internal_data = 5;
-	}
 private:
-	int internal_data = 0;
+	SearchLimits _limits; // todo limits belong to threads
+	SearchTimer _st;
+	Search _src;
+	timeManagement _timeMan;
+
+	std::unique_ptr<UciOutput> _UOI;
+
+	volatile static bool _quit;
+	volatile static bool _startThink;
+
+	long long _lastHasfullMessage;
+	
+	std::thread _timer;
+	std::thread _searcher;
+	std::mutex _searchMutex;
+
+	std::condition_variable _searchCond;
+	std::condition_variable _timerCond;
+
+	void _initThreads();
+
+	void _timerThread();
+	void _searchThread();
+	void _printTimeDependentOutput( long long int time );
+public:
+	impl();
+	~impl();
+	void startThinking( const Position& p, SearchLimits& l);
+	void stopThinking();
+	void ponderHit();
+	void stopPonder();
+	timeManagement& getTimeMan();
+	
+	void quitThreads();
 };
 
+volatile bool my_thread::impl::_quit = false;
+volatile bool my_thread::impl::_startThink= false;
 
-volatile bool my_thread::_quit = false;
-volatile bool my_thread::_startThink = false;
+my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
+{
+	_UOI = UciOutput::create();
+	_initThreads();
+}
 
+my_thread::impl::~impl()
+{
+	quitThreads();
+}
 
-void my_thread::_printTimeDependentOutput(long long int time) {
+timeManagement& my_thread::impl::getTimeMan(){ return _timeMan; }
+
+void my_thread::impl::_printTimeDependentOutput(long long int time) {
 
 	if( time - _lastHasfullMessage > 1000 )
 	{
@@ -56,7 +99,7 @@ void my_thread::_printTimeDependentOutput(long long int time) {
 	}
 }
 
-void my_thread::_timerThread()
+void my_thread::impl::_timerThread()
 {
 	std::mutex mutex;
 	while (!_quit)
@@ -88,7 +131,7 @@ void my_thread::_timerThread()
 	}
 }
 
-void my_thread::_searchThread()
+void my_thread::impl::_searchThread()
 {
 	std::mutex mutex;
 	while (!_quit)
@@ -110,14 +153,14 @@ void my_thread::_searchThread()
 	}
 }
 
-void my_thread::_initThreads()
+void my_thread::impl::_initThreads()
 {
-	_timer = std::thread(&my_thread::_timerThread, this);
-	_searcher = std::thread(&my_thread::_searchThread, this);
+	_timer = std::thread(&my_thread::impl::_timerThread, this);
+	_searcher = std::thread(&my_thread::impl::_searchThread, this);
 	_src.stopSearch();
 }
 
-void my_thread::quitThreads()
+inline void my_thread::impl::quitThreads()
 {
 	_quit = true;
 	_searchCond.notify_one();
@@ -126,32 +169,7 @@ void my_thread::quitThreads()
 	_searcher.join();
 }
 
-inline void my_thread::stopPonder(){ _limits.ponder = false;}
-
-void my_thread::stopThinking()
-{
-	_timeMan.stop();
-	stopPonder();
-}
-
-void my_thread::ponderHit()
-{
-	_st.resetPonderTimer();
-	stopPonder();
-}
-
-my_thread::my_thread(): pimpl{std::make_unique<impl>()}, _src(_st, _limits), _timeMan(_limits)
-{
-	_UOI = UciOutput::create();
-	_initThreads();
-}
-
-my_thread::~my_thread()
-{
-	quitThreads();
-}
-
-void my_thread::startThinking( const Position& p, SearchLimits& l)
+inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 {
 	_src.stopSearch();
 	_lastHasfullMessage = 0;
@@ -167,3 +185,39 @@ void my_thread::startThinking( const Position& p, SearchLimits& l)
 		_searchCond.notify_one();
 	}
 }
+
+inline void my_thread::impl::stopThinking()
+{
+	_timeMan.stop();
+	stopPonder();
+}
+
+inline void my_thread::impl::ponderHit()
+{
+	_st.resetPonderTimer();
+	stopPonder();
+}
+
+inline void my_thread::impl::stopPonder(){ _limits.ponder = false;}
+
+
+
+/*********************************************
+* my_thread class
+**********************************************/
+
+my_thread::my_thread(): pimpl{std::make_unique<impl>()}{}
+
+my_thread::~my_thread() = default;
+
+void my_thread::quitThreads(){ pimpl->quitThreads();}
+
+void my_thread::stopThinking() { pimpl->stopThinking();}
+
+void my_thread::ponderHit() { pimpl->ponderHit();}
+
+inline void my_thread::stopPonder(){ pimpl->stopPonder(); }
+
+timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
+
+void my_thread::startThinking( const Position& p, SearchLimits& l){	pimpl->startThinking( p, l); }
