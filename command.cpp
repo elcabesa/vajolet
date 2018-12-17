@@ -28,6 +28,7 @@
 #include "parameters.h"
 #include "position.h"
 #include "pvLine.h"
+#include "rootMove.h"
 #include "searchTimer.h"
 #include "searchLimits.h"
 #include "syzygy/tbprobe.h"

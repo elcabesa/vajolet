@@ -23,6 +23,7 @@
 #include "MoveList.h"
 #include "move.h"
 #include "search.h"
+#include "searchData.h"
 #include "score.h"
 
 
@@ -89,8 +90,6 @@ public:
 	};
 	
 private:
-	
-	static SearchData _defaultSearchData; // convert to const
 	//--------------------------------------------------------
 	// private members
 	//--------------------------------------------------------

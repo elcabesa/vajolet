@@ -25,17 +25,21 @@
 #include "bitops.h"
 #include "book.h"
 #include "command.h"
+#include "game.h"
 #include "history.h"
 #include "io.h"
 #include "movepicker.h"
 #include "position.h"
+#include "rootMove.h"
 #include "search.h"
+#include "searchData.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
 #include "timeManagement.h"
 #include "transposition.h"
 #include "thread.h"
 #include "uciParameters.h"
+#include "searchResult.h"
 #include "syzygy/tbprobe.h"
 #include "transposition.h"
 #include "vajolet.h"
@@ -59,35 +63,6 @@ void testSimmetry(Position& pos)
 	}
 }
 #endif
-
-class Game
-{
-public:
-	struct GamePosition
-	{
-		HashKey key;
-		Move m;
-		PVline PV;
-		Score alpha;
-		Score beta;
-		unsigned int depth;
-	};
-
-	void CreateNewGame();
-	void insertNewMoves(Position &pos);
-	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
-	void printGamesInfo();
-
-	bool isNewGame(const Position &pos) const;
-	bool isPonderRight() const;
-	GamePosition getNewSearchParameters() const;
-
-private:
-	std::vector<GamePosition> _positions;
-public:
-
-};
-
 
 class Search::impl
 {
@@ -114,7 +89,7 @@ public:
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return * this;
 	}
-	startThinkResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
+	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
 
 	void stopSearch(){ _stop = true;}
 	void resetStopCondition(){ _stop = false;}
@@ -183,7 +158,7 @@ private:
 	void cleanMemoryBeforeStartingNewSearch(void);
 	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
-	startThinkResult manageQsearch(void);
+	SearchResult manageQsearch(void);
 
 	void enableFollowPv();
 	void disableFollowPv();
@@ -491,14 +466,14 @@ void Search::impl::generateRootMovesList( std::vector<Move>& rm, std::list<Move>
 	}
 }
 
-startThinkResult Search::impl::manageQsearch(void)
+SearchResult Search::impl::manageQsearch(void)
 {
 	PVline pvLine;
 	Score res =qsearch<Search::impl::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, pvLine);
 	
 	_UOI->printScore( res/100 );
 	
-	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, res );
+	return SearchResult( -SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, res );
 }
 /*
 void Search::impl::_printRootMoveList() const
@@ -724,7 +699,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 
 }
 
-startThinkResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed)
+SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed)
 {
 	//------------------------------------
 	//init the new search
@@ -819,7 +794,7 @@ startThinkResult Search::impl::startThinking(int depth, Score alpha, Score beta,
 	//----------------------------------
 	const rootMove& bestMove = voteSystem(helperResults).getBestMove();
 	
-	return startThinkResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
+	return SearchResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 
 }
 
@@ -2073,118 +2048,6 @@ void Search::impl::initSearchParameters(void)
 	}
 }
 
-inline void SearchData::clearKillers(unsigned int ply)
-{
-	Move * const tempKillers =  story[ply].killers;
-
-	tempKillers[1] = 0;
-	tempKillers[0] = 0;
-}
-inline void SearchData::cleanData(void)
-{
-	std::memset(story, 0, sizeof(story));
-}
-
-inline void SearchData::saveKillers(unsigned int ply, Move& m)
-{
-	Move * const tempKillers = story[ply].killers;
-	if(tempKillers[0] != m)
-	{
-		tempKillers[1] = tempKillers[0];
-		tempKillers[0] = m;
-	}
-
-}
-
-
-
-void Game::CreateNewGame(void)
-{
-	_positions.clear();
-}
-
-void Game::insertNewMoves(Position &pos)
-{
-	unsigned int actualPosition = _positions.size();
-	for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
-	{
-		GamePosition p;
-		p.key = pos.getState(i).getKey();
-		p.m = pos.getState(i).getCurrentMove();
-		_positions.push_back(p);
-	}
-}
-
-void Game::savePV(PVline PV,unsigned int depth, Score alpha, Score beta)
-{
-	_positions.back().PV = PV;
-	_positions.back().depth = depth;
-	_positions.back().alpha = alpha;
-	_positions.back().beta = beta;
-}
-
-
-void Game::printGamesInfo()
-{
-	for(auto p : _positions)
-	{
-		if( p.m )
-		{
-			std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
-			for( auto m : p.PV )
-			{
-				std::cout<<displayUci(m)<<" ";
-			}
-
-		}
-		std::cout<<std::endl;
-	}
-
-}
-
-bool Game::isNewGame(const Position &pos) const
-{
-	if( _positions.size() == 0 || pos.getStateSize() < _positions.size())
-	{
-		//printGamesInfo();
-		return true;
-	}
-
-	unsigned int n = 0;
-	for(auto p : _positions)
-	{
-		if(pos.getState(n).getKey() != p.key)
-		{
-			//printGamesInfo();
-			return true;
-		}
-		n++;
-
-	}
-	return false;
-}
-
-bool Game::isPonderRight() const
-{
-	if( _positions.size() > 2)
-	{
-		GamePosition previous =*(_positions.end()-3);
-		if(previous.PV.size()>=1 && previous.PV.getMove(1) == _positions.back().m)
-		{
-			return true;
-		}
-
-	}
-	return false;
-}
-
-Game::GamePosition Game::getNewSearchParameters() const
-{
-	GamePosition previous =*(_positions.end()-3);
-	return previous;
-}
-
-
 Move Search::impl::_getPonderMoveFromHash(const Move bestMove )
 {
 	Move ponderMove(0);
@@ -2307,7 +2170,7 @@ void Search::impl::manageNewSearch()
 	//}
 	//else
 	
-	startThinkResult res = startThinking( );
+	SearchResult res = startThinking( );
 	
 	PVline PV = res.PV;
 
@@ -2337,7 +2200,7 @@ void Search::impl::manageNewSearch()
 void Search::initSearchParameters(){ Search::impl::initSearchParameters(); }
 Search::Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, std::move(UOI))}{}
 Search::~Search() = default;
-startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed ){ return pimpl->startThinking(depth, alpha, beta, pvToBeFollowed); }
+SearchResult Search::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed ){ return pimpl->startThinking(depth, alpha, beta, pvToBeFollowed); }
 void Search::stopSearch(){ pimpl->stopSearch(); }
 
 void Search::resetStopCondition(){ pimpl->resetStopCondition(); }

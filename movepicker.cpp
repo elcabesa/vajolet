@@ -19,8 +19,6 @@
 #include "movepicker.h"
 #include "position.h"
 
-SearchData MovePicker::_defaultSearchData;
-
 MovePicker::MovePicker( const Position& p, const SearchData& sd, unsigned int ply, const Move& ttm ): _pos(p), _sd(sd), _ply(ply), _ttMove(ttm)
 {
 	if( _pos.isInCheck() )
