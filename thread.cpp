@@ -130,6 +130,7 @@ void my_thread::impl::_timerThread()
 		}
 		lk.unlock();
 	}
+	_src.stopSearch();
 }
 
 void my_thread::impl::_searchThread()
