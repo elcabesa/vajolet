@@ -15,9 +15,11 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <chrono>
 #include <condition_variable>
 #include <thread>
 
+#include "io.h"
 #include "search.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
@@ -55,11 +57,12 @@ private:
 	std::condition_variable _searchCond;
 	std::condition_variable _timerCond;
 
-	void _initThreads();
+	bool _initThreads();
 
 	void _timerThread();
 	void _searchThread();
 	void _printTimeDependentOutput( long long int time );
+	bool _isReady();
 public:
 	impl();
 	~impl();
@@ -68,7 +71,7 @@ public:
 	void ponderHit();
 	void stopPonder();
 	timeManagement& getTimeMan();
-	bool isReady();
+	
 	
 	void quitThreads();
 };
@@ -82,7 +85,11 @@ volatile bool my_thread::impl::_timerReady = false;
 my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
 {
 	_UOI = UciOutput::create();
-	_initThreads();
+	if( !_initThreads() )
+	{
+		sync_cout<<"unable to initialize threads, exiting..."<<sync_endl;
+		exit(-1);
+	}
 }
 
 my_thread::impl::~impl()
@@ -90,7 +97,7 @@ my_thread::impl::~impl()
 	quitThreads();
 }
 
-bool my_thread::impl::isReady(){ return _searcherReady && _timerReady; }
+bool my_thread::impl::_isReady(){ return _searcherReady && _timerReady; }
 
 timeManagement& my_thread::impl::getTimeMan(){ return _timeMan; }
 
@@ -165,11 +172,21 @@ void my_thread::impl::_searchThread()
 	}
 }
 
-void my_thread::impl::_initThreads()
+bool my_thread::impl::_initThreads()
 {
+	auto startTime = std::chrono::steady_clock::now();
+	
 	_timer = std::thread(&my_thread::impl::_timerThread, this);
 	_searcher = std::thread(&my_thread::impl::_searchThread, this);
 	_src.stopSearch();
+	// wait initialization
+	for( auto delta = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - startTime ); delta.count() < 1000; delta = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - startTime ) )
+	{
+		if( _isReady() ) return true;
+	}
+	return false;
+	
+	
 }
 
 inline void my_thread::impl::quitThreads()
@@ -233,5 +250,3 @@ inline void my_thread::stopPonder(){ pimpl->stopPonder(); }
 timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
 
 void my_thread::startThinking( const Position& p, SearchLimits& l){	pimpl->startThinking( p, l); }
-
-bool my_thread::isReady(){ return pimpl->isReady(); }

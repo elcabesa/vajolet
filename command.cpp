@@ -532,8 +532,6 @@ void uciLoop()
 {
 	printStartMessage();
 	my_thread &thr = my_thread::getInstance();
-	// wait 
-	while( !thr.isReady() ){}
 	Position pos;
 	pos.setupFromFen(StartFEN);
 	std::string token, cmd;
