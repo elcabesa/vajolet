@@ -45,8 +45,8 @@ private:
 
 	long long _lastHasfullMessage;
 	
-	std::thread _timer;
 	std::thread _searcher;
+	std::thread _timer;
 	std::mutex _searchMutex;
 
 	std::condition_variable _searchCond;
