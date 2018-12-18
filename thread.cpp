@@ -42,6 +42,9 @@ private:
 
 	volatile static bool _quit;
 	volatile static bool _startThink;
+	
+	volatile static bool _searcherReady;
+	volatile static bool _timerReady;
 
 	long long _lastHasfullMessage;
 	
@@ -65,12 +68,16 @@ public:
 	void ponderHit();
 	void stopPonder();
 	timeManagement& getTimeMan();
+	bool isReady();
 	
 	void quitThreads();
 };
 
 volatile bool my_thread::impl::_quit = false;
-volatile bool my_thread::impl::_startThink= false;
+volatile bool my_thread::impl::_startThink = false;
+
+volatile bool my_thread::impl::_searcherReady = false;
+volatile bool my_thread::impl::_timerReady = false;
 
 my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
 {
@@ -82,6 +89,8 @@ my_thread::impl::~impl()
 {
 	quitThreads();
 }
+
+bool my_thread::impl::isReady(){ return _searcherReady && _timerReady; }
 
 timeManagement& my_thread::impl::getTimeMan(){ return _timeMan; }
 
@@ -106,7 +115,7 @@ void my_thread::impl::_timerThread()
 	while (!_quit)
 	{
 		std::unique_lock<std::mutex> lk(mutex);
-
+		_timerReady = true;
 		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan.isSearchFinished() ) || _quit;} );
 
 		if (!_quit)
@@ -140,6 +149,7 @@ void my_thread::impl::_searchThread()
 	{
 
 		std::unique_lock<std::mutex> lk(mutex);
+		_searcherReady =  true;
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
 		if(!_quit)
 		{
@@ -223,3 +233,5 @@ inline void my_thread::stopPonder(){ pimpl->stopPonder(); }
 timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
 
 void my_thread::startThinking( const Position& p, SearchLimits& l){	pimpl->startThinking( p, l); }
+
+bool my_thread::isReady(){ return pimpl->isReady(); }

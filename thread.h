@@ -48,5 +48,6 @@ public :
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();
+	bool isReady();
 };
 #endif /* THREAD_H_ */
