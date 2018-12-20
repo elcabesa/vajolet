@@ -24,7 +24,7 @@
 #include <iostream>
 #include <string>
 
-#include "bitboardIndex.h"
+#include "bitBoardIndex.h"
 //forward declaration
 class Move;
 class Position;

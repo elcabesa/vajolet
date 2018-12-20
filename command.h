@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "bitboardIndex.h"
+#include "bitBoardIndex.h"
 #include "score.h"
 //--------------------------------------------------------------------
 //	forward declaration
