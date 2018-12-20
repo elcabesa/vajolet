@@ -2114,7 +2114,7 @@ void Search::impl::manageNewSearch()
 		
 		_waitStopPondering();
 
-		_UOI->printBestMove( Move::NOMOVE );
+		_UOI->printBestMove( Move::NOMOVE, Move::NOMOVE );
 
 		return;
 	}

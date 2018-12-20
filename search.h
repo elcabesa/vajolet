@@ -21,7 +21,6 @@
 
 #include "command.h"
 
-#include "history.h"
 #include "pvLine.h"
 #include "score.h"
 

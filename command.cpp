@@ -20,6 +20,7 @@
 //---------------------------------------------
 #include <iomanip>
 
+#include "bitops.h"
 #include "benchmark.h"
 #include "command.h"
 #include "io.h"
@@ -66,7 +67,7 @@ public:
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
 	void printDepth() const;
 	void printScore(const signed int cp) const;
-	void printBestMove( const Move m, const Move ponder = Move(0) ) const;
+	void printBestMove( const Move m, const Move& ponder) const;
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
 };
 
@@ -81,7 +82,7 @@ public:
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
 	void printDepth() const;
 	void printScore(const signed int cp) const;
-	void printBestMove( const Move m, const Move ponder = Move(0)) const;
+	void printBestMove( const Move m, const Move& ponder) const;
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
 };
 
@@ -895,7 +896,7 @@ void UciStandardOutput::printScore(const signed int cp) const
 	sync_cout<<"info score cp "<<cp<<sync_endl;
 }
 
-void UciStandardOutput::printBestMove( const Move bm, const Move ponder ) const
+void UciStandardOutput::printBestMove( const Move bm, const Move& ponder ) const
 {
 	sync_cout<<"bestmove "<< displayUci(bm);
 	if( ponder )
@@ -923,7 +924,7 @@ void UciMuteOutput::printCurrMoveNumber(const unsigned int, const Move& , const 
 void UciMuteOutput::showCurrLine(const Position & , const unsigned int ) const{}
 void UciMuteOutput::printDepth() const{}
 void UciMuteOutput::printScore(const signed int ) const{}
-void UciMuteOutput::printBestMove( const Move, const Move ) const{}
+void UciMuteOutput::printBestMove( const Move, const Move& ) const{}
 void UciMuteOutput::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
 
 

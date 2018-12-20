@@ -19,10 +19,8 @@
 #define MOVEPICK_H_
 
 #include "bitBoardIndex.h"
-#include "movegen.h"
 #include "MoveList.h"
 #include "move.h"
-#include "search.h"
 #include "searchData.h"
 #include "score.h"
 

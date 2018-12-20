@@ -22,7 +22,6 @@
 #include "hashKey.h"
 #include "move.h"
 #include "score.h"
-#include "state.h"
 
 //--------------------------------------------------------
 // struct

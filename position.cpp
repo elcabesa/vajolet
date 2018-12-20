@@ -17,6 +17,8 @@
 #include <cstdlib>
 #include <sstream>
 
+#include "bitops.h"
+#include "command.h"
 #include "io.h"
 #include "movegen.h"
 #include "movepicker.h"
@@ -745,6 +747,13 @@ void Position::doNullMove()
 */
 void Position::doMove(const Move & m)
 {
+#ifdef	ENABLE_CHECK_CONSISTENCY
+	if( ! isMoveLegal(m) )
+	{
+		sync_cout<<"illegal move "<<displayUci(m)<<sync_endl;
+		exit(-1);
+	}
+#endif
 	assert( m != Move::NOMOVE );
 
 	const bool moveIsCheck = moveGivesCheck(m);

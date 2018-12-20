@@ -25,7 +25,6 @@
 
 #include "bitBoardIndex.h"
 #include "move.h"
-//#include "position.h"
 #include "score.h"
 #include "tSquare.h"
 #include "vajolet.h"

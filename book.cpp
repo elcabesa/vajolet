@@ -24,6 +24,7 @@
 #include "book.h"
 #include "move.h"
 #include "movepicker.h"
+#include "position.h"
 #include "tSquare.h"
 #include "vajolet.h"
 

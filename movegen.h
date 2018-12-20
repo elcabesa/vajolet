@@ -19,15 +19,8 @@
 #ifndef MOVEGEN_H_
 #define MOVEGEN_H_
 
-#include <utility>
-#include <algorithm>
-#include <array>
-
-#include "bitops.h"
-#include "eCastle.h"
 #include "magicmoves.h"
 #include "MoveList.h"
-#include "vajolet.h"
 
 class Position;
 

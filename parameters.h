@@ -20,7 +20,7 @@
 #ifndef PARAMETERS_H_
 #define PARAMETERS_H_
 
-#include "position.h"
+#include "bitboardIndex.h"
 #include "score.h"
 
 extern simdScore initialPieceValue[lastBitboard];
