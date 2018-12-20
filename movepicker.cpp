@@ -15,8 +15,6 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "bitops.h"
-#include "movegen.h"
 #include "movepicker.h"
 #include "position.h"
 

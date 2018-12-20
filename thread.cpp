@@ -15,11 +15,11 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <chrono>
 #include <condition_variable>
 #include <thread>
 
 #include "io.h"
+#include "position.h"
 #include "search.h"
 #include "searchLimits.h"
 #include "searchTimer.h"

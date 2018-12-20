@@ -14,13 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#include <cstdlib>
 #include <sstream>
 
-#include "bitops.h"
 #include "command.h"
 #include "io.h"
-#include "movegen.h"
 #include "movepicker.h"
 #include "parameters.h"
 #include "position.h"

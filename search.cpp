@@ -17,26 +17,20 @@
 
 
 #include <cmath>
-#include <map>
 #include <mutex>
 #include <thread>
 
 
-#include "bitops.h"
 #include "book.h"
-#include "command.h"
 #include "game.h"
-#include "history.h"
 #include "io.h"
 #include "movepicker.h"
 #include "position.h"
 #include "rootMove.h"
 #include "search.h"
 #include "searchData.h"
-#include "searchLimits.h"
 #include "searchTimer.h"
 #include "timeManagement.h"
-#include "transposition.h"
 #include "thread.h"
 #include "uciParameters.h"
 #include "searchResult.h"

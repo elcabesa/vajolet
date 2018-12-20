@@ -15,17 +15,15 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-
+#include <cstdint>
 #include <chrono>
 #include <random>
 
 
 #include "bitops.h"
 #include "book.h"
-#include "move.h"
 #include "movepicker.h"
 #include "position.h"
-#include "tSquare.h"
 #include "vajolet.h"
 
 

@@ -15,12 +15,9 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-
-#include <functional>
 #include <list>
 
 #include "bitops.h"
-#include "data.h"
 #include "movegen.h"
 #include "position.h"
 #include "vajolet.h"

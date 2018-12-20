@@ -14,12 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-
-#include "data.h"
-#include "eCastle.h"
-#include "bitops.h"
-#include "tSquare.h"
 #include <algorithm>
+#include "data.h"
 
 //--------------------------------------------------------------
 //	global variables

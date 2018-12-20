@@ -20,11 +20,9 @@
 //---------------------------------------------
 #include <iomanip>
 
-#include "bitops.h"
 #include "benchmark.h"
 #include "command.h"
 #include "io.h"
-#include "movegen.h"
 #include "movepicker.h"
 #include "parameters.h"
 #include "position.h"
@@ -36,7 +34,6 @@
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"
-#include "tSquare.h"
 #include "vajolet.h"
 #include "version.h"
 

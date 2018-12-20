@@ -19,9 +19,6 @@
 
 #include "benchmark.h"
 #include "command.h"
-#include "data.h"
-#include "hashKey.h"
-#include "movegen.h"
 #include "position.h"
 #include "search.h"
 #include "transposition.h"
