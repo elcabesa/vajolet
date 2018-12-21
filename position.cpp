@@ -1549,10 +1549,10 @@ bool Position::isMoveLegal(const Move &m)const
 	}
 
 	// mossa mal formata
-	//if( !m.isPromotionMove() && m.bit.promotion!=0)
-	//{
-	//	return false;
-	//}
+	if( !m.isPromotionMove() && m.getPromotionType() != Move::promQueen )
+	{
+		return false;
+	}
 	//arrocco impossibile
 	if( m.isCastleMove() )
 	{
