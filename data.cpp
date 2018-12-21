@@ -20,6 +20,7 @@
 //--------------------------------------------------------------
 //	global variables
 //--------------------------------------------------------------
+bitMap BITSET[squareNumber+1];
 
 const volatile tFile FILES[squareNumber] = {		//!< precalculated file from square number
 	FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH,
@@ -87,6 +88,12 @@ bitMap spaceMask;
 */
 void initData(void)
 {
+	for(tSquare i = A1; i<squareNumber; i++)
+	{
+		BITSET[i] = 1ull << i;
+	}
+	BITSET[squareNone] = 0;
+	
 	for(tSquare i = A1; i<squareNumber; i++)
 	{
 		DIAGA1H8MASK[i] = 0;

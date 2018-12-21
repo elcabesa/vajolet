@@ -56,9 +56,8 @@ extern bitMap spaceMask;
 */
 inline bitMap bitSet(tSquare n)
 {
-	//extern bitMap BITSET[squareNumber+1];
-	//return BITSET[n];
-	return (1ull) << n;
+	extern bitMap BITSET[squareNumber+1];
+	return BITSET[n];
 }
 
 inline bool isSquareSet( const bitMap b, const tSquare sq )
