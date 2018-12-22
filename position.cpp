@@ -747,7 +747,7 @@ void Position::doMove(const Move & m)
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	if( ! isMoveLegal(m) )
 	{
-		sync_cout<<"illegal move "<<displayUci(m)<<sync_endl;
+		std::cerr<<"illegal move "<<displayUci(m)<<std::endl;
 		exit(-1);
 	}
 #endif
@@ -1020,12 +1020,11 @@ void Position::initCastleRightsMask(void)
 
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-static bool block( std::string errorString, unsigned int type )
+static void block( std::string errorString, unsigned int type )
 {
-	sync_cout<< errorString <<sync_endl;
-	sync_cout<<( type ? "DO error" : "undoError" ) <<sync_endl;
-	while(1){}
-	return false;
+	std::cerr<< errorString <<std::endl;
+	std::cerr<<( type ? "DO error" : "undoError" ) <<std::endl;
+	exit(-1);
 }
 
 /*! \brief do a sanity check on the board
@@ -1033,18 +1032,18 @@ static bool block( std::string errorString, unsigned int type )
 	\version 1.0
 	\date 27/10/2013
 */
-bool Position::checkPosConsistency(int nn) const
+void Position::checkPosConsistency(int nn) const
 {
 	const state &x = getActualStateConst();
 	if( x.getNextTurn() != whiteTurn && x.getNextTurn() != blackTurn)
 	{
-		return block( "nextMove error", nn );
+		block( "nextMove error", nn );
 	}
 
 	// check board
 	if(bitBoard[whitePieces] & bitBoard[blackPieces])
 	{
-		return block( "white piece & black piece intersected", nn );
+		block( "white piece & black piece intersected", nn );
 	}
 	if((bitBoard[whitePieces] | bitBoard[blackPieces]) !=bitBoard[occupiedSquares])
 	{
@@ -1053,7 +1052,7 @@ bool Position::checkPosConsistency(int nn) const
 		displayBitmap(bitBoard[blackPieces]);
 		displayBitmap(bitBoard[occupiedSquares]);
 
-		return block( "all piece problem", nn );
+		block( "all piece problem", nn );
 	}
 	for(tSquare sq = square0; sq < squareNumber; sq++)
 	{
@@ -1061,7 +1060,7 @@ bool Position::checkPosConsistency(int nn) const
 
 		if( id != empty && !isSquareSet( bitBoard[id], sq ) )
 		{
-			return block( "board inconsistency", nn );
+			block( "board inconsistency", nn );
 		}
 	}
 
@@ -1071,7 +1070,7 @@ bool Position::checkPosConsistency(int nn) const
 		{
 			if(i!=j && i!= whitePieces && i!= separationBitmap && j!= whitePieces && j!= separationBitmap && (bitBoard[i] & bitBoard[j]))
 			{
-				return block( "bitboard intersection", nn );
+				block( "bitboard intersection", nn );
 			}
 		}
 	}
@@ -1081,7 +1080,7 @@ bool Position::checkPosConsistency(int nn) const
 		{
 			if(getPieceCount((bitboardIndex)i) != bitCnt(bitBoard[i]))
 			{
-				return block( "pieceCount Error", nn );
+				block( "pieceCount Error", nn );
 			}
 		}
 	}
@@ -1094,7 +1093,7 @@ bool Position::checkPosConsistency(int nn) const
 	}
 	if(test!= bitBoard[whitePieces])
 	{
-		return block( "white piece error", nn );
+		block( "white piece error", nn );
 	}
 	test=0;
 	for (int i = blackKing; i < blackPieces; i++)
@@ -1103,21 +1102,21 @@ bool Position::checkPosConsistency(int nn) const
 	}
 	if(test!= bitBoard[blackPieces])
 	{
-		return block( "black piece error", nn );
+		block( "black piece error", nn );
 	}
 	if( x.getKey() != calcKey() )
 	{
 		display();
-		return block( "hashKey error", nn );
+		block( "hashKey error", nn );
 	}
 	if(x.getPawnKey() != calcPawnKey())
 	{
 		display();
-		return block( "pawnKey error", nn );
+		block( "pawnKey error", nn );
 	}
 	if(x.getMaterialKey() != calcMaterialKey())
 	{
-		return block( "materialKey error", nn );
+		block( "materialKey error", nn );
 	}
 
 	simdScore sc=calcMaterialValue();
@@ -1126,7 +1125,7 @@ bool Position::checkPosConsistency(int nn) const
 		display();
 		sync_cout<<sc[0]<<":"<<x.getMaterialValue()[0]<<sync_endl;
 		sync_cout<<sc[1]<<":"<<x.getMaterialValue()[1]<<sync_endl;
-		return block( "material error", nn );
+		block( "material error", nn );
 	}
 	simdScore score = calcNonPawnMaterialValue();
 	if(score[0]!= x.getNonPawnValue()[0] ||
@@ -1139,9 +1138,8 @@ bool Position::checkPosConsistency(int nn) const
 		sync_cout<<score[1]<<":"<<x.getNonPawnValue()[1]<<sync_endl;
 		sync_cout<<score[2]<<":"<<x.getNonPawnValue()[2]<<sync_endl;
 		sync_cout<<score[3]<<":"<<x.getNonPawnValue()[3]<<sync_endl;
-		return block( "non pawn material error", nn );
+		block( "non pawn material error", nn );
 	}
-	return true;
 }
 #endif
 
