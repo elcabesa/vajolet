@@ -18,7 +18,5 @@
 
 #include "move.h"
 
-
-
 const Move Move::NOMOVE(0);
 

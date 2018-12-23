@@ -304,6 +304,11 @@ public:
 		return false;
 	}
 	
+	inline bool hasActivePlayerNonPawnMaterial() const
+	{
+		return getActualStateConst().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= Position::pieceValue[whiteKnights][0];
+	}
+
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
@@ -388,7 +393,7 @@ private:
 	simdScore calcMaterialValue(void) const;
 	simdScore calcNonPawnMaterialValue(void) const;
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	bool checkPosConsistency(int nn) const;
+	void checkPosConsistency(int nn) const;
 #endif
 	void clear();
 	inline void calcCheckingSquares(void);

@@ -15,38 +15,29 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef THREAD_H_
-#define THREAD_H_
+#include "searchData.h"
 
-class Position;
-class timeManagement;
-class SearchLimits;
+const SearchData _defaultSearchData; // convert to const
 
-class my_thread
+void SearchData::clearKillers(unsigned int ply)
 {
-private:
-	my_thread();
-	~my_thread();
-	my_thread(const my_thread&) = delete;
-	my_thread& operator=(const my_thread&) = delete;
-	my_thread(const my_thread&&) = delete;
-	my_thread& operator=(const my_thread&&) = delete;
-	
-	class impl;
-	std::unique_ptr<impl> pimpl;
-public :
+	Move * const tempKillers =  story[ply].killers;
 
-	static my_thread& getInstance()
+	tempKillers[1] = 0;
+	tempKillers[0] = 0;
+}
+void SearchData::cleanData(void)
+{
+	std::memset(story, 0, sizeof(story));
+}
+
+void SearchData::saveKillers(unsigned int ply, Move& m)
+{
+	Move * const tempKillers = story[ply].killers;
+	if(tempKillers[0] != m)
 	{
-		static my_thread pInstance;
-		return pInstance;
+		tempKillers[1] = tempKillers[0];
+		tempKillers[0] = m;
 	}
 
-	void quitThreads();
-	void startThinking( const Position& p, SearchLimits& l);
-	void stopPonder();
-	void stopThinking();
-	void ponderHit();
-	timeManagement& getTimeMan();
-};
-#endif /* THREAD_H_ */
+}

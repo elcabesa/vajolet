@@ -15,38 +15,21 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef THREAD_H_
-#define THREAD_H_
+#ifndef SEARCH_RESULT_H_
+#define SEARCH_RESULT_H_
 
-class Position;
-class timeManagement;
-class SearchLimits;
+#include "pvLine.h"
+#include "score.h"
 
-class my_thread
+class SearchResult
 {
-private:
-	my_thread();
-	~my_thread();
-	my_thread(const my_thread&) = delete;
-	my_thread& operator=(const my_thread&) = delete;
-	my_thread(const my_thread&&) = delete;
-	my_thread& operator=(const my_thread&&) = delete;
-	
-	class impl;
-	std::unique_ptr<impl> pimpl;
-public :
-
-	static my_thread& getInstance()
-	{
-		static my_thread pInstance;
-		return pInstance;
-	}
-
-	void quitThreads();
-	void startThinking( const Position& p, SearchLimits& l);
-	void stopPonder();
-	void stopThinking();
-	void ponderHit();
-	timeManagement& getTimeMan();
+public:
+	Score alpha;
+	Score beta;
+	unsigned int depth;
+	PVline PV;
+	Score Res;
+	SearchResult( Score Alpha, Score Beta, unsigned int Depth, PVline pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
 };
-#endif /* THREAD_H_ */
+
+#endif

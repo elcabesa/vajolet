@@ -17,102 +17,328 @@
 
 
 #include <cmath>
-#include <map>
+#include <mutex>
+#include <thread>
 
 
-#include "bitops.h"
-#include "command.h"
-#include "history.h"
+#include "book.h"
+#include "game.h"
 #include "io.h"
 #include "movepicker.h"
 #include "position.h"
+#include "rootMove.h"
 #include "search.h"
-#include "transposition.h"
+#include "searchData.h"
+#include "searchTimer.h"
+#include "timeManagement.h"
 #include "thread.h"
 #include "uciParameters.h"
+#include "searchResult.h"
 #include "syzygy/tbprobe.h"
+#include "transposition.h"
 #include "vajolet.h"
 
 #ifdef DEBUG_EVAL_SIMMETRY
-	
-	
-	void testSimmetry(Position& pos)
+void testSimmetry(Position& pos)
+{
+	static Position ppp;
+
+	ppp.setupFromFen(pos.getSymmetricFen());
+
+	Score staticEval = pos.eval<false>();
+	Score test = ppp.eval<false>();
+
+	if(test != staticEval)
 	{
-		static Position ppp;
-		
-		ppp.setupFromFen(pos.getSymmetricFen());
-		
-		Score staticEval = pos.eval<false>();
-		Score test = ppp.eval<false>();
-		
-		if(test != staticEval)
-		{
-			sync_cout << "eval symmetry problem " << test << ":" << staticEval << sync_endl;
-			pos.display();
-			ppp.display();
-			while(1);
-		}
+		sync_cout << "eval symmetry problem " << test << ":" << staticEval << sync_endl;
+		pos.display();
+		ppp.display();
+		while(1);
 	}
+}
 #endif
 
-const int Search::ONE_PLY;
-const int Search::ONE_PLY_SHIFT;
+class Search::impl
+{
+public:
 
-std::vector<Move> Search::rootMoves;
+	//--------------------------------------------------------
+	// public static methods
+	//--------------------------------------------------------
+	static void initSearchParameters(void);
+	static std::vector<impl> helperSearch;
+
+	//--------------------------------------------------------
+	// public methods
+	//--------------------------------------------------------
+	impl( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st){}
+
+	impl( const impl& other ) :_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMovesToBeSearched(other._rootMovesToBeSearched){}
+	impl& operator=(const impl& other)
+	{
+		// todo fare una copia fatta bene
+		_sl = other._sl;
+		_st = other._st;
+		_UOI= UciOutput::create();
+		_rootMovesToBeSearched = other._rootMovesToBeSearched;
+		return * this;
+	}
+	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
+
+	void stopSearch(){ _stop = true;}
+	void resetStopCondition(){ _stop = false;}
+
+	unsigned long long getVisitedNodes() const;
+	unsigned long long getTbHits() const;
+	void showLine(){ _showLine= true;}
+	void manageNewSearch();
+	Position& getPosition();
+
+private:
+	//--------------------------------------------------------
+	// private enum definition
+	//--------------------------------------------------------
+	enum nodeType
+	{
+		ROOT_NODE,
+		PV_NODE,
+		ALL_NODE,
+		CUT_NODE
+	};
+
+	//--------------------------------------------------------
+	// private static members
+	//--------------------------------------------------------
+	static const int ONE_PLY = 16;
+	static const int ONE_PLY_SHIFT = 4;
+	static const unsigned int LmrLimit = 32;
+	static Score futilityMargin[7];
+	static unsigned int FutilityMoveCounts[2][16];
+	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
+	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
+
+	//--------------------------------------------------------
+	// private members
+	//--------------------------------------------------------
+	std::unique_ptr<UciOutput> _UOI;
+
+	bool _validIteration = false;
+	Score _expectedValue = 0;
+	bool _followPV;
+	PVline _pvLineToFollow;
+	eNextMove _initialTurn;
+	bool _showLine = false;
 
 
-Score Search::futility(int depth, bool improving )
+	SearchData _sd;
+	unsigned long long _visitedNodes;
+	unsigned long long _tbHits;
+	unsigned int _maxPlyReached;
+
+	std::vector<rootMove> _multiPVresult;
+	Position pos;
+
+	SearchLimits& _sl; // todo limits belong to threads
+	SearchTimer& _st;
+	std::vector<Move> _rootMovesToBeSearched;
+	std::vector<Move> _rootMovesAlreadySearched;
+
+
+	volatile bool _stop = false;
+
+	//--------------------------------------------------------
+	// private methods
+	//--------------------------------------------------------
+	void cleanMemoryBeforeStartingNewSearch(void);
+	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
+	void filterRootMovesByTablebase( std::vector<Move>& rm );
+	SearchResult manageQsearch(void);
+
+	void enableFollowPv();
+	void disableFollowPv();
+	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
+
+
+	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*78+cut*20000; }
+
+	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
+	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
+
+	rootMove aspirationWindow(const int depth, Score alpha, Score beta, const bool masterThread);
+	void excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread);
+	void idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false );
+
+	void setUOI( std::unique_ptr<UciOutput> UOI );
+	static Score futility(int depth, bool improving );
+	Score getDrawValue() const;
+
+	void _updateCounterMove( const Move& m );
+	void _updateNodeStatistics(const unsigned int ply);
+	//void _printRootMoveList() const;
+
+	bool _manageDraw(const bool PVnode, PVline& pvLine);
+	void _showCurrenLine( const unsigned int ply, const int depth );
+	bool _MateDistancePruning( const unsigned int ply, Score& alpha, Score& beta) const;
+	void _appendTTmoveIfLegal(  const Move& ttm, PVline& pvLine ) const;
+	bool _canUseTTeValue( const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte, short int depth ) const;
+	const HashKey _getSearchKey( const bool excludedMove = false ) const;
+
+	using tableBaseRes = struct{ ttType TTtype; Score value;};
+	tableBaseRes _checkTablebase( const unsigned int ply, const int depth );
+
+	static std::mutex _mutex;
+
+	Game _game;
+
+
+	Move _getPonderMoveFromHash( const Move bestMove );
+	Move _getPonderMoveFromBook( const Move bookMove );
+	void _waitStopPondering() const;
+
+
+};
+
+std::vector<Search::impl> Search::impl::helperSearch;
+
+
+const int Search::impl::ONE_PLY;
+const int Search::impl::ONE_PLY_SHIFT;
+
+std::mutex  Search::impl::_mutex;
+
+class voteSystem
+{
+public:
+	voteSystem( const std::vector<rootMove>& res):_results(res){}
+
+	void print( const std::map<unsigned short, int>& votes, const Score minScore, const rootMove& bm ) const
+	{
+		std::cout<<"----------VOTE SYSTEM-------------"<<std::endl;
+		std::cout<<"minScore: "<<minScore<<std::endl;
+		std::cout<<"----------------------------------"<<std::endl;
+		for (auto &res : votes)
+		{
+			Move m(res.first);
+			std::cout<<"Move: "<<displayUci(m)<<" votes: "<<res.second;
+			if( bm == m ) std::cout<<" *****";
+			std::cout<<std::endl;
+		}
+		std::cout<<"----------------------------------"<<std::endl;
+
+		for (auto &res : _results)
+		{
+			if( res == bm)
+			{
+				std::cout<<"bestMove: "<<displayUci(res.firstMove)<<" *****"<<std::endl;
+			}
+			else
+			{
+				std::cout<<"bestMove: "<<displayUci(res.firstMove)<<std::endl;
+			}
+			std::cout<<"score: "<<res.score<<std::endl;
+			std::cout<<"depth: "<<res.depth<<std::endl;
+			std::cout<<"votes: "<<votes.at( res.firstMove.getPacked() )<<std::endl;
+		}
+	}
+
+	const rootMove& getBestMove( bool verbose = false) const
+	{
+
+		std::map<unsigned short, int> votes;
+
+		//////////////////////////////////////////
+		// calc the min value
+		//////////////////////////////////////////
+		Score minScore = _results[0].score;
+		for (auto &res : _results)
+		{
+			minScore = std::min( minScore, res.score );
+			votes[ res.firstMove.getPacked() ] = 0;
+		}
+
+		//////////////////////////////////////////
+		// calc votes
+		//////////////////////////////////////////
+		for (auto &res : _results)
+		{
+			votes[ res.firstMove.getPacked() ] += (int)( res.score - minScore ) + 40 * res.depth;
+		}
+
+		//////////////////////////////////////////
+		// find the maximum
+		//////////////////////////////////////////
+		const rootMove* bestMove = &_results[0];
+		int bestResult = votes[ _results[0].firstMove.getPacked() ];
+
+		for ( auto &res : _results )
+		{
+			if( votes[ res.firstMove.getPacked() ] > bestResult )
+			{
+				bestResult = votes[ res.firstMove.getPacked() ];
+				bestMove = &res;
+			}
+		}
+
+		if( verbose ) print( votes, minScore, *bestMove);
+
+		return *bestMove;
+	}
+
+private:
+	const std::vector<rootMove>& _results;
+};
+
+Score Search::impl::futility(int depth, bool improving )
 {
 	return 375 * depth - 2000 * improving;
 }
-Score Search::futilityMargin[7] = {0};
-unsigned int Search::FutilityMoveCounts[2][16]= {{0},{0}};
-Score Search::PVreduction[2][LmrLimit*ONE_PLY][64];
-Score Search::nonPVreduction[2][LmrLimit*ONE_PLY][64];
+Score Search::impl::futilityMargin[7] = {0};
+unsigned int Search::impl::FutilityMoveCounts[2][16]= {{0},{0}};
+Score Search::impl::PVreduction[2][LmrLimit*ONE_PLY][64];
+Score Search::impl::nonPVreduction[2][LmrLimit*ONE_PLY][64];
 
 
-static std::vector<Search> helperSearch;
-
-unsigned long long Search::getVisitedNodes() const
+unsigned long long Search::impl::getVisitedNodes() const
 {
-	unsigned long long n = visitedNodes;
+	unsigned long long n = _visitedNodes;
 	for (auto& hs : helperSearch)
-		n += hs.visitedNodes;
+		n += hs._visitedNodes;
 	return n;
 }
 
-unsigned long long Search::getTbHits() const
+unsigned long long Search::impl::getTbHits() const
 {
-	unsigned long long n = tbHits;
+	unsigned long long n = _tbHits;
 	for (auto& hs : helperSearch)
-		n += hs.tbHits;
+		n += hs._tbHits;
 	return n;
 }
 
-void Search::cleanMemoryBeforeStartingNewSearch(void)
+void Search::impl::cleanMemoryBeforeStartingNewSearch(void)
 {
-	sd.history.clear();
-	sd.captureHistory.clear();
-	sd.counterMoves.clear();
-	sd.cleanData();
-	visitedNodes = 0;
-	tbHits = 0;
-	rootMovesSearched.clear();
+	_sd.history.clear();
+	_sd.captureHistory.clear();
+	_sd.counterMoves.clear();
+	_sd.cleanData();
+	_visitedNodes = 0;
+	_tbHits = 0;
+	_multiPVresult.clear();
+	_rootMovesAlreadySearched.clear();
 }
-inline void Search::enableFollowPv()
+inline void Search::impl::enableFollowPv()
 {
-	followPV = true;
+	_followPV = true;
 }
-inline void Search::disableFollowPv()
+inline void Search::impl::disableFollowPv()
 {
-	followPV = false;
+	_followPV = false;
 }
-inline void Search::manageLineToBefollowed(unsigned int ply, Move& ttMove)
+inline void Search::impl::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 {
-	if (followPV)
+	if (_followPV)
 	{
-		unsigned int lastElementIndex = pvLineToFollow.size() - 1;
-		// if line is already finished, stop following PV
+		unsigned int lastElementIndex = _pvLineToFollow.size() - 1;
+		// if line is already finished, _stop following PV
 		if( ply > lastElementIndex )
 		{
 			disableFollowPv();
@@ -120,10 +346,10 @@ inline void Search::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 		else
 		{
 			// overwrite the ttMove
-			PVline::iterator it = pvLineToFollow.begin();
+			PVline::iterator it = _pvLineToFollow.begin();
 			std::advance(it, ply);
 			ttMove = *it;
-			// if this is the last move of the PVline, stop following it
+			// if this is the last move of the PVline, _stop following it
 			if( ply == lastElementIndex )
 			{
 				disableFollowPv();
@@ -132,7 +358,7 @@ inline void Search::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 	}
 }
 
-void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
+void Search::impl::filterRootMovesByTablebase( std::vector<Move>& rm )
 {
 	unsigned results[TB_MAX_MOVES];
 
@@ -214,7 +440,7 @@ void Search::filterRootMovesByTablebase( std::vector<Move>& rm )
 	}
 }
 
-void Search::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
+void Search::impl::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
 {
 	rm.clear();
 	
@@ -234,168 +460,240 @@ void Search::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
 	}
 }
 
-startThinkResult Search::manageQsearch(void)
+SearchResult Search::impl::manageQsearch(void)
 {
 	PVline pvLine;
-	Score res =qsearch<Search::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, pvLine);
+	Score res =qsearch<Search::impl::nodeType::PV_NODE>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, pvLine);
 	
 	_UOI->printScore( res/100 );
 	
-	return startThinkResult( -SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, res );
+	return SearchResult( -SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, res );
+}
+/*
+void Search::impl::_printRootMoveList() const
+{
+	unsigned int i = 0;
+	sync_cout;
+	std::cout<<"move list"<<std::endl;
+	for( auto m: _rootMovesToBeSearched)
+	{
+		++i;
+		std::cout<<i<<": "<<displayUci(m)<<std::endl;
+		
+	}
+	std::cout<<sync_endl;
+}*/
+
+
+rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score beta, const bool masterThread)
+{
+	timeManagement &tm = my_thread::getInstance().getTimeMan();
+
+	rootMove bestMove(Move::NOMOVE);
+	Score delta = 800;
+	//----------------------------------
+	// prepare alpha & beta
+	//----------------------------------
+	if (depth >= 5)
+	{
+		delta = 800;
+		alpha = (Score) std::max((signed long long int)_expectedValue - delta,(signed long long int) SCORE_MATED);
+		beta  = (Score) std::min((signed long long int)_expectedValue + delta,(signed long long int) SCORE_MATE);
+	}
+
+	int globalReduction = 0;
+
+	//----------------------------------
+	// aspiration window
+	//----------------------------------
+	do
+	{
+		_maxPlyReached = 0;
+		_validIteration = false;
+		enableFollowPv();
+		PVline newPV;
+		newPV.clear();
+
+		Score res = alphaBeta<Search::impl::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
+
+		if(_validIteration || !_stop)
+		{
+			long long int elapsedTime = _st.getElapsedTime();
+
+			if (res <= alpha)
+			{
+				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound);
+
+				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
+
+				globalReduction = 0;
+				if( masterThread )
+				{
+					tm.notifyFailLow();
+				}
+			}
+			else if (res >= beta)
+			{
+				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound);
+
+				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
+				if(depth > 1)
+				{
+					globalReduction = 1;
+				}
+				if( masterThread )
+				{
+					tm.notifyFailOver();
+				}
+				_pvLineToFollow = newPV;
+
+				bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+			}
+			else
+			{
+				bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
+				return bestMove;
+				break;
+			}
+			
+			delta += delta / 2;
+		}
+	}
+	while(!_stop);
+
+	return bestMove;
+
 }
 
-void Search::idLoop(rootMove& bestMove, int depth, Score alpha, Score beta , bool masterThread)
+void Search::impl::excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread )
 {
+	if( masterThread )
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+
+		// get temporary results from all the threads
+		std::map<unsigned short, unsigned int> tempBestMoves;
+		for( auto& m: temporaryResults)
+		{
+			tempBestMoves[m.firstMove.getPacked()]++;
+		}
+
+		Move mostSearchedMove = Move(tempBestMoves.begin()->first);
+		unsigned int max = tempBestMoves.begin()->second;
+		for( const auto& m: tempBestMoves )
+		{
+			if( m.second > max)
+			{
+				max = m.second;
+				mostSearchedMove = Move(m.first);
+			}
+		}
+
+		unsigned int threshold = uciParameters::threads * 0.75;
+		// and make some of search alternative moves
+		for( unsigned int i = 1; i < uciParameters::threads; ++i)
+		{
+			if( i >= threshold)
+			{
+				toBeExcludedMove[i] = mostSearchedMove;
+			}
+			else
+			{
+				toBeExcludedMove[i] = Move::NOMOVE;
+			}
+		}
+	}
+	else
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		// filter out some root move to search alternatives
+		_sd.story[0].excludeMove = toBeExcludedMove[index];
+	}
+}
+
+void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
+{
+	//_printRootMoveList();
+	rootMove& bestMove = temporaryResults[index];
+	
 	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
-	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)rootMoves.size());
-	
-	Score delta = 800;
-	
+	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size());
+
 	// ramdomly initialize the bestmove
-	bestMove = rootMoves[0];
+	bestMove = _rootMovesToBeSearched[0];
 	
 	do
 	{
-		_UOI->printDepth(depth);
+		_UOI->setDepth(depth);
+		_UOI->printDepth();
+
+		//----------------------------
+		// exclude root moves in multithread search
+		//----------------------------
+		excludeRootMoves(temporaryResults, index, toBeExcludedMove, masterThread);
+
 		//----------------------------
 		// iterative loop
 		//----------------------------
+		const auto previousIterationResults = _multiPVresult;
 
-		std::vector<rootMove> previousIterationResults = rootMovesSearched;
-		rootMovesSearched.clear();
+		_multiPVresult.clear();
+		_rootMovesAlreadySearched.clear();
 		
 		//----------------------------------
 		// multi PV loop
 		//----------------------------------
-		for (multiPVcounter = 0; multiPVcounter < linesToBeSearched; ++multiPVcounter)
+		for ( unsigned int _multiPVcounter = 0; _multiPVcounter < linesToBeSearched; ++_multiPVcounter )
 		{
-
-			//----------------------------------
-			// prepare alpha & beta
-			//----------------------------------
-			if (depth >= 5)
-			{
-				delta = 800;
-				alpha = (Score) std::max((signed long long int)(previousIterationResults[multiPVcounter].score) - delta,(signed long long int) SCORE_MATED);
-				beta  = (Score) std::min((signed long long int)(previousIterationResults[multiPVcounter].score) + delta,(signed long long int) SCORE_MATE);
-			}
-
-			Search::globalReduction = 0;
-
+			_UOI->setPVlineIndex(_multiPVcounter);
 			//----------------------------------
 			// reload PV
 			//----------------------------------
-			if( previousIterationResults.size() > multiPVcounter )
+			if( previousIterationResults.size() > _multiPVcounter )
 			{
-				ExpectedValue = previousIterationResults[multiPVcounter].score;
-				pvLineToFollow = previousIterationResults[multiPVcounter].PV;
-				enableFollowPv();
+				_expectedValue = previousIterationResults[_multiPVcounter].score;
+				_pvLineToFollow = previousIterationResults[_multiPVcounter].PV;
 			}
 			else
 			{
-				ExpectedValue = -SCORE_INFINITE;
-				pvLineToFollow.reset();
-				disableFollowPv();
+				_expectedValue = -SCORE_INFINITE;
+				_pvLineToFollow.clear();
+
 			}
-			
-			
+
 			//----------------------------------
 			// aspiration window
 			//----------------------------------
-			do
+			rootMove res = aspirationWindow( depth, alpha, beta, masterThread);
+			if( res.firstMove != Move::NOMOVE )
 			{
+				bestMove = res;
+				_multiPVresult.push_back(bestMove);
+				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
+			}
 
-				maxPlyReached = 0;
-				validIteration = false;
-				enableFollowPv();
-
-				PVline newPV;
-				newPV.reset();
-				
-				Score res = alphaBeta<Search::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
-
-				if(validIteration ||!stop)
-				{
-					long long int elapsedTime = _st.getElapsedTime();
-
-					if (res <= alpha)
-					{
-
-						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, multiPVcounter, newPV, getVisitedNodes());
-
-						alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
-
-						globalReduction = 0;
-						if( masterThread )
-						{
-							thr.getTimeMan().notifyFailLow();
-						}
-						
-						// follow the old PV
-						enableFollowPv();
-
-					}
-					else if (res >= beta)
-					{
-
-						_UOI->printPV(res, depth, maxPlyReached, alpha, beta, elapsedTime, multiPVcounter, newPV, getVisitedNodes());
-
-						beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
-						if(depth > 1)
-						{
-							globalReduction = 1;
-						}
-						if( masterThread )
-						{
-							thr.getTimeMan().notifyFailOver();
-						}
-						
-						pvLineToFollow = newPV;
-						enableFollowPv();
-												
-						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
-					}
-					else
-					{
-						bestMove = rootMove( newPV.getMove(0), newPV, res, maxPlyReached, depth, getVisitedNodes(), elapsedTime );
-						
-						rootMovesSearched.push_back(bestMove);
-
-						break;
-					}
-
-
-					delta += delta / 2;
-				}
-
-
-
-			}while(!stop);
-
-			if((!stop || validIteration) && (linesToBeSearched > 1 || depth == 1) )
+			if((!_stop || _validIteration) && (linesToBeSearched > 1 || depth == 1) )
 			{
 
 				// Sort the PV lines searched so far and update the GUI				
-				std::stable_sort(rootMovesSearched.begin(), rootMovesSearched.end());
-				bestMove = rootMovesSearched[0];
+				std::stable_sort(_multiPVresult.begin(), _multiPVresult.end());
+				bestMove = _multiPVresult[0];
 				
-				_UOI->printPVs( rootMovesSearched );
+				_UOI->printPVs( _multiPVresult );
 			}
 		}
-
 
 		if( masterThread )
 		{
 			thr.getTimeMan().notifyIterationHasBeenFinished();
 		}
-
 	}
-	while( ++depth <= (_sl.depth != -1 ? _sl.depth : 100) && !stop);
+	while( ++depth <= (_sl.depth != -1 ? _sl.depth : 100) && !_stop);
 
 }
 
-startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed)
+SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed)
 {
 	//------------------------------------
 	//init the new search
@@ -404,7 +702,21 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//clean transposition table
 	transpositionTable::getInstance().newSearch();
 	
-	pvLineToFollow = pvToBeFollowed;
+	_pvLineToFollow = pvToBeFollowed;
+	
+	//--------------------------------
+	// generate the list of root moves to be searched
+	//--------------------------------
+	generateRootMovesList( _rootMovesToBeSearched, _sl.searchMoves );
+	
+	//--------------------------------
+	//	tablebase probing, filtering rootmoves to be searched
+	//--------------------------------
+	if(_sl.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
+	{
+		filterRootMovesByTablebase( _rootMovesToBeSearched );
+	}
+	
 
 	// setup main thread
 	cleanMemoryBeforeStartingNewSearch();
@@ -421,21 +733,8 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 		// setup helper thread
 		hs.cleanMemoryBeforeStartingNewSearch();
 	}
-
-	//--------------------------------
-	// generate the list of root moves to be searched
-	//--------------------------------
-	generateRootMovesList( rootMoves, _sl.searchMoves );
 	
-	//--------------------------------
-	//	tablebase probing, filtering rootmoves to be searched
-	//--------------------------------
-	if(_sl.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
-	{
-		filterRootMovesByTablebase( rootMoves );
-	}
-	
-	initialNextMove = pos.getNextTurn();
+	_initialTurn = pos.getNextTurn();
 	//----------------------------------
 	// we can start the real search
 	//----------------------------------
@@ -454,28 +753,27 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	std::vector<std::thread> helperThread;
 	Move m(0);
 	rootMove rm(m);
-	std::vector<rootMove> helperResults( uciParameters::threads - 1, rm);
+	std::vector<rootMove> helperResults( uciParameters::threads, rm);
+	std::vector<Move> toBeExcludedMove( uciParameters::threads, Move::NOMOVE);
 
 	// launch helper threads
-	for( unsigned int i = 0; i < ( uciParameters::threads - 1); ++i)
+	for( unsigned int i = 1; i < ( uciParameters::threads); ++i)
 	{
 
 		helperResults[i].firstMove = m;
-		
-		helperSearch[i].cleanMemoryBeforeStartingNewSearch();
-		helperSearch[i].resetStopCondition();
-		helperSearch[i].pos = pos;
-		helperSearch[i].pvLineToFollow = pvLineToFollow;
-		helperThread.emplace_back( std::thread(&Search::idLoop, &helperSearch[i], std::ref(helperResults[i]),depth, alpha, beta, false));
+		helperSearch[i-1].resetStopCondition();
+		helperSearch[i-1].pos = pos;
+		helperSearch[i-1]._pvLineToFollow = _pvLineToFollow;
+		helperThread.emplace_back( std::thread(&Search::impl::idLoop, &helperSearch[i-1], std::ref(helperResults), i, std::ref(toBeExcludedMove),depth, alpha, beta, false));
 	}
 
 	//----------------------------------
 	// iterative deepening loop
 	//----------------------------------
-	rootMove MainThreadMove(m);
-	idLoop(MainThreadMove, depth, alpha, beta, true);
+	helperResults[0].firstMove = m;
+	idLoop(helperResults, 0, toBeExcludedMove,depth, alpha, beta, true);
 	
-	// stop helper threads
+	// _stop helper threads
 	for(unsigned int i = 0; i< ( uciParameters::threads - 1); i++)
 	{
 		helperSearch[i].stopSearch();
@@ -488,124 +786,223 @@ startThinkResult Search::startThinking(int depth, Score alpha, Score beta, PVlin
 	//----------------------------------
 	// gather results
 	//----------------------------------
+	const rootMove& bestMove = voteSystem(helperResults).getBestMove();
 	
-	helperResults.push_back(MainThreadMove);
-	
-	std::map<unsigned short, int> votes;
-	
-	Score minScore = MainThreadMove.score;
-	for (auto &res : helperResults)
-	{
-		minScore = std::min( minScore, res.score );
-		votes[ res.firstMove.getPacked() ] = 0;
-	}
-	
-	for (auto &res : helperResults)
-	{
-		votes[ res.firstMove.getPacked() ] += (int)( res.score - minScore ) + 40 * res.depth;
-	}
-	
-	rootMove* bestMove = &MainThreadMove;
-	int bestResult = votes[ MainThreadMove.firstMove.getPacked() ];
-	
-	for ( auto &res : helperResults )
-	{
-		if( votes[ res.firstMove.getPacked() ] > bestResult )
-		{
-			bestResult = votes[ res.firstMove.getPacked() ];
-			bestMove = &res;
-		}
-	}
-	
-	//std::cout<<"-------main thread----------"<<std::endl;
-	//std::cout<<"bestMove "<<displayUci(bestMove.firstMove)<<std::endl;
-	//std::cout<<"score "<<bestMove.score<<std::endl;
-	//std::cout<<"depth "<<bestMove.depth<<std::endl;
-	//for(unsigned int i = 0; i< (threads - 1); i++)
-	//{
-	//	std::cout<<"-------helper thread----------"<<std::endl;
-	//	std::cout<<"bestMove "<<displayUci(helperResults[i].firstMove)<<std::endl;
-	//	std::cout<<"score "<<helperResults[i].score<<std::endl;
-	//	std::cout<<"depth "<<helperResults[i].depth<<std::endl;
-	//}
-	
-	
-	return startThinkResult( alpha, beta, bestMove->depth, bestMove->PV, bestMove->score);
+	return SearchResult( alpha, beta, bestMove.depth, bestMove.PV, bestMove.score);
 
 }
 
-inline void Search::_updateCounterMove(const Move& m)
+inline void Search::impl::_updateCounterMove(const Move& m)
 {
 	if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
 	{
-		sd.counterMoves.update( pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
+		_sd.counterMoves.update( pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
 	}
 }
 
-template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
+bool Search::impl::_manageDraw(const bool PVnode, PVline& pvLine)
 {
+	if(pos.isDraw(PVnode) || _stop)
+	{
+		if(PVnode)
+		{
+			pvLine.clear();
+		}
+		return true;
+	}
+	return false;
+}
 
-	assert(alpha <beta);
-	assert(alpha>=-SCORE_INFINITE);
-	assert(beta<=SCORE_INFINITE);
-	assert(depth>=ONE_PLY);
-
-	visitedNodes++;
-	sd.clearKillers(ply+1);
-
-	const bool PVnode = ( type == Search::nodeType::PV_NODE || type == Search::nodeType::ROOT_NODE );
-	const bool inCheck = pos.isInCheck();
-	bool improving = false;
-	sd.story[ply].inCheck = inCheck;
-	//Move threatMove(Move::NOMOVE);
-
-
-	//--------------------------------------
-	// show current line if needed
-	//--------------------------------------
+void Search::impl::_showCurrenLine( const unsigned int ply, const int depth )
+{
 	if( _showLine && depth <= ONE_PLY)
 	{
 		_showLine = false;
 		_UOI->showCurrLine(pos,ply);
 	}
+}
+
+inline bool Search::impl::_MateDistancePruning( const unsigned int ply, Score& alpha, Score& beta) const
+{
+	alpha = std::max(matedIn(ply), alpha);
+	beta = std::min(mateIn(ply+1), beta);
+	if (alpha >= beta)
+	{
+		return true;
+	}
+	return false;
+}
+void Search::impl::_appendTTmoveIfLegal( const Move& ttm, PVline& pvLine ) const
+{
+	if( pos.isMoveLegal(ttm) )
+	{
+		pvLine.appendNewMove( ttm );
+	}
+	else
+	{
+		pvLine.clear();
+	}
+}
+
+inline bool Search::impl::_canUseTTeValue( const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte, short int depth ) const
+{
+	return
+		( tte->getDepth() >= depth )
+		&& ( ttValue != SCORE_NONE )// Only in case of TT access race
+		&& (
+			PVnode ?
+				false :
+			ttValue >= beta ?
+				tte->isTypeGoodForBetaCutoff():
+				tte->isTypeGoodForAlphaCutoff()
+		);
+}
+
+inline const HashKey Search::impl::_getSearchKey( const bool excludedMove ) const
+{
+	return excludedMove ? pos.getExclusionKey() : pos.getKey();
+}
+
+inline Search::impl::tableBaseRes Search::impl::_checkTablebase( const unsigned int ply, const int depth )
+{
+	tableBaseRes res{typeScoreLowerThanAlpha, SCORE_NONE};
+	if( TB_LARGEST )
+	{
+		res.TTtype = typeScoreLowerThanAlpha;
+		unsigned int piecesCnt = bitCnt (pos.getBitmap(whitePieces) | pos.getBitmap(blackPieces));
+
+		if (    piecesCnt <= TB_LARGEST
+			&& (piecesCnt <  TB_LARGEST || depth >= (int)( uciParameters::SyzygyProbeDepth * ONE_PLY ) )
+			&&  pos.getActualStateConst().getIrreversibleMoveCount() == 0)
+		{
+			unsigned result = tb_probe_wdl(pos.getBitmap(whitePieces),
+				pos.getBitmap(blackPieces),
+				pos.getBitmap(blackKing) | pos.getBitmap(whiteKing),
+				pos.getBitmap(blackQueens) | pos.getBitmap(whiteQueens),
+				pos.getBitmap(blackRooks) | pos.getBitmap(whiteRooks),
+				pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
+				pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
+				pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
+				pos.getActualStateConst().getIrreversibleMoveCount(),
+				pos.getActualStateConst().getCastleRights(),
+				pos.hasEpSquare() ? pos.getEpSquare(): 0,
+				pos.isWhiteTurn() );
+
+			if(result != TB_RESULT_FAILED)
+			{
+				++_tbHits;
+
+				unsigned wdl = TB_GET_WDL(result);
+				assert(wdl<5);
+				if( uciParameters::Syzygy50MoveRule )
+				{
+					switch(wdl)
+					{
+					case 0:
+						res.value = SCORE_MATED +100 +ply;
+						res.TTtype = typeScoreLowerThanAlpha;
+						break;
+					case 1:
+						res.TTtype = typeExact;
+						res.value = -100;
+						break;
+					case 2:
+						res.TTtype = typeExact;
+						res.value = 0;
+						break;
+					case 3:
+						res.TTtype = typeExact;
+						res.value = 100;
+						break;
+					case 4:
+						res.TTtype = typeScoreHigherThanBeta;
+						res.value = SCORE_MATE -100 -ply;
+						break;
+					default:
+						res.value = 0;
+					}
+
+				}
+				else
+				{
+					switch(wdl)
+					{
+					case 0:
+					case 1:
+						res.TTtype = typeScoreLowerThanAlpha;
+						res.value = SCORE_MATED +100 +ply;
+						break;
+					case 2:
+						res.TTtype = typeExact;
+						res.value = 0;
+						break;
+					case 3:
+					case 4:
+						res.TTtype = typeScoreHigherThanBeta;
+						res.value = SCORE_MATE -100 -ply;
+						break;
+					default:
+						res.value = 0;
+					}
+				}
+			}
+		}
+	}
+	return res;
+
+}
+
+template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
+{
+	//--------------------------------------
+	// node asserts
+	//--------------------------------------
+	assert(alpha <beta);
+	assert(alpha>=-SCORE_INFINITE);
+	assert(beta<=SCORE_INFINITE);
+	assert(depth>=ONE_PLY);
+
+	//--------------------------------------
+	// initialize node constants
+	//--------------------------------------
+	const bool PVnode = ( type == nodeType::PV_NODE || type == nodeType::ROOT_NODE );
+	const bool inCheck = pos.isInCheck();
+	_sd.story[ply].inCheck = inCheck;
+
+	_updateNodeStatistics(ply);
+	_sd.clearKillers(ply+1);
+
+	//--------------------------------------
+	// show current line if needed
+	//--------------------------------------
+	_showCurrenLine( ply, depth );
 
 	//--------------------------------------
 	// choose node type
 	//--------------------------------------
-
-	const Search::nodeType childNodesType =
-			type == Search::nodeType::ALL_NODE ?
-					Search::nodeType::CUT_NODE :
-					type == Search::nodeType::CUT_NODE ? Search::nodeType::ALL_NODE : Search::nodeType::PV_NODE;
-					
+	const nodeType childNodesType =
+		type == nodeType::ALL_NODE ?
+			nodeType::CUT_NODE :
+		type == nodeType::CUT_NODE ?
+			nodeType::ALL_NODE :
+			nodeType::PV_NODE;
 	(void)childNodesType;	// to suppress warning in root node and PV nodes
 
-	if(type != Search::nodeType::ROOT_NODE )
-	{
-		if(pos.isDraw(PVnode) || stop)
-		{
-			if constexpr (PVnode)
-			{
-				pvLine.reset();
-			}
-			return getDrawValue();
-		}
 
+	if(type != nodeType::ROOT_NODE )
+	{
+		//---------------------------------------
+		//	Manage Draw
+		//---------------------------------------
+		if( _manageDraw( PVnode, pvLine) ) return getDrawValue();
 		//---------------------------------------
 		//	MATE DISTANCE PRUNING
 		//---------------------------------------
-		alpha = std::max(matedIn(ply), alpha);
-		beta = std::min(mateIn(ply+1), beta);
-		if (alpha >= beta)
-		{
-			return alpha;
-		}
-
+		if( _MateDistancePruning( ply, alpha, beta) ) return alpha;
 	}
 
-	const Move& excludedMove = sd.story[ply].excludeMove;
-
-	const HashKey& posKey = excludedMove ? pos.getExclusionKey() : pos.getKey();
+	const Move& excludedMove = _sd.story[ply].excludeMove;
+	const HashKey& posKey = _getSearchKey( (bool)excludedMove );
 
 	//--------------------------------------
 	// test the transposition table
@@ -614,14 +1011,16 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Move ttMove( tte->getPackedMove() );
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
-	if (	type != Search::nodeType::ROOT_NODE
-			&& tte->getDepth() >= (depth +1 - ONE_PLY)
-		    && ttValue != SCORE_NONE // Only in case of TT access race
-		    && (	PVnode ?  false
-		            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
-		                              : tte->isTypeGoodForAlphaCutoff()))
+	if (	type != nodeType::ROOT_NODE
+			&& _canUseTTeValue( PVnode, beta, ttValue, tte, (depth +1 - ONE_PLY) )
+		)
 	{
 		transpositionTable::getInstance().refresh(*tte);
+		
+		if constexpr (PVnode)
+		{
+			_appendTTmoveIfLegal( ttMove, pvLine);
+		}
 
 		//save killers
 		if (ttValue >= beta
@@ -629,128 +1028,38 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			&& !pos.isCaptureMoveOrPromotion(ttMove)
 			&& !inCheck)
 		{
-			sd.saveKillers(ply, ttMove);
+			_sd.saveKillers(ply, ttMove);
 			_updateCounterMove( ttMove );
-		}
-		
-
-		if constexpr (PVnode)
-		{
-			if(pos.isMoveLegal(ttMove))
-			{
-				pvLine.appendNewMove( ttMove );
-			}
-			else
-			{
-				pvLine.reset();
-			}
 		}
 		return ttValue;
 	}
 	
+	//--------------------------------------
 	// overwrite ttMove with move from move from PVlineToBeFollowed
+	//--------------------------------------
 	if constexpr ( PVnode )
 	{
 		manageLineToBefollowed(ply, ttMove);
 	}
 
-	//Tablebase probe
+	//--------------------------------------
+	// table base prove
+	//--------------------------------------
 	if constexpr (!PVnode)
 	{
-		if( TB_LARGEST )
+		auto res = _checkTablebase( ply,depth );
+		if( res.value != SCORE_NONE )
 		{
-			ttType TTtype = typeScoreLowerThanAlpha;
-			unsigned int piecesCnt = bitCnt (pos.getBitmap(whitePieces) | pos.getBitmap(blackPieces));
-
-			if (    piecesCnt <= TB_LARGEST
-				&& (piecesCnt <  TB_LARGEST || depth >= (int)( uciParameters::SyzygyProbeDepth * ONE_PLY ) )
-				&&  pos.getActualStateConst().getIrreversibleMoveCount() == 0)
+			if(	res.TTtype == typeExact || (res.TTtype == typeScoreHigherThanBeta  && res.value >=beta) || (res.TTtype == typeScoreLowerThanAlpha && res.value <=alpha)	)
 			{
-				unsigned result = tb_probe_wdl(pos.getBitmap(whitePieces),
-					pos.getBitmap(blackPieces),
-					pos.getBitmap(blackKing) | pos.getBitmap(whiteKing),
-					pos.getBitmap(blackQueens) | pos.getBitmap(whiteQueens),
-					pos.getBitmap(blackRooks) | pos.getBitmap(whiteRooks),
-					pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
-					pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
-					pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
-					pos.getActualStateConst().getIrreversibleMoveCount(),
-					pos.getActualStateConst().getCastleRights(),
-					pos.hasEpSquare() ? pos.getEpSquare(): 0,
-					pos.isWhiteTurn() );
+				transpositionTable::getInstance().store(posKey,
+					transpositionTable::scoreToTT(res.value, ply),
+					res.TTtype,
+					std::min(90, depth + 6 * ONE_PLY),
+					ttMove,
+					pos.eval<false>());
 
-				if(result != TB_RESULT_FAILED)
-				{
-					tbHits++;
-
-					Score value;
-					unsigned wdl = TB_GET_WDL(result);
-					assert(wdl<5);
-					if( uciParameters::Syzygy50MoveRule )
-					{
-						switch(wdl)
-						{
-						case 0:
-							value = SCORE_MATED +100 +ply;
-							TTtype = typeScoreLowerThanAlpha;
-							break;
-						case 1:
-							TTtype = typeExact;
-							value = -100;
-							break;
-						case 2:
-							TTtype = typeExact;
-							value = 0;
-							break;
-						case 3:
-							TTtype = typeExact;
-							value = 100;
-							break;
-						case 4:
-							TTtype = typeScoreHigherThanBeta;
-							value = SCORE_MATE -100 -ply;
-							break;
-						default:
-							value = 0;
-						}
-
-					}
-					else
-					{
-						switch(wdl)
-						{
-						case 0:
-						case 1:
-							TTtype = typeScoreLowerThanAlpha;
-							value = SCORE_MATED +100 +ply;
-							break;
-						case 2:
-							TTtype = typeExact;
-							value = 0;
-							break;
-						case 3:
-						case 4:
-							TTtype = typeScoreHigherThanBeta;
-							value = SCORE_MATE -100 -ply;
-							break;
-						default:
-							value = 0;
-						}
-					}
-
-
-					if(	TTtype == typeExact || (TTtype == typeScoreHigherThanBeta  && value >=beta) || (TTtype == typeScoreLowerThanAlpha && value <=alpha)	)
-					{
-						transpositionTable::getInstance().store(posKey,
-							transpositionTable::scoreToTT(value, ply),
-							TTtype,
-							std::min(90, depth + 6 * ONE_PLY),
-							ttMove.getPacked(),
-							pos.eval<false>());
-
-						return value;
-					}
-				}
+				return res.value;
 			}
 		}
 	}
@@ -774,11 +1083,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	else
 	{
 		staticEval = tte->getStaticValue();
+		eval = staticEval;
 		assert(staticEval < SCORE_INFINITE);
 		assert(staticEval > -SCORE_INFINITE);
-
-		eval = staticEval;
-
 
 		if (ttValue != SCORE_NONE)
 		{
@@ -792,9 +1099,10 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 	}
 	
-	sd.story[ply].staticEval = staticEval;
+	_sd.story[ply].staticEval = staticEval;
 	
-	if( ply <2 || inCheck || ( ply >=2 && sd.story[ply-2].inCheck ) || ( ply >=2 && sd.story[ply].staticEval >= sd.story[ply-2].staticEval ) )
+	bool improving = false;
+	if( ply <2 || inCheck || ( ply >=2 && _sd.story[ply-2].inCheck ) || ( ply >=2 && _sd.story[ply].staticEval >= _sd.story[ply-2].staticEval ) )
 	{
 		improving = true;
 	}
@@ -812,7 +1120,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//------------------------
 			// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
 			//------------------------
-			if (!sd.story[ply].skipNullMove
+			if (!_sd.story[ply].skipNullMove
 				&&  depth < 4 * ONE_PLY
 				&&  eval + razorMargin(depth,type==CUT_NODE) <= alpha
 				&&  alpha >= -SCORE_INFINITE+razorMargin(depth,type==CUT_NODE)
@@ -835,14 +1143,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//---------------------------
 			//	at very low deep and with an evaluation well above beta, bet that we can found a move with a result above beta
 			//---------------------------
-
-			const state& st = pos.getActualStateConst();
-
-			if (!sd.story[ply].skipNullMove
+			if (!_sd.story[ply].skipNullMove
 				&& depth < 8 * ONE_PLY
 				&& eval - futility( depth, improving ) >= beta
 				&& eval < SCORE_KNOWN_WIN
-				&& ( ( pos.isBlackTurn() && st.getNonPawnValue()[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.getNonPawnValue()[0] >= Position::pieceValue[whiteKnights][0])))
+				&& pos.hasActivePlayerNonPawnMaterial()
+			)
 			{
 				assert((depth>>ONE_PLY_SHIFT)<8);
 				return eval;
@@ -858,8 +1164,8 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 			if( depth >= ONE_PLY
 				&& eval >= beta
-				&& !sd.story[ply].skipNullMove
-				&& ( ( pos.isBlackTurn() && st.getNonPawnValue()[2] >= Position::pieceValue[whiteKnights][0]) || ( pos.isWhiteTurn() && st.getNonPawnValue()[0] >= Position::pieceValue[whiteKnights][0]))
+				&& !_sd.story[ply].skipNullMove
+				&& pos.hasActivePlayerNonPawnMaterial()
 			){
 				// Null move dynamic reduction based on depth
 				int red = 3 * ONE_PLY + depth / 4;
@@ -871,7 +1177,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				}
 
 				pos.doNullMove();
-				sd.story[ply+1].skipNullMove = true;
+				_sd.story[ply+1].skipNullMove = true;
 
 				//uint64_t nullKey = pos.getKey();
 				Score nullVal;
@@ -886,7 +1192,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				}
 
 				pos.undoNullMove();
-				sd.story[ply+1].skipNullMove = false;
+				_sd.story[ply+1].skipNullMove = false;
 
 				if (nullVal >= beta)
 				{
@@ -904,11 +1210,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 					}
 
 					// Do verification search at high depths
-					sd.story[ply].skipNullMove = true;
+					_sd.story[ply].skipNullMove = true;
 					assert(depth - red >= ONE_PLY);
 					Score val;
 						val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
-					sd.story[ply].skipNullMove = false;
+					_sd.story[ply].skipNullMove = false;
 					if (val >= beta)
 					{
 						return nullVal;
@@ -925,7 +1231,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			//------------------------
 
 			if( depth >= 5*ONE_PLY
-				&&  !sd.story[ply].skipNullMove
+				&&  !_sd.story[ply].skipNullMove
 				// && abs(beta)<SCORE_KNOWN_WIN
 				// && eval> beta-40000
 				&& abs(beta) < SCORE_MATE_IN_MAX_PLY
@@ -934,7 +1240,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				Score rBeta = std::min(beta + 8000, SCORE_INFINITE);
 				int rDepth = depth -ONE_PLY- 3*ONE_PLY;
 
-				MovePicker mp(pos, sd, ply, ttMove);
+				MovePicker mp(pos, _sd, ply, ttMove);
 				mp.setupProbCutSearch( pos.getCapturedPiece() );
 
 				Move m;
@@ -976,15 +1282,15 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	{
 		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
 
-		bool skipBackup = sd.story[ply].skipNullMove;
-		sd.story[ply].skipNullMove = true;
+		bool skipBackup = _sd.story[ply].skipNullMove;
+		_sd.story[ply].skipNullMove = true;
 
 		PVline childPV;
-		const Search::nodeType iidType = type;
+		const nodeType iidType = type;
 		assert(d >= ONE_PLY);
 		alphaBeta<iidType>(ply, d, alpha, beta, childPV);
 
-		sd.story[ply].skipNullMove = skipBackup;
+		_sd.story[ply].skipNullMove = skipBackup;
 
 		tte = transpositionTable::getInstance().probe(posKey);
 		ttMove = tte->getPackedMove();
@@ -998,7 +1304,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Move bestMove(Move::NOMOVE);
 
 	Move m;
-	MovePicker mp(pos, sd, ply, ttMove);
+	MovePicker mp(pos, _sd, ply, ttMove);
 	unsigned int moveNumber = 0;
 	unsigned int quietMoveCount = 0;
 	Move quietMoveList[64];
@@ -1006,7 +1312,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	Move captureMoveList[32];
 
 	bool singularExtensionNode =
-		type != Search::nodeType::ROOT_NODE
+		type != nodeType::ROOT_NODE
 		&& depth >= (PVnode ? 6 * ONE_PLY : 8 * ONE_PLY)
 		&& ttMove
 		&& !excludedMove // Recursive singular Search is not allowed
@@ -1024,7 +1330,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		}
 
 		// Search only the moves in the Search list
-		if( type == Search::nodeType::ROOT_NODE && ( std::count(rootMovesSearched.begin(), rootMovesSearched.end(), m ) || !std::count(rootMoves.begin(), rootMoves.end(), m) ) )
+		if( type == nodeType::ROOT_NODE && ( std::count(_rootMovesAlreadySearched.begin(), _rootMovesAlreadySearched.end(), m ) || !std::count(_rootMovesToBeSearched.begin(), _rootMovesToBeSearched.end(), m) ) )
 		{
 			continue;
 		}
@@ -1064,9 +1370,9 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			Score rBeta = ttValue - int(depth*20);
 			rBeta = std::max( rBeta, -SCORE_MATE + 1 );
 
-			sd.story[ply].excludeMove = m;
+			_sd.story[ply].excludeMove = m;
 			Score temp = alphaBeta<ALL_NODE>(ply, depth/2, rBeta-1, rBeta, childPv);
-			sd.story[ply].excludeMove = Move::NOMOVE;
+			_sd.story[ply].excludeMove = Move::NOMOVE;
 
 			if(temp < rBeta)
 			{
@@ -1080,7 +1386,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 		//---------------------------------------
 		//	FUTILITY PRUNING
 		//---------------------------------------
-		if( type != Search::nodeType::ROOT_NODE
+		if( type != nodeType::ROOT_NODE
 			&& !captureOrPromotion
 			&& !inCheck
 			&& m != ttMove
@@ -1126,7 +1432,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 				elapsed>3000 &&
 #endif
-				!stop
+				!_stop
 				)
 			{
 				_UOI->printCurrMoveNumber(moveNumber, m, getVisitedNodes(), elapsed);
@@ -1144,11 +1450,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 			{
 				if(newDepth < ONE_PLY)
 				{
-					val = -qsearch<Search::nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
+					val = -qsearch<nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
 				}
 				else
 				{
-					val = -alphaBeta<Search::nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
+					val = -alphaBeta<nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
 				}
 			}
 			else
@@ -1172,7 +1478,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 					if(reduction != 0)
 					{
-						val = -alphaBeta<Search::nodeType::CUT_NODE>(ply+1, d, -alpha-1, -alpha, childPV);
+						val = -alphaBeta<nodeType::CUT_NODE>(ply+1, d, -alpha-1, -alpha, childPV);
 						if(val<=alpha)
 						{
 							doFullDepthSearch = false;
@@ -1186,22 +1492,22 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 					if(newDepth<ONE_PLY)
 					{
-						val = -qsearch<Search::nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -qsearch<nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
 					}
 					else
 					{
-						val = -alphaBeta<Search::nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -alphaBeta<nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
 					}
 
 					if( val > alpha && val < beta )
 					{
 						if( newDepth < ONE_PLY )
 						{
-							val = -qsearch<Search::nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
+							val = -qsearch<nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
 						}
 						else
 						{
-							val = -alphaBeta<Search::nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
+							val = -alphaBeta<nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
 						}
 					}
 				}
@@ -1252,11 +1558,11 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				{
 					if(newDepth < ONE_PLY)
 					{
-						val = -qsearch<Search::nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -qsearch<nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
 					}
 					else
 					{
-						val = -alphaBeta<Search::nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -alphaBeta<nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
 					}
 				}
 			}
@@ -1264,7 +1570,7 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 		pos.undoMove();
 
-		if(!stop && val > bestScore)
+		if(!_stop && val > bestScore)
 		{
 			bestScore = val;
 
@@ -1275,15 +1581,15 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				{
 					alpha = bestScore;
 					pvLine.appendNewPvLine( bestMove, childPV);
-					if(type == Search::nodeType::ROOT_NODE && uciParameters::multiPVLines == 1 )
+					if(type == nodeType::ROOT_NODE && uciParameters::multiPVLines == 1 )
 					{
 						if(val < beta && depth > 1*ONE_PLY)
 						{
-							_UOI->printPV(val, depth/ONE_PLY+globalReduction, maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, _st.getElapsedTime(), multiPVcounter, pvLine, getVisitedNodes());
+							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes());
 						}
-						if(val > ExpectedValue - 800)
+						if(val > _expectedValue - 800)
 						{
-							validIteration = true;
+							_validIteration = true;
 						}
 					}
 				}
@@ -1332,12 +1638,12 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	if (bestScore == -SCORE_INFINITE)
 		bestScore = alpha;
 
-	if(!stop)
+	if(!_stop)
 	{
 		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta  ? typeScoreHigherThanBeta :
 					(PVnode && bestMove ) ? typeExact : typeScoreLowerThanAlpha,
-							(short int)depth, bestMove.getPacked(), staticEval);
+							(short int)depth, bestMove, staticEval);
 	}
 
 	// save killer move & update history
@@ -1346,18 +1652,18 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 	{
 		if (!pos.isCaptureMoveOrPromotion(bestMove))
 		{
-			sd.saveKillers(ply, bestMove);
+			_sd.saveKillers(ply, bestMove);
 
 			// update history
 			int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
 			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-			sd.history.update( pos.isWhiteTurn() ? white: black, bestMove, bonus);
+			_sd.history.update( pos.isWhiteTurn() ? white: black, bestMove, bonus);
 
 			for (unsigned int i = 0; i < quietMoveCount; i++)
 			{
 				Move m = quietMoveList[i];
-				sd.history.update( pos.isWhiteTurn() ? white: black, m, -bonus);
+				_sd.history.update( pos.isWhiteTurn() ? white: black, m, -bonus);
 			}
 			
 			_updateCounterMove( bestMove );
@@ -1370,14 +1676,14 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 				int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
 				Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-				sd.captureHistory.update( pos.getPieceAt(bestMove.getFrom()), bestMove, pos.getPieceAt(bestMove.getTo()), bonus);
+				_sd.captureHistory.update( pos.getPieceAt(bestMove.getFrom()), bestMove, pos.getPieceAt(bestMove.getTo()), bonus);
 
 				for (unsigned int i = 0; i < captureMoveCount; i++)
 				{
 					Move m = captureMoveList[i];
 					//if( pos.isCaptureMove( m ) )
 					{
-						sd.captureHistory.update( pos.getPieceAt(m.getFrom()), m, pos.getPieceAt(m.getTo()), -bonus);
+						_sd.captureHistory.update( pos.getPieceAt(m.getFrom()), m, pos.getPieceAt(m.getTo()), -bonus);
 					}
 				}
 			}
@@ -1390,78 +1696,66 @@ template<Search::nodeType type> Score Search::alphaBeta(unsigned int ply, int de
 
 }
 
-
-template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
+inline void Search::impl::_updateNodeStatistics(const unsigned int ply)
 {
+	_maxPlyReached = std::max(ply, _maxPlyReached);
+	++_visitedNodes;
+}
 
+
+template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
+{
+	//---------------------------------------
+	//	node asserts
+	//---------------------------------------
 	assert(ply>0);
 	assert(depth<ONE_PLY);
 	assert(alpha<beta);
 	assert(beta<=SCORE_INFINITE);
 	assert(alpha>=-SCORE_INFINITE);
-
-	const bool PVnode = (type == Search::nodeType::PV_NODE);
-	assert(PVnode || alpha+1==beta);
+	//---------------------------------------
+	//	initialize constants
+	//---------------------------------------
+	const bool PVnode = (type == nodeType::PV_NODE);
+	assert( PVnode || alpha + 1 == beta );
 
 	bool inCheck = pos.isInCheck();
-	sd.story[ply].inCheck = inCheck;
+	_sd.story[ply].inCheck = inCheck;
 
-	maxPlyReached = std::max(ply, maxPlyReached);
-	visitedNodes++;
+	_updateNodeStatistics(ply);
 
-
-
-	if(pos.isDraw(PVnode) || stop)
-	{
-
-		if constexpr (PVnode)
-		{
-			pvLine.reset();
-		}
-		return getDrawValue();
-	}
+	if( _manageDraw( PVnode, pvLine) ) return getDrawValue();
 	//---------------------------------------
 	//	MATE DISTANCE PRUNING
 	//---------------------------------------
-	//
-	//alpha = std::max(matedIn(ply), alpha);
-	//beta = std::min(mateIn(ply+1), beta);
-
+	//if( _MateDistancePruning( ply, alpha, beta) ) return alpha;
 
 	//----------------------------
 	//	next node type
 	//----------------------------
-	const Search::nodeType childNodesType =
-		type == Search::nodeType::ALL_NODE?
-			Search::nodeType::CUT_NODE:
-			type == Search::nodeType::CUT_NODE ? Search::nodeType::ALL_NODE:
-				Search::nodeType::PV_NODE;
+	const nodeType childNodesType =
+		type == nodeType::ALL_NODE ?
+			nodeType::CUT_NODE :
+		type == nodeType::CUT_NODE ?
+			nodeType::ALL_NODE :
+			nodeType::PV_NODE;
 
 
-	ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
+	const HashKey& posKey = _getSearchKey();
+	ttEntry* const tte = transpositionTable::getInstance().probe( pos.getKey() );
 	Move ttMove( tte->getPackedMove() );
 
-	MovePicker mp(pos, sd, ply, ttMove);
-	int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
+	MovePicker mp(pos, _sd, ply, ttMove);
+	
+	short int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(),ply);
-	if (tte->getDepth() >= TTdepth
-	    && ttValue != SCORE_NONE // Only in case of TT access race
-	    && (	PVnode ?  false
-	            : ttValue >= beta ? tte->isTypeGoodForBetaCutoff()
-	                              : tte->isTypeGoodForAlphaCutoff()))
+
+	if( _canUseTTeValue( PVnode, beta, ttValue, tte, TTdepth ) )
 	{
 		transpositionTable::getInstance().refresh(*tte);
-
 		if constexpr (PVnode)
 		{
-			if(pos.isMoveLegal(ttMove))
-			{
-				pvLine.appendNewMove(ttMove);
-			}
-			else
-			{
-				pvLine.reset();
-			}
+			_appendTTmoveIfLegal( ttMove, pvLine);
 		}
 		return ttValue;
 	}
@@ -1491,10 +1785,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		bestScore = staticEval;
 		// todo trovare un valore buono per il futility
 
-
-
-
-		if (ttValue != SCORE_NONE)
+		if( /*!PVnode && */ttValue != SCORE_NONE)
 		{
 			if (
 					( tte->isTypeGoodForBetaCutoff() && (ttValue > staticEval) )
@@ -1512,18 +1803,18 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 			// TODO testare se la riga TTtype=typeExact; ha senso
 			if constexpr (PVnode)
 			{
-				pvLine.reset();
+				pvLine.clear();
 			}
 
 			if( bestScore >= beta)
 			{
 				if( !pos.isCaptureMoveOrPromotion(ttMove) )
 				{
-					sd.saveKillers(ply, ttMove);
+					_sd.saveKillers(ply, ttMove);
 				}
-				if(!stop)
+				if(!_stop)
 				{
-					transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove.getPacked(), staticEval);
+					transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove, staticEval);
 				}
 				return bestScore;
 			}
@@ -1647,7 +1938,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				TTtype = typeExact;
 				alpha = bestScore;
 
-				if(PVnode && !stop)
+				if(PVnode && !_stop)
 				{
 					pvLine.appendNewPvLine( bestMove, childPV ); 
 
@@ -1656,11 +1947,11 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 				{
 					if( !pos.isCaptureMoveOrPromotion(bestMove) && !inCheck )
 					{
-						sd.saveKillers(ply, bestMove);
+						_sd.saveKillers(ply, bestMove);
 					}
-					if(!stop)
+					if(!_stop)
 					{
-						transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove.getPacked(), staticEval);
+						transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
 					}
 					return bestScore;
 				}
@@ -1673,7 +1964,7 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 		assert(inCheck);
 		if constexpr (PVnode)
 		{
-			pvLine.reset();
+			pvLine.clear();
 		}
 		return matedIn(ply);
 	}
@@ -1683,15 +1974,15 @@ template<Search::nodeType type> Score Search::qsearch(unsigned int ply, int dept
 
 
 
-	if( !stop )
+	if( !_stop )
 	{
-		transpositionTable::getInstance().store(pos.getKey(), transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove.getPacked(), staticEval);
+		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove, staticEval);
 	}
 	return bestScore;
 
 }
 
-void Search::setUOI( std::unique_ptr<UciOutput> UOI )
+void Search::impl::setUOI( std::unique_ptr<UciOutput> UOI )
 {
 	// manage output syncronization
 	sync_cout;
@@ -1699,13 +1990,13 @@ void Search::setUOI( std::unique_ptr<UciOutput> UOI )
 	std::cout<<sync_noNewLineEndl;
 }
 
-inline Score Search::getDrawValue() const
+inline Score Search::impl::getDrawValue() const
 {
-	int contemptSign = ( pos.getNextTurn() == initialNextMove) ? 1 : -1;
+	int contemptSign = ( pos.getNextTurn() == _initialTurn) ? 1 : -1;
 	return contemptSign * std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
 }
 
-void Search::initSearchParameters(void)
+void Search::impl::initSearchParameters(void)
 {
 	/***************************************************
 	 * LRM
@@ -1751,25 +2042,164 @@ void Search::initSearchParameters(void)
 	}
 }
 
-inline void SearchData::clearKillers(unsigned int ply)
+Move Search::impl::_getPonderMoveFromHash(const Move bestMove )
 {
-	Move * const tempKillers =  story[ply].killers;
-
-	tempKillers[1] = 0;
-	tempKillers[0] = 0;
-}
-inline void SearchData::cleanData(void)
-{
-	std::memset(story, 0, sizeof(story));
-}
-
-inline void SearchData::saveKillers(unsigned int ply, Move& m)
-{
-	Move * const tempKillers = story[ply].killers;
-	if(tempKillers[0] != m)
+	Move ponderMove(0);
+	pos.doMove( bestMove );
+	
+	const ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
+	
+	Move m( tte->getPackedMove() );
+	if( pos.isMoveLegal(m) )
 	{
-		tempKillers[1] = tempKillers[0];
-		tempKillers[0] = m;
+		ponderMove = m;
+	}
+	pos.undoMove();
+	
+	return ponderMove;
+}
+
+Move Search::impl::_getPonderMoveFromBook(const Move bookMove )
+{
+	Move ponderMove(0);
+	pos.doMove( bookMove );
+	PolyglotBook pol;
+	Move m = pol.probe( pos, uciParameters::bestMoveBook);
+	
+	if( pos.isMoveLegal(m) )
+	{
+		ponderMove = m;
+	}
+	pos.undoMove();
+	
+	return ponderMove;
+}
+
+void Search::impl::_waitStopPondering() const
+{
+	while(_sl.ponder){}
+}
+
+Position& Search::impl::getPosition()
+{
+	return pos;
+}
+
+void Search::impl::manageNewSearch()
+{
+	/*************************************************
+	 *	first of all check the number of legal moves
+	 *	if there is only 1 moves do it
+	 *	if there is 0 legal moves return null move
+	 *************************************************/
+
+	if( _game.isNewGame(pos))
+	{
+		_game.CreateNewGame();
+
+	}
+	_game.insertNewMoves(pos);
+
+	unsigned int legalMoves = pos.getNumberOfLegalMoves();
+
+	if(legalMoves == 0)
+	{
+		_UOI->printPV( Move::NOMOVE );
+		
+		_waitStopPondering();
+
+		_UOI->printBestMove( Move::NOMOVE, Move::NOMOVE );
+
+		return;
+	}
+	
+	if( legalMoves == 1 && !_sl.infinite )
+	{
+		Move bestMove = MovePicker( pos ).getNextMove();
+		
+		_UOI->printPV(bestMove);
+		
+		_waitStopPondering();
+		
+		Move ponderMove = _getPonderMoveFromHash( bestMove );
+		
+		_UOI->printBestMove( bestMove, ponderMove );
+
+		return;
+
 	}
 
+	//----------------------------------------------
+	//	book probing
+	//----------------------------------------------
+	if( uciParameters::useOwnBook && !_sl.infinite )
+	{
+		PolyglotBook pol;
+		Move bookM = pol.probe( pos, uciParameters::bestMoveBook);
+		if( bookM )
+		{
+			_UOI->printPV(bookM);
+			
+			_waitStopPondering();
+			
+			Move ponderMove = _getPonderMoveFromBook( bookM );
+			
+			_UOI->printBestMove(bookM, ponderMove);
+			
+			return;
+		}
+	}
+	
+	//if( game.isPonderRight() )
+	//{
+	//	Game::GamePosition gp = game.getNewSearchParameters();
+	//
+	//	PVline newPV;
+	//	std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
+	//	
+	//	newPV.resize(gp.depth/2 + 1);
+	//	newPV.pop_front();
+	//	newPV.pop_front();
+	//	res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
+	//}
+	//else
+	
+	SearchResult res = startThinking( );
+	
+	PVline PV = res.PV;
+
+	_waitStopPondering();
+
+	//-----------------------------
+	// print out the choosen line
+	//-----------------------------
+
+	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime());
+	
+	Move bestMove = PV.getMove(0);
+	Move ponderMove = PV.getMove(1);
+	if( !ponderMove )
+	{
+		ponderMove = _getPonderMoveFromHash( bestMove );
+	}
+	
+	_UOI->printBestMove( bestMove, ponderMove );
+
+	_game.savePV(PV, res.depth, res.alpha, res.beta);
+
 }
+
+
+
+void Search::initSearchParameters(){ Search::impl::initSearchParameters(); }
+Search::Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, std::move(UOI))}{}
+Search::~Search() = default;
+SearchResult Search::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed ){ return pimpl->startThinking(depth, alpha, beta, pvToBeFollowed); }
+void Search::stopSearch(){ pimpl->stopSearch(); }
+
+void Search::resetStopCondition(){ pimpl->resetStopCondition(); }
+unsigned long long Search::getVisitedNodes() const{ return pimpl->getVisitedNodes(); }
+unsigned long long Search::getTbHits() const{ return pimpl->getTbHits(); }
+void Search::showLine(){ pimpl->showLine(); }
+void Search::manageNewSearch(){ pimpl->manageNewSearch(); }
+Position& Search::getPosition(){ return pimpl->getPosition(); }

@@ -19,10 +19,9 @@
 #define MOVEPICK_H_
 
 #include "bitBoardIndex.h"
-#include "movegen.h"
 #include "MoveList.h"
 #include "move.h"
-#include "search.h"
+#include "searchData.h"
 #include "score.h"
 
 
@@ -36,7 +35,7 @@ public:
 	//--------------------------------------------------------
 	MovePicker(const Position & p, const SearchData& sd = _defaultSearchData, unsigned int ply = 0, const Move & ttm = Move::NOMOVE);
 	// todo transform them into constructor? create base class and derived?
-	int setupQuiescentSearch( const bool inCheck, const int depth );
+	short int setupQuiescentSearch( const bool inCheck, const int depth );
 	void setupProbCutSearch( const bitboardIndex capturePiece );
 	
 	//--------------------------------------------------------
@@ -89,8 +88,6 @@ public:
 	};
 	
 private:
-	
-	static SearchData _defaultSearchData; // convert to const
 	//--------------------------------------------------------
 	// private members
 	//--------------------------------------------------------

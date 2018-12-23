@@ -15,11 +15,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "movegen.h"
 #include "movepicker.h"
 #include "position.h"
-
-SearchData MovePicker::_defaultSearchData;
 
 MovePicker::MovePicker( const Position& p, const SearchData& sd, unsigned int ply, const Move& ttm ): _pos(p), _sd(sd), _ply(ply), _ttMove(ttm)
 {
@@ -265,7 +262,7 @@ bool MovePicker::isKillerMove(Move &m) const
 	return m == _killerMoves[0] || m == _killerMoves[1];
 }
 
-int MovePicker::setupQuiescentSearch( const bool inCheck, const int depth )
+short int MovePicker::setupQuiescentSearch( const bool inCheck, const int depth )
 {
 	if( inCheck)
 	{

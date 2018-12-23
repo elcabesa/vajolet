@@ -22,14 +22,17 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "move.h"
+
+#include "bitBoardIndex.h"
 #include "score.h"
 //--------------------------------------------------------------------
 //	forward declaration
 //--------------------------------------------------------------------
+class Move;
 class Position;
 class rootMove;
 class PVline;
+
 
 //--------------------------------------------------------------------
 //	function prototype
@@ -53,21 +56,38 @@ public:
 		standard,	// standard output
 		mute		// no output
 	};
+
+	enum PVbound
+	{
+		lowerbound,
+		upperbound,
+		normal
+	};
+
 	static std::unique_ptr<UciOutput> create( const UciOutput::type t  = UciOutput::standard );
 	
+	virtual void setDepth( const unsigned int depth ) final;
+	virtual void setPVlineIndex( const unsigned int PVlineIndex ) final;
+
+
 	// destructor
 	virtual ~UciOutput(){};
 	
 	// virtual output methods
 	virtual void printPVs(std::vector<rootMove>& rm) const = 0;
-	virtual void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, PVline& PV, const unsigned long long nodes) const = 0;
+	virtual void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1) const = 0;
+	virtual void printPV( const Move& m ) final;
 	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const = 0;
 	virtual void showCurrLine(const Position & pos, const unsigned int ply) const = 0;
-	virtual void printDepth(const unsigned int depth) const = 0;
+	virtual void printDepth() const = 0;
 	virtual void printScore(const signed int cp) const = 0;
-	virtual void printBestMove( const Move bm, const Move ponder = Move(0)  ) const = 0;
+	virtual void printBestMove( const Move bm, const Move& ponder ) const = 0;
 	virtual void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const = 0;
 	
+protected:
+	unsigned int _depth;
+	unsigned int _PVlineIndex;
+
 };
 
 #endif /* COMMAND_H_ */

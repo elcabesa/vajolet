@@ -15,14 +15,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-
-#include <thread>
 #include <mutex>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
+
 #include "io.h"
 
 using namespace std;

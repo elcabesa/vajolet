@@ -24,15 +24,10 @@
 #include <iostream>
 #include <string>
 
-
-#include "position.h"
-
+#include "bitBoardIndex.h"
 //forward declaration
 class Move;
-
-
-
-
+class Position;
 
 class PolyglotBook : public std::ifstream
 {
@@ -57,7 +52,7 @@ private:
 		uint16_t count;
 		uint32_t learn;
 	};
-	const unsigned int pieceMapping[lastBitboard] = {	0,11,9,7,5,3,1,0,0,10,8,6,4,2,0,0 };
+	const unsigned int pieceMapping[lastBitboard] = { 0,11,9,7,5,3,1,0,0,10,8,6,4,2,0,0 };
 
 	// Random numbers from PolyGlot, used to compute book hash keys
 	const union

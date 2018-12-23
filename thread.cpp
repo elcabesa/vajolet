@@ -15,25 +15,93 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "book.h"
-#include "command.h"
-#include "movegen.h"
-#include "movepicker.h"
+#include <condition_variable>
+#include <thread>
+
+#include "io.h"
+#include "position.h"
 #include "search.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
+#include "timeManagement.h"
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"
 
 
-volatile bool my_thread::_quit = false;
-volatile bool my_thread::_startThink = false;
+/*********************************************
+* implementation
+**********************************************/
+class my_thread::impl
+{
+private:
+	SearchLimits _limits; // todo limits belong to threads
+	SearchTimer _st;
+	Search _src;
+	timeManagement _timeMan;
 
-my_thread * my_thread::pInstance;
-std::mutex  my_thread::_mutex;
+	std::unique_ptr<UciOutput> _UOI;
 
-void my_thread::_printTimeDependentOutput(long long int time) {
+	volatile static bool _quit;
+	volatile static bool _startThink;
+	
+	volatile static bool _searcherReady;
+	volatile static bool _timerReady;
+
+	long long _lastHasfullMessage;
+	
+	std::thread _searcher;
+	std::thread _timer;
+	std::mutex _searchMutex;
+
+	std::condition_variable _searchCond;
+	std::condition_variable _timerCond;
+
+	bool _initThreads();
+
+	void _timerThread();
+	void _searchThread();
+	void _printTimeDependentOutput( long long int time );
+	bool _isReady();
+public:
+	impl();
+	~impl();
+	void startThinking( const Position& p, SearchLimits& l);
+	void stopThinking();
+	void ponderHit();
+	void stopPonder();
+	timeManagement& getTimeMan();
+	
+	
+	void quitThreads();
+};
+
+volatile bool my_thread::impl::_quit = false;
+volatile bool my_thread::impl::_startThink = false;
+
+volatile bool my_thread::impl::_searcherReady = false;
+volatile bool my_thread::impl::_timerReady = false;
+
+my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
+{
+	_UOI = UciOutput::create();
+	if( !_initThreads() )
+	{
+		sync_cout<<"unable to initialize threads, exiting..."<<sync_endl;
+		exit(-1);
+	}
+}
+
+my_thread::impl::~impl()
+{
+	quitThreads();
+}
+
+bool my_thread::impl::_isReady(){ return _searcherReady && _timerReady; }
+
+timeManagement& my_thread::impl::getTimeMan(){ return _timeMan; }
+
+void my_thread::impl::_printTimeDependentOutput(long long int time) {
 
 	if( time - _lastHasfullMessage > 1000 )
 	{
@@ -48,13 +116,13 @@ void my_thread::_printTimeDependentOutput(long long int time) {
 	}
 }
 
-void my_thread::_timerThread()
+void my_thread::impl::_timerThread()
 {
 	std::mutex mutex;
 	while (!_quit)
 	{
 		std::unique_lock<std::mutex> lk(mutex);
-
+		_timerReady = true;
 		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan.isSearchFinished() ) || _quit;} );
 
 		if (!_quit)
@@ -78,150 +146,50 @@ void my_thread::_timerThread()
 		}
 		lk.unlock();
 	}
+	_src.stopSearch();
 }
 
-void my_thread::_searchThread()
+void my_thread::impl::_searchThread()
 {
 	std::mutex mutex;
 	while (!_quit)
 	{
 
 		std::unique_lock<std::mutex> lk(mutex);
+		_searcherReady =  true;
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
 		if(!_quit)
 		{
 			_limits.checkInfiniteSearch();
-			_timeMan.initNewSearch( _src.pos.getNextTurn() );
+			_timeMan.initNewSearch( _src.getPosition().getNextTurn() );
 			_src.resetStopCondition();
 			_st.resetStartTimers();
 			_timerCond.notify_one();
-			_manageNewSearch();
+			_src.manageNewSearch();
 			_startThink = false;
 		}
 		lk.unlock();
 	}
 }
 
-void my_thread::_manageNewSearch()
+bool my_thread::impl::_initThreads()
 {
-
-
-	/*************************************************
-	 *	first of all check the number of legal moves
-	 *	if there is only 1 moves do it
-	 *	if there is 0 legal moves return null move
-	 *************************************************/
-
-	if( _game.isNewGame(_src.pos))
-	{
-		_game.CreateNewGame();
-
-	}
-	_game.insertNewMoves(_src.pos);
-
-	unsigned int legalMoves = _src.pos.getNumberOfLegalMoves();
-
-	if(legalMoves == 0)
-	{
-		PVline PV( 1, Move(0) );
-		_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
-		
-		_waitStopPondering();
-
-		_UOI->printBestMove( Move(0) );
-
-		return;
-	}
+	auto startTime = std::chrono::steady_clock::now();
 	
-	if( legalMoves == 1 && !_limits.infinite )
-	{
-		Move bestMove = MovePicker( _src.pos ).getNextMove();
-		
-		PVline PV( 1, bestMove );
-		_UOI->printPV( 0, 0, 0, -1, 1, 0, 0, PV, 0 );
-		
-		_waitStopPondering();
-		
-		Move ponderMove = _getPonderMoveFromHash( bestMove );
-		
-		_UOI->printBestMove( bestMove, ponderMove );
-
-		return;
-
-	}
-
-	//----------------------------------------------
-	//	book probing
-	//----------------------------------------------
-	if( uciParameters::useOwnBook && !_limits.infinite )
-	{
-		PolyglotBook pol;
-		Move bookM = pol.probe(_src.pos, uciParameters::bestMoveBook);
-		if( bookM )
-		{
-			PVline PV( 1, bookM );
-			
-			_UOI->printPV(0, 0, 0, -1, 1, 0, 0, PV, 0);
-			
-			_waitStopPondering();
-			
-			Move ponderMove = _getPonderMoveFromBook( bookM );
-			
-			_UOI->printBestMove(bookM, ponderMove);
-			
-			return;
-		}
-	}
-	
-	//if( game.isPonderRight() )
-	//{
-	//	Game::GamePosition gp = game.getNewSearchParameters();
-	//
-	//	PVline newPV;
-	//	std::copy( gp.PV.begin(), gp.PV.end(), std::back_inserter( newPV ) );
-	//	
-	//	newPV.resize(gp.depth/2 + 1);
-	//	newPV.pop_front();
-	//	newPV.pop_front();
-	//	res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
-	//}
-	//else
-	
-	startThinkResult res = _src.startThinking( );
-	
-	PVline PV = res.PV;
-
-	_waitStopPondering();
-
-	//-----------------------------
-	// print out the choosen line
-	//-----------------------------
-
-	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), _src.getTbHits(), _src.getVisitedNodes(), _st.getElapsedTime());
-	
-	Move bestMove = PV.getMove(0);
-	Move ponderMove = PV.getMove(1);
-	if( !ponderMove )
-	{
-		ponderMove = _getPonderMoveFromHash( bestMove );
-	}
-	
-	_UOI->printBestMove( bestMove, ponderMove );
-
-	_game.savePV(PV, res.depth, res.alpha, res.beta);
-
-}
-
-
-
-void my_thread::_initThreads()
-{
-	_timer = std::thread(&my_thread::_timerThread, this);
-	_searcher = std::thread(&my_thread::_searchThread, this);
+	_timer = std::thread(&my_thread::impl::_timerThread, this);
+	_searcher = std::thread(&my_thread::impl::_searchThread, this);
 	_src.stopSearch();
+	// wait initialization
+	for( auto delta = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - startTime ); delta.count() < 1000; delta = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - startTime ) )
+	{
+		if( _isReady() ) return true;
+	}
+	return false;
+	
+	
 }
 
-void my_thread::quitThreads()
+inline void my_thread::impl::quitThreads()
 {
 	_quit = true;
 	_searchCond.notify_one();
@@ -230,72 +198,7 @@ void my_thread::quitThreads()
 	_searcher.join();
 }
 
-Move my_thread::_getPonderMoveFromHash(const Move bestMove )
-{
-	Move ponderMove(0);
-	_src.pos.doMove( bestMove );
-	
-	const ttEntry* const tte = transpositionTable::getInstance().probe(_src.pos.getKey());
-	
-	Move m( tte->getPackedMove() );
-	if( _src.pos.isMoveLegal(m) )
-	{
-		ponderMove = m;
-	}
-	_src.pos.undoMove();
-	
-	return ponderMove;
-}
-
-Move my_thread::_getPonderMoveFromBook(const Move bookMove )
-{
-	Move ponderMove(0);
-	_src.pos.doMove( bookMove );
-	PolyglotBook pol;
-	Move m = pol.probe(_src.pos, uciParameters::bestMoveBook);
-	
-	if( _src.pos.isMoveLegal(m) )
-	{
-		ponderMove = m;
-	}
-	_src.pos.undoMove();
-	
-	return ponderMove;
-}
-
-void my_thread::_waitStopPondering() const
-{
-	while(_limits.ponder){}
-}
-
-
-inline void my_thread::stopPonder(){ _limits.ponder = false;}
-
-void my_thread::stopThinking()
-{
-	_timeMan.stop();
-	stopPonder();
-}
-
-void my_thread::ponderHit()
-{
-	_st.resetPonderTimer();
-	stopPonder();
-}
-
-my_thread::my_thread():_src(_st, _limits), _timeMan(_limits)
-{
-	_UOI = UciOutput::create();
-	_initThreads();
-	_game.CreateNewGame();
-}
-
-my_thread::~my_thread()
-{
-	quitThreads();
-}
-
-void my_thread::startThinking(Position * p, SearchLimits& l)
+inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 {
 	_src.stopSearch();
 	_lastHasfullMessage = 0;
@@ -306,96 +209,44 @@ void my_thread::startThinking(Position * p, SearchLimits& l)
 	{
 		std::lock_guard<std::mutex> lk(_searchMutex);
 		_limits = l;
-		_src.pos = *p;
+		_src.getPosition() = p;
 		_startThink = true;
 		_searchCond.notify_one();
 	}
 }
 
-
-
-void Game::CreateNewGame(void)
+inline void my_thread::impl::stopThinking()
 {
-	_positions.clear();
+	_timeMan.stop();
+	stopPonder();
 }
 
-void Game::insertNewMoves(Position &pos)
+inline void my_thread::impl::ponderHit()
 {
-	unsigned int actualPosition = _positions.size();
-	for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato
-	{
-		GamePosition p;
-		p.key = pos.getState(i).getKey();
-		p.m = pos.getState(i).getCurrentMove();
-		_positions.push_back(p);
-	}
+	_st.resetPonderTimer();
+	stopPonder();
 }
 
-void Game::savePV(PVline PV,unsigned int depth, Score alpha, Score beta)
-{
-	_positions.back().PV = PV;
-	_positions.back().depth = depth;
-	_positions.back().alpha = alpha;
-	_positions.back().beta = beta;
-}
+inline void my_thread::impl::stopPonder(){ _limits.ponder = false;}
 
 
-void Game::printGamesInfo()
-{
-	for(auto p : _positions)
-	{
-		if( p.m )
-		{
-			std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
-			for( auto m : p.PV )
-			{
-				std::cout<<displayUci(m)<<" ";
-			}
 
-		}
-		std::cout<<std::endl;
-	}
+/*********************************************
+* my_thread class
+**********************************************/
 
-}
+my_thread::my_thread(): pimpl{std::make_unique<impl>()}{}
 
-bool Game::isNewGame(const Position &pos) const
-{
-	if( _positions.size() == 0 || pos.getStateSize() < _positions.size())
-	{
-		//printGamesInfo();
-		return true;
-	}
+my_thread::~my_thread() = default;
 
-	unsigned int n = 0;
-	for(auto p : _positions)
-	{
-		if(pos.getState(n).getKey() != p.key)
-		{
-			//printGamesInfo();
-			return true;
-		}
-		n++;
+void my_thread::quitThreads(){ pimpl->quitThreads();}
 
-	}
-	return false;
-}
+void my_thread::stopThinking() { pimpl->stopThinking();}
 
-bool Game:: isPonderRight() const
-{
-	if( _positions.size() > 2)
-	{
-		GamePosition previous =*(_positions.end()-3);
-		if(previous.PV.size()>=1 && previous.PV.getMove(1) == _positions.back().m)
-		{
-			return true;
-		}
+void my_thread::ponderHit() { pimpl->ponderHit();}
 
-	}
-	return false;
-}
+inline void my_thread::stopPonder(){ pimpl->stopPonder(); }
 
-Game::GamePosition Game::getNewSearchParameters() const
-{
-	GamePosition previous =*(_positions.end()-3);
-	return previous;
-}
+timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
+
+void my_thread::startThinking( const Position& p, SearchLimits& l){	pimpl->startThinking( p, l); }

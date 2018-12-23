@@ -15,14 +15,10 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <cstdint>
 #include <iomanip>
 
-#include "bitops.h"
-#include "data.h"
 #include "eval.h"
 #include "io.h"
-#include "movegen.h"
 #include "parameters.h"
 #include "position.h"
 

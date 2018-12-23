@@ -23,16 +23,17 @@
 #include "benchmark.h"
 #include "command.h"
 #include "io.h"
-#include "movegen.h"
 #include "movepicker.h"
 #include "parameters.h"
 #include "position.h"
-#include "search.h"
+#include "pvLine.h"
+#include "rootMove.h"
+#include "searchTimer.h"
+#include "searchLimits.h"
 #include "syzygy/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"
-#include "tSquare.h"
 #include "vajolet.h"
 #include "version.h"
 
@@ -58,12 +59,12 @@ class UciMuteOutput: public UciOutput
 {
 public:
 	void printPVs(std::vector<rootMove>& rm) const;
-	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, PVline& PV, const unsigned long long nodes) const;
+	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1) const;
 	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
-	void printDepth(const unsigned int depth) const;
+	void printDepth() const;
 	void printScore(const signed int cp) const;
-	void printBestMove( const Move m, const Move ponder = Move(0) ) const;
+	void printBestMove( const Move m, const Move& ponder) const;
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
 };
 
@@ -73,12 +74,12 @@ class UciStandardOutput: public UciOutput
 public:
 	static bool reduceVerbosity;
 	void printPVs(std::vector<rootMove>& rm) const;
-	void printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, PVline& PV, const unsigned long long nodes) const;
+	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1) const;
 	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
-	void printDepth(const unsigned int depth) const;
+	void printDepth() const;
 	void printScore(const signed int cp) const;
-	void printBestMove( const Move m, const Move ponder = Move(0)) const;
+	void printBestMove( const Move m, const Move& ponder) const;
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
 };
 
@@ -248,7 +249,7 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr)
 			}
         }
     }
-    thr.startThinking( &pos, limits );
+    thr.startThinking( pos, limits );
 }
 
 
@@ -627,8 +628,6 @@ void uciLoop()
 			sync_cout << "unknown command" << sync_endl;
 		}
 	}while(token!="quit");
-
-	thr.quitThreads();
 }
 
 char printFileOf( const tSquare& sq )
@@ -829,18 +828,16 @@ void UciStandardOutput::printPVs(std::vector<rootMove>& rmList) const
 	int i= 0;
 	for ( auto & rm : rmList )
 	{
-		if(rm.nodes)
-		{
-			printPV(rm.score, rm.depth, rm.maxPlyReached, -SCORE_INFINITE, SCORE_INFINITE, rm.time, i, rm.PV, rm.nodes );
-		}
-		i++;
+		printPV(rm.score, rm.maxPlyReached, rm.time, rm.PV, rm.nodes, normal, rm.depth, i++ );
 	}
 }
 
-void UciStandardOutput::printPV(const Score res, const unsigned int depth, const unsigned int seldepth, const Score alpha, const Score beta, const long long time, const unsigned int count, PVline& PV, const unsigned long long nodes) const
+void UciStandardOutput::printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound, const int depth, const int count) const
 {
 
-	sync_cout<<"info multipv "<< (count+1) << " depth "<< (depth) <<" seldepth "<< seldepth <<" score ";
+	int localDepth = depth == -1? _depth : depth;
+	int PVlineIndex = (count == -1 ? _PVlineIndex : count ) + 1 ;
+	sync_cout<<"info multipv "<< PVlineIndex << " depth "<< localDepth <<" seldepth "<< seldepth <<" score ";
 
 	if(abs(res) >SCORE_MATE_IN_MAX_PLY)
 	{
@@ -853,7 +850,7 @@ void UciStandardOutput::printPV(const Score res, const unsigned int depth, const
 		std::cout << "cp "<< (int)((float)res/100.0);
 	}
 
-	std::cout << (res >= beta ? " lowerbound" : res <= alpha ? " upperbound" : "");
+	std::cout << (bound == lowerbound ? " lowerbound" : bound == upperbound ? " upperbound" : "");
 
 	std::cout << " nodes " << nodes;
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
@@ -886,9 +883,9 @@ void UciStandardOutput::showCurrLine(const Position & pos, const unsigned int pl
 	std::cout << sync_endl;
 
 }
-void UciStandardOutput::printDepth(const unsigned int depth) const
+void UciStandardOutput::printDepth() const
 {
-	sync_cout<<"info depth "<<depth<<sync_endl;
+	sync_cout<<"info depth "<<_depth<<sync_endl;
 }
 
 void UciStandardOutput::printScore(const signed int cp) const
@@ -896,7 +893,7 @@ void UciStandardOutput::printScore(const signed int cp) const
 	sync_cout<<"info score cp "<<cp<<sync_endl;
 }
 
-void UciStandardOutput::printBestMove( const Move bm, const Move ponder ) const
+void UciStandardOutput::printBestMove( const Move bm, const Move& ponder ) const
 {
 	sync_cout<<"bestmove "<< displayUci(bm);
 	if( ponder )
@@ -919,12 +916,12 @@ void UciStandardOutput::printGeneralInfo( const unsigned int fullness, const uns
 uci Mute output implementation
 ******************************/
 void UciMuteOutput::printPVs(std::vector<rootMove>&) const{}
-void UciMuteOutput::printPV(const Score ,const unsigned int , const unsigned int ,const Score , const Score , const long long, const unsigned int, PVline&, const unsigned long long ) const{}
+void UciMuteOutput::printPV(const Score, const unsigned int, const long long, PVline&, const unsigned long long, const PVbound, const int, const int) const{}
 void UciMuteOutput::printCurrMoveNumber(const unsigned int, const Move& , const unsigned long long , const long long int ) const {}
 void UciMuteOutput::showCurrLine(const Position & , const unsigned int ) const{}
-void UciMuteOutput::printDepth(const unsigned int ) const{}
+void UciMuteOutput::printDepth() const{}
 void UciMuteOutput::printScore(const signed int ) const{}
-void UciMuteOutput::printBestMove( const Move, const Move ) const{}
+void UciMuteOutput::printBestMove( const Move, const Move& ) const{}
 void UciMuteOutput::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
 
 
@@ -942,4 +939,20 @@ std::unique_ptr<UciOutput> UciOutput::create( const UciOutput::type t )
 	{
 		return std::make_unique<UciMuteOutput>();
 	}
+}
+
+void UciOutput::setDepth( const unsigned int depth )
+{
+	_depth = depth;
+}
+
+void UciOutput::setPVlineIndex( const unsigned int PVlineIndex )
+{
+	_PVlineIndex = PVlineIndex;
+}
+
+void UciOutput::printPV( const Move& m )
+{
+	PVline PV( 1, m );
+	printPV(0, 0, 0, PV, 0, normal, 0, 0);
 }

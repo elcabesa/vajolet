@@ -24,6 +24,7 @@ CPP_SRCS := \
 ./data.cpp \
 ./endgame.cpp \
 ./eval.cpp \
+./game.cpp \
 ./hashKey.cpp \
 ./io.cpp \
 ./magicmoves.cpp \
@@ -33,6 +34,7 @@ CPP_SRCS := \
 ./parameters.cpp \
 ./position.cpp \
 ./search.cpp \
+./searchData.cpp \
 ./see.cpp \
 ./thread.cpp \
 ./timeManagement.cpp \
@@ -55,6 +57,7 @@ OBJS :=  \
 ./data.o \
 ./endgame.o \
 ./eval.o \
+./game.o \
 ./hashKey.o \
 ./io.o \
 ./magicmoves.o \
@@ -64,6 +67,7 @@ OBJS :=  \
 ./parameters.o \
 ./position.o \
 ./search.o \
+./searchData.o \
 ./see.o \
 ./thread.o \
 ./timeManagement.o \
@@ -81,6 +85,7 @@ CPP_DEPS := \
 ./data.d \
 ./endgame.d \
 ./eval.d \
+./game.d \
 ./hashKey.d \
 ./io.d \
 ./magicmoves.d \
@@ -90,6 +95,7 @@ CPP_DEPS := \
 ./parameters.d \
 ./position.d \
 ./search.d \
+./searchData.d \
 ./see.d \
 ./thread.d \
 ./timeManagement.d \

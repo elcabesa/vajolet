@@ -268,6 +268,14 @@ namespace {
 		ASSERT_FALSE( y );
 
 	}
+	
+	TEST(Move, getPacked)
+	{
+		Move x(tSquare::E1, tSquare::A8, Move::fenpassant, Move::promRook);
+
+		ASSERT_EQ( 40452, x.getPacked());
+
+	}
 
 	
 	

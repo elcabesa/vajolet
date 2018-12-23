@@ -14,39 +14,44 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#ifndef GAME_H_
+#define GAME_H_
 
-#ifndef THREAD_H_
-#define THREAD_H_
+#include <vector>
+
+#include "hashKey.h"
+#include "move.h"
+#include "pvLine.h"
+#include "score.h"
 
 class Position;
-class timeManagement;
-class SearchLimits;
 
-class my_thread
+class Game
 {
-private:
-	my_thread();
-	~my_thread();
-	my_thread(const my_thread&) = delete;
-	my_thread& operator=(const my_thread&) = delete;
-	my_thread(const my_thread&&) = delete;
-	my_thread& operator=(const my_thread&&) = delete;
-	
-	class impl;
-	std::unique_ptr<impl> pimpl;
-public :
-
-	static my_thread& getInstance()
+public:
+	struct GamePosition
 	{
-		static my_thread pInstance;
-		return pInstance;
-	}
+		HashKey key;
+		Move m;
+		PVline PV;
+		Score alpha;
+		Score beta;
+		unsigned int depth;
+	};
 
-	void quitThreads();
-	void startThinking( const Position& p, SearchLimits& l);
-	void stopPonder();
-	void stopThinking();
-	void ponderHit();
-	timeManagement& getTimeMan();
+	void CreateNewGame();
+	void insertNewMoves(Position &pos);
+	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
+	void printGamesInfo();
+
+	bool isNewGame(const Position &pos) const;
+	bool isPonderRight() const;
+	GamePosition getNewSearchParameters() const;
+
+private:
+	std::vector<GamePosition> _positions;
+public:
+
 };
-#endif /* THREAD_H_ */
+
+#endif

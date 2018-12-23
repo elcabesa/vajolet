@@ -15,11 +15,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <cstdint>
-
 #include "position.h"
-#include "bitops.h"
-#include "movegen.h"
 #include "vajolet.h"
 
   
@@ -277,16 +273,16 @@ bool Position::evalKQvsK(Score& res)
 		return true;
 	}
 
-	int mul = 1;
+	int sign = 1;
 	if(color == white)
 	{
-		mul = 1;
+		sign = 1;
 		kingSquare = getSquareOfThePiece(whiteKing);
 		enemySquare = getSquareOfThePiece(blackKing);
 	}
 	else
 	{
-		mul = -1;
+		sign = -1;
 		kingSquare = getSquareOfThePiece(blackKing);
 		enemySquare = getSquareOfThePiece(whiteKing);
 	}
@@ -295,7 +291,7 @@ bool Position::evalKQvsK(Score& res)
 	res -= 10 * distance(enemySquare,kingSquare);// devo tenere il re vicino
 	res += 20 * distance(enemySquare,E4);// devo portare il re avversario vicino al bordo
 
-	res *= mul;
+	res *= sign;
 	return true;
 
 }
