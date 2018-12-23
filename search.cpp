@@ -1785,7 +1785,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 		bestScore = staticEval;
 		// todo trovare un valore buono per il futility
 
-		if( !PVnode && ttValue != SCORE_NONE)
+		if( /*!PVnode && */ttValue != SCORE_NONE)
 		{
 			if (
 					( tte->isTypeGoodForBetaCutoff() && (ttValue > staticEval) )
