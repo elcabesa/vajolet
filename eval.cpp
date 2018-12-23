@@ -653,6 +653,14 @@ Score Position::eval(void)
 	unsigned int kingAdjacentZoneAttacksCount[2] = {0};
 
 	tSquare k = getSquareOfThePiece(whiteKing);
+	if( getFileOf(k) == FILEA )
+	{
+		k ++;
+	}
+	if( getFileOf(k) == FILEH )
+	{
+		k --;
+	}
 	kingRing[white] = Movegen::attackFrom<whiteKing>(k);
 	kingShield[white] = kingRing[white];
 	if( getRankOf(k) < RANK8 )
@@ -663,6 +671,14 @@ Score Position::eval(void)
 
 
 	k = getSquareOfThePiece(blackKing);
+	if( getFileOf(k) == FILEA )
+	{
+		k ++;
+	}
+	if( getFileOf(k) == FILEH )
+	{
+		k --;
+	}
 	kingRing[black] = Movegen::attackFrom<whiteKing>(k);
 	kingShield[black] = kingRing[black];
 	if( getRankOf(k) > RANK1 )
@@ -924,8 +940,13 @@ Score Position::eval(void)
 	//-----------------------------------------
 	bitMap blockedPawns = ( getBitmap(whitePawns)<<8 ) & getBitmap( blackPawns );
 	blockedPawns |= blockedPawns >> 8;
-
-
+	
+	
+	//-----------------------------------------
+	//	add pawn to king attackers
+	//-----------------------------------------
+	kingAttackersCount[white] = bitCnt(kingRing[black] & attackedSquares[whitePawns]);
+	kingAttackersCount[black] = bitCnt(kingRing[white] & attackedSquares[blackPawns]);
 
 	//-----------------------------------------
 	//	pieces
