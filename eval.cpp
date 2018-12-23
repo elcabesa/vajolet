@@ -74,7 +74,7 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 	bool passed, isolated, doubled, opposed, chain, backward;
 	const bitMap ourPawns = c ? getBitmap(blackPawns) : getBitmap(whitePawns);
 	const bitMap theirPawns = c ? getBitmap(whitePawns) : getBitmap(blackPawns);
-	const int relativeRank = c ? 7 - getRankOf(sq) : getRankOf(sq);
+	const int relativeRank = getRelativeRankOf( sq, c );
 
 	// Our rank plus previous one. Used for chain detection
 	bitMap b = rankMask(sq) | rankMask(sq - pawnPush(c));
@@ -195,7 +195,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 	while(tempPieces)
 	{
 		tSquare sq = iterateBit(tempPieces);
-		unsigned int relativeRank = isBlackPiece(piece) ? 7 - getRankOf(sq) : getRankOf(sq);
+		unsigned int relativeRank = getRelativeRankOf( sq, (Color)isBlackPiece(piece) );
 
 		//---------------------------
 		//	MOBILITY
@@ -334,7 +334,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 			{
 
 				tSquare ksq = isBlackPiece(piece) ?  getSquareOfThePiece(blackKing) : getSquareOfThePiece(whiteKing);
-				unsigned int relativeRankKing = isBlackPiece(piece) ? 7 - getRankOf(ksq) : getRankOf(ksq);
+				unsigned int relativeRankKing = getRelativeRankOf( ksq, (Color)isBlackPiece(piece) );
 
 				if(
 					((getFileOf(ksq) < FILEE) == (getFileOf(sq) < getFileOf(ksq))) &&
@@ -473,7 +473,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 		
 		simdScore passedPawnsBonus;
 		tSquare ppSq = iterateBit(pp);
-		unsigned int relativeRank = c ? 7-getRankOf(ppSq) : getRankOf(ppSq);
+		unsigned int relativeRank = getRelativeRankOf( ppSq, c );
 		
 		int r = relativeRank - 1;
 		int rr =  r * ( r - 1 );
@@ -530,7 +530,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 			}
 		}
 
-		if(getFileOf( ppSq ) == FILEA || getFileOf( ppSq )== FILEH)
+		if( isLateralFile( getFileOf( ppSq ) ) )
 		{
 			passedPawnsBonus -= passedPawnFileAHPenalty;
 		}
@@ -548,7 +548,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 
 		if( st.getNonPawnValue()[ c ? 0 : 2 ] == 0 )
 		{
-			tSquare promotionSquare =  getSquare(getFileOf(ppSq),c ? RANK1 : RANK8);
+			tSquare promotionSquare = getPromotionSquareOf( ppSq, c );
 			if( std::min( 5, (int)(7- relativeRank)) <  std::max((int)distance( enemyKingSquare, promotionSquare ) - ( (c ? isBlackTurn() : isWhiteTurn() ) ? 0 : 1 ), 0) )
 			{
 				passedPawnsBonus += unstoppablePassed * rr;

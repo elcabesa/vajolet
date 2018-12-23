@@ -81,10 +81,21 @@ inline tRank getRankOf( const tSquare s )
 	return RANKS[s];
 }
 
+inline tRank getRelativeRankOf( const tSquare s, const Color c )
+{
+	extern const volatile tRank RANKS[squareNumber];
+	return c ? tRank(7 - RANKS[s]) : RANKS[s];
+}
+
 inline tFile getFileOf( const tSquare s )
 {
 	extern const volatile tFile FILES[squareNumber];
 	return FILES[s];
+}
+
+inline bool isLateralFile( const tFile f )
+{
+	return f == FILEA || f == FILEH;
 }
 
 inline tSquare getSquare( const tFile f, const tRank r)
@@ -97,6 +108,11 @@ inline Color getSquareColor( const tSquare sq )
 	extern Color SQUARE_COLOR[squareNumber];
 	return SQUARE_COLOR[sq];
 }
+
+inline tSquare getPromotionSquareOf( tSquare sq, Color c)
+{
+	return getSquare( getFileOf( sq ), ( c ? RANK1 : RANK8 ) );
+} 
 
 
 #endif

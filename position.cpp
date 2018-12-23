@@ -140,7 +140,7 @@ void Position::initPstValues(void)
 			}
 			else if( isBlackPiece( piece ) && piece <blackPieces )
 			{
-				tRank r = tRank(7 - rank);
+				tRank r = getRelativeRankOf( s, black );
 				tFile f = file;
 				pstValue[piece][s] = -pstValue[ piece - separationBitmap ][getSquare(f,r)];
 
