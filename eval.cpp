@@ -419,6 +419,14 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 template<Color kingColor>
 Score Position::evalShieldStorm(tSquare ksq) const
 {
+	if( getFileOf(ksq) == FILEA )
+	{
+		ksq ++;
+	}
+	if( getFileOf(ksq) == FILEH )
+	{
+		ksq --;
+	}
 	Score ks = 0;
 	const bitMap ourPawns = kingColor ? getBitmap(blackPawns) : getBitmap(whitePawns);
 	const bitMap theirPawns = kingColor ? getBitmap(whitePawns) : getBitmap(blackPawns);
@@ -579,7 +587,7 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 			| DefendedSquaresBy[Knights]
 			| DefendedSquaresBy[Bishops]
 			| DefendedSquaresBy[Rooks]
-			| DefendedSquaresBy[Queens]);
+			/*| DefendedSquaresBy[Queens]*/);
 		//displayBitmap(undefendedSquares);
 		bitMap undefendedSquares2 = ~ DefendedSquaresBy[Pieces];
 		
