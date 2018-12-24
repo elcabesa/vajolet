@@ -562,32 +562,43 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 
 template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const
 {
+	//sync_cout<<"kingSafety color "<<c<<sync_endl;
 	simdScore res = {0,0,0,0};
 	bitMap AttackingPieces = c ? getBitmap(whitePieces) : getBitmap(blackPieces);
 	bitMap * DefendedSquaresBy = c ? &attackedSquares[blacks] : &attackedSquares[whites];
 	bitMap * AttackedSquaresBy = c ? &attackedSquares[whites] : &attackedSquares[blacks];
 	tSquare kingSquare = c ? getSquareOfThePiece(blackKing) : getSquareOfThePiece(whiteKing);
-
+	//sync_cout<<" kingAttackersCount "<<kingAttackersCount<<sync_endl;
 	if( kingAttackersCount )// se il re e' attaccato
 	{
 
 		bitMap undefendedSquares = AttackedSquaresBy[Pieces] & DefendedSquaresBy[King];
+		//displayBitmap(undefendedSquares);
 		undefendedSquares &=
 			~( DefendedSquaresBy[Pawns]
 			| DefendedSquaresBy[Knights]
 			| DefendedSquaresBy[Bishops]
 			| DefendedSquaresBy[Rooks]
 			| DefendedSquaresBy[Queens]);
+		//displayBitmap(undefendedSquares);
 		bitMap undefendedSquares2 = ~ DefendedSquaresBy[Pieces];
 		
 		signed int attackUnits = kingAttackersCount * kingAttackersWeight;
+		//sync_cout<<" attackUnits1 "<<attackUnits<<sync_endl;
 		attackUnits += kingAdjacentZoneAttacksCount * kingSafetyPars1[0];
+		//sync_cout<<" attackUnits2 "<<attackUnits<<sync_endl;
 		attackUnits += bitCnt( undefendedSquares ) * kingSafetyPars1[1];
+		//sync_cout<<" attackUnits3 "<<attackUnits<<sync_endl;
 		attackUnits += KingExposed[ c? 63 - kingSquare : kingSquare ] * kingSafetyPars1[2];
+		//sync_cout<<" attackUnits4 "<<attackUnits<<sync_endl;
 		attackUnits -= (getPieceCount(c? whiteQueens: blackQueens)==0) * kingSafetyPars1[3];
+		//sync_cout<<" attackUnits5 "<<attackUnits<<sync_endl;
 
 		attackUnits -= 10 * kingSafety / kingStormBonus[1] ;
-		attackUnits += kingStormBonus[2] ;
+		//sync_cout<<" attackUnits6 "<<attackUnits<<sync_endl;
+		attackUnits += kingStormBonus[2];
+		//sync_cout<<" attackUnits7 "<<attackUnits<<sync_endl;
+	
 
 
 
@@ -613,7 +624,11 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 		}
 
 		attackUnits = std::max( 0, attackUnits );
+		//sync_cout<<" attackUnits8 "<<attackUnits<<sync_endl;
 		simdScore ks = {attackUnits * attackUnits / kingSafetyBonus[0], 10 * attackUnits / kingSafetyBonus[1], 0, 0 };
+		//sync_cout<<" MG "<<attackUnits * attackUnits / kingSafetyBonus[0]<<sync_endl;
+		//sync_cout<<" EG "<< 10 * attackUnits / kingSafetyBonus[1]<<sync_endl;
+		
 		res = -ks;
 	}
 	return res;
@@ -1249,6 +1264,9 @@ Score Position::eval(void)
 	}
 
 	res+=simdScore{kingSafety[white]-kingSafety[black],0,0,0};
+	
+	//sync_cout<<kingSafety[white]<<sync_endl;
+	//sync_cout<<kingSafety[black]<<sync_endl;
 
 
 
@@ -1258,6 +1276,8 @@ Score Position::eval(void)
 	res += kingSaf;
 	if(trace)
 	{
+		//sync_cout<<kingSaf[0]<<sync_endl;
+		//sync_cout<<kingSaf[1]<<sync_endl;
 		wScore += kingSaf;
 	}
 
@@ -1266,6 +1286,8 @@ Score Position::eval(void)
 	res-= kingSaf;
 	if(trace)
 	{
+		//sync_cout<<kingSaf[0]<<sync_endl;
+		//sync_cout<<kingSaf[1]<<sync_endl;
 		bScore += kingSaf;
 	}
 

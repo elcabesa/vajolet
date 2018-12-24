@@ -156,13 +156,13 @@ simdScore weakPawnAttackedByKing =  {3144,4302,0,0};
 //------------------------------------------------
 //king safety 
 //------------------------------------------------
-simdScore KingAttackWeights =  {155,157,149,114};
+simdScore KingAttackWeights =  {10,44,55,77};
 simdScore kingShieldBonus =  {2709,0,0,0};
 simdScore kingFarShieldBonus =  {1951,0,0,0};
 simdScore kingStormBonus =  {225,86,617,0};
-simdScore kingSafetyBonus =  {300,5,0,0};
-simdScore kingSafetyPars1 =  {314,416,-13,1082};
-simdScore kingSafetyPars2 =  {1854,1516,976,1733};
+simdScore kingSafetyBonus =  {84,3,0,0};
+simdScore kingSafetyPars1 =  {69,185,-13,870};
+simdScore kingSafetyPars2 =  {780,880,435,790};
 
 //------------------------------------------------
 
