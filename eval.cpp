@@ -661,37 +661,39 @@ Score Position::eval(void)
 	unsigned int kingAdjacentZoneAttacksCount[2] = {0};
 
 	tSquare k = getSquareOfThePiece(whiteKing);
+	
+	kingRing[white] = Movegen::attackFrom<whiteKing>(k);
+	kingShield[white] = kingRing[white];
+	if( getRankOf(k) == RANK1 )
+	{
+		kingRing[white] |= Movegen::attackFrom<whiteKing>( tSquare( k + 8) );
+	}
 	if( getFileOf(k) == FILEA )
 	{
-		k ++;
+		kingRing[white] |= Movegen::attackFrom<whiteKing>( tSquare( k + 1) );
 	}
 	if( getFileOf(k) == FILEH )
 	{
-		k --;
-	}
-	kingRing[white] = Movegen::attackFrom<whiteKing>(k);
-	kingShield[white] = kingRing[white];
-	if( getRankOf(k) < RANK8 )
-	{
-		kingRing[white] |= Movegen::attackFrom<whiteKing>( tSquare( k + 8) );
+		kingRing[white] |= Movegen::attackFrom<whiteKing>( tSquare( k - 1) );
 	}
 	kingFarShield[white] = kingRing[white] & ~( kingShield[white] | bitSet( k ) );
 
 
 	k = getSquareOfThePiece(blackKing);
+	
+	kingRing[black] = Movegen::attackFrom<whiteKing>(k);
+	kingShield[black] = kingRing[black];
+	if( getRankOf(k) == RANK8 )
+	{
+		kingRing[black] |= Movegen::attackFrom<whiteKing>( tSquare( k - 8 ) );
+	}
 	if( getFileOf(k) == FILEA )
 	{
-		k ++;
+		kingRing[black] |= Movegen::attackFrom<whiteKing>( tSquare( k + 1 ) );
 	}
 	if( getFileOf(k) == FILEH )
 	{
-		k --;
-	}
-	kingRing[black] = Movegen::attackFrom<whiteKing>(k);
-	kingShield[black] = kingRing[black];
-	if( getRankOf(k) > RANK1 )
-	{
-		kingRing[black] |= Movegen::attackFrom<whiteKing>( tSquare( k - 8 ) );
+		kingRing[black] |= Movegen::attackFrom<whiteKing>( tSquare( k - 1 ) );
 	}
 	kingFarShield[black] = kingRing[black] & ~( kingShield[black] | bitSet( k ) );
 
