@@ -454,7 +454,7 @@ Score Position::evalShieldStorm(tSquare ksq) const
 	while(pawnStorm)
 	{
 		tSquare p = iterateBit(pawnStorm);
-		ks -= ( 7 - distance(p,ksq) ) * kingStormBonus[0];
+		ks -= std::max(0, 3 - (int)distance(p,ksq) ) * kingStormBonus[0];
 	}
 	return ks;
 }
