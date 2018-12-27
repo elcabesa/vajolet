@@ -576,7 +576,7 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 	bitMap * AttackedSquaresBy = c ? &attackedSquares[whites] : &attackedSquares[blacks];
 	tSquare kingSquare = c ? getSquareOfThePiece(blackKing) : getSquareOfThePiece(whiteKing);
 
-	if( kingAttackersCount )// se il re e' attaccato
+	if( kingAttackersCount > ( getPieceCount( c? whiteQueens: blackQueens ) > 0 ? 0 : 1 ) )// se il re e' attaccato
 	{
 
 		bitMap undefendedSquares = AttackedSquaresBy[Pieces] & DefendedSquaresBy[King];
@@ -654,48 +654,50 @@ Score Position::eval(void)
 	bitMap weakSquares[2];
 	bitMap holes[2];
 	bitMap kingRing[2];
-	bitMap kingShield[2];
-	bitMap kingFarShield[2];
 	unsigned int kingAttackersCount[2] = {0};
 	unsigned int kingAttackersWeight[2] = {0};
 	unsigned int kingAdjacentZoneAttacksCount[2] = {0};
 
-	tSquare k = getSquareOfThePiece(whiteKing);
 	
-	kingRing[white] = Movegen::attackFrom<whiteKing>(k);
-	kingShield[white] = kingRing[white];
-	if( getRankOf(k) == RANK1 )
-	{
-		kingRing[white] |= Movegen::attackFrom<whiteKing>( tSquare( k + 8) );
-	}
-	if( getFileOf(k) == FILEA )
-	{
-		kingRing[white] |= Movegen::attackFrom<whiteKing>( tSquare( k + 1) );
-	}
-	if( getFileOf(k) == FILEH )
-	{
-		kingRing[white] |= Movegen::attackFrom<whiteKing>( tSquare( k - 1) );
-	}
-	kingFarShield[white] = kingRing[white] & ~( kingShield[white] | bitSet( k ) );
-
-
-	k = getSquareOfThePiece(blackKing);
 	
-	kingRing[black] = Movegen::attackFrom<whiteKing>(k);
-	kingShield[black] = kingRing[black];
-	if( getRankOf(k) == RANK8 )
+	kingRing[white] = 0;
+	if( st.getNonPawnValue()[ 2 ] >= Position::pieceValue[Knights][0] + Position::pieceValue[Rooks][0] )
 	{
-		kingRing[black] |= Movegen::attackFrom<whiteKing>( tSquare( k - 8 ) );
+		tSquare k = getSquareOfThePiece(whiteKing);
+		if( getRankOf(k) == RANK1 )
+		{
+			k += north;
+		}
+		if( getFileOf(k) == FILEA )
+		{
+			k += est;
+		}
+		if( getFileOf(k) == FILEH )
+		{
+			k += ovest;
+		}
+		kingRing[white] = Movegen::attackFrom<whiteKing>(k) | bitSet( k );
 	}
-	if( getFileOf(k) == FILEA )
+
+	kingRing[black] = 0;
+	if( st.getNonPawnValue()[ 0 ] >= Position::pieceValue[Knights][0] + Position::pieceValue[Rooks][0] )
 	{
-		kingRing[black] |= Movegen::attackFrom<whiteKing>( tSquare( k + 1 ) );
+		tSquare k = getSquareOfThePiece(blackKing);
+		if( getRankOf(k) == RANK8 )
+		{
+			k += sud;
+		}
+		if( getFileOf(k) == FILEA )
+		{
+			k += est;
+		}
+		if( getFileOf(k) == FILEH )
+		{
+			k += ovest;
+		}
+		kingRing[black] = Movegen::attackFrom<blackKing>(k) | bitSet( k );
 	}
-	if( getFileOf(k) == FILEH )
-	{
-		kingRing[black] |= Movegen::attackFrom<whiteKing>( tSquare( k - 1 ) );
-	}
-	kingFarShield[black] = kingRing[black] & ~( kingShield[black] | bitSet( k ) );
+
 
 	// todo modificare valori material value & pst
 	// material + pst
