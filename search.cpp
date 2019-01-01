@@ -673,7 +673,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
 			}
 
-			if((!_stop || _validIteration) && (linesToBeSearched > 1 || depth == 1) )
+			if((!_stop || _validIteration) && (uciParameters::multiPVLines > 1 || depth == 1) )
 			{
 
 				// Sort the PV lines searched so far and update the GUI				
