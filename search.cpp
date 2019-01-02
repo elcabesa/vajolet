@@ -522,7 +522,10 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 
 			if (res <= alpha)
 			{
-				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound);
+				if( uciParameters::multiPVLines == 1 )
+				{
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound);
+				}
 
 				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
@@ -534,7 +537,10 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			}
 			else if (res >= beta)
 			{
-				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound);
+				if( uciParameters::multiPVLines == 1 )
+				{
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound);
+				}
 
 				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 				if(depth > 1)
@@ -680,7 +686,37 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 				std::stable_sort(_multiPVresult.begin(), _multiPVresult.end());
 				bestMove = _multiPVresult[0];
 				
-				_UOI->printPVs( _multiPVresult );
+				std::vector<rootMove> _multiPVprint = _multiPVresult;
+				// always send all the moves toghether in multiPV
+				int missingLines = uciParameters::multiPVLines - _multiPVprint.size();
+				if( missingLines > 0 )
+				{
+					// add result from the previous iteration
+					// try adding the missing lines (  uciParameters::multiPVLines - _multiPVprint.size() ) , but not more than previousIterationResults.size() 
+					int addedLines = 0;
+					for( const auto& m: previousIterationResults )
+					{
+						if( std::find(_multiPVprint.begin(), _multiPVprint.end(), m) == _multiPVprint.end() )
+						{
+							_multiPVprint.push_back(m);
+							++addedLines;
+							if( addedLines >= missingLines )
+							{
+								break;
+							}
+						}
+					}
+					// add the missing lines ... adding Move::NOMOVE to reach uciParameters::multiPVLines
+					missingLines =  uciParameters::multiPVLines - _multiPVprint.size();
+					for( int i = 0; i < missingLines; ++i )
+					{
+						PVline pv;
+						_multiPVprint.push_back(rootMove( Move::NOMOVE, pv, 0, 0, 0, 0, 0));
+					}
+					
+				}
+				
+				_UOI->printPVs( _multiPVprint );
 			}
 		}
 
