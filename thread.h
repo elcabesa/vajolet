@@ -42,9 +42,7 @@ public :
 		return pInstance;
 	}
 
-	void quitThreads();
 	void startThinking( const Position& p, SearchLimits& l);
-	void stopPonder();
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();

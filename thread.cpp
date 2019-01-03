@@ -63,17 +63,15 @@ private:
 	void _searchThread();
 	void _printTimeDependentOutput( long long int time );
 	bool _isReady();
+	void _stopPonder();
+	void _quitThreads();
 public:
 	impl();
 	~impl();
 	void startThinking( const Position& p, SearchLimits& l);
 	void stopThinking();
 	void ponderHit();
-	void stopPonder();
 	timeManagement& getTimeMan();
-	
-	
-	void quitThreads();
 };
 
 volatile bool my_thread::impl::_quit = false;
@@ -94,7 +92,7 @@ my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
 
 my_thread::impl::~impl()
 {
-	quitThreads();
+	_quitThreads();
 }
 
 bool my_thread::impl::_isReady(){ return _searcherReady && _timerReady; }
@@ -157,6 +155,7 @@ void my_thread::impl::_searchThread()
 
 		std::unique_lock<std::mutex> lk(mutex);
 		_searcherReady =  true;
+		_startThink = false;
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
 		if(!_quit)
 		{
@@ -166,7 +165,7 @@ void my_thread::impl::_searchThread()
 			_st.resetStartTimers();
 			_timerCond.notify_one();
 			_src.manageNewSearch();
-			_startThink = false;
+			
 		}
 		lk.unlock();
 	}
@@ -189,7 +188,7 @@ bool my_thread::impl::_initThreads()
 	
 }
 
-inline void my_thread::impl::quitThreads()
+inline void my_thread::impl::_quitThreads()
 {
 	_quit = true;
 	_searchCond.notify_one();
@@ -218,16 +217,16 @@ inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 inline void my_thread::impl::stopThinking()
 {
 	_timeMan.stop();
-	stopPonder();
+	_stopPonder();
 }
 
 inline void my_thread::impl::ponderHit()
 {
 	_st.resetPonderTimer();
-	stopPonder();
+	_stopPonder();
 }
 
-inline void my_thread::impl::stopPonder(){ _limits.ponder = false;}
+inline void my_thread::impl::_stopPonder(){ _limits.ponder = false;}
 
 
 
@@ -239,13 +238,9 @@ my_thread::my_thread(): pimpl{std::make_unique<impl>()}{}
 
 my_thread::~my_thread() = default;
 
-void my_thread::quitThreads(){ pimpl->quitThreads();}
-
 void my_thread::stopThinking() { pimpl->stopThinking();}
 
 void my_thread::ponderHit() { pimpl->ponderHit();}
-
-inline void my_thread::stopPonder(){ pimpl->stopPonder(); }
 
 timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
 
