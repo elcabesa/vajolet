@@ -35,6 +35,18 @@
 class my_thread::impl
 {
 private:
+
+	const unsigned int _initTimeout = 1;
+	
+	enum threadStatus{
+		initalizing,
+		ready,
+		running
+	};
+	
+	volatile threadStatus _timerStatus = initalizing;
+	volatile threadStatus _searchStatus = initalizing;
+		
 	SearchLimits _limits; // todo limits belong to threads
 	SearchTimer _st;
 	Search _src;
@@ -45,17 +57,18 @@ private:
 	volatile static bool _quit;
 	volatile static bool _startThink;
 	
-	volatile static bool _searcherReady;
-	volatile static bool _timerReady;
-
 	long long _lastHasfullMessage;
 	
 	std::thread _searcher;
 	std::thread _timer;
-	std::mutex _searchMutex;
-
+	
+	std::mutex _initMutex;
+	std::mutex _waitNewStartMutex;
+	
+	std::condition_variable _initCV;
 	std::condition_variable _searchCond;
 	std::condition_variable _timerCond;
+	std::condition_variable _runCV;
 
 	bool _initThreads();
 
@@ -77,8 +90,6 @@ public:
 volatile bool my_thread::impl::_quit = false;
 volatile bool my_thread::impl::_startThink = false;
 
-volatile bool my_thread::impl::_searcherReady = false;
-volatile bool my_thread::impl::_timerReady = false;
 
 my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
 {
@@ -95,7 +106,7 @@ my_thread::impl::~impl()
 	_quitThreads();
 }
 
-bool my_thread::impl::_isReady(){ return _searcherReady && _timerReady; }
+bool my_thread::impl::_isReady(){ return _searchStatus == ready && _timerStatus== ready; }
 
 timeManagement& my_thread::impl::getTimeMan(){ return _timeMan; }
 
@@ -120,8 +131,10 @@ void my_thread::impl::_timerThread()
 	while (!_quit)
 	{
 		std::unique_lock<std::mutex> lk(mutex);
-		_timerReady = true;
+		_timerStatus = ready;
+		_runCV.notify_one();
 		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan.isSearchFinished() ) || _quit;} );
+		_timerStatus = running;
 
 		if (!_quit)
 		{
@@ -154,9 +167,10 @@ void my_thread::impl::_searchThread()
 	{
 
 		std::unique_lock<std::mutex> lk(mutex);
-		_searcherReady =  true;
-		_startThink = false;
+		_searchStatus = ready;
+		_runCV.notify_one();
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
+		_searchStatus = running;
 		if(!_quit)
 		{
 			_limits.checkInfiniteSearch();
@@ -165,6 +179,7 @@ void my_thread::impl::_searchThread()
 			_st.resetStartTimers();
 			_timerCond.notify_one();
 			_src.manageNewSearch();
+			_startThink = false;
 			
 		}
 		lk.unlock();
@@ -172,20 +187,15 @@ void my_thread::impl::_searchThread()
 }
 
 bool my_thread::impl::_initThreads()
-{
-	auto startTime = std::chrono::steady_clock::now();
-	
+{	
 	_timer = std::thread(&my_thread::impl::_timerThread, this);
 	_searcher = std::thread(&my_thread::impl::_searchThread, this);
 	_src.stopSearch();
 	// wait initialization
-	for( auto delta = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - startTime ); delta.count() < 1000; delta = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - startTime ) )
-	{
-		if( _isReady() ) return true;
-	}
-	return false;
 	
-	
+	std::unique_lock<std::mutex> lck(_initMutex);
+	// wait initialization
+	return _initCV.wait_for( lck, std::chrono::seconds( _initTimeout ), [&]{ return _isReady();});
 }
 
 inline void my_thread::impl::_quitThreads()
@@ -202,16 +212,14 @@ inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 	_src.stopSearch();
 	_lastHasfullMessage = 0;
 
-	while(_startThink){}
+	std::unique_lock<std::mutex> lck(_waitNewStartMutex);
+	_runCV.wait( lck, [&]{ return _startThink == false && _timerStatus == ready && _searchStatus == ready; } );
 
-	if(!_startThink)
-	{
-		std::lock_guard<std::mutex> lk(_searchMutex);
-		_limits = l;
-		_src.getPosition() = p;
-		_startThink = true;
-		_searchCond.notify_one();
-	}
+	_limits = l;
+	_src.getPosition() = p;
+	_startThink = true;
+	_searchCond.notify_one();
+	
 }
 
 inline void my_thread::impl::stopThinking()
