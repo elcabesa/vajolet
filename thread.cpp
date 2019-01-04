@@ -70,11 +70,13 @@ private:
 
 
 	bool _initThreads();
+	void _quitThreads();
+	
 	void _timerThread();
 	void _searchThread();
 	void _printTimeDependentOutput( long long int time );
 	void _stopPonder();
-	void _quitThreads();
+
 public:
 	impl();
 	~impl();
