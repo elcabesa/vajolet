@@ -17,6 +17,7 @@
 
 #include <condition_variable>
 #include <thread>
+#include <mutex>
 
 #include "io.h"
 #include "position.h"
@@ -185,8 +186,9 @@ void my_thread::impl::_searchThread()
 
 bool my_thread::impl::_initThreads()
 {
-	std::unique_lock<std::mutex> lckt(_tMutex);
-	std::unique_lock<std::mutex> lcks(_sMutex);
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
+	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
 	_timer = std::thread(&my_thread::impl::_timerThread, this);
 	_searcher = std::thread(&my_thread::impl::_searchThread, this);
 	_src.stopSearch();
@@ -200,9 +202,9 @@ bool my_thread::impl::_initThreads()
 
 inline void my_thread::impl::_quitThreads()
 {
-
-	std::unique_lock<std::mutex> lks(_sMutex);
-	std::unique_lock<std::mutex> lkt(_tMutex);
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lks(_sMutex, std::adopt_lock);
+	std::unique_lock<std::mutex> lkt(_tMutex, std::adopt_lock);
 	_quit = true;
 	lks.unlock();
 	lkt.unlock();
@@ -217,10 +219,10 @@ inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 {
 	_src.stopSearch();
 	_lastHasfullMessageTime = 0;
-
-	std::unique_lock<std::mutex> lcks(_sMutex);
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
 	_searchCond.wait( lcks, [&]{ return _searchStatus == ready; } );
-	std::unique_lock<std::mutex> lckt(_tMutex);
+	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
 	_timerCond.wait( lckt, [&]{ return _timerStatus == ready; } );
 
 	_limits = l;
