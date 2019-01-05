@@ -33,6 +33,7 @@ simdScore Position::pieceValue[lastBitboard];
 simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 eCastle Position::castleRightsMask[squareNumber];
+std::array<bitMap,9> Position::_castlePath;
 
 bool Position::perftUseHash = false;
 
@@ -1016,6 +1017,15 @@ void Position::initCastleRightsMask(void)
 	castleRightsMask[E8] = bCastleOO | bCastleOOO;
 	castleRightsMask[A8] = bCastleOOO;
 	castleRightsMask[H8] = bCastleOO;
+	
+	for( auto& x : _castlePath )
+	{
+		x = 0;
+	}
+	_castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
+	_castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
+	_castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
+	_castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
 }
 
 
@@ -1585,7 +1595,7 @@ bool Position::isMoveLegal(const Move &m)const
 				Color color = s.isBlackTurn()? black : white;
 				eCastle cs = state::calcCastleRight( m.isKingSideCastle() ? castleOO: castleOOO, color );
 				if( !s.hasCastleRight( cs )
-					|| !mg.isCastlePathFree( cs )
+					|| !isCastlePathFree( cs )
 				)
 				{
 					return false;
@@ -1895,4 +1905,10 @@ unsigned int Position::getNumberOfLegalMoves() const
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
 	mg.generateMoves<Movegen::allMg>( moveList );
 	return moveList.size();
+}
+
+bool Position::isCastlePathFree( const eCastle c ) const
+{
+	assert( c < 9);
+	return !( _castlePath[c] & getOccupationBitmap() );
 }

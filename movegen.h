@@ -99,7 +99,6 @@ public:
 		assert(from<squareNumber);
 		return _attackFromBishop(from,0);
 	}
-	bool isCastlePathFree( const eCastle c ) const;
 	
 private:
 
@@ -109,7 +108,6 @@ private:
 	static bitMap _KNIGHT_MOVE[squareNumber];
 	static bitMap _KING_MOVE[squareNumber];
 	static bitMap _PAWN_ATTACK[2][squareNumber];
-	static std::array<bitMap,9> _castlePath;
 
 	inline static bitMap _attackFromRook(const tSquare from, const bitMap& occupancy)
 	{

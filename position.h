@@ -308,6 +308,8 @@ public:
 	{
 		return getActualStateConst().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= Position::pieceValue[whiteKnights][0];
 	}
+	
+	bool isCastlePathFree( const eCastle c ) const;
 
 	//--------------------------------------------------------
 	// public members
@@ -356,6 +358,7 @@ private:
 	static simdScore pstValue[lastBitboard][squareNumber];
 	static simdScore nonPawnValue[lastBitboard];
 	std::unordered_map<tKey, materialStruct> static materialKeyMap;
+	static std::array<bitMap,9> _castlePath;
 	
 	//--------------------------------------------------------
 	// private members

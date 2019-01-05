@@ -26,7 +26,6 @@
 bitMap Movegen::_KNIGHT_MOVE[squareNumber];
 bitMap Movegen::_KING_MOVE[squareNumber];
 bitMap Movegen::_PAWN_ATTACK[2][squareNumber];
-std::array<bitMap,9> Movegen::_castlePath;
 
 bool Movegen::_isValidCoordinate( const int tofile, const int torank )
 {
@@ -42,16 +41,7 @@ void Movegen::_setBit( bitMap& b, tFile file, tRank rank )
 }
 
 void Movegen::initMovegenConstant(void){
-
-	for( auto& x : _castlePath )
-	{
-		x = 0;
-	}
-	_castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
-	_castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
-	_castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
-	_castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
-
+	
 	initmagicmoves();
 	
 	struct coord{ int x; int y;};
@@ -466,17 +456,11 @@ void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml
 
 }
 
-bool Movegen::isCastlePathFree( const eCastle c ) const
-{
-	assert( c < 9);
-	return !( _castlePath[c] & _pos.getOccupationBitmap() );
-}
-
 template<Movegen::genType type>
 inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
 {
 	eCastle cr = state::calcCastleRight( castleOO, color );
-	if( _pos.getActualStateConst().hasCastleRight( cr ) && isCastlePathFree( cr ) )
+	if( _pos.getActualStateConst().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
 
 		bool castleDenied = false;
@@ -507,7 +491,7 @@ template<Movegen::genType type>
 inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
 {
 	eCastle cr = state::calcCastleRight( castleOOO, color );
-	if( _pos.getActualStateConst().hasCastleRight( cr ) && isCastlePathFree( cr ) )
+	if( _pos.getActualStateConst().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
 		bool castleDenied = false;
 		for( tSquare x = (tSquare)1 ;x<3 ;x++)
