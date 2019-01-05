@@ -1749,7 +1749,7 @@ bool Position::isMoveLegal(const Move &m)const
 }
 
 
-Position::Position():mg(*this),_ply(0)
+Position::Position():_ply(0), _mg(*this)
 {
 	stateInfo.clear();
 	stateInfo.emplace_back(state());
@@ -1760,7 +1760,7 @@ Position::Position():mg(*this),_ply(0)
 }
 
 
-Position::Position(const Position& other): mg(*this), _ply(other._ply), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
+Position::Position(const Position& other): _ply(other._ply), _mg(*this), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
 {
 	updateUsThem();
 }
@@ -1903,7 +1903,7 @@ inline void  Position::removeState()
 unsigned int Position::getNumberOfLegalMoves() const
 {
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
-	mg.generateMoves<Movegen::allMg>( moveList );
+	_mg.generateMoves<Movegen::allMg>( moveList );
 	return moveList.size();
 }
 

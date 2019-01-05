@@ -42,7 +42,7 @@ simdScore traceRes={0,0,0,0};
 
 
 //---------------------------------------------
-const Position::materialStruct * Position::getMaterialData()
+const Position::materialStruct * Position::getMaterialData() const
 {
 	tKey key = getMaterialKey().getKey();
 
@@ -633,10 +633,10 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 	\date 27/10/2013
 */
 template<bool trace>
-Score Position::eval(void)
+Score Position::eval(void) const
 {
 
-	const state &st = getActualState();
+	const state &st = getActualStateConst();
 
 	if(trace)
 	{
@@ -710,10 +710,10 @@ Score Position::eval(void)
 	//-----------------------------------------------------
 
 
-	const materialStruct* materialData = getMaterialData();
+	const materialStruct* const materialData = getMaterialData();
 	if( materialData )
 	{
-		bool (Position::*pointer)(Score &) = materialData->pointer;
+		bool (Position::*pointer)(Score &) const = materialData->pointer;
 		switch(materialData->type)
 		{
 			case materialStruct::exact:
@@ -1350,5 +1350,5 @@ Score Position::eval(void)
 
 }
 
-template Score Position::eval<false>(void);
-template Score Position::eval<true>(void);
+template Score Position::eval<false>(void) const;
+template Score Position::eval<true>(void) const;

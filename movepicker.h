@@ -26,6 +26,7 @@
 
 
 class Position;
+class Movegen;
 
 class MovePicker
 {
@@ -100,6 +101,7 @@ private:
 	Score _captureThreshold;
 	
 	const Position& _pos;
+	const Movegen& _mg;
 	const SearchData& _sd;
 	
 	unsigned int _ply;
