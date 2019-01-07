@@ -1127,12 +1127,11 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				&&  ( !ttMove || type == ALL_NODE)
 			)
 			{
-				Score ralpha = alpha - razorMargin(depth,type==CUT_NODE);
 				assert(ralpha>=-SCORE_INFINITE);
 
 				PVline childPV;
-				Score v = qsearch<CUT_NODE>(ply,0, ralpha, ralpha+1, childPV);
-				if (v <= ralpha)
+				Score v = qsearch<CUT_NODE>(ply,0, alpha, alpha+1, childPV);
+				if (v <= alpha)
 				{
 					return v;
 				}
