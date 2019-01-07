@@ -17,6 +17,7 @@
 
 #include <condition_variable>
 #include <thread>
+#include <mutex>
 
 #include "io.h"
 #include "position.h"
@@ -35,52 +36,60 @@
 class my_thread::impl
 {
 private:
+
+	const unsigned int _initTimeout = 1;
+	
+	enum threadStatus
+	{
+		initalizing,
+		ready,
+		running
+	};
+	
+	volatile threadStatus _searchStatus = initalizing;
+	volatile threadStatus _timerStatus = initalizing;
+	
+	std::thread _searcher;
+	std::thread _timer;
+	
+	std::mutex _sMutex;
+	std::mutex _tMutex;
+	
+	std::condition_variable _searchCond;
+	std::condition_variable _timerCond;
+	
+	volatile static bool _quit;
+	volatile static bool _startThink;
+	
+		
 	SearchLimits _limits; // todo limits belong to threads
 	SearchTimer _st;
 	Search _src;
 	timeManagement _timeMan;
-
 	std::unique_ptr<UciOutput> _UOI;
+	long long _lastHasfullMessageTime;
 
-	volatile static bool _quit;
-	volatile static bool _startThink;
-	
-	volatile static bool _searcherReady;
-	volatile static bool _timerReady;
-
-	long long _lastHasfullMessage;
-	
-	std::thread _searcher;
-	std::thread _timer;
-	std::mutex _searchMutex;
-
-	std::condition_variable _searchCond;
-	std::condition_variable _timerCond;
 
 	bool _initThreads();
-
+	void _quitThreads();
+	
 	void _timerThread();
 	void _searchThread();
 	void _printTimeDependentOutput( long long int time );
-	bool _isReady();
+	void _stopPonder();
+
 public:
 	impl();
 	~impl();
 	void startThinking( const Position& p, SearchLimits& l);
 	void stopThinking();
 	void ponderHit();
-	void stopPonder();
 	timeManagement& getTimeMan();
-	
-	
-	void quitThreads();
 };
 
 volatile bool my_thread::impl::_quit = false;
 volatile bool my_thread::impl::_startThink = false;
 
-volatile bool my_thread::impl::_searcherReady = false;
-volatile bool my_thread::impl::_timerReady = false;
 
 my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
 {
@@ -94,18 +103,16 @@ my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
 
 my_thread::impl::~impl()
 {
-	quitThreads();
+	_quitThreads();
 }
-
-bool my_thread::impl::_isReady(){ return _searcherReady && _timerReady; }
 
 timeManagement& my_thread::impl::getTimeMan(){ return _timeMan; }
 
 void my_thread::impl::_printTimeDependentOutput(long long int time) {
 
-	if( time - _lastHasfullMessage > 1000 )
+	if( time - _lastHasfullMessageTime > 1000 )
 	{
-		_lastHasfullMessage = time;
+		_lastHasfullMessageTime = time;
 
 		_UOI->printGeneralInfo(transpositionTable::getInstance().getFullness(),	_src.getTbHits(), _src.getVisitedNodes(), time);
 
@@ -118,16 +125,20 @@ void my_thread::impl::_printTimeDependentOutput(long long int time) {
 
 void my_thread::impl::_timerThread()
 {
-	std::mutex mutex;
+	std::unique_lock<std::mutex> lk(_tMutex);
+	
 	while (!_quit)
 	{
-		std::unique_lock<std::mutex> lk(mutex);
-		_timerReady = true;
+		_timerStatus = ready;
+		_timerCond.notify_one();
+		
 		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan.isSearchFinished() ) || _quit;} );
+		
+		_timerStatus = running;
+		_timerCond.notify_one();
 
 		if (!_quit)
 		{
-
 			long long int time = _st.getClockTime();
 			
 			bool stop = _timeMan.stateMachineStep( time, _src.getVisitedNodes() );
@@ -136,28 +147,29 @@ void my_thread::impl::_timerThread()
 				_src.stopSearch();
 			}
 
-
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			_printTimeDependentOutput( time );
 #endif
-
-
 			std::this_thread::sleep_for(std::chrono::milliseconds( _timeMan.getResolution() ));
 		}
-		lk.unlock();
 	}
 	_src.stopSearch();
 }
 
 void my_thread::impl::_searchThread()
 {
-	std::mutex mutex;
+	std::unique_lock<std::mutex> lk(_sMutex);
+	
 	while (!_quit)
 	{
-
-		std::unique_lock<std::mutex> lk(mutex);
-		_searcherReady =  true;
+		_searchStatus = ready;
+		_searchCond.notify_one();
+		
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
+		
+		_searchStatus = running;
+		_searchCond.notify_one();
+		
 		if(!_quit)
 		{
 			_limits.checkInfiniteSearch();
@@ -167,31 +179,36 @@ void my_thread::impl::_searchThread()
 			_timerCond.notify_one();
 			_src.manageNewSearch();
 			_startThink = false;
+			
 		}
-		lk.unlock();
 	}
 }
 
 bool my_thread::impl::_initThreads()
 {
-	auto startTime = std::chrono::steady_clock::now();
-	
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
+	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
 	_timer = std::thread(&my_thread::impl::_timerThread, this);
 	_searcher = std::thread(&my_thread::impl::_searchThread, this);
 	_src.stopSearch();
+	
 	// wait initialization
-	for( auto delta = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - startTime ); delta.count() < 1000; delta = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - startTime ) )
-	{
-		if( _isReady() ) return true;
-	}
-	return false;
-	
-	
+	if( !_timerCond.wait_for( lckt, std::chrono::seconds( _initTimeout ), [&]{ return _timerStatus == ready;} ) ) return false;
+	if( !_searchCond.wait_for( lcks, std::chrono::seconds( _initTimeout ), [&]{ return _searchStatus == ready;} ) ) return false;
+
+	return true;
 }
 
-inline void my_thread::impl::quitThreads()
+inline void my_thread::impl::_quitThreads()
 {
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lks(_sMutex, std::adopt_lock);
+	std::unique_lock<std::mutex> lkt(_tMutex, std::adopt_lock);
 	_quit = true;
+	lks.unlock();
+	lkt.unlock();
+
 	_searchCond.notify_one();
 	_timerCond.notify_one();
 	_timer.join();
@@ -201,33 +218,33 @@ inline void my_thread::impl::quitThreads()
 inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 {
 	_src.stopSearch();
-	_lastHasfullMessage = 0;
+	_lastHasfullMessageTime = 0;
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
+	_searchCond.wait( lcks, [&]{ return _searchStatus == ready; } );
+	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
+	_timerCond.wait( lckt, [&]{ return _timerStatus == ready; } );
 
-	while(_startThink){}
-
-	if(!_startThink)
-	{
-		std::lock_guard<std::mutex> lk(_searchMutex);
-		_limits = l;
-		_src.getPosition() = p;
-		_startThink = true;
-		_searchCond.notify_one();
-	}
+	_limits = l;
+	_src.getPosition() = p;
+	_startThink = true;
+	_searchCond.notify_one();
+	
 }
 
 inline void my_thread::impl::stopThinking()
 {
 	_timeMan.stop();
-	stopPonder();
+	_stopPonder();
 }
 
 inline void my_thread::impl::ponderHit()
 {
 	_st.resetPonderTimer();
-	stopPonder();
+	_stopPonder();
 }
 
-inline void my_thread::impl::stopPonder(){ _limits.ponder = false;}
+inline void my_thread::impl::_stopPonder(){ _limits.ponder = false;}
 
 
 
@@ -239,13 +256,9 @@ my_thread::my_thread(): pimpl{std::make_unique<impl>()}{}
 
 my_thread::~my_thread() = default;
 
-void my_thread::quitThreads(){ pimpl->quitThreads();}
-
 void my_thread::stopThinking() { pimpl->stopThinking();}
 
 void my_thread::ponderHit() { pimpl->ponderHit();}
-
-inline void my_thread::stopPonder(){ pimpl->stopPonder(); }
 
 timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
 
