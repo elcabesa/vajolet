@@ -24,7 +24,7 @@
 	\version 1.0
 	\date 21/10/2013
 */
-void displayBitmap(bitMap b)
+void displayBitmap(const bitMap b)
 {
 	char boardc[squareNumber];
 
