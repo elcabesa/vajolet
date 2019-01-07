@@ -79,7 +79,7 @@ void Position::initPstValues(void)
 					{
 						pstValue[piece][s] = PawnE5;
 					}
-					pstValue[piece][s] += PawnRankBonus * (rank - 2);
+					pstValue[piece][s] += PawnRankBonus * static_cast<int>(rank - 2);
 					pstValue[piece][s] += Center[file] * PawnCentering;
 				}
 				if( isKnight( piece ) )
@@ -379,11 +379,11 @@ void Position::display()const
 	const state& st = getActualStateConst();
 	sync_cout;
 	{
-		for (tRank rank = RANK8; rank >= RANK1; rank--)
+		for (tRank rank = RANK8; rank >= RANK1; --rank)
 		{
 			std::cout << "  +---+---+---+---+---+---+---+---+" << std::endl;
 			std::cout << rank+1 <<  " |";
-			for (tFile file = FILEA; file <= FILEH; file++)
+			for (tFile file = FILEA; file <= FILEH; ++file)
 			{
 				std::cout << " " << getPieceName(getPieceAt(getSquare(file,rank))) << " |";
 			}
@@ -425,10 +425,10 @@ std::string  Position::getFen() const {
 	std::string s;
 	int emptyFiles = 0;
 	const state& st = getActualStateConst();
-	for ( tRank rank = RANK8; rank >= RANK1; rank--)
+	for ( tRank rank = RANK8; rank >= RANK1; --rank)
 	{
 		emptyFiles = 0;
-		for ( tFile file = FILEA; file <= FILEH; file++)
+		for ( tFile file = FILEA; file <= FILEH; ++file)
 		{
 			if(getPieceAt(getSquare(file,rank)) != empty)
 			{

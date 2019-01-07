@@ -107,9 +107,9 @@ void initData(void)
 			bitSet(C3)|bitSet(D3)|bitSet(E3)|bitSet(F3);
 
 
-	for (tFile file = FILEA; file <= FILEH; file++)
+	for (tFile file = FILEA; file <= FILEH; ++file)
 	{
-		for (tRank rank = RANK1; rank <= RANK8; rank++)
+		for (tRank rank = RANK1; rank <= RANK8; ++rank)
 		{
 			//===========================================================================
 			//initialize 8-bit rank mask
@@ -130,14 +130,14 @@ void initData(void)
 			int diaga8h1 = file + rank; // from 0 to 14, longest diagonal = 7
 			if (diaga8h1 < 8)  // lower half, diagonals 0 to 7
 			{
-				for (int square = 0 ; square <= diaga8h1 ; square ++)
+				for (int square = 0 ; square <= diaga8h1 ; ++square)
 				{
 					DIAGA8H1MASK[getSquare(file,rank)] |= bitSet(getSquare(tFile(square),tRank(diaga8h1-square)));
 				}
 			}
 			else  // upper half, diagonals 8 to 14
 			{
-				for (int square = 0 ; square < 15 - diaga8h1 ; square ++)
+				for (int square = 0 ; square < 15 - diaga8h1 ; ++square)
 				{
 					DIAGA8H1MASK[getSquare(file,rank)] |= bitSet(getSquare(tFile(diaga8h1+square-7),tRank(7-square)));
 				}
@@ -185,20 +185,20 @@ void initData(void)
 				LINES[square][i] = fileMask(square);
 				if(getRankOf(i) > getRankOf(square)) // in salita
 				{
-					tRank temp = tRank(getRankOf(square) + 1);
+					tRank temp = getRankOf(square) + 1;
 					while(temp < getRankOf(i))
 					{
 						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(getFileOf(square),temp));
-						temp++;
+						++temp;
 					}
 				}
 				if(getRankOf(i) < getRankOf(square)) // in discesa
 				{
-					tRank temp = tRank(getRankOf(square) - 1);
+					tRank temp = getRankOf(square) - 1;
 					while(temp > getRankOf(i))
 					{
 						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(getFileOf(square),temp));
-						temp--;
+						--temp;
 					}
 				}
 			}
@@ -207,20 +207,20 @@ void initData(void)
 				LINES[square][i] = rankMask(square);
 				if(getFileOf(i) > getFileOf(square)) // in salita
 				{
-					tFile temp = tFile(getFileOf(square) + 1);
+					tFile temp = getFileOf(square) + 1;
 					while(temp < getFileOf(i))
 					{
 						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,getRankOf(square)));
-						temp++;
+						++temp;
 					}
 				}
 				if(getFileOf(i) < getFileOf(square)) // in discesa
 				{
-					tFile temp = tFile(getFileOf(square) - 1);
+					tFile temp = getFileOf(square) - 1;
 					while(temp > getFileOf(i))
 					{
 						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,getRankOf(square)));
-						temp--;
+						--temp;
 					}
 				}
 			}
@@ -229,24 +229,24 @@ void initData(void)
 				LINES[square][i] = DIAGA1H8MASK[square];
 				if(getFileOf(i) > getFileOf(square)) // in salita
 				{
-					tFile temp = tFile(getFileOf(square) + 1);
-					tRank temp2 = tRank(getRankOf(square) + 1);
+					tFile temp = getFileOf(square) + 1;
+					tRank temp2 = getRankOf(square) + 1;
 					while(temp < getFileOf(i))
 					{
 						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,temp2));
-						temp++;
-						temp2++;
+						++temp;
+						++temp2;
 					}
 				}
 				if(getFileOf(i) < getFileOf(square)) // in discesa
 				{
-					tFile temp = tFile(getFileOf(square) - 1);
-					tRank temp2 = tRank(getRankOf(square)- 1);
+					tFile temp = getFileOf(square) - 1;
+					tRank temp2 = getRankOf(square)- 1;
 					while(temp > getFileOf(i))
 					{
 						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,temp2));
-						temp--;
-						temp2--;
+						--temp;
+						--temp2;
 					}
 				}
 			}
@@ -255,24 +255,24 @@ void initData(void)
 				LINES[square][i] = DIAGA8H1MASK[square];
 				if(getFileOf(i) > getFileOf(square)) // in salita
 				{
-					tFile temp = tFile(getFileOf(square) + 1);
-					tRank temp2 = tRank(getRankOf(square) - 1);
+					tFile temp = getFileOf(square) + 1;
+					tRank temp2 = getRankOf(square) - 1;
 					while(temp < getFileOf(i))
 					{
 						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,temp2));
-						temp++;
-						temp2--;
+						++temp;
+						--temp2;
 					}
 				}
 				if(getFileOf(i) < getFileOf(square)) // in discesa
 				{
-					tFile temp = tFile(getFileOf(square)-1);
-					tRank temp2 = tRank(getRankOf(square)+1);
+					tFile temp = getFileOf(square)-1;
+					tRank temp2 = getRankOf(square)+1;
 					while(temp > getFileOf(i))
 					{
 						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,temp2));
-						temp--;
-						temp2++;
+						--temp;
+						++temp2;
 					}
 				}
 			}
@@ -284,18 +284,18 @@ void initData(void)
 	//	PAWN STRUCTURE DATA
 	//
 	//////////////////////////////////////////////////
-	for(tSquare square = A1; square < squareNumber; square++)
+	for(tSquare square = A1; square < squareNumber; ++square)
 	{
 		ISOLATED_PAWN[square] = 0;
 		tFile file = getFileOf(square);
 
 		if(file>FILEA)
 		{
-			ISOLATED_PAWN[square] |= fileMask(getSquare(tFile(file-1),RANK1));
+			ISOLATED_PAWN[square] |= fileMask(getSquare(file - 1, RANK1));
 		}
 		if(file<FILEH)
 		{
-			ISOLATED_PAWN[square] |= fileMask(getSquare(tFile(file+1),RANK1));
+			ISOLATED_PAWN[square] |= fileMask(getSquare(file + 1, RANK1));
 		}
 	}
 
@@ -308,38 +308,38 @@ void initData(void)
 		tFile file = getFileOf(square);
 		tRank rank = getRankOf(square);
 
-		for(tRank i=tRank(rank+1); i<=RANK8; i++)
+		for( tRank i=rank+1; i<=RANK8; ++i)
 		{
 			if(file>FILEA)
 			{
-				PASSED_PAWN[0][square] |= bitSet(getSquare(tFile(file-1),i));
+				PASSED_PAWN[0][square] |= bitSet(getSquare(file - 1, i));
 			}
 			PASSED_PAWN[0][square] |= bitSet(getSquare(file,i));
 			SQUARES_IN_FRONT_OF[0][square] |= bitSet(getSquare(file,i));
 			if(file<FILEH)
 			{
-				PASSED_PAWN[0][square] |= bitSet(getSquare(tFile(file+1),i));
+				PASSED_PAWN[0][square] |= bitSet(getSquare(file + 1, i));
 			}
 		}
 
-		for(tRank i=tRank(rank-1); i>=RANK1; i--)
+		for(tRank i=rank-1; i>=RANK1; --i)
 		{
 			if(file>FILEA)
 			{
-				PASSED_PAWN[1][square] |= bitSet(getSquare(tFile(file-1),i));
+				PASSED_PAWN[1][square] |= bitSet(getSquare(file - 1, i));
 			}
 			PASSED_PAWN[1][square] |= bitSet(getSquare(file,i));
 			SQUARES_IN_FRONT_OF[1][square] |= bitSet(getSquare(file,i));
 			if(file<FILEH)
 			{
-				PASSED_PAWN[1][square] |= bitSet(getSquare(tFile(file+1),i));
+				PASSED_PAWN[1][square] |= bitSet(getSquare(file + 1, i));
 			}
 		}
 	}
 
-	for(tSquare square = A1; square < squareNumber; square++)
+	for(tSquare square = A1; square < squareNumber; ++square)
 	{
-		for(tSquare square2 = A1; square2 < squareNumber; square2++){
+		for(tSquare square2 = A1; square2 < squareNumber; ++square2){
 
 			SQUARE_DISTANCE[square][square2] = std::max(std::abs(getFileOf(square)-getFileOf(square2)), std::abs(getRankOf(square)-getRankOf(square2)));
 		}

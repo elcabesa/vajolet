@@ -59,20 +59,20 @@ enum tRank
 	RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8, rankNumber
 };
 
-inline tRank operator++(tRank& d, int) { tRank r = d; d = tRank(int(d) + 1); return r; }
-inline tRank operator--(tRank& d, int) { tRank r = d; d = tRank(int(d) - 1); return r; }
 inline tRank& operator++(tRank& d) { d = tRank(int(d) + 1); return d; }
 inline tRank& operator--(tRank& d) { d = tRank(int(d) - 1); return d; }
+inline tRank operator+(const tRank d1, const int d2) { return tRank(int(d1) + d2); }
+inline tRank operator-(const tRank d1, const int d2) { return tRank(int(d1) - d2); }
 
 enum tFile								
 {
 	FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH, fileNumber
 };
 
-inline tFile operator++(tFile& d, int) { tFile r = d; d = tFile(int(d) + 1); return r; }
-inline tFile operator--(tFile& d, int) { tFile r = d; d = tFile(int(d) - 1); return r; }
 inline tFile& operator++(tFile& d) { d = tFile(int(d) + 1); return d; }
 inline tFile& operator--(tFile& d) { d = tFile(int(d) - 1); return d; }
+inline tFile operator+(const tFile d1, const int d2) { return tFile(int(d1) + d2); }
+inline tFile operator-(const tFile d1, const int d2) { return tFile(int(d1) - d2); }
 
 
 inline tRank getRankOf( const tSquare s )

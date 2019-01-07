@@ -70,7 +70,7 @@ void Movegen::initMovegenConstant(void){
 			_PAWN_ATTACK[color][square] = 0x0;
 			for( auto c: pawnsAttack[color] )
 			{
-				_setBit( _PAWN_ATTACK[color][square], (tFile)(file + c.x), (tRank)(rank + c.y) );
+				_setBit( _PAWN_ATTACK[color][square], file + c.x, rank + c.y );
 			}
 		}
 		
@@ -78,14 +78,14 @@ void Movegen::initMovegenConstant(void){
 		_KNIGHT_MOVE[square] = 0x0;
 		for( auto c: knightAttack )
 		{
-			_setBit( _KNIGHT_MOVE[square], (tFile)(file + c.x), (tRank)(rank + c.y) );
+			_setBit( _KNIGHT_MOVE[square], file + c.x, rank + c.y );
 		}
 		
 		// king moves;
 		_KING_MOVE[square]= 0x0;
 		for( auto c: kingAttack )
 		{
-			_setBit( _KING_MOVE[square], (tFile)(file + c.x), (tRank)(rank + c.y) );
+			_setBit( _KING_MOVE[square], file + c.x, rank + c.y );
 		}
 	}
 }

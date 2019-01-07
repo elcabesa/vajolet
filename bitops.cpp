@@ -28,7 +28,7 @@ void displayBitmap(bitMap b)
 {
 	char boardc[squareNumber];
 
-	for ( tSquare sq = A1; sq < squareNumber; sq++)
+	for ( tSquare sq = A1; sq < squareNumber; ++sq)
 	{
 		if ( isSquareSet( b, sq ) )
 		{
@@ -41,10 +41,10 @@ void displayBitmap(bitMap b)
 	}
 
 	sync_cout;
-	for (tRank rank = RANK8 ; rank >= RANK1; rank--)
+	for (tRank rank = RANK8 ; rank >= RANK1; --rank)
 	{
 		std::cout <<rank +1<< " ";
-		for (tFile file = FILEA ; file <= FILEH; file++)
+		for (tFile file = FILEA ; file <= FILEH; ++file)
 		{
 			std::cout << boardc[getSquare(file,rank)];
 		}
