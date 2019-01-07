@@ -38,41 +38,39 @@ enum tSquare: int								/*!< square name and directions*/
 	square0=0
 };
 
-inline tSquare operator+(const tSquare d1, const tSquare d2) { return tSquare(int(d1) + int(d2)); }
-inline tSquare operator-(const tSquare d1, const tSquare d2) { return tSquare(int(d1) - int(d2)); }
-inline tSquare operator*(int i, const tSquare d) { return tSquare(i * int(d)); }
-inline tSquare operator*(const tSquare d, int i) { return tSquare(int(d) * i); }
-inline tSquare operator-(const tSquare d) { return tSquare(-int(d)); }
+inline tSquare operator+(const tSquare d1, const tSquare d2) { return static_cast<tSquare>(static_cast<int>(d1) + static_cast<int>(d2)); }
+inline tSquare operator-(const tSquare d1, const tSquare d2) { return static_cast<tSquare>(static_cast<int>(d1) - static_cast<int>(d2)); }
+inline tSquare operator*(int i, const tSquare d) { return static_cast<tSquare>(i * static_cast<int>(d)); }
+inline tSquare operator*(const tSquare d, int i) { return static_cast<tSquare>(static_cast<int>(d) * i); }
+inline tSquare operator-(const tSquare d) { return static_cast<tSquare>(-static_cast<int>(d)); }
 inline tSquare& operator+=(tSquare& d1, const tSquare d2) { d1 = d1 + d2; return d1; }
 inline tSquare& operator-=(tSquare& d1, const tSquare d2) { d1 = d1 - d2; return d1; }
-inline tSquare& operator*=(tSquare& d, int i) { d = tSquare(int(d) * i); return d; }
+inline tSquare& operator*=(tSquare& d, int i) { d = static_cast<tSquare>(static_cast<int>(d) * i); return d; }
 
-inline tSquare operator++(tSquare& d, int) { tSquare r = d; d = tSquare(int(d) + 1); return r; }
-inline tSquare operator--(tSquare& d, int) { tSquare r = d; d = tSquare(int(d) - 1); return r; }
-inline tSquare& operator++(tSquare& d) { d = tSquare(int(d) + 1); return d; }
-inline tSquare& operator--(tSquare& d) { d = tSquare(int(d) - 1); return d; }
-inline tSquare operator/(const tSquare d, int i) { return tSquare(int(d) / i); }
-inline tSquare& operator/=(tSquare& d, int i) { d = tSquare(int(d) / i); return d; }
+inline tSquare& operator++(tSquare& d) { d = static_cast<tSquare>(static_cast<int>(d) + 1); return d; }
+inline tSquare& operator--(tSquare& d) { d = static_cast<tSquare>(static_cast<int>(d) - 1); return d; }
+inline tSquare operator/(const tSquare d, int i) { return static_cast<tSquare>(static_cast<int>(d) / i); }
+inline tSquare& operator/=(tSquare& d, int i) { d = static_cast<tSquare>(static_cast<int>(d) / i); return d; }
 
 enum tRank: int								
 {
 	RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8, rankNumber
 };
 
-inline tRank& operator++(tRank& d) { d = tRank(int(d) + 1); return d; }
-inline tRank& operator--(tRank& d) { d = tRank(int(d) - 1); return d; }
-inline tRank operator+(const tRank d1, const int d2) { return tRank(int(d1) + d2); }
-inline tRank operator-(const tRank d1, const int d2) { return tRank(int(d1) - d2); }
+inline tRank& operator++(tRank& d) { d = static_cast<tRank>(static_cast<int>(d) + 1); return d; }
+inline tRank& operator--(tRank& d) { d = static_cast<tRank>(static_cast<int>(d) - 1); return d; }
+inline tRank operator+(const tRank d1, const int d2) { return static_cast<tRank>(static_cast<int>(d1) + d2); }
+inline tRank operator-(const tRank d1, const int d2) { return static_cast<tRank>(static_cast<int>(d1) - d2); }
 
 enum tFile: int								
 {
 	FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH, fileNumber
 };
 
-inline tFile& operator++(tFile& d) { d = tFile(int(d) + 1); return d; }
-inline tFile& operator--(tFile& d) { d = tFile(int(d) - 1); return d; }
-inline tFile operator+(const tFile d1, const int d2) { return tFile(int(d1) + d2); }
-inline tFile operator-(const tFile d1, const int d2) { return tFile(int(d1) - d2); }
+inline tFile& operator++(tFile& d) { d = static_cast<tFile>(static_cast<int>(d) + 1); return d; }
+inline tFile& operator--(tFile& d) { d = static_cast<tFile>(static_cast<int>(d) - 1); return d; }
+inline tFile operator+(const tFile d1, const int d2) { return static_cast<tFile>(static_cast<int>(d1) + d2); }
+inline tFile operator-(const tFile d1, const int d2) { return static_cast<tFile>(static_cast<int>(d1) - d2); }
 
 
 inline tRank getRankOf( const tSquare s )
@@ -100,7 +98,7 @@ inline bool isLateralFile( const tFile f )
 
 inline tSquare getSquare( const tFile f, const tRank r)
 {
-	return tSquare(f + 8 * r);
+	return static_cast<tSquare>(f + 8 * r);
 }
 
 inline Color getSquareColor( const tSquare sq )

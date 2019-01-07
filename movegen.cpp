@@ -464,7 +464,7 @@ inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, cons
 	{
 
 		bool castleDenied = false;
-		for( tSquare x = (tSquare)1; x<3; x++)
+		for( tSquare x = (tSquare)1; x<3; ++x)
 		{
 			assert(kingSquare+x<squareNumber);
 			if(_pos.getAttackersTo(kingSquare+x,occupiedSquares) & _pos.getTheirBitmap(Pieces))
@@ -494,7 +494,7 @@ inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 	if( _pos.getActualStateConst().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
 		bool castleDenied = false;
-		for( tSquare x = (tSquare)1 ;x<3 ;x++)
+		for( tSquare x = (tSquare)1; x<3; ++x)
 		{
 			assert(kingSquare-x<squareNumber);
 			if(_pos.getAttackersTo(kingSquare-x, occupiedSquares) & _pos.getTheirBitmap(Pieces))

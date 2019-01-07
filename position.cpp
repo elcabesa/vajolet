@@ -220,7 +220,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 				putPiece(blackKing,sq);
 				break;
 			}
-			sq++;
+			++sq;
 		}
 	}
 
@@ -354,11 +354,11 @@ void Position::initScoreValues(void)
 */
 void Position::clear()
 {
-	for (tSquare i = square0; i < squareNumber; i++)
+	for (tSquare sq = square0; sq < squareNumber; ++sq)
 	{
-		squares[i] = empty;
+		squares[sq] = empty;
 	}
-	for (bitboardIndex i = occupiedSquares; i < lastBitboard; i++)
+	for (bitboardIndex i = occupiedSquares; i < lastBitboard; ++i)
 	{
 		bitBoard[i] = 0;
 	}
@@ -587,7 +587,7 @@ HashKey Position::calcKey(void) const
 	HashKey hash(0);
 	const state& st =getActualStateConst();
 
-	for( tSquare sq = A1; sq < squareNumber; sq++)
+	for( tSquare sq = A1; sq < squareNumber; ++sq)
 	{
 		if( bitboardIndex p = getPieceAt( sq ); p != empty )
 		{
@@ -1602,14 +1602,14 @@ bool Position::isMoveLegal(const Move &m)const
 				}
 				if(m.getTo()>m.getFrom())
 				{
-					for(tSquare x=m.getFrom();x<=m.getTo() ;x++){
+					for(tSquare x=m.getFrom(); x<=m.getTo(); ++x){
 						if(getAttackersTo(x,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
 						{
 							return false;
 						}
 					}
 				}else{
-					for(tSquare x=m.getTo();x<=m.getFrom() ;x++)
+					for(tSquare x=m.getTo(); x<=m.getFrom(); ++x)
 					{
 						if(getAttackersTo(x,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
 						{

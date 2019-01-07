@@ -299,7 +299,7 @@ void initData(void)
 		}
 	}
 
-	for(tSquare sq = A1; sq < squareNumber; sq++)
+	for(tSquare sq = A1; sq < squareNumber; ++sq)
 	{
 		PASSED_PAWN[0][sq] = 0;
 		PASSED_PAWN[1][sq] = 0;
@@ -348,7 +348,7 @@ void initData(void)
 	BITMAP_COLOR[0] = 0;
 	BITMAP_COLOR[1] = 0;
 
-	for(tSquare sq = A1; sq < squareNumber; sq++)
+	for(tSquare sq = A1; sq < squareNumber; ++sq)
 	{
 		if( getSquareColor(sq))
 		{
