@@ -688,7 +688,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 				
 				std::vector<rootMove> _multiPVprint = _multiPVresult;
 				// always send all the moves toghether in multiPV
-				int missingLines = uciParameters::multiPVLines - _multiPVprint.size();
+				int missingLines = linesToBeSearched - _multiPVprint.size();
 				if( missingLines > 0 )
 				{
 					// add result from the previous iteration
@@ -706,13 +706,13 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 							}
 						}
 					}
-					// add the missing lines ... adding Move::NOMOVE to reach uciParameters::multiPVLines
+					/*// add the missing lines ... adding Move::NOMOVE to reach uciParameters::multiPVLines
 					missingLines =  uciParameters::multiPVLines - _multiPVprint.size();
 					for( int i = 0; i < missingLines; ++i )
 					{
 						PVline pv;
 						_multiPVprint.push_back(rootMove( Move::NOMOVE, pv, 0, 0, 0, 0, 0));
-					}
+					}*/
 					
 				}
 				
