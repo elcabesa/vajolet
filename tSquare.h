@@ -19,7 +19,7 @@
 
 #include "eCastle.h"
 
-enum tSquare								/*!< square name and directions*/
+enum tSquare: int								/*!< square name and directions*/
 {
 	A1,	B1,	C1,	D1,	E1,	F1,	G1,	H1,
 	A2,	B2,	C2,	D2,	E2,	F2,	G2,	H2,
@@ -54,7 +54,7 @@ inline tSquare& operator--(tSquare& d) { d = tSquare(int(d) - 1); return d; }
 inline tSquare operator/(const tSquare d, int i) { return tSquare(int(d) / i); }
 inline tSquare& operator/=(tSquare& d, int i) { d = tSquare(int(d) / i); return d; }
 
-enum tRank								
+enum tRank: int								
 {
 	RANK1, RANK2, RANK3, RANK4, RANK5, RANK6, RANK7, RANK8, rankNumber
 };
@@ -64,7 +64,7 @@ inline tRank& operator--(tRank& d) { d = tRank(int(d) - 1); return d; }
 inline tRank operator+(const tRank d1, const int d2) { return tRank(int(d1) + d2); }
 inline tRank operator-(const tRank d1, const int d2) { return tRank(int(d1) - d2); }
 
-enum tFile								
+enum tFile: int								
 {
 	FILEA, FILEB, FILEC, FILED, FILEE, FILEF, FILEG, FILEH, fileNumber
 };
