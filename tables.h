@@ -44,7 +44,7 @@ static const int size = 8192;
 public:
 	void insert(const HashKey& key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
 
-		pawnEntry& x=pawnTable[ _getIndex( key ) ];
+		pawnEntry& x= _pawnTable[ _getIndex( key ) ];
 
 		x.key = key;
 		x.res[0]=res[0];
@@ -63,11 +63,11 @@ public:
 
 	pawnEntry& probe(const HashKey& key)
 	{
-		return pawnTable[ _getIndex( key ) ];
+		return _pawnTable[ _getIndex( key ) ];
 	}
 private:
 	unsigned int _getIndex( const HashKey& key ) const { return ( (unsigned int)key.getKey() ) % size; }
-	std::array<pawnEntry,size> pawnTable;
+	std::array<pawnEntry,size> _pawnTable;
 };
 
 #endif /* TABLES_H_ */

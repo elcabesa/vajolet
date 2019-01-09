@@ -33,7 +33,7 @@ public:
 	void resetPonderTimer(){ ponderTime = getTime(); }
 
 	explicit SearchTimer(const SearchTimer &other):startTime(other.startTime), ponderTime(other.ponderTime){};
-	SearchTimer():startTime(getTime()), ponderTime(getTime()){};
+	explicit SearchTimer():startTime(getTime()), ponderTime(getTime()){};
 };
 
 #endif

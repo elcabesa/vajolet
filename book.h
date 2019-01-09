@@ -37,9 +37,9 @@ public:
 	Move probe(const Position& pos, bool pickBest);
 private:
 
-	PolyglotBook(const PolyglotBook& other);
+	explicit PolyglotBook(const PolyglotBook& other);
 	PolyglotBook& operator=(const PolyglotBook& other);
-	PolyglotBook(PolyglotBook&& other) noexcept;
+	explicit PolyglotBook(PolyglotBook&& other) noexcept;
 	PolyglotBook& operator=(PolyglotBook&& other) noexcept;
 
 

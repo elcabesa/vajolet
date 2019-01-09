@@ -62,7 +62,7 @@ public:
 		\date 27/10/2013
 	*/
 	explicit Position();
-	/*explicit */Position(const Position& other);
+	explicit Position(const Position& other);
 	Position& operator=(const Position& other);
 	
 

@@ -53,7 +53,7 @@ public:
 	******************************************************************/
 	explicit Move(){}
 	explicit Move( const unsigned short i ):_u(i){}
-	Move( const tSquare _from, const tSquare _to, const eflags _flag=fnone, const epromotion _prom=promQueen ):_u(_from, _to, _flag, _prom){}
+	explicit Move( const tSquare _from, const tSquare _to, const eflags _flag=fnone, const epromotion _prom=promQueen ):_u(_from, _to, _flag, _prom){}
 
 	/*****************************************************************
 	*	Operators
