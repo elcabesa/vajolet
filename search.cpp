@@ -1012,7 +1012,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
 	if (	type != nodeType::ROOT_NODE
-			&& _canUseTTeValue( PVnode, beta, ttValue, tte, (depth +1 - ONE_PLY) )
+			&& _canUseTTeValue( PVnode, beta, ttValue, tte, depth )
 		)
 	{
 		transpositionTable::getInstance().refresh(*tte);
