@@ -30,7 +30,7 @@ public:
 	unsigned int wtime, btime, winc, binc, movesToGo, nodes, mate, moveTime;
 	int depth;
 	std::list<Move> searchMoves;
-	SearchLimits()
+	explicit SearchLimits()
 	{
 		ponder = false;
 		infinite = false;

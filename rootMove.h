@@ -36,12 +36,12 @@ public:
 	bool operator==(const Move& m) const { return firstMove == m; }
 	bool operator==(const rootMove& m) const { return firstMove == m.firstMove; }
 
-	rootMove(const Move& m) : firstMove{m}
+	explicit rootMove(const Move& m) : firstMove{m}
 	{
 		PV.clear();
 	}
 	
-	rootMove( const Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
+	explicit rootMove( const Move& m, PVline& pv, Score s, unsigned int maxPly, unsigned int d, unsigned long long n, long long int t) : score{s}, PV{pv}, firstMove{m}, maxPlyReached{maxPly}, depth{d}, nodes{n}, time{t} {}
 };
 
 #endif

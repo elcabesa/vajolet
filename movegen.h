@@ -41,7 +41,7 @@ public:
 
 	};
 	
-	Movegen(const Position & p): _pos(p){}
+	explicit Movegen(const Position & p): _pos(p){}
 	
 	template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
 	

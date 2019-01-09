@@ -35,7 +35,7 @@ public:
 		searchFinished
 	};
 
-	timeManagement( SearchLimits& limits ):_limits(limits){}
+	explicit timeManagement( SearchLimits& limits ):_limits(limits){}
 
 	void initNewSearch( const eNextMove nm );
 

@@ -61,8 +61,8 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	Position();
-	Position(const Position& other);
+	explicit Position();
+	/*explicit */Position(const Position& other);
 	Position& operator=(const Position& other);
 	
 

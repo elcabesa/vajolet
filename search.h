@@ -41,7 +41,7 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) );
+	explicit Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) );
 	~Search();
 
 	Search( const Search& other ) = delete;
@@ -49,7 +49,7 @@ public:
 	Search(Search&&) =delete;
 	Search& operator=(Search&&) = delete;
 
-	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
+	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
 
 	void stopSearch();
 	void resetStopCondition();

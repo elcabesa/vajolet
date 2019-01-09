@@ -37,7 +37,7 @@ struct state
 public:
 	// todo modifiche a keys inseririle dentro alle altre chiamate
 
-	state(){}
+	explicit state(){}
 
 	inline HashKey& getKey()
 	{

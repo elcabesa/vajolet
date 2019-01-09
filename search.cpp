@@ -83,7 +83,7 @@ public:
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return * this;
 	}
-	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
+	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
 
 	void stopSearch(){ _stop = true;}
 	void resetStopCondition(){ _stop = false;}
@@ -621,7 +621,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size());
 
 	// ramdomly initialize the bestmove
-	bestMove = _rootMovesToBeSearched[0];
+	bestMove = rootMove(_rootMovesToBeSearched[0]);
 	
 	do
 	{

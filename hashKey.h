@@ -76,7 +76,7 @@ public:
 		_key ^= _ep[t];
 	}
 
-	HashKey(){}
+	explicit HashKey(){}
 	explicit HashKey(tKey k):_key(k){}
 
 	bool operator==(HashKey const & r) const {return (_key == r._key);}

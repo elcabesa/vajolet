@@ -29,7 +29,7 @@ public:
 	unsigned int depth;
 	PVline PV;
 	Score Res;
-	SearchResult( Score Alpha, Score Beta, unsigned int Depth, PVline pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
+	explicit SearchResult( Score Alpha, Score Beta, unsigned int Depth, PVline pv, Score res ): alpha(Alpha), beta(Beta), depth(Depth), PV(pv), Res(res){}
 };
 
 #endif

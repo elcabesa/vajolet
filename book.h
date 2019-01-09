@@ -32,7 +32,7 @@ class Position;
 class PolyglotBook : public std::ifstream
 {
 public:
-	PolyglotBook();
+	explicit PolyglotBook();
 	~PolyglotBook();
 	Move probe(const Position& pos, bool pickBest);
 private:

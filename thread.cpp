@@ -79,7 +79,7 @@ private:
 	void _stopPonder();
 
 public:
-	impl();
+	explicit impl();
 	~impl();
 	void startThinking( const Position& p, SearchLimits& l);
 	void stopThinking();

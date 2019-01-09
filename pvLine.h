@@ -62,8 +62,8 @@ public:
 	using std::list<Move>::iterator;
 	using std::list<Move>::begin;
 	using std::list<Move>::end;
-	PVline( unsigned int n, const Move m ) : std::list<Move>(n,m){}
-	PVline(){}
+	explicit PVline( unsigned int n, const Move m ) : std::list<Move>(n,m){}
+	explicit PVline(){}
 	
 };
 
