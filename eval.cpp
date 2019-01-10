@@ -419,6 +419,14 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 template<Color kingColor>
 Score Position::evalShieldStorm(tSquare ksq) const
 {
+	if( getFileOf(ksq) == FILEA )
+	{
+		ksq ++;
+	}
+	if( getFileOf(ksq) == FILEH )
+	{
+		ksq --;
+	}
 	Score ks = 0;
 	const bitMap ourPawns = kingColor ? getBitmap(blackPawns) : getBitmap(whitePawns);
 	const bitMap theirPawns = kingColor ? getBitmap(whitePawns) : getBitmap(blackPawns);
@@ -446,7 +454,7 @@ Score Position::evalShieldStorm(tSquare ksq) const
 	while(pawnStorm)
 	{
 		tSquare p = iterateBit(pawnStorm);
-		ks -= ( 7 - distance(p,ksq) ) * kingStormBonus[0];
+		ks -= std::max(0, 3 - (int)distance(p,ksq) ) * kingStormBonus[0];
 	}
 	return ks;
 }
@@ -568,7 +576,7 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 	bitMap * AttackedSquaresBy = c ? &attackedSquares[whites] : &attackedSquares[blacks];
 	tSquare kingSquare = c ? getSquareOfThePiece(blackKing) : getSquareOfThePiece(whiteKing);
 
-	if( kingAttackersCount )// se il re e' attaccato
+	if( kingAttackersCount > ( getPieceCount( c? whiteQueens: blackQueens ) > 0 ? 0 : 1 ) )// se il re e' attaccato
 	{
 
 		bitMap undefendedSquares = AttackedSquaresBy[Pieces] & DefendedSquaresBy[King];
@@ -577,7 +585,7 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 			| DefendedSquaresBy[Knights]
 			| DefendedSquaresBy[Bishops]
 			| DefendedSquaresBy[Rooks]
-			| DefendedSquaresBy[Queens]);
+			/*| DefendedSquaresBy[Queens]*/);
 		bitMap undefendedSquares2 = ~ DefendedSquaresBy[Pieces];
 		
 		signed int attackUnits = kingAttackersCount * kingAttackersWeight;
@@ -646,30 +654,50 @@ Score Position::eval(void)
 	bitMap weakSquares[2];
 	bitMap holes[2];
 	bitMap kingRing[2];
-	bitMap kingShield[2];
-	bitMap kingFarShield[2];
 	unsigned int kingAttackersCount[2] = {0};
 	unsigned int kingAttackersWeight[2] = {0};
 	unsigned int kingAdjacentZoneAttacksCount[2] = {0};
 
-	tSquare k = getSquareOfThePiece(whiteKing);
-	kingRing[white] = Movegen::attackFrom<whiteKing>(k);
-	kingShield[white] = kingRing[white];
-	if( getRankOf(k) < RANK8 )
+	
+	
+	kingRing[white] = 0;
+	if( st.getNonPawnValue()[ 2 ] >= Position::pieceValue[Knights][0] + Position::pieceValue[Rooks][0] )
 	{
-		kingRing[white] |= Movegen::attackFrom<whiteKing>( tSquare( k + 8) );
+		tSquare k = getSquareOfThePiece(whiteKing);
+		if( getRankOf(k) == RANK1 )
+		{
+			k += north;
+		}
+		if( getFileOf(k) == FILEA )
+		{
+			k += est;
+		}
+		if( getFileOf(k) == FILEH )
+		{
+			k += ovest;
+		}
+		kingRing[white] = Movegen::attackFrom<whiteKing>(k) | bitSet( k );
 	}
-	kingFarShield[white] = kingRing[white] & ~( kingShield[white] | bitSet( k ) );
 
-
-	k = getSquareOfThePiece(blackKing);
-	kingRing[black] = Movegen::attackFrom<whiteKing>(k);
-	kingShield[black] = kingRing[black];
-	if( getRankOf(k) > RANK1 )
+	kingRing[black] = 0;
+	if( st.getNonPawnValue()[ 0 ] >= Position::pieceValue[Knights][0] + Position::pieceValue[Rooks][0] )
 	{
-		kingRing[black] |= Movegen::attackFrom<whiteKing>( tSquare( k - 8 ) );
+		tSquare k = getSquareOfThePiece(blackKing);
+		if( getRankOf(k) == RANK8 )
+		{
+			k += sud;
+		}
+		if( getFileOf(k) == FILEA )
+		{
+			k += est;
+		}
+		if( getFileOf(k) == FILEH )
+		{
+			k += ovest;
+		}
+		kingRing[black] = Movegen::attackFrom<blackKing>(k) | bitSet( k );
 	}
-	kingFarShield[black] = kingRing[black] & ~( kingShield[black] | bitSet( k ) );
+
 
 	// todo modificare valori material value & pst
 	// material + pst
@@ -924,8 +952,13 @@ Score Position::eval(void)
 	//-----------------------------------------
 	bitMap blockedPawns = ( getBitmap(whitePawns)<<8 ) & getBitmap( blackPawns );
 	blockedPawns |= blockedPawns >> 8;
-
-
+	
+	
+	//-----------------------------------------
+	//	add pawn to king attackers
+	//-----------------------------------------
+	kingAttackersCount[white] = bitCnt(kingRing[black] & attackedSquares[whitePawns]);
+	kingAttackersCount[black] = bitCnt(kingRing[white] & attackedSquares[blackPawns]);
 
 	//-----------------------------------------
 	//	pieces
