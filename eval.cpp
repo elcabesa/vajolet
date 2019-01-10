@@ -421,11 +421,11 @@ Score Position::evalShieldStorm(tSquare ksq) const
 {
 	if( getFileOf(ksq) == FILEA )
 	{
-		ksq ++;
+		++ksq;
 	}
 	if( getFileOf(ksq) == FILEH )
 	{
-		ksq --;
+		--ksq;
 	}
 	Score ks = 0;
 	const bitMap ourPawns = kingColor ? getBitmap(blackPawns) : getBitmap(whitePawns);
