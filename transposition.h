@@ -50,8 +50,8 @@ private:
 	signed int type:3;			/*! 2 bit for the type of the entry*/
 							/*  144 bits total =16 bytes*/
 public:
-	ttEntry(unsigned int _Key, Score _Value, unsigned char _Type, signed short int _Depth, unsigned short _Move, Score _StaticValue, unsigned char _gen): key(_Key),packedMove(_Move),depth(_Depth), value(_Value),generation(_gen),staticValue(_StaticValue),type(_Type){}
-	ttEntry(){}
+	explicit ttEntry(unsigned int _Key, Score _Value, unsigned char _Type, signed short int _Depth, unsigned short _Move, Score _StaticValue, unsigned char _gen): key(_Key),packedMove(_Move),depth(_Depth), value(_Value),generation(_gen),staticValue(_StaticValue),type(_Type){}
+	explicit ttEntry(){}
 
 	void save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue, unsigned char gen)
 	{
@@ -108,7 +108,7 @@ private:
 	unsigned long int elements;
 	unsigned char generation;
 
-	transpositionTable()
+	explicit transpositionTable()
 	{
 		table.clear();
 		table.shrink_to_fit();
@@ -201,7 +201,7 @@ public:
 class PerftTranspositionTable
 {
 public:
-	PerftTranspositionTable(){}
+	explicit PerftTranspositionTable(){}
 	
 	void store(const HashKey& key, signed short int depth, unsigned long long v);
 	bool retrieve(const HashKey& key, unsigned int depth, unsigned long long& res);

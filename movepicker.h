@@ -26,6 +26,7 @@
 
 
 class Position;
+class Movegen;
 
 class MovePicker
 {
@@ -33,7 +34,7 @@ public:
 	//--------------------------------------------------------
 	// constructor
 	//--------------------------------------------------------
-	MovePicker(const Position & p, const SearchData& sd = _defaultSearchData, unsigned int ply = 0, const Move & ttm = Move::NOMOVE);
+	explicit MovePicker(const Position & p, const SearchData& sd = _defaultSearchData, unsigned int ply = 0, const Move & ttm = Move::NOMOVE);
 	// todo transform them into constructor? create base class and derived?
 	short int setupQuiescentSearch( const bool inCheck, const int depth );
 	void setupProbCutSearch( const bitboardIndex capturePiece );
@@ -100,6 +101,7 @@ private:
 	Score _captureThreshold;
 	
 	const Position& _pos;
+	const Movegen& _mg;
 	const SearchData& _sd;
 	
 	unsigned int _ply;

@@ -61,8 +61,8 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	Position();
-	Position(const Position& other);
+	explicit Position();
+	explicit Position(const Position& other);
 	Position& operator=(const Position& other);
 	
 
@@ -134,7 +134,7 @@ public:
 	void undoNullMove();
 
 
-	template<bool trace>Score eval(void);
+	template<bool trace>Score eval(void) const;
 	bool isDraw(bool isPVline) const;
 	bool hasRepeated(bool isPVline = false) const;
 
@@ -308,16 +308,19 @@ public:
 	{
 		return getActualStateConst().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= Position::pieceValue[whiteKnights][0];
 	}
+	
+	bool isCastlePathFree( const eCastle c ) const;
+
+	const Movegen& getMoveGen() const
+	{
+		return _mg;
+	}
 
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
 	static bool perftUseHash;
 	static simdScore pieceValue[lastBitboard];
-
-	// todo private?
-	Movegen mg;
-
 private:
 
 
@@ -338,7 +341,7 @@ private:
 			saturationL,
 		};
 		tType type;
-		bool (Position::*pointer)(Score &);
+		bool (Position::*pointer)(Score &) const;
 		Score val;
 
 	};
@@ -356,15 +359,17 @@ private:
 	static simdScore pstValue[lastBitboard][squareNumber];
 	static simdScore nonPawnValue[lastBitboard];
 	std::unordered_map<tKey, materialStruct> static materialKeyMap;
+	static std::array<bitMap,9> _castlePath;
 	
 	//--------------------------------------------------------
 	// private members
 	//--------------------------------------------------------	
 	unsigned int _ply;
+	const Movegen _mg;
 
 
 	/*used for search*/
-	pawnTable pawnHashTable;
+	mutable pawnTable pawnHashTable;
 
 	std::vector<state> stateInfo;
 
@@ -412,21 +417,21 @@ private:
 	template<Color c> Score evalShieldStorm(tSquare ksq) const;
 	template<Color c> simdScore evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
 
-	const materialStruct* getMaterialData();
-	bool evalKxvsK(Score& res);
-	bool evalKBPsvsK(Score& res);
-	bool evalKQvsKP(Score& res);
-	bool evalKRPvsKr(Score& res);
-	bool evalKBNvsK(Score& res);
-	bool evalKQvsK(Score& res);
-	bool evalKRvsK(Score& res);
-	bool kingsDirectOpposition();
-	bool evalKPvsK(Score& res);
-	bool evalKPsvsK(Score& res);
-	bool evalOppositeBishopEndgame(Score& res);
-	bool evalKRvsKm(Score& res);
-	bool evalKNNvsK(Score& res);
-	bool evalKNPvsK(Score& res);
+	const materialStruct* getMaterialData() const;
+	bool evalKxvsK(Score& res) const;
+	bool evalKBPsvsK(Score& res) const;
+	bool evalKQvsKP(Score& res) const;
+	bool evalKRPvsKr(Score& res) const;
+	bool evalKBNvsK(Score& res) const;
+	bool evalKQvsK(Score& res) const;
+	bool evalKRvsK(Score& res) const;
+	bool kingsDirectOpposition() const;
+	bool evalKPvsK(Score& res) const;
+	bool evalKPsvsK(Score& res) const;
+	bool evalOppositeBishopEndgame(Score& res) const;
+	bool evalKRvsKm(Score& res) const;
+	bool evalKNNvsK(Score& res) const;
+	bool evalKNPvsK(Score& res) const;
 
 	static std::string _printEpSquare( const state& st );
 

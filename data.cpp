@@ -88,16 +88,16 @@ bitMap spaceMask;
 */
 void initData(void)
 {
-	for(tSquare i = A1; i<squareNumber; i++)
+	for(tSquare sq = A1; sq < squareNumber; ++sq)
 	{
-		BITSET[i] = 1ull << i;
+		BITSET[sq] = 1ull << sq;
 	}
 	BITSET[squareNone] = 0;
 	
-	for(tSquare i = A1; i<squareNumber; i++)
+	for(tSquare sq = A1; sq < squareNumber; ++sq)
 	{
-		DIAGA1H8MASK[i] = 0;
-		DIAGA8H1MASK[i] = 0;
+		DIAGA1H8MASK[sq] = 0;
+		DIAGA8H1MASK[sq] = 0;
 	}
 
 	centerBitmap = bitSet(E4)|bitSet(E5)|bitSet(D4)|bitSet(D5);
@@ -107,9 +107,9 @@ void initData(void)
 			bitSet(C3)|bitSet(D3)|bitSet(E3)|bitSet(F3);
 
 
-	for (tFile file = FILEA; file <= FILEH; file++)
+	for (tFile file = FILEA; file <= FILEH; ++file)
 	{
-		for (tRank rank = RANK1; rank <= RANK8; rank++)
+		for (tRank rank = RANK1; rank <= RANK8; ++rank)
 		{
 			//===========================================================================
 			//initialize 8-bit rank mask
@@ -130,14 +130,14 @@ void initData(void)
 			int diaga8h1 = file + rank; // from 0 to 14, longest diagonal = 7
 			if (diaga8h1 < 8)  // lower half, diagonals 0 to 7
 			{
-				for (int square = 0 ; square <= diaga8h1 ; square ++)
+				for (int square = 0 ; square <= diaga8h1 ; ++square)
 				{
 					DIAGA8H1MASK[getSquare(file,rank)] |= bitSet(getSquare(tFile(square),tRank(diaga8h1-square)));
 				}
 			}
 			else  // upper half, diagonals 8 to 14
 			{
-				for (int square = 0 ; square < 15 - diaga8h1 ; square ++)
+				for (int square = 0 ; square < 15 - diaga8h1 ; ++square)
 				{
 					DIAGA8H1MASK[getSquare(file,rank)] |= bitSet(getSquare(tFile(diaga8h1+square-7),tRank(7-square)));
 				}
@@ -166,113 +166,113 @@ void initData(void)
 		}
 	}
 	
-	for(tSquare square=A1; square<squareNumber; square++)
+	for(tSquare sq1 = A1; sq1 < squareNumber; ++sq1)
 	{
-		for(tSquare i=A1; i<squareNumber; i++)
+		for(tSquare sq2 = A1; sq2 < squareNumber; ++sq2)
 		{
-			LINES[square][i] =0;
-			SQUARES_BETWEEN[square][i] = 0;
+			LINES[sq1][sq2] =0;
+			SQUARES_BETWEEN[sq1][sq2] = 0;
 
-			if(i == square)
+			if(sq2 == sq1)
 			{
 				continue;
 			}
 
-			if(getFileOf(square) == getFileOf(i))
+			if(getFileOf(sq1) == getFileOf(sq2))
 			{
 				// stessa colonna
 
-				LINES[square][i] = fileMask(square);
-				if(getRankOf(i) > getRankOf(square)) // in salita
+				LINES[sq1][sq2] = fileMask(sq1);
+				if(getRankOf(sq2) > getRankOf(sq1)) // in salita
 				{
-					tRank temp = tRank(getRankOf(square) + 1);
-					while(temp < getRankOf(i))
+					tRank temp = getRankOf(sq1) + 1;
+					while(temp < getRankOf(sq2))
 					{
-						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(getFileOf(square),temp));
-						temp++;
+						SQUARES_BETWEEN[sq1][sq2] |= bitSet(getSquare(getFileOf(sq1),temp));
+						++temp;
 					}
 				}
-				if(getRankOf(i) < getRankOf(square)) // in discesa
+				if(getRankOf(sq2) < getRankOf(sq1)) // in discesa
 				{
-					tRank temp = tRank(getRankOf(square) - 1);
-					while(temp > getRankOf(i))
+					tRank temp = getRankOf(sq1) - 1;
+					while(temp > getRankOf(sq2))
 					{
-						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(getFileOf(square),temp));
-						temp--;
-					}
-				}
-			}
-			if(getRankOf(square) == getRankOf(i)) // stessa riga
-			{
-				LINES[square][i] = rankMask(square);
-				if(getFileOf(i) > getFileOf(square)) // in salita
-				{
-					tFile temp = tFile(getFileOf(square) + 1);
-					while(temp < getFileOf(i))
-					{
-						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,getRankOf(square)));
-						temp++;
-					}
-				}
-				if(getFileOf(i) < getFileOf(square)) // in discesa
-				{
-					tFile temp = tFile(getFileOf(square) - 1);
-					while(temp > getFileOf(i))
-					{
-						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,getRankOf(square)));
-						temp--;
+						SQUARES_BETWEEN[sq1][sq2] |= bitSet(getSquare(getFileOf(sq1),temp));
+						--temp;
 					}
 				}
 			}
-			if( isSquareSet( DIAGA1H8MASK[square], i ) )
+			if(getRankOf(sq1) == getRankOf(sq2)) // stessa riga
 			{
-				LINES[square][i] = DIAGA1H8MASK[square];
-				if(getFileOf(i) > getFileOf(square)) // in salita
+				LINES[sq1][sq2] = rankMask(sq1);
+				if(getFileOf(sq2) > getFileOf(sq1)) // in salita
 				{
-					tFile temp = tFile(getFileOf(square) + 1);
-					tRank temp2 = tRank(getRankOf(square) + 1);
-					while(temp < getFileOf(i))
+					tFile temp = getFileOf(sq1) + 1;
+					while(temp < getFileOf(sq2))
 					{
-						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,temp2));
-						temp++;
-						temp2++;
+						SQUARES_BETWEEN[sq1][sq2] |= bitSet(getSquare(temp,getRankOf(sq1)));
+						++temp;
 					}
 				}
-				if(getFileOf(i) < getFileOf(square)) // in discesa
+				if(getFileOf(sq2) < getFileOf(sq1)) // in discesa
 				{
-					tFile temp = tFile(getFileOf(square) - 1);
-					tRank temp2 = tRank(getRankOf(square)- 1);
-					while(temp > getFileOf(i))
+					tFile temp = getFileOf(sq1) - 1;
+					while(temp > getFileOf(sq2))
 					{
-						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,temp2));
-						temp--;
-						temp2--;
+						SQUARES_BETWEEN[sq1][sq2] |= bitSet(getSquare(temp,getRankOf(sq1)));
+						--temp;
 					}
 				}
 			}
-			if( isSquareSet( DIAGA8H1MASK[square], i ) )
+			if( isSquareSet( DIAGA1H8MASK[sq1], sq2 ) )
 			{
-				LINES[square][i] = DIAGA8H1MASK[square];
-				if(getFileOf(i) > getFileOf(square)) // in salita
+				LINES[sq1][sq2] = DIAGA1H8MASK[sq1];
+				if(getFileOf(sq2) > getFileOf(sq1)) // in salita
 				{
-					tFile temp = tFile(getFileOf(square) + 1);
-					tRank temp2 = tRank(getRankOf(square) - 1);
-					while(temp < getFileOf(i))
+					tFile temp = getFileOf(sq1) + 1;
+					tRank temp2 = getRankOf(sq1) + 1;
+					while(temp < getFileOf(sq2))
 					{
-						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,temp2));
-						temp++;
-						temp2--;
+						SQUARES_BETWEEN[sq1][sq2] |= bitSet(getSquare(temp,temp2));
+						++temp;
+						++temp2;
 					}
 				}
-				if(getFileOf(i) < getFileOf(square)) // in discesa
+				if(getFileOf(sq2) < getFileOf(sq1)) // in discesa
 				{
-					tFile temp = tFile(getFileOf(square)-1);
-					tRank temp2 = tRank(getRankOf(square)+1);
-					while(temp > getFileOf(i))
+					tFile temp = getFileOf(sq1) - 1;
+					tRank temp2 = getRankOf(sq1)- 1;
+					while(temp > getFileOf(sq2))
 					{
-						SQUARES_BETWEEN[square][i] |= bitSet(getSquare(temp,temp2));
-						temp--;
-						temp2++;
+						SQUARES_BETWEEN[sq1][sq2] |= bitSet(getSquare(temp,temp2));
+						--temp;
+						--temp2;
+					}
+				}
+			}
+			if( isSquareSet( DIAGA8H1MASK[sq1], sq2 ) )
+			{
+				LINES[sq1][sq2] = DIAGA8H1MASK[sq1];
+				if(getFileOf(sq2) > getFileOf(sq1)) // in salita
+				{
+					tFile temp = getFileOf(sq1) + 1;
+					tRank temp2 = getRankOf(sq1) - 1;
+					while(temp < getFileOf(sq2))
+					{
+						SQUARES_BETWEEN[sq1][sq2] |= bitSet(getSquare(temp,temp2));
+						++temp;
+						--temp2;
+					}
+				}
+				if(getFileOf(sq2) < getFileOf(sq1)) // in discesa
+				{
+					tFile temp = getFileOf(sq1)-1;
+					tRank temp2 = getRankOf(sq1)+1;
+					while(temp > getFileOf(sq2))
+					{
+						SQUARES_BETWEEN[sq1][sq2] |= bitSet(getSquare(temp,temp2));
+						--temp;
+						++temp2;
 					}
 				}
 			}
@@ -284,79 +284,79 @@ void initData(void)
 	//	PAWN STRUCTURE DATA
 	//
 	//////////////////////////////////////////////////
-	for(tSquare square = A1; square < squareNumber; square++)
+	for(tSquare sq = A1; sq < squareNumber; ++sq)
 	{
-		ISOLATED_PAWN[square] = 0;
-		tFile file = getFileOf(square);
+		ISOLATED_PAWN[sq] = 0;
+		tFile file = getFileOf(sq);
 
 		if(file>FILEA)
 		{
-			ISOLATED_PAWN[square] |= fileMask(getSquare(tFile(file-1),RANK1));
+			ISOLATED_PAWN[sq] |= fileMask(getSquare(file - 1, RANK1));
 		}
 		if(file<FILEH)
 		{
-			ISOLATED_PAWN[square] |= fileMask(getSquare(tFile(file+1),RANK1));
+			ISOLATED_PAWN[sq] |= fileMask(getSquare(file + 1, RANK1));
 		}
 	}
 
-	for(tSquare square = A1; square < squareNumber; square++)
+	for(tSquare sq = A1; sq < squareNumber; ++sq)
 	{
-		PASSED_PAWN[0][square] = 0;
-		PASSED_PAWN[1][square] = 0;
-		SQUARES_IN_FRONT_OF[0][square] = 0;
-		SQUARES_IN_FRONT_OF[1][square] = 0;
-		tFile file = getFileOf(square);
-		tRank rank = getRankOf(square);
+		PASSED_PAWN[0][sq] = 0;
+		PASSED_PAWN[1][sq] = 0;
+		SQUARES_IN_FRONT_OF[0][sq] = 0;
+		SQUARES_IN_FRONT_OF[1][sq] = 0;
+		tFile file = getFileOf(sq);
+		tRank rank = getRankOf(sq);
 
-		for(tRank i=tRank(rank+1); i<=RANK8; i++)
+		for( tRank r=rank+1; r<=RANK8; ++r)
 		{
 			if(file>FILEA)
 			{
-				PASSED_PAWN[0][square] |= bitSet(getSquare(tFile(file-1),i));
+				PASSED_PAWN[0][sq] |= bitSet(getSquare(file - 1, r));
 			}
-			PASSED_PAWN[0][square] |= bitSet(getSquare(file,i));
-			SQUARES_IN_FRONT_OF[0][square] |= bitSet(getSquare(file,i));
+			PASSED_PAWN[0][sq] |= bitSet(getSquare(file,r));
+			SQUARES_IN_FRONT_OF[0][sq] |= bitSet(getSquare(file,r));
 			if(file<FILEH)
 			{
-				PASSED_PAWN[0][square] |= bitSet(getSquare(tFile(file+1),i));
+				PASSED_PAWN[0][sq] |= bitSet(getSquare(file + 1, r));
 			}
 		}
 
-		for(tRank i=tRank(rank-1); i>=RANK1; i--)
+		for(tRank r=rank-1; r>=RANK1; --r)
 		{
 			if(file>FILEA)
 			{
-				PASSED_PAWN[1][square] |= bitSet(getSquare(tFile(file-1),i));
+				PASSED_PAWN[1][sq] |= bitSet(getSquare(file - 1, r));
 			}
-			PASSED_PAWN[1][square] |= bitSet(getSquare(file,i));
-			SQUARES_IN_FRONT_OF[1][square] |= bitSet(getSquare(file,i));
+			PASSED_PAWN[1][sq] |= bitSet(getSquare(file,r));
+			SQUARES_IN_FRONT_OF[1][sq] |= bitSet(getSquare(file,r));
 			if(file<FILEH)
 			{
-				PASSED_PAWN[1][square] |= bitSet(getSquare(tFile(file+1),i));
+				PASSED_PAWN[1][sq] |= bitSet(getSquare(file + 1, r));
 			}
 		}
 	}
 
-	for(tSquare square = A1; square < squareNumber; square++)
+	for(tSquare sq = A1; sq < squareNumber; ++sq)
 	{
-		for(tSquare square2 = A1; square2 < squareNumber; square2++){
+		for(tSquare sq2 = A1; sq2 < squareNumber; ++sq2){
 
-			SQUARE_DISTANCE[square][square2] = std::max(std::abs(getFileOf(square)-getFileOf(square2)), std::abs(getRankOf(square)-getRankOf(square2)));
+			SQUARE_DISTANCE[sq][sq2] = std::max(std::abs(getFileOf(sq)-getFileOf(sq2)), std::abs(getRankOf(sq)-getRankOf(sq2)));
 		}
 	}
 
 	BITMAP_COLOR[0] = 0;
 	BITMAP_COLOR[1] = 0;
 
-	for(tSquare square = A1; square < squareNumber; square++)
+	for(tSquare sq = A1; sq < squareNumber; ++sq)
 	{
-		if( getSquareColor(square))
+		if( getSquareColor(sq))
 		{
-			BITMAP_COLOR[1] |= bitSet(square);
+			BITMAP_COLOR[1] |= bitSet(sq);
 		}
 		else
 		{
-			BITMAP_COLOR[0] |= bitSet(square);
+			BITMAP_COLOR[0] |= bitSet(sq);
 		}
 	}
 	

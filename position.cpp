@@ -33,6 +33,7 @@ simdScore Position::pieceValue[lastBitboard];
 simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 eCastle Position::castleRightsMask[squareNumber];
+std::array<bitMap,9> Position::_castlePath;
 
 bool Position::perftUseHash = false;
 
@@ -79,7 +80,7 @@ void Position::initPstValues(void)
 					{
 						pstValue[piece][s] = PawnE5;
 					}
-					pstValue[piece][s] += PawnRankBonus * (rank - 2);
+					pstValue[piece][s] += PawnRankBonus * static_cast<int>(rank - 2);
 					pstValue[piece][s] += Center[file] * PawnCentering;
 				}
 				if( isKnight( piece ) )
@@ -219,7 +220,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 				putPiece(blackKing,sq);
 				break;
 			}
-			sq++;
+			++sq;
 		}
 	}
 
@@ -353,11 +354,11 @@ void Position::initScoreValues(void)
 */
 void Position::clear()
 {
-	for (tSquare i = square0; i < squareNumber; i++)
+	for (tSquare sq = square0; sq < squareNumber; ++sq)
 	{
-		squares[i] = empty;
+		squares[sq] = empty;
 	}
-	for (bitboardIndex i = occupiedSquares; i < lastBitboard; i++)
+	for (bitboardIndex i = occupiedSquares; i < lastBitboard; ++i)
 	{
 		bitBoard[i] = 0;
 	}
@@ -379,11 +380,11 @@ void Position::display()const
 	const state& st = getActualStateConst();
 	sync_cout;
 	{
-		for (tRank rank = RANK8; rank >= RANK1; rank--)
+		for (tRank rank = RANK8; rank >= RANK1; --rank)
 		{
 			std::cout << "  +---+---+---+---+---+---+---+---+" << std::endl;
 			std::cout << rank+1 <<  " |";
-			for (tFile file = FILEA; file <= FILEH; file++)
+			for (tFile file = FILEA; file <= FILEH; ++file)
 			{
 				std::cout << " " << getPieceName(getPieceAt(getSquare(file,rank))) << " |";
 			}
@@ -425,10 +426,10 @@ std::string  Position::getFen() const {
 	std::string s;
 	int emptyFiles = 0;
 	const state& st = getActualStateConst();
-	for ( tRank rank = RANK8; rank >= RANK1; rank--)
+	for ( tRank rank = RANK8; rank >= RANK1; --rank)
 	{
 		emptyFiles = 0;
-		for ( tFile file = FILEA; file <= FILEH; file++)
+		for ( tFile file = FILEA; file <= FILEH; ++file)
 		{
 			if(getPieceAt(getSquare(file,rank)) != empty)
 			{
@@ -586,7 +587,7 @@ HashKey Position::calcKey(void) const
 	HashKey hash(0);
 	const state& st =getActualStateConst();
 
-	for( tSquare sq = A1; sq < squareNumber; sq++)
+	for( tSquare sq = A1; sq < squareNumber; ++sq)
 	{
 		if( bitboardIndex p = getPieceAt( sq ); p != empty )
 		{
@@ -1016,6 +1017,15 @@ void Position::initCastleRightsMask(void)
 	castleRightsMask[E8] = bCastleOO | bCastleOOO;
 	castleRightsMask[A8] = bCastleOOO;
 	castleRightsMask[H8] = bCastleOO;
+	
+	for( auto& x : _castlePath )
+	{
+		x = 0;
+	}
+	_castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
+	_castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
+	_castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
+	_castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
 }
 
 
@@ -1585,21 +1595,21 @@ bool Position::isMoveLegal(const Move &m)const
 				Color color = s.isBlackTurn()? black : white;
 				eCastle cs = state::calcCastleRight( m.isKingSideCastle() ? castleOO: castleOOO, color );
 				if( !s.hasCastleRight( cs )
-					|| !mg.isCastlePathFree( cs )
+					|| !isCastlePathFree( cs )
 				)
 				{
 					return false;
 				}
 				if(m.getTo()>m.getFrom())
 				{
-					for(tSquare x=m.getFrom();x<=m.getTo() ;x++){
+					for(tSquare x=m.getFrom(); x<=m.getTo(); ++x){
 						if(getAttackersTo(x,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
 						{
 							return false;
 						}
 					}
 				}else{
-					for(tSquare x=m.getTo();x<=m.getFrom() ;x++)
+					for(tSquare x=m.getTo(); x<=m.getFrom(); ++x)
 					{
 						if(getAttackersTo(x,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
 						{
@@ -1739,7 +1749,7 @@ bool Position::isMoveLegal(const Move &m)const
 }
 
 
-Position::Position():mg(*this),_ply(0)
+Position::Position():_ply(0), _mg(*this)
 {
 	stateInfo.clear();
 	stateInfo.emplace_back(state());
@@ -1750,7 +1760,7 @@ Position::Position():mg(*this),_ply(0)
 }
 
 
-Position::Position(const Position& other): mg(*this), _ply(other._ply), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
+Position::Position(const Position& other): _ply(other._ply), _mg(*this), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
 {
 	updateUsThem();
 }
@@ -1893,6 +1903,12 @@ inline void  Position::removeState()
 unsigned int Position::getNumberOfLegalMoves() const
 {
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
-	mg.generateMoves<Movegen::allMg>( moveList );
+	_mg.generateMoves<Movegen::allMg>( moveList );
 	return moveList.size();
+}
+
+bool Position::isCastlePathFree( const eCastle c ) const
+{
+	assert( c < 9);
+	return !( _castlePath[c] & getOccupationBitmap() );
 }

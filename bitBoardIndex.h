@@ -24,27 +24,27 @@
 */
 enum bitboardIndex
 {
-	occupiedSquares=0,				//0		00000000
-	whiteKing=1,					//1		00000001
-	whiteQueens=2,					//2		00000010
-	whiteRooks=3,					//3		00000011
-	whiteBishops=4,					//4		00000100
-	whiteKnights=5,					//5		00000101
-	whitePawns=6,					//6		00000110
-	whitePieces=7,					//7		00000111
+	occupiedSquares,			//0		00000000
+	whiteKing,					//1		00000001
+	whiteQueens,				//2		00000010
+	whiteRooks,					//3		00000011
+	whiteBishops,				//4		00000100
+	whiteKnights,				//5		00000101
+	whitePawns,					//6		00000110
+	whitePieces,				//7		00000111
 
-	separationBitmap=8,
-	blackKing=9,					//9		00001001
-	blackQueens=10,					//10	00001010
-	blackRooks=11,					//11	00001011
-	blackBishops=12,				//12	00001100
-	blackKnights=13,				//13	00001101
-	blackPawns=14,					//14	00001110
-	blackPieces=15,					//15	00001111
+	separationBitmap,			//8
+	blackKing,					//9		00001001
+	blackQueens,				//10	00001010
+	blackRooks,					//11	00001011
+	blackBishops,				//12	00001100
+	blackKnights,				//13	00001101
+	blackPawns,					//14	00001110
+	blackPieces,				//15	00001111
 
-	lastBitboard=16,
+	lastBitboard,
 
-	King=whiteKing,
+	King = whiteKing,
 	Queens,
 	Rooks,
 	Bishops,
@@ -54,68 +54,66 @@ enum bitboardIndex
 	whites = occupiedSquares,
 	blacks = separationBitmap,
 
-	empty=occupiedSquares
+	empty = occupiedSquares
 
 };
 
-inline bitboardIndex operator++(bitboardIndex& d, int) { bitboardIndex r = d; d = bitboardIndex(int(d) + 1); return r; }
-inline bitboardIndex& operator++(bitboardIndex& d) { d = bitboardIndex(int(d) + 1); return d; }
+inline bitboardIndex operator++(bitboardIndex& d, int) { bitboardIndex r = d; d = static_cast<bitboardIndex>(static_cast<int>(d) + 1); return r; }
+inline bitboardIndex& operator++(bitboardIndex& d) { d = static_cast<bitboardIndex>(static_cast<int>(d) + 1); return d; }
 
-inline bitboardIndex operator--(bitboardIndex& d, int) { bitboardIndex r = d; d = bitboardIndex(int(d) - 1); return r; }
-inline bitboardIndex& operator--(bitboardIndex& d) { d = bitboardIndex(int(d) - 1); return d; }
+inline bitboardIndex operator--(bitboardIndex& d, int) { bitboardIndex r = d; d = static_cast<bitboardIndex>(static_cast<int>(d) - 1); return r; }
+inline bitboardIndex& operator--(bitboardIndex& d) { d = static_cast<bitboardIndex>(static_cast<int>(d) - 1); return d; }
 
 enum eNextMove	// color turn. ( it's also used as offset to access bitmaps by index)
 {
 	whiteTurn = 0,
-	blackTurn=blackKing-whiteKing
+	blackTurn = blackKing - whiteKing
 };
-
-inline eNextMove operator++(eNextMove& d, int) { eNextMove r = d; d = eNextMove(int(d) + 1); return r; }
-inline eNextMove& operator++(eNextMove& d) { d = eNextMove(int(d) + 1); return d; }
 
 /*! \brief tell if the piece is a pawn
 	\author Marco Belli
 	\version 1.0
 	\date 27/10/2013
 */
-inline static bool isPawn(bitboardIndex piece)
+inline static bool isPawn(const bitboardIndex piece)
 {
-	return (piece&7) == Pawns;
+	return (piece & 7) == Pawns;
 }
 /*! \brief tell if the piece is a king
 	\author Marco Belli
 	\version 1.0
 	\date 27/10/2013
 */
-inline static bool isKing(bitboardIndex piece)
+inline static bool isKing(const bitboardIndex piece)
 {
-	return (piece&7) == King;
+	return (piece & 7) == King;
 }
 /*! \brief tell if the piece is a queen
 	\author Marco Belli
 	\version 1.0
 	\date 04/11/2013
 */
-inline static bool isQueen(bitboardIndex piece)
+inline static bool isQueen(const bitboardIndex piece)
 {
-	return (piece&7) == Queens;
+	return (piece & 7) == Queens;
 }
 /*! \brief tell if the piece is a rook
 	\author Marco Belli
 	\version 1.0
 	\date 04/11/2013
 */
-inline static bool isRook(bitboardIndex piece)
+inline static bool isRook(const bitboardIndex piece)
 {
-	return (piece&7) == Rooks;
+	return (piece & 7) == Rooks;
 }
 /*! \brief tell if the piece is a bishop
 	\author Marco Belli
 	\version 1.0
 	\date 04/11/2013
 */
-inline static bool isBishop(bitboardIndex piece){
-	return (piece&7) == Bishops;
+inline static bool isBishop(const bitboardIndex piece)
+{
+	return (piece & 7) == Bishops;
 }
 
 /*! \brief tell if the piece is a bishop
@@ -123,15 +121,16 @@ inline static bool isBishop(bitboardIndex piece){
 	\version 1.0
 	\date 04/11/2013
 */
-inline static bool isKnight(bitboardIndex piece){
-	return (piece&7) == Knights;
+inline static bool isKnight(const bitboardIndex piece)
+{
+	return (piece & 7) == Knights;
 }
 /*! \brief tell the color of a piece
 	\author Marco Belli
 	\version 1.0
 	\date 27/10/2013
 */
-inline static bool isblack(bitboardIndex piece)
+inline static bool isblack(const bitboardIndex piece)
 {
 	return piece & 8;
 }
@@ -141,7 +140,7 @@ inline static bool isblack(bitboardIndex piece)
 	\version 1.0
 	\date 27/10/2013
 */
-inline static bool isValidPiece(bitboardIndex piece)
+inline static bool isValidPiece(const bitboardIndex piece)
 {
 	return piece < lastBitboard && piece != occupiedSquares && piece != whitePieces && piece != separationBitmap && piece != blackPieces;
 }

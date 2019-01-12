@@ -26,7 +26,7 @@
 #include "searchTimer.h"
 #include "transposition.h"
 
-static const std::vector< std::string >positions = {
+static const std::vector<std::string> positions = {
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 10",
   "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 11",
@@ -45,22 +45,18 @@ static const std::vector< std::string >positions = {
   "3q2k1/pb3p1p/4pbp1/2r5/PpN2N2/1P2P2P/5PP1/Q2R2K1 b - - 4 26"
 };
 
-static std::string getNodesPerSecond( unsigned long long nodeCount, long long int time )
-{
+static std::string getNodesPerSecond( const unsigned long long nodeCount, const long long int time ) {
 	std::string s;
-	if( time == 0 )
-	{
+	if( time == 0 )	{
 		s = "---";
-	}
-	else
-	{
+	} else {
 		s = std::to_string( 1000 * nodeCount / time );
 	}
 	return s;
 }
 
-void benchmark(void)
-{
+void benchmark(void) {
+
 	transpositionTable::getInstance().setSize(32);
 
 	unsigned long long nodeCount = 0;
@@ -73,19 +69,17 @@ void benchmark(void)
 	int i = 0;
 	
 	for( auto pos: positions )
-	{
-		++i;
-		
+	{	
 		src.getPosition().setupFromFen( pos );
 		
-		sync_cout << "Position: " << i << '/' << positions.size() << sync_endl;
+		sync_cout << "Position: " << (++i) << '/' << positions.size() << sync_endl;
 		
 		src.startThinking();
 		
 		nodeCount += src.getVisitedNodes();
 	}
 
-	long long int totalTime = st.getElapsedTime();
+	const long long int totalTime = st.getElapsedTime();
 
 	sync_cout << "\n==========================="
        << "\nTotal time (ms) : " << totalTime

@@ -32,8 +32,8 @@ public:
 	void resetStartTimers(){ ponderTime = startTime = getTime(); }
 	void resetPonderTimer(){ ponderTime = getTime(); }
 
-	SearchTimer(const SearchTimer &other):startTime(other.startTime), ponderTime(other.ponderTime){};
-	SearchTimer():startTime(getTime()), ponderTime(getTime()){};
+	explicit SearchTimer(const SearchTimer &other):startTime(other.startTime), ponderTime(other.ponderTime){};
+	explicit SearchTimer():startTime(getTime()), ponderTime(getTime()){};
 };
 
 #endif

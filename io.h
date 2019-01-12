@@ -19,6 +19,8 @@
 #define IO_H_
 
 #include <iostream>
+
+// todo use <syncstream> as soon as implemented by compiler
 //--------------------------------------------------------------------
 //	enum
 //--------------------------------------------------------------------

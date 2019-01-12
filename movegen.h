@@ -41,7 +41,7 @@ public:
 
 	};
 	
-	Movegen(const Position & p): _pos(p){}
+	explicit Movegen(const Position & p): _pos(p){}
 	
 	template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
 	
@@ -99,7 +99,6 @@ public:
 		assert(from<squareNumber);
 		return _attackFromBishop(from,0);
 	}
-	bool isCastlePathFree( const eCastle c ) const;
 	
 private:
 
@@ -109,7 +108,6 @@ private:
 	static bitMap _KNIGHT_MOVE[squareNumber];
 	static bitMap _KING_MOVE[squareNumber];
 	static bitMap _PAWN_ATTACK[2][squareNumber];
-	static std::array<bitMap,9> _castlePath;
 
 	inline static bitMap _attackFromRook(const tSquare from, const bitMap& occupancy)
 	{
@@ -171,9 +169,6 @@ private:
 	
 	template<Movegen::genType type>void generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const;
 	template<Movegen::genType type>void generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const;
-
-
-
 };
 
 

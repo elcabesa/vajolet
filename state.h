@@ -31,13 +31,13 @@
 	\version 1.0
 	\date 27/10/2013
 */
-struct state
+class state
 {
 
 public:
 	// todo modifiche a keys inseririle dentro alle altre chiamate
 
-	state(){}
+	explicit state(){}
 
 	inline HashKey& getKey()
 	{

@@ -39,7 +39,7 @@
 #include "vajolet.h"
 
 #ifdef DEBUG_EVAL_SIMMETRY
-void testSimmetry(Position& pos)
+void testSimmetry(const Position& pos)
 {
 	static Position ppp;
 
@@ -83,7 +83,7 @@ public:
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return * this;
 	}
-	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = {} );
+	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
 
 	void stopSearch(){ _stop = true;}
 	void resetStopCondition(){ _stop = false;}
@@ -136,7 +136,7 @@ private:
 	unsigned int _maxPlyReached;
 
 	std::vector<rootMove> _multiPVresult;
-	Position pos;
+	Position _pos;
 
 	SearchLimits& _sl; // todo limits belong to threads
 	SearchTimer& _st;
@@ -362,22 +362,22 @@ void Search::impl::filterRootMovesByTablebase( std::vector<Move>& rm )
 {
 	unsigned results[TB_MAX_MOVES];
 
-	unsigned int piecesCnt = bitCnt (pos.getBitmap(whitePieces) | pos.getBitmap(blackPieces));
+	unsigned int piecesCnt = bitCnt (_pos.getBitmap(whitePieces) | _pos.getBitmap(blackPieces));
 
 	if ( piecesCnt <= TB_LARGEST )
 	{
-		unsigned result = tb_probe_root(pos.getBitmap(whitePieces),
-			pos.getBitmap(blackPieces),
-			pos.getBitmap(blackKing) | pos.getBitmap(whiteKing),
-			pos.getBitmap(blackQueens) | pos.getBitmap(whiteQueens),
-			pos.getBitmap(blackRooks) | pos.getBitmap(whiteRooks),
-			pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
-			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
-			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
-			pos.getActualStateConst().getIrreversibleMoveCount(),
-			pos.getActualStateConst().getCastleRights(),
-			pos.hasEpSquare() ? pos.getEpSquare(): 0,
-			pos.isWhiteTurn(),
+		unsigned result = tb_probe_root(_pos.getBitmap(whitePieces),
+			_pos.getBitmap(blackPieces),
+			_pos.getBitmap(blackKing) | _pos.getBitmap(whiteKing),
+			_pos.getBitmap(blackQueens) | _pos.getBitmap(whiteQueens),
+			_pos.getBitmap(blackRooks) | _pos.getBitmap(whiteRooks),
+			_pos.getBitmap(blackBishops) | _pos.getBitmap(whiteBishops),
+			_pos.getBitmap(blackKnights) | _pos.getBitmap(whiteKnights),
+			_pos.getBitmap(blackPawns) | _pos.getBitmap(whitePawns),
+			_pos.getActualStateConst().getIrreversibleMoveCount(),
+			_pos.getActualStateConst().getCastleRights(),
+			_pos.hasEpSquare() ? _pos.getEpSquare(): 0,
+			_pos.isWhiteTurn(),
 			results);
 
 		if (result != TB_RESULT_FAILED)
@@ -447,7 +447,7 @@ void Search::impl::generateRootMovesList( std::vector<Move>& rm, std::list<Move>
 	if( ml.size() == 0 )	// all the legal moves
 	{
 		Move m;
-		MovePicker mp( pos );
+		MovePicker mp( _pos );
 		while( ( m = mp.getNextMove() ) )
 		{
 			rm.emplace_back( m );
@@ -621,7 +621,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size());
 
 	// ramdomly initialize the bestmove
-	bestMove = _rootMovesToBeSearched[0];
+	bestMove = rootMove(_rootMovesToBeSearched[0]);
 	
 	do
 	{
@@ -734,7 +734,7 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 		hs.cleanMemoryBeforeStartingNewSearch();
 	}
 	
-	_initialTurn = pos.getNextTurn();
+	_initialTurn = _pos.getNextTurn();
 	//----------------------------------
 	// we can start the real search
 	//----------------------------------
@@ -762,7 +762,7 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 
 		helperResults[i].firstMove = m;
 		helperSearch[i-1].resetStopCondition();
-		helperSearch[i-1].pos = pos;
+		helperSearch[i-1]._pos = _pos;
 		helperSearch[i-1]._pvLineToFollow = _pvLineToFollow;
 		helperThread.emplace_back( std::thread(&Search::impl::idLoop, &helperSearch[i-1], std::ref(helperResults), i, std::ref(toBeExcludedMove),depth, alpha, beta, false));
 	}
@@ -794,15 +794,15 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 
 inline void Search::impl::_updateCounterMove(const Move& m)
 {
-	if( const Move& previousMove = pos.getActualStateConst().getCurrentMove() )
+	if( const Move& previousMove = _pos.getActualStateConst().getCurrentMove() )
 	{
-		_sd.counterMoves.update( pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
+		_sd.counterMoves.update( _pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
 	}
 }
 
 bool Search::impl::_manageDraw(const bool PVnode, PVline& pvLine)
 {
-	if(pos.isDraw(PVnode) || _stop)
+	if(_pos.isDraw(PVnode) || _stop)
 	{
 		if(PVnode)
 		{
@@ -818,7 +818,7 @@ void Search::impl::_showCurrenLine( const unsigned int ply, const int depth )
 	if( _showLine && depth <= ONE_PLY)
 	{
 		_showLine = false;
-		_UOI->showCurrLine(pos,ply);
+		_UOI->showCurrLine(_pos,ply);
 	}
 }
 
@@ -834,7 +834,7 @@ inline bool Search::impl::_MateDistancePruning( const unsigned int ply, Score& a
 }
 void Search::impl::_appendTTmoveIfLegal( const Move& ttm, PVline& pvLine ) const
 {
-	if( pos.isMoveLegal(ttm) )
+	if( _pos.isMoveLegal(ttm) )
 	{
 		pvLine.appendNewMove( ttm );
 	}
@@ -860,7 +860,7 @@ inline bool Search::impl::_canUseTTeValue( const bool PVnode, const Score beta, 
 
 inline const HashKey Search::impl::_getSearchKey( const bool excludedMove ) const
 {
-	return excludedMove ? pos.getExclusionKey() : pos.getKey();
+	return excludedMove ? _pos.getExclusionKey() : _pos.getKey();
 }
 
 inline Search::impl::tableBaseRes Search::impl::_checkTablebase( const unsigned int ply, const int depth )
@@ -869,24 +869,24 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase( const unsigned 
 	if( TB_LARGEST )
 	{
 		res.TTtype = typeScoreLowerThanAlpha;
-		unsigned int piecesCnt = bitCnt (pos.getBitmap(whitePieces) | pos.getBitmap(blackPieces));
+		unsigned int piecesCnt = bitCnt (_pos.getBitmap(whitePieces) | _pos.getBitmap(blackPieces));
 
 		if (    piecesCnt <= TB_LARGEST
 			&& (piecesCnt <  TB_LARGEST || depth >= (int)( uciParameters::SyzygyProbeDepth * ONE_PLY ) )
-			&&  pos.getActualStateConst().getIrreversibleMoveCount() == 0)
+			&&  _pos.getActualStateConst().getIrreversibleMoveCount() == 0)
 		{
-			unsigned result = tb_probe_wdl(pos.getBitmap(whitePieces),
-				pos.getBitmap(blackPieces),
-				pos.getBitmap(blackKing) | pos.getBitmap(whiteKing),
-				pos.getBitmap(blackQueens) | pos.getBitmap(whiteQueens),
-				pos.getBitmap(blackRooks) | pos.getBitmap(whiteRooks),
-				pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
-				pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
-				pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
-				pos.getActualStateConst().getIrreversibleMoveCount(),
-				pos.getActualStateConst().getCastleRights(),
-				pos.hasEpSquare() ? pos.getEpSquare(): 0,
-				pos.isWhiteTurn() );
+			unsigned result = tb_probe_wdl(_pos.getBitmap(whitePieces),
+				_pos.getBitmap(blackPieces),
+				_pos.getBitmap(blackKing) | _pos.getBitmap(whiteKing),
+				_pos.getBitmap(blackQueens) | _pos.getBitmap(whiteQueens),
+				_pos.getBitmap(blackRooks) | _pos.getBitmap(whiteRooks),
+				_pos.getBitmap(blackBishops) | _pos.getBitmap(whiteBishops),
+				_pos.getBitmap(blackKnights) | _pos.getBitmap(whiteKnights),
+				_pos.getBitmap(blackPawns) | _pos.getBitmap(whitePawns),
+				_pos.getActualStateConst().getIrreversibleMoveCount(),
+				_pos.getActualStateConst().getCastleRights(),
+				_pos.hasEpSquare() ? _pos.getEpSquare(): 0,
+				_pos.isWhiteTurn() );
 
 			if(result != TB_RESULT_FAILED)
 			{
@@ -966,7 +966,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	// initialize node constants
 	//--------------------------------------
 	const bool PVnode = ( type == nodeType::PV_NODE || type == nodeType::ROOT_NODE );
-	const bool inCheck = pos.isInCheck();
+	const bool inCheck = _pos.isInCheck();
 	_sd.story[ply].inCheck = inCheck;
 
 	_updateNodeStatistics(ply);
@@ -1025,7 +1025,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 		//save killers
 		if (ttValue >= beta
 			&& ttMove
-			&& !pos.isCaptureMoveOrPromotion(ttMove)
+			&& !_pos.isCaptureMoveOrPromotion(ttMove)
 			&& !inCheck)
 		{
 			_sd.saveKillers(ply, ttMove);
@@ -1057,7 +1057,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					res.TTtype,
 					std::min(90, depth + 6 * ONE_PLY),
 					ttMove,
-					pos.eval<false>());
+					_pos.eval<false>());
 
 				return res.value;
 			}
@@ -1073,11 +1073,11 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	Score eval;
 	if(inCheck || tte->getType() == typeVoid)
 	{
-		staticEval = pos.eval<false>();
+		staticEval = _pos.eval<false>();
 		eval = staticEval;
 
 #ifdef DEBUG_EVAL_SIMMETRY
-		testSimmetry(pos);
+		testSimmetry(_pos);
 #endif
 	}
 	else
@@ -1146,7 +1146,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				&& depth < 8 * ONE_PLY
 				&& eval - futility( depth, improving ) >= beta
 				&& eval < SCORE_KNOWN_WIN
-				&& pos.hasActivePlayerNonPawnMaterial()
+				&& _pos.hasActivePlayerNonPawnMaterial()
 			)
 			{
 				assert((depth>>ONE_PLY_SHIFT)<8);
@@ -1164,7 +1164,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			if( depth >= ONE_PLY
 				&& eval >= beta
 				&& !_sd.story[ply].skipNullMove
-				&& pos.hasActivePlayerNonPawnMaterial()
+				&& _pos.hasActivePlayerNonPawnMaterial()
 			){
 				// Null move dynamic reduction based on depth
 				int red = 3 * ONE_PLY + depth / 4;
@@ -1175,10 +1175,10 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					red += ONE_PLY;
 				}
 
-				pos.doNullMove();
+				_pos.doNullMove();
 				_sd.story[ply+1].skipNullMove = true;
 
-				//uint64_t nullKey = pos.getKey();
+				//uint64_t nullKey = _pos.getKey();
 				Score nullVal;
 				PVline childPV;
 				if( depth-red < ONE_PLY )
@@ -1190,7 +1190,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					nullVal = -alphaBeta<childNodesType>(ply+1, depth - red, -beta, -beta+1, childPV);
 				}
 
-				pos.undoNullMove();
+				_pos.undoNullMove();
 				_sd.story[ply+1].skipNullMove = false;
 
 				if (nullVal >= beta)
@@ -1239,8 +1239,8 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				Score rBeta = std::min(beta + 8000, SCORE_INFINITE);
 				int rDepth = depth -ONE_PLY- 3*ONE_PLY;
 
-				MovePicker mp(pos, _sd, ply, ttMove);
-				mp.setupProbCutSearch( pos.getCapturedPiece() );
+				MovePicker mp(_pos, _sd, ply, ttMove);
+				mp.setupProbCutSearch( _pos.getCapturedPiece() );
 
 				Move m;
 				PVline childPV;
@@ -1253,12 +1253,12 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					}
 
 					++pbCount;
-					pos.doMove(m);
+					_pos.doMove(m);
 
 					assert(rDepth>=ONE_PLY);
 					s = -alphaBeta<childNodesType>(ply+1, rDepth, -rBeta ,-rBeta+1, childPV);
 
-					pos.undoMove();
+					_pos.undoMove();
 
 					if(s >= rBeta)
 					{
@@ -1303,7 +1303,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	Move bestMove(Move::NOMOVE);
 
 	Move m;
-	MovePicker mp(pos, _sd, ply, ttMove);
+	MovePicker mp(_pos, _sd, ply, ttMove);
 	unsigned int moveNumber = 0;
 	unsigned int quietMoveCount = 0;
 	Move quietMoveList[64];
@@ -1336,11 +1336,11 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 		++moveNumber;
 
 
-		bool captureOrPromotion = pos.isCaptureMoveOrPromotion(m);
+		bool captureOrPromotion = _pos.isCaptureMoveOrPromotion(m);
 
 
-		bool moveGivesCheck = pos.moveGivesCheck(m);
-		bool isDangerous = moveGivesCheck || m.isCastleMove() || pos.isPassedPawnMove(m);
+		bool moveGivesCheck = _pos.moveGivesCheck(m);
+		bool isDangerous = moveGivesCheck || m.isCastleMove() || _pos.isPassedPawnMove(m);
 		bool FutilityMoveCountFlag = depth < 16*ONE_PLY && moveNumber >= FutilityMoveCounts[improving][depth >> ONE_PLY_SHIFT];
 
 		int ext = 0;
@@ -1348,7 +1348,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 		{
 			ext = ONE_PLY;
 		}
-		else if( moveGivesCheck && pos.seeSign(m) >= 0 && !FutilityMoveCountFlag)
+		else if( moveGivesCheck && _pos.seeSign(m) >= 0 && !FutilityMoveCountFlag)
 		{
 			ext = ONE_PLY / 2;
 		}
@@ -1415,7 +1415,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				}
 			}
 
-			if(newDepth < 4 * ONE_PLY && pos.seeSign(m) < 0)
+			if(newDepth < 4 * ONE_PLY && _pos.seeSign(m) < 0)
 			{
 				continue;
 			}
@@ -1439,7 +1439,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 		}
 
 
-		pos.doMove(m);
+		_pos.doMove(m);
 		Score val;
 		PVline childPV;
 
@@ -1567,7 +1567,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			}
 		}
 
-		pos.undoMove();
+		_pos.undoMove();
 
 		if(!_stop && val > bestScore)
 		{
@@ -1626,7 +1626,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 		}
 		else if(!inCheck)
 		{
-			bestScore = std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
+			bestScore = std::min( (int)0, (int)(-5000 + _pos.getPly()*250) );
 		}
 		else
 		{
@@ -1649,7 +1649,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	if (bestScore >= beta
 		&& !inCheck)
 	{
-		if (!pos.isCaptureMoveOrPromotion(bestMove))
+		if (!_pos.isCaptureMoveOrPromotion(bestMove))
 		{
 			_sd.saveKillers(ply, bestMove);
 
@@ -1657,32 +1657,32 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
 			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-			_sd.history.update( pos.isWhiteTurn() ? white: black, bestMove, bonus);
+			_sd.history.update( _pos.isWhiteTurn() ? white: black, bestMove, bonus);
 
 			for (unsigned int i = 0; i < quietMoveCount; i++)
 			{
 				Move m = quietMoveList[i];
-				_sd.history.update( pos.isWhiteTurn() ? white: black, m, -bonus);
+				_sd.history.update( _pos.isWhiteTurn() ? white: black, m, -bonus);
 			}
 			
 			_updateCounterMove( bestMove );
 		}
 		else
 		{
-			//if( pos.isCaptureMove( bestMove ) )
+			//if( _pos.isCaptureMove( bestMove ) )
 			{
 				// update capture history
 				int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
 				Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
 
-				_sd.captureHistory.update( pos.getPieceAt(bestMove.getFrom()), bestMove, pos.getPieceAt(bestMove.getTo()), bonus);
+				_sd.captureHistory.update( _pos.getPieceAt(bestMove.getFrom()), bestMove, _pos.getPieceAt(bestMove.getTo()), bonus);
 
 				for (unsigned int i = 0; i < captureMoveCount; i++)
 				{
 					Move m = captureMoveList[i];
-					//if( pos.isCaptureMove( m ) )
+					//if( _pos.isCaptureMove( m ) )
 					{
-						_sd.captureHistory.update( pos.getPieceAt(m.getFrom()), m, pos.getPieceAt(m.getTo()), -bonus);
+						_sd.captureHistory.update( _pos.getPieceAt(m.getFrom()), m, _pos.getPieceAt(m.getTo()), -bonus);
 					}
 				}
 			}
@@ -1718,7 +1718,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	const bool PVnode = (type == nodeType::PV_NODE);
 	assert( PVnode || alpha + 1 == beta );
 
-	bool inCheck = pos.isInCheck();
+	bool inCheck = _pos.isInCheck();
 	_sd.story[ply].inCheck = inCheck;
 
 	_updateNodeStatistics(ply);
@@ -1741,10 +1741,10 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 
 
 	const HashKey& posKey = _getSearchKey();
-	ttEntry* const tte = transpositionTable::getInstance().probe( pos.getKey() );
+	ttEntry* const tte = transpositionTable::getInstance().probe( _pos.getKey() );
 	Move ttMove( tte->getPackedMove() );
 
-	MovePicker mp(pos, _sd, ply, ttMove);
+	MovePicker mp(_pos, _sd, ply, ttMove);
 	
 	short int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(),ply);
@@ -1768,9 +1768,9 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	ttType TTtype = typeScoreLowerThanAlpha;
 
 
-	Score staticEval = tte->getType()!=typeVoid ? tte->getStaticValue() : pos.eval<false>();
+	Score staticEval = tte->getType()!=typeVoid ? tte->getStaticValue() : _pos.eval<false>();
 #ifdef DEBUG_EVAL_SIMMETRY
-	testSimmetry(pos);
+	testSimmetry(_pos);
 #endif
 
 
@@ -1807,7 +1807,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 
 			if( bestScore >= beta)
 			{
-				if( !pos.isCaptureMoveOrPromotion(ttMove) )
+				if( !_pos.isCaptureMoveOrPromotion(ttMove) )
 				{
 					_sd.saveKillers(ply, ttMove);
 				}
@@ -1858,7 +1858,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 			}
 
 			// at very deep search allow only recapture
-			if(depth < -7 * ONE_PLY && pos.getActualStateConst().getCurrentMove().getTo() != m.getTo())
+			if(depth < -7 * ONE_PLY && _pos.getActualStateConst().getCurrentMove().getTo() != m.getTo())
 			{
 				continue;
 			}
@@ -1871,18 +1871,18 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 				if(
 					m != ttMove
 					//&& m.bit.flags != Move::fpromotion
-					//&& !pos.moveGivesCheck(m)
+					//&& !_pos.moveGivesCheck(m)
 					)
 				{
-					bool moveGiveCheck = pos.moveGivesCheck(m);
+					bool moveGiveCheck = _pos.moveGivesCheck(m);
 					if(
 							!moveGiveCheck
-							&& !pos.isPassedPawnMove(m)
+							&& !_pos.isPassedPawnMove(m)
 							&& abs(staticEval)<SCORE_KNOWN_WIN
 					)
 					{
 						Score futilityValue = futilityBase
-								+ Position::pieceValue[pos.getPieceAt(m.getTo())][1]
+								+ Position::pieceValue[_pos.getPieceAt(m.getTo())][1]
 								+ ( m.isEnPassantMove() ? Position::pieceValue[whitePawns][1] : 0);
 
 						if( m.isPromotionMove() )
@@ -1896,7 +1896,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 							bestScore = std::max(bestScore, futilityValue);
 							continue;
 						}
-						if (futilityBase < beta && pos.seeSign(m) <= 0)
+						if (futilityBase < beta && _pos.seeSign(m) <= 0)
 						{
 							bestScore = std::max(bestScore, futilityBase);
 							continue;
@@ -1913,7 +1913,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 					// TODO testare se aggiungere o no !movegivesCheck() &&
 					if(
 							//!moveGiveCheck &&
-							pos.seeSign(m) < 0)
+							_pos.seeSign(m) < 0)
 					{
 						continue;
 					}
@@ -1921,11 +1921,11 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 			}
 
 		}
-		pos.doMove(m);
+		_pos.doMove(m);
 		Score val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
 
 
-		pos.undoMove();
+		_pos.undoMove();
 
 
 		if( val > bestScore)
@@ -1944,7 +1944,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 				}
 				if( bestScore >= beta)
 				{
-					if( !pos.isCaptureMoveOrPromotion(bestMove) && !inCheck )
+					if( !_pos.isCaptureMoveOrPromotion(bestMove) && !inCheck )
 					{
 						_sd.saveKillers(ply, bestMove);
 					}
@@ -1991,8 +1991,8 @@ void Search::impl::setUOI( std::unique_ptr<UciOutput> UOI )
 
 inline Score Search::impl::getDrawValue() const
 {
-	int contemptSign = ( pos.getNextTurn() == _initialTurn) ? 1 : -1;
-	return contemptSign * std::min( (int)0, (int)(-5000 + pos.getPly()*250) );
+	int contemptSign = ( _pos.getNextTurn() == _initialTurn) ? 1 : -1;
+	return contemptSign * std::min( (int)0, (int)(-5000 + _pos.getPly()*250) );
 }
 
 void Search::impl::initSearchParameters(void)
@@ -2044,16 +2044,16 @@ void Search::impl::initSearchParameters(void)
 Move Search::impl::_getPonderMoveFromHash(const Move bestMove )
 {
 	Move ponderMove(0);
-	pos.doMove( bestMove );
+	_pos.doMove( bestMove );
 	
-	const ttEntry* const tte = transpositionTable::getInstance().probe(pos.getKey());
+	const ttEntry* const tte = transpositionTable::getInstance().probe(_pos.getKey());
 	
 	Move m( tte->getPackedMove() );
-	if( pos.isMoveLegal(m) )
+	if( _pos.isMoveLegal(m) )
 	{
 		ponderMove = m;
 	}
-	pos.undoMove();
+	_pos.undoMove();
 	
 	return ponderMove;
 }
@@ -2061,15 +2061,15 @@ Move Search::impl::_getPonderMoveFromHash(const Move bestMove )
 Move Search::impl::_getPonderMoveFromBook(const Move bookMove )
 {
 	Move ponderMove(0);
-	pos.doMove( bookMove );
+	_pos.doMove( bookMove );
 	PolyglotBook pol;
-	Move m = pol.probe( pos, uciParameters::bestMoveBook);
+	Move m = pol.probe( _pos, uciParameters::bestMoveBook);
 	
-	if( pos.isMoveLegal(m) )
+	if( _pos.isMoveLegal(m) )
 	{
 		ponderMove = m;
 	}
-	pos.undoMove();
+	_pos.undoMove();
 	
 	return ponderMove;
 }
@@ -2081,7 +2081,7 @@ void Search::impl::_waitStopPondering() const
 
 Position& Search::impl::getPosition()
 {
-	return pos;
+	return _pos;
 }
 
 void Search::impl::manageNewSearch()
@@ -2092,14 +2092,14 @@ void Search::impl::manageNewSearch()
 	 *	if there is 0 legal moves return null move
 	 *************************************************/
 
-	if( _game.isNewGame(pos))
+	if( _game.isNewGame(_pos))
 	{
 		_game.CreateNewGame();
 
 	}
-	_game.insertNewMoves(pos);
+	_game.insertNewMoves(_pos);
 
-	unsigned int legalMoves = pos.getNumberOfLegalMoves();
+	unsigned int legalMoves = _pos.getNumberOfLegalMoves();
 
 	if(legalMoves == 0)
 	{
@@ -2114,7 +2114,7 @@ void Search::impl::manageNewSearch()
 	
 	if( legalMoves == 1 && !_sl.infinite )
 	{
-		Move bestMove = MovePicker( pos ).getNextMove();
+		Move bestMove = MovePicker( _pos ).getNextMove();
 		
 		_UOI->printPV(bestMove);
 		
@@ -2134,7 +2134,7 @@ void Search::impl::manageNewSearch()
 	if( uciParameters::useOwnBook && !_sl.infinite )
 	{
 		PolyglotBook pol;
-		Move bookM = pol.probe( pos, uciParameters::bestMoveBook);
+		Move bookM = pol.probe( _pos, uciParameters::bestMoveBook);
 		if( bookM )
 		{
 			_UOI->printPV(bookM);

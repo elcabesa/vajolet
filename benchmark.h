@@ -18,7 +18,7 @@
 #define BENCHMARK_H_
 
 
-void benchmark(void);
+void benchmark();
 
 
 #endif /* BENCHMARK_H_ */

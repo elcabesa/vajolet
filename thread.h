@@ -25,7 +25,7 @@ class SearchLimits;
 class my_thread
 {
 private:
-	my_thread();
+	explicit my_thread();
 	~my_thread();
 	my_thread(const my_thread&) = delete;
 	my_thread& operator=(const my_thread&) = delete;

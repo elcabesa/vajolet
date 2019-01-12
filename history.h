@@ -59,7 +59,7 @@ public :
 	}
 
 
-	History(){}
+	explicit History(){}
 
 };
 
@@ -104,7 +104,7 @@ public :
 	}
 
 
-	CaptureHistory(){}
+	explicit CaptureHistory(){}
 
 };
 
@@ -139,7 +139,7 @@ public :
 	}
 
 
-	CounterMove(){}
+	explicit CounterMove(){}
 
 };
 

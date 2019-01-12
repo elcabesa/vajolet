@@ -28,7 +28,7 @@ std::unordered_map<tKey, Position::materialStruct> Position::materialKeyMap;
 /**********************************************
 eval king and pieces vs lone king
 **********************************************/
-bool Position::evalKxvsK(Score& res)
+bool Position::evalKxvsK(Score& res) const
 {
 	const Color StrongColor = bitCnt(getBitmap(whitePieces))>1  ? white : black;
 	tSquare winKingSquare;
@@ -74,7 +74,7 @@ bool Position::evalKxvsK(Score& res)
 eval king Knight and pawn vs lone king, 
 it looks drawish if the pawn is on seventh and on the edge of the board
 **********************************************/
-bool Position::evalKNPvsK(Score& res)
+bool Position::evalKNPvsK(Score& res) const
 {
 	const Color Pcolor = getBitmap(whitePawns) ? white : black;
 	const tSquare pawnSquare = getSquareOfThePiece( Pcolor ? blackPawns: whitePawns);
@@ -94,7 +94,7 @@ bool Position::evalKNPvsK(Score& res)
 eval king Bishop and pawns vs lone king, 
 it looks drawish if all the pawns are on the edge of the board and the bishop is of the wrong color
 **********************************************/
-bool Position::evalKBPsvsK(Score& res)
+bool Position::evalKBPsvsK(Score& res) const
 {
 	const Color Pcolor = getBitmap(whitePawns) ? white : black;
 	bitMap pawns;
@@ -139,7 +139,7 @@ bool Position::evalKBPsvsK(Score& res)
 eval king and queen vs king and pawn, 
 it looks drawish if the promoting pawn is on column A or C
 **********************************************/
-bool Position::evalKQvsKP(Score& res)
+bool Position::evalKQvsKP(Score& res) const
 {
 	Color pColor = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
@@ -182,7 +182,7 @@ bool Position::evalKQvsKP(Score& res)
 eval king, rook and pawn vs king and rook, 
 help handling lucena and philidor positions
 **********************************************/
-bool Position::evalKRPvsKr(Score& res)
+bool Position::evalKRPvsKr(Score& res) const
 {
 	Color Pcolor = getBitmap(whitePawns) ? white : black;
 	bitboardIndex pawnPiece;
@@ -216,7 +216,7 @@ bool Position::evalKRPvsKr(Score& res)
 eval king, bishop and knight vs lone king, 
 the rook shall be pyushed toward thre right corner and the winning king shall help the pieces
 **********************************************/
-bool Position::evalKBNvsK( Score& res)
+bool Position::evalKBNvsK( Score& res) const
 {
 	Color color = getBitmap(whiteBishops) ? white : black;
 	tSquare bishopSquare;
@@ -261,7 +261,7 @@ bool Position::evalKBNvsK( Score& res)
 
 }
 
-bool Position::evalKQvsK(Score& res)
+bool Position::evalKQvsK(Score& res) const
 {
 	Color color = getBitmap(whiteQueens) ? white : black;
 	tSquare kingSquare;
@@ -296,7 +296,7 @@ bool Position::evalKQvsK(Score& res)
 
 }
 
-bool Position::evalKRvsK(Score& res)
+bool Position::evalKRvsK(Score& res) const
 {
 	Color color = getBitmap(whiteRooks) ? white : black;
 	tSquare kingSquare;
@@ -331,7 +331,7 @@ bool Position::evalKRvsK(Score& res)
 
 }
 
-bool Position::kingsDirectOpposition()
+bool Position::kingsDirectOpposition() const
 {
 	if(
 			(getSquareOfThePiece(whiteKing) + 16 == getSquareOfThePiece(blackKing) )
@@ -345,7 +345,7 @@ bool Position::kingsDirectOpposition()
 
 }
 
-bool Position::evalKPvsK(Score& res)
+bool Position::evalKPvsK(Score& res) const
 {
 	Color pColor = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
@@ -444,7 +444,7 @@ bool Position::evalKPvsK(Score& res)
 	return false;
 }
 
-bool Position::evalKPsvsK(Score& res)
+bool Position::evalKPsvsK(Score& res) const
 {
 	Color color = getBitmap(whitePawns) ? white : black;
 	
@@ -483,7 +483,7 @@ bool Position::evalKPsvsK(Score& res)
 }
 
 
-bool Position::evalOppositeBishopEndgame(Score& res)
+bool Position::evalOppositeBishopEndgame(Score& res) const
 {
 	if( getSquareColor(getSquareOfThePiece(blackBishops)) != getSquareColor(getSquareOfThePiece(whiteBishops)))
 	{
@@ -535,13 +535,13 @@ bool Position::evalOppositeBishopEndgame(Score& res)
 
 }
 
-bool Position::evalKRvsKm(Score& res)
+bool Position::evalKRvsKm(Score& res) const
 {
 	res = 64;
 	return true;
 }
 
-bool Position::evalKNNvsK(Score& res)
+bool Position::evalKNNvsK(Score& res) const
 {
 	res = 10;
 	return true;
@@ -575,7 +575,7 @@ void Position::initMaterialKeys(void)
 	static const struct{
 		std::string fen;
 		materialStruct::tType type;
-		bool (Position::*pointer)(Score &);
+		bool (Position::*pointer)(Score &) const;
 		Score val;
 	} Endgames[] = {
 			// DRAWN
