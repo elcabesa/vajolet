@@ -116,16 +116,14 @@ private:
 		generation = 0;
 		elements = 1;
 	}
-	static transpositionTable instance; // Guaranteed to be destroyed.
-	// Instantiated on first use.
-	
+
 public:
 
 	void clear();
 	static transpositionTable& getInstance()
 	{
-		
-
+		static transpositionTable instance; // Guaranteed to be destroyed.
+		// Instantiated on first use.
 		return instance;
 	}
 	transpositionTable(transpositionTable const&) = delete;
