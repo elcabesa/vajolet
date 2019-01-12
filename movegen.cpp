@@ -87,7 +87,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 {
 
 	// initialize constants
-	const state &s =_pos.getActualStateConst();
+	const state &s =_pos.getActualState();
 	const bitMap& enemy = _pos.getTheirBitmap(Pieces);
 	const bitMap& occupiedSquares = _pos.getOccupationBitmap();
 	
@@ -296,7 +296,7 @@ inline void Movegen::generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bi
 		while(moves)
 		{
 			tSquare to = iterateBit(moves);
-			if( !_pos.getActualStateConst().isPinned( from ) || squaresAligned(from, to, kingSquare))
+			if( !_pos.getActualState().isPinned( from ) || squaresAligned(from, to, kingSquare))
 			{
 				m.setTo( to );
 				insertStandardMove<type>( ml, m );
@@ -325,7 +325,7 @@ inline bitMap Movegen::generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, 
 		tSquare to = iterateBit(moves);
 		tSquare from = to - pawnPush( color );
 		
-		if( !_pos.getActualStateConst().isPinned( from ) || squaresAligned(from,to,kingSquare))
+		if( !_pos.getActualState().isPinned( from ) || squaresAligned(from,to,kingSquare))
 		{
 			m.setTo( to );
 			m.setFrom( from );
@@ -354,7 +354,7 @@ inline void Movegen::generatePawnDoublePushes( MoveList<MAX_MOVE_PER_POSITION>& 
 		tSquare to = iterateBit(moves);
 		tSquare from = to - 2*pawnPush( color );
 
-		if( !_pos.getActualStateConst().isPinned( from ) || squaresAligned(from ,to ,kingSquare))
+		if( !_pos.getActualState().isPinned( from ) || squaresAligned(from ,to ,kingSquare))
 		{
 			m.setTo( to );
 			m.setFrom( from );
@@ -393,7 +393,7 @@ inline void Movegen::generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, i
 		tSquare to = iterateBit(moves);
 		tSquare from = (tSquare)(to - delta);
 
-		if( !_pos.getActualStateConst().isPinned( from ) || squaresAligned(from,to,kingSquare))
+		if( !_pos.getActualState().isPinned( from ) || squaresAligned(from,to,kingSquare))
 		{
 			m.setTo( to );
 			m.setFrom( from );
@@ -412,9 +412,9 @@ inline void Movegen::generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, i
 
 inline void Movegen::generateEpMove(MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const bitMap occupiedSquares, const tSquare kingSquare) const
 {
-	if( _pos.getActualStateConst().hasEpSquare() )
+	if( _pos.getActualState().hasEpSquare() )
 	{
-		auto epSquare = _pos.getActualStateConst().getEpSquare();
+		auto epSquare = _pos.getActualState().getEpSquare();
 		Move m(Move::NOMOVE);
 		m.setFlag( Move::fenpassant );
 		bitMap epAttacker = pawns & _attackFromPawn( epSquare, 1 - color );
@@ -460,7 +460,7 @@ template<Movegen::genType type>
 inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
 {
 	eCastle cr = state::calcCastleRight( castleOO, color );
-	if( _pos.getActualStateConst().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
+	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
 
 		bool castleDenied = false;
@@ -491,7 +491,7 @@ template<Movegen::genType type>
 inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
 {
 	eCastle cr = state::calcCastleRight( castleOOO, color );
-	if( _pos.getActualStateConst().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
+	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
 		bool castleDenied = false;
 		for( tSquare x = (tSquare)1; x<3; ++x)

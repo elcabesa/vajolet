@@ -74,7 +74,7 @@ TEST(PositionTest, setupFromFen){
 	Position pos;
 	pos.setupFromFen("3r4/5pk1/2R3p1/7p/1bKP1P1P/r1p3P1/1pB5/1R6 b - - 2 46"); 
 
-	EXPECT_EQ(squareNone, pos.getActualStateConst().getEpSquare());
+	EXPECT_EQ(squareNone, pos.getActualState().getEpSquare());
 	
 }
 

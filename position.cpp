@@ -377,7 +377,7 @@ void Position::display()const
 {
 	sync_cout<<getFen()<<sync_endl;
 
-	const state& st = getActualStateConst();
+	const state& st = getActualState();
 	sync_cout;
 	{
 		for (tRank rank = RANK8; rank >= RANK1; --rank)
@@ -425,7 +425,7 @@ std::string  Position::getFen() const {
 
 	std::string s;
 	int emptyFiles = 0;
-	const state& st = getActualStateConst();
+	const state& st = getActualState();
 	for ( tRank rank = RANK8; rank >= RANK1; --rank)
 	{
 		emptyFiles = 0;
@@ -499,7 +499,7 @@ std::string Position::getSymmetricFen() const {
 
 	std::string s;
 	int emptyFiles=0;
-	const state& st =getActualStateConst();
+	const state& st =getActualState();
 	for (tRank rank = RANK1; rank <=RANK8 ; rank++)
 	{
 		emptyFiles=0;
@@ -585,7 +585,7 @@ std::string Position::getSymmetricFen() const {
 HashKey Position::calcKey(void) const
 {
 	HashKey hash(0);
-	const state& st =getActualStateConst();
+	const state& st =getActualState();
 
 	for( tSquare sq = A1; sq < squareNumber; ++sq)
 	{
@@ -935,7 +935,7 @@ void Position::undoMove()
 {
 	--_ply;
 
-	const state& x = getActualStateConst();
+	const state& x = getActualState();
 	const Move &m = x.getCurrentMove();
 	assert( m );
 	const tSquare to = m.getTo();
@@ -1044,7 +1044,7 @@ static void block( std::string errorString, unsigned int type )
 */
 void Position::checkPosConsistency(int nn) const
 {
-	const state &x = getActualStateConst();
+	const state &x = getActualState();
 	if( x.getNextTurn() != whiteTurn && x.getNextTurn() != blackTurn)
 	{
 		block( "nextMove error", nn );
@@ -1282,7 +1282,7 @@ inline void Position::calcCheckingSquares(void)
 template<bool our>
 bitMap Position::getHiddenCheckers() const
 {
-	const state &x  = getActualStateConst();
+	const state &x  = getActualState();
 	const tSquare kingSquare = our? getSquareOfTheirKing(): getSquareOfOurKing();
 	const eNextMove next = our? x.getNextTurn(): x.getSwitchedTurn();
 	
@@ -1337,7 +1337,7 @@ bool Position::moveGivesCheck(const Move& m)const
 	tSquare to = m.getTo();
 	bitboardIndex piece = getPieceAt(from);
 	assert( isValidPiece( piece ) );
-	const state &s = getActualStateConst();
+	const state &s = getActualState();
 
 	// Direct check ?
 	if( isSquareSet( s.getCheckingSquares( piece ), to ) )
@@ -1416,7 +1416,7 @@ bool Position::moveGivesDoubleCheck(const Move& m)const
 	tSquare from = m.getFrom();
 	tSquare to = m.getTo();
 	bitboardIndex piece = getPieceAt( from );
-	const state &s = getActualStateConst();
+	const state &s = getActualState();
 
 	// Direct check ?
 	return isSquareSet( s.getCheckingSquares( piece ), to) && ( s.thereAreHiddenCheckers() && s.isHiddenChecker( from ) );
@@ -1432,7 +1432,7 @@ bool Position::moveGivesSafeDoubleCheck(const Move& m)const
 
 bool Position::hasRepeated(bool isPVline) const
 {
-	const state &s = getActualStateConst();
+	const state &s = getActualState();
 	unsigned int counter = 1;
 	const HashKey& actualkey = s.getKey();
 	auto it = stateInfo.rbegin();
@@ -1463,7 +1463,7 @@ bool Position::isDraw(bool isPVline) const
 
 	// Draw by material?
 
-	const state & s = getActualStateConst();
+	const state & s = getActualState();
 	if (  !bitBoard[whitePawns] && !bitBoard[blackPawns]
 		&&( ( (s.getNonPawnValue()[0]<= pieceValue[whiteBishops][0]) && s.getNonPawnValue()[2] == 0)
 		|| ( (s.getNonPawnValue()[2]<= pieceValue[whiteBishops][0]) && s.getNonPawnValue()[0] == 0)
@@ -1498,7 +1498,7 @@ bool Position::isMoveLegal(const Move &m)const
 		return false;
 	}
 
-	const state &s = getActualStateConst();
+	const state &s = getActualState();
 	const bitboardIndex piece = getPieceAt(m.getFrom());
 	assert( isValidPiece( piece ) || piece == empty );
 

@@ -339,7 +339,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 				{
 
 					res -= rookTrapped*(int)(3-mobility);
-					const state & st = getActualStateConst();
+					const state & st = getActualState();
 					if( isBlackPiece(piece) )
 					{
 						if( !st.hasCastleRight( bCastleOO | bCastleOOO ) )
@@ -469,7 +469,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 	bitboardIndex ourRooks = c ? blackRooks : whiteRooks;
 	bitboardIndex enemyRooks = c ? whiteRooks : blackRooks;
 	bitboardIndex ourPawns = c ? blackPawns : whitePawns;
-	const state st = getActualStateConst();
+	const state st = getActualState();
 
 	simdScore score = {0,0,0,0};
 	while(pp)
@@ -636,7 +636,7 @@ template<bool trace>
 Score Position::eval(void) const
 {
 
-	const state &st = getActualStateConst();
+	const state &st = getActualState();
 
 	if(trace)
 	{
