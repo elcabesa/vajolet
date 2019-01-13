@@ -139,7 +139,7 @@ Move MovePicker::getNextMove()
 				_killerMoves[0] = _sd.getKillers( _ply, 0 );
 				_killerMoves[1] = _sd.getKillers( _ply, 1 );
 
-				if( const Move& previousMove = _pos.getActualStateConst().getCurrentMove() )
+				if( const Move& previousMove = _pos.getActualState().getCurrentMove() )
 				{
 					_counterMoves[0] = _sd.getCounterMove().getMove( _pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), 0);
 					_counterMoves[1] = _sd.getCounterMove().getMove( _pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), 1);

@@ -22,8 +22,6 @@
 #include "transposition.h"
 #include "vajolet.h"
 
-
-transpositionTable transpositionTable::instance; // Guaranteed to be destroyed.
 unsigned long int transpositionTable::setSize(unsigned long int mbSize)
 {
 

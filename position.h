@@ -147,52 +147,52 @@ public:
 	
 	const HashKey& getKey(void) const
 	{
-		return getActualStateConst().getKey();
+		return getActualState().getKey();
 	}
 
 	const HashKey getExclusionKey(void) const
 	{
-		return getActualStateConst().getKey().getExclusionKey();
+		return getActualState().getKey().getExclusionKey();
 	}
 
 	const HashKey& getPawnKey(void) const
 	{
-		return getActualStateConst().getPawnKey();
+		return getActualState().getPawnKey();
 	}
 
 	const HashKey& getMaterialKey(void) const
 	{
-		return getActualStateConst().getMaterialKey();
+		return getActualState().getMaterialKey();
 	}
 
 	eNextMove getNextTurn(void) const
 	{
-		return getActualStateConst().getNextTurn();
+		return getActualState().getNextTurn();
 	}
 
 	inline bool isBlackTurn() const
 	{
-		return getActualStateConst().isBlackTurn();
+		return getActualState().isBlackTurn();
 	}
 
 	inline bool isWhiteTurn() const
 	{
-		return getActualStateConst().isWhiteTurn();
+		return getActualState().isWhiteTurn();
 	}
 
 	tSquare getEpSquare(void) const
 	{
-		return getActualStateConst().getEpSquare();
+		return getActualState().getEpSquare();
 	}
 
 	bool hasEpSquare(void) const
 	{
-		return getActualStateConst().hasEpSquare();
+		return getActualState().hasEpSquare();
 	}
 
 	eCastle getCastleRights(void) const
 	{
-		return getActualStateConst().getCastleRights();
+		return getActualState().getCastleRights();
 	}
 
 	unsigned int getPly(void) const
@@ -202,12 +202,12 @@ public:
 
 	bitboardIndex getCapturedPiece(void) const
 	{
-		return getActualStateConst().getCapturedPiece();
+		return getActualState().getCapturedPiece();
 	}
 
 	bool isInCheck(void) const
 	{
-		return getActualStateConst().getCheckers();
+		return getActualState().getCheckers();
 	}
 	
 	/*! \brief return a reference to the actual state
@@ -216,7 +216,7 @@ public:
 		\version 1.1 get rid of continuos malloc/free
 		\date 21/11/2013
 	*/
-	inline const state& getActualStateConst(void)const
+	inline const state& getActualState(void)const
 	{
 		return stateInfo.back();
 	}
@@ -306,7 +306,7 @@ public:
 	
 	inline bool hasActivePlayerNonPawnMaterial() const
 	{
-		return getActualStateConst().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= Position::pieceValue[whiteKnights][0];
+		return getActualState().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= Position::pieceValue[whiteKnights][0];
 	}
 	
 	bool isCastlePathFree( const eCastle c ) const;

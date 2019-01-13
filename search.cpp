@@ -374,8 +374,8 @@ void Search::impl::filterRootMovesByTablebase( std::vector<Move>& rm )
 			_pos.getBitmap(blackBishops) | _pos.getBitmap(whiteBishops),
 			_pos.getBitmap(blackKnights) | _pos.getBitmap(whiteKnights),
 			_pos.getBitmap(blackPawns) | _pos.getBitmap(whitePawns),
-			_pos.getActualStateConst().getIrreversibleMoveCount(),
-			_pos.getActualStateConst().getCastleRights(),
+			_pos.getActualState().getIrreversibleMoveCount(),
+			_pos.getActualState().getCastleRights(),
 			_pos.hasEpSquare() ? _pos.getEpSquare(): 0,
 			_pos.isWhiteTurn(),
 			results);
@@ -794,7 +794,7 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 
 inline void Search::impl::_updateCounterMove(const Move& m)
 {
-	if( const Move& previousMove = _pos.getActualStateConst().getCurrentMove() )
+	if( const Move& previousMove = _pos.getActualState().getCurrentMove() )
 	{
 		_sd.counterMoves.update( _pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
 	}
@@ -873,7 +873,7 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase( const unsigned 
 
 		if (    piecesCnt <= TB_LARGEST
 			&& (piecesCnt <  TB_LARGEST || depth >= (int)( uciParameters::SyzygyProbeDepth * ONE_PLY ) )
-			&&  _pos.getActualStateConst().getIrreversibleMoveCount() == 0)
+			&&  _pos.getActualState().getIrreversibleMoveCount() == 0)
 		{
 			unsigned result = tb_probe_wdl(_pos.getBitmap(whitePieces),
 				_pos.getBitmap(blackPieces),
@@ -883,8 +883,8 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase( const unsigned 
 				_pos.getBitmap(blackBishops) | _pos.getBitmap(whiteBishops),
 				_pos.getBitmap(blackKnights) | _pos.getBitmap(whiteKnights),
 				_pos.getBitmap(blackPawns) | _pos.getBitmap(whitePawns),
-				_pos.getActualStateConst().getIrreversibleMoveCount(),
-				_pos.getActualStateConst().getCastleRights(),
+				_pos.getActualState().getIrreversibleMoveCount(),
+				_pos.getActualState().getCastleRights(),
 				_pos.hasEpSquare() ? _pos.getEpSquare(): 0,
 				_pos.isWhiteTurn() );
 
@@ -1858,7 +1858,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 			}
 
 			// at very deep search allow only recapture
-			if(depth < -7 * ONE_PLY && _pos.getActualStateConst().getCurrentMove().getTo() != m.getTo())
+			if(depth < -7 * ONE_PLY && _pos.getActualState().getCurrentMove().getTo() != m.getTo())
 			{
 				continue;
 			}
