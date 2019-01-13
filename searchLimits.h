@@ -27,32 +27,56 @@ class SearchLimits
 {
 public:
 	volatile bool ponder, infinite;
-	long long int wtime, btime, winc, binc, movesToGo, mate, moveTime;
-	unsigned int nodes;
-	int depth;
+	long long int _wtime, _btime, _winc, _binc, _movesToGo, _mate, _moveTime;
+	unsigned int _nodes;
+	int _depth;
 	std::list<Move> searchMoves;
 	explicit SearchLimits()
 	{
 		ponder = false;
 		infinite = false;
-		wtime = -1;
-		btime = -1;
-		winc = 0;
-		binc = 0;
-		movesToGo = 0;
-		depth = -1;
-		mate = 0;
-		moveTime = -1;
-		nodes = 0;
+		_wtime = -1;
+		_btime = -1;
+		_winc = 0;
+		_binc = 0;
+		_movesToGo = 0;
+		_depth = -1;
+		_mate = 0;
+		_moveTime = -1;
+		_nodes = 0;
 	}
 
 	void checkInfiniteSearch()
 	{
-		if(btime == -1 && wtime == -1 && moveTime == -1)
+		if(_btime == -1 && _wtime == -1 && _moveTime == -1)
 		{
 			infinite = true;
 		}
 	}
+	
+	bool isMoveTimeSearch() const { return _moveTime != -1; }
+	bool isNodeLimitedSearch() const { return _nodes != 0; } 
+	bool isDepthLimitedSearch() const { return _depth != -1; }
+	
+	long long int getWTime() const { return _wtime; }
+	long long int& getWTime() { return _wtime; }
+	long long int getBTime() const  { return _btime; }
+	long long int& getBTime() { return _btime; }
+	long long int getWInc() const  { return _winc; }
+	long long int& getWInc() { return _winc; }
+	long long int getBInc() const  { return _binc; }
+	long long int& getBInc() { return _binc; }
+	long long int getMovesToGo() const  { return _movesToGo; }
+	long long int& getMovesToGo() { return _movesToGo; }
+	int getDepth() const  { return _depth; }
+	int& getDepth() { return _depth; }
+	long long int getMate() const  { return _mate; }
+	long long int& getMate() { return _mate; }
+	
+	long long int getMoveTime() const { return _moveTime; }
+	long long int& getMoveTime() { return _moveTime; }
+	unsigned int getNodeLimit() const { return _nodes; }
+	unsigned int& getNodeLimit() { return _nodes; }
 
 };
 

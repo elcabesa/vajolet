@@ -229,15 +229,15 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr)
     while (is >> token)
     {
         if (token == "searchmoves")		{searchMovesCommand = true;}
-        else if (token == "wtime")		{is >> limits.wtime;searchMovesCommand = false;}
-        else if (token == "btime")		{is >> limits.btime;searchMovesCommand = false;}
-        else if (token == "winc")		{is >> limits.winc;searchMovesCommand = false;}
-        else if (token == "binc")		{is >> limits.binc;searchMovesCommand = false;}
-        else if (token == "movestogo")	{is >> limits.movesToGo;searchMovesCommand = false;}
-        else if (token == "depth")		{is >> limits.depth;searchMovesCommand = false;}
-        else if (token == "nodes")		{is >> limits.nodes;searchMovesCommand = false;}
-        else if (token == "movetime")	{is >> limits.moveTime;searchMovesCommand = false;}
-        else if (token == "mate")		{is >> limits.mate;searchMovesCommand = false;}
+        else if (token == "wtime")		{is >> limits.getWTime();searchMovesCommand = false;}
+        else if (token == "btime")		{is >> limits.getBTime();searchMovesCommand = false;}
+        else if (token == "winc")		{is >> limits.getWInc();searchMovesCommand = false;}
+        else if (token == "binc")		{is >> limits.getBInc();searchMovesCommand = false;}
+        else if (token == "movestogo")	{is >> limits.getMovesToGo();searchMovesCommand = false;}
+        else if (token == "depth")		{is >> limits.getDepth();searchMovesCommand = false;}
+        else if (token == "nodes")		{is >> limits.getNodeLimit();searchMovesCommand = false;}
+        else if (token == "movetime")	{is >> limits.getMoveTime();searchMovesCommand = false;}
+        else if (token == "mate")		{is >> limits.getMate();searchMovesCommand = false;}
         else if (token == "infinite")	{limits.infinite = true;searchMovesCommand = false;}
         else if (token == "ponder")		{limits.ponder = true;searchMovesCommand = false;}
         else if (searchMovesCommand == true)

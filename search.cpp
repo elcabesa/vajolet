@@ -737,7 +737,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
 			}
 
-			if((!_stop || _validIteration) && (uciParameters::multiPVLines > 1 || depth == 1) )
+			if(!_stop && uciParameters::multiPVLines > 1)
 			{
 				auto mpRes = _multiPVresult.get();
 				bestMove = mpRes[0];
@@ -750,7 +750,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			thr.getTimeMan().notifyIterationHasBeenFinished();
 		}
 	}
-	while( ++depth <= (_sl.depth != -1 ? _sl.depth : 100) && !_stop);
+	while( ++depth <= (_sl.isDepthLimitedSearch() ? _sl.getDepth() : 100) && !_stop);
 
 }
 
@@ -801,7 +801,7 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 	//----------------------------------
 	
 	// manage depth 0 search ( return qsearch )
-	if(_sl.depth == 0)
+	if(_sl.getDepth() == 0)
 	{
 		return manageQsearch();
 	}

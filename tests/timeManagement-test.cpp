@@ -5,10 +5,10 @@
 TEST(timeManagement, initNewSearch0time)
 {
 	SearchLimits s;
-	s.btime = 0;
-	s.wtime = 1;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 0;
+	s.getWTime() = 1;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.checkInfiniteSearch();
 	timeManagement tm( s );
 
@@ -65,7 +65,7 @@ TEST(timeManagement, infiniteSearch)
 TEST(timeManagement, NodesSearchStop)
 {
 	SearchLimits s;
-	s.nodes = 100000000;
+	s.getNodeLimit() = 100000000;
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -107,7 +107,7 @@ TEST(timeManagement, NodesSearch)
 {
 
 	SearchLimits s;
-	s.nodes = 1000000;
+	s.getNodeLimit() = 1000000;
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -128,15 +128,15 @@ TEST(timeManagement, NodesSearch)
 		if( i % 23 == 0 )tm.notifyFailOver();
 		if( i % 29 == 0 )tm.notifyFailLow();
 
-		ASSERT_EQ( tm.stateMachineStep( t, n ), n >= s.nodes ? true: false );
-		ASSERT_EQ( tm.isSearchFinished(), n >= s.nodes ? true: false );
+		ASSERT_EQ( tm.stateMachineStep( t, n ), n >= s.getNodeLimit() ? true: false );
+		ASSERT_EQ( tm.isSearchFinished(), n >= s.getNodeLimit() ? true: false );
 	}
 }
 
 TEST(timeManagement, moveTimeSearchStop)
 {
 	SearchLimits s;
-	s.moveTime = 100000000;
+	s.getMoveTime() = 100000000;
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -178,7 +178,7 @@ TEST(timeManagement, moveTimeSearch)
 {
 
 	SearchLimits s;
-	s.moveTime = 1000000;
+	s.getMoveTime() = 1000000;
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -199,8 +199,8 @@ TEST(timeManagement, moveTimeSearch)
 		if( i % 23 == 0 )tm.notifyFailOver();
 		if( i % 29 == 0 )tm.notifyFailLow();
 
-		ASSERT_EQ( tm.stateMachineStep( t, n ), t >= s.moveTime ? true: false );
-		ASSERT_EQ( tm.isSearchFinished(), t >= s.moveTime ? true: false );
+		ASSERT_EQ( tm.stateMachineStep( t, n ), t >= s.getMoveTime() ? true: false );
+		ASSERT_EQ( tm.isSearchFinished(), t >= s.getMoveTime() ? true: false );
 	}
 }
 
@@ -208,7 +208,7 @@ TEST(timeManagement, moveTimeSearch2)
 {
 
 	SearchLimits s;
-	s.moveTime = 1000;
+	s.getMoveTime() = 1000;
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -216,11 +216,11 @@ TEST(timeManagement, moveTimeSearch2)
 	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 10 );
 
-	s.moveTime = 100;
+	s.getMoveTime() = 100;
 	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 1 );
 
-	s.moveTime = 100000;
+	s.getMoveTime() = 100000;
 	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 100);
 
@@ -246,10 +246,10 @@ TEST(timeManagement, normalSearch)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -281,10 +281,10 @@ TEST(timeManagement, normalSearchEarlyStop)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.checkInfiniteSearch();
 
 	unsigned int shortAllocatedTime = 571 * 0.7;
@@ -305,10 +305,10 @@ TEST(timeManagement, normalSearchStop)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -329,10 +329,10 @@ TEST(timeManagement, normalSearchNoExtend)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -366,10 +366,10 @@ TEST(timeManagement, normalSearchExtend)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -403,10 +403,10 @@ TEST(timeManagement, normalSearchExtend2)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -443,10 +443,10 @@ TEST(timeManagement, normalSearchExtendStop)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -484,10 +484,10 @@ TEST(timeManagement, PonderSearch)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.ponder = true;
 	s.checkInfiniteSearch();
 
@@ -522,10 +522,10 @@ TEST(timeManagement, PonderSearchStop)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.getBTime() = 10000;
+	s.getWTime() = 20000;
+	s.getBInc() = 0;
+	s.getWInc() = 0;
 	s.ponder = true;
 	s.checkInfiniteSearch();
 
