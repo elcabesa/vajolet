@@ -2,6 +2,25 @@
 #include "gtest/gtest.h"
 #include "./../timeManagement.h"
 
+TEST(timeManagement, initNewSearch0time)
+{
+	SearchLimits s;
+	s.btime = 0;
+	s.wtime = 1;
+	s.binc = 0;
+	s.winc = 0;
+	s.checkInfiniteSearch();
+	timeManagement tm( s );
+
+	tm.initNewSearch( whiteTurn );
+	
+	ASSERT_EQ( tm.stateMachineStep( 1, 0 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	
+	tm.notifyIterationHasBeenFinished();
+	ASSERT_EQ( tm.stateMachineStep( 1, 0 ), true);
+	ASSERT_EQ( tm.isSearchFinished(), true );
+}
 
 TEST(timeManagement, infiniteSearch)
 {	

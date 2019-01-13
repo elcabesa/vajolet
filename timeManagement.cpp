@@ -95,7 +95,7 @@ void timeManagement::initNewSearch( const eNextMove nm )
 		_resolution = 100;
 		_chooseSearchType( timeManagement::infiniteSearch );
 	}
-	else if(_limits.moveTime)
+	else if(_limits.moveTime != -1)
 	{
 		_allocatedTime = _limits.moveTime;
 		_resolution = std::min((long long int)100, _allocatedTime / 100 );
@@ -103,8 +103,8 @@ void timeManagement::initNewSearch( const eNextMove nm )
 	}
 	else
 	{
-		unsigned int time;
-		unsigned int increment;
+		long long time;
+		long long increment;
 
 		if( nm == blackTurn )
 		{
@@ -135,6 +135,11 @@ void timeManagement::initNewSearch( const eNextMove nm )
 		long long buffer = std::max( 2 * _resolution, 200u );
 		_allocatedTime = std::min( (long long int)_allocatedTime, (long long int)( time - buffer ) );
 		_maxAllocatedTime = std::min( (long long int)_maxAllocatedTime, (long long int)( time - buffer ) );
+		
+		_maxAllocatedTime = std::max(0ll, _maxAllocatedTime);
+		_minSearchTime = std::max(0ll, _minSearchTime);
+		_allocatedTime = std::max(0ll, _allocatedTime);
+		
 
 		_chooseSearchType( _limits.ponder == true ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
 	}
@@ -159,7 +164,7 @@ bool timeManagement::stateMachineStep( const long long int time, const unsigned 
 		if(
 				_stop
 				|| ( _limits.nodes && _hasFirstIterationFinished() && visitedNodes >= _limits.nodes )
-				|| ( _limits.moveTime && _hasFirstIterationFinished() && time >= _limits.moveTime )
+				|| ( _limits.moveTime != -1 && _hasFirstIterationFinished() && time >= _limits.moveTime )
 		)
 		{
 			_searchState = searchFinished;

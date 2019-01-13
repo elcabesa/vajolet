@@ -27,27 +27,28 @@ class SearchLimits
 {
 public:
 	volatile bool ponder, infinite;
-	unsigned int wtime, btime, winc, binc, movesToGo, nodes, mate, moveTime;
+	long long int wtime, btime, winc, binc, movesToGo, mate, moveTime;
+	unsigned int nodes;
 	int depth;
 	std::list<Move> searchMoves;
 	explicit SearchLimits()
 	{
 		ponder = false;
 		infinite = false;
-		wtime = 0;
-		btime = 0;
+		wtime = -1;
+		btime = -1;
 		winc = 0;
 		binc = 0;
 		movesToGo = 0;
 		depth = -1;
-		nodes = 0;
 		mate = 0;
-		moveTime = 0;
+		moveTime = -1;
+		nodes = 0;
 	}
 
 	void checkInfiniteSearch()
 	{
-		if((!btime && !wtime) && !moveTime)
+		if(btime == -1 && wtime == -1 && moveTime == -1)
 		{
 			infinite = true;
 		}
