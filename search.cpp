@@ -706,16 +706,9 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 							}
 						}
 					}
-					/*// add the missing lines ... adding Move::NOMOVE to reach uciParameters::multiPVLines
-					missingLines =  uciParameters::multiPVLines - _multiPVprint.size();
-					for( int i = 0; i < missingLines; ++i )
-					{
-						PVline pv;
-						_multiPVprint.push_back(rootMove( Move::NOMOVE, pv, 0, 0, 0, 0, 0));
-					}*/
 					
 				}
-				
+				assert(_multiPVprint.size() == linesToBeSearched || 1 == depth);
 				_UOI->printPVs( _multiPVprint );
 			}
 		}
