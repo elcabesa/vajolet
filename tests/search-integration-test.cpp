@@ -72,7 +72,7 @@ TEST(search, search) {
 	for (auto & p : _p)
 	{
 		src.getPosition().setupFromFen(p.Fen);
-		sl.getDepth() = p.depth;
+		sl.setDepth(p.depth);
 		auto res = src.startThinking();
 		if( p.bm != Move::NOMOVE)
 		{

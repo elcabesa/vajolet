@@ -244,7 +244,7 @@ inline void my_thread::impl::ponderHit()
 	_stopPonder();
 }
 
-inline void my_thread::impl::_stopPonder(){ _limits.ponder = false;}
+inline void my_thread::impl::_stopPonder(){ _limits.setPonder(false);}
 
 
 

@@ -212,7 +212,7 @@ private:
 	// private methods
 	//--------------------------------------------------------
 	void cleanMemoryBeforeStartingNewSearch(void);
-	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
+	void generateRootMovesList( std::vector<Move>& rm, const std::list<Move>& ml);
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
 	SearchResult manageQsearch(void);
 
@@ -502,7 +502,7 @@ void Search::impl::filterRootMovesByTablebase( std::vector<Move>& rm )
 	}
 }
 
-void Search::impl::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
+void Search::impl::generateRootMovesList( std::vector<Move>& rm, const std::list<Move>& ml)
 {
 	rm.clear();
 	
@@ -518,7 +518,7 @@ void Search::impl::generateRootMovesList( std::vector<Move>& rm, std::list<Move>
 	else
 	{
 		//only selected moves
-		for_each( ml.begin(), ml.end(), [&](Move &m){rm.emplace_back(m);} );
+		for_each( ml.begin(), ml.end(), [&]( const Move &m){rm.emplace_back(m);} );
 	}
 }
 
@@ -768,12 +768,12 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 	//--------------------------------
 	// generate the list of root moves to be searched
 	//--------------------------------
-	generateRootMovesList( _rootMovesToBeSearched, _sl.searchMoves );
+	generateRootMovesList( _rootMovesToBeSearched, _sl.getMoveList() );
 	
 	//--------------------------------
 	//	tablebase probing, filtering rootmoves to be searched
 	//--------------------------------
-	if(_sl.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
+	if( !_sl.isSearchMovesMode() && uciParameters::multiPVLines==1)
 	{
 		filterRootMovesByTablebase( _rootMovesToBeSearched );
 	}
@@ -2137,7 +2137,7 @@ Move Search::impl::_getPonderMoveFromBook(const Move bookMove )
 
 void Search::impl::_waitStopPondering() const
 {
-	while(_sl.ponder){}
+	while(_sl.isPondering()){}
 }
 
 Position& Search::impl::getPosition()
@@ -2173,7 +2173,7 @@ void Search::impl::manageNewSearch()
 		return;
 	}
 	
-	if( legalMoves == 1 && !_sl.infinite )
+	if( legalMoves == 1 && !_sl.isInfiniteSearch() )
 	{
 		Move bestMove = MovePicker( _pos ).getNextMove();
 		
@@ -2192,7 +2192,7 @@ void Search::impl::manageNewSearch()
 	//----------------------------------------------
 	//	book probing
 	//----------------------------------------------
-	if( uciParameters::useOwnBook && !_sl.infinite )
+	if( uciParameters::useOwnBook && !_sl.isInfiniteSearch() )
 	{
 		PolyglotBook pol;
 		Move bookM = pol.probe( _pos, uciParameters::bestMoveBook);

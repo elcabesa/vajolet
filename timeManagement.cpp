@@ -90,7 +90,7 @@ void timeManagement::_chooseSearchType( enum searchState s )
 
 void timeManagement::initNewSearch( const eNextMove nm )
 {
-	if( _limits.infinite )
+	if( _limits.isInfiniteSearch() )
 	{
 		_resolution = 100;
 		_chooseSearchType( timeManagement::infiniteSearch );
@@ -141,7 +141,7 @@ void timeManagement::initNewSearch( const eNextMove nm )
 		_allocatedTime = std::max(0ll, _allocatedTime);
 		
 
-		_chooseSearchType( _limits.ponder == true ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
+		_chooseSearchType( _limits.isPondering() ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
 	}
 
 	_resetSearchVariables();
@@ -217,7 +217,7 @@ bool timeManagement::stateMachineStep( const long long int time, const unsigned 
 			_searchState = searchFinished;
 			stopSearch = true;
 		}
-		else if( _limits.ponder == false )
+		else if( !_limits.isPondering() )
 		{
 			_searchState = standardSearch;
 		}

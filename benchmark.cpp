@@ -63,7 +63,7 @@ void benchmark(void) {
 
 	SearchTimer st;
 	SearchLimits sl;
-	sl.getDepth() = 15;
+	sl.setDepth(15);
 
 	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
 	int i = 0;
