@@ -357,16 +357,7 @@ inline void Search::impl::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 					PVline::iterator it = _pvLineToFollow.begin();
 					std::advance(it, ply);
 					ttMove = *it;
-					//sync_cout<<"PLY "<<ply<<" "<<displayUci(ttMove)<<sync_endl;
 					assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
-					/*if( ttMove != Move::NOMOVE && !_pos.isMoveLegal(ttMove) )
-					{
-						sync_cout<<"ARGGGGGG"<<sync_endl;
-						_pos.display();
-						sync_cout<<displayUci(ttMove)<<sync_endl;
-						
-						for( auto& i: _pvLineToFollow ) sync_cout<<displayUci(i)<<sync_endl;
-					}*/
 					// if this is the last move of the PVline, _stop following it
 					if( (int)ply == lastElementIndex )
 					{
