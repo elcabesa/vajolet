@@ -337,23 +337,30 @@ inline void Search::impl::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 {
 	if (_followPV)
 	{
-		unsigned int lastElementIndex = _pvLineToFollow.size() - 1;
-		// if line is already finished, _stop following PV
-		if( ply > lastElementIndex )
+		if(	_pvLineToFollow.size() > 0 )
 		{
-			disableFollowPv();
-		}
-		else
-		{
-			// overwrite the ttMove
-			PVline::iterator it = _pvLineToFollow.begin();
-			std::advance(it, ply);
-			ttMove = *it;
-			// if this is the last move of the PVline, _stop following it
-			if( ply == lastElementIndex )
+			int lastElementIndex = _pvLineToFollow.size() - 1;
+			// if line is already finished, _stop following PV
+			if( (int)ply > lastElementIndex )
 			{
 				disableFollowPv();
 			}
+			else
+			{
+				// overwrite the ttMove
+				PVline::iterator it = _pvLineToFollow.begin();
+				std::advance(it, ply);
+				ttMove = *it;
+				// if this is the last move of the PVline, _stop following it
+				if( (int)ply == lastElementIndex )
+				{
+					disableFollowPv();
+				}
+			}
+		}
+		else
+		{
+			disableFollowPv();
 		}
 	}
 }
