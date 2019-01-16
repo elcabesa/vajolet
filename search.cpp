@@ -128,6 +128,8 @@ private:
 	PVline _pvLineToFollow;
 	eNextMove _initialTurn;
 	bool _showLine = false;
+	
+	 int _maxPvLineRead;
 
 
 	SearchData _sd;
@@ -328,6 +330,7 @@ void Search::impl::cleanMemoryBeforeStartingNewSearch(void)
 inline void Search::impl::enableFollowPv()
 {
 	_followPV = true;
+	_maxPvLineRead = -1;
 }
 inline void Search::impl::disableFollowPv()
 {
@@ -337,35 +340,43 @@ inline void Search::impl::manageLineToBefollowed(unsigned int ply, Move& ttMove)
 {
 	if (_followPV)
 	{
-		if(	_pvLineToFollow.size() > 0 )
+		if( (int)ply > _maxPvLineRead )
 		{
-			int lastElementIndex = _pvLineToFollow.size() - 1;
-			// if line is already finished, _stop following PV
-			if( (int)ply > lastElementIndex )
+			_maxPvLineRead = std::max( (int)ply, _maxPvLineRead);
+			if(	_pvLineToFollow.size() > 0 )
 			{
-				disableFollowPv();
-			}
-			else
-			{
-				sync_cout<<"PLY "<<ply<<sync_endl;
-				// overwrite the ttMove
-				PVline::iterator it = _pvLineToFollow.begin();
-				std::advance(it, ply);
-				ttMove = *it;
-				assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
-				/*if( ttMove != Move::NOMOVE && !_pos.isMoveLegal(ttMove) )
-				{
-					sync_cout<<"ARGGGGGG"<<sync_endl;
-					_pos.display();
-					sync_cout<<displayUci(ttMove)<<sync_endl;
-					
-					for( auto& i: _pvLineToFollow ) sync_cout<<displayUci(i)<<sync_endl;
-				}*/
-				// if this is the last move of the PVline, _stop following it
-				if( (int)ply == lastElementIndex )
+				int lastElementIndex = _pvLineToFollow.size() - 1;
+				// if line is already finished, _stop following PV
+				if( (int)ply > lastElementIndex )
 				{
 					disableFollowPv();
 				}
+				else
+				{
+					// overwrite the ttMove
+					PVline::iterator it = _pvLineToFollow.begin();
+					std::advance(it, ply);
+					ttMove = *it;
+					//sync_cout<<"PLY "<<ply<<" "<<displayUci(ttMove)<<sync_endl;
+					assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
+					/*if( ttMove != Move::NOMOVE && !_pos.isMoveLegal(ttMove) )
+					{
+						sync_cout<<"ARGGGGGG"<<sync_endl;
+						_pos.display();
+						sync_cout<<displayUci(ttMove)<<sync_endl;
+						
+						for( auto& i: _pvLineToFollow ) sync_cout<<displayUci(i)<<sync_endl;
+					}*/
+					// if this is the last move of the PVline, _stop following it
+					if( (int)ply == lastElementIndex )
+					{
+						disableFollowPv();
+					}
+				}
+			}
+			else
+			{
+				disableFollowPv();
 			}
 		}
 		else
