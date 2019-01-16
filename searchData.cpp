@@ -28,7 +28,6 @@ void SearchData::clearKillers(unsigned int ply)
 }
 void SearchData::cleanData(void)
 {
-	unsigned int t = 0;
 	for( auto&x: story)
 	{
 		
@@ -38,7 +37,6 @@ void SearchData::cleanData(void)
 		x.killers[1] = Move::NOMOVE;
 		x.staticEval = 0;
 		x.inCheck = false;
-		++t;
 	}
 }
 
