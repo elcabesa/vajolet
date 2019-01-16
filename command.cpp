@@ -919,7 +919,10 @@ void UciMuteOutput::printPVs(std::vector<rootMove>&) const{}
 void UciMuteOutput::printPV(const Score, const unsigned int, const long long, PVline&, const unsigned long long, const PVbound, const int, const int) const{}
 void UciMuteOutput::printCurrMoveNumber(const unsigned int, const Move& , const unsigned long long , const long long int ) const {}
 void UciMuteOutput::showCurrLine(const Position & , const unsigned int ) const{}
-void UciMuteOutput::printDepth() const{}
+void UciMuteOutput::printDepth() const
+{
+	sync_cout<<"info depth "<<_depth<<sync_endl;
+}
 void UciMuteOutput::printScore(const signed int ) const{}
 void UciMuteOutput::printBestMove( const Move, const Move& ) const{}
 void UciMuteOutput::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
