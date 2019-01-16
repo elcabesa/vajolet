@@ -49,7 +49,7 @@
 static const int MAX_MOVE_PER_POSITION = 250;
 static const int MAX_BAD_MOVE_PER_POSITION = 32;
 
-template <std::size_t N> class MoveList: private std::array< extMove, N >
+template <std::size_t N> class MoveList
 {
 	
 public:
@@ -72,49 +72,45 @@ public:
 	const Move& getNextMove(void);
 	void ignoreMove( const Move& m );
 
-
-
 /*****************************************************************
 *	members
 ******************************************************************/
 private:
-	typename std::array<extMove,N >::iterator _moveListEnd = std::array< extMove, N >::begin();
-	typename std::array<extMove,N >::iterator _moveListPosition = std::array< extMove, N >::begin();
-	
+	std::array< extMove, N > _ml;
+	typename std::array<extMove,N >::iterator _moveListEnd = _ml.begin();
+	typename std::array<extMove,N >::iterator _moveListPosition = _ml.begin();
 };
 
 template <std::size_t N>
 void MoveList<N>::insert( const Move& m )
 {
-	//assert( _moveListEnd < N );
 	*( _moveListEnd++ ) = m;
 }
 
 template <std::size_t N>
 inline void MoveList<N>::reset()
 {
-	_moveListPosition = std::array< extMove, N >::begin();
-	_moveListEnd = std::array< extMove, N >::begin();
+	_moveListPosition = _ml.begin();
+	_moveListEnd = _ml.begin();
 }
 
 template <std::size_t N>
 unsigned int MoveList<N>::size() const
 {
-	//assert( _moveListEnd < N );
-	return _moveListEnd - std::array< extMove, N >::cbegin();
+	return _moveListEnd - _ml.cbegin();
 }
 
 template <std::size_t N>
 const Move& MoveList<N>::get( const unsigned int n ) const
 {
 	assert( n < N );
-	return (*this)[ n ];
+	return _ml[ n ];
 }
 
 template <std::size_t N>
 const typename std::array<extMove,N >::iterator MoveList<N>::begin() 
 {
-	return std::array< extMove, N >::begin();
+	return _ml.begin();
 }
 
 template <std::size_t N>

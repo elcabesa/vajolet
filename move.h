@@ -54,6 +54,7 @@ public:
 	explicit Move(){}
 	explicit Move( const unsigned short i ):_u(i){}
 	explicit Move( const tSquare _from, const tSquare _to, const eflags _flag=fnone, const epromotion _prom=promQueen ):_u(_from, _to, _flag, _prom){}
+	virtual ~Move(){}
 
 	/*****************************************************************
 	*	Operators
@@ -200,6 +201,7 @@ public:
 	explicit extMove( const Move& m ): Move(m){}
 	explicit extMove( const unsigned short i ): Move(i){}
 	extMove( const tSquare _from, const tSquare _to, const eflags _flag=fnone, const epromotion _prom=promQueen): Move( _from, _to, _flag, _prom ){}
+	~extMove(){}
 	
 	/*****************************************************************
 	*	Operators

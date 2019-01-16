@@ -26,10 +26,9 @@ class SearchData
 public:
 	struct Sd
 	{
-	public:
-		Move excludeMove;
+		Move excludeMove = Move(0);
 		bool skipNullMove = false;
-		Move killers[2];
+		Move killers[2] = { Move(0),Move(0)};
 		Score staticEval = 0;
 		bool inCheck = false;
 	} story[800];
@@ -39,7 +38,7 @@ public:
 
 	void clearKillers(unsigned int ply);
 	void cleanData(void);
-	void saveKillers(unsigned int ply, Move& m);
+	void saveKillers(unsigned int ply, const Move& m);
 
 	const History& getHistory()const {return history;}
 	const CaptureHistory& getCaptureHistory()const {return captureHistory;}

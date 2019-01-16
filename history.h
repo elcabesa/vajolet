@@ -22,6 +22,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <array>
 
 #include "bitBoardIndex.h"
 #include "move.h"
@@ -111,10 +112,15 @@ public :
 class CounterMove
 {
 private:
-	Move table[lastBitboard][squareNumber][2];
+	std::array<std::array<std::array<Move,2>,squareNumber>,lastBitboard> table;
 public :
 
-	inline void clear() { std::memset(table, 0, sizeof(table)); }
+	inline void clear()
+	{
+		for(auto& a: table)
+			for(auto& b: a)
+				b.fill(Move::NOMOVE);
+	}
 
 
 	inline void update( const bitboardIndex p, const tSquare to, const Move m)
@@ -122,7 +128,7 @@ public :
 
 		assert( isValidPiece( p ) );
 		assert(to<squareNumber);
-		Move * const mm =  table[p][to];
+		auto& mm =  table[p][to];
 		if(mm[0] != m)
 		{
 			mm[1] = mm[0];
