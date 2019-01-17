@@ -953,6 +953,7 @@ void UciOutput::setPVlineIndex( const unsigned int PVlineIndex )
 
 void UciOutput::printPV( const Move& m )
 {
-	PVline PV( 1, m );
+	PVline PV;
+	PV.set(m);
 	printPV(0, 0, 0, PV, 0, normal, 0, 0);
 }

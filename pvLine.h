@@ -39,13 +39,13 @@ public:
 		splice( end(), childPV );
 	}
 	
-	inline void appendNewMove( const Move& move )
+	inline void set( const Move& move )
 	{
 		clear();
 		emplace_back( move );
 	}
 	
-	inline const Move& getMove( unsigned int n ) const
+	inline const Move& getMove( const unsigned int n ) const
 	{
 		if( size() > n )
 		{
@@ -62,7 +62,6 @@ public:
 	using std::list<Move>::iterator;
 	using std::list<Move>::begin;
 	using std::list<Move>::end;
-	explicit PVline( unsigned int n, const Move m ) : std::list<Move>(n,m){}
 	explicit PVline(){}
 	
 };

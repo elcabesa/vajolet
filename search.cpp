@@ -850,7 +850,7 @@ void Search::impl::_appendTTmoveIfLegal( const Move& ttm, PVline& pvLine ) const
 {
 	if( _pos.isMoveLegal(ttm) )
 	{
-		pvLine.appendNewMove( ttm );
+		pvLine.set( ttm );
 	}
 	else
 	{
