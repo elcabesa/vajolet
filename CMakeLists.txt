@@ -80,7 +80,7 @@ endif()
 
 enable_testing()
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(Vajolet_unit_test tests/dataTest.cpp tests/main.cpp tests/MoveTest.cpp tests/MoveListTest.cpp tests/perft-test.cpp tests/positionTest.cpp tests/see-test.cpp tests/timeManagement-test.cpp)
+add_executable(Vajolet_unit_test tests/dataTest.cpp tests/main.cpp tests/MoveTest.cpp tests/MoveListTest.cpp tests/multiPVmanagerTest.cpp tests/perft-test.cpp tests/positionTest.cpp tests/see-test.cpp tests/timeManagement-test.cpp)
 target_link_libraries(Vajolet_unit_test gtest libChess)
 
 add_executable(Vajolet_syzygy_test tests/main.cpp tests/syzygy-test.cpp)

@@ -30,13 +30,13 @@ public:
 	void startNewIteration(){ _previousRes = _res; _res.clear(); _multiPvCounter = 0;}
 	void goToNextPV(){ ++_multiPvCounter; }
 	void insertMove( const rootMove& m ){ _res.push_back(m); }
-	void setLinesToBeSearched( unsigned int l ){ _linesToBeSearched = l;}
+	void setLinesToBeSearched( const unsigned int l ){ _linesToBeSearched = l;}
 	bool thereArePvToBeSearched() const { return _multiPvCounter < _linesToBeSearched; }
 	
-	unsigned int getPreviousIterationSize() const { return _previousRes.size(); }
+	
 	bool getPreviousIterationRootMove(rootMove& rm) const
 	{
-		if ( _multiPvCounter < getPreviousIterationSize() )
+		if ( _multiPvCounter < _getPreviousIterationSize() )
 		{			
 			rm = _previousRes[_multiPvCounter]; 
 			return true;
@@ -83,6 +83,8 @@ private:
 	std::vector<rootMove> _previousRes;
 	unsigned int _linesToBeSearched;
 	unsigned int _multiPvCounter;
+	
+	unsigned int _getPreviousIterationSize() const { return _previousRes.size(); }
 };
 
 
