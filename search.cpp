@@ -58,6 +58,55 @@ void testSimmetry(const Position& pos)
 }
 #endif
 
+class PVlineFollower
+{
+public:
+	void setPVline( const PVline& p ){ _line = p; }
+	
+	void restart()
+	{
+		_followPV = true;
+		_maxPvLineRead = -1;
+	}
+	
+	void disable()
+	{
+		_followPV = false;
+	}
+	
+	void clear()	
+	{
+		_line.clear();
+	}
+	
+	inline void getNextMove( const int ply, Move& ttMove)
+	{
+		if (_followPV)
+		{
+			if( ply > _maxPvLineRead )
+			{
+				_maxPvLineRead = std::max( ply, _maxPvLineRead);
+		
+				// if line is already finished, _stop following PV
+				if( ply < (int)_line.size() )
+				{
+					// overwrite the ttMove
+					PVline::iterator it = _line.begin();
+					std::advance(it, ply);
+					ttMove = *it;
+					assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
+					return;
+				}
+			}
+			disable();
+		}
+	}
+private:
+	PVline _line;
+	int _maxPvLineRead;
+	bool _followPV;
+};
+
 class Search::impl
 {
 public:
@@ -124,12 +173,10 @@ private:
 
 	bool _validIteration = false;
 	Score _expectedValue = 0;
-	bool _followPV;
-	PVline _pvLineToFollow;
 	eNextMove _initialTurn;
 	bool _showLine = false;
 	
-	 int _maxPvLineRead;
+	PVlineFollower _pvLineFollower;
 
 
 	SearchData _sd;
@@ -156,9 +203,6 @@ private:
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
 	SearchResult manageQsearch(void);
 
-	void enableFollowPv();
-	void disableFollowPv();
-	void manageLineToBefollowed(unsigned int ply, Move& ttMove);
 
 
 	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*78+cut*20000; }
@@ -327,55 +371,6 @@ void Search::impl::cleanMemoryBeforeStartingNewSearch(void)
 	_multiPVresult.clear();
 	_rootMovesAlreadySearched.clear();
 }
-inline void Search::impl::enableFollowPv()
-{
-	_followPV = true;
-	_maxPvLineRead = -1;
-}
-inline void Search::impl::disableFollowPv()
-{
-	_followPV = false;
-}
-inline void Search::impl::manageLineToBefollowed(unsigned int ply, Move& ttMove)
-{
-	if (_followPV)
-	{
-		if( (int)ply > _maxPvLineRead )
-		{
-			_maxPvLineRead = std::max( (int)ply, _maxPvLineRead);
-			if(	_pvLineToFollow.size() > 0 )
-			{
-				int lastElementIndex = _pvLineToFollow.size() - 1;
-				// if line is already finished, _stop following PV
-				if( (int)ply > lastElementIndex )
-				{
-					disableFollowPv();
-				}
-				else
-				{
-					// overwrite the ttMove
-					PVline::iterator it = _pvLineToFollow.begin();
-					std::advance(it, ply);
-					ttMove = *it;
-					assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
-					// if this is the last move of the PVline, _stop following it
-					if( (int)ply == lastElementIndex )
-					{
-						disableFollowPv();
-					}
-				}
-			}
-			else
-			{
-				disableFollowPv();
-			}
-		}
-		else
-		{
-			disableFollowPv();
-		}
-	}
-}
 
 void Search::impl::filterRootMovesByTablebase( std::vector<Move>& rm )
 {
@@ -529,7 +524,7 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 	{
 		_maxPlyReached = 0;
 		_validIteration = false;
-		enableFollowPv();
+		_pvLineFollower.restart();
 		PVline newPV;
 		newPV.clear();
 
@@ -564,7 +559,7 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 				{
 					tm.notifyFailOver();
 				}
-				_pvLineToFollow = newPV;
+				_pvLineFollower.setPVline(newPV);
 
 				bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 			}
@@ -672,12 +667,12 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			if( previousIterationResults.size() > _multiPVcounter )
 			{
 				_expectedValue = previousIterationResults[_multiPVcounter].score;
-				_pvLineToFollow = previousIterationResults[_multiPVcounter].PV;
+				_pvLineFollower.setPVline(previousIterationResults[_multiPVcounter].PV);
 			}
 			else
 			{
 				_expectedValue = -SCORE_INFINITE;
-				_pvLineToFollow.clear();
+				_pvLineFollower.clear();
 
 			}
 
@@ -721,7 +716,7 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 	//clean transposition table
 	transpositionTable::getInstance().newSearch();
 	
-	_pvLineToFollow = pvToBeFollowed;
+	_pvLineFollower.setPVline(pvToBeFollowed);
 	
 	//--------------------------------
 	// generate the list of root moves to be searched
@@ -782,7 +777,7 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 		helperResults[i].firstMove = m;
 		helperSearch[i-1].resetStopCondition();
 		helperSearch[i-1]._pos = _pos;
-		helperSearch[i-1]._pvLineToFollow = _pvLineToFollow;
+		helperSearch[i-1]._pvLineFollower.setPVline(pvToBeFollowed);
 		helperThread.emplace_back( std::thread(&Search::impl::idLoop, &helperSearch[i-1], std::ref(helperResults), i, std::ref(toBeExcludedMove),depth, alpha, beta, false));
 	}
 
@@ -1058,7 +1053,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	//--------------------------------------
 	if constexpr ( PVnode )
 	{
-		manageLineToBefollowed(ply, ttMove);
+		_pvLineFollower.getNextMove(ply, ttMove);
 	}
 
 	//--------------------------------------
@@ -1781,7 +1776,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	// overwrite ttMove with move from move from PVlineToBeFollowed
 	if constexpr ( PVnode )
 	{
-		manageLineToBefollowed(ply, ttMove);
+		_pvLineFollower.getNextMove(ply, ttMove);
 	}
 
 	ttType TTtype = typeScoreLowerThanAlpha;
