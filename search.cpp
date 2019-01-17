@@ -25,6 +25,7 @@
 #include "game.h"
 #include "io.h"
 #include "movepicker.h"
+#include "multiPVmanager.h"
 #include "position.h"
 #include "rootMove.h"
 #include "search.h"
@@ -58,67 +59,7 @@ void testSimmetry(const Position& pos)
 }
 #endif
 
-class MultiPVResult
-{
-public:
-	void clean(){ _res.clear(); _previousRes.clear();}
-	void startNewIteration(){ _previousRes = _res; _res.clear(); _multiPvCounter = 0;}
-	void goToNextPV(){ ++_multiPvCounter; }
-	void insertMove( const rootMove& m ){ _res.push_back(m); }
-	void setLinesToBeSearched( unsigned int l ){ _linesToBeSearched = l;}
-	bool thereArePvToBeSearched() const { return _multiPvCounter < _linesToBeSearched; }
-	
-	unsigned int getPreviousIterationSize() const { return _previousRes.size(); }
-	bool getPreviousIterationRootMove(rootMove& rm) const
-	{
-		if ( _multiPvCounter < getPreviousIterationSize() )
-		{			
-			rm = _previousRes[_multiPvCounter]; 
-			return true;
-		}
-		return false;
-	}
-	
-	unsigned int getLinesToBeSearched() const { return _linesToBeSearched; }
-	unsigned int getPVNumber() const { return _multiPvCounter;}
-	
-	std::vector<rootMove> get()
-	{	
-		// Sort the PV lines searched so far and update the GUI				
-		std::stable_sort(_res.begin(), _res.end());
-		
-		std::vector<rootMove> _multiPVprint = _res;
-		// always send all the moves toghether in multiPV
-		int missingLines = _linesToBeSearched - _multiPVprint.size();
-		if( missingLines > 0 )
-		{
-			// add result from the previous iteration
-			// try adding the missing lines (  uciParameters::multiPVLines - _multiPVprint.size() ) , but not more than previousIterationResults.size() 
-			int addedLines = 0;
-			for( const auto& m: _previousRes )
-			{
-				if( std::find(_multiPVprint.begin(), _multiPVprint.end(), m) == _multiPVprint.end() )
-				{
-					_multiPVprint.push_back(m);
-					++addedLines;
-					if( addedLines >= missingLines )
-					{
-						break;
-					}
-				}
-			}
-		}
-		assert(_multiPVprint.size() == _linesToBeSearched);
-		
-		return _multiPVprint;
-	}
-	
-private:
-	std::vector<rootMove> _res;
-	std::vector<rootMove> _previousRes;
-	unsigned int _linesToBeSearched;
-	unsigned int _multiPvCounter;
-};
+
 
 class Search::impl
 {
@@ -197,7 +138,7 @@ private:
 	unsigned long long _tbHits;
 	unsigned int _maxPlyReached;
 
-	MultiPVResult _multiPVresult;
+	MultiPVManager _multiPVmanager;
 	Position _pos;
 
 	SearchLimits& _sl; // todo limits belong to threads
@@ -384,7 +325,7 @@ void Search::impl::cleanMemoryBeforeStartingNewSearch(void)
 	_sd.cleanData();
 	_visitedNodes = 0;
 	_tbHits = 0;
-	_multiPVresult.clean();
+	_multiPVmanager.clean();
 	_rootMovesAlreadySearched.clear();
 }
 inline void Search::impl::enableFollowPv()
@@ -686,7 +627,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 	
 	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
-	_multiPVresult.setLinesToBeSearched( std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size()) );
+	_multiPVmanager.setLinesToBeSearched( std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size()) );
 
 	// ramdomly initialize the bestmove
 	bestMove = rootMove(_rootMovesToBeSearched[0]);
@@ -709,13 +650,13 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 		//----------------------------------
 		// multi PV loop
 		//----------------------------------
-		for ( _multiPVresult.startNewIteration(); _multiPVresult.thereArePvToBeSearched(); _multiPVresult.goToNextPV() )
+		for ( _multiPVmanager.startNewIteration(); _multiPVmanager.thereArePvToBeSearched(); _multiPVmanager.goToNextPV() )
 		{
-			_UOI->setPVlineIndex(_multiPVresult.getPVNumber());
+			_UOI->setPVlineIndex(_multiPVmanager.getPVNumber());
 			//----------------------------------
 			// reload PV
 			//----------------------------------
-			if( rootMove rm(Move::NOMOVE); _multiPVresult.getPreviousIterationRootMove(rm) )
+			if( rootMove rm(Move::NOMOVE); _multiPVmanager.getPreviousIterationRootMove(rm) )
 			{
 				_expectedValue = rm.score;
 				_pvLineToFollow = rm.PV;
@@ -733,13 +674,13 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			if( res.firstMove != Move::NOMOVE )
 			{
 				bestMove = res;
-				_multiPVresult.insertMove(bestMove);
+				_multiPVmanager.insertMove(bestMove);
 				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
 			}
 
 			if(!_stop && uciParameters::multiPVLines > 1)
 			{
-				auto mpRes = _multiPVresult.get();
+				auto mpRes = _multiPVmanager.get();
 				bestMove = mpRes[0];
 				_UOI->printPVs( mpRes );
 			}
