@@ -26,6 +26,7 @@
 #include "io.h"
 #include "movepicker.h"
 #include "position.h"
+#include "pvLineFollower.h"
 #include "rootMove.h"
 #include "search.h"
 #include "searchData.h"
@@ -58,54 +59,7 @@ void testSimmetry(const Position& pos)
 }
 #endif
 
-class PVlineFollower
-{
-public:
-	void setPVline( const PVline& p ){ _line = p; }
-	
-	void restart()
-	{
-		_followPV = true;
-		_maxPvLineRead = -1;
-	}
-	
-	void disable()
-	{
-		_followPV = false;
-	}
-	
-	void clear()	
-	{
-		_line.clear();
-	}
-	
-	inline void getNextMove( const int ply, Move& ttMove)
-	{
-		if (_followPV)
-		{
-			if( ply > _maxPvLineRead )
-			{
-				_maxPvLineRead = std::max( ply, _maxPvLineRead);
-		
-				// if line is already finished, _stop following PV
-				if( ply < (int)_line.size() )
-				{
-					// overwrite the ttMove
-					PVline::iterator it = _line.begin();
-					std::advance(it, ply);
-					ttMove = *it;
-					assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
-					return;
-				}
-			}
-			disable();
-		}
-	}
-private:
-	PVline _line;
-	int _maxPvLineRead;
-	bool _followPV;
-};
+
 
 class Search::impl
 {
