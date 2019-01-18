@@ -30,11 +30,6 @@ public:
 		_maxPvLineRead = -1;
 	}
 	
-	void disable()
-	{
-		_followPV = false;
-	}
-	
 	void clear()	
 	{
 		_line.clear();
@@ -59,13 +54,18 @@ public:
 					return;
 				}
 			}
-			disable();
+			_disable();
 		}
 	}
 private:
+
+	void _disable()
+	{
+		_followPV = false;
+	}
 	PVline _line;
-	int _maxPvLineRead;
-	bool _followPV;
+	int _maxPvLineRead = -1;
+	bool _followPV = false;
 };
 
 #endif
