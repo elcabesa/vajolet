@@ -28,10 +28,19 @@ void SearchData::clearKillers(unsigned int ply)
 }
 void SearchData::cleanData(void)
 {
-	std::memset(story, 0, sizeof(story));
+	for( auto&x: story)
+	{
+		
+		x.excludeMove = Move::NOMOVE;
+		x.skipNullMove = false;
+		x.killers[0] = Move::NOMOVE;
+		x.killers[1] = Move::NOMOVE;
+		x.staticEval = 0;
+		x.inCheck = false;
+	}
 }
 
-void SearchData::saveKillers(unsigned int ply, Move& m)
+void SearchData::saveKillers(unsigned int ply, const Move& m)
 {
 	Move * const tempKillers = story[ply].killers;
 	if(tempKillers[0] != m)
