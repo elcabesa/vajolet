@@ -25,6 +25,7 @@
 #include "game.h"
 #include "io.h"
 #include "movepicker.h"
+#include "multiPVmanager.h"
 #include "position.h"
 #include "pvLineFollower.h"
 #include "rootMove.h"
@@ -138,7 +139,7 @@ private:
 	unsigned long long _tbHits;
 	unsigned int _maxPlyReached;
 
-	std::vector<rootMove> _multiPVresult;
+	MultiPVManager _multiPVmanager;
 	Position _pos;
 
 	SearchLimits& _sl; // todo limits belong to threads
@@ -153,7 +154,7 @@ private:
 	// private methods
 	//--------------------------------------------------------
 	void cleanMemoryBeforeStartingNewSearch(void);
-	void generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml);
+	void generateRootMovesList( std::vector<Move>& rm, const std::list<Move>& ml);
 	void filterRootMovesByTablebase( std::vector<Move>& rm );
 	SearchResult manageQsearch(void);
 
@@ -322,7 +323,7 @@ void Search::impl::cleanMemoryBeforeStartingNewSearch(void)
 	_sd.cleanData();
 	_visitedNodes = 0;
 	_tbHits = 0;
-	_multiPVresult.clear();
+	_multiPVmanager.clean();
 	_rootMovesAlreadySearched.clear();
 }
 
@@ -408,7 +409,7 @@ void Search::impl::filterRootMovesByTablebase( std::vector<Move>& rm )
 	}
 }
 
-void Search::impl::generateRootMovesList( std::vector<Move>& rm, std::list<Move>& ml)
+void Search::impl::generateRootMovesList( std::vector<Move>& rm, const std::list<Move>& ml)
 {
 	rm.clear();
 	
@@ -424,7 +425,7 @@ void Search::impl::generateRootMovesList( std::vector<Move>& rm, std::list<Move>
 	else
 	{
 		//only selected moves
-		for_each( ml.begin(), ml.end(), [&](Move &m){rm.emplace_back(m);} );
+		for_each( ml.begin(), ml.end(), [&]( const Move &m){rm.emplace_back(m);} );
 	}
 }
 
@@ -490,7 +491,10 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 
 			if (res <= alpha)
 			{
-				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound);
+				if( uciParameters::multiPVLines == 1 )
+				{
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound);
+				}
 
 				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
 
@@ -502,7 +506,10 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			}
 			else if (res >= beta)
 			{
-				_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound);
+				if( uciParameters::multiPVLines == 1 )
+				{
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound);
+				}
 
 				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
 				if(depth > 1)
@@ -586,7 +593,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 	
 	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
-	unsigned int linesToBeSearched = std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size());
+	_multiPVmanager.setLinesToBeSearched( std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size()) );
 
 	// ramdomly initialize the bestmove
 	bestMove = rootMove(_rootMovesToBeSearched[0]);
@@ -604,30 +611,26 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 		//----------------------------
 		// iterative loop
 		//----------------------------
-		const auto previousIterationResults = _multiPVresult;
-
-		_multiPVresult.clear();
 		_rootMovesAlreadySearched.clear();
 		
 		//----------------------------------
 		// multi PV loop
 		//----------------------------------
-		for ( unsigned int _multiPVcounter = 0; _multiPVcounter < linesToBeSearched; ++_multiPVcounter )
+		for ( _multiPVmanager.startNewIteration(); _multiPVmanager.thereArePvToBeSearched(); _multiPVmanager.goToNextPV() )
 		{
-			_UOI->setPVlineIndex(_multiPVcounter);
+			_UOI->setPVlineIndex(_multiPVmanager.getPVNumber());
 			//----------------------------------
 			// reload PV
 			//----------------------------------
-			if( previousIterationResults.size() > _multiPVcounter )
+			if( rootMove rm(Move::NOMOVE); _multiPVmanager.getPreviousIterationRootMove(rm) )
 			{
-				_expectedValue = previousIterationResults[_multiPVcounter].score;
-				_pvLineFollower.setPVline(previousIterationResults[_multiPVcounter].PV);
+				_expectedValue = rm.score;
+				_pvLineFollower.setPVline(rm.PV);
 			}
 			else
 			{
 				_expectedValue = -SCORE_INFINITE;
 				_pvLineFollower.clear();
-
 			}
 
 			//----------------------------------
@@ -637,18 +640,15 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			if( res.firstMove != Move::NOMOVE )
 			{
 				bestMove = res;
-				_multiPVresult.push_back(bestMove);
+				_multiPVmanager.insertMove(bestMove);
 				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
 			}
 
-			if((!_stop || _validIteration) && (uciParameters::multiPVLines > 1 || depth == 1) )
+			if(!_stop && uciParameters::multiPVLines > 1)
 			{
-
-				// Sort the PV lines searched so far and update the GUI				
-				std::stable_sort(_multiPVresult.begin(), _multiPVresult.end());
-				bestMove = _multiPVresult[0];
-				
-				_UOI->printPVs( _multiPVresult );
+				auto mpRes = _multiPVmanager.get();
+				bestMove = mpRes[0];
+				_UOI->printPVs( mpRes );
 			}
 		}
 
@@ -657,7 +657,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			thr.getTimeMan().notifyIterationHasBeenFinished();
 		}
 	}
-	while( ++depth <= (_sl.depth != -1 ? _sl.depth : 100) && !_stop);
+	while( ++depth <= (_sl.isDepthLimitedSearch() ? _sl.getDepth() : 100) && !_stop);
 
 }
 
@@ -675,12 +675,12 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 	//--------------------------------
 	// generate the list of root moves to be searched
 	//--------------------------------
-	generateRootMovesList( _rootMovesToBeSearched, _sl.searchMoves );
+	generateRootMovesList( _rootMovesToBeSearched, _sl.getMoveList() );
 	
 	//--------------------------------
 	//	tablebase probing, filtering rootmoves to be searched
 	//--------------------------------
-	if(_sl.searchMoves.size() == 0 && uciParameters::multiPVLines==1)
+	if( !_sl.isSearchMovesMode() && uciParameters::multiPVLines==1)
 	{
 		filterRootMovesByTablebase( _rootMovesToBeSearched );
 	}
@@ -708,7 +708,7 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 	//----------------------------------
 	
 	// manage depth 0 search ( return qsearch )
-	if(_sl.depth == 0)
+	if(_sl.getDepth() == 0)
 	{
 		return manageQsearch();
 	}
@@ -2044,7 +2044,7 @@ Move Search::impl::_getPonderMoveFromBook(const Move bookMove )
 
 void Search::impl::_waitStopPondering() const
 {
-	while(_sl.ponder){}
+	while(_sl.isPondering()){}
 }
 
 Position& Search::impl::getPosition()
@@ -2080,7 +2080,7 @@ void Search::impl::manageNewSearch()
 		return;
 	}
 	
-	if( legalMoves == 1 && !_sl.infinite )
+	if( legalMoves == 1 && !_sl.isInfiniteSearch() )
 	{
 		Move bestMove = MovePicker( _pos ).getNextMove();
 		
@@ -2099,7 +2099,7 @@ void Search::impl::manageNewSearch()
 	//----------------------------------------------
 	//	book probing
 	//----------------------------------------------
-	if( uciParameters::useOwnBook && !_sl.infinite )
+	if( uciParameters::useOwnBook && !_sl.isInfiniteSearch() )
 	{
 		PolyglotBook pol;
 		Move bookM = pol.probe( _pos, uciParameters::bestMoveBook);

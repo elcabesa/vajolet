@@ -2,11 +2,30 @@
 #include "gtest/gtest.h"
 #include "./../timeManagement.h"
 
+TEST(timeManagement, initNewSearch0time)
+{
+	SearchLimits s;
+	s.setBTime(0);
+	s.setWTime(0);
+	s.setBInc(0);
+	s.setWInc(0);
+	s.checkInfiniteSearch();
+	timeManagement tm( s );
+
+	tm.initNewSearch( whiteTurn );
+	
+	ASSERT_EQ( tm.stateMachineStep( 1, 0 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	
+	tm.notifyIterationHasBeenFinished();
+	ASSERT_EQ( tm.stateMachineStep( 1, 0 ), true);
+	ASSERT_EQ( tm.isSearchFinished(), true );
+}
 
 TEST(timeManagement, infiniteSearch)
 {	
 	SearchLimits s;
-	s.infinite = true;
+	s.setInfiniteSearch();
 
 	timeManagement tm( s );
 
@@ -46,7 +65,7 @@ TEST(timeManagement, infiniteSearch)
 TEST(timeManagement, NodesSearchStop)
 {
 	SearchLimits s;
-	s.nodes = 100000000;
+	s.setNodeLimit(100000000);
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -88,7 +107,7 @@ TEST(timeManagement, NodesSearch)
 {
 
 	SearchLimits s;
-	s.nodes = 1000000;
+	s.setNodeLimit(1000000);
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -109,15 +128,15 @@ TEST(timeManagement, NodesSearch)
 		if( i % 23 == 0 )tm.notifyFailOver();
 		if( i % 29 == 0 )tm.notifyFailLow();
 
-		ASSERT_EQ( tm.stateMachineStep( t, n ), n >= s.nodes ? true: false );
-		ASSERT_EQ( tm.isSearchFinished(), n >= s.nodes ? true: false );
+		ASSERT_EQ( tm.stateMachineStep( t, n ), n >= s.getNodeLimit() ? true: false );
+		ASSERT_EQ( tm.isSearchFinished(), n >= s.getNodeLimit() ? true: false );
 	}
 }
 
 TEST(timeManagement, moveTimeSearchStop)
 {
 	SearchLimits s;
-	s.moveTime = 100000000;
+	s.setMoveTime(100000000);
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -159,7 +178,7 @@ TEST(timeManagement, moveTimeSearch)
 {
 
 	SearchLimits s;
-	s.moveTime = 1000000;
+	s.setMoveTime(1000000);
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -180,8 +199,8 @@ TEST(timeManagement, moveTimeSearch)
 		if( i % 23 == 0 )tm.notifyFailOver();
 		if( i % 29 == 0 )tm.notifyFailLow();
 
-		ASSERT_EQ( tm.stateMachineStep( t, n ), t >= s.moveTime ? true: false );
-		ASSERT_EQ( tm.isSearchFinished(), t >= s.moveTime ? true: false );
+		ASSERT_EQ( tm.stateMachineStep( t, n ), t >= s.getMoveTime() ? true: false );
+		ASSERT_EQ( tm.isSearchFinished(), t >= s.getMoveTime() ? true: false );
 	}
 }
 
@@ -189,7 +208,7 @@ TEST(timeManagement, moveTimeSearch2)
 {
 
 	SearchLimits s;
-	s.moveTime = 1000;
+	s.setMoveTime(1000);
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );
@@ -197,11 +216,11 @@ TEST(timeManagement, moveTimeSearch2)
 	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 10 );
 
-	s.moveTime = 100;
+	s.setMoveTime(100);
 	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 1 );
 
-	s.moveTime = 100000;
+	s.setMoveTime(100000);
 	tm.initNewSearch( whiteTurn );
 	ASSERT_EQ( tm.getResolution(), 100);
 
@@ -227,10 +246,10 @@ TEST(timeManagement, normalSearch)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -262,10 +281,10 @@ TEST(timeManagement, normalSearchEarlyStop)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
 	s.checkInfiniteSearch();
 
 	unsigned int shortAllocatedTime = 571 * 0.7;
@@ -286,10 +305,10 @@ TEST(timeManagement, normalSearchStop)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -310,10 +329,10 @@ TEST(timeManagement, normalSearchNoExtend)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -347,10 +366,10 @@ TEST(timeManagement, normalSearchExtend)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -384,10 +403,10 @@ TEST(timeManagement, normalSearchExtend2)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -424,10 +443,10 @@ TEST(timeManagement, normalSearchExtendStop)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -465,11 +484,11 @@ TEST(timeManagement, PonderSearch)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
-	s.ponder = true;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
+	s.setPonder(true);
 	s.checkInfiniteSearch();
 
 	unsigned int allocatedTime = 571;
@@ -487,7 +506,7 @@ TEST(timeManagement, PonderSearch)
 	ASSERT_EQ( tm.stateMachineStep( 100000000, 100000000 ), false);
 	ASSERT_EQ( tm.isSearchFinished(), false );
 
-	s.ponder = false;
+	s.setPonder(false);
 
 	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
 	ASSERT_EQ( tm.isSearchFinished(), false );
@@ -503,11 +522,11 @@ TEST(timeManagement, PonderSearchStop)
 {
 
 	SearchLimits s;
-	s.btime = 10000;
-	s.wtime = 20000;
-	s.binc = 0;
-	s.winc = 0;
-	s.ponder = true;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
+	s.setPonder(true);
 	s.checkInfiniteSearch();
 
 	timeManagement tm( s );

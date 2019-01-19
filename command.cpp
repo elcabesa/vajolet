@@ -229,23 +229,22 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr)
     while (is >> token)
     {
         if (token == "searchmoves")		{searchMovesCommand = true;}
-        else if (token == "wtime")		{is >> limits.wtime;searchMovesCommand = false;}
-        else if (token == "btime")		{is >> limits.btime;searchMovesCommand = false;}
-        else if (token == "winc")		{is >> limits.winc;searchMovesCommand = false;}
-        else if (token == "binc")		{is >> limits.binc;searchMovesCommand = false;}
-        else if (token == "movestogo")	{is >> limits.movesToGo;searchMovesCommand = false;}
-        else if (token == "depth")		{is >> limits.depth;searchMovesCommand = false;}
-        else if (token == "nodes")		{is >> limits.nodes;searchMovesCommand = false;}
-        else if (token == "movetime")	{is >> limits.moveTime;searchMovesCommand = false;}
-        else if (token == "mate")		{is >> limits.mate;searchMovesCommand = false;}
-        else if (token == "infinite")	{limits.infinite = true;searchMovesCommand = false;}
-        else if (token == "ponder")		{limits.ponder = true;searchMovesCommand = false;}
+        else if (token == "wtime")		{ long long int x; is >> x; limits.setWTime(x);     searchMovesCommand = false;}
+        else if (token == "btime")		{ long long int x; is >> x; limits.setBTime(x);     searchMovesCommand = false;}
+        else if (token == "winc")		{ long long int x; is >> x; limits.setWInc(x);      searchMovesCommand = false;}
+        else if (token == "binc")		{ long long int x; is >> x; limits.setBInc(x);      searchMovesCommand = false;}
+        else if (token == "movestogo")	{ long long int x; is >> x; limits.setMovesToGo(x); searchMovesCommand = false;}
+        else if (token == "depth")		{ int x;           is >> x; limits.setDepth(x);     searchMovesCommand = false;}
+        else if (token == "nodes")		{ unsigned int x;  is >> x; limits.setNodeLimit(x); searchMovesCommand = false;}
+        else if (token == "movetime")	{ long long int x; is >> x; limits.setMoveTime(x);  searchMovesCommand = false;}
+        else if (token == "mate")		{ long long int x; is >> x; limits.setMate(x);      searchMovesCommand = false;}
+        else if (token == "infinite")	{ limits.setInfiniteSearch();                       searchMovesCommand = false;}
+        else if (token == "ponder")		{ limits.setPonder(true);                           searchMovesCommand = false;}
         else if (searchMovesCommand == true)
         {
-        	Move m = moveFromUci(pos, token);
-			if( m )
+			if( Move m = moveFromUci(pos, token); m != Move::NOMOVE )
 			{
-				limits.searchMoves.push_back( m );
+				limits.moveListInsert(m);
 			}
         }
     }

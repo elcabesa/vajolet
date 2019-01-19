@@ -26,32 +26,56 @@
 class SearchLimits
 {
 public:
-	volatile bool ponder, infinite;
-	unsigned int wtime, btime, winc, binc, movesToGo, nodes, mate, moveTime;
-	int depth;
-	std::list<Move> searchMoves;
-	explicit SearchLimits()
-	{
-		ponder = false;
-		infinite = false;
-		wtime = 0;
-		btime = 0;
-		winc = 0;
-		binc = 0;
-		movesToGo = 0;
-		depth = -1;
-		nodes = 0;
-		mate = 0;
-		moveTime = 0;
-	}
+	explicit SearchLimits() {}
 
 	void checkInfiniteSearch()
 	{
-		if((!btime && !wtime) && !moveTime)
+		if(_btime == -1 && _wtime == -1 && _moveTime == -1)
 		{
-			infinite = true;
+			setInfiniteSearch();
 		}
 	}
+	
+	bool isMoveTimeSearch() const { return _moveTime != -1; }
+	bool isNodeLimitedSearch() const { return _nodes != 0; } 
+	bool isDepthLimitedSearch() const { return _depth != -1; }
+	bool isSearchMovesMode() const { return _searchMoves.size() != 0; }
+	bool isInfiniteSearch() const { return _infinite; }
+	bool isPondering() const { return _ponder; }
+	
+	long long int getWTime() const { return _wtime; }
+	void setWTime(long long int x) { _wtime = x; }
+	long long int getBTime() const  { return _btime; }
+	void setBTime(long long int x) { _btime = x; }
+	long long int getWInc() const  { return _winc; }
+	void setWInc(long long int x) { _winc = x; }
+	long long int getBInc() const  { return _binc; }
+	void setBInc(long long int x) { _binc = x; }
+	long long int getMovesToGo() const  { return _movesToGo; }
+	void setMovesToGo(long long int x) { _movesToGo = x; }
+	int getDepth() const  { return _depth; }
+	void setDepth(int x) { _depth = x; }
+	long long int getMate() const  { return _mate; }
+	void setMate(long long int x) { _mate = x; }
+	
+	long long int getMoveTime() const { return _moveTime; }
+	void setMoveTime(long long int x) { _moveTime = x; }
+	unsigned int getNodeLimit() const { return _nodes; }
+	void setNodeLimit(long long int x) { _nodes = x; }
+	
+	void setInfiniteSearch(){ _infinite = true; }
+	void setPonder(const bool p){ _ponder = p; }
+	
+	const std::list<Move>& getMoveList() const { return _searchMoves; }
+	void moveListInsert( const Move& m){ _searchMoves.push_back(m); }
+	
+private:
+	long long int _wtime = -1, _btime = -1, _winc = 0, _binc = 0, _movesToGo = 0, _mate = 0, _moveTime = -1;
+	unsigned int _nodes = 0;
+	int _depth = -1;
+	std::list<Move> _searchMoves;
+	bool _infinite = false;
+	volatile bool _ponder = false;
 
 };
 

@@ -90,36 +90,36 @@ void timeManagement::_chooseSearchType( enum searchState s )
 
 void timeManagement::initNewSearch( const eNextMove nm )
 {
-	if( _limits.infinite )
+	if( _limits.isInfiniteSearch() )
 	{
 		_resolution = 100;
 		_chooseSearchType( timeManagement::infiniteSearch );
 	}
-	else if(_limits.moveTime)
+	else if(_limits.isMoveTimeSearch())
 	{
-		_allocatedTime = _limits.moveTime;
+		_allocatedTime = _limits.getMoveTime();
 		_resolution = std::min((long long int)100, _allocatedTime / 100 );
 		_chooseSearchType( timeManagement::fixedTimeSearch);
 	}
 	else
 	{
-		unsigned int time;
-		unsigned int increment;
+		long long time;
+		long long increment;
 
 		if( nm == blackTurn )
 		{
-			time = _limits.btime;
-			increment = _limits.binc;
+			time = _limits.getBTime();
+			increment = _limits.getBInc();
 		}
 		else
 		{
-			time = _limits.wtime;
-			increment = _limits.winc;
+			time = _limits.getWTime();
+			increment = _limits.getWInc();
 		}
 
-		if( _limits.movesToGo > 0 )
+		if( _limits.getMovesToGo() > 0 )
 		{
-			_allocatedTime = time / _limits.movesToGo;
+			_allocatedTime = time / _limits.getMovesToGo();
 			_maxAllocatedTime = std::min( 10.0 * _allocatedTime, 0.8 * time);
 			_maxAllocatedTime = std::max( _maxAllocatedTime, _allocatedTime );
 		}
@@ -135,8 +135,13 @@ void timeManagement::initNewSearch( const eNextMove nm )
 		long long buffer = std::max( 2 * _resolution, 200u );
 		_allocatedTime = std::min( (long long int)_allocatedTime, (long long int)( time - buffer ) );
 		_maxAllocatedTime = std::min( (long long int)_maxAllocatedTime, (long long int)( time - buffer ) );
+		
+		_maxAllocatedTime = std::max(0ll, _maxAllocatedTime);
+		_minSearchTime = std::max(0ll, _minSearchTime);
+		_allocatedTime = std::max(0ll, _allocatedTime);
+		
 
-		_chooseSearchType( _limits.ponder == true ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
+		_chooseSearchType( _limits.isPondering() ? timeManagement::standardSearchPonder : timeManagement::standardSearch );
 	}
 
 	_resetSearchVariables();
@@ -158,8 +163,8 @@ bool timeManagement::stateMachineStep( const long long int time, const unsigned 
 		//sync_cout<<"infiniteSearch"<<sync_endl;
 		if(
 				_stop
-				|| ( _limits.nodes && _hasFirstIterationFinished() && visitedNodes >= _limits.nodes )
-				|| ( _limits.moveTime && _hasFirstIterationFinished() && time >= _limits.moveTime )
+				|| ( _limits.isNodeLimitedSearch() && _hasFirstIterationFinished() && visitedNodes >= _limits.getNodeLimit() )
+				|| ( _limits.isMoveTimeSearch() && _hasFirstIterationFinished() && time >= _limits.getMoveTime() )
 		)
 		{
 			_searchState = searchFinished;
@@ -212,7 +217,7 @@ bool timeManagement::stateMachineStep( const long long int time, const unsigned 
 			_searchState = searchFinished;
 			stopSearch = true;
 		}
-		else if( _limits.ponder == false )
+		else if( !_limits.isPondering() )
 		{
 			_searchState = standardSearch;
 		}
