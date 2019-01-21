@@ -50,7 +50,6 @@ public:
 					PVline::iterator it = _line.begin();
 					std::advance(it, ply);
 					ttMove = *it;
-					assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
 					return;
 				}
 			}
