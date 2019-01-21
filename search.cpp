@@ -1008,6 +1008,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	if constexpr ( PVnode )
 	{
 		_pvLineFollower.getNextMove(ply, ttMove);
+		assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
 	}
 
 	//--------------------------------------
@@ -1095,8 +1096,6 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				&&  ( !ttMove || type == ALL_NODE)
 			)
 			{
-				assert(ralpha>=-SCORE_INFINITE);
-
 				PVline childPV;
 				Score v = qsearch<CUT_NODE>(ply,0, alpha, alpha+1, childPV);
 				if (v <= alpha)
