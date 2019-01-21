@@ -37,21 +37,6 @@
 #include "vajolet.h"
 #include "version.h"
 
-
-
-//---------------------------------------------
-//	local global constant
-//---------------------------------------------
-const char PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
-
-
-const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-/*! \brief array of char to create the fen string
-	\author Marco Belli
-	\version 1.0
-	\date 27/10/2013
-*/
-
 /*****************************
 uci concrete output definitions
 ******************************/
@@ -83,18 +68,333 @@ public:
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
 };
 
+class UciManager::impl
+{
+public:
+	explicit impl();
+	~impl();
+	
+	void uciLoop();
+	char getPieceName( const bitboardIndex idx );
+	std::string displayUci( const Move& m );
+	std::string displayMove( const Position& pos, const Move& m );
+	
+private:
+	/*! \brief array of char to create the fen string
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	std::string unusedVersion;
+	static const char _PIECE_NAMES_FEN[];
+	static const std::string _StartFEN;
+	
+	static char _printFileOf( const tSquare& sq ) { return char( 'a' + getFileOf( sq ) ); }
+	static char _printRankOf( const tSquare& sq ) { return char( '1' + getRankOf( sq ) ); }
+	
+	class UciOption
+	{
+	public:
+		virtual std::string print() const =0;	
+	protected:
+		UciOption( std::string name):_name(name){}	
+		const std::string _name;
+	};
+
+	class StringUciOption final: public UciOption
+	{
+	public:
+		StringUciOption( std::string name, std::string& value, const std::string defVal):UciOption(name),_defaultValue(defVal),_value(value){ _value = _defaultValue; }
+		//Type getType() const { return uciString; };
+		//std::string getCurValue() const{ return _value; };
+		std::string print() const{
+			std::string s = "option name ";
+			s += _name;
+			s += " type string default ";
+			s += _defaultValue;
+			return s;
+		};	
+	private:
+		const std::string _defaultValue;
+		std::string& _value;
+	};
+
+	class SpinUciOption final: public UciOption
+	{
+	public:
+	// todo inserire una funzione  di callback per fare il set
+		SpinUciOption( std::string name, unsigned int& value, const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal):
+			UciOption(name),
+			_defValue(defVal),
+			_minValue(minVal),
+			_maxValue(maxVal),
+			_value(value)
+			{  _value = _defValue; }
+		//Type getType() const { return uciString; };
+		//std::string getCurValue() const{ return _value; };
+		std::string print() const{
+			std::string s = "option name ";
+			s += _name;
+			s += " type spin default ";
+			s += std::to_string(_defValue);
+			s += " min ";
+			s += std::to_string(_minValue);
+			s += " max ";
+			s += std::to_string(_maxValue);
+			return s;
+		};	
+	private:
+		const unsigned int _defValue;
+		const unsigned int _minValue;
+		const unsigned int _maxValue;
+		unsigned int & _value;
+	};
+
+	class CheckUciOption final: public UciOption
+	{
+	public:
+		CheckUciOption( std::string name/*, std::string& value*/, const bool defVal):UciOption(name),_defaultValue(defVal)/*,_value(value)*/{}
+		//Type getType() const { return uciString; };
+		//std::string getCurValue() const{ return _value; };
+		std::string print() const{
+			std::string s = "option name ";
+			s += _name;
+			s += " type check default ";
+			s += ( _defaultValue ? "true" : "false" );
+			return s;
+		};	
+	private:
+		const bool _defaultValue;
+		//std::string& _value;
+	};
+
+	class ButtonUciOption final: public UciOption
+	{
+	public:
+		ButtonUciOption( std::string name):UciOption(name){}
+		//Type getType() const { return uciString; };
+		//std::string getCurValue() const{ return _value; };
+		std::string print() const{
+			std::string s = "option name ";
+			s += _name;
+			s += " type button";
+			return s;
+		};	
+	private:
+	};
+
+	
+	std::list<std::unique_ptr<UciOption>> _optionList;
+	
+	std::string _getProgramNameAndVersion();
+	void _printNameAndVersionMessage(void);
+	void _printUciInfo(void);
+	Move _moveFromUci(const Position& pos,const  std::string& str);
+	void _position(std::istringstream& is, Position & pos);
+	void _doPerft(const unsigned int n, Position & pos);
+	void _go(std::istringstream& is, Position & pos, my_thread & thr);
+	void _setoption(std::istringstream& is);
+	void _setvalue(std::istringstream& is);
+};
+
+const char UciManager::impl::_PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
+const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+UciManager::impl::impl()
+{
+	_optionList.emplace_back( new SpinUciOption("Hash", 1, 1, 65535));
+	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, 1, 1, 128));
+	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, 1, 1, 500));
+	_optionList.emplace_back( new CheckUciOption("Ponder", true));
+	_optionList.emplace_back( new CheckUciOption("OwnBook", true));
+	_optionList.emplace_back( new CheckUciOption("BestMoveBook", true));
+	_optionList.emplace_back( new StringUciOption("UCI_EngineAbout", unusedVersion, _getProgramNameAndVersion() + " by Marco Belli (build date: " + __DATE__ + " " + __TIME__ + ")"));
+	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", false));
+	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath ,"<empty>"));
+	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, 1, 1, 100));
+	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", true));
+	_optionList.emplace_back( new ButtonUciOption("ClearHash"));
+	_optionList.emplace_back( new CheckUciOption("PerftUseHash", false));
+	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", false));
+}
+
+UciManager::impl::~impl()
+{}
+
+char UciManager::impl::getPieceName( const bitboardIndex idx ){
+	assert( isValidPiece( idx ) || idx == empty);
+	return _PIECE_NAMES_FEN[ idx ];
+}
+
+std::string UciManager::impl::displayUci( const Move& m )
+{
+	std::string s;
+
+	if( !m )
+	{
+		s = "0000";
+		return s;
+	}
+
+	//from
+	s += _printFileOf( m.getFrom() );
+	s += _printRankOf( m.getFrom() );
+
+
+	//to
+	s += _printFileOf( m.getTo() );
+	s += _printRankOf( m.getTo() );
+	//promotion
+	if( m.isPromotionMove() )
+	{
+		s += tolower( getPieceName( m.getPromotedPiece() ) );
+	}
+	return s;
+}
+
+std::string UciManager::impl::displayMove( const Position& pos, const Move& m )
+{
+	std::string s;
+
+	const bool capture = pos.isCaptureMove(m);
+	const bool check = pos.moveGivesCheck(m);
+	const bool doubleCheck = pos.moveGivesDoubleCheck(m);
+	unsigned int legalReplies;
+	const bitboardIndex piece = pos.getPieceAt( m.getFrom() );
+	const bool pawnMove = isPawn(piece);
+	const bool isPromotion = m.isPromotionMove();
+	const bool isEnPassant = m.isEnPassantMove();
+	const bool isCastle = m.isCastleMove();
+
+	bool disambigusFlag = false;
+	bool fileFlag = false;
+	bool rankFlag = false;
+
+
+	// calc legal reply to this move
+	{
+		Position p(pos);
+		p.doMove(m);
+		legalReplies = p.getNumberOfLegalMoves();
+		p.undoMove();
+	}
+
+
+	{
+		// calc disambigus data
+		Move mm;
+		MovePicker mp( pos );
+		while ( ( mm = mp.getNextMove() ) )
+		{
+			if( pos.getPieceAt( mm.getFrom() ) == piece 
+				&& ( mm.getTo() == m.getTo() ) 
+				&& ( mm.getFrom() != m.getFrom() )
+			)
+			{
+				disambigusFlag = true;
+				if( getFileOf( mm.getFrom() ) == getFileOf( m.getFrom() ) )
+				{
+					rankFlag = true;
+				}
+				if( getRankOf( mm.getFrom() ) == getRankOf( m.getFrom() ) )
+				{
+					fileFlag = true;
+				}
+			}
+		}
+		if( disambigusFlag && !rankFlag && !fileFlag )
+		{
+			fileFlag = true;
+		}
+	}
+
+
+	// castle move
+	if (isCastle)
+	{
+		if( m.isKingSideCastle() )
+		{
+			s = "O-O";
+		}
+		else
+		{
+			s = "O-O-O";
+		}
+		return s;
+
+	}
+
+
+	// 1 ) use the name of the piece if it's not a pawn move
+	if( !pawnMove )
+	{
+		s+= getPieceName( getPieceType( piece ) );
+	}
+	if( fileFlag )
+	{
+		s += _printFileOf( m.getFrom() );
+	}
+	if( rankFlag )
+	{
+		s += _printRankOf( m.getFrom() );
+	}
+
+
+	//capture motation
+	if (capture)
+	{
+		if(pawnMove)
+		{
+			s += _printFileOf( m.getFrom() );
+		}
+		// capture add x before to square
+		s+="x";
+	}
+	// to square
+	s += _printFileOf( m.getTo() );
+	s += _printRankOf( m.getTo() );
+	// add en passant info
+	if ( isEnPassant )
+	{
+		s+="e.p.";
+	}
+	//promotion add promotion to
+	if(isPromotion)
+	{
+		s += "=";
+		s +=  getPieceName( m.getPromotedPiece() );
+	}
+	// add check information
+	if( check )
+	{
+		if( legalReplies > 0 )
+		{
+			if( doubleCheck )
+			{
+				s+="++";
+			}
+			else
+			{
+				s+="+";
+			}
+		}
+		else
+		{
+			s+="#";
+		}
+	}
+	return s;
+}
+
+
+
 
 //---------------------------------------------
 //	function implementation
 //---------------------------------------------
 
-char getPieceName( const bitboardIndex idx )
-{
-	assert( isValidPiece( idx ) || idx == empty);
-	return PIECE_NAMES_FEN[ idx ];
-}
 
-std::string getProgramNameAndVersion()
+std::string UciManager::impl::_getProgramNameAndVersion()
 {
 	std::string s = programName;
 	s += " ";
@@ -108,9 +408,9 @@ std::string getProgramNameAndVersion()
 	\version 1.0
 	\date 21/10/2013
 */
-void static printStartMessage(void)
+void UciManager::impl::_printNameAndVersionMessage(void)
 {
-	sync_cout << "id name " << getProgramNameAndVersion() << sync_endl;
+	sync_cout << "id name " << _getProgramNameAndVersion() << sync_endl;
 }
 
 /*	\brief print the uci reply
@@ -118,25 +418,11 @@ void static printStartMessage(void)
 	\version 1.0
 	\date 21/10/2013
 */
-void static printUciInfo(void)
+void UciManager::impl::_printUciInfo(void)
 {
-	sync_cout << "id name " << getProgramNameAndVersion() << sync_endl;
+	_printNameAndVersionMessage();
 	sync_cout << "id author Marco Belli" << sync_endl;
-	sync_cout << "option name Hash type spin default 1 min 1 max 65535" << sync_endl;
-	sync_cout << "option name Threads type spin default 1 min 1 max 128" << sync_endl;
-	sync_cout << "option name MultiPV type spin default 1 min 1 max 500" << sync_endl;
-	sync_cout << "option name Ponder type check default true" << sync_endl;
-	sync_cout << "option name OwnBook type check default true" <<sync_endl;
-	sync_cout << "option name BestMoveBook type check default false"<<sync_endl;
-	sync_cout << "option name UCI_EngineAbout type string default " << getProgramNameAndVersion() << " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
-	sync_cout << "option name UCI_ShowCurrLine type check default false" << sync_endl;
-	sync_cout << "option name SyzygyPath type string default <empty>" << sync_endl;
-	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
-	sync_cout << "option name Syzygy50MoveRule type check default true" << sync_endl;
-	sync_cout << "option name ClearHash type button" << sync_endl;
-	sync_cout << "option name PerftUseHash type check default false" << sync_endl;
-	sync_cout << "option name reduceVerbosity type check default false" << sync_endl;
-
+	for( const auto& opt: _optionList ) sync_cout << opt->print()<<sync_endl;
 	sync_cout << "uciok" << sync_endl;
 }
 
@@ -146,7 +432,7 @@ void static printUciInfo(void)
 	\version 1.0
 	\date 21/10/2013
 */
-Move moveFromUci(const Position& pos,const  std::string& str)
+Move UciManager::impl::_moveFromUci(const Position& pos,const  std::string& str)
 {
 
 	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
@@ -169,13 +455,13 @@ Move moveFromUci(const Position& pos,const  std::string& str)
 	\version 1.0
 	\date 21/10/2013
 */
-void static position(std::istringstream& is, Position & pos)
+void UciManager::impl::_position(std::istringstream& is, Position & pos)
 {
 	std::string token, fen;
 	is >> token;
 	if (token == "startpos")
 	{
-		fen = StartFEN;
+		fen = _StartFEN;
 		is >> token; // Consume "moves" token if any
 	}
 	else if (token == "fen")
@@ -189,12 +475,12 @@ void static position(std::istringstream& is, Position & pos)
 	{
 		return;
 	}
-
+	// todo parse fen!! invalida fen shall be rejected and Vajolet shall not crash
 	pos.setupFromFen(fen);
 
 	Move m;
 	// Parse move list (if any)
-	while( is >> token && (m = moveFromUci(pos, token) ) )
+	while( is >> token && (m = _moveFromUci(pos, token) ) )
 	{
 		pos.doMove(m);
 	}
@@ -205,9 +491,8 @@ void static position(std::istringstream& is, Position & pos)
 	\version 1.0
 	\date 08/11/2013
 */
-void static doPerft(const unsigned int n, Position & pos)
+void UciManager::impl::_doPerft(const unsigned int n, Position & pos)
 {
-
 	SearchTimer st;
 
 	unsigned long long res = pos.perft(n);
@@ -219,8 +504,9 @@ void static doPerft(const unsigned int n, Position & pos)
 }
 
 
-void static go(std::istringstream& is, Position & pos, my_thread & thr)
+void UciManager::impl::_go(std::istringstream& is, Position & pos, my_thread & thr)
 {
+	// todo manage parameters in a better way
 	SearchLimits limits;
 	std::string token;
 	bool searchMovesCommand = false;
@@ -242,7 +528,7 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr)
         else if (token == "ponder")		{ limits.setPonder(true);                           searchMovesCommand = false;}
         else if (searchMovesCommand == true)
         {
-			if( Move m = moveFromUci(pos, token); m != Move::NOMOVE )
+			if( Move m = _moveFromUci(pos, token); m != Move::NOMOVE )
 			{
 				limits.moveListInsert(m);
 			}
@@ -254,8 +540,9 @@ void static go(std::istringstream& is, Position & pos, my_thread & thr)
 
 
 
-void setoption(std::istringstream& is)
+void UciManager::impl::_setoption(std::istringstream& is)
 {
+	// todo manage setoption with a option list
 	std::string token, name, value;
 
 	is >> token; // Consume "name" token
@@ -433,8 +720,9 @@ void setoption(std::istringstream& is)
 }
 
 
-void setvalue(std::istringstream& is)
+void UciManager::impl::_setvalue(std::istringstream& is)
 {
+	// todo manage setValue with a list, remove from release builds
 	std::string token, name, value;
 
 	is >> name;
@@ -525,12 +813,13 @@ void setvalue(std::istringstream& is)
 	\version 1.0
 	\date 21/10/2013
 */
-void uciLoop()
+void UciManager::impl::uciLoop()
 {
-	printStartMessage();
+	// todo manage command parsin with a list?
+	_printNameAndVersionMessage();
 	my_thread &thr = my_thread::getInstance();
 	Position pos;
-	pos.setupFromFen(StartFEN);
+	pos.setupFromFen(_StartFEN);
 	std::string token, cmd;
 
 	do
@@ -545,7 +834,7 @@ void uciLoop()
 
 		if(token== "uci")
 		{
-			printUciInfo();
+			_printUciInfo();
 		}
 		else if (token == "quit" || token == "stop")
 		{
@@ -560,15 +849,15 @@ void uciLoop()
 		}
 		else if (token == "position")
 		{
-			position(is,pos);
+			_position(is,pos);
 		}
 		else if(token == "setoption")
 		{
-			setoption(is);
+			_setoption(is);
 		}
 		else if(token == "setvalue")
 		{
-			setvalue(is);
+			_setvalue(is);
 		}
 		else if (token == "eval")
 		{
@@ -593,7 +882,7 @@ void uciLoop()
 				n = 1;
 			}
 			n = std::max(n,1);
-			doPerft(n, pos);
+			_doPerft(n, pos);
 		}
 		else if (token == "divide" && (is>>token))
 		{
@@ -612,7 +901,7 @@ void uciLoop()
 		}
 		else if (token == "go")
 		{
-			go(is, pos, thr);
+			_go(is, pos, thr);
 		}
 		else if (token == "bench")
 		{
@@ -629,191 +918,16 @@ void uciLoop()
 	}while(token!="quit");
 }
 
-char printFileOf( const tSquare& sq )
-{
-	return char( 'a' + getFileOf( sq ) );
-}
-
-char printRankOf( const tSquare& sq )
-{
-	return char( '1' + getRankOf( sq ) );
-}
-
-/*! \brief return the uci string for a given move
-	\author Marco Belli
-	\version 1.0
-	\date 08/11/2013
-*/
-std::string displayUci(const Move & m){
 
 
-	std::string s;
+UciManager::UciManager(): pimpl{std::make_unique<impl>()}{}
 
-	if( !m )
-	{
-		s = "0000";
-		return s;
-	}
+UciManager::~UciManager() = default;
 
-	//from
-	s += printFileOf( m.getFrom() );
-	s += printRankOf( m.getFrom() );
-
-
-	//to
-	s += printFileOf( m.getTo() );
-	s += printRankOf( m.getTo() );
-	//promotion
-	if( m.isPromotionMove() )
-	{
-		s += tolower( getPieceName( m.getPromotedPiece() ) );
-	}
-	return s;
-
-}
-
-/*! \brief return the uci string for a given move
-	\author Marco Belli
-	\version 1.0
-	\date 08/11/2013
-*/
-std::string displayMove(const Position& pos, const Move & m)
-{
-
-	std::string s;
-
-	bool capture = pos.isCaptureMove(m);
-	bool check = pos.moveGivesCheck(m);
-	bool doubleCheck = pos.moveGivesDoubleCheck(m);
-	unsigned int legalMoves;
-	bitboardIndex piece = pos.getPieceAt( m.getFrom() );
-	bool pawnMove = isPawn(piece);
-	bool isPromotion = m.isPromotionMove();
-	bool isEnPassant = m.isEnPassantMove();
-	bool isCastle = m.isCastleMove();
-
-	bool disambigusFlag = false;
-	bool fileFlag = false;
-	bool rankFlag = false;
-
-
-	// calc legalmoves
-	{
-		Position p(pos);
-		p.doMove(m);
-		legalMoves = p.getNumberOfLegalMoves();
-		p.undoMove();
-	}
-
-
-	{
-		// calc disambigus data
-		Move mm;
-		MovePicker mp( pos );
-		while ( ( mm = mp.getNextMove() ) )
-		{
-			if( pos.getPieceAt( mm.getFrom() ) == piece 
-				&& ( mm.getTo() == m.getTo() ) 
-				&& ( mm.getFrom() != m.getFrom() )
-			)
-			{
-				disambigusFlag = true;
-				if( getFileOf( mm.getFrom() ) == getFileOf( m.getFrom() ) )
-				{
-					rankFlag = true;
-				}
-				if( getRankOf( mm.getFrom() ) == getRankOf( m.getFrom() ) )
-				{
-					fileFlag = true;
-				}
-			}
-		}
-		if( disambigusFlag && !rankFlag && !fileFlag )
-		{
-			fileFlag = true;
-		}
-	}
-
-
-	// castle move
-	if (isCastle)
-	{
-		if( m.isKingSideCastle() )
-		{
-			s = "O-O";
-		}
-		else
-		{
-			s = "O-O-O";
-		}
-		return s;
-
-	}
-
-
-	// 1 ) use the name of the piece if it's not a pawn move
-	if( !pawnMove )
-	{
-		s+= getPieceName( getPieceType( piece ) );
-	}
-	if( fileFlag )
-	{
-		s += printFileOf( m.getFrom() );
-	}
-	if( rankFlag )
-	{
-		s += printRankOf( m.getFrom() );
-	}
-
-
-	//capture motation
-	if (capture)
-	{
-		if(pawnMove)
-		{
-			s += printFileOf( m.getFrom() );
-		}
-		// capture add x before to square
-		s+="x";
-	}
-	// to square
-	s += printFileOf( m.getTo() );
-	s += printRankOf( m.getTo() );
-	// add en passant info
-	if ( isEnPassant )
-	{
-		s+="e.p.";
-	}
-	//promotion add promotion to
-	if(isPromotion)
-	{
-		s += "=";
-		s +=  getPieceName( m.getPromotedPiece() );
-	}
-	// add check information
-	if( check  )
-	{
-		if( legalMoves > 0 )
-		{
-			if( doubleCheck )
-			{
-				s+="++";
-			}
-			else
-			{
-				s+="+";
-			}
-		}
-		else
-		{
-			s+="#";
-		}
-	}
-	return s;
-
-}
-
-
+void UciManager::uciLoop() { pimpl->uciLoop();}
+char UciManager::getPieceName( const bitboardIndex idx ) { return pimpl->getPieceName(idx);}
+std::string UciManager::displayUci( const Move& m ) { return  pimpl->displayUci(m);}
+std::string UciManager::displayMove( const Position& pos, const Move& m ) {  return pimpl->displayMove(pos, m);}
 
 /*****************************
 uci standard output implementation
@@ -857,13 +971,13 @@ void UciStandardOutput::printPV(const Score res, const unsigned int seldepth, co
 #endif
 
 	std::cout << " pv ";
-	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<displayUci(m)<<" ";});
+	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<UciManager::getInstance().displayUci(m)<<" ";});
 	std::cout<<sync_endl;
 }
 
 void UciStandardOutput::printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const
 {
-	sync_cout << "info currmovenumber " << moveNumber << " currmove " << displayUci(m) << " nodes " << visitedNodes <<
+	sync_cout << "info currmovenumber " << moveNumber << " currmove " << UciManager::getInstance().displayUci(m) << " nodes " << visitedNodes <<
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			" time " << time <<
 #endif
@@ -877,7 +991,7 @@ void UciStandardOutput::showCurrLine(const Position & pos, const unsigned int pl
 
 	for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
 	{
-		std::cout << " " << displayUci(pos.getState(i).getCurrentMove());
+		std::cout << " " << UciManager::getInstance().displayUci(pos.getState(i).getCurrentMove());
 	}
 	std::cout << sync_endl;
 
@@ -894,10 +1008,10 @@ void UciStandardOutput::printScore(const signed int cp) const
 
 void UciStandardOutput::printBestMove( const Move bm, const Move& ponder ) const
 {
-	sync_cout<<"bestmove "<< displayUci(bm);
+	sync_cout<<"bestmove "<< UciManager::getInstance().displayUci(bm);
 	if( ponder )
 	{
-		std::cout<<" ponder " << displayUci(ponder);
+		std::cout<<" ponder " << UciManager::getInstance().displayUci(ponder);
 	}
 	std::cout<< sync_endl;
 }

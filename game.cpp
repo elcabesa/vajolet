@@ -53,10 +53,10 @@ void Game::printGamesInfo()
 	{
 		if( p.m )
 		{
-			std::cout<<"Move: "<<displayUci(p.m)<<"  PV:";
+			std::cout<<"Move: "<<UciManager::getInstance().displayUci(p.m)<<"  PV:";
 			for( auto m : p.PV )
 			{
-				std::cout<<displayUci(m)<<" ";
+				std::cout<<UciManager::getInstance().displayUci(m)<<" ";
 			}
 
 		}

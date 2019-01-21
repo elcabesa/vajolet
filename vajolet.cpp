@@ -79,6 +79,6 @@ int main( int argc, char* argv[] )
 	//----------------------------------
 	//	main loop
 	//----------------------------------
-	uciLoop();
+	UciManager::getInstance().uciLoop();
 	return 0;
 }

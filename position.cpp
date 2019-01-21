@@ -386,7 +386,7 @@ void Position::display()const
 			std::cout << rank+1 <<  " |";
 			for (tFile file = FILEA; file <= FILEH; ++file)
 			{
-				std::cout << " " << getPieceName(getPieceAt(getSquare(file,rank))) << " |";
+				std::cout << " " << UciManager::getInstance().getPieceName(getPieceAt(getSquare(file,rank))) << " |";
 			}
 			std::cout << std::endl;
 		}
@@ -438,7 +438,7 @@ std::string  Position::getFen() const {
 					s+=std::to_string(emptyFiles);
 				}
 				emptyFiles=0;
-				s += getPieceName( getPieceAt(getSquare(file,rank)) );
+				s += UciManager::getInstance().getPieceName( getPieceAt(getSquare(file,rank)) );
 			}
 			else
 			{
@@ -521,7 +521,7 @@ std::string Position::getSymmetricFen() const {
 				{
 					xx = (bitboardIndex)(xx + separationBitmap);
 				}
-				s += getPieceName( xx );
+				s += UciManager::getInstance().getPieceName( xx );
 			}
 			else
 			{
@@ -748,7 +748,7 @@ void Position::doMove(const Move & m)
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	if( ! isMoveLegal(m) )
 	{
-		std::cerr<<"illegal move "<<displayUci(m)<<std::endl;
+		std::cerr<<"illegal move "<<UciManager::getInstance().displayUci(m)<<std::endl;
 		exit(-1);
 	}
 #endif
@@ -1231,7 +1231,7 @@ unsigned long long Position::divide(unsigned int depth)
 		}
 		tot += n;
 		undoMove();
-		sync_cout<<mn<<") "<<displayMove(*this,m)<<": "<<n<<sync_endl;
+		sync_cout<<mn<<") "<<UciManager::getInstance().displayMove(*this,m)<<": "<<n<<sync_endl;
 
 	}
 	return tot;
