@@ -18,11 +18,12 @@
 
 unsigned int uciParameters::threads;
 unsigned int uciParameters::multiPVLines;
-bool uciParameters::useOwnBook = true;
-bool uciParameters::bestMoveBook = false;
-bool uciParameters::showCurrentLine = false;
+bool uciParameters::useOwnBook;
+bool uciParameters::bestMoveBook;
+bool uciParameters::showCurrentLine;
 std::string uciParameters::SyzygyPath;
 unsigned int uciParameters::SyzygyProbeDepth;
-bool uciParameters::Syzygy50MoveRule =  true;
+bool uciParameters::Syzygy50MoveRule;
+bool uciParameters::Ponder;
 
 

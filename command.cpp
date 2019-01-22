@@ -85,16 +85,26 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
+	
+	static void setTTSize(unsigned int size)
+	{
+		unsigned long elements = transpositionTable::getInstance().setSize(size);
+		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
+	}
+	static void clearHash(){ transpositionTable::getInstance().clear(); }
+	static void setTTPath( std::string s ){ tb_init(s.c_str());}
 	std::string unusedVersion;
+	unsigned int unusedSize;
 	static const char _PIECE_NAMES_FEN[];
 	static const std::string _StartFEN;
 	
 	static char _printFileOf( const tSquare& sq ) { return char( 'a' + getFileOf( sq ) ); }
 	static char _printRankOf( const tSquare& sq ) { return char( '1' + getRankOf( sq ) ); }
-	
+	// todo add a method to tell wheter a option needs valur or can accept a missing or empty one
 	class UciOption
 	{
 	public:
+		virtual void setValue( std::string v) = 0;
 		virtual std::string print() const =0;	
 	protected:
 		UciOption( std::string name):_name(name){}	
@@ -104,9 +114,7 @@ private:
 	class StringUciOption final: public UciOption
 	{
 	public:
-		StringUciOption( std::string name, std::string& value, const std::string defVal):UciOption(name),_defaultValue(defVal),_value(value){ _value = _defaultValue; }
-		//Type getType() const { return uciString; };
-		//std::string getCurValue() const{ return _value; };
+		StringUciOption( std::string name, std::string& value, void (*callbackFunc)(std::string), const std::string defVal):UciOption(name),_defaultValue(defVal),_value(value), _callbackFunc(callbackFunc){ setValue(_defaultValue); }
 		std::string print() const{
 			std::string s = "option name ";
 			s += _name;
@@ -114,24 +122,36 @@ private:
 			s += _defaultValue;
 			return s;
 		};	
+		void setValue( std::string s)
+		{
+			_value = s;
+			if(_callbackFunc)
+			{
+				_callbackFunc(_value);
+			}
+			sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
+			
+	
+		}
 	private:
 		const std::string _defaultValue;
 		std::string& _value;
+		void (*_callbackFunc)(std::string);
 	};
 
 	class SpinUciOption final: public UciOption
 	{
 	public:
-	// todo inserire una funzione  di callback per fare il set
-		SpinUciOption( std::string name, unsigned int& value, const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal):
+		SpinUciOption( std::string name, unsigned int& value, void (*callbackFunc)(unsigned int), const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal):
 			UciOption(name),
 			_defValue(defVal),
 			_minValue(minVal),
 			_maxValue(maxVal),
-			_value(value)
-			{  _value = _defValue; }
-		//Type getType() const { return uciString; };
-		//std::string getCurValue() const{ return _value; };
+			_value(value),
+			_callbackFunc(callbackFunc)
+		{ 
+			setValue( std::to_string(_defValue) );
+		}
 		std::string print() const{
 			std::string s = "option name ";
 			s += _name;
@@ -142,20 +162,46 @@ private:
 			s += " max ";
 			s += std::to_string(_maxValue);
 			return s;
-		};	
+		};
+
+		void setValue( std::string s)
+		{
+			int value;
+			try
+			{
+				value = std::stoi(s);
+			}
+			catch(...)
+			{
+				value = _defValue;
+			}
+			if( value < (int)_minValue ) { value = _minValue; }
+			if( value > (int)_maxValue ) { value = _maxValue; }
+			
+			_value = value;
+			
+			if( _callbackFunc )
+			{
+				_callbackFunc(_value);
+			}
+			sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
+		}		
 	private:
 		const unsigned int _defValue;
 		const unsigned int _minValue;
 		const unsigned int _maxValue;
 		unsigned int & _value;
+		void (*_callbackFunc)(unsigned int);
+		
 	};
 
 	class CheckUciOption final: public UciOption
 	{
 	public:
-		CheckUciOption( std::string name/*, std::string& value*/, const bool defVal):UciOption(name),_defaultValue(defVal)/*,_value(value)*/{}
-		//Type getType() const { return uciString; };
-		//std::string getCurValue() const{ return _value; };
+		CheckUciOption( std::string name, bool& value, const bool defVal):UciOption(name),_defaultValue(defVal), _value(value)
+		{
+			setValue( _defaultValue ? "true" : "false" );
+		}
 		std::string print() const{
 			std::string s = "option name ";
 			s += _name;
@@ -163,24 +209,42 @@ private:
 			s += ( _defaultValue ? "true" : "false" );
 			return s;
 		};	
+		void setValue( std::string s)
+		{
+			if( s == "true" )
+			{
+				_value = true;
+				sync_cout<<"info string "<<_name<<" set to "<<s<<sync_endl;
+				
+			}
+			else if( s == "false" )
+			{
+				_value = false;
+				sync_cout<<"info string "<<_name<<" set to "<<s<<sync_endl;
+			}
+			else
+			{
+				sync_cout<<"info string error setting "<<_name<<sync_endl;
+			}
+		}
 	private:
 		const bool _defaultValue;
-		//std::string& _value;
+		bool& _value;
 	};
 
 	class ButtonUciOption final: public UciOption
 	{
 	public:
-		ButtonUciOption( std::string name):UciOption(name){}
-		//Type getType() const { return uciString; };
-		//std::string getCurValue() const{ return _value; };
+		ButtonUciOption( std::string name, void (*callbackFunc)()):UciOption(name), _callbackFunc(callbackFunc){}
 		std::string print() const{
 			std::string s = "option name ";
 			s += _name;
 			s += " type button";
 			return s;
-		};	
+		};
+		void setValue( std::string ){if(_callbackFunc){_callbackFunc();}}
 	private:
+		void (*_callbackFunc)();
 	};
 
 	
@@ -202,20 +266,20 @@ const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPP
 
 UciManager::impl::impl()
 {
-	_optionList.emplace_back( new SpinUciOption("Hash", 1, 1, 65535));
-	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, 1, 1, 128));
-	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, 1, 1, 500));
-	_optionList.emplace_back( new CheckUciOption("Ponder", true));
-	_optionList.emplace_back( new CheckUciOption("OwnBook", true));
-	_optionList.emplace_back( new CheckUciOption("BestMoveBook", true));
-	_optionList.emplace_back( new StringUciOption("UCI_EngineAbout", unusedVersion, _getProgramNameAndVersion() + " by Marco Belli (build date: " + __DATE__ + " " + __TIME__ + ")"));
-	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", false));
-	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath ,"<empty>"));
-	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, 1, 1, 100));
-	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", true));
-	_optionList.emplace_back( new ButtonUciOption("ClearHash"));
-	_optionList.emplace_back( new CheckUciOption("PerftUseHash", false));
-	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", false));
+	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, setTTSize, 1, 1, 65535));
+	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, nullptr, 1, 1, 128));
+	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, nullptr, 1, 1, 500));
+	_optionList.emplace_back( new CheckUciOption("Ponder", uciParameters::Ponder, true));
+	_optionList.emplace_back( new CheckUciOption("OwnBook", uciParameters::useOwnBook, true));
+	_optionList.emplace_back( new CheckUciOption("BestMoveBook", uciParameters::bestMoveBook, false));
+	_optionList.emplace_back( new StringUciOption("UCI_EngineAbout", unusedVersion, nullptr, _getProgramNameAndVersion() + " by Marco Belli (build date: " + __DATE__ + " " + __TIME__ + ")"));
+	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", uciParameters::showCurrentLine, false));
+	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath, setTTPath, "<empty>"));
+	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, nullptr, 1, 1, 100));
+	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, true));
+	_optionList.emplace_back( new ButtonUciOption("ClearHash", clearHash));
+	_optionList.emplace_back( new CheckUciOption("PerftUseHash", Position::perftUseHash, false));
+	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciStandardOutput::reduceVerbosity, false));
 }
 
 UciManager::impl::~impl()

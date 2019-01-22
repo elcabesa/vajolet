@@ -30,6 +30,7 @@ public:
 	static std::string SyzygyPath;
 	static unsigned int SyzygyProbeDepth;
 	static bool Syzygy50MoveRule;
+	static bool Ponder;
 };
 
 #endif
