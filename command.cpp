@@ -105,8 +105,8 @@ private:
 	class UciOption
 	{
 	public:
-		virtual void setValue( std::string v, bool verbose = true) = 0;
-		virtual std::string print() const =0;	
+		virtual bool setValue( std::string v, bool verbose = true) = 0;
+		virtual std::string print() const =0;
 		virtual ~UciOption(){}
 	protected:
 		UciOption( std::string name):_name(name){}	
@@ -124,7 +124,7 @@ private:
 			s += _defaultValue;
 			return s;
 		};	
-		void setValue( std::string s, bool verbose = true)
+		bool setValue( std::string s, bool verbose = true)
 		{
 			_value = s;
 			if(_callbackFunc)
@@ -135,8 +135,7 @@ private:
 			{
 				sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
 			}
-			
-	
+			return true;
 		}
 	private:
 		const std::string _defaultValue;
@@ -169,7 +168,7 @@ private:
 			return s;
 		};
 
-		void setValue( std::string s, bool verbose = true)
+		bool setValue( std::string s, bool verbose = true)
 		{
 			int value;
 			try
@@ -178,7 +177,7 @@ private:
 			}
 			catch(...)
 			{
-				value = _defValue;
+				return false;
 			}
 			if( value < (int)_minValue ) { value = _minValue; }
 			if( value > (int)_maxValue ) { value = _maxValue; }
@@ -193,6 +192,7 @@ private:
 			{
 				sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
 			}
+			return true;
 		}		
 	private:
 		const unsigned int _defValue;
@@ -217,7 +217,7 @@ private:
 			s += ( _defaultValue ? "true" : "false" );
 			return s;
 		};	
-		void setValue( std::string s, bool verbose = true)
+		bool setValue( std::string s, bool verbose = true)
 		{
 			if( s == "true" )
 			{
@@ -239,7 +239,9 @@ private:
 			else
 			{
 				sync_cout<<"info string error setting "<<_name<<sync_endl;
+				return false;
 			}
+			return true;
 		}
 	private:
 		const bool _defaultValue;
@@ -256,11 +258,10 @@ private:
 			s += " type button";
 			return s;
 		};
-		void setValue( std::string, bool verbose = true ){if(_callbackFunc){_callbackFunc();} (void)verbose;}
+		bool setValue( std::string, bool verbose = true ){if(_callbackFunc){_callbackFunc();} (void)verbose; return true;}
 	private:
 		void (*_callbackFunc)();
 	};
-
 	
 	std::list<std::unique_ptr<UciOption>> _optionList;
 	
@@ -620,7 +621,6 @@ void UciManager::impl::_go(std::istringstream& is, Position & pos, my_thread & t
 
 void UciManager::impl::_setoption(std::istringstream& is)
 {
-	// todo manage setoption with a option list
 	std::string token, name, value;
 
 	is >> token; // Consume "name" token
@@ -629,10 +629,8 @@ void UciManager::impl::_setoption(std::istringstream& is)
 	{
 		sync_cout << "info string malformed command"<< sync_endl;
 		return;
-		
 	}
 	
-
 	// Read option name (can contain spaces)
 	while (is >> token && token != "value")
 	{
@@ -644,7 +642,22 @@ void UciManager::impl::_setoption(std::istringstream& is)
 		value += std::string(" ", !value.empty()) + token;
 	}
 	
-	if( value.empty() && (name != "SyzygyPath" && name != "UCI_EngineAbout" && name != "ClearHash")) // sygyzy path is allowed to have an empty value
+	// find the  in the list
+	auto it = std::find_if(_optionList.begin(), _optionList.end(), [&](std::unique_ptr<UciOption>& p) { return *p == name;});
+	if( it == _optionList.end() )
+	{
+		sync_cout << "info string No such option: " << name << sync_endl;
+		return;
+	}
+	
+	auto &op = *it;
+	if( !op->setValue(value) )
+	{
+		sync_cout << "info string malformed command"<< sync_endl;
+		return;
+	}
+	
+	/*if( value.empty() && (name != "SyzygyPath" && name != "UCI_EngineAbout" && name != "ClearHash")) // sygyzy path is allowed to have an empty value
 	{
 		sync_cout << "info string malformed command"<< sync_endl;
 		return;
@@ -789,11 +802,7 @@ void UciManager::impl::_setoption(std::istringstream& is)
 	else if(name == "UCI_EngineAbout")
 	{
 		sync_cout<< programName << " " << version << preRelease << " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
-	}
-	else
-	{
-		sync_cout << "info string No such option: " << name << sync_endl;
-	}
+	}*/
 
 }
 
