@@ -273,7 +273,7 @@ private:
 	void _doPerft(const unsigned int n, Position & pos);
 	void _go(std::istringstream& is, Position & pos, my_thread & thr);
 	void _setoption(std::istringstream& is);
-	void _setvalue(std::istringstream& is);
+	//void _setvalue(std::istringstream& is);
 };
 
 const char UciManager::impl::_PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
@@ -582,7 +582,6 @@ void UciManager::impl::_doPerft(const unsigned int n, Position & pos)
 	sync_cout << totalTime << "ms " << ((double)res) / (double)totalTime << " kN/s" << sync_endl;
 }
 
-
 void UciManager::impl::_go(std::istringstream& is, Position & pos, my_thread & thr)
 {
 	// todo manage parameters in a better way
@@ -616,13 +615,13 @@ void UciManager::impl::_go(std::istringstream& is, Position & pos, my_thread & t
     thr.startThinking( pos, limits );
 }
 
-
-
-
 void UciManager::impl::_setoption(std::istringstream& is)
 {
 	std::string token, name, value;
 
+	///////////////////////////////////////////////
+	// PARSE INPUT
+	///////////////////////////////////////////////
 	is >> token; // Consume "name" token
 	
 	if( token != "name" )
@@ -642,6 +641,10 @@ void UciManager::impl::_setoption(std::istringstream& is)
 		value += std::string(" ", !value.empty()) + token;
 	}
 	
+	///////////////////////////////////////////////
+	// FIND OPTION
+	///////////////////////////////////////////////
+	
 	// find the  in the list
 	auto it = std::find_if(_optionList.begin(), _optionList.end(), [&](std::unique_ptr<UciOption>& p) { return *p == name;});
 	if( it == _optionList.end() )
@@ -650,163 +653,19 @@ void UciManager::impl::_setoption(std::istringstream& is)
 		return;
 	}
 	
+	///////////////////////////////////////////////
+	// EXECUTE ACTION
+	///////////////////////////////////////////////
+	
 	auto &op = *it;
 	if( !op->setValue(value) )
 	{
 		sync_cout << "info string malformed command"<< sync_endl;
 		return;
 	}
-	
-	/*if( value.empty() && (name != "SyzygyPath" && name != "UCI_EngineAbout" && name != "ClearHash")) // sygyzy path is allowed to have an empty value
-	{
-		sync_cout << "info string malformed command"<< sync_endl;
-		return;
-		
-	}
-
-	if(name == "Hash")
-	{
-		int hash = 1;
-		try
-		{
-			hash = std::stoi(value);
-		}
-		catch(...)
-		{
-			hash = 1;
-		}
-		hash = std::min(hash,65535);
-		unsigned long elements = transpositionTable::getInstance().setSize(hash);
-		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<hash<<"MB)"<<sync_endl;
-
-	}
-	else if(name == "ClearHash")
-	{
-		transpositionTable::getInstance().clear();
-	}
-	else if(name == "PerftUseHash")
-	{
-		if(value=="true")
-		{
-			Position::perftUseHash = true;
-		}
-		else
-		{
-			Position::perftUseHash = false;
-		}
-	}
-	else if(name == "reduceVerbosity")
-	{
-		if(value=="true")
-		{
-			UciStandardOutput::reduceVerbosity = true;
-		}
-		else
-		{
-			UciStandardOutput::reduceVerbosity = false;
-		}
-	}
-	else if(name == "Threads")
-	{
-		try
-		{
-			int i = std::stoi(value);
-			uciParameters::threads = (i<=128)?(i>0?i:1):128;
-			sync_cout<<"info string Threads number set to "<<uciParameters::threads<<sync_endl;
-		}
-		catch(...){}
-	}
-	else if(name == "MultiPV")
-	{
-		try
-		{
-			int i = std::stoi(value);
-			uciParameters::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
-			sync_cout<<"info string MultiPv Lines set to "<<uciParameters::multiPVLines<<sync_endl;
-		}
-		catch(...){}	
-	}
-	else if(name == "OwnBook")
-	{
-		if(value=="true")
-		{
-			uciParameters::useOwnBook = true;
-			sync_cout<<"info string OwnBook option set to true"<<sync_endl;
-		}
-		else{
-			uciParameters::useOwnBook = false;
-			sync_cout<<"info string OwnBook option set to false"<<sync_endl;
-		}
-	}
-	else if(name == "BestMoveBook")
-	{
-		if(value == "true")
-		{
-			uciParameters::bestMoveBook = true;
-			sync_cout<<"info string BestMoveBook option set to true"<<sync_endl;
-		}
-		else
-		{
-			uciParameters::bestMoveBook = false;
-			sync_cout<<"info string BestMoveBook option set to false"<<sync_endl;
-		}
-	}
-	else if(name == "UCI_ShowCurrLine")
-	{
-		if(value == "true")
-		{
-			uciParameters::showCurrentLine = true;
-			sync_cout<<"info string UCI_ShowCurrLine option set to true"<<sync_endl;
-		}
-		else
-		{
-			uciParameters::showCurrentLine = false;
-			sync_cout<<"info string UCI_ShowCurrLine option set to false"<<sync_endl;
-		}
-	}
-	else if(name == "Ponder")
-	{
-		sync_cout<<"info string Ponder option set to "<<value<<sync_endl;
-	}
-	else if(name == "SyzygyPath")
-	{
-		uciParameters::SyzygyPath = value;
-		tb_init(uciParameters::SyzygyPath.c_str());
-		sync_cout<<"info string TB_LARGEST = "<<TB_LARGEST<<sync_endl;
-	}
-	else if(name == "SyzygyProbeDepth")
-	{
-		try
-		{
-			uciParameters::SyzygyProbeDepth = std::max(std::stoi(value),0) ;
-		}
-		catch(...)
-		{
-			uciParameters::SyzygyProbeDepth = 1;
-		}
-		sync_cout<<"info string SyzygyProbeDepth option set to "<<uciParameters::SyzygyProbeDepth<<sync_endl;
-	}
-	else if(name == "Syzygy50MoveRule")
-	{
-		if(value == "true")
-		{
-			uciParameters::Syzygy50MoveRule = true;
-			sync_cout<<"info string Syzygy50MoveRule option set to true"<<sync_endl;
-		}
-		else
-		{
-			uciParameters::Syzygy50MoveRule = false;
-			sync_cout<<"info string Syzygy50MoveRule option set to false"<<sync_endl;
-		}
-	}
-	else if(name == "UCI_EngineAbout")
-	{
-		sync_cout<< programName << " " << version << preRelease << " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
-	}*/
-
 }
 
-
+/*
 void UciManager::impl::_setvalue(std::istringstream& is)
 {
 	// todo manage setValue with a list, remove from release builds
@@ -892,7 +751,7 @@ void UciManager::impl::_setvalue(std::istringstream& is)
 	{
 		kingSafetyPars2[3] = stoi(value);
 	}
-}
+}*/
 
 
 /*	\brief manage the uci loop
@@ -942,10 +801,10 @@ void UciManager::impl::uciLoop()
 		{
 			_setoption(is);
 		}
-		else if(token == "setvalue")
+		/*else if(token == "setvalue")
 		{
 			_setvalue(is);
-		}
+		}*/
 		else if (token == "eval")
 		{
 			Score s = pos.eval<true>();

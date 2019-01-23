@@ -16,14 +16,14 @@
 */
 #include "uciParameters.h"
 
-unsigned int uciParameters::threads;
-unsigned int uciParameters::multiPVLines;
-bool uciParameters::useOwnBook;
-bool uciParameters::bestMoveBook;
-bool uciParameters::showCurrentLine;
-std::string uciParameters::SyzygyPath;
-unsigned int uciParameters::SyzygyProbeDepth;
-bool uciParameters::Syzygy50MoveRule;
+unsigned int uciParameters::threads = 1;
+unsigned int uciParameters::multiPVLines = 1;
+bool uciParameters::useOwnBook = true;
+bool uciParameters::bestMoveBook = false;
+bool uciParameters::showCurrentLine = false;
+std::string uciParameters::SyzygyPath = "<empty>";
+unsigned int uciParameters::SyzygyProbeDepth = 1;
+bool uciParameters::Syzygy50MoveRule =  true;
 bool uciParameters::Ponder;
 
 
