@@ -644,6 +644,11 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
 			}
 
+			// at depth 1 only print the PV at the ned of search
+			if(!_stop && depth == 1)
+			{
+				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), UciOutput::upperbound);
+			}
 			if(!_stop && uciParameters::multiPVLines > 1)
 			{
 				auto mpRes = _multiPVmanager.get();

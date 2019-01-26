@@ -106,6 +106,7 @@ private:
 	public:
 		virtual void setValue( std::string v) = 0;
 		virtual std::string print() const =0;	
+		virtual ~UciOption(){}
 	protected:
 		UciOption( std::string name):_name(name){}	
 		const std::string _name;
