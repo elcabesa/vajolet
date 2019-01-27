@@ -100,11 +100,12 @@ private:
 	
 	static char _printFileOf( const tSquare& sq ) { return char( 'a' + getFileOf( sq ) ); }
 	static char _printRankOf( const tSquare& sq ) { return char( '1' + getRankOf( sq ) ); }
-	// todo add a method to tell wheter a option needs valur or can accept a missing or empty one
+
+	
 	class UciOption
 	{
 	public:
-		virtual void setValue( std::string v) = 0;
+		virtual void setValue( std::string v, bool verbose = true) = 0;
 		virtual std::string print() const =0;	
 		virtual ~UciOption(){}
 	protected:
@@ -115,7 +116,7 @@ private:
 	class StringUciOption final: public UciOption
 	{
 	public:
-		StringUciOption( std::string name, std::string& value, void (*callbackFunc)(std::string), const std::string defVal):UciOption(name),_defaultValue(defVal),_value(value), _callbackFunc(callbackFunc){ setValue(_defaultValue); }
+		StringUciOption( std::string name, std::string& value, void (*callbackFunc)(std::string), const std::string defVal):UciOption(name),_defaultValue(defVal),_value(value), _callbackFunc(callbackFunc){ setValue(_defaultValue, false); }
 		std::string print() const{
 			std::string s = "option name ";
 			s += _name;
@@ -123,14 +124,17 @@ private:
 			s += _defaultValue;
 			return s;
 		};	
-		void setValue( std::string s)
+		void setValue( std::string s, bool verbose = true)
 		{
 			_value = s;
 			if(_callbackFunc)
 			{
 				_callbackFunc(_value);
 			}
-			sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
+			if(verbose)
+			{
+				sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
+			}
 			
 	
 		}
@@ -151,7 +155,7 @@ private:
 			_value(value),
 			_callbackFunc(callbackFunc)
 		{ 
-			setValue( std::to_string(_defValue) );
+			setValue( std::to_string(_defValue), false );
 		}
 		std::string print() const{
 			std::string s = "option name ";
@@ -165,7 +169,7 @@ private:
 			return s;
 		};
 
-		void setValue( std::string s)
+		void setValue( std::string s, bool verbose = true)
 		{
 			int value;
 			try
@@ -185,7 +189,10 @@ private:
 			{
 				_callbackFunc(_value);
 			}
-			sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
+			if(verbose)
+			{
+				sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
+			}
 		}		
 	private:
 		const unsigned int _defValue;
@@ -201,7 +208,7 @@ private:
 	public:
 		CheckUciOption( std::string name, bool& value, const bool defVal):UciOption(name),_defaultValue(defVal), _value(value)
 		{
-			setValue( _defaultValue ? "true" : "false" );
+			setValue( _defaultValue ? "true" : "false", false );
 		}
 		std::string print() const{
 			std::string s = "option name ";
@@ -210,18 +217,24 @@ private:
 			s += ( _defaultValue ? "true" : "false" );
 			return s;
 		};	
-		void setValue( std::string s)
+		void setValue( std::string s, bool verbose = true)
 		{
 			if( s == "true" )
 			{
 				_value = true;
-				sync_cout<<"info string "<<_name<<" set to "<<s<<sync_endl;
+				if(verbose)
+				{
+					sync_cout<<"info string "<<_name<<" set to "<<s<<sync_endl;
+				}
 				
 			}
 			else if( s == "false" )
 			{
 				_value = false;
-				sync_cout<<"info string "<<_name<<" set to "<<s<<sync_endl;
+				if(verbose)
+				{
+					sync_cout<<"info string "<<_name<<" set to "<<s<<sync_endl;
+				}
 			}
 			else
 			{
@@ -243,7 +256,7 @@ private:
 			s += " type button";
 			return s;
 		};
-		void setValue( std::string ){if(_callbackFunc){_callbackFunc();}}
+		void setValue( std::string, bool verbose = true ){if(_callbackFunc){_callbackFunc();} (void)verbose;}
 	private:
 		void (*_callbackFunc)();
 	};
