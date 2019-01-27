@@ -108,6 +108,7 @@ private:
 		virtual bool setValue( std::string v, bool verbose = true) = 0;
 		virtual std::string print() const =0;
 		virtual ~UciOption(){}
+		bool operator==(const std::string& rhs){ return _name == rhs; }
 	protected:
 		UciOption( std::string name):_name(name){}	
 		const std::string _name;
@@ -273,7 +274,6 @@ private:
 	void _doPerft(const unsigned int n, Position & pos);
 	void _go(std::istringstream& is, Position & pos, my_thread & thr);
 	void _setoption(std::istringstream& is);
-	//void _setvalue(std::istringstream& is);
 };
 
 const char UciManager::impl::_PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
@@ -584,7 +584,6 @@ void UciManager::impl::_doPerft(const unsigned int n, Position & pos)
 
 void UciManager::impl::_go(std::istringstream& is, Position & pos, my_thread & thr)
 {
-	// todo manage parameters in a better way
 	SearchLimits limits;
 	std::string token;
 	bool searchMovesCommand = false;
@@ -665,94 +664,6 @@ void UciManager::impl::_setoption(std::istringstream& is)
 	}
 }
 
-/*
-void UciManager::impl::_setvalue(std::istringstream& is)
-{
-	// todo manage setValue with a list, remove from release builds
-	std::string token, name, value;
-
-	is >> name;
-
-	is >> value;
-
-	if(name =="KingAttackWeights0")
-	{
-		KingAttackWeights[0] = stoi(value);
-	}
-	else if(name =="KingAttackWeights1")
-	{
-		KingAttackWeights[1] = stoi(value);
-	}
-	else if(name =="KingAttackWeights2")
-	{
-		KingAttackWeights[2] = stoi(value);
-	}
-	else if(name =="KingAttackWeights3")
-	{
-		KingAttackWeights[3] = stoi(value);
-	}
-	else if(name =="kingShieldBonus")
-	{
-		kingShieldBonus[0] = stoi(value);
-	}
-	else if(name =="kingFarShieldBonus")
-	{
-		kingFarShieldBonus[0] = stoi(value);
-	}
-	else if(name =="kingStormBonus0")
-	{
-		kingStormBonus[0] = stoi(value);
-	}
-	else if(name =="kingStormBonus1")
-	{
-		kingStormBonus[1] = stoi(value);
-	}
-	else if(name =="kingStormBonus2")
-	{
-		kingStormBonus[2] = stoi(value);
-	}
-	else if(name =="kingSafetyBonus0")
-	{
-		kingSafetyBonus[0] = stoi(value);
-	}
-	else if(name =="kingSafetyBonus1")
-	{
-		kingSafetyBonus[1] = stoi(value);
-	}
-	else if(name =="kingSafetyPars10")
-	{
-		kingSafetyPars1[0] = stoi(value);
-	}
-	else if(name =="kingSafetyPars11")
-	{
-		kingSafetyPars1[1] = stoi(value);
-	}
-	else if(name =="kingSafetyPars12")
-	{
-		kingSafetyPars1[2] = stoi(value);
-	}
-	else if(name =="kingSafetyPars13")
-	{
-		kingSafetyPars1[3] = stoi(value);
-	}
-	else if(name =="kingSafetyPars20")
-	{
-		kingSafetyPars2[0] = stoi(value);
-	}
-	else if(name =="kingSafetyPars21")
-	{
-		kingSafetyPars2[1] = stoi(value);
-	}
-	else if(name =="kingSafetyPars22")
-	{
-		kingSafetyPars2[2] = stoi(value);
-	}
-	else if(name =="kingSafetyPars23")
-	{
-		kingSafetyPars2[3] = stoi(value);
-	}
-}*/
-
 
 /*	\brief manage the uci loop
 	\author Marco Belli
@@ -801,10 +712,6 @@ void UciManager::impl::uciLoop()
 		{
 			_setoption(is);
 		}
-		/*else if(token == "setvalue")
-		{
-			_setvalue(is);
-		}*/
 		else if (token == "eval")
 		{
 			Score s = pos.eval<true>();
