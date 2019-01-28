@@ -732,14 +732,14 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 		helperSearch[i-1].resetStopCondition();
 		helperSearch[i-1]._pos = _pos;
 		helperSearch[i-1]._pvLineFollower.setPVline(pvToBeFollowed);
-		helperThread.emplace_back( std::thread(&Search::impl::idLoop, &helperSearch[i-1], std::ref(helperResults), i, std::ref(toBeExcludedMove),depth, alpha, beta, false));
+		helperThread.emplace_back( std::thread(&Search::impl::idLoop, &helperSearch[i-1], std::ref(helperResults), i, std::ref(toBeExcludedMove), depth, alpha, beta, false));
 	}
 
 	//----------------------------------
 	// iterative deepening loop
 	//----------------------------------
 	helperResults[0].firstMove = m;
-	idLoop(helperResults, 0, toBeExcludedMove,depth, alpha, beta, true);
+	idLoop(helperResults, 0, toBeExcludedMove, depth, alpha, beta, true);
 	
 	// _stop helper threads
 	for(unsigned int i = 0; i< ( uciParameters::threads - 1); i++)
@@ -786,7 +786,7 @@ void Search::impl::_showCurrenLine( const unsigned int ply, const int depth )
 	if( _showLine && depth <= ONE_PLY)
 	{
 		_showLine = false;
-		_UOI->showCurrLine(_pos,ply);
+		_UOI->showCurrLine(_pos, ply);
 	}
 }
 
@@ -1024,7 +1024,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				transpositionTable::getInstance().store(posKey,
 					transpositionTable::scoreToTT(res.value, ply),
 					res.TTtype,
-					std::min(90, depth + 6 * ONE_PLY),
+					std::min( 100 * ONE_PLY , depth + 6 * ONE_PLY),
 					ttMove,
 					_pos.eval<false>());
 
