@@ -160,7 +160,7 @@ private:
 
 
 
-	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*78+cut*20000; }
+	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*(1248/ONE_PLY)+cut*20000; }
 
 	template<nodeType type>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
 	template<nodeType type>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
@@ -291,7 +291,7 @@ private:
 
 Score Search::impl::futility(int depth, bool improving )
 {
-	return 375 * depth - 2000 * improving;
+	return (6000/ONE_PLY) * depth - 2000 * improving;
 }
 Score Search::impl::futilityMargin[7] = {0};
 unsigned int Search::impl::FutilityMoveCounts[2][16]= {{0},{0}};
@@ -1179,7 +1179,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					_sd.story[ply].skipNullMove = true;
 					assert(depth - red >= ONE_PLY);
 					Score val;
-						val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
+					val = alphaBeta<childNodesType>(ply, depth - red, beta-1, beta, childPV);
 					_sd.story[ply].skipNullMove = false;
 					if (val >= beta)
 					{
