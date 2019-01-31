@@ -1366,8 +1366,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				continue;
 			}
 
-
-			if(newDepth < 7*ONE_PLY)
+			if(newDepth < 7 * ONE_PLY)
 			{
 				Score localEval = eval + futilityMargin[newDepth >> ONE_PLY_SHIFT];
 				if(localEval<beta)
@@ -1385,9 +1384,6 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			{
 				continue;
 			}
-
-
-
 		}
 
 		if(type == ROOT_NODE)
@@ -1415,11 +1411,11 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			{
 				if(newDepth < ONE_PLY)
 				{
-					val = -qsearch<nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
+					val = -qsearch<nodeType::PV_NODE>(ply + 1, newDepth, -beta, -alpha, childPV);
 				}
 				else
 				{
-					val = -alphaBeta<nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
+					val = -alphaBeta<nodeType::PV_NODE>(ply + 1, newDepth, -beta, -alpha, childPV);
 				}
 			}
 			else
@@ -1429,22 +1425,22 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				//	LMR
 				//------------------------------
 				bool doFullDepthSearch = true;
-				if( depth >= 3*ONE_PLY
+				if( depth >= 3 * ONE_PLY
 					&& (!captureOrPromotion || FutilityMoveCountFlag )
 					&& !isDangerous
 					&& m != ttMove
 					&& !mp.isKillerMove(m)
 				)
 				{
-					assert(moveNumber!=0);
+					assert(moveNumber != 0);
 
-					int reduction = PVreduction[improving][ std::min(depth, int(LmrLimit*ONE_PLY-1)) ][ std::min(moveNumber, (unsigned int)63) ];
+					int reduction = PVreduction[improving][ std::min(depth, int((LmrLimit * ONE_PLY) - 1)) ][ std::min(moveNumber, (unsigned int)63) ];
 					int d = std::max(newDepth - reduction, ONE_PLY);
 
 					if(reduction != 0)
 					{
-						val = -alphaBeta<nodeType::CUT_NODE>(ply+1, d, -alpha-1, -alpha, childPV);
-						if(val<=alpha)
+						val = -alphaBeta<nodeType::CUT_NODE>(ply + 1, d, -alpha - 1, -alpha, childPV);
+						if(val <= alpha)
 						{
 							doFullDepthSearch = false;
 						}
@@ -1455,24 +1451,24 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				if(doFullDepthSearch)
 				{
 
-					if(newDepth<ONE_PLY)
+					if(newDepth < ONE_PLY)
 					{
-						val = -qsearch<nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -qsearch<nodeType::CUT_NODE>(ply + 1, newDepth, -alpha - 1, -alpha, childPV);
 					}
 					else
 					{
-						val = -alphaBeta<nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -alphaBeta<nodeType::CUT_NODE>(ply + 1, newDepth, -alpha - 1, -alpha, childPV);
 					}
 
 					if( val > alpha && val < beta )
 					{
 						if( newDepth < ONE_PLY )
 						{
-							val = -qsearch<nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
+							val = -qsearch<nodeType::PV_NODE>(ply + 1, newDepth, -beta, -alpha, childPV);
 						}
 						else
 						{
-							val = -alphaBeta<nodeType::PV_NODE>(ply+1, newDepth, -beta, -alpha, childPV);
+							val = -alphaBeta<nodeType::PV_NODE>(ply + 1, newDepth, -beta, -alpha, childPV);
 						}
 					}
 				}
@@ -1485,19 +1481,19 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			//	LMR
 			//------------------------------
 			bool doFullDepthSearch = true;
-			if( depth >= 3*ONE_PLY
+			if( depth >= 3 * ONE_PLY
 				&& (!captureOrPromotion || FutilityMoveCountFlag )
 				&& !isDangerous
 				&& m != ttMove
 				&& !mp.isKillerMove(m)
 			)
 			{
-				int reduction = nonPVreduction[improving][std::min(depth, int(LmrLimit*ONE_PLY-1))][std::min(moveNumber, (unsigned int)63)];
+				int reduction = nonPVreduction[improving][std::min(depth, int((LmrLimit * ONE_PLY) - 1))][std::min(moveNumber, (unsigned int)63)];
 				int d = std::max(newDepth - reduction, ONE_PLY);
 
 				if(reduction != 0)
 				{
-					val = -alphaBeta<childNodesType>(ply+1, d, -alpha-1, -alpha, childPV);
+					val = -alphaBeta<childNodesType>(ply + 1, d, -alpha - 1, -alpha, childPV);
 					if(val <= alpha)
 					{
 						doFullDepthSearch = false;
@@ -1512,22 +1508,22 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				{
 					if(newDepth < ONE_PLY)
 					{
-						val = -qsearch<childNodesType>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -qsearch<childNodesType>(ply + 1, newDepth, -alpha - 1, -alpha, childPV);
 					}
 					else
 					{
-						val = -alphaBeta<childNodesType>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -alphaBeta<childNodesType>(ply + 1, newDepth, -alpha - 1, -alpha, childPV);
 					}
 				}
 				else
 				{
 					if(newDepth < ONE_PLY)
 					{
-						val = -qsearch<nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -qsearch<nodeType::CUT_NODE>(ply + 1, newDepth, -alpha - 1, -alpha, childPV);
 					}
 					else
 					{
-						val = -alphaBeta<nodeType::CUT_NODE>(ply+1, newDepth, -alpha-1, -alpha, childPV);
+						val = -alphaBeta<nodeType::CUT_NODE>(ply + 1, newDepth, -alpha - 1, -alpha, childPV);
 					}
 				}
 			}
@@ -1548,7 +1544,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					pvLine.appendNewPvLine( bestMove, childPV);
 					if(type == nodeType::ROOT_NODE && uciParameters::multiPVLines == 1 )
 					{
-						if(val < beta && depth > 1*ONE_PLY)
+						if(val < beta && depth > 1 * ONE_PLY)
 						{
 							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes());
 						}
@@ -1558,7 +1554,6 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 						}
 					}
 				}
-
 			}
 		}
 		
@@ -1612,8 +1607,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	}
 
 	// save killer move & update history
-	if (bestScore >= beta
-		&& !inCheck)
+	if (bestScore >= beta && !inCheck)
 	{
 		if (!_pos.isCaptureMoveOrPromotion(bestMove))
 		{
@@ -1621,11 +1615,11 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 
 			// update history
 			int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
-			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
+			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY * ONE_PLY);
 
 			_sd.history.update( _pos.isWhiteTurn() ? white: black, bestMove, bonus);
 
-			for (unsigned int i = 0; i < quietMoveCount; i++)
+			for (unsigned int i = 0; i < quietMoveCount; ++i)
 			{
 				Move m = quietMoveList[i];
 				_sd.history.update( _pos.isWhiteTurn() ? white: black, m, -bonus);
@@ -1639,7 +1633,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			{
 				// update capture history
 				int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
-				Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY*ONE_PLY);
+				Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY * ONE_PLY);
 
 				_sd.captureHistory.update( _pos.getPieceAt(bestMove.getFrom()), bestMove, _pos.getPieceAt(bestMove.getTo()), bonus);
 
@@ -1653,9 +1647,6 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				}
 			}
 		}
-		
-		
-
 	}
 	return bestScore;
 
@@ -1713,7 +1704,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	MovePicker mp(_pos, _sd, ply, ttMove);
 	
 	short int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
-	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(),ply);
+	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
 	if( _canUseTTeValue( PVnode, beta, ttValue, tte, TTdepth ) )
 	{
@@ -1734,11 +1725,10 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	ttType TTtype = typeScoreLowerThanAlpha;
 
 
-	Score staticEval = tte->getType()!=typeVoid ? tte->getStaticValue() : _pos.eval<false>();
+	Score staticEval = (tte->getType() != typeVoid) ? tte->getStaticValue() : _pos.eval<false>();
 #ifdef DEBUG_EVAL_SIMMETRY
 	testSimmetry(_pos);
 #endif
-
 
 	//----------------------------
 	//	stand pat score
@@ -1818,7 +1808,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 		if(!inCheck)
 		{
 			// allow only queen promotion at deeper search
-			if( (TTdepth <- 1*ONE_PLY) && ( m.isPromotionMove() ) && (m.getPromotionType() != Move::promQueen))
+			if( (TTdepth < -1 * ONE_PLY) && ( m.isPromotionMove() ) && (m.getPromotionType() != Move::promQueen))
 			{
 				continue;
 			}
@@ -1842,9 +1832,9 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 				{
 					bool moveGiveCheck = _pos.moveGivesCheck(m);
 					if(
-							!moveGiveCheck
-							&& !_pos.isPassedPawnMove(m)
-							&& abs(staticEval)<SCORE_KNOWN_WIN
+						!moveGiveCheck
+						&& !_pos.isPassedPawnMove(m)
+						&& abs(staticEval)<SCORE_KNOWN_WIN
 					)
 					{
 						Score futilityValue = futilityBase
@@ -1856,12 +1846,12 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 							futilityValue += Position::pieceValue[m.getPromotionType() + whiteQueens][1] - Position::pieceValue[whitePawns][1];
 						}
 
-
 						if (futilityValue < beta)
 						{
 							bestScore = std::max(bestScore, futilityValue);
 							continue;
 						}
+						
 						if (futilityBase < beta && _pos.seeSign(m) <= 0)
 						{
 							bestScore = std::max(bestScore, futilityBase);
@@ -1887,14 +1877,12 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 			}
 
 		}
+		
 		_pos.doMove(m);
-		Score val = -qsearch<childNodesType>(ply+1, depth-ONE_PLY, -beta, -alpha, childPV);
-
-
+		Score val = -qsearch<childNodesType>(ply+1, depth - ONE_PLY, -beta, -alpha, childPV);
 		_pos.undoMove();
 
-
-		if( val > bestScore)
+		if(val > bestScore)
 		{
 			bestScore = val;
 			if( bestScore > alpha )
@@ -1935,9 +1923,6 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	}
 
 	assert(bestScore != -SCORE_INFINITE);
-
-
-
 
 	if( !_stop )
 	{
