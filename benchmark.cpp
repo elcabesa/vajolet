@@ -45,42 +45,39 @@ static const std::vector<std::string> positions = {
   "3q2k1/pb3p1p/4pbp1/2r5/PpN2N2/1P2P2P/5PP1/Q2R2K1 b - - 4 26"
 };
 
-static std::string getNodesPerSecond( const unsigned long long nodeCount, const long long int time ) {
-	std::string s;
-	if( time == 0 )	{
-		s = "---";
+static std::string getNodesPerSecond(const unsigned long long nodeCount, const long long int time) {
+	if (time == 0) {
+		return "---";
 	} else {
-		s = std::to_string( 1000 * nodeCount / time );
+		return std::to_string(1000 * nodeCount / time);
 	}
-	return s;
 }
 
-void benchmark(void) {
-
-	transpositionTable::getInstance().setSize(32);
+void benchmark() {
 
 	unsigned long long nodeCount = 0;
-
+	int i = 0;
+	
+	//  initialize search parameters
+	transpositionTable::getInstance().setSize(32);
 	SearchTimer st;
 	SearchLimits sl;
 	sl.setDepth(15);
-
 	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
-	int i = 0;
 	
-	for( auto pos: positions )
-	{	
-		src.getPosition().setupFromFen( pos );
-		
+	
+	// iterate positions
+	for (auto pos: positions) {	
+		src.getPosition().setupFromFen(pos);
 		sync_cout << "Position: " << (++i) << '/' << positions.size() << sync_endl;
-		
 		src.startThinking();
-		
 		nodeCount += src.getVisitedNodes();
 	}
-
+	
+	// get total time
 	const long long int totalTime = st.getElapsedTime();
 
+	// print result
 	sync_cout << "\n==========================="
        << "\nTotal time (ms) : " << totalTime
        << "\nNodes searched  : " << nodeCount
