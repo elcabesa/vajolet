@@ -75,9 +75,9 @@ public:
 	~impl();
 	
 	void uciLoop();
-	char getPieceName( const bitboardIndex idx );
-	std::string displayUci( const Move& m );
-	std::string displayMove( const Position& pos, const Move& m );
+	static char getPieceName( const bitboardIndex idx );
+	static std::string displayUci( const Move& m );
+	static std::string displayMove( const Position& pos, const Move& m );
 	
 private:
 	/*! \brief array of char to create the fen string
@@ -270,10 +270,12 @@ private:
 	void _printNameAndVersionMessage(void);
 	void _printUciInfo(void);
 	Move _moveFromUci(const Position& pos,const  std::string& str);
-	void _position(std::istringstream& is, Position & pos);
-	void _doPerft(const unsigned int n, Position & pos);
-	void _go(std::istringstream& is, Position & pos, my_thread & thr);
+	void _position(std::istringstream& is);
+	void _doPerft(const unsigned int n);
+	void _go(std::istringstream& is);
 	void _setoption(std::istringstream& is);
+	
+	Position _pos;
 };
 
 const char UciManager::impl::_PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
@@ -295,6 +297,7 @@ UciManager::impl::impl()
 	_optionList.emplace_back( new ButtonUciOption("ClearHash", clearHash));
 	_optionList.emplace_back( new CheckUciOption("PerftUseHash", Position::perftUseHash, false));
 	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciStandardOutput::reduceVerbosity, false));
+	_pos.setupFromFen(_StartFEN);
 }
 
 UciManager::impl::~impl()
@@ -534,7 +537,7 @@ Move UciManager::impl::_moveFromUci(const Position& pos,const  std::string& str)
 	\version 1.0
 	\date 21/10/2013
 */
-void UciManager::impl::_position(std::istringstream& is, Position & pos)
+void UciManager::impl::_position(std::istringstream& is)
 {
 	std::string token, fen;
 	is >> token;
@@ -555,13 +558,13 @@ void UciManager::impl::_position(std::istringstream& is, Position & pos)
 		return;
 	}
 	// todo parse fen!! invalida fen shall be rejected and Vajolet shall not crash
-	pos.setupFromFen(fen);
+	_pos.setupFromFen(fen);
 
 	Move m;
 	// Parse move list (if any)
-	while( is >> token && (m = _moveFromUci(pos, token) ) )
+	while( is >> token && (m = _moveFromUci(_pos, token) ) )
 	{
-		pos.doMove(m);
+		_pos.doMove(m);
 	}
 }
 
@@ -570,11 +573,11 @@ void UciManager::impl::_position(std::istringstream& is, Position & pos)
 	\version 1.0
 	\date 08/11/2013
 */
-void UciManager::impl::_doPerft(const unsigned int n, Position & pos)
+void UciManager::impl::_doPerft(const unsigned int n)
 {
 	SearchTimer st;
 
-	unsigned long long res = pos.perft(n);
+	unsigned long long res = _pos.perft(n);
 
 	long long int totalTime = std::max( st.getElapsedTime(), 1ll) ;
 
@@ -582,7 +585,7 @@ void UciManager::impl::_doPerft(const unsigned int n, Position & pos)
 	sync_cout << totalTime << "ms " << ((double)res) / (double)totalTime << " kN/s" << sync_endl;
 }
 
-void UciManager::impl::_go(std::istringstream& is, Position & pos, my_thread & thr)
+void UciManager::impl::_go(std::istringstream& is)
 {
 	SearchLimits limits;
 	std::string token;
@@ -605,13 +608,13 @@ void UciManager::impl::_go(std::istringstream& is, Position & pos, my_thread & t
         else if (token == "ponder")		{ limits.setPonder(true);                           searchMovesCommand = false;}
         else if (searchMovesCommand == true)
         {
-			if( Move m = _moveFromUci(pos, token); m != Move::NOMOVE )
+			if( Move m = _moveFromUci(_pos, token); m != Move::NOMOVE )
 			{
 				limits.moveListInsert(m);
 			}
         }
     }
-    thr.startThinking( pos, limits );
+    my_thread::getInstance().startThinking( _pos, limits );
 }
 
 void UciManager::impl::_setoption(std::istringstream& is)
@@ -675,8 +678,7 @@ void UciManager::impl::uciLoop()
 	// todo manage command parsin with a list?
 	_printNameAndVersionMessage();
 	my_thread &thr = my_thread::getInstance();
-	Position pos;
-	pos.setupFromFen(_StartFEN);
+	
 	std::string token, cmd;
 
 	do
@@ -702,11 +704,11 @@ void UciManager::impl::uciLoop()
 		}
 		else if (token == "d")
 		{
-			pos.display();
+			_pos.display();
 		}
 		else if (token == "position")
 		{
-			_position(is,pos);
+			_position(is);
 		}
 		else if(token == "setoption")
 		{
@@ -714,9 +716,9 @@ void UciManager::impl::uciLoop()
 		}
 		else if (token == "eval")
 		{
-			Score s = pos.eval<true>();
+			Score s = _pos.eval<true>();
 			sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
-			sync_cout << "gamePhase:"  << pos.getGamePhase( pos.getActualState() )/65536.0*100 << "%" << sync_endl;
+			sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0*100 << "%" << sync_endl;
 
 		}
 		else if (token == "isready")
@@ -735,7 +737,7 @@ void UciManager::impl::uciLoop()
 				n = 1;
 			}
 			n = std::max(n,1);
-			_doPerft(n, pos);
+			_doPerft(n);
 		}
 		else if (token == "divide" && (is>>token))
 		{
@@ -749,12 +751,12 @@ void UciManager::impl::uciLoop()
 				n = 1;
 			}
 			
-			unsigned long long res = pos.divide(n);
+			unsigned long long res = _pos.divide(n);
 			sync_cout << "divide Res= " << res << sync_endl;
 		}
 		else if (token == "go")
 		{
-			_go(is, pos, thr);
+			_go(is);
 		}
 		else if (token == "bench")
 		{
@@ -778,9 +780,9 @@ UciManager::UciManager(): pimpl{std::make_unique<impl>()}{}
 UciManager::~UciManager() = default;
 
 void UciManager::uciLoop() { pimpl->uciLoop();}
-char UciManager::getPieceName( const bitboardIndex idx ) { return pimpl->getPieceName(idx);}
-std::string UciManager::displayUci( const Move& m ) { return  pimpl->displayUci(m);}
-std::string UciManager::displayMove( const Position& pos, const Move& m ) {  return pimpl->displayMove(pos, m);}
+char UciManager::getPieceName( const bitboardIndex idx ) { return impl::getPieceName(idx);}
+std::string UciManager::displayUci( const Move& m ) { return  impl::displayUci(m);}
+std::string UciManager::displayMove( const Position& pos, const Move& m ) {  return impl::displayMove(pos, m);}
 
 /*****************************
 uci standard output implementation
