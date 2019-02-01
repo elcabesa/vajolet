@@ -1972,8 +1972,10 @@ void Search::impl::initSearchParameters(void)
 	{
 		for (int mc = 1; mc < 64; ++mc)
 		{
-			double    PVRed = -1.5 + 0.33 * log(double(d)) * log(double(mc));
-			double nonPVRed = -1.2 + 0.37 * log(double(d)) * log(double(mc));
+			double dd = (16.0 * d) / ONE_PLY;
+			
+			double    PVRed = -1.5 + 0.33 * log(double(dd)) * log(double(mc));
+			double nonPVRed = -1.2 + 0.37 * log(double(dd)) * log(double(mc));
 
 			PVreduction[1][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
 			nonPVreduction[1][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
