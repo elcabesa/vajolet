@@ -18,10 +18,8 @@
 
 #include "command.h"
 #include "io.h"
-#include "movepicker.h"
 #include "parameters.h"
 #include "position.h"
-#include "transposition.h"
 #include "vajolet.h"
 
 /* PST data */
@@ -34,9 +32,6 @@ simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 eCastle Position::castleRightsMask[squareNumber];
 std::array<bitMap,9> Position::_castlePath;
-
-bool Position::perftUseHash = false;
-
 
 void Position::initPstValues(void)
 {
@@ -1152,92 +1147,6 @@ void Position::checkPosConsistency(int nn) const
 	}
 }
 #endif
-
-
-/*! \brief calculate the perft result
-	\author Marco Belli
-	\version 1.0
-	\date 08/11/2013
-*/
-unsigned long long Position::perft(unsigned int depth)
-{
-
-#define FAST_PERFT
-#ifndef FAST_PERFT
-	if (depth == 0) {
-		return 1;
-	}
-#endif
-	PerftTranspositionTable tt;
-	
-	unsigned long long tot;
-	if( perftUseHash && tt.retrieve(getKey(), depth, tot) )
-	{
-		return tot;
-	}
-	
-#ifdef FAST_PERFT
-	
-	if(depth==1)
-	{
-		return getNumberOfLegalMoves();
-	}
-#endif
-
-	tot = 0;
-	Move m;
-	MovePicker mp(*this);
-	while( ( m = mp.getNextMove() ) )
-	{
-		doMove(m);
-		tot += perft(depth - 1);
-		undoMove();
-	}
-	
-	if( perftUseHash )
-	{
-		tt.store( getKey(), depth, tot );
-	}
-	
-	return tot;
-
-}
-
-/*! \brief calculate the divide result
-	\author Marco Belli
-	\version 1.0
-	\date 08/11/2013
-*/
-unsigned long long Position::divide(unsigned int depth)
-{
-
-
-	MovePicker mp(*this);
-	unsigned long long tot = 0;
-	unsigned int mn=0;
-	Move m;
-	while ( ( m = mp.getNextMove() ) )
-	{
-		mn++;
-		doMove(m);
-		unsigned long long n= 1;
-		if( depth>1)
-		{
-			n= perft(depth - 1);
-		}
-		else
-		{
-			n= 1;
-		}
-		tot += n;
-		undoMove();
-		sync_cout<<mn<<") "<<UciManager::getInstance().displayMove(*this,m)<<": "<<n<<sync_endl;
-
-	}
-	return tot;
-
-}
-
 
 /*! \brief calculate the checking squares given the king position
 	\author Marco Belli

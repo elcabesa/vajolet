@@ -125,9 +125,6 @@ public:
 	const Position& setupFromFen(const std::string& fenStr);
 	const Position& setup(const std::string& code, const Color c);
 
-	unsigned long long perft(unsigned int depth);
-	unsigned long long divide(unsigned int depth);
-
 	void doNullMove();
 	void doMove(const Move &m);
 	void undoMove();
@@ -319,7 +316,6 @@ public:
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
-	static bool perftUseHash;
 	static simdScore pieceValue[lastBitboard];
 private:
 
