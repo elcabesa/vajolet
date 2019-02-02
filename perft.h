@@ -15,13 +15,22 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VERSION_H_
-#define VERSION_H_
+#ifndef PERFT_H_
+#define PERFT_H_
 
-#include <string>
+class Position;
 
-const std::string programName = "Vajolet2";
-const std::string version = "2.7.0";
-const std::string preRelease = "-PRE-52";
+class Perft
+{
+public:
+	static bool perftUseHash;
+	
+	Perft( Position & pos ): _pos(pos){}
+	unsigned long long perft(unsigned int depth);
+	unsigned long long divide(unsigned int depth);
 
-#endif
+private:
+	Position & _pos;
+};
+
+#endif /* PERFT_H_ */

@@ -25,6 +25,7 @@
 #include "io.h"
 #include "movepicker.h"
 #include "parameters.h"
+#include "perft.h"
 #include "position.h"
 #include "pvLine.h"
 #include "rootMove.h"
@@ -295,7 +296,7 @@ UciManager::impl::impl()
 	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, nullptr, 1, 1, 100));
 	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, true));
 	_optionList.emplace_back( new ButtonUciOption("ClearHash", clearHash));
-	_optionList.emplace_back( new CheckUciOption("PerftUseHash", Position::perftUseHash, false));
+	_optionList.emplace_back( new CheckUciOption("PerftUseHash", Perft::perftUseHash, false));
 	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciStandardOutput::reduceVerbosity, false));
 	_pos.setupFromFen(_StartFEN);
 }
@@ -576,8 +577,8 @@ void UciManager::impl::_position(std::istringstream& is)
 void UciManager::impl::_doPerft(const unsigned int n)
 {
 	SearchTimer st;
-
-	unsigned long long res = _pos.perft(n);
+	
+	unsigned long long res = Perft(_pos).perft(n);
 
 	long long int totalTime = std::max( st.getElapsedTime(), 1ll) ;
 
@@ -751,7 +752,7 @@ void UciManager::impl::uciLoop()
 				n = 1;
 			}
 			
-			unsigned long long res = _pos.divide(n);
+			unsigned long long res = Perft(_pos).divide(n);
 			sync_cout << "divide Res= " << res << sync_endl;
 		}
 		else if (token == "go")

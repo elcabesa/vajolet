@@ -1,5 +1,6 @@
 #include <vector>
 #include "gtest/gtest.h"
+#include "./../perft.h"
 #include "./../position.h"
 
 typedef struct _positions
@@ -27,7 +28,7 @@ TEST(PerftTest, perft) {
 		pos.setupFromFen(p.Fen); 
 		for( unsigned int i = 0; i < p.PerftValue.size(); i++)
 		{
-			EXPECT_EQ(pos.perft(i+1), p.PerftValue[i]);
+			EXPECT_EQ(Perft(pos).perft(i+1), p.PerftValue[i]);
 		}
 	}
 }
