@@ -296,7 +296,7 @@ UciManager::impl::impl()
 	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, nullptr, 1, 1, 100));
 	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, true));
 	_optionList.emplace_back( new ButtonUciOption("ClearHash", clearHash));
-	_optionList.emplace_back( new CheckUciOption("PerftUseHash", Position::perftUseHash, false));
+	_optionList.emplace_back( new CheckUciOption("PerftUseHash", Perft::perftUseHash, false));
 	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciStandardOutput::reduceVerbosity, false));
 	_pos.setupFromFen(_StartFEN);
 }
