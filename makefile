@@ -32,6 +32,7 @@ CPP_SRCS := \
 ./movegen.cpp \
 ./movepicker.cpp \
 ./parameters.cpp \
+./perft.cpp \
 ./position.cpp \
 ./search.cpp \
 ./searchData.cpp \
@@ -65,6 +66,7 @@ OBJS :=  \
 ./movegen.o \
 ./movepicker.o \
 ./parameters.o \
+./perft.o \
 ./position.o \
 ./search.o \
 ./searchData.o \
@@ -93,6 +95,7 @@ CPP_DEPS := \
 ./movegen.d \
 ./movepicker.d \
 ./parameters.d \
+./perft.d \
 ./position.d \
 ./search.d \
 ./searchData.d \
