@@ -42,9 +42,7 @@ static void init()
 	Movegen::initMovegenConstant();
 
 	Search::initSearchParameters();
-	transpositionTable::getInstance().setSize(1);
 	Position::initMaterialKeys();
-	tb_init(uciParameters::SyzygyPath.c_str());
 }
 
 static bool manageCommandLine( int argc, char* argv[] )
@@ -79,6 +77,6 @@ int main( int argc, char* argv[] )
 	//----------------------------------
 	//	main loop
 	//----------------------------------
-	uciLoop();
+	UciManager::getInstance().uciLoop();
 	return 0;
 }

@@ -56,7 +56,7 @@ public:
 
 			unsigned long long startNode = st.top();
 			unsigned long long endNode = nodeId;
-			ofs <<"\tN"<<std::to_string(startNode)<<" -> N"<<std::to_string(endNode)<<" [label=\""<< displayUci(m)<< "\"];"<<std::endl;
+			ofs <<"\tN"<<std::to_string(startNode)<<" -> N"<<std::to_string(endNode)<<" [label=\""<< UciManager::getInstance().displayUci(m)<< "\"];"<<std::endl;
 		}
 		st.push(nodeId);
 		nodeId++;

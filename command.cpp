@@ -37,21 +37,6 @@
 #include "vajolet.h"
 #include "version.h"
 
-
-
-//---------------------------------------------
-//	local global constant
-//---------------------------------------------
-const char PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
-
-
-const static std::string StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-/*! \brief array of char to create the fen string
-	\author Marco Belli
-	\version 1.0
-	\date 27/10/2013
-*/
-
 /*****************************
 uci concrete output definitions
 ******************************/
@@ -83,570 +68,248 @@ public:
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
 };
 
-
-//---------------------------------------------
-//	function implementation
-//---------------------------------------------
-
-char getPieceName( const bitboardIndex idx )
+class UciManager::impl
 {
-	assert( isValidPiece( idx ) || idx == empty);
-	return PIECE_NAMES_FEN[ idx ];
-}
-
-std::string getProgramNameAndVersion()
-{
-	std::string s = programName;
-	s += " ";
-	s += version;
-	s += preRelease;
-	return s;
-}
-
-/*	\brief print the start message
-	\author Marco Belli
-	\version 1.0
-	\date 21/10/2013
-*/
-void static printStartMessage(void)
-{
-	sync_cout << "id name " << getProgramNameAndVersion() << sync_endl;
-}
-
-/*	\brief print the uci reply
-	\author Marco Belli
-	\version 1.0
-	\date 21/10/2013
-*/
-void static printUciInfo(void)
-{
-	sync_cout << "id name " << getProgramNameAndVersion() << sync_endl;
-	sync_cout << "id author Marco Belli" << sync_endl;
-	sync_cout << "option name Hash type spin default 1 min 1 max 65535" << sync_endl;
-	sync_cout << "option name Threads type spin default 1 min 1 max 128" << sync_endl;
-	sync_cout << "option name MultiPV type spin default 1 min 1 max 500" << sync_endl;
-	sync_cout << "option name Ponder type check default true" << sync_endl;
-	sync_cout << "option name OwnBook type check default true" <<sync_endl;
-	sync_cout << "option name BestMoveBook type check default false"<<sync_endl;
-	sync_cout << "option name UCI_EngineAbout type string default " << getProgramNameAndVersion() << " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
-	sync_cout << "option name UCI_ShowCurrLine type check default false" << sync_endl;
-	sync_cout << "option name SyzygyPath type string default <empty>" << sync_endl;
-	sync_cout << "option name SyzygyProbeDepth type spin default 1 min 1 max 100" << sync_endl;
-	sync_cout << "option name Syzygy50MoveRule type check default true" << sync_endl;
-	sync_cout << "option name ClearHash type button" << sync_endl;
-	sync_cout << "option name PerftUseHash type check default false" << sync_endl;
-	sync_cout << "option name reduceVerbosity type check default false" << sync_endl;
-
-	sync_cout << "uciok" << sync_endl;
-}
-
-
-/*	\brief get an input string and convert it to a valid move;
-	\author Marco Belli
-	\version 1.0
-	\date 21/10/2013
-*/
-Move moveFromUci(const Position& pos,const  std::string& str)
-{
-
-	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
-	Move m;
-	MovePicker mp(pos);
-	while( ( m = mp.getNextMove() ) )
+public:
+	explicit impl();
+	~impl();
+	
+	void uciLoop();
+	static char getPieceName( const bitboardIndex idx );
+	static std::string displayUci( const Move& m );
+	static std::string displayMove( const Position& pos, const Move& m );
+	
+private:
+	/*! \brief array of char to create the fen string
+		\author Marco Belli
+		\version 1.0
+		\date 27/10/2013
+	*/
+	
+	static void setTTSize(unsigned int size)
 	{
-		if(str == displayUci(m))
+		unsigned long elements = transpositionTable::getInstance().setSize(size);
+		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
+	}
+	static void clearHash(){ transpositionTable::getInstance().clear(); }
+	static void setTTPath( std::string s ){ tb_init(s.c_str());}
+	std::string unusedVersion;
+	unsigned int unusedSize;
+	static const char _PIECE_NAMES_FEN[];
+	static const std::string _StartFEN;
+	
+	static char _printFileOf( const tSquare& sq ) { return char( 'a' + getFileOf( sq ) ); }
+	static char _printRankOf( const tSquare& sq ) { return char( '1' + getRankOf( sq ) ); }
+
+	
+	class UciOption
+	{
+	public:
+		virtual bool setValue( std::string v, bool verbose = true) = 0;
+		virtual std::string print() const =0;
+		virtual ~UciOption(){}
+		bool operator==(const std::string& rhs){ return _name == rhs; }
+	protected:
+		UciOption( std::string name):_name(name){}	
+		const std::string _name;
+	};
+
+	class StringUciOption final: public UciOption
+	{
+	public:
+		StringUciOption( std::string name, std::string& value, void (*callbackFunc)(std::string), const std::string defVal):UciOption(name),_defaultValue(defVal),_value(value), _callbackFunc(callbackFunc){ setValue(_defaultValue, false); }
+		std::string print() const{
+			std::string s = "option name ";
+			s += _name;
+			s += " type string default ";
+			s += _defaultValue;
+			return s;
+		};	
+		bool setValue( std::string s, bool verbose = true)
 		{
-			return m;
-		}
-	}
-	// move not found
-	return Move::NOMOVE;
-}
-
-
-/*	\brief handle position command
-	\author Marco Belli
-	\version 1.0
-	\date 21/10/2013
-*/
-void static position(std::istringstream& is, Position & pos)
-{
-	std::string token, fen;
-	is >> token;
-	if (token == "startpos")
-	{
-		fen = StartFEN;
-		is >> token; // Consume "moves" token if any
-	}
-	else if (token == "fen")
-	{
-		while (is >> token && token != "moves")
-		{
-			fen += token + " ";
-		}
-	}
-	else
-	{
-		return;
-	}
-
-	pos.setupFromFen(fen);
-
-	Move m;
-	// Parse move list (if any)
-	while( is >> token && (m = moveFromUci(pos, token) ) )
-	{
-		pos.doMove(m);
-	}
-}
-
-/*	\brief handle perft command
-	\author Marco Belli
-	\version 1.0
-	\date 08/11/2013
-*/
-void static doPerft(const unsigned int n, Position & pos)
-{
-
-	SearchTimer st;
-
-	unsigned long long res = pos.perft(n);
-
-	long long int totalTime = std::max( st.getElapsedTime(), 1ll) ;
-
-	sync_cout << "Perft " << n << " leaf nodes: " << res << sync_endl;
-	sync_cout << totalTime << "ms " << ((double)res) / (double)totalTime << " kN/s" << sync_endl;
-}
-
-
-void static go(std::istringstream& is, Position & pos, my_thread & thr)
-{
-	SearchLimits limits;
-	std::string token;
-	bool searchMovesCommand = false;
-
-
-    while (is >> token)
-    {
-        if (token == "searchmoves")		{searchMovesCommand = true;}
-        else if (token == "wtime")		{ long long int x; is >> x; limits.setWTime(x);     searchMovesCommand = false;}
-        else if (token == "btime")		{ long long int x; is >> x; limits.setBTime(x);     searchMovesCommand = false;}
-        else if (token == "winc")		{ long long int x; is >> x; limits.setWInc(x);      searchMovesCommand = false;}
-        else if (token == "binc")		{ long long int x; is >> x; limits.setBInc(x);      searchMovesCommand = false;}
-        else if (token == "movestogo")	{ long long int x; is >> x; limits.setMovesToGo(x); searchMovesCommand = false;}
-        else if (token == "depth")		{ int x;           is >> x; limits.setDepth(x);     searchMovesCommand = false;}
-        else if (token == "nodes")		{ unsigned int x;  is >> x; limits.setNodeLimit(x); searchMovesCommand = false;}
-        else if (token == "movetime")	{ long long int x; is >> x; limits.setMoveTime(x);  searchMovesCommand = false;}
-        else if (token == "mate")		{ long long int x; is >> x; limits.setMate(x);      searchMovesCommand = false;}
-        else if (token == "infinite")	{ limits.setInfiniteSearch();                       searchMovesCommand = false;}
-        else if (token == "ponder")		{ limits.setPonder(true);                           searchMovesCommand = false;}
-        else if (searchMovesCommand == true)
-        {
-			if( Move m = moveFromUci(pos, token); m != Move::NOMOVE )
+			_value = s;
+			if(_callbackFunc)
 			{
-				limits.moveListInsert(m);
+				_callbackFunc(_value);
 			}
-        }
-    }
-    thr.startThinking( pos, limits );
-}
+			if(verbose)
+			{
+				sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
+			}
+			return true;
+		}
+	private:
+		const std::string _defaultValue;
+		std::string& _value;
+		void (*_callbackFunc)(std::string);
+	};
 
+	class SpinUciOption final: public UciOption
+	{
+	public:
+		SpinUciOption( std::string name, unsigned int& value, void (*callbackFunc)(unsigned int), const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal):
+			UciOption(name),
+			_defValue(defVal),
+			_minValue(minVal),
+			_maxValue(maxVal),
+			_value(value),
+			_callbackFunc(callbackFunc)
+		{ 
+			setValue( std::to_string(_defValue), false );
+		}
+		std::string print() const{
+			std::string s = "option name ";
+			s += _name;
+			s += " type spin default ";
+			s += std::to_string(_defValue);
+			s += " min ";
+			s += std::to_string(_minValue);
+			s += " max ";
+			s += std::to_string(_maxValue);
+			return s;
+		};
 
-
-
-void setoption(std::istringstream& is)
-{
-	std::string token, name, value;
-
-	is >> token; // Consume "name" token
-	
-	if( token != "name" )
-	{
-		sync_cout << "info string malformed command"<< sync_endl;
-		return;
-		
-	}
-	
-
-	// Read option name (can contain spaces)
-	while (is >> token && token != "value")
-	{
-		name += std::string(" ", !name.empty()) + token;
-	}
-	// Read option value (can contain spaces)
-	while (is >> token)
-	{
-		value += std::string(" ", !value.empty()) + token;
-	}
-	
-	if( value.empty() && (name != "SyzygyPath" && name != "UCI_EngineAbout" && name != "ClearHash")) // sygyzy path is allowed to have an empty value
-	{
-		sync_cout << "info string malformed command"<< sync_endl;
-		return;
-		
-	}
-
-	if(name == "Hash")
-	{
-		int hash = 1;
-		try
+		bool setValue( std::string s, bool verbose = true)
 		{
-			hash = std::stoi(value);
-		}
-		catch(...)
-		{
-			hash = 1;
-		}
-		hash = std::min(hash,65535);
-		unsigned long elements = transpositionTable::getInstance().setSize(hash);
-		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<hash<<"MB)"<<sync_endl;
-
-	}
-	else if(name == "ClearHash")
-	{
-		transpositionTable::getInstance().clear();
-	}
-	else if(name == "PerftUseHash")
-	{
-		if(value=="true")
-		{
-			Position::perftUseHash = true;
-		}
-		else
-		{
-			Position::perftUseHash = false;
-		}
-	}
-	else if(name == "reduceVerbosity")
-	{
-		if(value=="true")
-		{
-			UciStandardOutput::reduceVerbosity = true;
-		}
-		else
-		{
-			UciStandardOutput::reduceVerbosity = false;
-		}
-	}
-	else if(name == "Threads")
-	{
-		try
-		{
-			int i = std::stoi(value);
-			uciParameters::threads = (i<=128)?(i>0?i:1):128;
-			sync_cout<<"info string Threads number set to "<<uciParameters::threads<<sync_endl;
-		}
-		catch(...){}
-	}
-	else if(name == "MultiPV")
-	{
-		try
-		{
-			int i = std::stoi(value);
-			uciParameters::multiPVLines = i<500 ? (i>0 ? i : 1) : 500;
-			sync_cout<<"info string MultiPv Lines set to "<<uciParameters::multiPVLines<<sync_endl;
-		}
-		catch(...){}	
-	}
-	else if(name == "OwnBook")
-	{
-		if(value=="true")
-		{
-			uciParameters::useOwnBook = true;
-			sync_cout<<"info string OwnBook option set to true"<<sync_endl;
-		}
-		else{
-			uciParameters::useOwnBook = false;
-			sync_cout<<"info string OwnBook option set to false"<<sync_endl;
-		}
-	}
-	else if(name == "BestMoveBook")
-	{
-		if(value == "true")
-		{
-			uciParameters::bestMoveBook = true;
-			sync_cout<<"info string BestMoveBook option set to true"<<sync_endl;
-		}
-		else
-		{
-			uciParameters::bestMoveBook = false;
-			sync_cout<<"info string BestMoveBook option set to false"<<sync_endl;
-		}
-	}
-	else if(name == "UCI_ShowCurrLine")
-	{
-		if(value == "true")
-		{
-			uciParameters::showCurrentLine = true;
-			sync_cout<<"info string UCI_ShowCurrLine option set to true"<<sync_endl;
-		}
-		else
-		{
-			uciParameters::showCurrentLine = false;
-			sync_cout<<"info string UCI_ShowCurrLine option set to false"<<sync_endl;
-		}
-	}
-	else if(name == "Ponder")
-	{
-		sync_cout<<"info string Ponder option set to "<<value<<sync_endl;
-	}
-	else if(name == "SyzygyPath")
-	{
-		uciParameters::SyzygyPath = value;
-		tb_init(uciParameters::SyzygyPath.c_str());
-		sync_cout<<"info string TB_LARGEST = "<<TB_LARGEST<<sync_endl;
-	}
-	else if(name == "SyzygyProbeDepth")
-	{
-		try
-		{
-			uciParameters::SyzygyProbeDepth = std::max(std::stoi(value),0) ;
-		}
-		catch(...)
-		{
-			uciParameters::SyzygyProbeDepth = 1;
-		}
-		sync_cout<<"info string SyzygyProbeDepth option set to "<<uciParameters::SyzygyProbeDepth<<sync_endl;
-	}
-	else if(name == "Syzygy50MoveRule")
-	{
-		if(value == "true")
-		{
-			uciParameters::Syzygy50MoveRule = true;
-			sync_cout<<"info string Syzygy50MoveRule option set to true"<<sync_endl;
-		}
-		else
-		{
-			uciParameters::Syzygy50MoveRule = false;
-			sync_cout<<"info string Syzygy50MoveRule option set to false"<<sync_endl;
-		}
-	}
-	else if(name == "UCI_EngineAbout")
-	{
-		sync_cout<< programName << " " << version << preRelease << " by Marco Belli (build date: " <<__DATE__ <<" "<< __TIME__<<")"<<sync_endl;
-	}
-	else
-	{
-		sync_cout << "info string No such option: " << name << sync_endl;
-	}
-
-}
-
-
-void setvalue(std::istringstream& is)
-{
-	std::string token, name, value;
-
-	is >> name;
-
-	is >> value;
-
-	if(name =="KingAttackWeights0")
-	{
-		KingAttackWeights[0] = stoi(value);
-	}
-	else if(name =="KingAttackWeights1")
-	{
-		KingAttackWeights[1] = stoi(value);
-	}
-	else if(name =="KingAttackWeights2")
-	{
-		KingAttackWeights[2] = stoi(value);
-	}
-	else if(name =="KingAttackWeights3")
-	{
-		KingAttackWeights[3] = stoi(value);
-	}
-	else if(name =="kingShieldBonus")
-	{
-		kingShieldBonus[0] = stoi(value);
-	}
-	else if(name =="kingFarShieldBonus")
-	{
-		kingFarShieldBonus[0] = stoi(value);
-	}
-	else if(name =="kingStormBonus0")
-	{
-		kingStormBonus[0] = stoi(value);
-	}
-	else if(name =="kingStormBonus1")
-	{
-		kingStormBonus[1] = stoi(value);
-	}
-	else if(name =="kingStormBonus2")
-	{
-		kingStormBonus[2] = stoi(value);
-	}
-	else if(name =="kingSafetyBonus0")
-	{
-		kingSafetyBonus[0] = stoi(value);
-	}
-	else if(name =="kingSafetyBonus1")
-	{
-		kingSafetyBonus[1] = stoi(value);
-	}
-	else if(name =="kingSafetyPars10")
-	{
-		kingSafetyPars1[0] = stoi(value);
-	}
-	else if(name =="kingSafetyPars11")
-	{
-		kingSafetyPars1[1] = stoi(value);
-	}
-	else if(name =="kingSafetyPars12")
-	{
-		kingSafetyPars1[2] = stoi(value);
-	}
-	else if(name =="kingSafetyPars13")
-	{
-		kingSafetyPars1[3] = stoi(value);
-	}
-	else if(name =="kingSafetyPars20")
-	{
-		kingSafetyPars2[0] = stoi(value);
-	}
-	else if(name =="kingSafetyPars21")
-	{
-		kingSafetyPars2[1] = stoi(value);
-	}
-	else if(name =="kingSafetyPars22")
-	{
-		kingSafetyPars2[2] = stoi(value);
-	}
-	else if(name =="kingSafetyPars23")
-	{
-		kingSafetyPars2[3] = stoi(value);
-	}
-}
-
-
-/*	\brief manage the uci loop
-	\author Marco Belli
-	\version 1.0
-	\date 21/10/2013
-*/
-void uciLoop()
-{
-	printStartMessage();
-	my_thread &thr = my_thread::getInstance();
-	Position pos;
-	pos.setupFromFen(StartFEN);
-	std::string token, cmd;
-
-	do
-	{
-		if (!std::getline(std::cin, cmd)) // Block here waiting for input
-			cmd = "quit";
-		std::istringstream is(cmd);
-
-		token.clear();
-		is >> std::skipws >> token;
-
-
-		if(token== "uci")
-		{
-			printUciInfo();
-		}
-		else if (token == "quit" || token == "stop")
-		{
-			thr.stopThinking();
-		}
-		else if (token == "ucinewgame")
-		{
-		}
-		else if (token == "d")
-		{
-			pos.display();
-		}
-		else if (token == "position")
-		{
-			position(is,pos);
-		}
-		else if(token == "setoption")
-		{
-			setoption(is);
-		}
-		else if(token == "setvalue")
-		{
-			setvalue(is);
-		}
-		else if (token == "eval")
-		{
-			Score s = pos.eval<true>();
-			sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
-			sync_cout << "gamePhase:"  << pos.getGamePhase( pos.getActualState() )/65536.0*100 << "%" << sync_endl;
-
-		}
-		else if (token == "isready")
-		{
-			sync_cout << "readyok" << sync_endl;
-		}
-		else if (token == "perft" && (is>>token))
-		{
-			int n = 1;
+			int value;
 			try
 			{
-				n = std::stoi(token);
+				value = std::stoi(s);
 			}
 			catch(...)
 			{
-				n = 1;
+				return false;
 			}
-			n = std::max(n,1);
-			doPerft(n, pos);
-		}
-		else if (token == "divide" && (is>>token))
-		{
-			int n = 1;
-			try
-			{
-				n = std::stoi(token);
-			}
-			catch(...)
-			{
-				n = 1;
-			}
+			if( value < (int)_minValue ) { value = _minValue; }
+			if( value > (int)_maxValue ) { value = _maxValue; }
 			
-			unsigned long long res = pos.divide(n);
-			sync_cout << "divide Res= " << res << sync_endl;
-		}
-		else if (token == "go")
-		{
-			go(is, pos, thr);
-		}
-		else if (token == "bench")
-		{
-			benchmark();
-		}
-		else if (token == "ponderhit")
-		{
-			thr.ponderHit();
-		}
-		else
-		{
-			sync_cout << "unknown command" << sync_endl;
-		}
-	}while(token!="quit");
-}
+			_value = value;
+			
+			if( _callbackFunc )
+			{
+				_callbackFunc(_value);
+			}
+			if(verbose)
+			{
+				sync_cout<<"info string "<<_name<<" set to "<<_value<<sync_endl;
+			}
+			return true;
+		}		
+	private:
+		const unsigned int _defValue;
+		const unsigned int _minValue;
+		const unsigned int _maxValue;
+		unsigned int & _value;
+		void (*_callbackFunc)(unsigned int);
+		
+	};
 
-char printFileOf( const tSquare& sq )
+	class CheckUciOption final: public UciOption
+	{
+	public:
+		CheckUciOption( std::string name, bool& value, const bool defVal):UciOption(name),_defaultValue(defVal), _value(value)
+		{
+			setValue( _defaultValue ? "true" : "false", false );
+		}
+		std::string print() const{
+			std::string s = "option name ";
+			s += _name;
+			s += " type check default ";
+			s += ( _defaultValue ? "true" : "false" );
+			return s;
+		};	
+		bool setValue( std::string s, bool verbose = true)
+		{
+			if( s == "true" )
+			{
+				_value = true;
+				if(verbose)
+				{
+					sync_cout<<"info string "<<_name<<" set to "<<s<<sync_endl;
+				}
+				
+			}
+			else if( s == "false" )
+			{
+				_value = false;
+				if(verbose)
+				{
+					sync_cout<<"info string "<<_name<<" set to "<<s<<sync_endl;
+				}
+			}
+			else
+			{
+				sync_cout<<"info string error setting "<<_name<<sync_endl;
+				return false;
+			}
+			return true;
+		}
+	private:
+		const bool _defaultValue;
+		bool& _value;
+	};
+
+	class ButtonUciOption final: public UciOption
+	{
+	public:
+		ButtonUciOption( std::string name, void (*callbackFunc)()):UciOption(name), _callbackFunc(callbackFunc){}
+		std::string print() const{
+			std::string s = "option name ";
+			s += _name;
+			s += " type button";
+			return s;
+		};
+		bool setValue( std::string, bool verbose = true ){if(_callbackFunc){_callbackFunc();} (void)verbose; return true;}
+	private:
+		void (*_callbackFunc)();
+	};
+	
+	std::list<std::unique_ptr<UciOption>> _optionList;
+	
+	std::string _getProgramNameAndVersion();
+	void _printNameAndVersionMessage(void);
+	void _printUciInfo(void);
+	Move _moveFromUci(const Position& pos,const  std::string& str);
+	void _position(std::istringstream& is);
+	void _doPerft(const unsigned int n);
+	void _go(std::istringstream& is);
+	void _setoption(std::istringstream& is);
+	
+	Position _pos;
+};
+
+const char UciManager::impl::_PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
+const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+UciManager::impl::impl()
 {
-	return char( 'a' + getFileOf( sq ) );
+	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, setTTSize, 1, 1, 65535));
+	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, nullptr, 1, 1, 128));
+	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, nullptr, 1, 1, 500));
+	_optionList.emplace_back( new CheckUciOption("Ponder", uciParameters::Ponder, true));
+	_optionList.emplace_back( new CheckUciOption("OwnBook", uciParameters::useOwnBook, true));
+	_optionList.emplace_back( new CheckUciOption("BestMoveBook", uciParameters::bestMoveBook, false));
+	_optionList.emplace_back( new StringUciOption("UCI_EngineAbout", unusedVersion, nullptr, _getProgramNameAndVersion() + " by Marco Belli (build date: " + __DATE__ + " " + __TIME__ + ")"));
+	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", uciParameters::showCurrentLine, false));
+	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath, setTTPath, "<empty>"));
+	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, nullptr, 1, 1, 100));
+	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, true));
+	_optionList.emplace_back( new ButtonUciOption("ClearHash", clearHash));
+	_optionList.emplace_back( new CheckUciOption("PerftUseHash", Position::perftUseHash, false));
+	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciStandardOutput::reduceVerbosity, false));
+	_pos.setupFromFen(_StartFEN);
 }
 
-char printRankOf( const tSquare& sq )
+UciManager::impl::~impl()
+{}
+
+char UciManager::impl::getPieceName( const bitboardIndex idx ){
+	assert( isValidPiece( idx ) || idx == empty);
+	return _PIECE_NAMES_FEN[ idx ];
+}
+
+std::string UciManager::impl::displayUci( const Move& m )
 {
-	return char( '1' + getRankOf( sq ) );
-}
-
-/*! \brief return the uci string for a given move
-	\author Marco Belli
-	\version 1.0
-	\date 08/11/2013
-*/
-std::string displayUci(const Move & m){
-
-
 	std::string s;
 
 	if( !m )
@@ -656,52 +319,45 @@ std::string displayUci(const Move & m){
 	}
 
 	//from
-	s += printFileOf( m.getFrom() );
-	s += printRankOf( m.getFrom() );
+	s += _printFileOf( m.getFrom() );
+	s += _printRankOf( m.getFrom() );
 
 
 	//to
-	s += printFileOf( m.getTo() );
-	s += printRankOf( m.getTo() );
+	s += _printFileOf( m.getTo() );
+	s += _printRankOf( m.getTo() );
 	//promotion
 	if( m.isPromotionMove() )
 	{
 		s += tolower( getPieceName( m.getPromotedPiece() ) );
 	}
 	return s;
-
 }
 
-/*! \brief return the uci string for a given move
-	\author Marco Belli
-	\version 1.0
-	\date 08/11/2013
-*/
-std::string displayMove(const Position& pos, const Move & m)
+std::string UciManager::impl::displayMove( const Position& pos, const Move& m )
 {
-
 	std::string s;
 
-	bool capture = pos.isCaptureMove(m);
-	bool check = pos.moveGivesCheck(m);
-	bool doubleCheck = pos.moveGivesDoubleCheck(m);
-	unsigned int legalMoves;
-	bitboardIndex piece = pos.getPieceAt( m.getFrom() );
-	bool pawnMove = isPawn(piece);
-	bool isPromotion = m.isPromotionMove();
-	bool isEnPassant = m.isEnPassantMove();
-	bool isCastle = m.isCastleMove();
+	const bool capture = pos.isCaptureMove(m);
+	const bool check = pos.moveGivesCheck(m);
+	const bool doubleCheck = pos.moveGivesDoubleCheck(m);
+	unsigned int legalReplies;
+	const bitboardIndex piece = pos.getPieceAt( m.getFrom() );
+	const bool pawnMove = isPawn(piece);
+	const bool isPromotion = m.isPromotionMove();
+	const bool isEnPassant = m.isEnPassantMove();
+	const bool isCastle = m.isCastleMove();
 
 	bool disambigusFlag = false;
 	bool fileFlag = false;
 	bool rankFlag = false;
 
 
-	// calc legalmoves
+	// calc legal reply to this move
 	{
 		Position p(pos);
 		p.doMove(m);
-		legalMoves = p.getNumberOfLegalMoves();
+		legalReplies = p.getNumberOfLegalMoves();
 		p.undoMove();
 	}
 
@@ -758,11 +414,11 @@ std::string displayMove(const Position& pos, const Move & m)
 	}
 	if( fileFlag )
 	{
-		s += printFileOf( m.getFrom() );
+		s += _printFileOf( m.getFrom() );
 	}
 	if( rankFlag )
 	{
-		s += printRankOf( m.getFrom() );
+		s += _printRankOf( m.getFrom() );
 	}
 
 
@@ -771,14 +427,14 @@ std::string displayMove(const Position& pos, const Move & m)
 	{
 		if(pawnMove)
 		{
-			s += printFileOf( m.getFrom() );
+			s += _printFileOf( m.getFrom() );
 		}
 		// capture add x before to square
 		s+="x";
 	}
 	// to square
-	s += printFileOf( m.getTo() );
-	s += printRankOf( m.getTo() );
+	s += _printFileOf( m.getTo() );
+	s += _printRankOf( m.getTo() );
 	// add en passant info
 	if ( isEnPassant )
 	{
@@ -791,9 +447,9 @@ std::string displayMove(const Position& pos, const Move & m)
 		s +=  getPieceName( m.getPromotedPiece() );
 	}
 	// add check information
-	if( check  )
+	if( check )
 	{
-		if( legalMoves > 0 )
+		if( legalReplies > 0 )
 		{
 			if( doubleCheck )
 			{
@@ -810,10 +466,323 @@ std::string displayMove(const Position& pos, const Move & m)
 		}
 	}
 	return s;
-
 }
 
 
+
+
+//---------------------------------------------
+//	function implementation
+//---------------------------------------------
+
+
+std::string UciManager::impl::_getProgramNameAndVersion()
+{
+	std::string s = programName;
+	s += " ";
+	s += version;
+	s += preRelease;
+	return s;
+}
+
+/*	\brief print the start message
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
+void UciManager::impl::_printNameAndVersionMessage(void)
+{
+	sync_cout << "id name " << _getProgramNameAndVersion() << sync_endl;
+}
+
+/*	\brief print the uci reply
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
+void UciManager::impl::_printUciInfo(void)
+{
+	_printNameAndVersionMessage();
+	sync_cout << "id author Marco Belli" << sync_endl;
+	for( const auto& opt: _optionList ) sync_cout << opt->print()<<sync_endl;
+	sync_cout << "uciok" << sync_endl;
+}
+
+
+/*	\brief get an input string and convert it to a valid move;
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
+Move UciManager::impl::_moveFromUci(const Position& pos,const  std::string& str)
+{
+
+	// idea from stockfish, we generate all the legal moves and return the legal moves with the same UCI string
+	Move m;
+	MovePicker mp(pos);
+	while( ( m = mp.getNextMove() ) )
+	{
+		if(str == displayUci(m))
+		{
+			return m;
+		}
+	}
+	// move not found
+	return Move::NOMOVE;
+}
+
+
+/*	\brief handle position command
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
+void UciManager::impl::_position(std::istringstream& is)
+{
+	std::string token, fen;
+	is >> token;
+	if (token == "startpos")
+	{
+		fen = _StartFEN;
+		is >> token; // Consume "moves" token if any
+	}
+	else if (token == "fen")
+	{
+		while (is >> token && token != "moves")
+		{
+			fen += token + " ";
+		}
+	}
+	else
+	{
+		return;
+	}
+	// todo parse fen!! invalida fen shall be rejected and Vajolet shall not crash
+	_pos.setupFromFen(fen);
+
+	Move m;
+	// Parse move list (if any)
+	while( is >> token && (m = _moveFromUci(_pos, token) ) )
+	{
+		_pos.doMove(m);
+	}
+}
+
+/*	\brief handle perft command
+	\author Marco Belli
+	\version 1.0
+	\date 08/11/2013
+*/
+void UciManager::impl::_doPerft(const unsigned int n)
+{
+	SearchTimer st;
+
+	unsigned long long res = _pos.perft(n);
+
+	long long int totalTime = std::max( st.getElapsedTime(), 1ll) ;
+
+	sync_cout << "Perft " << n << " leaf nodes: " << res << sync_endl;
+	sync_cout << totalTime << "ms " << ((double)res) / (double)totalTime << " kN/s" << sync_endl;
+}
+
+void UciManager::impl::_go(std::istringstream& is)
+{
+	SearchLimits limits;
+	std::string token;
+	bool searchMovesCommand = false;
+
+
+    while (is >> token)
+    {
+        if (token == "searchmoves")		{searchMovesCommand = true;}
+        else if (token == "wtime")		{ long long int x; is >> x; limits.setWTime(x);     searchMovesCommand = false;}
+        else if (token == "btime")		{ long long int x; is >> x; limits.setBTime(x);     searchMovesCommand = false;}
+        else if (token == "winc")		{ long long int x; is >> x; limits.setWInc(x);      searchMovesCommand = false;}
+        else if (token == "binc")		{ long long int x; is >> x; limits.setBInc(x);      searchMovesCommand = false;}
+        else if (token == "movestogo")	{ long long int x; is >> x; limits.setMovesToGo(x); searchMovesCommand = false;}
+        else if (token == "depth")		{ int x;           is >> x; limits.setDepth(x);     searchMovesCommand = false;}
+        else if (token == "nodes")		{ unsigned int x;  is >> x; limits.setNodeLimit(x); searchMovesCommand = false;}
+        else if (token == "movetime")	{ long long int x; is >> x; limits.setMoveTime(x);  searchMovesCommand = false;}
+        else if (token == "mate")		{ long long int x; is >> x; limits.setMate(x);      searchMovesCommand = false;}
+        else if (token == "infinite")	{ limits.setInfiniteSearch();                       searchMovesCommand = false;}
+        else if (token == "ponder")		{ limits.setPonder(true);                           searchMovesCommand = false;}
+        else if (searchMovesCommand == true)
+        {
+			if( Move m = _moveFromUci(_pos, token); m != Move::NOMOVE )
+			{
+				limits.moveListInsert(m);
+			}
+        }
+    }
+    my_thread::getInstance().startThinking( _pos, limits );
+}
+
+void UciManager::impl::_setoption(std::istringstream& is)
+{
+	std::string token, name, value;
+
+	///////////////////////////////////////////////
+	// PARSE INPUT
+	///////////////////////////////////////////////
+	is >> token; // Consume "name" token
+	
+	if( token != "name" )
+	{
+		sync_cout << "info string malformed command"<< sync_endl;
+		return;
+	}
+	
+	// Read option name (can contain spaces)
+	while (is >> token && token != "value")
+	{
+		name += std::string(" ", !name.empty()) + token;
+	}
+	// Read option value (can contain spaces)
+	while (is >> token)
+	{
+		value += std::string(" ", !value.empty()) + token;
+	}
+	
+	///////////////////////////////////////////////
+	// FIND OPTION
+	///////////////////////////////////////////////
+	
+	// find the  in the list
+	auto it = std::find_if(_optionList.begin(), _optionList.end(), [&](std::unique_ptr<UciOption>& p) { return *p == name;});
+	if( it == _optionList.end() )
+	{
+		sync_cout << "info string No such option: " << name << sync_endl;
+		return;
+	}
+	
+	///////////////////////////////////////////////
+	// EXECUTE ACTION
+	///////////////////////////////////////////////
+	
+	auto &op = *it;
+	if( !op->setValue(value) )
+	{
+		sync_cout << "info string malformed command"<< sync_endl;
+		return;
+	}
+}
+
+
+/*	\brief manage the uci loop
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
+void UciManager::impl::uciLoop()
+{
+	// todo manage command parsin with a list?
+	_printNameAndVersionMessage();
+	my_thread &thr = my_thread::getInstance();
+	
+	std::string token, cmd;
+
+	do
+	{
+		if (!std::getline(std::cin, cmd)) // Block here waiting for input
+			cmd = "quit";
+		std::istringstream is(cmd);
+
+		token.clear();
+		is >> std::skipws >> token;
+
+
+		if(token== "uci")
+		{
+			_printUciInfo();
+		}
+		else if (token == "quit" || token == "stop")
+		{
+			thr.stopThinking();
+		}
+		else if (token == "ucinewgame")
+		{
+		}
+		else if (token == "d")
+		{
+			_pos.display();
+		}
+		else if (token == "position")
+		{
+			_position(is);
+		}
+		else if(token == "setoption")
+		{
+			_setoption(is);
+		}
+		else if (token == "eval")
+		{
+			Score s = _pos.eval<true>();
+			sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
+			sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0*100 << "%" << sync_endl;
+
+		}
+		else if (token == "isready")
+		{
+			sync_cout << "readyok" << sync_endl;
+		}
+		else if (token == "perft" && (is>>token))
+		{
+			int n = 1;
+			try
+			{
+				n = std::stoi(token);
+			}
+			catch(...)
+			{
+				n = 1;
+			}
+			n = std::max(n,1);
+			_doPerft(n);
+		}
+		else if (token == "divide" && (is>>token))
+		{
+			int n = 1;
+			try
+			{
+				n = std::stoi(token);
+			}
+			catch(...)
+			{
+				n = 1;
+			}
+			
+			unsigned long long res = _pos.divide(n);
+			sync_cout << "divide Res= " << res << sync_endl;
+		}
+		else if (token == "go")
+		{
+			_go(is);
+		}
+		else if (token == "bench")
+		{
+			benchmark();
+		}
+		else if (token == "ponderhit")
+		{
+			thr.ponderHit();
+		}
+		else
+		{
+			sync_cout << "unknown command" << sync_endl;
+		}
+	}while(token!="quit");
+}
+
+
+
+UciManager::UciManager(): pimpl{std::make_unique<impl>()}{}
+
+UciManager::~UciManager() = default;
+
+void UciManager::uciLoop() { pimpl->uciLoop();}
+char UciManager::getPieceName( const bitboardIndex idx ) { return impl::getPieceName(idx);}
+std::string UciManager::displayUci( const Move& m ) { return  impl::displayUci(m);}
+std::string UciManager::displayMove( const Position& pos, const Move& m ) {  return impl::displayMove(pos, m);}
 
 /*****************************
 uci standard output implementation
@@ -857,13 +826,13 @@ void UciStandardOutput::printPV(const Score res, const unsigned int seldepth, co
 #endif
 
 	std::cout << " pv ";
-	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<displayUci(m)<<" ";});
+	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<UciManager::getInstance().displayUci(m)<<" ";});
 	std::cout<<sync_endl;
 }
 
 void UciStandardOutput::printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const
 {
-	sync_cout << "info currmovenumber " << moveNumber << " currmove " << displayUci(m) << " nodes " << visitedNodes <<
+	sync_cout << "info currmovenumber " << moveNumber << " currmove " << UciManager::getInstance().displayUci(m) << " nodes " << visitedNodes <<
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			" time " << time <<
 #endif
@@ -877,7 +846,7 @@ void UciStandardOutput::showCurrLine(const Position & pos, const unsigned int pl
 
 	for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
 	{
-		std::cout << " " << displayUci(pos.getState(i).getCurrentMove());
+		std::cout << " " << UciManager::getInstance().displayUci(pos.getState(i).getCurrentMove());
 	}
 	std::cout << sync_endl;
 
@@ -894,10 +863,10 @@ void UciStandardOutput::printScore(const signed int cp) const
 
 void UciStandardOutput::printBestMove( const Move bm, const Move& ponder ) const
 {
-	sync_cout<<"bestmove "<< displayUci(bm);
+	sync_cout<<"bestmove "<< UciManager::getInstance().displayUci(bm);
 	if( ponder )
 	{
-		std::cout<<" ponder " << displayUci(ponder);
+		std::cout<<" ponder " << UciManager::getInstance().displayUci(ponder);
 	}
 	std::cout<< sync_endl;
 }

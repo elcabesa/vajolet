@@ -37,12 +37,31 @@ class PVline;
 //--------------------------------------------------------------------
 //	function prototype
 //--------------------------------------------------------------------
-void uciLoop(void);
-char getPieceName( const bitboardIndex idx );
-std::string displayUci( const Move& m );
-std::string displayMove( const Position& pos, const Move& m );
+class UciManager
+{
+private:
+	explicit UciManager();
+	~UciManager();
+	UciManager(const UciManager&) = delete;
+	UciManager& operator=(const UciManager&) = delete;
+	UciManager(const UciManager&&) = delete;
+	UciManager& operator=(const UciManager&&) = delete;
+	
+	class impl;
+	std::unique_ptr<impl> pimpl;
+public:
 
-
+	static UciManager& getInstance()
+	{
+		static UciManager instance; // Guaranteed to be destroyed.
+		// Instantiated on first use.
+		return instance;
+	}
+	void uciLoop(void);
+	char getPieceName( const bitboardIndex idx );
+	std::string displayUci( const Move& m );
+	std::string displayMove( const Position& pos, const Move& m );
+};
 
 /******************************************
 UCI output library

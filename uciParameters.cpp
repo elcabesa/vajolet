@@ -24,5 +24,6 @@ bool uciParameters::showCurrentLine = false;
 std::string uciParameters::SyzygyPath = "<empty>";
 unsigned int uciParameters::SyzygyProbeDepth = 1;
 bool uciParameters::Syzygy50MoveRule =  true;
+bool uciParameters::Ponder;
 
 
