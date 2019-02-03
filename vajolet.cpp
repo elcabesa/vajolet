@@ -15,6 +15,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <csignal>
 #include <iostream>
 
 #include "benchmark.h"
@@ -26,8 +27,17 @@
 #include "syzygy/tbprobe.h"
 
 
+void signalHandler(int signum)
+{
+	exit(signum);
+}
+
 static void init()
 {
+	
+	signal(SIGINT, signalHandler);  
+	signal(SIGBREAK, signalHandler);  
+	//signal(SIGHUP, signalHandler);  
 	//----------------------------------
 	//	init global data
 	//----------------------------------
@@ -40,7 +50,6 @@ static void init()
 	Position::initScoreValues();
 	Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();
-
 	Search::initSearchParameters();
 	Position::initMaterialKeys();
 }
