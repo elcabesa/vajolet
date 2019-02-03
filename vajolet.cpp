@@ -35,9 +35,13 @@ void signalHandler(int signum)
 static void init()
 {
 	
-	signal(SIGINT, signalHandler);  
-	signal(SIGBREAK, signalHandler);  
-	//signal(SIGHUP, signalHandler);  
+	signal(SIGINT, signalHandler); 
+#ifdef SIGBREAK	
+	signal(SIGBREAK, signalHandler); 
+#endif
+#ifdef SIGHUP		
+	signal(SIGHUP, signalHandler);  
+#endif
 	//----------------------------------
 	//	init global data
 	//----------------------------------
