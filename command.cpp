@@ -827,13 +827,13 @@ void UciStandardOutput::printPV(const Score res, const unsigned int seldepth, co
 #endif
 
 	std::cout << " pv ";
-	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<UciManager::getInstance().displayUci(m)<<" ";});
+	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<UciManager::displayUci(m)<<" ";});
 	std::cout<<sync_endl;
 }
 
 void UciStandardOutput::printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const
 {
-	sync_cout << "info currmovenumber " << moveNumber << " currmove " << UciManager::getInstance().displayUci(m) << " nodes " << visitedNodes <<
+	sync_cout << "info currmovenumber " << moveNumber << " currmove " << UciManager::displayUci(m) << " nodes " << visitedNodes <<
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			" time " << time <<
 #endif
@@ -847,7 +847,7 @@ void UciStandardOutput::showCurrLine(const Position & pos, const unsigned int pl
 
 	for (unsigned int i = start; i<= start+ply/2; i++) // show only half of the search line
 	{
-		std::cout << " " << UciManager::getInstance().displayUci(pos.getState(i).getCurrentMove());
+		std::cout << " " << UciManager::displayUci(pos.getState(i).getCurrentMove());
 	}
 	std::cout << sync_endl;
 
@@ -864,10 +864,10 @@ void UciStandardOutput::printScore(const signed int cp) const
 
 void UciStandardOutput::printBestMove( const Move bm, const Move& ponder ) const
 {
-	sync_cout<<"bestmove "<< UciManager::getInstance().displayUci(bm);
+	sync_cout<<"bestmove "<< UciManager::displayUci(bm);
 	if( ponder )
 	{
-		std::cout<<" ponder " << UciManager::getInstance().displayUci(ponder);
+		std::cout<<" ponder " << UciManager::displayUci(ponder);
 	}
 	std::cout<< sync_endl;
 }

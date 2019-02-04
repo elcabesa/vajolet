@@ -104,7 +104,7 @@ unsigned long long Perft::divide(unsigned int depth)
 		}
 		tot += n;
 		_pos.undoMove();
-		sync_cout<<mn<<") "<<UciManager::getInstance().displayMove(_pos, m)<<": "<<n<<sync_endl;
+		sync_cout<<mn<<") "<<UciManager::displayMove(_pos, m)<<": "<<n<<sync_endl;
 	}
 	return tot;
 
