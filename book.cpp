@@ -171,9 +171,9 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 		}
 	}
 
-	if ( m )
+	if ( m == Move::NOMOVE )
 	{
-		return m;
+		return Move::NOMOVE;
 	}
 	// A PolyGlot book move is encoded as follows:
 	//
