@@ -1,0 +1,500 @@
+@startuml
+
+title Vajolet classes
+
+'------------------------
+'book file
+'------------------------
+class PolyglotBook {
+  +Move probe(const Position& pos, bool pickBest);
+}
+
+PolyglotBook *-- MovePicker
+
+'------------------------
+'command file
+'------------------------
+interface UciManager {
+  +{static} UciManager& getInstance()
+  +void uciLoop(void);
+  -UciManager();
+  
+  -UciManager::impl pimpl;
+}
+
+class UciManager::impl {
+  -Position Pos
+  +void uciLoop()
+  -std::list<std::unique_ptr<UciOption>> _optionList
+}
+
+UciManager o-- UciManager::impl
+UciManager::impl *-- Position
+UciManager::impl o-- my_thread
+
+UciManager::impl o-- "many" UciOption
+
+UciManager::impl *-- Perft
+UciManager::impl *-- MovePicker
+
+abstract UciOutput {
+  +{static} std::unique_ptr<UciOutput> create( const UciOutput::type t  = UciOutput::standard );
+}
+
+class UciMuteOutput {
+}
+
+class UciStandardOutput {
+}
+
+UciOutput <|-- UciStandardOutput
+UciOutput <|-- UciMuteOutput
+
+abstract UciOption {
+  +bool setValue( std::string v, bool verbose = true);
+  +std::string print() const;
+}
+
+class StringUciOption {
+}
+class SpinUciOption {
+}
+class CheckUciOption {
+}
+class ButtonUciOption { 
+}
+
+UciOption <|-- StringUciOption
+UciOption <|-- SpinUciOption
+UciOption <|-- CheckUciOption
+UciOption <|-- ButtonUciOption
+
+
+'------------------------
+'game file
+'------------------------
+
+class GamePosition {
+  +HashKey key;
+  +Move m;
+  +PVline PV;
+  +Score alpha;
+  +Score beta;
+  +unsigned int depth;
+}
+
+GamePosition *-- HashKey
+GamePosition *-- Move
+GamePosition *-- PVline
+
+class Game {
+  -std::vector<GamePosition> _positions;
+}
+
+Game o-- "many" GamePosition
+
+'------------------------
+'hashkey file
+'------------------------
+
+class HashKey {
+}
+
+'------------------------
+'history file
+'------------------------
+
+class History {
+  +void clear();
+  +void update(...);
+  +Score getValue(...);
+}
+
+class CaptureHistory {
+  +void clear();
+  +void update(...);
+  +Score getValue(...);
+}
+
+class CounterMove {
+  +void clear();
+  +void update(...);
+  +Move getValue(...);
+}
+
+CounterMove *-- Move
+
+'------------------------
+'Move file
+'------------------------
+
+class Move {
+}
+
+class extMove {
+  +setScore()
+}
+
+Move <|-- extMove
+
+'------------------------
+'Movegen file
+'------------------------
+class Movegen {
+  +template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
+  -const Position &_pos;
+}
+
+Movegen *-- MoveList
+Movegen o-- Position
+Movegen o-- Move
+
+'------------------------
+'MoveList file
+'------------------------
+class MoveList {
+  -std::array< extMove, N > _ml;
+  +const Move& getNextMove(void);
+}
+
+MoveList *-- extMove
+MoveList o-- Move
+
+'------------------------
+'MovePicker file
+'------------------------
+class MovePicker {
+  -MoveList<MAX_MOVE_PER_POSITION> _moveList;
+  -MoveList<MAX_BAD_MOVE_PER_POSITION> _badCaptureList;
+  -const Position& _pos;
+  -const Movegen& _mg;
+  -const SearchData& _sd;
+  
+  -Move _ttMove;
+  -Move _killerMoves[2];
+  -Move _counterMoves[2];
+}
+
+MovePicker *-- "2" MoveList
+MovePicker o-- Position
+MovePicker o-- Movegen
+MovePicker o-- SearchData
+MovePicker *-- "many" Move
+
+'------------------------
+'MultiPVManager file
+'------------------------
+
+class MultiPVManager {
+  -std::vector<rootMove> _res;
+  -std::vector<rootMove> _previousRes;
+}
+
+MultiPVManager *-- "many" rootMove
+
+'------------------------
+'perft file
+'------------------------
+
+class Perft {
+  -Position & _pos;
+}
+
+Perft o-- Position
+Perft o-- PerftTranspositionTable
+Perft o-- MovePicker
+
+'------------------------
+'position file
+'------------------------
+
+class Position {
+  -const Movegen _mg;
+  -pawnTable pawnHashTable;
+  -std::vector<state> stateInfo;
+  -std::array<bitboardIndex,squareNumber> squares;
+  -std::array<bitMap,lastBitboard> bitBoard;
+  -bitMap *Us;
+  -bitmap *Them;
+  
+  -std::unordered_map<tKey, materialStruct> static materialKeyMap;
+}
+
+Position *-- Movegen
+Position *-- pawnTable
+Position *-- "many" state
+Position o-- Move
+Position *-- "many" materialStruct
+
+
+
+
+class materialStruct {
+}
+
+'------------------------
+'PVline file
+'------------------------
+
+class PVline {
+} 
+
+PVline *-- Move
+
+'------------------------
+'PVlineFollower file
+'------------------------
+
+class PVlineFollower {
+  -PVline _line;
+}
+
+PVlineFollower *-- PVline
+
+'------------------------
+'rootMove file
+'------------------------
+
+class rootMove {
+  +PVline PV;
+  +Move firstMove;
+  
+}
+
+rootMove *-- PVline
+rootMove *-- Move
+
+'------------------------
+'search file
+'------------------------
+
+interface Search {
+  -Search::impl pimpl;
+}
+
+class Search::impl {
+  +{static} std::vector<impl> helperSearch;
+  -std::unique_ptr<UciOutput> _UOI;
+  -PVlineFollower _pvLineFollower;
+  -SearchData _sd;
+  -MultiPVManager _multiPVmanager;
+  -Position _pos;
+  -SearchLimits& _sl; // todo limits belong to threads
+  -SearchTimer& _st;
+  -std::vector<Move> _rootMovesToBeSearched;
+  -std::vector<Move> _rootMovesAlreadySearched;
+  -Game _game;
+}
+
+class voteSystem {
+  -const std::vector<rootMove>& _results;
+}
+
+Search o-- Search::impl
+
+Search::impl *-- UciOutput
+Search::impl *-- PVlineFollower
+Search::impl *-- SearchData
+Search::impl *-- MultiPVManager
+Search::impl *-- Position
+Search::impl o-- SearchLimits
+Search::impl o-- SearchTimer
+Search::impl *-- Move
+Search::impl *-- Game
+Search::impl *-- voteSystem
+Search::impl o-- SearchResult
+Search::impl o-- transpositionTable
+Search::impl o-- MovePicker
+Search::impl o-- PolyglotBook
+
+voteSystem o-- "many" rootMove
+
+'------------------------
+'searchData file
+'------------------------
+
+class SearchData {
+  +Sd story[800];
+  +CounterMove counterMoves;
+  +CaptureHistory captureHistory;
+  +History history;
+}
+
+class Sd {
+  +Move excludeMove;
+  +Move killers[2];
+}
+
+SearchData *-- "many" Sd
+SearchData *-- CounterMove
+SearchData *-- CaptureHistory
+SearchData *-- History
+
+Sd *-- Move
+
+'------------------------
+'searchLimits file
+'------------------------
+
+class SearchLimits {
+  -long long int _wtime;
+  -long long int _btime;
+  -long long int _winc;
+  -long long int _binc;
+  -long long int _movesToGo;
+  -long long int _mate;
+  -long long int _moveTime;
+  -unsigned int _nodes;
+  -int _depth;
+  -std::list<Move> _searchMoves;
+  -bool _infinite;
+  -volatile bool _ponder;
+}
+
+SearchLimits *-- "many" Move
+
+'------------------------
+'searchResult file
+'------------------------
+
+class SearchResult {
+  +PVline PV;
+}
+
+SearchResult *-- PVline
+
+'------------------------
+'searchTimer file
+'------------------------
+
+class SearchTimer {
+  -std::chrono::time_point<std::chrono::steady_clock> startTime;
+  -std::chrono::time_point<std::chrono::steady_clock> ponderTime;
+}
+
+'------------------------
+'state file
+'------------------------
+
+class state {
+  -eCastle _castleRights;
+  -Move _currentMove;
+  -bitMap _pinnedPieces;
+  -bitMap _checkers;
+  -eNextMove _nextMove;
+  -bitMap _hiddenCheckersCandidate;
+  -simdScore _material;
+  -simdScore _nonPawnMaterial;
+  -unsigned int _fiftyMoveCnt;
+  -unsigned int _pliesFromNull;
+  -bitMap _checkingSquares[lastBitboard];
+  -bitboardIndex _capturedPiece;
+  -tSquare _epSquare;
+  -HashKey _key:
+  -HashKey _pawnKey:
+  -HashKey _materialKey;
+}
+
+state *-- Move
+state *-- "3" HashKey
+
+'------------------------
+'tables file
+'------------------------
+
+class pawnEntry {
+  +HashKey key;
+  +bitMap weakPawns;
+  +bitMap passedPawns;
+  +bitMap pawnAttacks[2];
+  +bitMap weakSquares[2];
+  +bitMap holes[2];
+  +Score res[2];
+}
+
+class pawnTable {
+  +void insert(const HashKey& key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles);
+  +pawnEntry& probe(const HashKey& key);
+  
+  -std::array<pawnEntry,size> _pawnTable;
+}
+
+pawnEntry *-- HashKey
+pawnTable *-- "many" pawnEntry
+
+'------------------------
+'thread file
+'------------------------
+
+class my_thread {
+  -my_thread::impl pimpl;
+  +{static} my_thread& getInstance();
+  +void startThinking( const Position& p, SearchLimits& l);
+  +void stopThinking();
+  +void ponderHit();
+  +timeManagement& getTimeMan();
+}
+
+class my_thread::impl {
+  -SearchLimits _limits; // todo limits belong to threads
+  -SearchTimer _st;
+  -Search _src;
+  -timeManagement _timeMan;
+  -std::unique_ptr<UciOutput> _UOI;
+
+}
+
+my_thread *-- my_thread::impl
+
+my_thread::impl *-- SearchLimits
+my_thread::impl *-- SearchTimer
+my_thread::impl *-- Search
+my_thread::impl *-- timeManagement
+my_thread::impl *-- UciOutput
+
+'------------------------
+'timeManagement file
+'------------------------
+
+class timeManagement {
+  -bool _firstIterationFinished;
+  -bool _idLoopIterationFinished;
+  -bool _idLoopFailLow;
+  -bool _idLoopFailOver;
+	
+  -long long _allocatedTime;
+  -long long _minSearchTime;
+  -long long _maxAllocatedTime;
+  -unsigned int _resolution
+  -bool _stop;
+  -searchState _searchState;
+  -const SearchLimits& _limits;
+}
+
+timeManagement o-- SearchLimits
+
+'------------------------
+'transposition file
+'------------------------
+class ttEntry {
+}
+
+class transpositionTable {
+  -std::vector<ttEntry> _table;
+  +{static} transpositionTable& getInstance();
+}
+
+class PerftTranspositionTable {
+}
+
+transpositionTable *-- "many" ttEntry
+PerftTranspositionTable *-- transpositionTable
+
+'------------------------
+'uci Parameters file
+'------------------------
+
+class uciParameters {
+}
+
+@enduml
