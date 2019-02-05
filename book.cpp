@@ -143,31 +143,53 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 	if (!open("book.bin"))
 		return Move::NOMOVE;
 
-	std::mt19937_64 rnd;
-	std::uniform_int_distribution<unsigned int> uint_dist;
-
-	// use current time (in seconds) as random seed:
-	rnd.seed(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count());
-
 	Move m(Move::NOMOVE);
 	Entry e;
 	uint16_t best = 0;
 	unsigned sum = 0;
 	uint64_t key = polyglotKey(pos);
 
-	seekg(find_first(key) * sizeof(Entry), ios_base::beg);
+	auto idx = find_first(key);
+	seekg(idx * sizeof(Entry), ios_base::beg);
+	
+	std::vector<Entry> moves;
 
+	// search best move and collect statistics
 	while (*this >> e, e.key == key && good())
 	{
-		best = std::max(best, e.count);
-		sum += e.count;
-
-		/// Choose book move according to its score. If a move has a very
-		// high score it has higher probability to be choosen than a move
-		// with lower score. Note that first entry is always chosen.
-		if ( (sum && (uint_dist(rnd) % sum) < e.count) || (pickBest && e.count == best))
+		//std::cout<<"----------"<<std::endl;
+		//std::cout<<UciManager::getInstance().displayUci(Move(e.move))<<std::endl;
+		moves.push_back(e);
+		if( e.count > best )
 		{
+			best = e.count;
 			m = e.move;
+		}
+		sum += e.count;
+	}
+	
+	if (!pickBest) {
+		
+		//get a random number
+		
+		std::mt19937_64 rnd;
+		std::uniform_int_distribution<unsigned int> uint_dist(0, sum);
+		// use current time (in seconds) as random seed:
+		rnd.seed(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count());
+		unsigned int r = uint_dist(rnd);
+		
+		unsigned total = 0;
+		for(auto& e: moves)
+		{
+			total += e.count;
+			
+			/// Choose book move according to its score. If a move has a very
+			// high score it has higher probability to be choosen than a move
+			// with lower score. Note that first entry is always chosen.
+			if (total > r) {
+				m = e.move;
+				break;
+			}
 		}
 	}
 
@@ -200,22 +222,42 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 		m.setPromotion( (Move::epromotion)(3-pt) );
 	}
 
-
 	Move mm;
 	MovePicker mp(pos);
 	while( ( mm = mp.getNextMove() ) )
 	{
-		if(m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo())
-		{
-			if( !m.isPromotionMove() )
-			{
-				return mm;
-			}
-			else
-			{
-				if( m.getPromotionType() == mm.getPromotionType() ){
+		if (mm.isPromotionMove()) {
+			if (m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo()) {
+				if (m.getPromotionType() == mm.getPromotionType()) {
 					return mm;
 				}
+			}	
+		} else if (mm.isCastleMove()) {
+			if (mm.isKingSideCastle()) {
+				if (m.getFrom() == mm.getFrom()) {
+					if (getFileOf(m.getTo()) == FILEH) {
+						if (getRankOf(m.getTo()) == getRankOf(m.getFrom())) {
+							return mm;
+						}
+					}
+				}
+			} else {
+				if (m.getFrom() == mm.getFrom()) {
+					if (getFileOf(m.getTo()) == FILEA) {
+						if (getRankOf(m.getTo()) == getRankOf(m.getFrom())) {
+							return mm;
+						}
+					}
+				}
+			}
+			//todo mm has king from-to format, m has king->rook format
+		} else if (mm.isEnPassantMove()) {
+			if (m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo()) {
+				return mm;
+			}
+		} else {
+			if (m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo()) {
+				return mm;
 			}
 		}
 	}

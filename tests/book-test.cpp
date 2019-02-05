@@ -15,6 +15,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <algorithm>
 //#include <iostream>
 #include "gtest/gtest.h"
 #include "./../book.h"
@@ -23,15 +24,87 @@
 #include "./../position.h"
 
 
-TEST(bookTest, probe){
+TEST(bookTest, probeBest){
 	Position p;
 	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	PolyglotBook b;
-	Move m = b.probe(p, true);
-	//std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
-	EXPECT_EQ(m, Move(E2,E4));
+	for (int i = 0;i<100;++i) {
+		Move m = b.probe(p, true);
+		//std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
+		ASSERT_EQ(m, Move(E2,E4));
+	}	
+}
+
+TEST(bookTest, probeBest1){
+	Position p;
+	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	p.doMove(Move(E2,E4));
+	p.doMove(Move(C7,C6));
+	p.doMove(Move(D2,D4));
+	p.doMove(Move(D7,D5));
+	p.doMove(Move(B1,C3));
+	p.doMove(Move(D5,E4));
+	PolyglotBook b;
+	for (int i = 0;i<100;++i) {
+		Move m = b.probe(p, false);
+		//std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
+		ASSERT_EQ(m, Move(C3,E4));
+	}	
+}
+
+TEST(bookTest, probeRandom1){
+	Position p;
+	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	p.doMove(Move(E2,E4));
+	p.doMove(Move(C7,C6));
+	p.doMove(Move(D2,D4));
+	p.doMove(Move(D7,D5));
+	p.doMove(Move(B1,C3));
+	p.doMove(Move(D5,E4));
+	PolyglotBook b;
+	for (int i = 0;i<100;++i) {
+		Move m = b.probe(p, false);
+		//std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
+		ASSERT_EQ(m, Move(C3,E4));
+	}	
+}
+
+TEST(bookTest, probeCastle){
+	Position p;
+	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");	
+	p.doMove(Move(E2,E4));
+	p.doMove(Move(E7,E5));
+	p.doMove(Move(G1,F3));
+	p.doMove(Move(B8,C6));
+	p.doMove(Move(F1,C4));
+	p.doMove(Move(F8,C5));
 	
+	std::vector<Move> v ={ Move(C2,C3), Move(E1,G1,Move::fcastle)};
+	
+	PolyglotBook b;
+	for (int i = 0;i<100;++i) {
+		Move m = b.probe(p, false);
+		auto res = std::find(v.begin(), v.end(), m);
+		//if( res != v.end())std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
+		ASSERT_NE(res, v.end());
+	}	
+}
+
+TEST(bookTest, probeRandom){
+	Position p;
+	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	
+	std::vector<Move> v ={ Move(E7,E5), Move(C7,C5), Move(E7,E6), Move(C7,C6)};
+	p.doMove(Move(E2,E4));
+	
+	PolyglotBook b;
+	for (int i = 0;i<1000;++i) {
+		Move m = b.probe(p, false);
+		auto res = std::find(v.begin(), v.end(), m);
+		//if( res == v.end())std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
+		ASSERT_NE(res, v.end());
+	}	
 }
 
 TEST(bookTest, probeFail){
@@ -41,6 +114,8 @@ TEST(bookTest, probeFail){
 	PolyglotBook b;
 	Move m = b.probe(p, true);
 	//std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
-	EXPECT_EQ(m, Move::NOMOVE);
+	ASSERT_EQ(m, Move::NOMOVE);
 }
-	
+
+// todo promotion and enpassant?
+
