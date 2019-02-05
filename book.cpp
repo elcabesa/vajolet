@@ -165,7 +165,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 		/// Choose book move according to its score. If a move has a very
 		// high score it has higher probability to be choosen than a move
 		// with lower score. Note that first entry is always chosen.
-		if (   (sum && (uint_dist(rnd) % sum) < e.count) || (pickBest && e.count == best))
+		if ( (sum && (uint_dist(rnd) % sum) < e.count) || (pickBest && e.count == best))
 		{
 			m = e.move;
 		}
