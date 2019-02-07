@@ -7,9 +7,16 @@ title Vajolet classes
 '------------------------
 class PolyglotBook {
   +Move probe(const Position& pos, bool pickBest);
+  -PolyglotBook::impl pimpl;
 }
 
-PolyglotBook *-- MovePicker
+class PolyglotBook::impl {
+  +Move probe(const Position& pos, bool pickBest);
+}
+
+PolyglotBook o-- PolyglotBook::impl
+PolyglotBook::impl *-- MovePicker
+PolyglotBook::impl o-- PolyglotKey
 
 '------------------------
 'command file
@@ -203,6 +210,14 @@ class Perft {
 Perft o-- Position
 Perft o-- PerftTranspositionTable
 Perft o-- MovePicker
+
+'------------------------
+'polyglotKey file
+'------------------------
+
+class PolyglotKey {
+  +uint64_t get(const Position& pos);
+}
 
 '------------------------
 'position file
