@@ -2,15 +2,22 @@
 
 title Vajolet classes
 
+skinparam class {
+	BackgroundColor<<Tested>> PaleGreen
+	ArrowColor<<Tested>> SeaGreen
+	BorderColor<<Tested>> SpringGreen
+
+}
+
 '------------------------
 'book file
 '------------------------
-class PolyglotBook {
+interface PolyglotBook <<tested>>{
   +Move probe(const Position& pos, bool pickBest);
   -PolyglotBook::impl pimpl;
 }
 
-class PolyglotBook::impl {
+class PolyglotBook::impl <<tested>>{
   +Move probe(const Position& pos, bool pickBest);
 }
 
@@ -135,10 +142,10 @@ CounterMove *-- Move
 'Move file
 '------------------------
 
-class Move {
+class Move <<tested>>{
 }
 
-class extMove {
+class extMove <<tested>>{
   +setScore()
 }
 
@@ -159,7 +166,7 @@ Movegen o-- Move
 '------------------------
 'MoveList file
 '------------------------
-class MoveList {
+class MoveList <<tested>>{
   -std::array< extMove, N > _ml;
   +const Move& getNextMove(void);
 }
@@ -192,7 +199,7 @@ MovePicker *-- "many" Move
 'MultiPVManager file
 '------------------------
 
-class MultiPVManager {
+class MultiPVManager <<tested>>{
   -std::vector<rootMove> _res;
   -std::vector<rootMove> _previousRes;
 }
@@ -203,7 +210,7 @@ MultiPVManager *-- "many" rootMove
 'perft file
 '------------------------
 
-class Perft {
+class Perft <<tested>>{
   -Position & _pos;
 }
 
@@ -215,7 +222,7 @@ Perft o-- MovePicker
 'polyglotKey file
 '------------------------
 
-class PolyglotKey {
+class PolyglotKey <<tested>>{
   +uint64_t get(const Position& pos);
 }
 
@@ -251,7 +258,7 @@ class materialStruct {
 'PVline file
 '------------------------
 
-class PVline {
+class PVline <<tested>>{
 } 
 
 PVline *-- Move
@@ -260,7 +267,7 @@ PVline *-- Move
 'PVlineFollower file
 '------------------------
 
-class PVlineFollower {
+class PVlineFollower <<tested>>{
   -PVline _line;
 }
 
@@ -471,7 +478,7 @@ my_thread::impl *-- UciOutput
 'timeManagement file
 '------------------------
 
-class timeManagement {
+class timeManagement <<tested>>{
   -bool _firstIterationFinished;
   -bool _idLoopIterationFinished;
   -bool _idLoopFailLow;
