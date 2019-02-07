@@ -35,6 +35,8 @@ public:
 	explicit PolyglotBook();
 	~PolyglotBook();
 	Move probe(const Position& pos, bool pickBest);
+
+	static uint64_t polyglotKey(const Position& pos);
 private:
 
 	explicit PolyglotBook(const PolyglotBook& other);
@@ -52,10 +54,10 @@ private:
 		uint16_t count;
 		uint32_t learn;
 	};
-	const unsigned int pieceMapping[lastBitboard] = { 0,11,9,7,5,3,1,0,0,10,8,6,4,2,0,0 };
+	static constexpr unsigned int pieceMapping[lastBitboard] = { 0,11,9,7,5,3,1,0,0,10,8,6,4,2,0,0 };
 
 	// Random numbers from PolyGlot, used to compute book hash keys
-	const union
+	static constexpr union
 	{
 		uint64_t PolyGlotRandoms[781];
 		struct
@@ -330,8 +332,6 @@ private:
 	}};
 
 	template<typename T> PolyglotBook& operator >> (T& n);
-
-	uint64_t polyglotKey(const Position& pos) const;
 	bool open(const std::string& fName);
 	size_t find_first(uint64_t key);
 

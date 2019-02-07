@@ -22,13 +22,14 @@
 
 #include "bitops.h"
 #include "book.h"
+//#include "command.h"
 #include "movepicker.h"
 #include "position.h"
 #include "vajolet.h"
 
 
 // polyglot_key() returns the PolyGlot hash key of the given position
-uint64_t PolyglotBook::polyglotKey(const Position& pos) const
+uint64_t PolyglotBook::polyglotKey(const Position& pos)
 {
 	uint64_t k = 0;
 	bitMap b = pos.getOccupationBitmap();
