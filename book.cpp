@@ -17,64 +17,61 @@
 
 #include <cstdint>
 #include <chrono>
+#include <fstream>
+#include <iostream>
 #include <random>
 
 
 #include "bitops.h"
 #include "book.h"
-//#include "command.h"
 #include "movepicker.h"
+#include "polyglotKey.h"
 #include "position.h"
 #include "vajolet.h"
 
 
-// polyglot_key() returns the PolyGlot hash key of the given position
-uint64_t PolyglotBook::polyglotKey(const Position& pos)
+class PolyglotBook::impl : public std::ifstream
 {
-	uint64_t k = 0;
-	bitMap b = pos.getOccupationBitmap();
+public:
+	explicit impl();
+	~impl();
+	Move probe(const Position& pos, bool pickBest);
+private:
 
-	while( b )
-	{
-		tSquare s = iterateBit(b);
-		bitboardIndex p = pos.getPieceAt(s);
+	explicit impl(const impl& other);
+	impl& operator=(const impl& other);
+	explicit impl(impl&& other) noexcept;
+	impl& operator=(impl&& other) noexcept;
 
-		// PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
-		k ^= PG.Zobrist.psq[pieceMapping[p]][s];
-	}
 
-	b = pos.getCastleRights();
+	// A Polyglot book is a series of "entries" of 16 bytes. All integers are
+	// stored in big-endian format, with highest byte first (regardless of size).
+	// The entries are ordered according to the key in ascending order.
+	struct Entry {
+		uint64_t key;
+		uint16_t move;
+		uint16_t count;
+		uint32_t learn;
+	};
 
-	while(b)
-	{
-		k ^= PG.Zobrist.castle[iterateBit(b)];
-	}
+	template<typename T> impl& operator >> (T& n);
+	bool open(const std::string& fName);
+	size_t find_first(uint64_t key);
 
-	if( pos.hasEpSquare() )
-	{
-		k ^= PG.Zobrist.enpassant[getFileOf(pos.getEpSquare())];
-	}
 
-	if( pos.isWhiteTurn() )
-	{
-		k ^= PG.Zobrist.turn;
-	}
+};
 
-	return k;
+
+PolyglotBook::impl::impl() {
 }
 
-
-
-PolyglotBook::PolyglotBook() {
-}
-
-PolyglotBook::~PolyglotBook() { if (is_open()) close(); }
+PolyglotBook::impl::~impl() { if (is_open()) close(); }
 
 /// operator>>() reads sizeof(T) chars from the file's binary byte stream and
 /// converts them in a number of type T. A Polyglot book stores numbers in
 /// big-endian format.
 
-template<typename T> PolyglotBook& PolyglotBook::operator>>(T& n)
+template<typename T> PolyglotBook::impl& PolyglotBook::impl::operator>>(T& n)
 {
 	n = 0;
 	for (size_t i = 0; i < sizeof(T); i++)
@@ -83,14 +80,14 @@ template<typename T> PolyglotBook& PolyglotBook::operator>>(T& n)
 	return *this;
 }
 
-template<> PolyglotBook& PolyglotBook::operator>>(Entry& e) {
+template<> PolyglotBook::impl& PolyglotBook::impl::operator>>(Entry& e) {
 	return *this >> e.key >> e.move >> e.count >> e.learn;
 }
 
 /// open() tries to open a book file with the given name after closing any
 /// exsisting one.
 
-bool PolyglotBook::open(const std::string& fName) {
+bool PolyglotBook::impl::open(const std::string& fName) {
 
 	if (is_open()) // Cannot close an already closed file
 		close();
@@ -104,7 +101,7 @@ bool PolyglotBook::open(const std::string& fName) {
 /// the book file for the given key. Returns the index of the leftmost book
 /// entry with the same key as the input.
 
-size_t PolyglotBook::find_first(uint64_t key)
+size_t PolyglotBook::impl::find_first(uint64_t key)
 {
 
 	seekg(0, std::ios::end); // Move pointer to end, so tellg() gets file's size
@@ -138,7 +135,7 @@ size_t PolyglotBook::find_first(uint64_t key)
 /// found returns MOVE_NONE. If pickBest is true returns always the highest
 /// rated move, otherwise randomly chooses one, based on the move score.
 
-Move PolyglotBook::probe(const Position& pos, bool pickBest)
+Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
 {
 
 	if (!open("book.bin"))
@@ -148,7 +145,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 	Entry e;
 	uint16_t best = 0;
 	unsigned sum = 0;
-	uint64_t key = polyglotKey(pos);
+	uint64_t key = PolyglotKey().get(pos);
 
 	auto idx = find_first(key);
 	seekg(idx * sizeof(Entry), ios_base::beg);
@@ -269,3 +266,7 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 
 
 
+PolyglotBook::PolyglotBook(): pimpl{std::make_unique<impl>()}{}
+PolyglotBook::~PolyglotBook() = default;
+
+Move PolyglotBook::probe(const Position& pos, bool pickBest) { return pimpl->probe(pos,pickBest);}

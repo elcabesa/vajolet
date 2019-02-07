@@ -34,6 +34,7 @@ CPP_SRCS := \
 ./movepicker.cpp \
 ./parameters.cpp \
 ./perft.cpp \
+./polyglotKey.cpp \
 ./position.cpp \
 ./search.cpp \
 ./searchData.cpp \
@@ -69,6 +70,7 @@ OBJS :=  \
 ./movepicker.o \
 ./parameters.o \
 ./perft.o \
+./polyglotKey.o \
 ./position.o \
 ./search.o \
 ./searchData.o \
@@ -99,6 +101,7 @@ CPP_DEPS := \
 ./movepicker.d \
 ./parameters.d \
 ./perft.d \
+./polyglotKey.d \
 ./position.d \
 ./search.d \
 ./searchData.d \
