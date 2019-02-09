@@ -26,4 +26,4 @@ script:
   - ./Vajolet_unit_test
   
 after_success:
-  - coveralls --gcov gcov-8 --gcov-options '\-lp'
+  - coveralls --gcov gcov-8 --gcov-options '\-lp' -E build -E tests
