@@ -22,8 +22,8 @@ script:
   - mkdir build
   - cd build
   - cmake -DVAJOLET_CPU_TYPE=64NEW -DCMAKE_BUILD_TYPE=Debug ..
-  - make VERBOSE=1
+  - make
   - ./Vajolet_unit_test
   
 after_success:
-  - coveralls --gcov gcov-8 --root .. --gcov-options '\-lp' -E "build" -E "tests"
+  - coveralls --gcov gcov-8 --root .. --gcov-options '\-lp' -E build -E tests
