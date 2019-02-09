@@ -26,4 +26,4 @@ script:
   - ./Vajolet_unit_test
   
 after_success:
-  - coveralls --gcov-options '\-lp -o CMakeFiles/libChess.dir' --verbose
+  - coveralls --root .. --gcov-options '\-lp -o CMakeFiles/libChess.dir/' --verbose
