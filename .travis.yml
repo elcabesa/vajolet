@@ -18,5 +18,5 @@ script:
   - gcc-8 -v && g++-8 -v && cmake --version
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DVAJOLET_CPU_TYPE=64BMI2 -DCMAKE_BUILD_TYPE=Release ..
   - make VERBOSE=1
