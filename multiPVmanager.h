@@ -73,7 +73,7 @@ public:
 				}
 			}
 		}
-		assert(_multiPVprint.size() <= _linesToBeSearched);
+		assert(_multiPVprint.size() == _linesToBeSearched);
 		
 		return _multiPVprint;
 	}

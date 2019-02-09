@@ -33,25 +33,15 @@ TEST(MultiPVManager, functionalTest)
 	x.setLinesToBeSearched(5);
 	x.startNewIteration();
 	
-	// insert some move
+	// insert moves
 	x.insertMove(rm1);
-	x.insertMove(rm2);
-	
-	// order
-	auto res = x.get();
-	
-	// test
-	ASSERT_EQ( res.size(), 2 );
-	ASSERT_EQ( res[0], rm2 );
-	ASSERT_EQ( res[1], rm1 );
-	
-	// insert the other moves
+	x.insertMove(rm2);	
 	x.insertMove(rm3);
 	x.insertMove(rm4);
 	x.insertMove(rm5);
 	
 	// order
-	res = x.get();
+	auto res = x.get();
 	
 	// test
 	ASSERT_EQ( res.size(), 5 );
@@ -86,6 +76,7 @@ TEST(MultiPVManager, functionalTest)
 	ASSERT_EQ( res[4], rm5 );
 	
 	x.clean();
+	x.setLinesToBeSearched(0);
 	res = x.get();
 	
 	ASSERT_EQ( res.size(), 0 );	
@@ -126,6 +117,7 @@ TEST(MultiPVManager, clean)
 	
 	auto res = x.get();
 	ASSERT_EQ( res.size(), 5 );
+	x.setLinesToBeSearched(0);
 	x.clean();
 	res = x.get();
 	
