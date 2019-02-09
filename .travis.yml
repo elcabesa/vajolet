@@ -12,10 +12,18 @@ addons:
       - gcc-8
       - g++-8
       - cmake
+
+before_install:
+  - pip install --user cpp-coveralls
+
 script:
   - export CC=/usr/bin/gcc-8
   - export CXX=/usr/bin/g++-8
   - mkdir build
   - cd build
-  - cmake -DVAJOLET_CPU_TYPE=64NEW -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -DVAJOLET_CPU_TYPE=64NEW -DCMAKE_BUILD_TYPE=Debug ..
   - make
+  - ./Vajolet_unit_test.exe
+  
+after_success:
+- coveralls --gcov-options '\-lp' --root .. -E ".*Debug.*" -E ".*test.*"
