@@ -36,7 +36,7 @@ private:
 
 	tKey _key;
 
-	static tKey _keys[squareNumber][30];	// position, piece (not all the keys are used)
+	static tKey _keys[squareNumber][30];// position, piece (not all the keys are used)
 	static tKey _side;					// side to move (black)
 	static tKey _ep[squareNumber];		// ep targets (only 16 used)
 	static tKey _castlingRight[16];		// white king-side castling right
