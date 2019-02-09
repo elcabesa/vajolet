@@ -26,4 +26,4 @@ script:
   - ./Vajolet_unit_test
   
 after_success:
-  - coveralls --gcov gcov-8 --gcov-options '\-lp' -E build -E tests
+  - coveralls --gcov gcov-8 --root build/CMakeFiles/libChess.dir --gcov-options '\-lp' 
