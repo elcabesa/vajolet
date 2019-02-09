@@ -9,16 +9,16 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gcc-8
-      - g++-8
+      - gcc-7
+      - g++-7
       - cmake
 
 before_install:
   - pip install --user cpp-coveralls
 
 script:
-  - export CC=/usr/bin/gcc-8
-  - export CXX=/usr/bin/g++-8
+  - export CC=/usr/bin/gcc-7
+  - export CXX=/usr/bin/g++-7
   - mkdir build
   - cd build
   - cmake -DVAJOLET_CPU_TYPE=64NEW -DCMAKE_BUILD_TYPE=Debug ..
@@ -26,4 +26,5 @@ script:
   - ./Vajolet_unit_test
   
 after_success:
-  - coveralls --gcov gcov-8 --root .. --gcov-options '\-lp' -e build/CMakeFiles/Vajolet_unit_test.dir -e build/CMakeFiles/Vajolet.dir -e build/googletest-build -e build/CMakeFiles/tuner.dir -e build/CMakeFiles/Vajolet_long_tests.dir -e build/CMakeFiles/Vajolet_search_integration_test.dir -e build/CMakeFiles/Vajolet_syzygy_test.dir -e build/CMakeFiles/libChess.dir/syzygy
+  - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp'
+  
