@@ -15,7 +15,7 @@ addons:
 script:
   - export CC=/usr/bin/gcc-8
   - export CXX=/usr/bin/g++-8
-  - gcc -v && g++ -v && cmake --version
+  - gcc-8 -v && g++-8 -v && cmake --version
   - mkdir build
   - cd build
   - cmake ..
