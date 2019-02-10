@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include "./../perft.h"
 #include "./../position.h"
+#include "./../transposition.h"
 
 typedef struct _positions
 {
@@ -27,6 +28,22 @@ TEST(PerftTest, perft) {
 		pos.setupFromFen(p.Fen); 
 		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
 		{
+			EXPECT_EQ(Perft(pos).perft(i+1), p.PerftValue[i]);
+		}
+	}
+}
+
+TEST(PerftTest, perftHash) {
+	transpositionTable::getInstance().setSize(1);
+	Position pos;
+	for (auto & p : perftPos)
+	{
+		pos.setupFromFen(p.Fen); 
+		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
+		{
+			Perft pft(pos);
+			pft.perftUseHash = true;
+			
 			EXPECT_EQ(Perft(pos).perft(i+1), p.PerftValue[i]);
 		}
 	}

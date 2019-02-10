@@ -39,49 +39,49 @@ TEST(PVlineFollower, getNextMove)
 	pvf.restart();
 	
 	Move m = Move::NOMOVE;
-	pvf.getNextMove(0, m);
+	ASSERT_EQ( pvf.getNextMove(0, m), true );
 	ASSERT_EQ( m, Move(E2, E4));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(1, m);
+	ASSERT_EQ( pvf.getNextMove(1, m), true );
 	ASSERT_EQ( m, Move(E7, E5));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(2, m);
+	ASSERT_EQ( pvf.getNextMove(2, m), true );
 	ASSERT_EQ( m, Move(D2, D4));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(3, m);
+	ASSERT_EQ( pvf.getNextMove(3, m), true );
 	ASSERT_EQ( m, Move(D7, D5));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(4, m);
+	ASSERT_EQ( pvf.getNextMove(4, m), false );
 	ASSERT_EQ( m, Move::NOMOVE);
 	
 	pvf.restart();
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(0, m);
+	ASSERT_EQ( pvf.getNextMove(0, m), true );
 	ASSERT_EQ( m, Move(E2, E4));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(1, m);
+	ASSERT_EQ( pvf.getNextMove(1, m), true );
 	ASSERT_EQ( m, Move(E7, E5));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(2, m);
+	ASSERT_EQ( pvf.getNextMove(2, m), true );
 	ASSERT_EQ( m, Move(D2, D4));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(3, m);
+	ASSERT_EQ( pvf.getNextMove(3, m), true );
 	ASSERT_EQ( m, Move(D7, D5));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(4, m);
+	ASSERT_EQ( pvf.getNextMove(4, m), false );
 	ASSERT_EQ( m, Move::NOMOVE);
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(2, m);
+	ASSERT_EQ( pvf.getNextMove(2, m), false );
 	ASSERT_EQ( m, Move::NOMOVE);
 	
 	
@@ -107,23 +107,23 @@ TEST(PVlineFollower, getNextMove2)
 	pvf.restart();
 	
 	Move m = Move::NOMOVE;
-	pvf.getNextMove(0, m);
+	ASSERT_EQ( pvf.getNextMove(0, m), true );
 	ASSERT_EQ( m, Move(E2, E4));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(1, m);
+	ASSERT_EQ( pvf.getNextMove(1, m), true );
 	ASSERT_EQ( m, Move(E7, E5));
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(1, m);
+	ASSERT_EQ( pvf.getNextMove(1, m), false );
 	ASSERT_EQ( m, Move::NOMOVE);
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(3, m);
+	ASSERT_EQ( pvf.getNextMove(3, m), false );
 	ASSERT_EQ( m, Move::NOMOVE);
 	
 	m = Move::NOMOVE;
-	pvf.getNextMove(4, m);
+	ASSERT_EQ( pvf.getNextMove(4, m), false );
 	ASSERT_EQ( m, Move::NOMOVE);
 	
 
@@ -150,7 +150,7 @@ TEST(PVlineFollower, clean)
 	Move m= Move::NOMOVE;
 	for( unsigned int i = 0; i <20 ;++i)
 	{
-		pvf.getNextMove(i, m);
+		ASSERT_EQ( pvf.getNextMove(i, m), false );
 		ASSERT_EQ( m, Move::NOMOVE);
 	}
 }
@@ -161,7 +161,7 @@ TEST(PVlineFollower, empty)
 	Move m= Move::NOMOVE;
 	for( unsigned int i = 0; i <20 ;++i)
 	{
-		pvf.getNextMove(i, m);
+		ASSERT_EQ( pvf.getNextMove(i, m), false );
 		ASSERT_EQ( m, Move::NOMOVE);
 	}
 

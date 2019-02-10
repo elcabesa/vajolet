@@ -25,11 +25,14 @@
 
 inline void ttEntry::save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue, unsigned char gen)
 {
-	assert(Value < SCORE_INFINITE || Value == SCORE_NONE);
-	assert(Value >- SCORE_INFINITE);
-	assert(StaticValue < SCORE_INFINITE);
-	assert(StaticValue > -SCORE_INFINITE);
-	assert(Type <= typeScoreHigherThanBeta);
+	if( Move != 0 && Type != typeExact)
+	{
+		assert(Value < SCORE_INFINITE || Value == SCORE_NONE);
+		assert(Value >- SCORE_INFINITE);
+		assert(StaticValue < SCORE_INFINITE);
+		assert(StaticValue > -SCORE_INFINITE);
+		assert(Type <= typeScoreHigherThanBeta);
+	}
 	key = Key;
 	value = Value;
 	staticValue = StaticValue;
