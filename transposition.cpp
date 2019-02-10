@@ -25,14 +25,6 @@
 
 inline void ttEntry::save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue, unsigned char gen)
 {
-	if( Move != 0 && Type != typeExact)
-	{
-		assert(Value < SCORE_INFINITE || Value == SCORE_NONE);
-		assert(Value >- SCORE_INFINITE);
-		assert(StaticValue < SCORE_INFINITE);
-		assert(StaticValue > -SCORE_INFINITE);
-		assert(Type <= typeScoreHigherThanBeta);
-	}
 	key = Key;
 	value = Value;
 	staticValue = StaticValue;
@@ -94,6 +86,14 @@ ttEntry* transpositionTable::probe( const HashKey& k )
 
 void transpositionTable::store(const HashKey& k, Score value, unsigned char type, signed short int depth, const Move& move, Score statValue)
 {
+	if( move != Move::NOMOVE || type != typeExact)
+	{
+		assert(value < SCORE_INFINITE || value == SCORE_NONE);
+		assert(value >- SCORE_INFINITE);
+		assert(statValue < SCORE_INFINITE);
+		assert(statValue > -SCORE_INFINITE);
+		assert(type <= typeScoreHigherThanBeta);
+	}
 
 	const auto key = k.getKey();
 	ttEntry *candidate;
