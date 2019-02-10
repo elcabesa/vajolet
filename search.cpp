@@ -1012,8 +1012,11 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	//--------------------------------------
 	if constexpr ( PVnode )
 	{
-		_pvLineFollower.getNextMove(ply, ttMove);
-		assert( ttMove == Move::NOMOVE || _pos.isMoveLegal(ttMove) );
+		if (_pvLineFollower.getNextMove(ply, ttMove))
+		{
+			assert(_pos.isMoveLegal(ttMove));
+		}
+		
 	}
 
 	//--------------------------------------
@@ -1724,7 +1727,10 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	// overwrite ttMove with move from move from PVlineToBeFollowed
 	if constexpr ( PVnode )
 	{
-		_pvLineFollower.getNextMove(ply, ttMove);
+		if (_pvLineFollower.getNextMove(ply, ttMove))
+		{
+			assert(_pos.isMoveLegal(ttMove));
+		}
 	}
 
 	ttType TTtype = typeScoreLowerThanAlpha;

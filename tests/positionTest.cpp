@@ -50,7 +50,7 @@ static unsigned long long myperft(Position& p, unsigned int depth)
 
 }
 
-TEST(PositionTest, isMoveLegalperft) {
+TEST(PositionTest, isMoveLegalPerft) {
 	Position pos;
 	for (auto & p : perftPos)
 	{

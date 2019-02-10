@@ -34,6 +34,7 @@ void Game::insertNewMoves(Position &pos)
 		GamePosition p;
 		p.key = pos.getState(i).getKey();
 		p.m = pos.getState(i).getCurrentMove();
+		p.depth = 0;
 		_positions.push_back(p);
 	}
 }
