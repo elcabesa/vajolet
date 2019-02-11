@@ -133,26 +133,29 @@ TEST(bookTest, probeRandom){
 	}	
 }
 
-/*TEST(bookTest, probeEnPassant){
+TEST(bookTest, probeEnPassant){
 	Position p;
 	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");	
-	p.doMove(Move(E2,E4));
-	p.doMove(Move(G7,G6));
-	//p.doMove(Move(D2,D4));
-	//p.doMove(Move(F8,G7));
-	//p.doMove(Move(F1,C4));
-	//p.doMove(Move(F8,C5));
-	
-	std::vector<Move> v ={ Move(C2,C3), Move(E1,G1,Move::fcastle)};
-	
+	p.doMove(Move(G1,F3));
+	p.doMove(Move(G8,F6));
+	p.doMove(Move(G2,G3));
+	p.doMove(Move(D7,D5));
+	p.doMove(Move(C2,C4));
+	p.doMove(Move(D5,D4));
+	p.doMove(Move(B2,B4));
+	p.doMove(Move(D8,D6));
+	p.doMove(Move(C1,A3));
+	p.doMove(Move(E7,E5));
+	p.doMove(Move(B4,B5));
+	p.doMove(Move(C7,C5));
+
 	PolyglotBook b;
 	for (int i = 0;i<1;++i) {
-		Move m = b.probe(p, false);
-		auto res = std::find(v.begin(), v.end(), m);
+		Move m = b.probe(p, true);
 		//if( res != v.end())std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
-		ASSERT_NE(res, v.end());
+		ASSERT_EQ(m, Move(B5,C6,Move::fenpassant));
 	}	
-}*/
+}
 
 TEST(bookTest, probeFail){
 	Position p;
