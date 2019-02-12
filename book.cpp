@@ -57,15 +57,18 @@ private:
 	template<typename T> impl& operator >> (T& n);
 	bool open(const std::string& fName);
 	size_t find_first(uint64_t key);
-
-
+	
+	std::vector<Entry> getMovesFromBook(const Position& pos);
+	Move find_best(const std::vector<Entry> moves);
+	Move find_random(const std::vector<Entry> moves);
+	
 };
 
 
 PolyglotBook::impl::impl() {
 }
 
-PolyglotBook::impl::~impl() { if (is_open()) close(); }
+PolyglotBook::impl::~impl() { if (is_open()) {close();} }
 
 /// operator>>() reads sizeof(T) chars from the file's binary byte stream and
 /// converts them in a number of type T. A Polyglot book stores numbers in
@@ -74,9 +77,10 @@ PolyglotBook::impl::~impl() { if (is_open()) close(); }
 template<typename T> PolyglotBook::impl& PolyglotBook::impl::operator>>(T& n)
 {
 	n = 0;
-	for (size_t i = 0; i < sizeof(T); i++)
+	for (size_t i = 0; i < sizeof(T); ++i)
+	{
 		n = T((n << 8) + std::ifstream::get());
-
+	}
 	return *this;
 }
 
@@ -89,8 +93,9 @@ template<> PolyglotBook::impl& PolyglotBook::impl::operator>>(Entry& e) {
 
 bool PolyglotBook::impl::open(const std::string& fName) {
 
-	if (is_open()) // Cannot close an already closed file
+	if (is_open()) { // Cannot close an already closed file
 		close();
+	}
 
 	std::ifstream::open(fName, std::ifstream::in | std::ifstream::binary);
 	std::ifstream::clear(); // Reset any error flag to allow retry ifstream::open()
@@ -103,33 +108,99 @@ bool PolyglotBook::impl::open(const std::string& fName) {
 
 size_t PolyglotBook::impl::find_first(uint64_t key)
 {
-
+	// get the size of file
 	seekg(0, std::ios::end); // Move pointer to end, so tellg() gets file's size
-
 	size_t low = 0, mid, high = (size_t)tellg() / sizeof(Entry) - 1;
-	Entry e;
-
 	assert(low <= high);
-
+	
+	Entry e;
 	while (low < high && good())
 	{
+		// calculate mid element
 		mid = (low + high) / 2;
-
 		assert(mid >= low && mid < high);
 
+		// read key
 		seekg(mid * sizeof(Entry), ios_base::beg);
 		*this >> e;
 
-		if (key <= e.key)
+		// update bounds
+		if (key <= e.key) {
 			high = mid;
-		else
-			low = mid + 1;
+		} else {
+			low = (mid + 1);
+		}
 	}
+	
 	assert(low == high);
-
 	return low;
 }
 
+
+std::vector<PolyglotBook::impl::Entry> PolyglotBook::impl::getMovesFromBook(const Position& pos)
+{
+	std::vector<Entry> moves;
+	Entry e;
+	
+	if (is_open())
+	{
+		uint64_t key = PolyglotKey().get(pos);
+		auto idx = find_first(key);
+		seekg(idx * sizeof(Entry), ios_base::beg);
+		
+		// search best move and collect statistics
+		while (*this >> e, e.key == key && good())
+		{
+			moves.push_back(e);
+		}
+	}
+	return moves;
+}
+
+Move PolyglotBook::impl::find_best(const std::vector<PolyglotBook::impl::Entry> moves)
+{
+	Move bestMove(Move::NOMOVE);
+	uint16_t bestCount = 0;
+	for (const auto& m : moves) {
+		if ( m.count > bestCount ) {
+			bestCount = m.count;
+			bestMove = m.move;
+		}
+	}
+	return bestMove;
+}
+
+
+Move PolyglotBook::impl::find_random(const std::vector<PolyglotBook::impl::Entry> moves)
+{
+	Move bestMove(Move::NOMOVE);
+	unsigned int sum = 0;
+	for (const auto& m : moves) {
+		sum += m.count;
+	}
+
+	std::mt19937_64 rnd;
+	std::uniform_int_distribution<unsigned int> uint_dist(0, sum - 1);
+	// use current time (in seconds) as random seed:
+	rnd.seed(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count());
+	unsigned int r = uint_dist(rnd);
+	
+	unsigned total = 0;
+	for(const auto& m: moves)
+	{
+		total += m.count;
+		
+		/// Choose book move according to its score. If a move has a very
+		// high score it has higher probability to be choosen than a move
+		// with lower score. Note that first entry is always chosen.
+		if (total > r) {
+			bestMove = m.move;
+			return bestMove;
+		}
+	}
+	
+	return Move::NOMOVE;
+}
 
 /// probe() tries to find a book move for the given position. If no move is
 /// found returns MOVE_NONE. If pickBest is true returns always the highest
@@ -138,60 +209,21 @@ size_t PolyglotBook::impl::find_first(uint64_t key)
 Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
 {
 
-	if (!open("book.bin"))
+	if (!open("book.bin")) {
 		return Move::NOMOVE;
-
-	Move m(Move::NOMOVE);
-	Entry e;
-	uint16_t best = 0;
-	unsigned sum = 0;
-	uint64_t key = PolyglotKey().get(pos);
-
-	auto idx = find_first(key);
-	seekg(idx * sizeof(Entry), ios_base::beg);
-	
-	std::vector<Entry> moves;
-
-	// search best move and collect statistics
-	while (*this >> e, e.key == key && good())
-	{
-		//std::cout<<"----------"<<std::endl;
-		//std::cout<<UciManager::getInstance().displayUci(Move(e.move))<<std::endl;
-		moves.push_back(e);
-		if( e.count > best )
-		{
-			best = e.count;
-			m = e.move;
-		}
-		sum += e.count;
 	}
 	
-	if (!pickBest) {
-		
-		//get a random number
-		
-		std::mt19937_64 rnd;
-		std::uniform_int_distribution<unsigned int> uint_dist(0, sum);
-		// use current time (in seconds) as random seed:
-		rnd.seed(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count());
-		unsigned int r = uint_dist(rnd);
-		
-		unsigned total = 0;
-		for(auto& e: moves)
-		{
-			total += e.count;
-			
-			/// Choose book move according to its score. If a move has a very
-			// high score it has higher probability to be choosen than a move
-			// with lower score. Note that first entry is always chosen.
-			if (total > r) {
-				m = e.move;
-				break;
-			}
-		}
+	Move bestMove(Move::NOMOVE);
+	
+	std::vector<Entry> moves = getMovesFromBook(pos);
+	
+	if (pickBest) {
+		bestMove = find_best(moves);
+	} else {
+		bestMove = find_random(moves);
 	}
-
-	if ( m == Move::NOMOVE )
+	
+	if ( bestMove == Move::NOMOVE )
 	{
 		return Move::NOMOVE;
 	}
@@ -208,16 +240,16 @@ Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
 
 	// scambio from e to
 
-	Move tempMove(m);
+	Move tempMove(bestMove);
 
-	m.setTo( tempMove.getFrom() );
-	m.setFrom( tempMove.getTo() );
+	bestMove.setTo( tempMove.getFrom() );
+	bestMove.setFrom( tempMove.getTo() );
 
 	int pt = (tempMove.getPacked() >> 12) & 7;
 	if (pt)
 	{
-		m.setFlag( Move::fpromotion );
-		m.setPromotion( (Move::epromotion)(3-pt) );
+		bestMove.setFlag( Move::fpromotion );
+		bestMove.setPromotion( (Move::epromotion)(3-pt) );
 	}
 
 	Move mm;
@@ -225,36 +257,36 @@ Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
 	while( ( mm = mp.getNextMove() ) )
 	{
 		if (mm.isPromotionMove()) {
-			if (m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo()) {
-				if (m.getPromotionType() == mm.getPromotionType()) {
+			if (bestMove.getFrom() == mm.getFrom() && bestMove.getTo() == mm.getTo()) {
+				if (bestMove.getPromotionType() == mm.getPromotionType()) {
 					return mm;
 				}
 			}	
 		} else if (mm.isCastleMove()) {
 			if (mm.isKingSideCastle()) {
-				if (m.getFrom() == mm.getFrom()) {
-					if (getFileOf(m.getTo()) == FILEH) {
-						if (getRankOf(m.getTo()) == getRankOf(m.getFrom())) {
+				if (bestMove.getFrom() == mm.getFrom()) {
+					if (getFileOf(bestMove.getTo()) == FILEH) {
+						if (getRankOf(bestMove.getTo()) == getRankOf(bestMove.getFrom())) {
 							return mm;
 						}
 					}
 				}
 			} else {
-				if (m.getFrom() == mm.getFrom()) {
-					if (getFileOf(m.getTo()) == FILEA) {
-						if (getRankOf(m.getTo()) == getRankOf(m.getFrom())) {
+				if (bestMove.getFrom() == mm.getFrom()) {
+					if (getFileOf(bestMove.getTo()) == FILEA) {
+						if (getRankOf(bestMove.getTo()) == getRankOf(bestMove.getFrom())) {
 							return mm;
 						}
 					}
 				}
 			}
-			//todo mm has king from-to format, m has king->rook format
+			//todo mm has king from-to format, bestMove has king->rook format
 		} else if (mm.isEnPassantMove()) {
-			if (m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo()) {
+			if (bestMove.getFrom() == mm.getFrom() && bestMove.getTo() == mm.getTo()) {
 				return mm;
 			}
 		} else {
-			if (m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo()) {
+			if (bestMove.getFrom() == mm.getFrom() && bestMove.getTo() == mm.getTo()) {
 				return mm;
 			}
 		}

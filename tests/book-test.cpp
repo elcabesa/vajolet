@@ -73,7 +73,7 @@ TEST(bookTest, probeBest1){
 	p.doMove(Move(D5,E4));
 	PolyglotBook b;
 	for (int i = 0;i<100;++i) {
-		Move m = b.probe(p, false);
+		Move m = b.probe(p, true);
 		//std::cout<<UciManager::getInstance().displayUci(m)<<std::endl;
 		ASSERT_EQ(m, Move(C3,E4));
 	}	
