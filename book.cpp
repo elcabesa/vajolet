@@ -61,6 +61,7 @@ private:
 	std::vector<Entry> getMovesFromBook(const Position& pos);
 	Move find_best(const std::vector<Entry> moves);
 	Move find_random(const std::vector<Entry> moves);
+	Move convertMove(Move polyglotMove, const Position& pos);
 	
 };
 
@@ -202,31 +203,9 @@ Move PolyglotBook::impl::find_random(const std::vector<PolyglotBook::impl::Entry
 	return Move::NOMOVE;
 }
 
-/// probe() tries to find a book move for the given position. If no move is
-/// found returns MOVE_NONE. If pickBest is true returns always the highest
-/// rated move, otherwise randomly chooses one, based on the move score.
 
-Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
+Move PolyglotBook::impl::convertMove(Move polyglotMove, const Position& pos)
 {
-
-	if (!open("book.bin")) {
-		return Move::NOMOVE;
-	}
-	
-	Move bestMove(Move::NOMOVE);
-	
-	std::vector<Entry> moves = getMovesFromBook(pos);
-	
-	if (pickBest) {
-		bestMove = find_best(moves);
-	} else {
-		bestMove = find_random(moves);
-	}
-	
-	if ( bestMove == Move::NOMOVE )
-	{
-		return Move::NOMOVE;
-	}
 	// A PolyGlot book move is encoded as follows:
 	//
 	// bit  0- 5: destination square (from 0 to 63)
@@ -239,17 +218,16 @@ Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
 	// the special Move's flags (bit 14-15) that are not supported by PolyGlot.
 
 	// scambio from e to
+	Move tempMove(polyglotMove);
 
-	Move tempMove(bestMove);
-
-	bestMove.setTo( tempMove.getFrom() );
-	bestMove.setFrom( tempMove.getTo() );
+	polyglotMove.setTo( tempMove.getFrom() );
+	polyglotMove.setFrom( tempMove.getTo() );
 
 	int pt = (tempMove.getPacked() >> 12) & 7;
 	if (pt)
 	{
-		bestMove.setFlag( Move::fpromotion );
-		bestMove.setPromotion( (Move::epromotion)(3-pt) );
+		polyglotMove.setFlag( Move::fpromotion );
+		polyglotMove.setPromotion( (Move::epromotion)(3-pt) );
 	}
 
 	Move mm;
@@ -257,24 +235,24 @@ Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
 	while( ( mm = mp.getNextMove() ) )
 	{
 		if (mm.isPromotionMove()) {
-			if (bestMove.getFrom() == mm.getFrom() && bestMove.getTo() == mm.getTo()) {
-				if (bestMove.getPromotionType() == mm.getPromotionType()) {
+			if (polyglotMove.getFrom() == mm.getFrom() && polyglotMove.getTo() == mm.getTo()) {
+				if (polyglotMove.getPromotionType() == mm.getPromotionType()) {
 					return mm;
 				}
 			}	
 		} else if (mm.isCastleMove()) {
 			if (mm.isKingSideCastle()) {
-				if (bestMove.getFrom() == mm.getFrom()) {
-					if (getFileOf(bestMove.getTo()) == FILEH) {
-						if (getRankOf(bestMove.getTo()) == getRankOf(bestMove.getFrom())) {
+				if (polyglotMove.getFrom() == mm.getFrom()) {
+					if (getFileOf(polyglotMove.getTo()) == FILEH) {
+						if (getRankOf(polyglotMove.getTo()) == getRankOf(polyglotMove.getFrom())) {
 							return mm;
 						}
 					}
 				}
 			} else {
-				if (bestMove.getFrom() == mm.getFrom()) {
-					if (getFileOf(bestMove.getTo()) == FILEA) {
-						if (getRankOf(bestMove.getTo()) == getRankOf(bestMove.getFrom())) {
+				if (polyglotMove.getFrom() == mm.getFrom()) {
+					if (getFileOf(polyglotMove.getTo()) == FILEA) {
+						if (getRankOf(polyglotMove.getTo()) == getRankOf(polyglotMove.getFrom())) {
 							return mm;
 						}
 					}
@@ -282,17 +260,40 @@ Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
 			}
 			//todo mm has king from-to format, bestMove has king->rook format
 		} else if (mm.isEnPassantMove()) {
-			if (bestMove.getFrom() == mm.getFrom() && bestMove.getTo() == mm.getTo()) {
+			if (polyglotMove.getFrom() == mm.getFrom() && polyglotMove.getTo() == mm.getTo()) {
 				return mm;
 			}
 		} else {
-			if (bestMove.getFrom() == mm.getFrom() && bestMove.getTo() == mm.getTo()) {
+			if (polyglotMove.getFrom() == mm.getFrom() && polyglotMove.getTo() == mm.getTo()) {
 				return mm;
 			}
 		}
 	}
 
 	return Move::NOMOVE;
+}
+
+/// probe() tries to find a book move for the given position. If no move is
+/// found returns MOVE_NONE. If pickBest is true returns always the highest
+/// rated move, otherwise randomly chooses one, based on the move score.
+
+Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
+{
+	if (!open("book.bin")) {
+		return Move::NOMOVE;
+	}
+	
+	std::vector<Entry> moves = getMovesFromBook(pos);
+	
+	Move bestMove(Move::NOMOVE);
+	if (pickBest) {
+		bestMove = find_best(moves);
+	} else {
+		bestMove = find_random(moves);
+	}
+
+	return convertMove(bestMove, pos);
+	
 }
 
 
