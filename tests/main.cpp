@@ -1,12 +1,13 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
-#include "./../io.h"
-#include "./../bitops.h"
-#include "./../data.h"
-#include "./../position.h"
-#include "./../movegen.h"
-#include "../hashKey.h"
+//#include "./../io.h"
+#include "./../libchess.h"
+//#include "./../bitops.h"
+//#include "./../data.h"
+//#include "./../position.h"
+//#include "./../movegen.h"
+//#include "../hashKey.h"
 
 using ::testing::Environment;
 
@@ -14,11 +15,7 @@ class EnvironmentInvocationCatcher : public Environment {
 protected:
 	virtual void SetUp()
 	{
-		initData();
-		HashKey::init();
-		Position::initScoreValues();
-		Position::initCastleRightsMask();
-		Movegen::initMovegenConstant();
+		libChessInit();
 	}
 
 	virtual void TearDown()

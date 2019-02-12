@@ -21,6 +21,7 @@
 #include "io.h"
 #include "bitops.h"
 #include "data.h"
+#include "libchess.h"
 #include "position.h"
 #include "movegen.h"
 #include "transposition.h"
@@ -195,17 +196,10 @@ int main()
 	//----------------------------------
 	//	init global data
 	//----------------------------------
-	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
-	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
-	initData();
-	HashKey::init();
-	Position::initScoreValues();
-	Position::initCastleRightsMask();
-	Movegen::initMovegenConstant();
+	
+	libChessInit();
 
-	Search::initSearchParameters();
 	transpositionTable::getInstance().setSize(1);
-	Position::initMaterialKeys();
 	tb_init(uciParameters::SyzygyPath.c_str());
 	
 	enablePawnHash =false;
