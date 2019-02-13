@@ -44,7 +44,7 @@ static const int size = 8192;
 public:
 	void insert(const HashKey& key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
 
-		pawnEntry& x= _pawnTable[ _getIndex( key ) ];
+		pawnEntry& x= probe(key);
 
 		x.key = key;
 		x.res[0]=res[0];
