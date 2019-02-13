@@ -40,11 +40,10 @@ public:
 
 class pawnTable
 {
-static const int size = 8192;
 public:
 	void insert(const HashKey& key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
 
-		pawnEntry& x= probe(key);
+		pawnEntry& x = probe(key);
 
 		x.key = key;
 		x.res[0]=res[0];
@@ -57,7 +56,7 @@ public:
 		x.pawnAttacks[1]=blackAttack;
 		x.weakSquares[0]=weakSquareWhite;
 		x.weakSquares[1]=weakSquareBlack;
-		x.holes[0]=whiteHoles ;
+		x.holes[0]=whiteHoles;
 		x.holes[1]=blackHoles;
 	}
 
@@ -66,8 +65,9 @@ public:
 		return _pawnTable[ _getIndex( key ) ];
 	}
 private:
-	unsigned int _getIndex( const HashKey& key ) const { return ( (unsigned int)key.getKey() ) % size; }
-	std::array<pawnEntry,size> _pawnTable;
+	static const int _size = 8192;
+	unsigned int _getIndex( const HashKey& key ) const { return ( (unsigned int)key.getKey() ) % _size; }
+	std::array<pawnEntry,_size> _pawnTable;
 };
 
 #endif /* TABLES_H_ */
