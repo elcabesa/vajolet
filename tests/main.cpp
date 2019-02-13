@@ -1,13 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
-//#include "./../io.h"
 #include "./../libchess.h"
-//#include "./../bitops.h"
-//#include "./../data.h"
-//#include "./../position.h"
-//#include "./../movegen.h"
-//#include "../hashKey.h"
 
 using ::testing::Environment;
 
