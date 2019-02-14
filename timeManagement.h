@@ -26,7 +26,6 @@ class timeManagement
 public:
 	enum searchState
 	{
-		wait,
 		infiniteSearch,
 		fixedTimeSearch,
 		standardSearchPonder,
