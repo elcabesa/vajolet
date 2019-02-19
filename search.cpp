@@ -113,8 +113,8 @@ private:
 	//--------------------------------------------------------
 	// private static members
 	//--------------------------------------------------------
-	static const int ONE_PLY = 1;
-	static const int ONE_PLY_SHIFT = 0;
+	static const int ONE_PLY = 16;
+	static const int ONE_PLY_SHIFT = 4;
 	static const unsigned int LmrLimit = 32;
 	static Score futilityMargin[7];
 	static unsigned int FutilityMoveCounts[2][16];
@@ -1324,7 +1324,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 		}
 		else if( moveGivesCheck && _pos.seeSign(m) >= 0 && !FutilityMoveCountFlag)
 		{
-			ext = ONE_PLY;
+			ext = ONE_PLY / 2;
 		}
 
 		//------------------------------
