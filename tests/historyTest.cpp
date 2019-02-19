@@ -69,30 +69,30 @@ TEST(historyTest, updateMoveIndipendency) {
 	
 	ASSERT_NE(r1, r2); 	
 }
-/*
+
 TEST(historyTest, updateMoveEvolution) {
 	
 	History h;
 	h.clear();
 	
 	Move m(F4,D7);
-	
-	std::vector<Score> res;
 
+
+	auto r = h.getValue(black, m);
+	for (int n = 0; n < 200; ++n) {
+		h.update(black, m, 20);
+		auto r1 = h.getValue(black, m);
+		ASSERT_GE(r1, r); 	
+		r = r1;
+	}
+	ASSERT_EQ(r, 16000); 	
+	
 	for (int n = 0; n < 200; ++n) {
 		h.update(black, m, -20);
-		auto r = h.getValue(black, m);
-		res.push_back(r);
+		auto r1 = h.getValue(black, m);
+		ASSERT_LE(r1, r); 	
+		r = r1;
 	}
-	for (int n = 0; n < 80; ++n) {
-		h.update(black, m, 1);
-		auto r = h.getValue(black, m);
-		res.push_back(r);
-	}
-	
-	
-	for( const auto r: res) {
-		std::cout<<"res: "<<r<<std::endl;
-	}
+	ASSERT_EQ(r, -16000); 	
 
-}*/
+}

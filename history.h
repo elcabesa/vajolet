@@ -71,7 +71,7 @@ public :
 	inline void clear() { std::memset(_table, 0, sizeof(_table)); }
 
 
-	inline void update( const bitboardIndex p, const Move& m, bitboardIndex captured,  Score v)
+	inline void update( const bitboardIndex p, const Move& m, const bitboardIndex captured, const Score v)
 	{
 				
 		const int W = 2;
