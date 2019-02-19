@@ -35,30 +35,27 @@
 class History
 {
 private:
-	Score table[2][squareNumber][squareNumber];
+	Score _table[2][squareNumber][squareNumber];
 public :
 
-	inline void clear() { std::memset(table, 0, sizeof(table)); }
+	inline void clear() { std::memset(_table, 0, sizeof(_table)); }
 
-
-	inline void update( const Color c, const Move& m,  Score v)
+	inline void update( const Color c, const Move& m, const Score v)
 	{
 		const int W = 32;
 		const int D = 500;
 
 		assert(c<=black);
 		
-		Score & e = table[c][m.getFrom()][m.getTo()];
+		Score & e = _table[c][m.getFrom()][m.getTo()];
 		e += v * W - e * std::abs(v)/ D;
-
-	
 	}
+
 	inline Score getValue( const Color c, const Move& m ) const
 	{
 		assert(c<=black);
-		return table[c][m.getFrom()][m.getTo()];
+		return _table[c][m.getFrom()][m.getTo()];
 	}
-
 
 	explicit History(){}
 
@@ -68,10 +65,10 @@ class CaptureHistory
 {
 private:
 	// piece, to, captured piece
-	Score table[lastBitboard][squareNumber][lastBitboard];
+	Score _table[lastBitboard][squareNumber][lastBitboard];
 public :
 
-	inline void clear() { std::memset(table, 0, sizeof(table)); }
+	inline void clear() { std::memset(_table, 0, sizeof(_table)); }
 
 
 	inline void update( const bitboardIndex p, const Move& m, bitboardIndex captured,  Score v)
@@ -89,7 +86,7 @@ public :
 		assert( isValidPiece( captured ) || captured == empty );
 		const tSquare to = (tSquare)m.getTo();
 
-		Score &e = table[p][to][captured];
+		Score &e = _table[p][to][captured];
 		e += v * W - e * std::abs(v)/ D;
 	}
 	inline Score getValue( const bitboardIndex p, const Move& m, bitboardIndex captured ) const
@@ -101,7 +98,7 @@ public :
 		assert( isValidPiece( p ) );
 		assert( isValidPiece( captured ) || captured == empty );
 		const tSquare to = (tSquare)m.getTo();
-		return table[p][to][captured];
+		return _table[p][to][captured];
 	}
 
 
@@ -112,12 +109,12 @@ public :
 class CounterMove
 {
 private:
-	std::array<std::array<std::array<Move,2>,squareNumber>,lastBitboard> table;
+	std::array<std::array<std::array<Move,2>,squareNumber>,lastBitboard> _table;
 public :
 
 	inline void clear()
 	{
-		for(auto& a: table)
+		for(auto& a: _table)
 			for(auto& b: a)
 				b.fill(Move::NOMOVE);
 	}
@@ -128,7 +125,7 @@ public :
 
 		assert( isValidPiece( p ) );
 		assert(to<squareNumber);
-		auto& mm =  table[p][to];
+		auto& mm =  _table[p][to];
 		if(mm[0] != m)
 		{
 			mm[1] = mm[0];
@@ -141,7 +138,7 @@ public :
 		assert( pos < 2 );
 		assert( isValidPiece( p ) );
 		assert(to<squareNumber);
-		return table[p][to][pos];
+		return _table[p][to][pos];
 	}
 
 

@@ -18,7 +18,7 @@
 #include "gtest/gtest.h"
 #include "./../hashKey.h"
 
-TEST(dhashKeyTest, keysNotNull) {
+TEST(hashKeyTest, keysNotNull) {
 	
 	HashKey k(0);
 	
@@ -59,7 +59,7 @@ TEST(dhashKeyTest, keysNotNull) {
 
 }
 
-TEST(dhashKeyTest, testEqual) {
+TEST(hashKeyTest, testEqual) {
 	
 	HashKey k1(175473);
 	HashKey k2(175473);
