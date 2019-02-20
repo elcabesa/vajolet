@@ -284,6 +284,9 @@ const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPP
 
 UciManager::impl::impl()
 {
+	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
+	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
+	
 	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, setTTSize, 1, 1, 65535));
 	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, nullptr, 1, 1, 128));
 	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, nullptr, 1, 1, 500));

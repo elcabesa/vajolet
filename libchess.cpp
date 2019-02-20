@@ -15,13 +15,18 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VERSION_H_
-#define VERSION_H_
+#include "libchess.h"
+#include "position.h"
+#include "search.h"
 
-#include <string>
 
-const std::string programName = "Vajolet2";
-const std::string version = "2.7.0";
-const std::string preRelease = "-PRE-56";
-
-#endif
+void libChessInit()
+{
+	initData();
+	HashKey::init();
+	Position::initScoreValues();
+	Position::initCastleRightsMask();
+	Movegen::initMovegenConstant();
+	Search::initSearchParameters();
+	Position::initMaterialKeys();
+}

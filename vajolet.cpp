@@ -20,12 +20,7 @@
 
 #include "benchmark.h"
 #include "command.h"
-#include "position.h"
-#include "search.h"
-#include "transposition.h"
-#include "uciParameters.h"
-#include "syzygy/tbprobe.h"
-
+#include "libchess.h"
 
 void signalHandler(int signum)
 {
@@ -45,17 +40,7 @@ static void init()
 	//----------------------------------
 	//	init global data
 	//----------------------------------
-	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
-	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
-	
-	
-	initData();
-	HashKey::init();
-	Position::initScoreValues();
-	Position::initCastleRightsMask();
-	Movegen::initMovegenConstant();
-	Search::initSearchParameters();
-	Position::initMaterialKeys();
+	libChessInit();
 }
 
 static bool manageCommandLine( int argc, char* argv[] )

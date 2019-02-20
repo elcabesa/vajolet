@@ -27,6 +27,7 @@ CPP_SRCS := \
 ./game.cpp \
 ./hashKey.cpp \
 ./io.cpp \
+./libchess.cpp \
 ./magicmoves.cpp \
 ./Move.cpp \
 ./movegen.cpp \
@@ -61,6 +62,7 @@ OBJS :=  \
 ./game.o \
 ./hashKey.o \
 ./io.o \
+./libchess.o \
 ./magicmoves.o \
 ./Move.o \
 ./movegen.o \
@@ -90,6 +92,7 @@ CPP_DEPS := \
 ./game.d \
 ./hashKey.d \
 ./io.d \
+./libchess.d \
 ./magicmoves.d \
 ./Move.d \
 ./movegen.d \

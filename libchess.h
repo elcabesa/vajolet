@@ -15,13 +15,9 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VERSION_H_
-#define VERSION_H_
+#ifndef LIBCHESS_H_
+#define LIBCHESS_H_
 
-#include <string>
+void libChessInit();
 
-const std::string programName = "Vajolet2";
-const std::string version = "2.7.0";
-const std::string preRelease = "-PRE-56";
-
-#endif
+#endif /* LIBCHESS_H_ */
