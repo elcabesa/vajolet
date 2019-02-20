@@ -17,6 +17,7 @@
 
 #include "movepicker.h"
 #include "position.h"
+#include "searchData.h"
 
 MovePicker::MovePicker( const Position& p, const SearchData& sd, unsigned int ply, const Move& ttm ): _pos(p), _mg(p.getMoveGen()), _sd(sd), _ply(ply), _ttMove(ttm)
 {

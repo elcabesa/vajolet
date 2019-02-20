@@ -21,14 +21,17 @@ const SearchData _defaultSearchData; // convert to const
 
 void SearchData::clearKillers(unsigned int ply)
 {
-	Move * const tempKillers =  story[ply].killers;
+	Move * const tempKillers =  _story[ply].killers;
 
-	tempKillers[1] = 0;
-	tempKillers[0] = 0;
+	tempKillers[1] = Move::NOMOVE;
+	tempKillers[0] = Move::NOMOVE;
 }
 void SearchData::cleanData(void)
 {
-	for( auto&x: story)
+	_history.clear();
+	_captureHistory.clear();
+	_counterMoves.clear();
+	for( auto&x: _story)
 	{
 		
 		x.excludeMove = Move::NOMOVE;
@@ -42,11 +45,23 @@ void SearchData::cleanData(void)
 
 void SearchData::saveKillers(unsigned int ply, const Move& m)
 {
-	Move * const tempKillers = story[ply].killers;
+	Move * const tempKillers = _story[ply].killers;
 	if(tempKillers[0] != m)
 	{
 		tempKillers[1] = tempKillers[0];
 		tempKillers[0] = m;
 	}
 
+}
+
+void SearchData::setExcludedMove(unsigned int ply, const Move& m)
+{
+	assert(ply < STORY_LENGTH);
+	_story[ply].excludeMove = m;
+}
+
+const Move& SearchData::getExcludedMove(unsigned int ply)
+{
+	assert(ply < STORY_LENGTH);
+	return _story[ply].excludeMove;
 }

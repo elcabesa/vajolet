@@ -21,12 +21,14 @@
 #include "bitBoardIndex.h"
 #include "MoveList.h"
 #include "move.h"
-#include "searchData.h"
 #include "score.h"
 
 
 class Position;
 class Movegen;
+class SearchData;
+
+extern const SearchData _defaultSearchData;
 
 class MovePicker
 {
