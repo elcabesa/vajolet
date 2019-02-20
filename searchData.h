@@ -54,7 +54,7 @@ public:
 	const CounterMove& getCounterMove()const {return _counterMoves;}
 	const Move& getKillers(unsigned int ply, unsigned int n) const {
 		assert(ply < STORY_LENGTH);
-		assert(n < _story::KILLER_SIZE);
+		assert(n < Sd::KILLER_SIZE);
 		return _story[ply].killers[n];
 	}
 	bool skipNullMove(unsigned int ply) const {
