@@ -17,82 +17,86 @@
 
 #include <cstdint>
 #include <chrono>
+#include <fstream>
+#include <iostream>
 #include <random>
 
 
 #include "bitops.h"
 #include "book.h"
 #include "movepicker.h"
+#include "polyglotKey.h"
 #include "position.h"
 #include "vajolet.h"
 
 
-// polyglot_key() returns the PolyGlot hash key of the given position
-uint64_t PolyglotBook::polyglotKey(const Position& pos) const
+class PolyglotBook::impl : public std::ifstream
 {
-	uint64_t k = 0;
-	bitMap b = pos.getOccupationBitmap();
+public:
+	explicit impl();
+	~impl();
+	Move probe(const Position& pos, bool pickBest);
+private:
 
-	while( b )
-	{
-		tSquare s = iterateBit(b);
-		bitboardIndex p = pos.getPieceAt(s);
+	explicit impl(const impl& other);
+	impl& operator=(const impl& other);
+	explicit impl(impl&& other) noexcept;
+	impl& operator=(impl&& other) noexcept;
 
-		// PolyGlot pieces are: BP = 0, WP = 1, BN = 2, ... BK = 10, WK = 11
-		k ^= PG.Zobrist.psq[pieceMapping[p]][s];
-	}
 
-	b = pos.getCastleRights();
+	// A Polyglot book is a series of "entries" of 16 bytes. All integers are
+	// stored in big-endian format, with highest byte first (regardless of size).
+	// The entries are ordered according to the key in ascending order.
+	struct Entry {
+		uint64_t key;
+		uint16_t move;
+		uint16_t count;
+		uint32_t learn;
+	};
 
-	while(b)
-	{
-		k ^= PG.Zobrist.castle[iterateBit(b)];
-	}
+	template<typename T> impl& operator >> (T& n);
+	bool open(const std::string& fName);
+	size_t find_first(uint64_t key);
+	
+	std::vector<Entry> getMovesFromBook(const Position& pos);
+	Move find_best(const std::vector<Entry> moves);
+	Move find_random(const std::vector<Entry> moves);
+	Move convertMove(Move polyglotMove, const Position& pos);
+	
+};
 
-	if( pos.hasEpSquare() )
-	{
-		k ^= PG.Zobrist.enpassant[getFileOf(pos.getEpSquare())];
-	}
 
-	if( pos.isWhiteTurn() )
-	{
-		k ^= PG.Zobrist.turn;
-	}
-
-	return k;
+PolyglotBook::impl::impl() {
 }
 
-
-
-PolyglotBook::PolyglotBook() {
-}
-
-PolyglotBook::~PolyglotBook() { if (is_open()) close(); }
+PolyglotBook::impl::~impl() { if (is_open()) {close();} }
 
 /// operator>>() reads sizeof(T) chars from the file's binary byte stream and
 /// converts them in a number of type T. A Polyglot book stores numbers in
 /// big-endian format.
 
-template<typename T> PolyglotBook& PolyglotBook::operator>>(T& n)
+template<typename T> PolyglotBook::impl& PolyglotBook::impl::operator>>(T& n)
 {
 	n = 0;
-	for (size_t i = 0; i < sizeof(T); i++)
+	for (size_t i = 0; i < sizeof(T); ++i)
+	{
 		n = T((n << 8) + std::ifstream::get());
-
+	}
 	return *this;
 }
 
-template<> PolyglotBook& PolyglotBook::operator>>(Entry& e) {
+template<> PolyglotBook::impl& PolyglotBook::impl::operator>>(Entry& e) {
 	return *this >> e.key >> e.move >> e.count >> e.learn;
 }
 
 /// open() tries to open a book file with the given name after closing any
 /// exsisting one.
 
-bool PolyglotBook::open(const std::string& fName) {
+bool PolyglotBook::impl::open(const std::string& fName) {
 
-	if (is_open()) // Cannot close an already closed file
+	if (is_open()) { // Cannot close an already closed file
 		close();
+	}
 
 	std::ifstream::open(fName, std::ifstream::in | std::ifstream::binary);
 	std::ifstream::clear(); // Reset any error flag to allow retry ifstream::open()
@@ -103,78 +107,105 @@ bool PolyglotBook::open(const std::string& fName) {
 /// the book file for the given key. Returns the index of the leftmost book
 /// entry with the same key as the input.
 
-size_t PolyglotBook::find_first(uint64_t key)
+size_t PolyglotBook::impl::find_first(uint64_t key)
 {
-
+	// get the size of file
 	seekg(0, std::ios::end); // Move pointer to end, so tellg() gets file's size
-
 	size_t low = 0, mid, high = (size_t)tellg() / sizeof(Entry) - 1;
-	Entry e;
-
 	assert(low <= high);
-
+	
+	Entry e;
 	while (low < high && good())
 	{
+		// calculate mid element
 		mid = (low + high) / 2;
-
 		assert(mid >= low && mid < high);
 
+		// read key
 		seekg(mid * sizeof(Entry), ios_base::beg);
 		*this >> e;
 
-		if (key <= e.key)
+		// update bounds
+		if (key <= e.key) {
 			high = mid;
-		else
-			low = mid + 1;
+		} else {
+			low = (mid + 1);
+		}
 	}
+	
 	assert(low == high);
-
 	return low;
 }
 
 
-/// probe() tries to find a book move for the given position. If no move is
-/// found returns MOVE_NONE. If pickBest is true returns always the highest
-/// rated move, otherwise randomly chooses one, based on the move score.
-
-Move PolyglotBook::probe(const Position& pos, bool pickBest)
+std::vector<PolyglotBook::impl::Entry> PolyglotBook::impl::getMovesFromBook(const Position& pos)
 {
+	std::vector<Entry> moves;
+	Entry e;
+	
+	if (is_open())
+	{
+		uint64_t key = PolyglotKey().get(pos);
+		auto idx = find_first(key);
+		seekg(idx * sizeof(Entry), ios_base::beg);
+		
+		// search best move and collect statistics
+		while (*this >> e, e.key == key && good())
+		{
+			moves.push_back(e);
+		}
+	}
+	return moves;
+}
 
-	if (!open("book.bin"))
-		return Move::NOMOVE;
+Move PolyglotBook::impl::find_best(const std::vector<PolyglotBook::impl::Entry> moves)
+{
+	Move bestMove(Move::NOMOVE);
+	uint16_t bestCount = 0;
+	for (const auto& m : moves) {
+		if ( m.count > bestCount ) {
+			bestCount = m.count;
+			bestMove = m.move;
+		}
+	}
+	return bestMove;
+}
+
+
+Move PolyglotBook::impl::find_random(const std::vector<PolyglotBook::impl::Entry> moves)
+{
+	Move bestMove(Move::NOMOVE);
+	unsigned int sum = 0;
+	for (const auto& m : moves) {
+		sum += m.count;
+	}
 
 	std::mt19937_64 rnd;
-	std::uniform_int_distribution<unsigned int> uint_dist;
-
+	std::uniform_int_distribution<unsigned int> uint_dist(0, sum - 1);
 	// use current time (in seconds) as random seed:
 	rnd.seed(std::chrono::duration_cast<std::chrono::milliseconds >(std::chrono::steady_clock::now().time_since_epoch()).count());
-
-	Move m(Move::NOMOVE);
-	Entry e;
-	uint16_t best = 0;
-	unsigned sum = 0;
-	uint64_t key = polyglotKey(pos);
-
-	seekg(find_first(key) * sizeof(Entry), ios_base::beg);
-
-	while (*this >> e, e.key == key && good())
+	unsigned int r = uint_dist(rnd);
+	
+	unsigned total = 0;
+	for(const auto& m: moves)
 	{
-		best = std::max(best, e.count);
-		sum += e.count;
-
+		total += m.count;
+		
 		/// Choose book move according to its score. If a move has a very
 		// high score it has higher probability to be choosen than a move
 		// with lower score. Note that first entry is always chosen.
-		if (   (sum && (uint_dist(rnd) % sum) < e.count) || (pickBest && e.count == best))
-		{
-			m = e.move;
+		if (total > r) {
+			bestMove = m.move;
+			return bestMove;
 		}
 	}
+	
+	return Move::NOMOVE;
+}
 
-	if ( m )
-	{
-		return m;
-	}
+
+Move PolyglotBook::impl::convertMove(Move polyglotMove, const Position& pos)
+{
 	// A PolyGlot book move is encoded as follows:
 	//
 	// bit  0- 5: destination square (from 0 to 63)
@@ -187,35 +218,54 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 	// the special Move's flags (bit 14-15) that are not supported by PolyGlot.
 
 	// scambio from e to
+	Move tempMove(polyglotMove);
 
-	Move tempMove(m);
-
-	m.setTo( tempMove.getFrom() );
-	m.setFrom( tempMove.getTo() );
+	polyglotMove.setTo( tempMove.getFrom() );
+	polyglotMove.setFrom( tempMove.getTo() );
 
 	int pt = (tempMove.getPacked() >> 12) & 7;
 	if (pt)
 	{
-		m.setFlag( Move::fpromotion );
-		m.setPromotion( (Move::epromotion)(3-pt) );
+		polyglotMove.setFlag( Move::fpromotion );
+		polyglotMove.setPromotion( (Move::epromotion)(3-pt) );
 	}
-
 
 	Move mm;
 	MovePicker mp(pos);
 	while( ( mm = mp.getNextMove() ) )
 	{
-		if(m.getFrom() == mm.getFrom() && m.getTo() == mm.getTo())
-		{
-			if( !m.isPromotionMove() )
-			{
-				return mm;
-			}
-			else
-			{
-				if( m.getPromotionType() == mm.getPromotionType() ){
+		if (mm.isPromotionMove()) {
+			if (polyglotMove.getFrom() == mm.getFrom() && polyglotMove.getTo() == mm.getTo()) {
+				if (polyglotMove.getPromotionType() == mm.getPromotionType()) {
 					return mm;
 				}
+			}	
+		} else if (mm.isCastleMove()) {
+			if (mm.isKingSideCastle()) {
+				if (polyglotMove.getFrom() == mm.getFrom()) {
+					if (getFileOf(polyglotMove.getTo()) == FILEH) {
+						if (getRankOf(polyglotMove.getTo()) == getRankOf(polyglotMove.getFrom())) {
+							return mm;
+						}
+					}
+				}
+			} else {
+				if (polyglotMove.getFrom() == mm.getFrom()) {
+					if (getFileOf(polyglotMove.getTo()) == FILEA) {
+						if (getRankOf(polyglotMove.getTo()) == getRankOf(polyglotMove.getFrom())) {
+							return mm;
+						}
+					}
+				}
+			}
+			//todo mm has king from-to format, bestMove has king->rook format
+		} else if (mm.isEnPassantMove()) {
+			if (polyglotMove.getFrom() == mm.getFrom() && polyglotMove.getTo() == mm.getTo()) {
+				return mm;
+			}
+		} else {
+			if (polyglotMove.getFrom() == mm.getFrom() && polyglotMove.getTo() == mm.getTo()) {
+				return mm;
 			}
 		}
 	}
@@ -223,6 +273,33 @@ Move PolyglotBook::probe(const Position& pos, bool pickBest)
 	return Move::NOMOVE;
 }
 
+/// probe() tries to find a book move for the given position. If no move is
+/// found returns MOVE_NONE. If pickBest is true returns always the highest
+/// rated move, otherwise randomly chooses one, based on the move score.
+
+Move PolyglotBook::impl::probe(const Position& pos, bool pickBest)
+{
+	if (!open("book.bin")) {
+		return Move::NOMOVE;
+	}
+	
+	std::vector<Entry> moves = getMovesFromBook(pos);
+	
+	Move bestMove(Move::NOMOVE);
+	if (pickBest) {
+		bestMove = find_best(moves);
+	} else {
+		bestMove = find_random(moves);
+	}
+
+	return convertMove(bestMove, pos);
+	
+}
 
 
 
+
+PolyglotBook::PolyglotBook(): pimpl{std::make_unique<impl>()}{}
+PolyglotBook::~PolyglotBook() = default;
+
+Move PolyglotBook::probe(const Position& pos, bool pickBest) { return pimpl->probe(pos,pickBest);}

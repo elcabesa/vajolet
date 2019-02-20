@@ -1,0 +1,1 @@
+C:\Users\mabe\AppData\Local\Programs\Python\Python36-32\Scripts\lizard -l cpp  -x"../.git/*"  -x"../build/*" -x"../buildClang/*" -x"../tests/*" -x"../script/*" .. >complexity.txt

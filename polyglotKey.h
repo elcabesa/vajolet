@@ -16,30 +16,31 @@
 */
 
 
-#ifndef BOOK_H_
-#define BOOK_H_
+#ifndef POLYGLOT_KEY_H_
+#define POLYGLOT_KEY_H_
 
-#include <memory>
+#include <cstdint>
+#include "bitBoardIndex.h"
 
-//forward declaration
-class Move;
 class Position;
 
-class PolyglotBook
+class PolyglotKey
 {
 private:
-	PolyglotBook(const PolyglotBook&) = delete;
-	PolyglotBook& operator=(const PolyglotBook&) = delete;
-	PolyglotBook(const PolyglotBook&&) = delete;
-	PolyglotBook& operator=(const PolyglotBook&&) = delete;
-	
-	class impl;
-	std::unique_ptr<impl> pimpl;
+	const unsigned int _pieceMapping[lastBitboard];
+	const union {
+		uint64_t PolyGlotRandoms[781];
+		struct {
+			uint64_t psq[12][64];  // [piece][square]
+			uint64_t castle[4];    // [castle right]
+			uint64_t enpassant[8]; // [file]
+			uint64_t turn;
+		} Zobrist;
+	}_PG;
 public:
-	explicit PolyglotBook();
-	~PolyglotBook();
-	Move probe(const Position& pos, bool pickBest);
-
+	PolyglotKey();
+	uint64_t get(const Position& pos);
+	
 };
 
-#endif /* BOOK_H_ */
+#endif
