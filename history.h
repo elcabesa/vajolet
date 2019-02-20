@@ -35,7 +35,7 @@
 class History
 {
 private:
-	Score table[2][squareNumber][squareNumber];
+	Score table[2][squareNumber][squareNumber] = {};
 public :
 
 	inline void clear() { std::memset(table, 0, sizeof(table)); }
@@ -68,7 +68,7 @@ class CaptureHistory
 {
 private:
 	// piece, to, captured piece
-	Score table[lastBitboard][squareNumber][lastBitboard];
+	Score table[lastBitboard][squareNumber][lastBitboard] = {};
 public :
 
 	inline void clear() { std::memset(table, 0, sizeof(table)); }
@@ -123,7 +123,7 @@ public :
 	}
 
 
-	inline void update( const bitboardIndex p, const tSquare to, const Move m)
+	inline void update( const bitboardIndex p, const tSquare to, const Move& m)
 	{
 
 		assert( isValidPiece( p ) );

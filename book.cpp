@@ -111,14 +111,15 @@ size_t PolyglotBook::impl::find_first(uint64_t key)
 {
 	// get the size of file
 	seekg(0, std::ios::end); // Move pointer to end, so tellg() gets file's size
-	size_t low = 0, mid, high = (size_t)tellg() / sizeof(Entry) - 1;
+	size_t low = 0, high = (size_t)tellg() / sizeof(Entry) - 1;
 	assert(low <= high);
 	
 	Entry e;
+
 	while (low < high && good())
 	{
-		// calculate mid element
-		mid = (low + high) / 2;
+		assert(low <= high);
+		size_t mid = (low + high) / 2;
 		assert(mid >= low && mid < high);
 
 		// read key

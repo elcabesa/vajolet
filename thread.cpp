@@ -91,9 +91,8 @@ volatile bool my_thread::impl::_quit = false;
 volatile bool my_thread::impl::_startThink = false;
 
 
-my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits)
+my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits), _UOI(UciOutput::create())
 {
-	_UOI = UciOutput::create();
 	if( !_initThreads() )
 	{
 		sync_cout<<"unable to initialize threads, exiting..."<<sync_endl;

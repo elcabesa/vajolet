@@ -25,7 +25,7 @@ class Perft
 public:
 	static bool perftUseHash;
 	
-	Perft( Position & pos ): _pos(pos){}
+	explicit Perft( Position & pos ): _pos(pos){}
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 
