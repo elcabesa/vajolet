@@ -39,7 +39,7 @@ public:
 	bool isMoveTimeSearch() const { return _moveTime != -1; }
 	bool isNodeLimitedSearch() const { return _nodes != 0; } 
 	bool isDepthLimitedSearch() const { return _depth != -1; }
-	bool isSearchMovesMode() const { return _searchMoves.size() != 0; }
+	bool isSearchMovesMode() const { return _searchMoves.size()/* != 0*/; }
 	bool isInfiniteSearch() const { return _infinite; }
 	bool isPondering() const { return _ponder; }
 	

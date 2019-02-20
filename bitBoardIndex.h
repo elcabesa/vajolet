@@ -132,7 +132,7 @@ inline static bool isKnight(const bitboardIndex piece)
 */
 inline static bool isblack(const bitboardIndex piece)
 {
-	return piece & 8;
+	return bool(piece & 8);
 }
 
 	/*! \brief tell the color of a piece

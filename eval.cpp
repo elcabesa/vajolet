@@ -721,7 +721,7 @@ Score Position::eval(void) const
 				break;
 			case materialStruct::multiplicativeFunction:
 			{
-				Score r;
+				Score r = 0;
 				if( (this->*pointer)(r))
 				{
 					mulCoeff = r;

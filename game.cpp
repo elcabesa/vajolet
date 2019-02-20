@@ -35,6 +35,8 @@ void Game::insertNewMoves(Position &pos)
 		p.key = pos.getState(i).getKey();
 		p.m = pos.getState(i).getCurrentMove();
 		p.depth = 0;
+		p.alpha = -SCORE_INFINITE;
+		p.beta = SCORE_INFINITE;
 		_positions.push_back(p);
 	}
 }

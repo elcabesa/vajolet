@@ -100,7 +100,7 @@ public:
 	virtual void showCurrLine(const Position & pos, const unsigned int ply) const = 0;
 	virtual void printDepth() const = 0;
 	virtual void printScore(const signed int cp) const = 0;
-	virtual void printBestMove( const Move bm, const Move& ponder ) const = 0;
+	virtual void printBestMove( const Move& bm, const Move& ponder ) const = 0;
 	virtual void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const = 0;
 	
 protected:
