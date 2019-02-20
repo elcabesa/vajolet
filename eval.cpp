@@ -831,7 +831,7 @@ Score Position::eval(void) const
 	//----------------------------------------------
 	simdScore pawnResult;
 	const HashKey& pawnKey = getPawnKey();
-	pawnEntry& probePawn = pawnHashTable.probe( pawnKey );
+	const pawnEntry& probePawn = pawnHashTable.probe( pawnKey );
 	if( enablePawnHash && ( probePawn.key == pawnKey ) )
 	{
 		pawnResult = simdScore{probePawn.res[0], probePawn.res[1], 0, 0};

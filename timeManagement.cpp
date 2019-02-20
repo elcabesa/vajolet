@@ -154,17 +154,12 @@ bool timeManagement::stateMachineStep( const long long int time, const unsigned 
 	
 	switch( _searchState )
 	{
-	case wait:
-		//sync_cout<<"wait"<<sync_endl;
-		break;
-
 	case infiniteSearch:
 
 		//sync_cout<<"infiniteSearch"<<sync_endl;
 		if(
 				_stop
 				|| ( _limits.isNodeLimitedSearch() && _hasFirstIterationFinished() && visitedNodes >= _limits.getNodeLimit() )
-				|| ( _limits.isMoveTimeSearch() && _hasFirstIterationFinished() && time >= _limits.getMoveTime() )
 		)
 		{
 			_searchState = searchFinished;
