@@ -3,21 +3,25 @@
 title Vajolet classes
 
 skinparam class {
-	BackgroundColor<<Tested>> PaleGreen
-	ArrowColor<<Tested>> SeaGreen
-	BorderColor<<Tested>> SpringGreen
-
+	BackgroundColor<<Unit_Tested>> PaleGreen
+	ArrowColor<<Unit_Tested>> SeaGreen
+	BorderColor<<Unit_Tested>> SpringGreen
+	BorderColor<<Func_Tested>> DarkRed
+	BackgroundColor<<Func_Tested>> Salmon
 }
+
+note "Green classes are unit Tested\nRed border classes are functionaly functionally Tested" as N1
+
 
 '------------------------
 'book file
 '------------------------
-interface PolyglotBook <<tested>>{
+interface PolyglotBook <<Unit_Tested>>{
   +Move probe(const Position& pos, bool pickBest);
   -PolyglotBook::impl pimpl;
 }
 
-class PolyglotBook::impl <<tested>>{
+class PolyglotBook::impl <<Unit_Tested>>{
   +Move probe(const Position& pos, bool pickBest);
 }
 
@@ -111,26 +115,26 @@ Game o-- "many" GamePosition
 'hashkey file
 '------------------------
 
-class HashKey {
+class HashKey <<Unit_Tested>>{
 }
 
 '------------------------
 'history file
 '------------------------
 
-class History {
+class History <<Unit_Tested>>{
   +void clear();
   +void update(...);
   +Score getValue(...);
 }
 
-class CaptureHistory {
+class CaptureHistory <<Func_Tested>>{
   +void clear();
   +void update(...);
   +Score getValue(...);
 }
 
-class CounterMove {
+class CounterMove <<Func_Tested>>{
   +void clear();
   +void update(...);
   +Move getValue(...);
@@ -142,10 +146,10 @@ CounterMove *-- Move
 'Move file
 '------------------------
 
-class Move <<tested>>{
+class Move <<Unit_Tested>>{
 }
 
-class extMove <<tested>>{
+class extMove <<Unit_Tested>>{
   +setScore()
 }
 
@@ -154,7 +158,7 @@ Move <|-- extMove
 '------------------------
 'Movegen file
 '------------------------
-class Movegen {
+class Movegen <<Func_Tested>>{
   +template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
   -const Position &_pos;
 }
@@ -166,7 +170,7 @@ Movegen o-- Move
 '------------------------
 'MoveList file
 '------------------------
-class MoveList <<tested>>{
+class MoveList <<Unit_Tested>>{
   -std::array< extMove, N > _ml;
   +const Move& getNextMove(void);
 }
@@ -177,7 +181,7 @@ MoveList o-- Move
 '------------------------
 'MovePicker file
 '------------------------
-class MovePicker {
+class MovePicker <<Func_Tested>>{
   -MoveList<MAX_MOVE_PER_POSITION> _moveList;
   -MoveList<MAX_BAD_MOVE_PER_POSITION> _badCaptureList;
   -const Position& _pos;
@@ -199,7 +203,7 @@ MovePicker *-- "many" Move
 'MultiPVManager file
 '------------------------
 
-class MultiPVManager <<tested>>{
+class MultiPVManager <<Unit_Tested>>{
   -std::vector<rootMove> _res;
   -std::vector<rootMove> _previousRes;
 }
@@ -210,7 +214,7 @@ MultiPVManager *-- "many" rootMove
 'perft file
 '------------------------
 
-class Perft <<tested>>{
+class Perft <<Unit_Tested>>{
   -Position & _pos;
 }
 
@@ -222,7 +226,7 @@ Perft o-- MovePicker
 'polyglotKey file
 '------------------------
 
-class PolyglotKey <<tested>>{
+class PolyglotKey <<Unit_Tested>>{
   +uint64_t get(const Position& pos);
 }
 
@@ -230,7 +234,7 @@ class PolyglotKey <<tested>>{
 'position file
 '------------------------
 
-class Position {
+class Position <<Func_Tested>>{
   -const Movegen _mg;
   -pawnTable pawnHashTable;
   -std::vector<state> stateInfo;
@@ -251,14 +255,14 @@ Position *-- "many" materialStruct
 
 
 
-class materialStruct {
+class materialStruct <<Func_Tested>>{
 }
 
 '------------------------
 'PVline file
 '------------------------
 
-class PVline <<tested>>{
+class PVline <<Unit_Tested>>{
 } 
 
 PVline *-- Move
@@ -267,7 +271,7 @@ PVline *-- Move
 'PVlineFollower file
 '------------------------
 
-class PVlineFollower <<tested>>{
+class PVlineFollower <<Unit_Tested>>{
   -PVline _line;
 }
 
@@ -277,7 +281,7 @@ PVlineFollower *-- PVline
 'rootMove file
 '------------------------
 
-class rootMove {
+class rootMove <<Func_Tested>>{
   +PVline PV;
   +Move firstMove;
   
@@ -290,11 +294,11 @@ rootMove *-- Move
 'search file
 '------------------------
 
-interface Search {
+interface Search <<Func_Tested>>{
   -Search::impl pimpl;
 }
 
-class Search::impl {
+class Search::impl <<Func_Tested>>{
   +{static} std::vector<impl> helperSearch;
   -std::unique_ptr<UciOutput> _UOI;
   -PVlineFollower _pvLineFollower;
@@ -335,14 +339,14 @@ voteSystem o-- "many" rootMove
 'searchData file
 '------------------------
 
-class SearchData {
+class SearchData <<Func_Tested>>{
   +Sd story[800];
   +CounterMove counterMoves;
   +CaptureHistory captureHistory;
   +History history;
 }
 
-class Sd {
+class Sd <<Func_Tested>>{
   +Move excludeMove;
   +Move killers[2];
 }
@@ -358,7 +362,7 @@ Sd *-- Move
 'searchLimits file
 '------------------------
 
-class SearchLimits {
+class SearchLimits <<Func_Tested>>{
   -long long int _wtime;
   -long long int _btime;
   -long long int _winc;
@@ -379,7 +383,7 @@ SearchLimits *-- "many" Move
 'searchResult file
 '------------------------
 
-class SearchResult {
+class SearchResult <<Func_Tested>>{
   +PVline PV;
 }
 
@@ -389,7 +393,7 @@ SearchResult *-- PVline
 'searchTimer file
 '------------------------
 
-class SearchTimer {
+class SearchTimer <<Func_Tested>>{
   -std::chrono::time_point<std::chrono::steady_clock> startTime;
   -std::chrono::time_point<std::chrono::steady_clock> ponderTime;
 }
@@ -398,7 +402,7 @@ class SearchTimer {
 'state file
 '------------------------
 
-class state {
+class state <<Func_Tested>>{
   -eCastle _castleRights;
   -Move _currentMove;
   -bitMap _pinnedPieces;
@@ -424,7 +428,7 @@ state *-- "3" HashKey
 'tables file
 '------------------------
 
-class pawnEntry {
+class pawnEntry <<Func_Tested>>{
   +HashKey key;
   +bitMap weakPawns;
   +bitMap passedPawns;
@@ -434,7 +438,7 @@ class pawnEntry {
   +Score res[2];
 }
 
-class pawnTable {
+class pawnTable <<Func_Tested>>{
   +void insert(const HashKey& key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles);
   +pawnEntry& probe(const HashKey& key);
   
@@ -448,7 +452,7 @@ pawnTable *-- "many" pawnEntry
 'thread file
 '------------------------
 
-class my_thread {
+class my_thread <<Func_Tested>>{
   -my_thread::impl pimpl;
   +{static} my_thread& getInstance();
   +void startThinking( const Position& p, SearchLimits& l);
@@ -457,7 +461,7 @@ class my_thread {
   +timeManagement& getTimeMan();
 }
 
-class my_thread::impl {
+class my_thread::impl <<Func_Tested>>{
   -SearchLimits _limits; // todo limits belong to threads
   -SearchTimer _st;
   -Search _src;
@@ -478,7 +482,7 @@ my_thread::impl *-- UciOutput
 'timeManagement file
 '------------------------
 
-class timeManagement <<tested>>{
+class timeManagement <<Unit_Tested>>{
   -bool _firstIterationFinished;
   -bool _idLoopIterationFinished;
   -bool _idLoopFailLow;
@@ -498,7 +502,7 @@ timeManagement o-- SearchLimits
 '------------------------
 'transposition file
 '------------------------
-class ttEntry {
+class ttEntry <<Func_Tested>>{
 }
 
 class transpositionTable {
@@ -506,7 +510,7 @@ class transpositionTable {
   +{static} transpositionTable& getInstance();
 }
 
-class PerftTranspositionTable {
+class PerftTranspositionTable <<Func_Tested>>{
 }
 
 transpositionTable *-- "many" ttEntry
@@ -516,7 +520,7 @@ PerftTranspositionTable *-- transpositionTable
 'uci Parameters file
 '------------------------
 
-class uciParameters {
+class uciParameters <<Func_Tested>>{
 }
 
 @enduml

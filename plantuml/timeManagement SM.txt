@@ -1,0 +1,17 @@
+@startuml
+
+[*] --> infiniteSearch : 1) _limits.isInfiniteSearch()
+[*] --> fixedTimeSearch : 2) _limits.isMoveTimeSearch()
+[*] --> standardSearchPonder : 3) _limits.isPondering()
+[*] --> standardSearch : else
+
+infiniteSearch --> searchFinished : stop ||\n (firstIteration Finished && \n node limits exceeded)
+fixedTimeSearch --> searchFinished : stop ||\n (firstIteration Finished && \n time limits exceeded) 
+standardSearchPonder --> searchFinished : stop
+standardSearchPonder --> standardSearch : !_limits.isPondering()
+standardSearch --> searchFinished : stop ||\n (IdLoopEnded &&\n time > minTime &&\n time > 70% allocatedTime ) ||\n (firstIteration Finished &&\n time >= allocatedTime)
+standardSearch --> standardSearchExtendedTime : time >= allocatedTime \n && failover
+standardSearchExtendedTime --> searchFinished : stop ||\n ( time >= maxAllocatedTime && \nfirstIteration Finished )\n || IdLoopEnded
+searchFinished --> [*]
+
+@enduml
