@@ -58,9 +58,9 @@ public:
 		return instance;
 	}
 	void uciLoop(void);
-	char getPieceName( const bitboardIndex idx );
-	std::string displayUci( const Move& m );
-	std::string displayMove( const Position& pos, const Move& m );
+	static char getPieceName( const bitboardIndex idx );
+	static std::string displayUci( const Move& m );
+	static std::string displayMove( const Position& pos, const Move& m );
 };
 
 /******************************************

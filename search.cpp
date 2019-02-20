@@ -220,7 +220,7 @@ public:
 		for (auto &res : votes)
 		{
 			Move m(res.first);
-			std::cout<<"Move: "<<UciManager::getInstance().displayUci(m)<<" votes: "<<res.second;
+			std::cout<<"Move: "<<UciManager::displayUci(m)<<" votes: "<<res.second;
 			if( bm == m ) std::cout<<" *****";
 			std::cout<<std::endl;
 		}
@@ -230,11 +230,11 @@ public:
 		{
 			if( res == bm)
 			{
-				std::cout<<"bestMove: "<<UciManager::getInstance().displayUci(res.firstMove)<<" *****"<<std::endl;
+				std::cout<<"bestMove: "<<UciManager::displayUci(res.firstMove)<<" *****"<<std::endl;
 			}
 			else
 			{
-				std::cout<<"bestMove: "<<UciManager::getInstance().displayUci(res.firstMove)<<std::endl;
+				std::cout<<"bestMove: "<<UciManager::displayUci(res.firstMove)<<std::endl;
 			}
 			std::cout<<"score: "<<res.score<<std::endl;
 			std::cout<<"depth: "<<res.depth<<std::endl;
@@ -447,7 +447,7 @@ void Search::impl::_printRootMoveList() const
 	for( auto m: _rootMovesToBeSearched)
 	{
 		++i;
-		std::cout<<i<<": "<<UciManager::getInstance().displayUci(m)<<std::endl;
+		std::cout<<i<<": "<<UciManager::displayUci(m)<<std::endl;
 		
 	}
 	std::cout<<sync_endl;
