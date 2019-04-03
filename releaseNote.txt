@@ -1,0 +1,63 @@
+release note 2.7
+
+fix:
+  2.6 crash debug
+  wrong scores when draw is reached
+  syszygy in search
+  contempt code
+  multiPV fix
+  futility pruning
+  moveIsLegal
+  multithread debugging
+  time manager for very short time  (lost on time)
+  ttdepth
+  openingbook management
+  
+move ordering:
+  better improve move list update
+  improve quiet move history
+  add capture history
+  improve counter move
+  pvlineFollower Debug
+  window quit signal handler
+  
+eval:
+  king safety
+  
+search:
+  improve futilityMoveCount
+  improve search when the game has been won
+  reduced score range of mate
+  multithread vote system
+  add improving framework
+    lrm
+    futility
+    futilityMoveCount
+  probcut
+  simplify razor
+
+time management
+  timemanager debug and rewrite
+  
+general:
+  add UseHashInPerft options & transpostion refactor
+  add uciLoggerClass
+  implemented semantic versioning
+  reduce verbosity command
+  remove uci score cap
+  add command line bench calc
+  refactor multithread code
+  very big code and design refactor
+  update build scripts
+  benchmark refactor
+  make evaluation simmetrical
+  add integration tests
+  make code ONE_PLY indipendent
+  uci command refactor
+  perft refactor
+  
+CI/CD
+  restore travis builds
+  restore coverage
+  add integration tests
+  plantuml docs
