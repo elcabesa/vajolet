@@ -21,8 +21,10 @@
 #include <iostream>
 #include <fstream>
 #include <stack>
-#include "move.h"
+
 #include "command.h"
+#include "move.h"
+
 
 class logger
 {
@@ -54,7 +56,7 @@ public:
 
 			unsigned long long startNode = st.top();
 			unsigned long long endNode = nodeId;
-			ofs <<"\tN"<<std::to_string(startNode)<<" -> N"<<std::to_string(endNode)<<" [label=\""<< displayUci(m)<< "\"];"<<std::endl;
+			ofs <<"\tN"<<std::to_string(startNode)<<" -> N"<<std::to_string(endNode)<<" [label=\""<< UciManager::displayUci(m)<< "\"];"<<std::endl;
 		}
 		st.push(nodeId);
 		nodeId++;

@@ -15,28 +15,46 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "vajolet.h"
+#include <csignal>
+#include <iostream>
+
+#include "benchmark.h"
 #include "command.h"
-#include "io.h"
-#include "bitops.h"
-#include "data.h"
-#include "hashKeys.h"
-#include "position.h"
-#include "movegen.h"
-#include "transposition.h"
-#include "search.h"
-#include "eval.h"
-#include "syzygy/tbprobe.h"
+#include "libchess.h"
 
-
-/*!	\brief	print the startup information
-	\author Marco Belli
-	\version 1.0
-	\date 21/10/2013
-*/
-static void printStartInfo(void)
+void signalHandler(int signum)
 {
-	sync_cout<<PROGRAM_NAME<<" "<<VERSION<<" by Marco Belli"<<sync_endl;
+	exit(signum);
+}
+
+static void init()
+{
+	
+	signal(SIGINT, signalHandler); 
+#ifdef SIGBREAK	
+	signal(SIGBREAK, signalHandler); 
+#endif
+#ifdef SIGHUP		
+	signal(SIGHUP, signalHandler);  
+#endif
+	//----------------------------------
+	//	init global data
+	//----------------------------------
+	libChessInit();
+}
+
+static bool manageCommandLine( int argc, char* argv[] )
+{
+	if (argc > 1)
+	{
+		std::string command = argv[1];
+		if( command == "bench" )
+		{
+			benchmark();
+			return true;
+		}
+	}
+	return false;
 }
 
 /*!	\brief	main function
@@ -44,31 +62,19 @@ static void printStartInfo(void)
 	\version 1.0
 	\date 21/10/2013
 */
-int main()
+int main( int argc, char* argv[] )
 {
-	//----------------------------------
-	//	init global data
-	//----------------------------------
-	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
-	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
-	
-	printStartInfo();
-	
-	initData();
-	HashKeys::init();
-	Position::initScoreValues();
-	Position::initCastleRightsMask();
-	Movegen::initMovegenConstant();
 
-	Search::initLMRreduction();
-	TT.setSize(1);
-	Position::initMaterialKeys();
-	tb_init(Search::SyzygyPath.c_str());
+	init();
 
+	// manage bench from commandline
+	if( manageCommandLine( argc, argv ) )
+	{
+		return 0;
+	}
 	//----------------------------------
 	//	main loop
 	//----------------------------------
-	
-	uciLoop();
+	UciManager::getInstance().uciLoop();
 	return 0;
 }

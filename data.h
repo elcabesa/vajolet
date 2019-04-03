@@ -17,13 +17,16 @@
 
 #ifndef DATA_H_
 #define DATA_H_
-#include "vajolet.h"
+
+#include "bitops.h"
+#include "eCastle.h"
+#include "tSquare.h"
+
+
 
 //------------------------------------------------
 //enum
 //------------------------------------------------
-
-
 
 //------------------------------------------------
 //	const
@@ -32,22 +35,10 @@
 //------------------------------------------------
 //	extern variables
 //------------------------------------------------
-extern bitMap BITSET[squareNumber+1];
-extern tSquare BOARDINDEX[8][8];
-extern const int FILES[squareNumber];
-extern const int RANKS[squareNumber];
-extern bitMap RANKMASK[squareNumber];
-extern bitMap FILEMASK[squareNumber];
-//extern bitMap DIAGA1H8MASK[squareNumber];
-//extern bitMap DIAGA8H1MASK[squareNumber];
-extern bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
-//extern bitMap LINES[squareNumber][squareNumber];
+// todo move them in position, eval or endgame
 extern bitMap ISOLATED_PAWN[squareNumber];
 extern bitMap PASSED_PAWN[2][squareNumber];
 extern bitMap SQUARES_IN_FRONT_OF[2][squareNumber];
-extern const int SQUARE_COLOR[squareNumber];
-extern bitMap BITMAP_COLOR[2];
-extern int SQUARE_DISTANCE[squareNumber][squareNumber];
 extern bitMap centerBitmap;
 extern bitMap bigCenterBitmap;
 extern bitMap spaceMask;
@@ -65,7 +56,13 @@ extern bitMap spaceMask;
 */
 inline bitMap bitSet(tSquare n)
 {
+	extern bitMap BITSET[squareNumber+1];
 	return BITSET[n];
+}
+
+inline bool isSquareSet( const bitMap b, const tSquare sq )
+{
+	return b & bitSet( sq );
 }
 
 /*	\brief return true if the 3 squares are aligned
@@ -76,10 +73,41 @@ inline bitMap bitSet(tSquare n)
 inline bool squaresAligned(tSquare s1, tSquare s2, tSquare s3)
 {
 	extern bitMap LINES[squareNumber][squareNumber];
-	return LINES[s1][s2] & bitSet(s3);
-	/*return  (SQUARES_BETWEEN[s1][s2] | SQUARES_BETWEEN[s1][s3] | SQUARES_BETWEEN[s2][s3])
-			& (     bitSet(s1) |        bitSet(s2) |        bitSet(s3));*/
+	return isSquareSet( LINES[s1][s2], s3 );
 }
+
+inline const bitMap& getSquaresBetween( const tSquare sq1, const tSquare sq2 )
+{
+	extern bitMap SQUARES_BETWEEN[squareNumber][squareNumber];
+	return SQUARES_BETWEEN[sq1][sq2];
+}
+
+inline const bitMap& getColorBitmap( const Color c )
+{
+	extern bitMap BITMAP_COLOR[2];
+	return BITMAP_COLOR[c];
+}
+
+inline unsigned int distance( const tSquare sq1, const tSquare sq2 )
+{
+	extern unsigned int SQUARE_DISTANCE[squareNumber][squareNumber];
+	return SQUARE_DISTANCE[sq1][sq2];
+}
+
+inline const bitMap& rankMask( const tSquare sq )
+{
+	extern bitMap RANKMASK[squareNumber];
+	return RANKMASK[sq];
+}
+
+inline const bitMap& fileMask( const tSquare sq )
+{
+	extern bitMap FILEMASK[squareNumber];
+	return FILEMASK[sq];
+}
+
+
+
 //------------------------------------------------
 //	function prototype
 //------------------------------------------------

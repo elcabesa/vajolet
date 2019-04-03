@@ -16,7 +16,7 @@ TEST(Syzygy, test)
 	
 	ASSERT_TRUE(myfile.is_open());
 	
-	tb_init("C:/vajolet/syzygy");
+	tb_init("D:/vajolet/syzygy");
 	ASSERT_TRUE(TB_LARGEST > 0);
 	
 	
@@ -46,36 +46,36 @@ TEST(Syzygy, test)
 		pos.setupFromFen(fen); 
 		
 		
-		unsigned result1 = tb_probe_wdl(pos.getBitmap(Position::whitePieces),
-			pos.getBitmap(Position::blackPieces),
-			pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
-			pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
-			pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
-			pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
-			pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
-			pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
+		unsigned result1 = tb_probe_wdl(pos.getBitmap(whitePieces),
+			pos.getBitmap(blackPieces),
+			pos.getBitmap(blackKing) | pos.getBitmap(whiteKing),
+			pos.getBitmap(blackQueens) | pos.getBitmap(whiteQueens),
+			pos.getBitmap(blackRooks) | pos.getBitmap(whiteRooks),
+			pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
+			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
+			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
 			0,//pos.getActualState().fiftyMoveCnt,
-			pos.getActualState().castleRights,
-			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-			pos.getActualState().nextMove== Position::whiteTurn);
+			pos.getActualState().getCastleRights(),
+			pos.hasEpSquare() ? pos.getEpSquare(): 0,
+			pos.isWhiteTurn() );
 
 		//EXPECT_NE(result1, TB_RESULT_FAILED);
 		int wdl_res = TB_GET_WDL(result1)-2;
 		
 		
 		unsigned results[TB_MAX_MOVES];
-		unsigned result2 = tb_probe_root(pos.getBitmap(Position::whitePieces),
-			pos.getBitmap(Position::blackPieces),
-			pos.getBitmap(Position::blackKing) | pos.getBitmap(Position::whiteKing),
-			pos.getBitmap(Position::blackQueens) | pos.getBitmap(Position::whiteQueens),
-			pos.getBitmap(Position::blackRooks) | pos.getBitmap(Position::whiteRooks),
-			pos.getBitmap(Position::blackBishops) | pos.getBitmap(Position::whiteBishops),
-			pos.getBitmap(Position::blackKnights) | pos.getBitmap(Position::whiteKnights),
-			pos.getBitmap(Position::blackPawns) | pos.getBitmap(Position::whitePawns),
-			pos.getActualState().fiftyMoveCnt,
-			pos.getActualState().castleRights,
-			pos.getActualState().epSquare == squareNone? 0 : pos.getActualState().epSquare ,
-			pos.getActualState().nextMove== Position::whiteTurn,
+		unsigned result2 = tb_probe_root(pos.getBitmap(whitePieces),
+			pos.getBitmap(blackPieces),
+			pos.getBitmap(blackKing) | pos.getBitmap(whiteKing),
+			pos.getBitmap(blackQueens) | pos.getBitmap(whiteQueens),
+			pos.getBitmap(blackRooks) | pos.getBitmap(whiteRooks),
+			pos.getBitmap(blackBishops) | pos.getBitmap(whiteBishops),
+			pos.getBitmap(blackKnights) | pos.getBitmap(whiteKnights),
+			pos.getBitmap(blackPawns) | pos.getBitmap(whitePawns),
+			pos.getActualState().getIrreversibleMoveCount(),
+			pos.getActualState().getCastleRights(),
+			pos.hasEpSquare() ? pos.getEpSquare(): 0,
+			pos.isWhiteTurn(),
 			results);
 			
 		//EXPECT_NE(result2, TB_RESULT_FAILED);

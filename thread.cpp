@@ -15,353 +15,250 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "thread.h"
+#include <condition_variable>
+#include <thread>
+#include <mutex>
+
 #include "io.h"
+#include "position.h"
 #include "search.h"
-#include "movegen.h"
-#include "book.h"
-#include "command.h"
+#include "searchLimits.h"
+#include "searchTimer.h"
+#include "timeManagement.h"
+#include "thread.h"
+#include "transposition.h"
+#include "uciParameters.h"
 
 
-
-
-void timeManagerInit(const Position& pos, searchLimits& lim, timeManagementStruct& timeMan)
+/*********************************************
+* implementation
+**********************************************/
+class my_thread::impl
 {
-	timeMan.FirstIterationFinished = false;
-	if((!lim.btime && !lim.wtime) && !lim.moveTime)
-	{
-		lim.infinite = true;
-		timeMan.resolution = 100;
-	}
-	else if(lim.moveTime)
-	{
-		timeMan.maxAllocatedTime = lim.moveTime+1;
-		timeMan.allocatedTime = lim.moveTime;
-		timeMan.minSearchTime =lim.moveTime;
-		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
-	}
-	else
-	{
-		unsigned int time;
-		unsigned int increment;
+private:
 
-		if(pos.getNextTurn())
-		{
-			time = lim.btime;
-			increment = lim.binc;
-		}
-		else
-		{
-			time = lim.wtime;
-			increment = lim.winc;
-		}
-
-
-
-		if(lim.movesToGo > 0)
-		{
-			timeMan.allocatedTime = time / lim.movesToGo;
-			timeMan.maxAllocatedTime = 10.0 * timeMan.allocatedTime;
-			timeMan.maxAllocatedTime = std::min(10.0 * timeMan.allocatedTime, 0.8 * time);
-			timeMan.maxAllocatedTime = std::max(timeMan.maxAllocatedTime,timeMan.allocatedTime);
-		}
-		else
-		{
-			timeMan.allocatedTime = time / 35.0 + increment * 0.98;
-			timeMan.maxAllocatedTime= 10 * timeMan.allocatedTime;
-		}
-
-		timeMan.resolution = std::min((long long int)100, timeMan.allocatedTime/100);
-		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)( time - 2 * timeMan.resolution));
-		timeMan.minSearchTime = timeMan.allocatedTime * 0.3;
-		long long buffer = std::max( 2 * timeMan.resolution, 200u );
-		timeMan.allocatedTime = std::min( (long long int)timeMan.allocatedTime ,(long long int)(time - buffer ));
-		timeMan.maxAllocatedTime = std::min( (long long int)timeMan.maxAllocatedTime ,(long long int)(time - buffer ));
-	}
-
-
-
-	timeMan.singularRootMoveCount = 0;
-	timeMan.idLoopIterationFinished = false;
-	timeMan.idLoopAlpha = false;
-	timeMan.idLoopBeta = false;
-
-	//sync_cout<<"info debug resolution "<<timeMan.resolution<<sync_endl;
-	//sync_cout<<"info debug allocatedTime "<<timeMan.allocatedTime<<sync_endl;
-
-}
-
-
-volatile bool my_thread::quit = false;
-volatile bool my_thread::startThink = false;
-
-
-timeManagementStruct my_thread::timeMan;
-
-
-long long my_thread::lastHasfullMessage;
-
-
-my_thread * my_thread::pInstance;
-std::mutex  my_thread::_mutex;
-
-
-void my_thread::timerThread()
-{
-	std::mutex mutex;
-	while (!quit)
-	{
-
-		std::unique_lock<std::mutex> lk(mutex);
-
-		timerCond.wait(lk, [&]{return (startThink && src.stop==false ) || quit;} );
-		if (!quit)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(timeMan.resolution));
-			long long int time = src.getClockTime();
-
-			if(timeMan.idLoopIterationFinished)
-			{
-				timeMan.FirstIterationFinished = true;
-			}
-			if(!src.stop && time >= timeMan.allocatedTime && ( timeMan.idLoopAlpha || timeMan.idLoopBeta ) )
-			{
-				timeMan.allocatedTime = timeMan.maxAllocatedTime;
-				//sync_cout<<"info debug EXTEND TIME: "<<timeMan.allocatedTime<<sync_endl;
-			}
-			if(!src.stop && timeMan.maxAllocatedTime == timeMan.allocatedTime /*&& time >= timeMan.allocatedTime */&& ( timeMan.idLoopIterationFinished ) && !(src.limits.infinite || src.limits.ponder) )
-			{
-				src.stop = true;
-				//sync_cout<<"info debug FINISHED ITERATION IN EXTEND TIME "<<time<<sync_endl;
-			}
-
-			if(!src.stop && time >= timeMan.allocatedTime && timeMan.FirstIterationFinished && !(src.limits.infinite || src.limits.ponder))
-			{
-				//sync_cout<<"info debug TIME EXPIRED "<<time<< " >= "<<timeMan.allocatedTime<<sync_endl;
-				src.stop = true;
-			}
-			if(!src.stop && timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && time >= timeMan.allocatedTime*0.7 && !(src.limits.infinite || src.limits.ponder))
-			{
-				//sync_cout<<"info debug STOP BECAUSE WE WILL PROBABLY NOT BE ABLE TO FINISH THE NEXT ITERATION "<<time<<":"<<timeMan.allocatedTime<<sync_endl;
-				src.stop = true;
-			}
-#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-			if(time - lastHasfullMessage > 1000)
-			{
-
-				lastHasfullMessage = time;
-				unsigned int fullness = TT.getFullness();
-				unsigned long long int thbits = src.getTbHits();
-				unsigned long long int nodes = src.getVisitedNodes();
-
-				sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)time) << sync_endl;
-
-				if(src.showCurrentLine)
-				{
-					src.showLine = true;
-				}
-
-			}
-
-#endif
-
-
-
-			if(timeMan.idLoopIterationFinished && time >= timeMan.minSearchTime && !(src.limits.infinite || src.limits.ponder))
-			{
-				if(timeMan.singularRootMoveCount >=20)
-				{
-					//sync_cout<<"info debug EARLY STOP"<<sync_endl;
-					src.stop = true;
-				}
-			}
-
-
-			if(src.limits.nodes && timeMan.FirstIterationFinished && src.getVisitedNodes() > src.limits.nodes)
-			{
-				src.stop = true;
-			}
-			if(src.limits.moveTime && timeMan.FirstIterationFinished && time>=src.limits.moveTime)
-			{
-				src.stop = true;
-			}
-			if(src.stop)
-			{
-				sync_cout<<"info hashfull " << TT.getFullness() << sync_endl;
-				sync_cout<<"info tbhits " << src.getTbHits() << sync_endl;
-			}
-			timeMan.idLoopIterationFinished = false;
-		}
-		lk.unlock();
-	}
-}
-
-void my_thread::searchThread()
-{
-	std::mutex mutex;
-	while (!quit)
-	{
-
-		std::unique_lock<std::mutex> lk(mutex);
-		searchCond.wait(lk, [&]{return startThink||quit;} );
-		if(!quit)
-		{
-			timeManagerInit(src.pos, src.limits, timeMan);
-			src.stop = false;
-			src.resetStartTime();
-			src.resetPonderTime();
-			timerCond.notify_one();
-			src.stop = false;
-			manageNewSearch();
-			startThink = false;
-		}
-		lk.unlock();
-	}
-}
-
-void my_thread::manageNewSearch()
-{
-
-
-	/*************************************************
-	 *	first of all check the number of legal moves
-	 *	if there is only 1 moves do it
-	 *	if there is 0 legal moves return null move
-	 *************************************************/
-
-	if( game.isNewGame(src.pos))
-	{
-		game.CreateNewGame();
-
-	}
-	game.insertNewMoves(src.pos);
-
-
-	Movegen mg(src.pos);
-	unsigned int legalMoves = mg.getNumberOfLegalMoves();
-
-	if(legalMoves == 0)
-	{
-		while((src.limits.infinite && !src.stop) || src.limits.ponder){}
-
-		sync_cout<<"info depth 0 score cp 0"<<sync_endl;
-		sync_cout<<"bestmove 0000"<<sync_endl;
-
-		return;
-	}
-	else if( legalMoves == 1 )
-	{
-		if(!src.limits.infinite)
-		{
-			Move m = mg.getMoveFromMoveList(0);
-			sync_cout << "info pv " << displayUci(m) << sync_endl;
-			while(src.limits.ponder){}
-			sync_cout << "bestmove " << displayUci(m);
-
-			src.pos.doMove(m);
-			const ttEntry* const tte = TT.probe(src.pos.getKey());
-			
-			m.packed = tte->getPackedMove();
-			if( src.pos.isMoveLegal(m) )
-			{
-				std::cout<<" ponder "<<displayUci(m)<<sync_endl;
-			}
-			else
-			{
-				std::cout<<sync_endl;
-			}
-			src.pos.undoMove();
-
-			return;
-		}
-	}
-
-	//----------------------------------------------
-	//	book probing
-	//----------------------------------------------
-	if(Search::useOwnBook && !src.limits.infinite )
-	{
-		PolyglotBook pol;
-		Move bookM = pol.probe(src.pos, Search::bestMoveBook);
-		if(bookM.packed)
-		{
-			sync_cout << "info pv " << displayUci(bookM) << sync_endl;
-			while( (src.limits.infinite && !src.stop) || src.limits.ponder){}
-			sync_cout<<"bestmove "<< displayUci(bookM) << sync_endl;
-			return;
-		}
-	}
-	startThinkResult res;
-	/*if(game.isPonderRight())
-	{
-		sync_cout<<"info debug PONDER RIGHT"<<sync_endl;
-	}else
-	{
-		sync_cout<<"info debug PONDER WRONG"<<sync_endl;
-	}*/
-	res = src.startThinking();
-
-
-
-	std::list<Move> PV = res.PV;
-
-	while(src.limits.ponder)
-	{
-	}
-
-	//-----------------------------
-	// print out the choosen line
-	//-----------------------------
-	sync_cout << "bestmove " << displayUci( PV.front() );
-
-	if(PV.size() > 1)
-	{
-		std::list<Move>::iterator it = PV.begin();
-		std::advance(it, 1);
-		std::cout<<" ponder "<<displayUci(*it)<<sync_endl;
-	}
-	else
-	{
-		src.pos.doMove( PV.front() );
-		const ttEntry* const tte = TT.probe(src.pos.getKey());
-		
-
-		Move m;
-		m.packed = tte->getPackedMove();
-		if( src.pos.isMoveLegal(m) )
-		{
-			std::cout<<" ponder "<<displayUci(m)<<sync_endl;
-		}
-		else
-		{
-			std::cout<<sync_endl;
-		}
-		src.pos.undoMove();
-
-	}
-
+	const unsigned int _initTimeout = 1;
 	
-	game.savePV(PV, res.depth, res.alpha, res.beta);
+	enum threadStatus
+	{
+		initalizing,
+		ready,
+		running
+	};
+	
+	volatile threadStatus _searchStatus = initalizing;
+	volatile threadStatus _timerStatus = initalizing;
+	
+	std::thread _searcher;
+	std::thread _timer;
+	
+	std::mutex _sMutex;
+	std::mutex _tMutex;
+	
+	std::condition_variable _searchCond;
+	std::condition_variable _timerCond;
+	
+	volatile static bool _quit;
+	volatile static bool _startThink;
+	
+		
+	SearchLimits _limits; // todo limits belong to threads
+	SearchTimer _st;
+	Search _src;
+	timeManagement _timeMan;
+	std::unique_ptr<UciOutput> _UOI;
+	long long _lastHasfullMessageTime;
 
 
-}
+	bool _initThreads();
+	void _quitThreads();
+	
+	void _timerThread();
+	void _searchThread();
+	void _printTimeDependentOutput( long long int time );
+	void _stopPonder();
+
+public:
+	explicit impl();
+	~impl();
+	void startThinking( const Position& p, SearchLimits& l);
+	void stopThinking();
+	void ponderHit();
+	timeManagement& getTimeMan();
+};
+
+volatile bool my_thread::impl::_quit = false;
+volatile bool my_thread::impl::_startThink = false;
 
 
-
-void my_thread::initThreads()
+my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits), _UOI(UciOutput::create())
 {
-	timer = std::thread(&my_thread::timerThread, this);
-	searcher = std::thread(&my_thread::searchThread, this);
-	src.stop = true;
+	if( !_initThreads() )
+	{
+		sync_cout<<"unable to initialize threads, exiting..."<<sync_endl;
+		exit(-1);
+	}
 }
 
-void my_thread::quitThreads()
+my_thread::impl::~impl()
 {
-	quit = true;
-	searchCond.notify_one();
-	timerCond.notify_one();
-	timer.join();
-	searcher.join();
+	_quitThreads();
 }
 
+timeManagement& my_thread::impl::getTimeMan(){ return _timeMan; }
 
+void my_thread::impl::_printTimeDependentOutput(long long int time) {
+
+	if( time - _lastHasfullMessageTime > 1000 )
+	{
+		_lastHasfullMessageTime = time;
+
+		_UOI->printGeneralInfo(transpositionTable::getInstance().getFullness(),	_src.getTbHits(), _src.getVisitedNodes(), time);
+
+		if(uciParameters::showCurrentLine)
+		{
+			_src.showLine();
+		}
+	}
+}
+
+void my_thread::impl::_timerThread()
+{
+	std::unique_lock<std::mutex> lk(_tMutex);
+	
+	while (!_quit)
+	{
+		_timerStatus = ready;
+		_timerCond.notify_one();
+		
+		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan.isSearchFinished() ) || _quit;} );
+		
+		_timerStatus = running;
+		_timerCond.notify_one();
+
+		if (!_quit)
+		{
+			long long int time = _st.getClockTime();
+			
+			bool stop = _timeMan.stateMachineStep( time, _src.getVisitedNodes() );
+			if( stop )
+			{
+				_src.stopSearch();
+			}
+
+#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
+			_printTimeDependentOutput( time );
+#endif
+			std::this_thread::sleep_for(std::chrono::milliseconds( _timeMan.getResolution() ));
+		}
+	}
+	_src.stopSearch();
+}
+
+void my_thread::impl::_searchThread()
+{
+	std::unique_lock<std::mutex> lk(_sMutex);
+	
+	while (!_quit)
+	{
+		_searchStatus = ready;
+		_searchCond.notify_one();
+		
+		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
+		
+		_searchStatus = running;
+		_searchCond.notify_one();
+		
+		if(!_quit)
+		{
+			_limits.checkInfiniteSearch();
+			_timeMan.initNewSearch( _src.getPosition().getNextTurn() );
+			_src.resetStopCondition();
+			_st.resetStartTimers();
+			_timerCond.notify_one();
+			_src.manageNewSearch();
+			_startThink = false;
+			
+		}
+	}
+}
+
+bool my_thread::impl::_initThreads()
+{
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
+	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
+	_timer = std::thread(&my_thread::impl::_timerThread, this);
+	_searcher = std::thread(&my_thread::impl::_searchThread, this);
+	_src.stopSearch();
+	
+	// wait initialization
+	if( !_timerCond.wait_for( lckt, std::chrono::seconds( _initTimeout ), [&]{ return _timerStatus == ready;} ) ) return false;
+	if( !_searchCond.wait_for( lcks, std::chrono::seconds( _initTimeout ), [&]{ return _searchStatus == ready;} ) ) return false;
+
+	return true;
+}
+
+inline void my_thread::impl::_quitThreads()
+{
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lks(_sMutex, std::adopt_lock);
+	std::unique_lock<std::mutex> lkt(_tMutex, std::adopt_lock);
+	_quit = true;
+	lks.unlock();
+	lkt.unlock();
+
+	_searchCond.notify_one();
+	_timerCond.notify_one();
+	_timer.join();
+	_searcher.join();
+}
+
+inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
+{
+	_src.stopSearch();
+	_lastHasfullMessageTime = 0;
+	std::lock( _tMutex, _sMutex );
+	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
+	_searchCond.wait( lcks, [&]{ return _searchStatus == ready; } );
+	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
+	_timerCond.wait( lckt, [&]{ return _timerStatus == ready; } );
+
+	_limits = l;
+	_src.getPosition() = p;
+	_startThink = true;
+	_searchCond.notify_one();
+	
+}
+
+inline void my_thread::impl::stopThinking()
+{
+	_timeMan.stop();
+	_stopPonder();
+}
+
+inline void my_thread::impl::ponderHit()
+{
+	_st.resetPonderTimer();
+	_stopPonder();
+}
+
+inline void my_thread::impl::_stopPonder(){ _limits.setPonder(false);}
+
+
+
+/*********************************************
+* my_thread class
+**********************************************/
+
+my_thread::my_thread(): pimpl{std::make_unique<impl>()}{}
+
+my_thread::~my_thread() = default;
+
+void my_thread::stopThinking() { pimpl->stopThinking();}
+
+void my_thread::ponderHit() { pimpl->ponderHit();}
+
+timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
+
+void my_thread::startThinking( const Position& p, SearchLimits& l){	pimpl->startThinking( p, l); }

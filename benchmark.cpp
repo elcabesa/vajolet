@@ -14,20 +14,19 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#include <fstream>
-#include <iostream>
-#include <istream>
+
+#include <string>
 #include <vector>
-#include <ctime>
-#include <chrono>
 
-#include "vajolet.h"
-#include "search.h"
+#include "io.h"
 #include "position.h"
+#include "search.h"
+#include "searchResult.h"
+#include "searchLimits.h"
+#include "searchTimer.h"
 #include "transposition.h"
-#include "thread.h"
 
-static const std::vector<std::string>positions = {
+static const std::vector<std::string> positions = {
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 10",
   "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 11",
@@ -46,33 +45,42 @@ static const std::vector<std::string>positions = {
   "3q2k1/pb3p1p/4pbp1/2r5/PpN2N2/1P2P2P/5PP1/Q2R2K1 b - - 4 26"
 };
 
-
-void benchmark(void)
-{
-	TT.setSize(32);
-
-	unsigned long long nodes = 0;
-
-	long long int totalTime = Search::getTime();
-
-
-	for (unsigned int i = 0; i < positions.size(); i++)
-	{
-		Search src;
-		src.limits.depth = 15;
-		src.resetStartTime();
-		src.resetPonderTime();
-		src.pos.setupFromFen(positions[i]);
-		sync_cout << "\nPosition: " << i + 1 << '/' << positions.size() << sync_endl;
-		src.startThinking();
-		nodes += src.getVisitedNodes();
+static std::string getNodesPerSecond(const unsigned long long nodeCount, const long long int time) {
+	if (time == 0) {
+		return "---";
+	} else {
+		return std::to_string(1000 * nodeCount / time);
 	}
+}
 
-	totalTime =Search::getTime() - totalTime + 1;
+void benchmark() {
 
+	unsigned long long nodeCount = 0;
+	int i = 0;
+	
+	//  initialize search parameters
+	transpositionTable::getInstance().setSize(32);
+	SearchTimer st;
+	SearchLimits sl;
+	sl.setDepth(15);
+	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
+	
+	
+	// iterate positions
+	for (auto pos: positions) {	
+		src.getPosition().setupFromFen(pos);
+		sync_cout << "Position: " << (++i) << '/' << positions.size() << sync_endl;
+		src.startThinking();
+		nodeCount += src.getVisitedNodes();
+	}
+	
+	// get total time
+	const long long int totalTime = st.getElapsedTime();
+
+	// print result
 	sync_cout << "\n==========================="
        << "\nTotal time (ms) : " << totalTime
-       << "\nNodes searched  : " << nodes
-       << "\nNodes/second    : " << 1000 * nodes / totalTime << sync_endl;
+       << "\nNodes searched  : " << nodeCount
+       << "\nNodes/second    : " << getNodesPerSecond( nodeCount, totalTime ) << sync_endl;
 
 }

@@ -16,26 +16,28 @@
 */
 
 #include <algorithm>
-
-#include "vajolet.h"
+#include <random>
 #include "command.h"
 #include "io.h"
 #include "bitops.h"
 #include "data.h"
-#include "hashKeys.h"
+#include "libchess.h"
 #include "position.h"
 #include "movegen.h"
 #include "transposition.h"
 #include "search.h"
+#include "score.h"
 #include "eval.h"
 #include "parameters.h"
+#include "uciParameters.h"
 #include "syzygy/tbprobe.h"
 #include "eval.h"
 
 #include <fstream>
+#include "hashKey.h"
 
 const int arraySize = 200;
-const int arrayScaling = 300;
+//const int arrayScaling = 300;
 unsigned long long int array[arraySize]= {0};
 
 std::ifstream infile("oracle.epd");
@@ -97,22 +99,22 @@ long double calcSigleError2(Position &p, long double res)
 	
 	if( std::abs( sateval ) <= 199900.0L && std::abs( satres ) <= 199900.0L)
 	{
-		/*unsigned int index = std::abs(sateval - satres)/ arrayScaling;
-		if( index >= arraySize )
-		{
-			index = arraySize -1;
-		}
-		array[index]++;
-		
-
-		if( 
-		std::abs(sateval - satres) >15000
-		//&& std::abs(sateval - satres) < 14100  
-		//&& bitCnt(p.getOccupationBitmap()) >3 
-		)
-		{
-			std::cout<<p.getFen()<<" "<<sateval <<" "<<satres<<" " << sateval - satres<<std::endl;
-		}*/
+		//unsigned int index = std::abs(sateval - satres)/ arrayScaling;
+		//if( index >= arraySize )
+		//{
+		//	index = arraySize -1;
+		//}
+		//array[index]++;
+		//
+		//
+		//if( 
+		//std::abs(sateval - satres) >15000
+		// //&& std::abs(sateval - satres) < 14100  
+		// //&& bitCnt(p.getOccupationBitmap()) >3 
+		//)
+		//{
+		//	std::cout<<p.getFen()<<" "<<sateval <<" "<<satres<<" " << sateval - satres<<std::endl;
+		//}
 	}
 	
 	long double error = sateval - satres ;
@@ -173,10 +175,10 @@ void updateParameter(parameter& par,unsigned int i, const long double delta)
 	{
 		(*(par.pointer))[i] = 1;
 	}
-	/*if(par.requireUpdate)
-	{
-		Position::initPstValues();
-	}*/
+	//if(par.requireUpdate)
+	//{
+	//	Position::initPstValues();
+	//}
 
 }
 
@@ -194,18 +196,11 @@ int main()
 	//----------------------------------
 	//	init global data
 	//----------------------------------
-	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
-	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
-	initData();
-	HashKeys::init();
-	Position::initScoreValues();
-	Position::initCastleRightsMask();
-	Movegen::initMovegenConstant();
+	
+	libChessInit();
 
-	Search::initLMRreduction();
-	TT.setSize(1);
-	Position::initMaterialKeys();
-	tb_init(Search::SyzygyPath.c_str());
+	transpositionTable::getInstance().setSize(1);
+	tb_init(uciParameters::SyzygyPath.c_str());
 	
 	enablePawnHash =false;
 
@@ -414,10 +409,10 @@ int main()
 	std::cout<<"start to optimizing "<<totParameters<<" parameters"<<std::endl;
 
 	
-	/*for(auto& p : parameters)
-	{
-		std::cout<<p.name<<" "<<p.value<<std::endl;
-	}*/
+	//for(auto& p : parameters)
+	//{
+	//	std::cout<<p.name<<" "<<p.value<<std::endl;
+	//}
 
 	std::vector<parameter> bestParameters;
 
@@ -436,11 +431,11 @@ int main()
 	std::cout<<"iteration #"<<iteration<<std::endl;
 	std::cout<<"startError "<<error<<std::endl;
 	
-	/*for( int i = 0; i < arraySize; ++i )
-	{
-	std::cout<<"["<<arrayScaling*(i)<<";"<<arrayScaling*(i+1)<<") "<<array[i]<<std::endl;
-	}
-	return 0;*/
+	//for( int i = 0; i < arraySize; ++i )
+	//{
+	//std::cout<<"["<<arrayScaling*(i)<<";"<<arrayScaling*(i+1)<<") "<<array[i]<<std::endl;
+	//}
+	//return 0;
 
 	while(!stop)
 	{

@@ -17,24 +17,96 @@
 
 #ifndef COMMAND_H_
 #define COMMAND_H_
+
+
+#include <memory>
 #include <string>
-#include <list>
-#include <algorithm>
-#include "position.h"
-#include "move.h"
+#include <vector>
+
+#include "bitBoardIndex.h"
+#include "score.h"
+//--------------------------------------------------------------------
+//	forward declaration
+//--------------------------------------------------------------------
+class Move;
+class Position;
+class rootMove;
+class PVline;
+
+
 //--------------------------------------------------------------------
 //	function prototype
 //--------------------------------------------------------------------
-const char PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
-void uciLoop(void);
+class UciManager
+{
+private:
+	explicit UciManager();
+	~UciManager();
+	UciManager(const UciManager&) = delete;
+	UciManager& operator=(const UciManager&) = delete;
+	UciManager(const UciManager&&) = delete;
+	UciManager& operator=(const UciManager&&) = delete;
+	
+	class impl;
+	std::unique_ptr<impl> pimpl;
+public:
 
-std::string displayUci(const Move & m);
-std::string displayMove(const Position& pos,const Move & m);
-void printCurrMoveNumber(unsigned int moveNumber, const Move &m, unsigned long long visitedNodes, long long int time);
-void showCurrLine(const Position & pos, unsigned int ply);
-void printPVs(unsigned int count);
-void printPV(Score res, unsigned int depth, unsigned int seldepth, Score alpha, Score beta, long long time, unsigned int count, std::list<Move>& PV, unsigned long long nodes);
+	static UciManager& getInstance()
+	{
+		static UciManager instance; // Guaranteed to be destroyed.
+		// Instantiated on first use.
+		return instance;
+	}
+	void uciLoop(void);
+	static char getPieceName( const bitboardIndex idx );
+	static std::string displayUci( const Move& m );
+	static std::string displayMove( const Position& pos, const Move& m );
+};
+
+/******************************************
+UCI output library
+*******************************************/
+class UciOutput
+{
+public:
+	/* factory method */
+	enum type
+	{
+		standard,	// standard output
+		mute		// no output
+	};
+
+	enum PVbound
+	{
+		lowerbound,
+		upperbound,
+		normal
+	};
+
+	static std::unique_ptr<UciOutput> create( const UciOutput::type t  = UciOutput::standard );
+	
+	virtual void setDepth( const unsigned int depth ) final;
+	virtual void setPVlineIndex( const unsigned int PVlineIndex ) final;
 
 
+	// destructor
+	virtual ~UciOutput(){};
+	
+	// virtual output methods
+	virtual void printPVs(std::vector<rootMove>& rm) const = 0;
+	virtual void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1) const = 0;
+	virtual void printPV( const Move& m ) final;
+	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const = 0;
+	virtual void showCurrLine(const Position & pos, const unsigned int ply) const = 0;
+	virtual void printDepth() const = 0;
+	virtual void printScore(const signed int cp) const = 0;
+	virtual void printBestMove( const Move& bm, const Move& ponder ) const = 0;
+	virtual void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const = 0;
+	
+protected:
+	unsigned int _depth;
+	unsigned int _PVlineIndex;
+
+};
 
 #endif /* COMMAND_H_ */

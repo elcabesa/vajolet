@@ -1,3 +1,4 @@
+
 /*
 	This file is part of Vajolet.
 
@@ -18,50 +19,14 @@
 #ifndef MOVEGEN_H_
 #define MOVEGEN_H_
 
-#include <list>
-#include <utility>
-#include <algorithm>
-#include <array>
-#include "vajolet.h"
-#include "move.h"
-#include "position.h"
-#include "search.h"
-#include "history.h"
-#include "bitops.h"
 #include "magicmoves.h"
+#include "MoveList.h"
 
+class Position;
 
-class Movegen{
-private:
-
-	std::array<extMove,MAX_MOVE_PER_POSITION> moveList;
-	std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListEnd;
-	std::array<extMove,MAX_MOVE_PER_POSITION>::iterator moveListPosition;
-
-	std::array<extMove,MAX_BAD_MOVE_PER_POSITION> badCaptureList;
-	std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCaptureEnd;
-	std::array<extMove,MAX_BAD_MOVE_PER_POSITION>::iterator badCapturePosition;
-
-	unsigned int killerPos;
-	Score captureThreshold;
-
-
-	const Position &pos;
-	const Search &src;
-	unsigned int ply;
-	Move ttMove;
-
-	Move killerMoves[2];
-	Move counterMoves[2];
-
-
-
-	enum CastleSide
-	{
-		kingSideCastle,
-		queenSideCastle
-	};
-
+class Movegen
+{
+public:
 	enum genType
 	{
 		captureMg,			// generate capture moves
@@ -75,245 +40,46 @@ private:
 
 
 	};
-
-	enum eStagedGeneratorState
-	{
-		getTT,
-		generateCaptureMoves,
-		iterateGoodCaptureMoves,
-		getKillers,
-		getCounters,
-		generateQuietMoves,
-		iterateQuietMoves,
-		iterateBadCaptureMoves,
-		finishedNormalStage,
-
-		getTTevasion,
-		generateCaptureEvasionMoves,
-		iterateCaptureEvasionMoves,
-		generateQuietEvasionMoves,
-		iterateQuietEvasionMoves,
-		finishedEvasionStage,
-
-		getQsearchTT,
-		generateQuiescentMoves,
-		iterateQuiescentMoves,
-		finishedQuiescentStage,
-
-		getProbCutTT,
-		generateProbCutCaptures,
-		iterateProbCutCaptures,
-		finishedProbCutStage,
-
-		getQsearchTTquiet,
-		generateQuiescentCaptures,
-		iterateQuiescentCaptures,
-		generateQuietCheks,
-		iterateQuietChecks,
-		finishedQuiescentQuietStage,
-
-	}stagedGeneratorState;
-
-	template<Movegen::genType type>	void generateMoves();
-
-	void insertMove(const Move& m)
-	{
-		assert(moveListEnd<moveList.end());
-		(moveListEnd++)->m = m;
-	}
-
-	inline void scoreCaptureMoves()
-	{
-		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
-		{
-			mov->score = pos.getMvvLvaScore(mov->m);
-		}
-	}
-
-	inline void scoreQuietMoves()
-	{
-		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
-		{
-			mov->score = src.getHistory().getValue(pos.getPieceAt((tSquare)mov->m.bit.from),(tSquare)mov->m.bit.to);
-		}
-	}
-
-	inline void scoreQuietEvasion()
-	{
-		for(auto mov = moveListPosition; mov != moveListEnd; ++mov)
-		{
-			mov->score = (pos.getPieceAt((tSquare)mov->m.bit.from));
-			if(pos.getPieceAt((tSquare)mov->m.bit.from) % Position::separationBitmap == Position::King)
-			{
-				mov->score = 20;
-			}
-			mov->score *=500000;
-
-			mov->score += src.getHistory().getValue(pos.getPieceAt((tSquare)mov->m.bit.from),(tSquare)mov->m.bit.to);
-		}
-	}
-
-	inline void resetMoveList()
-	{
-		moveListPosition = moveList.begin();
-		moveListEnd = moveList.begin();
-	}
-
-
-	inline const Move& FindNextBestMove()
-	{
-		const auto max = std::max_element(moveListPosition,moveListEnd);
-		if( max != moveListEnd)
-		{
-			std::swap(*max, *moveListPosition);
-			return (moveListPosition++)->m;
-		}
-		return NOMOVE;
-	}
-	inline void RemoveMove(Move m)
-	{
-		const auto i = std::find(moveListPosition,moveListEnd,m);
-		if( i != moveListEnd)
-		{
-			std::swap(*i, *moveListPosition);
-			++moveListPosition;
-		}
-	}
-
-
-public:
-	const static Move NOMOVE;
-	unsigned int getNumberOfLegalMoves();
-
-	inline unsigned int getGeneratedMoveNumber(void)const { return moveListEnd-moveList.begin();}
-
-	bool isKillerMove(Move &m) const
-	{
-		return m == killerMoves[0] || m == killerMoves[1];
-	}
-
-	const Move& getMoveFromMoveList(unsigned int n) const {	return moveList[n].m; }
-
-	Move getNextMove(void);
-
-
-
-
-
-
-	Movegen(const Position & p, const Search& s, unsigned int ply, const Move & ttm): pos(p),src(s),ply(ply), ttMove(ttm)
-	{
-		if(pos.isInCheck())
-		{
-			stagedGeneratorState = getTTevasion;
-		}
-		else
-		{
-			stagedGeneratorState = getTT;
-		}
-		moveListPosition =  moveList.begin();
-		moveListEnd =  moveList.begin();
-		badCaptureEnd = badCaptureList.begin();
-		badCapturePosition = badCaptureList.begin();
-
-	}
-
-	Movegen(const Position & p): Movegen(p, defaultSearch, 0, NOMOVE)
-	{
-	}
-
-
-	int setupQuiescentSearch(const bool inCheck,const int depth)
-	{
-		if(inCheck)
-		{
-			stagedGeneratorState = getTTevasion;
-			return (-1*ONE_PLY);
-		}
-		else
-		{
-			if(depth >= (0*ONE_PLY))
-			{
-				stagedGeneratorState = getQsearchTTquiet;
-				return -1*ONE_PLY;
-			}
-			else
-			{
-				
-				stagedGeneratorState = getQsearchTT;
-				if(ttMove.packed && /*pos.isMoveLegal(ttMove)&&  */!pos.isCaptureMove(ttMove))
-				{
-					ttMove = NOMOVE;
-				}
-				return (-2*ONE_PLY);
-			}
-		}
-	}
-
-	void setupProbCutSearch(Position::bitboardIndex capturePiece)
-	{
-		/*if(pos.isInCheck())
-		{
-			stagedGeneratorState = getTTevasion;
-		}
-		else*/
-		{
-			stagedGeneratorState = getProbCutTT;
-		}
-
-		captureThreshold = Position::pieceValue[capturePiece][0];
-		if(pos.isMoveLegal(ttMove) && ((!pos.isCaptureMove(ttMove)) || (pos.see(ttMove) < captureThreshold)))
-		{
-			ttMove = NOMOVE;
-		}
-	}
-
-
-
-
-
-
-
+	
+	explicit Movegen(const Position & p): _pos(p){}
+	
+	template<Movegen::genType type>	void generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml)const;
+	
 	static void initMovegenConstant(void);
-
-	template<Position::bitboardIndex piece> inline static bitMap attackFrom(const tSquare& from,const bitMap & occupancy=0xffffffffffffffff)
+	
+	template<bitboardIndex piece> inline static bitMap attackFrom(const tSquare& from,const bitMap& occupancy=0xffffffffffffffff)
 	{
-		assert(piece<Position::lastBitboard);
-		assert(piece!=Position::occupiedSquares);
-		assert(piece!=Position::whitePieces);
-		assert(piece!=Position::blackPieces);
-		assert(piece!=Position::blackPieces);
-		assert(piece!=Position::separationBitmap);
+		assert( isValidPiece( piece ));
 		assert(from<squareNumber);
-		switch(piece)
+		switch( piece )
 		{
-		case Position::whiteKing:
-		case Position::blackKing:
-			return attackFromKing(from);
+		case whiteKing:
+		case blackKing:
+			return _attackFromKing(from, occupancy);
 			break;
-		case Position::whiteQueens:
-		case Position::blackQueens:
+		case whiteQueens:
+		case blackQueens:
 			assert(from<squareNumber);
-			return attackFromQueen(from,occupancy);
+			return _attackFromQueen(from,occupancy);
 			break;
-		case Position::whiteRooks:
-		case Position::blackRooks:
+		case whiteRooks:
+		case blackRooks:
 			assert(from<squareNumber);
-			return attackFromRook(from,occupancy);
+			return _attackFromRook(from,occupancy);
 			break;
-		case Position::whiteBishops:
-		case Position::blackBishops:
-			return attackFromBishop(from,occupancy);
+		case whiteBishops:
+		case blackBishops:
+			return _attackFromBishop(from,occupancy);
 			break;
-		case Position::whiteKnights:
-		case Position::blackKnights:
-			return attackFromKnight(from);
+		case whiteKnights:
+		case blackKnights:
+			return _attackFromKnight(from,occupancy);
 			break;
-		case Position::whitePawns:
-			return attackFromPawn(from,0);
+		case whitePawns:
+			return _attackFromPawn(from,0);
 			break;
-		case Position::blackPawns:
-			return attackFromPawn(from,1);
+		case blackPawns:
+			return _attackFromPawn(from,1);
 			break;
 		default:
 			return 0;
@@ -322,80 +88,87 @@ public:
 
 	}
 
-
-
-
-
-
-
-
-
 	inline static bitMap getRookPseudoAttack(const tSquare& from)
 	{
 		assert(from<squareNumber);
-		return attackFromRook(from,0);
+		return _attackFromRook(from,0);
 	}
 
 	inline static bitMap getBishopPseudoAttack(const tSquare& from)
 	{
 		assert(from<squareNumber);
-		return attackFromBishop(from,0);
+		return _attackFromBishop(from,0);
 	}
-	inline static bitMap getCastlePath(const int x, const int y)
-	{
-		return castlePath[x][y];
-	}
-
+	
 private:
 
+	const Position &_pos;
+	
+	// Move generator magic multiplication numbers for files:
+	static bitMap _KNIGHT_MOVE[squareNumber];
+	static bitMap _KING_MOVE[squareNumber];
+	static bitMap _PAWN_ATTACK[2][squareNumber];
 
-	inline static bitMap attackFromRook(const tSquare& from,const bitMap & occupancy)
+	inline static bitMap _attackFromRook(const tSquare from, const bitMap& occupancy)
 	{
 		assert(from <squareNumber);
-		//return Rmagic(from,occupancy);
 		return *(magicmoves_r_indices[from]+(((occupancy&magicmoves_r_mask[from])*magicmoves_r_magics[from])>>magicmoves_r_shift[from]));
-
 	}
 
-	inline static bitMap attackFromBishop(const tSquare from,const bitMap & occupancy)
+	inline static bitMap _attackFromBishop(const tSquare from, const bitMap& occupancy)
 	{
 		assert(from <squareNumber);
 		return *(magicmoves_b_indices[from]+(((occupancy&magicmoves_b_mask[from])*magicmoves_b_magics[from])>>magicmoves_b_shift[from]));
-		//return Bmagic(from,occupancy);
-
 	}
-	inline static bitMap attackFromQueen(const tSquare from,const bitMap & occupancy)
+	
+	inline static bitMap _attackFromQueen(const tSquare from, const bitMap& occupancy)
 	{
-		return attackFromRook(from,occupancy) | attackFromBishop(from,occupancy);
+		return _attackFromRook(from,occupancy) | _attackFromBishop(from,occupancy);
 	}
-	inline static const bitMap& attackFromKnight(const tSquare& from)
-	{
-		assert(from <squareNumber);
-		return KNIGHT_MOVE[from];
-	}
-	inline static const bitMap& attackFromKing(const tSquare& from)
+	
+	inline static bitMap _attackFromKnight(const tSquare from, const bitMap&)
 	{
 		assert(from <squareNumber);
-		return KING_MOVE[from];
+		return _KNIGHT_MOVE[from];
 	}
-	inline static const bitMap& attackFromPawn(const tSquare& from,const unsigned int& color )
+	
+	inline static bitMap _attackFromKing(const tSquare from, const bitMap&)
+	{
+		assert(from <squareNumber);
+		return _KING_MOVE[from];
+	}
+	
+	inline static bitMap _attackFromPawn(const tSquare from ,const unsigned int& color )
 	{
 		assert(color <=1);
 		assert(from <squareNumber);
-		return PAWN_ATTACK[color][from];
+		return _PAWN_ATTACK[color][from];
 	}
-
-
-	// Move generator magic multiplication numbers for files:
-	static bitMap KNIGHT_MOVE[squareNumber];
-	static bitMap KING_MOVE[squareNumber];
-	static bitMap PAWN_ATTACK[2][squareNumber];
-	static bitMap ROOK_PSEUDO_ATTACK[squareNumber];
-	static bitMap BISHOP_PSEUDO_ATTACK[squareNumber];
-	static bitMap castlePath[2][2];
-
-
-
+	
+	static bool _isValidCoordinate( const int tofile, const int torank );
+	static void _setBit( bitMap& b, tFile file, tRank rank );
+	
+	template<Movegen::genType type>	void insertStandardMove( MoveList<MAX_MOVE_PER_POSITION>& ml, const Move& m ) const;
+	void insertPromotionMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, Move& m ) const;
+	
+	template<Movegen::genType type>	void generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap kingTarget, const bitMap enemy )const;
+	
+	template<Movegen::genType type>	void generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&),const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target)const;
+	
+	template<Movegen::genType type, bool promotion> bitMap generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const;
+	
+	template<Movegen::genType type> void generatePawnDoublePushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const;
+	
+	template<Movegen::genType type, bool promotion> void generatePawnCaptureLeft( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const;
+	
+	template<Movegen::genType type, bool promotion> void generatePawnCaptureRight( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const;
+	
+	template<Movegen::genType type, bool promotion> void generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, int delta, bitMap moves, const tSquare kingSquare)const;
+	
+	inline void generateEpMove(MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const bitMap occupiedSquares, const tSquare kingSquare) const;
+	
+	template<Movegen::genType type>void generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const;
+	template<Movegen::genType type>void generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const;
 };
 
 

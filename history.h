@@ -22,59 +22,110 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <array>
 
+#include "bitBoardIndex.h"
+#include "move.h"
+#include "score.h"
+#include "tSquare.h"
 #include "vajolet.h"
-#include "position.h"
+
 
 
 class History
 {
 private:
-	static const Score Max = Score(500000);
-	Score table[Position::lastBitboard][squareNumber];
+	Score _table[2][squareNumber][squareNumber] = {};
 public :
 
-	inline void clear() { std::memset(table, 0, sizeof(table)); }
+	inline void clear() { std::memset(_table, 0, sizeof(_table)); }
 
-
-	inline void update(Position::bitboardIndex p, tSquare to, Score v)
+	inline void update( const Color c, const Move& m, const Score v)
 	{
+		const int W = 32;
+		const int D = 500;
 
-		assert(p<Position::lastBitboard);
-		assert(to<squareNumber);
-
-		if (abs(table[p][to] + v) < Max)
-		{
-			table[p][to] +=  v;
-		}
-	}
-	inline Score getValue(Position::bitboardIndex p, tSquare to) const
-	{
-		assert(p<Position::lastBitboard);
-		assert(to<squareNumber);
-		return table[p][to];
+		assert(c<=black);
+		
+		Score & e = _table[c][m.getFrom()][m.getTo()];
+		e += v * W - e * std::abs(v)/ D;
 	}
 
+	inline Score getValue( const Color c, const Move& m ) const
+	{
+		assert(c<=black);
+		return _table[c][m.getFrom()][m.getTo()];
+	}
 
-	History(){}
+	explicit History(){}
+
+};
+
+class CaptureHistory
+{
+private:
+	// piece, to, captured piece
+	Score _table[lastBitboard][squareNumber][lastBitboard] = {};
+public :
+
+	inline void clear() { std::memset(_table, 0, sizeof(_table)); }
+
+
+	inline void update( const bitboardIndex p, const Move& m, const bitboardIndex captured, const Score v)
+	{
+				
+		const int W = 2;
+		const int D = 324;
+		
+		//if( captured == empty && m.bit.flags == Move::fenpassant )
+		//{
+		//	captured = ( isblack( p ) ? whitePawns : blackPawns );
+		//}
+		
+		assert( isValidPiece( p ));
+		assert( isValidPiece( captured ) || captured == empty );
+		const tSquare to = (tSquare)m.getTo();
+
+		Score &e = _table[p][to][captured];
+		e += v * W - e * std::abs(v)/ D;
+	}
+	inline Score getValue( const bitboardIndex p, const Move& m, bitboardIndex captured ) const
+	{
+		//if( captured == empty && m.bit.flags == Move::fenpassant )
+		//{
+		//	captured = ( isblack( p ) ? whitePawns : blackPawns );
+		//}
+		assert( isValidPiece( p ) );
+		assert( isValidPiece( captured ) || captured == empty );
+		const tSquare to = (tSquare)m.getTo();
+		return _table[p][to][captured];
+	}
+
+
+	explicit CaptureHistory(){}
 
 };
 
 class CounterMove
 {
 private:
-	Move table[Position::lastBitboard][squareNumber][2];
+	std::array<std::array<std::array<Move,2>,squareNumber>,lastBitboard> _table;
 public :
 
-	inline void clear() { std::memset(table, 0, sizeof(table)); }
+	inline void clear()
+	{
+		for(auto& a: _table)
+			for(auto& b: a)
+				b.fill(Move::NOMOVE);
+	}
 
 
-	inline void update(Position::bitboardIndex p, tSquare to, Move m)
+	inline void update( const bitboardIndex p, const tSquare to, const Move& m)
 	{
 
-		assert(p<Position::lastBitboard);
+		assert( isValidPiece( p ) );
 		assert(to<squareNumber);
-		Move * const mm =  table[p][to];
+		auto& mm =  _table[p][to];
 		if(mm[0] != m)
 		{
 			mm[1] = mm[0];
@@ -82,15 +133,16 @@ public :
 		}
 
 	}
-	inline const Move& getMove(Position::bitboardIndex p, tSquare to, unsigned int pos) const
+	inline const Move& getMove( const bitboardIndex p, const tSquare to, const unsigned int pos ) const
 	{
-		assert(p<Position::lastBitboard);
+		assert( pos < 2 );
+		assert( isValidPiece( p ) );
 		assert(to<squareNumber);
-		return table[p][to][pos];
+		return _table[p][to][pos];
 	}
 
 
-	CounterMove(){}
+	explicit CounterMove(){}
 
 };
 

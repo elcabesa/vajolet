@@ -21,11 +21,15 @@
 
 
 #include <array>
+#include <cstdint>
+
+#include "bitops.h"
+#include "score.h"
 
 class pawnEntry
 {
 public:
-	U64 key;
+	HashKey key;
 	bitMap weakPawns;
 	bitMap passedPawns;
 	bitMap pawnAttacks[2];
@@ -36,12 +40,12 @@ public:
 
 class pawnTable
 {
-static const int size = 8192;
 public:
-	void insert(U64 key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
-		pawnEntry& x=pawnTable[((unsigned int)key) %size];
+	void insert(const HashKey& key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
 
-		x.key=key;
+		pawnEntry& x = probe(key);
+
+		x.key = key;
 		x.res[0]=res[0];
 		x.res[1]=res[1];
 
@@ -52,16 +56,18 @@ public:
 		x.pawnAttacks[1]=blackAttack;
 		x.weakSquares[0]=weakSquareWhite;
 		x.weakSquares[1]=weakSquareBlack;
-		x.holes[0]=whiteHoles ;
+		x.holes[0]=whiteHoles;
 		x.holes[1]=blackHoles;
 	}
 
-	pawnEntry& probe(U64 key)
+	pawnEntry& probe(const HashKey& key)
 	{
-		return pawnTable[((unsigned int)key) %size];
+		return _pawnTable[ _getIndex( key ) ];
 	}
 private:
-	std::array<pawnEntry,size> pawnTable;
+	static const int _size = 8192;
+	unsigned int _getIndex( const HashKey& key ) const { return ( (unsigned int)key.getKey() ) % _size; }
+	std::array<pawnEntry,_size> _pawnTable;
 };
 
 #endif /* TABLES_H_ */

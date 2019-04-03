@@ -1,6 +1,8 @@
 #include <vector>
 #include "gtest/gtest.h"
+#include "./../perft.h"
 #include "./../position.h"
+#include "./../transposition.h"
 
 typedef struct _positions
 {
@@ -8,7 +10,7 @@ typedef struct _positions
      const std::vector<unsigned long long> PerftValue;
 }positions;
 
-static const std::vector<positions> perftPos ={
+static const std::vector<positions> perftPos = {
 	{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", {20ull, 400ull, 8902ull, 197281ull, 4865609ull, 119060324ull}},
 	{"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", {48ull, 2039ull, 97862ull, 4085603ull, 193690690ull, 8031647685ull}},
 	{"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", {14ull, 191ull, 2812ull, 43238ull, 674624ull, 11030083ull, 178633661ull}},
@@ -19,38 +21,30 @@ static const std::vector<positions> perftPos ={
 	
 };
 
-TEST(FastPerftTest, perft) {
-	Position pos;
-	for (auto & p : perftPos)
-	{
-		pos.setupFromFen(p.Fen); 
-		for( unsigned int i = 0; i < 2 && i < p.PerftValue.size(); i++)
-		{
-			EXPECT_EQ(pos.perft(i+1), p.PerftValue[i]);
-		}
-	}
-}
-
-TEST(MediumPerftTest, perft) {
+TEST(PerftTest, perft) {
 	Position pos;
 	for (auto & p : perftPos)
 	{
 		pos.setupFromFen(p.Fen); 
 		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
 		{
-			EXPECT_EQ(pos.perft(i+1), p.PerftValue[i]);
+			EXPECT_EQ(Perft(pos).perft(i+1), p.PerftValue[i]);
 		}
 	}
 }
 
-TEST(LongPerftTest, perft) {
+TEST(PerftTest, perftHash) {
+	transpositionTable::getInstance().setSize(1);
 	Position pos;
 	for (auto & p : perftPos)
 	{
 		pos.setupFromFen(p.Fen); 
-		for( unsigned int i = 0; i < p.PerftValue.size(); i++)
+		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
 		{
-			EXPECT_EQ(pos.perft(i+1), p.PerftValue[i]);
+			Perft pft(pos);
+			pft.perftUseHash = true;
+			
+			EXPECT_EQ(Perft(pos).perft(i+1), p.PerftValue[i]);
 		}
 	}
 }

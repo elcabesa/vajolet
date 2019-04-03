@@ -15,37 +15,61 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <iostream>
+
+#include "hashKey.h"
+#include "move.h"
 #include "transposition.h"
-#include "io.h"
+#include "vajolet.h"
 
 
-transpositionTable TT;
+inline void ttEntry::save(unsigned int Key, Score Value, unsigned char Type, signed short int Depth, unsigned short Move, Score StaticValue, unsigned char gen)
+{
+	key = Key;
+	value = Value;
+	staticValue = StaticValue;
+	if(Move)
+	{
+		packedMove = Move;
+	}
+	depth = Depth;
+	generation = gen;
+	type = Type;
+}
+
+inline void ttEntry::setGeneration(unsigned char gen)
+{
+	generation = gen;
+}
+
 
 unsigned long int transpositionTable::setSize(unsigned long int mbSize)
 {
 
 	long long unsigned int size = (long unsigned int)( ((unsigned long long int)mbSize << 20) / sizeof(ttCluster));
-	elements = size;
+	_elements = size;
 
-	table.clear();
-	table.shrink_to_fit();
+	_table.clear();
+	_table.shrink_to_fit();
 	try
 	{
-		table.resize(elements);
+		_table.resize(_elements);
 	}
 	catch(...)
 	{
 		std::cerr << "Failed to allocate " << mbSize<< "MB for transposition table." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	return elements * 4;
+	return _elements * 4;
 }
 
+void transpositionTable::newSearch() {_generation++;}
 
 static ttEntry null(0,SCORE_NONE, typeVoid, -100, 0, 0, 0);
-ttEntry* transpositionTable::probe(const U64 key)
+ttEntry* transpositionTable::probe( const HashKey& k )
 {
 
+	const auto key = k.getKey();
 
 	ttCluster& ttc = findCluster(key);
 	unsigned int keyH = (unsigned int)(key >> 32);
@@ -60,10 +84,18 @@ ttEntry* transpositionTable::probe(const U64 key)
 }
 
 
-void transpositionTable::store(const U64 key, Score value, unsigned char type, signed short int depth, unsigned short move, Score statValue)
+void transpositionTable::store(const HashKey& k, Score value, unsigned char type, signed short int depth, const Move& move, Score statValue)
 {
+	if( move != Move::NOMOVE || type != typeExact)
+	{
+		assert(value < SCORE_INFINITE || value == SCORE_NONE);
+		assert(value >- SCORE_INFINITE);
+		assert(statValue < SCORE_INFINITE);
+		assert(statValue > -SCORE_INFINITE);
+		assert(type <= typeScoreHigherThanBeta);
+	}
 
-
+	const auto key = k.getKey();
 	ttEntry *candidate;
 	unsigned int keyH = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
 
@@ -81,8 +113,8 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 		{
 			bool cc1,cc2,cc3,cc4;
 
-			cc1 = candidate->getGeneration() == generation;
-			cc2 = d.getGeneration() == generation;
+			cc1 = candidate->getGeneration() == _generation;
+			cc2 = d.getGeneration() == _generation;
 			cc3 = d.getType() == typeExact;
 			cc4 = d.getDepth() < candidate->getDepth();
 
@@ -95,9 +127,54 @@ void transpositionTable::store(const U64 key, Score value, unsigned char type, s
 		}
 	}
 	assert(candidate != nullptr);
-	candidate->save(keyH, value, type, depth, move, statValue, generation);
+	candidate->save(keyH, value, type, depth, move.getPacked(), statValue, _generation);
+
+}
+void transpositionTable::clear()
+{
+	ttCluster ttc;
+	ttc.fill(ttEntry(0,0,0,0,0,0,0));
+	std::fill(_table.begin(), _table.end(), ttc);
+}
+
+inline ttCluster& transpositionTable::findCluster(uint64_t key)
+{
+	return _table[ static_cast<size_t>(((unsigned int)key) % _elements) ];
+}
+
+void transpositionTable::refresh(ttEntry& tte)
+{
+	tte.setGeneration(_generation);
+}
+
+unsigned int transpositionTable::getFullness() const
+{
+	unsigned int cnt = 0u;
+	unsigned int end = std::min( 250lu, _elements );
+
+	for (auto t = _table.begin(); t != _table.begin()+end; t++)
+	{
+		cnt+= std::count_if (t->begin(), t->end(), [=](ttEntry d){return d.getGeneration() == this->_generation;});
+	}
+	return (unsigned int)(cnt*250lu/(end));
+}
 
 
+void PerftTranspositionTable::store(const HashKey& key, signed short int depth, unsigned long long v)
+{
+	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, Move::NOMOVE, (v>>23)&0x7FFFFF);
+}
 
+bool PerftTranspositionTable::retrieve(const HashKey& key, unsigned int depth, unsigned long long& res)
+{
+	ttEntry* tte = transpositionTable::getInstance().probe( key );
+	
+	if( tte->getKey() == (key.getKey()>>32) && (unsigned int)tte->getDepth() == depth )
+	{
+		res = (unsigned long long)(((unsigned int)tte->getValue())&0x7FFFFF) + (((unsigned long long)((unsigned int)tte->getStaticValue())&0x7FFFFF)<<23);
 
+		return true;
+	}
+	return false;
+	
 }

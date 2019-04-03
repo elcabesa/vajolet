@@ -14,35 +14,27 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#include <utility>
 
-#include <iomanip>
 #include "position.h"
-#include "move.h"
-#include "bitops.h"
-#include "movegen.h"
-#include "eval.h"
+#include "vajolet.h"
 
   
  
 //---------------------------------------------
 //	MATERIAL KEYS
 //---------------------------------------------
+std::unordered_map<tKey, Position::materialStruct> Position::materialKeyMap;
 
-
-
-
-std::unordered_map<U64, Position::materialStruct> Position::materialKeyMap;
-
-
-bool Position::evalKxvsK(Score& res)
+/**********************************************
+eval king and pieces vs lone king
+**********************************************/
+bool Position::evalKxvsK(Score& res) const
 {
-	//display();
-	Color StrongColor = bitCnt(getBitmap(whitePieces))>1  ? white : black;
+	const Color StrongColor = bitCnt(getBitmap(whitePieces))>1  ? white : black;
 	tSquare winKingSquare;
 	tSquare losKingSquare;
 	bitboardIndex pieces;
-	int mul = 1;
+	int mul;
 	if(StrongColor == white)
 	{
 		winKingSquare = getSquareOfThePiece(whiteKing);
@@ -59,8 +51,8 @@ bool Position::evalKxvsK(Score& res)
 
 		mul = -1;
 	}
-	Movegen mg(*this);
-	if( mg.getNumberOfLegalMoves() == 0 )
+	
+	if( getNumberOfLegalMoves() == 0 )
 	{
 		res = 0;
 		return true;
@@ -68,8 +60,8 @@ bool Position::evalKxvsK(Score& res)
 
 
 	res = SCORE_KNOWN_WIN + 50000;
-	res -= 10 * SQUARE_DISTANCE[winKingSquare][losKingSquare];// devo tenere il re vicino
-	res += 20 * SQUARE_DISTANCE[losKingSquare][E4];// devo portare il re avversario vicino al bordo
+	res -= 10 * distance(winKingSquare,losKingSquare);// devo tenere il re vicino
+	res += 20 * distance(losKingSquare,E4);// devo portare il re avversario vicino al bordo
 	res += 50 * bitCnt(getBitmap(pieces));
 	assert( res < SCORE_MATE_IN_MAX_PLY);
 
@@ -78,176 +70,153 @@ bool Position::evalKxvsK(Score& res)
 
 }
 
-bool Position::evalKNPvsK(Score& res)
+/**********************************************
+eval king Knight and pawn vs lone king, 
+it looks drawish if the pawn is on seventh and on the edge of the board
+**********************************************/
+bool Position::evalKNPvsK(Score& res) const
 {
-	Color Pcolor = getBitmap(whitePawns) ? white : black;
-	tSquare pawnSquare;
-	if(Pcolor == white)
+	const Color Pcolor = getBitmap(whitePawns) ? white : black;
+	const tSquare pawnSquare = getSquareOfThePiece( Pcolor ? blackPawns: whitePawns);
+	const tRank relativeRank = getRelativeRankOf( pawnSquare, Pcolor);	
+	const tFile pawnFile = getFileOf(pawnSquare);
+	
+	if( isLateralFile( pawnFile ) && relativeRank == RANK7 )
 	{
-		pawnSquare = getSquareOfThePiece(whitePawns);
-		int pawnFile = FILES[pawnSquare];
-		int pawnRank = RANKS[pawnSquare];
-		if( (pawnFile ==0 || pawnFile ==7) && pawnRank == 6 )
-		{
-
-			res = 0;
-			return true;
-
-		}
-	}
-	else
-	{
-		pawnSquare = getSquareOfThePiece(blackPawns);
-		int pawnFile = FILES[pawnSquare];
-		int pawnRank = RANKS[pawnSquare];
-		if( (pawnFile ==0 || pawnFile ==7) && pawnRank == 1 )
-		{
-			res = 10;
-			return true;
-		}
+		res = 0;
+		return true;
 	}
 	return false;
 
 }
 
-
-bool Position::evalKBPsvsK(Score& res)
+/**********************************************
+eval king Bishop and pawns vs lone king, 
+it looks drawish if all the pawns are on the edge of the board and the bishop is of the wrong color
+**********************************************/
+bool Position::evalKBPsvsK(Score& res) const
 {
-	Color Pcolor = getBitmap(whitePawns) ? white : black;
+	const Color Pcolor = getBitmap(whitePawns) ? white : black;
 	bitMap pawns;
 	tSquare bishopSquare;
+	tSquare kingSquare;
 	
-	bitMap HFile = FILEMASK[H1];
-	bitMap AFile = FILEMASK[A1];
+	bitMap HFile = fileMask(H1);
+	bitMap AFile = fileMask(A1);
 	
 	if(Pcolor == white)
 	{	
 		pawns = getBitmap(whitePawns);
-		int pawnFile = FILES[firstOne( pawns )];
-		
-		if(  0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
-		{
-			bishopSquare = getSquareOfThePiece(whiteBishops);
-			if( SQUARE_COLOR[BOARDINDEX[pawnFile][7]] != SQUARE_COLOR[bishopSquare])
-			{
-				tSquare kingSquare = getSquareOfThePiece(blackKing);
-				if(RANKS[kingSquare] >= 6  && abs( pawnFile - FILES[kingSquare] ) <= 1 )
-				{
-					res = 0;
-					return true;
-				}
-			}
-		}
+		bishopSquare = getSquareOfThePiece(whiteBishops);
+		kingSquare = getSquareOfThePiece(blackKing);
 	}
 	else
 	{
 		pawns = getBitmap(blackPawns);
-		int pawnFile = FILES[firstOne( pawns )];
-		if( 0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
-		{
-			bishopSquare = getSquareOfThePiece(blackBishops);
-			if( SQUARE_COLOR[BOARDINDEX[pawnFile][0]] != SQUARE_COLOR[ bishopSquare ])
-			{
-				tSquare kingSquare = getSquareOfThePiece(whiteKing);
-				if(RANKS[kingSquare] <= 1  && abs(pawnFile - FILES[kingSquare]) <= 1)
-				{
-					res = 0;
-					return true;
-				}
-			}
-		}
+		bishopSquare = getSquareOfThePiece(blackBishops);
+		kingSquare = getSquareOfThePiece(whiteKing);
 	}
+	
+	tFile pawnFile = getFileOf( firstOne( pawns ) );
+	// all the pawn are on the A file or on the H file
+	if(  
+		// all the pawn are on the A file or on the H file
+		(0 == ( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
+		// the square of promotion is not protected by bishop
+		&& ( getSquareColor( getSquare( pawnFile, getRelativeRankOf(  A8, Pcolor ) ) ) != getSquareColor(bishopSquare) )
+		// the defending king is near the promotion square
+		&& ( getRankOf(kingSquare) >= getRelativeRankOf(A7, Pcolor) && abs( pawnFile - getFileOf(kingSquare) ) <= 1 )
+	)
+	{
+		res = 0;
+		return true;
+	}	
 	return false;
 
 }
 
-bool Position::evalKQvsKP(Score& res)
+/**********************************************
+eval king and queen vs king and pawn, 
+it looks drawish if the promoting pawn is on column A or C
+**********************************************/
+bool Position::evalKQvsKP(Score& res) const
 {
-	Color Pcolor = getBitmap(whitePawns) ? white  :black;
+	Color pColor = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
 	tSquare winningKingSquare;
 	tSquare losingKingSquare;
+	int mul;
 
-
-	if(Pcolor == white)
+	if(pColor == white)
 	{
 		pawnSquare = getSquareOfThePiece(whitePawns);
 		winningKingSquare = getSquareOfThePiece(blackKing);
 		losingKingSquare = getSquareOfThePiece(whiteKing);
-
-		int pawnFile = FILES[pawnSquare];
-		int pawnRank = RANKS[pawnSquare];
-		res = -100 * ( 7 - SQUARE_DISTANCE[winningKingSquare][losingKingSquare] );
-
-		if(
-				pawnRank != 6
-				|| SQUARE_DISTANCE[losingKingSquare][pawnSquare] != 1
-				|| (pawnFile == 1 || pawnFile == 3 || pawnFile == 4 || pawnFile == 6) )
-		{
-			res -= 90000;
-		}
-		return true;
-
+		mul = 1;
 	}
 	else
 	{
 		pawnSquare = getSquareOfThePiece(blackPawns);
 		winningKingSquare = getSquareOfThePiece(whiteKing);
 		losingKingSquare = getSquareOfThePiece(blackKing);
-
-		int pawnFile = FILES[pawnSquare];
-		int pawnRank = RANKS[pawnSquare];
-		res = 100 * ( 7 - SQUARE_DISTANCE[winningKingSquare][losingKingSquare] );
-
-		if(
-				pawnRank != 1
-				|| SQUARE_DISTANCE[losingKingSquare][pawnSquare] != 1
-				|| (pawnFile == 1 || pawnFile == 3 || pawnFile == 4 || pawnFile == 6) )
-		{
-			res += 90000;
-		}
-		return true;
-
+		mul = -1;
 	}
-	return false;
+	
+	int pawnFile = getFileOf(pawnSquare);
+	int pawnRank = getRelativeRankOf(pawnSquare, pColor);
+	res = -100 * ( 7 - distance(winningKingSquare,losingKingSquare) );
+	
+	if(
+			pawnRank != RANK7
+			|| distance(losingKingSquare,pawnSquare) != 1
+			|| (pawnFile == FILEB || pawnFile == FILED || pawnFile == FILEE || pawnFile == FILEG) )
+	{
+		res -= 90000;
+	}
+	res *= mul;
+	return true;
 
 }
 
-
-bool Position::evalKRPvsKr(Score& res)
+/**********************************************
+eval king, rook and pawn vs king and rook, 
+help handling lucena and philidor positions
+**********************************************/
+bool Position::evalKRPvsKr(Score& res) const
 {
 	Color Pcolor = getBitmap(whitePawns) ? white : black;
-	tSquare pawnSquare;
+	bitboardIndex pawnPiece;
+	bitboardIndex enemyKing;
+	
 	if( Pcolor == white )
 	{
-		pawnSquare = getSquareOfThePiece(whitePawns);
-		if(	FILES[pawnSquare] == FILES[getSquareOfThePiece(blackKing)]
-		    && RANKS[pawnSquare] <= 6
-		    && RANKS[pawnSquare] < RANKS[getSquareOfThePiece(blackKing)]
-		)
-		{
-			res = 128;
-			return true;
-		}
+		pawnPiece = whitePawns;
+		enemyKing = blackKing;
 	}
 	else
 	{
-		pawnSquare = getSquareOfThePiece(blackPawns);
-		if(	FILES[pawnSquare] == FILES[getSquareOfThePiece(whiteKing)]
-			&& RANKS[pawnSquare] >= 1
-			&& RANKS[pawnSquare] > RANKS[getSquareOfThePiece(whiteKing)]
-		)
-		{
-			res=128;
-			return true;
-		}
-
+		pawnPiece = blackPawns;
+		enemyKing = whiteKing;
+	}
+	
+	tSquare pawnSquare = getSquareOfThePiece(pawnPiece);
+	if(	getFileOf(pawnSquare) == getFileOf(getSquareOfThePiece(enemyKing))
+		&& getRelativeRankOf(pawnSquare, Pcolor) <= RANK7
+		&& getRelativeRankOf(pawnSquare, Pcolor) < getRelativeRankOf(getSquareOfThePiece(enemyKing), Pcolor)
+	)
+	{
+		res = 128;
+		return true;
 	}
 	return false;
 
 }
 
-bool Position::evalKBNvsK( Score& res)
+/**********************************************
+eval king, bishop and knight vs lone king, 
+the rook shall be pyushed toward thre right corner and the winning king shall help the pieces
+**********************************************/
+bool Position::evalKBNvsK( Score& res) const
 {
 	Color color = getBitmap(whiteBishops) ? white : black;
 	tSquare bishopSquare;
@@ -270,7 +239,7 @@ bool Position::evalKBNvsK( Score& res)
 		enemySquare = getSquareOfThePiece(whiteKing);
 	}
 
-	int mateColor = SQUARE_COLOR[bishopSquare];
+	int mateColor = getSquareColor(bishopSquare);
 	if(mateColor == 0)
 	{
 		mateSquare1 = A1;
@@ -284,58 +253,56 @@ bool Position::evalKBNvsK( Score& res)
 
 	res = SCORE_KNOWN_WIN + 20000;
 
-	res -= 5 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
-	res -= 10 * std::min( SQUARE_DISTANCE[enemySquare][mateSquare1], SQUARE_DISTANCE[enemySquare][mateSquare2]);// devo portare il re avversario nel giusto angolo
+	res -= 5 * distance(enemySquare,kingSquare);// devo tenere il re vicino
+	res -= 10 * std::min( distance(enemySquare,mateSquare1), distance(enemySquare,mateSquare2));// devo portare il re avversario nel giusto angolo
 
 	res *=mul;
 	return true;
 
 }
 
-bool Position::evalKQvsK(Score& res)
+bool Position::evalKQvsK(Score& res) const
 {
 	Color color = getBitmap(whiteQueens) ? white : black;
 	tSquare kingSquare;
 	tSquare enemySquare;
 	
-	Movegen mg(*this);
-	if( mg.getNumberOfLegalMoves() == 0 )
+	if( getNumberOfLegalMoves() == 0 )
 	{
 		res = 0;
 		return true;
 	}
 
-	int mul = 1;
+	int sign = 1;
 	if(color == white)
 	{
-		mul = 1;
+		sign = 1;
 		kingSquare = getSquareOfThePiece(whiteKing);
 		enemySquare = getSquareOfThePiece(blackKing);
 	}
 	else
 	{
-		mul = -1;
+		sign = -1;
 		kingSquare = getSquareOfThePiece(blackKing);
 		enemySquare = getSquareOfThePiece(whiteKing);
 	}
 
 	res = SCORE_KNOWN_WIN + 40000;
-	res -= 10 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
-	res += 20 * SQUARE_DISTANCE[enemySquare][E4];// devo portare il re avversario vicino al bordo
+	res -= 10 * distance(enemySquare,kingSquare);// devo tenere il re vicino
+	res += 20 * distance(enemySquare,E4);// devo portare il re avversario vicino al bordo
 
-	res *= mul;
+	res *= sign;
 	return true;
 
 }
 
-bool Position::evalKRvsK(Score& res)
+bool Position::evalKRvsK(Score& res) const
 {
 	Color color = getBitmap(whiteRooks) ? white : black;
 	tSquare kingSquare;
 	tSquare enemySquare;
 
-	Movegen mg(*this);
-	if( mg.getNumberOfLegalMoves() == 0 )
+	if( getNumberOfLegalMoves() == 0 )
 	{
 		res = 0;
 		return true;
@@ -356,20 +323,20 @@ bool Position::evalKRvsK(Score& res)
 	}
 
 	res = SCORE_KNOWN_WIN + 30000;
-	res -= 10 * SQUARE_DISTANCE[enemySquare][kingSquare];// devo tenere il re vicino
-	res += 20 * SQUARE_DISTANCE[enemySquare][E4];// devo portare il re avversario vicino al bordo
+	res -= 10 * distance(enemySquare,kingSquare);// devo tenere il re vicino
+	res += 20 * distance(enemySquare,E4);// devo portare il re avversario vicino al bordo
 
 	res *= mul;
 	return true;
 
 }
 
-bool Position::kingsDirectOpposition()
+bool Position::kingsDirectOpposition() const
 {
 	if(
 			(getSquareOfThePiece(whiteKing) + 16 == getSquareOfThePiece(blackKing) )
-			/*||
-			(getSquareOfThePiece(whiteKing) == getSquareOfThePiece(blackKing) +16 )*/
+			//||
+			//(getSquareOfThePiece(whiteKing) == getSquareOfThePiece(blackKing) +16 )
 	)
 	{
 		return true;
@@ -378,181 +345,114 @@ bool Position::kingsDirectOpposition()
 
 }
 
-bool Position::evalKPvsK(Score& res)
+bool Position::evalKPvsK(Score& res) const
 {
-	Color color = getBitmap(whitePawns) ? white : black;
+	Color pColor = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
 	tSquare kingSquare;
 	tSquare enemySquare;
-
-	if(color == white)
+	tRank promotionRank;
+	eNextMove turn;
+	int mul;
+	if(pColor == white)
 	{
 		pawnSquare = getSquareOfThePiece(whitePawns);
 		kingSquare = getSquareOfThePiece(whiteKing);
 		enemySquare = getSquareOfThePiece(blackKing);
-
-
-		tSquare promotionSquare = BOARDINDEX[ FILES[pawnSquare] ][7];
-		const int relativeRank = RANKS[pawnSquare];
-		// Rule of the square
-		if ( std::min( 5, (int)(7- relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (getNextTurn() == whiteTurn? 0 : 1) , 0) )
-		{
-			res = SCORE_KNOWN_WIN + relativeRank;
-			return true;
-		}
-		if(FILES[pawnSquare] !=0 && FILES[pawnSquare] != 7)
-		{
-
-			if(SQUARE_DISTANCE[enemySquare][pawnSquare] >= 2 || getNextTurn() == Position::whiteTurn )
-			{
-				//winning king on a key square
-				if(relativeRank < 4)
-				{
-					if(kingSquare >= pawnSquare + 15 && kingSquare <= pawnSquare + 17 )
-					{
-						res = SCORE_KNOWN_WIN + relativeRank;
-						return true;
-					}
-				}
-				else if(relativeRank < 6)
-				{
-					if((kingSquare >= pawnSquare + 15 && kingSquare <= pawnSquare + 17) || (kingSquare >= pawnSquare + 7 && kingSquare <= pawnSquare + 9))
-					{
-						res = SCORE_KNOWN_WIN + relativeRank;
-						return true;
-					}
-				}
-				else{
-
-					if((kingSquare >= pawnSquare - 1 && kingSquare <= pawnSquare + 1 ) || (kingSquare >= pawnSquare + 7 && kingSquare <= pawnSquare + 9))
-					{
-						res = SCORE_KNOWN_WIN + relativeRank;
-						return true;
-					}
-
-				}
-
-				// 3 rules for winning, if  conditions are met -> it's won
-				unsigned int count = 0;
-				if(kingSquare == pawnSquare + 8) count++;
-				if(getNextTurn() == blackTurn && kingsDirectOpposition()) count++;
-				if(RANKS[kingSquare] == 5) count++;
-
-				if(count > 1)
-				{
-					res = SCORE_KNOWN_WIN + relativeRank;
-					return true;
-				}
-
-			}
-			//draw rule
-			if((enemySquare==pawnSquare+8) || (enemySquare==pawnSquare+16 && RANKS[enemySquare]!=7))
-			{
-				res = 0;
-				return true;
-			}
-		}
-		else
-		{
-			//ROOKS PAWN
-			if(abs(FILES[enemySquare] - FILES[pawnSquare]) <= 1  && RANKS[enemySquare] > 5 )
-			{
-				res = 0;
-				return true;
-			}
-
-
-		}
+		promotionRank = RANK8;
+		turn = whiteTurn;
+		mul = 1;
 	}
-	else{
+	else
+	{
 		pawnSquare = getSquareOfThePiece(blackPawns);
 		kingSquare = getSquareOfThePiece(blackKing);
 		enemySquare = getSquareOfThePiece(whiteKing);
+		promotionRank = RANK1;
+		turn = blackTurn;
+		mul = -1;
+	}
+	
+	const tSquare promotionSquare = getPromotionSquareOf( pawnSquare, pColor );
+	const int relativeRank = getRelativeRankOf(pawnSquare, pColor);
+	// Rule of the square
+	if ( std::min( 5, 7- relativeRank) <  std::max((int)distance(enemySquare,promotionSquare) - ( getNextTurn() == turn ? 0 : 1) , 0) )
+	{
+		res = mul * (SCORE_KNOWN_WIN + relativeRank);
+		return true;
+	}
+	if( !isLateralFile( getFileOf(pawnSquare) ) )
+	{
 
-
-
-		tSquare promotionSquare = BOARDINDEX[FILES[pawnSquare]][0];
-		const int relativeRank = 7 - RANKS[pawnSquare];
-		// Rule of the square
-		if ( std::min( 5, (int)( 7 - relativeRank)) <  std::max(SQUARE_DISTANCE[enemySquare][promotionSquare] - (getNextTurn() == blackTurn ? 0 : 1 ), 0) )
+		if(distance(enemySquare,pawnSquare) >= 2 || getNextTurn() == turn )
 		{
-			res = -SCORE_KNOWN_WIN - relativeRank;
-			return true;
-		}
-		if(FILES[pawnSquare] != 0 && FILES[pawnSquare] != 7)
-		{
-			if(SQUARE_DISTANCE[enemySquare][pawnSquare] >= 2 || getNextTurn() == blackTurn)
+			//winning king on a key square
+			if(relativeRank < RANK5)
 			{
-				//winning king on a key square
-				if(relativeRank < 4)
+				if(kingSquare >= pawnSquare + 2 * pawnPush(pColor) - 1  && kingSquare <= pawnSquare + 2 * pawnPush(pColor) + 1)
 				{
-					if(kingSquare >= pawnSquare - 17 && kingSquare <= pawnSquare - 15 )
-					{
-						res = -SCORE_KNOWN_WIN - relativeRank;
-						return true;
-					}
-				}
-				else if(relativeRank < 6)
-				{
-					if((kingSquare >= pawnSquare - 17 && kingSquare <= pawnSquare - 15) || (kingSquare >= pawnSquare - 9 && kingSquare <= pawnSquare - 7 ) )
-					{
-						res = -SCORE_KNOWN_WIN - relativeRank;
-						return true;
-					}
-				}
-				else{
-
-					if((kingSquare >= pawnSquare - 1 && kingSquare <= pawnSquare + 1) || (kingSquare >= pawnSquare - 9 && kingSquare <= pawnSquare - 7))
-					{
-						res = -SCORE_KNOWN_WIN - relativeRank;
-						return true;
-					}
-				}
-				// 3 rules for winning, if  conditions are met -> it's won
-				unsigned int count = 0;
-				if(kingSquare == pawnSquare - 8) count++;
-				if(getNextTurn() == whiteTurn && kingsDirectOpposition()) count++;
-				if(RANKS[kingSquare] == 2) count++;
-
-				if(count > 1)
-				{
-					res = -SCORE_KNOWN_WIN - relativeRank;
+					res = mul * (SCORE_KNOWN_WIN + relativeRank);
 					return true;
 				}
 			}
-			//draw rule
-			if((enemySquare == pawnSquare - 8) || (enemySquare == pawnSquare - 16 && RANKS[enemySquare] != 0) )
+			else if(relativeRank < RANK7)
 			{
-				res = 0;
+				if((kingSquare >= pawnSquare + 2 * pawnPush(pColor) -1 && kingSquare <= pawnSquare + 2 * pawnPush(pColor) +1) || (kingSquare >= pawnSquare + pawnPush(pColor) -1 && kingSquare <= pawnSquare + pawnPush(pColor) + 1 ))
+				{
+					res = mul * (SCORE_KNOWN_WIN + relativeRank);
+					return true;
+				}
+			}
+			else{
+
+				if((kingSquare >= pawnSquare - 1 && kingSquare <= pawnSquare + 1 ) || (kingSquare >= pawnSquare + pawnPush(pColor) -1 && kingSquare <=  pawnPush(pColor) + 1 ))
+				{
+					res = mul * (SCORE_KNOWN_WIN + relativeRank);
+					return true;
+				}
+			}
+
+			// 3 rules for winning, if  conditions are met -> it's won
+			unsigned int count = 0;
+			if(kingSquare == pawnSquare + pawnPush(pColor) ) count++;
+			if(isBlackTurn() && kingsDirectOpposition()) count++;
+			if(getRelativeRankOf(kingSquare, pColor) == RANK6) count++;
+
+			if(count > 1)
+			{
+				res = mul * (SCORE_KNOWN_WIN + relativeRank);
 				return true;
 			}
+
 		}
-		else
+		//draw rule
+		if((enemySquare==pawnSquare+pawnPush(pColor)) || (enemySquare==pawnSquare+2*pawnPush(pColor) && getRankOf(enemySquare)!=promotionRank))
 		{
-			//ROOKS PAWN
-			if(abs(FILES[enemySquare] - FILES[pawnSquare]) <= 1  && RANKS[enemySquare] < 2)
-			{
-				res = 0;
-				return true;
-			}
-
-
+			res = 0;
+			return true;
 		}
 	}
-
-
+	else
+	{
+		//ROOKS PAWN
+		if(abs(getFileOf(enemySquare) - getFileOf(pawnSquare)) <= 1  && getRelativeRankOf(enemySquare, pColor) > RANK6 )
+		{
+			res = 0;
+			return true;
+		}
+	}
 	return false;
 }
 
-bool Position::evalKPsvsK(Score& res)
+bool Position::evalKPsvsK(Score& res) const
 {
 	Color color = getBitmap(whitePawns) ? white : black;
 	
 	tSquare kingSquare;
 	bitMap pawns;
 	
-	bitMap HFile = FILEMASK[H1];
-	bitMap AFile = FILEMASK[A1];
+	bitMap HFile = fileMask(H1);
+	bitMap AFile = fileMask(A1);
 	
 	// If all pawns are ahead of the king, on a single rook file and
 	// the king is within one file of the pawns, it's a draw.
@@ -569,7 +469,7 @@ bool Position::evalKPsvsK(Score& res)
 	
 	if( 
 			// re e pedoni sono al massimo su colonne adiacenti
-			(std::abs(FILES[ firstOne( pawns ) ] - FILES[ kingSquare ])<=1 )
+			(std::abs(getFileOf( firstOne( pawns ) ) - getFileOf( kingSquare ))<=1 )
 			// se tutti i pedoni sono sulla colonna A oppure tutti i pedoni sono sulla colonna H
 			&&(  0 ==( pawns & ~AFile ) || 0 == ( pawns & ~HFile ) )
 			// se tutti i pedoni sono davanti al re
@@ -583,9 +483,9 @@ bool Position::evalKPsvsK(Score& res)
 }
 
 
-bool Position::evalOppositeBishopEndgame(Score& res)
+bool Position::evalOppositeBishopEndgame(Score& res) const
 {
-	if(SQUARE_COLOR[getSquareOfThePiece(blackBishops)] != SQUARE_COLOR[ getSquareOfThePiece(whiteBishops)])
+	if( getSquareColor(getSquareOfThePiece(blackBishops)) != getSquareColor(getSquareOfThePiece(whiteBishops)))
 	{
 		unsigned int pawnCount = 0;
 		int pawnDifference = 0;
@@ -635,13 +535,13 @@ bool Position::evalOppositeBishopEndgame(Score& res)
 
 }
 
-bool Position::evalKRvsKm(Score& res)
+bool Position::evalKRvsKm(Score& res) const
 {
 	res = 64;
 	return true;
 }
 
-bool Position::evalKNNvsK(Score& res)
+bool Position::evalKNNvsK(Score& res) const
 {
 	res = 10;
 	return true;
@@ -672,12 +572,10 @@ void Position::initMaterialKeys(void)
 
 
 	Position p;
-	U64 key;
-
 	static const struct{
 		std::string fen;
 		materialStruct::tType type;
-		bool (Position::*pointer)(Score &);
+		bool (Position::*pointer)(Score &) const;
 		Score val;
 	} Endgames[] = {
 			// DRAWN
@@ -812,8 +710,7 @@ void Position::initMaterialKeys(void)
 
 	for (auto& eg : Endgames)
 	{
-		p.setupFromFen(eg.fen);
-		key = p.getMaterialKey();
+		tKey key = p.setupFromFen(eg.fen).getMaterialKey().getKey();
 		t.type = eg.type;
 		t.pointer = eg.pointer;
 		t.val = eg.val;
@@ -837,9 +734,7 @@ void Position::initMaterialKeys(void)
 				}
 				if(wp!=8){s+=std::to_string(8-wp);}
 				s+="/6BK w - -";
-				//sync_cout<<s<<sync_endl;
-				p.setupFromFen(s);
-				key = p.getMaterialKey();
+				tKey key = p.setupFromFen(s).getMaterialKey().getKey();
 				t.type=materialStruct::multiplicativeFunction;
 				t.pointer=&Position::evalOppositeBishopEndgame;
 				t.val=0;

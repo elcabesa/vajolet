@@ -15,19 +15,14 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "vajolet.h"
-
-#include "io.h"
-#include "move.h"
 #include "position.h"
-#include "movegen.h"
-#include "bitops.h"
+#include "vajolet.h"
 
 
 Score Position::seeSign(const Move& m) const
 {
-	assert(m.packed);
-	if ( (pieceValue[getPieceAt((tSquare)m.bit.from)][0] <= pieceValue[getPieceAt((tSquare)m.bit.to)][0])/* ||  m.isEnPassantMove() */)
+	assert( m );
+	if ( (pieceValue[getPieceAt(m.getFrom())][0] <= pieceValue[getPieceAt(m.getTo())][0])/* ||  m.isEnPassantMove() */)
 	{
 		return 1;
 	}
@@ -35,19 +30,15 @@ Score Position::seeSign(const Move& m) const
 	return see(m);
 }
 
-
-
-
-
 Score Position::see(const Move& m) const
 {
 
-	assert(m.packed);
+	assert( m );
 
-	tSquare from = (tSquare)m.bit.from, to = (tSquare)m.bit.to;
-	const bool canBePromotion = RANKS[to] == 0 ||  RANKS[to] == 7;
+	tSquare from = m.getFrom(), to = m.getTo();
+	const bool canBePromotion = getRankOf(to) == RANK1 ||  getRankOf(to) == RANK8;
 	bitMap occupied = getOccupationBitmap() ^ bitSet(from);
-	eNextMove color = getPieceAt(from) > separationBitmap ? blackTurn : whiteTurn;
+	eNextMove color = isBlackPiece( getPieceAt(from) ) ? blackTurn : whiteTurn;
 
 	Score swapList[64];
 	unsigned int slIndex = 1;
@@ -56,7 +47,7 @@ Score Position::see(const Move& m) const
 
 	swapList[0] = pieceValue[getPieceAt(to)][0];
 	//std::cout<<"DEBUG inital capture: "<<swapList[0]<<std::endl;
-	captured = bitboardIndex(getPieceAt(from) % separationBitmap);
+	captured = getPieceTypeAt(from);
 
 	if( m.isEnPassantMove() )
 	{
@@ -69,8 +60,8 @@ Score Position::see(const Move& m) const
 	}
 	if( m.isPromotionMove() )
 	{
-		captured = bitboardIndex(whiteQueens + m.bit.promotion);
-		swapList[0] += pieceValue[whiteQueens + m.bit.promotion][0] - pieceValue[whitePawns][0];
+		captured = bitboardIndex(whiteQueens + m.getPromotionType());
+		swapList[0] += pieceValue[whiteQueens + m.getPromotionType()][0] - pieceValue[whitePawns][0];
 	}
 
 	// Find all attackers to the destination square, with the moving piece
@@ -79,7 +70,7 @@ Score Position::see(const Move& m) const
 
 	// If the opponent has no attackers we are finished
 	color = (eNextMove)(blackTurn - color);
-	assert(Pieces + color < lastBitboard);
+	assert( (bitboardIndex)( Pieces + color ) == blackPieces || (bitboardIndex)( Pieces + color ) == whitePieces );
 	colorAttackers = attackers & getBitmap((bitboardIndex)(Pieces + color));
 
 
@@ -97,7 +88,7 @@ Score Position::see(const Move& m) const
 	// new X-ray attacks from behind the capturing piece.
 
 	//std::cout<<"DEBUG start the loop "<<swapList[0]<<std::endl;
-	assert(captured<lastBitboard);
+	assert( isValidPiece( captured ) );
 	assert(getPieceAt(from) != empty);
 	do
 	{
@@ -127,12 +118,12 @@ Score Position::see(const Move& m) const
 				attackers ^= att;
 
 				if (nextAttacker == Pawns || nextAttacker == Bishops || nextAttacker == Queens){
-					attackers |= Movegen::attackFrom<Position::whiteBishops>(to,occupied)& (getBitmap(whiteBishops) |getBitmap(blackBishops) |getBitmap(whiteQueens) |getBitmap(blackQueens));
+					attackers |= Movegen::attackFrom<whiteBishops>(to,occupied)& (getBitmap(whiteBishops) |getBitmap(blackBishops) |getBitmap(whiteQueens) |getBitmap(blackQueens));
 				}
 
 				if (nextAttacker == Rooks || nextAttacker == Queens){
 					assert(to<squareNumber);
-					attackers |= Movegen::attackFrom<Position::whiteRooks>(to,occupied)& (getBitmap(whiteRooks) |getBitmap(blackRooks) |getBitmap(whiteQueens) |getBitmap(blackQueens));
+					attackers |= Movegen::attackFrom<whiteRooks>(to,occupied)& (getBitmap(whiteRooks) |getBitmap(blackRooks) |getBitmap(whiteQueens) |getBitmap(blackQueens));
 				}
 				attackers &= occupied;
 				captured = nextAttacker;

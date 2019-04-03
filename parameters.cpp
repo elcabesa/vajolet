@@ -15,18 +15,10 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <utility>
-
-#include <iomanip>
-#include "position.h"
-#include "move.h"
-#include "bitops.h"
-#include "movegen.h"
-#include "eval.h"
 #include "parameters.h"
 
 
-simdScore initialPieceValue[Position::lastBitboard] = {
+simdScore initialPieceValue[lastBitboard] = {
 		{0,0,0,0},
 		{3000000,3000000,0,0},//king
 		{118976,105579,4236,-3888},
@@ -45,12 +37,12 @@ simdScore initialPieceValue[Position::lastBitboard] = {
 		{0,0,0,0}
 };
 
-simdScore PawnD3 =  {213,33,-40,54};
-simdScore PawnD4 =  {675,-391,156,5};
-simdScore PawnD5 =  {574,-217,50,-344};
-simdScore PawnE3 =  {100,145,-271,-179};
-simdScore PawnE4 =  {715,-362,149,282};
-simdScore PawnE5 =  {29,-386,127,-128};
+simdScore PawnD3 =  {0,0,0,0};
+simdScore PawnD4 =  {0,0,0,0};
+simdScore PawnD5 =  {0,0,0,0};
+simdScore PawnE3 =  {0,0,0,0};
+simdScore PawnE4 =  {0,0,0,0};
+simdScore PawnE5 =  {0,0,0,0};
 simdScore PawnCentering =  {274,-28,-445,1};
 simdScore PawnRankBonus =  {165,357,1,-396};
 simdScore KnightPST =  {938,806,-204,70};
@@ -88,7 +80,7 @@ simdScore EnemyRookBehindPassedPawn =  {-30,100,0,0};
 simdScore holesPenalty =  {19,-166,-216,83};
 simdScore pawnCenterControl =  {472,-125,-8,-69};
 simdScore pawnBigCenterControl =  {61,194,-129,107};
-simdScore pieceCoordination[Position::lastBitboard] = {
+simdScore pieceCoordination[lastBitboard] = {
 	{0},
 	{0},
 	{122,41,17,-60},
@@ -97,7 +89,7 @@ simdScore pieceCoordination[Position::lastBitboard] = {
 	{346,213,10,-97}
 };
 
-simdScore piecesCenterControl[Position::lastBitboard] = {
+simdScore piecesCenterControl[lastBitboard] = {
 	{0},
 	{0},
 	{80,-53,246,-230},
@@ -106,7 +98,7 @@ simdScore piecesCenterControl[Position::lastBitboard] = {
 	{83,55,70,-74}
 };
 
-simdScore piecesBigCenterControl[Position::lastBitboard] = {
+simdScore piecesBigCenterControl[lastBitboard] = {
 	{0},
 	{0},
 	{-69,-128,-288,-597},
@@ -138,7 +130,7 @@ simdScore enemyKingNearPassedPawn =  {24,185,38,9};
 simdScore spaceBonus =  {215,-31,0,0};
 simdScore undefendedMinorPenalty =  {259,234,0,0};
 
-simdScore attackedByPawnPenalty[Position::separationBitmap]=
+simdScore attackedByPawnPenalty[separationBitmap]=
 {	{0,0,0,0},
 	{0,0,0,0},//king
 	{8509,3188,0,0},
@@ -149,7 +141,7 @@ simdScore attackedByPawnPenalty[Position::separationBitmap]=
 	{0,0,0,0},
 };
 
-simdScore weakPiecePenalty[Position::separationBitmap][Position::separationBitmap]=
+simdScore weakPiecePenalty[separationBitmap][separationBitmap]=
 {	{{0,0,0,0},{0,0,0,0},	{0,0,0,0},			{0,0,0,0},		{0,0,0,0},		{0,0,0,0},		{0,0,0,0},	{0,0,0,0}},
 	{{0,0,0,0},{0,0,0,0},	{0,0,0,0},			{0,0,0,0},		{0,0,0,0},		{0,0,0,0},		{0,0,0,0},	{0,0,0,0}},//king
 	{{0,0,0,0},{0,0,0,0},	{-139,358,0,0},		{6033,2881,0,0},{5604,3529,0,0},{4944,3186,0,0},{1414,-578,0,0},{0,0,0,0}},//queen
@@ -164,13 +156,13 @@ simdScore weakPawnAttackedByKing =  {3144,4302,0,0};
 //------------------------------------------------
 //king safety 
 //------------------------------------------------
-simdScore KingAttackWeights =  {155,157,149,114};
+simdScore KingAttackWeights =  {29,58,46,75};
 simdScore kingShieldBonus =  {2709,0,0,0};
 simdScore kingFarShieldBonus =  {1951,0,0,0};
-simdScore kingStormBonus =  {225,86,617,0};
-simdScore kingSafetyBonus =  {589,543,0,0};
-simdScore kingSafetyPars1 =  {314,416,-13,1082};
-simdScore kingSafetyPars2 =  {1854,1516,976,1733};
+simdScore kingStormBonus =  {500,200,217,0};
+simdScore kingSafetyBonus =  {84,3,0,0};
+simdScore kingSafetyPars1 =  {56,179,-13,870};
+simdScore kingSafetyPars2 =  {780,880,435,790};
 
 //------------------------------------------------
 
@@ -179,7 +171,7 @@ simdScore kingSafetyPars2 =  {1854,1516,976,1733};
 
 simdScore queenVsRook2MinorsImbalance =  {19932,20041,-8,31};
 
-simdScore mobilityBonus[Position::separationBitmap][32] = {
+simdScore mobilityBonus[separationBitmap][32] = {
 	{0},
 	{0},
 	{ {-1625,-1500}, {-875,-625}, {125,333}, {125,750}, {583,1416},

@@ -18,8 +18,11 @@
 #ifndef BITOPS_H_
 #define BITOPS_H_
 
-#include "vajolet.h"
+#include <cstdint>
 
+#include "tSquare.h"
+
+using bitMap = uint64_t; /*!< 64 bit bitMap*/
 
 //-----------------------------------------------------------------------------
 //	inline function
@@ -30,9 +33,9 @@
 	\version 1.0
 	\date 21/10/2013
 */
-static inline unsigned int bitCnt(bitMap bitmap)
+static inline unsigned int bitCnt(const bitMap b)
 {
-	return __builtin_popcountll(bitmap);
+	return __builtin_popcountll(b);
 }
 
 
@@ -41,12 +44,12 @@ static inline unsigned int bitCnt(bitMap bitmap)
 	\version 1.0
 	\date 22/10/2013
 */
-static inline tSquare firstOne(bitMap bitmap)
+static inline tSquare firstOne(const bitMap b)
 {
-	return (tSquare)__builtin_ctzll(bitmap);
+	return (tSquare)__builtin_ctzll(b);
 }
 
-static inline tSquare iterateBit(bitMap & b)
+static inline tSquare iterateBit(bitMap& b)
 {
 	const tSquare t = firstOne(b);
 	b &= ( b - 1 );
@@ -68,7 +71,7 @@ inline bool moreThanOneBit(const bitMap b)
 //-----------------------------------------------------------------------------
 //	function prototype
 //-----------------------------------------------------------------------------
-void displayBitmap(bitMap b);
+void displayBitmap(const bitMap b);
 
 
 #endif /* BITOPS_H_ */

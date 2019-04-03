@@ -4,6 +4,8 @@
 
 -include ../makefile.init
 
+EXE = Vajolet
+
 RM := rm -rf
 
 # All of the sources participating in the build are defined here
@@ -22,16 +24,25 @@ CPP_SRCS := \
 ./data.cpp \
 ./endgame.cpp \
 ./eval.cpp \
-./hashKeys.cpp \
+./game.cpp \
+./hashKey.cpp \
 ./io.cpp \
+./libchess.cpp \
 ./magicmoves.cpp \
+./Move.cpp \
 ./movegen.cpp \
+./movepicker.cpp \
 ./parameters.cpp \
+./perft.cpp \
+./polyglotKey.cpp \
 ./position.cpp \
 ./search.cpp \
+./searchData.cpp \
 ./see.cpp \
 ./thread.cpp \
+./timeManagement.cpp \
 ./transposition.cpp \
+./uciParameters.cpp \
 ./vajolet.cpp \
 ./syzygy/tbprobe.cpp 
 
@@ -49,16 +60,25 @@ OBJS :=  \
 ./data.o \
 ./endgame.o \
 ./eval.o \
-./hashKeys.o \
+./game.o \
+./hashKey.o \
 ./io.o \
+./libchess.o \
 ./magicmoves.o \
+./Move.o \
 ./movegen.o \
+./movepicker.o \
 ./parameters.o \
+./perft.o \
+./polyglotKey.o \
 ./position.o \
 ./search.o \
+./searchData.o \
 ./see.o \
 ./thread.o \
+./timeManagement.o \
 ./transposition.o \
+./uciParameters.o \
 ./vajolet.o \
 ./syzygy/tbprobe.o 
 C_UPPER_DEPS := 
@@ -71,16 +91,25 @@ CPP_DEPS := \
 ./data.d \
 ./endgame.d \
 ./eval.d \
-./hashKeys.d \
+./game.d \
+./hashKey.d \
 ./io.d \
+./libchess.d \
 ./magicmoves.d \
+./Move.d \
 ./movegen.d \
+./movepicker.d \
 ./parameters.d \
+./perft.d \
+./polyglotKey.d \
 ./position.d \
 ./search.d \
+./searchData.d \
 ./see.d \
 ./thread.d \
+./timeManagement.d \
 ./transposition.d \
+./uciParameters.cd \
 ./vajolet.d \
 ./syzygy/tbprobe.d 
 C_DEPS := 
@@ -89,7 +118,7 @@ C_DEPS :=
 %.o: ./%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++11 -O3 -msse4.2 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	g++ -std=c++1z -O3 -DNDEBUG -msse4.2 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -130,13 +159,13 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: vajolet2.exe
+all: vajolet
 
 # Tool invocations
-vajolet2.exe: $(OBJS) $(USER_OBJS)
+vajolet: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -s -pthread -o "vajolet2.exe" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -s -pthread -o $(EXE) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

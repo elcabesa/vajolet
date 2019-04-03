@@ -1,7 +1,31 @@
-language: cpp
-sudo: required
 dist: trusty
+sudo: required
+language:
+  - cpp
+compiler:
+  - gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-7
+      - g++-7
+      - cmake
 
-compiler: gcc
+before_install:
+  - pip install --user cpp-coveralls
 
-script: make clean && make all
+script:
+  - export CC=/usr/bin/gcc-7
+  - export CXX=/usr/bin/g++-7
+  - mkdir build
+  - cd build
+  - cmake -DVAJOLET_CPU_TYPE=64NEW -DCMAKE_BUILD_TYPE=Debug ..
+  - make
+  - ./Vajolet_unit_test
+  - ./Vajolet_search_integration_test
+  
+after_success:
+  - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build/googletest-src -e build/CMakeFiles/3.9.2 -e build/CMakeFiles/feature_tests.c -e build/CMakeFiles/feature_tests.cxx -e syzygy
+  
