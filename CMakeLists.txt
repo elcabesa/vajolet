@@ -40,6 +40,8 @@ else()
 	
 endif()
 
+SET(BUILD_GMOCK OFF CACHE BOOL "don't build GMOCK")
+
 set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 
 # Download and unpack googletest at configure time
