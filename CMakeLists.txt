@@ -1,5 +1,7 @@
+#cmake configuration
+
 cmake_minimum_required (VERSION 2.8)
-project (Vajolet)
+
 
 IF( VAJOLET_CPU_TYPE STREQUAL "64OLD")
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3 -m64" )
@@ -71,5 +73,8 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-add_subdirectory(tests)
+#sudoku solver project configration
+project (Vajolet)
+
 add_subdirectory(src)
+add_subdirectory(tests)

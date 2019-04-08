@@ -16,12 +16,11 @@
 */
 
 #include <algorithm>
-
 #include "gtest/gtest.h"
-#include "./../book.h"
-#include "./../move.h"
-#include "./../polyglotKey.h"
-#include "./../position.h"
+#include "book.h"
+#include "move.h"
+#include "polyglotKey.h"
+#include "position.h"
 
 TEST(bookTest, probeKey){
 	struct st{
