@@ -1,9 +1,13 @@
-# Create a library called "Hello" which includes the source file "hello.cxx".
-# The extension is already found. Any number of sources could be listed here.
-add_library(libSudoku board.cpp candidates.cpp iterators.cpp solver.cpp tSquares.cpp value.cpp)
-add_executable(SudokuSolver main.cpp )
-target_link_libraries (SudokuSolver libSudoku)
 
-# Make sure the compiler can find include files for our Hello library
-# when other libraries or executables link to Hello
-target_include_directories (libSudoku PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp endgame.cpp eval.cpp game.cpp hashKey.cpp io.cpp libchess.cpp magicmoves.cpp Move.cpp movegen.cpp movepicker.cpp parameters.cpp perft.cpp polyglotKey.cpp position.cpp search.cpp searchData.cpp see.cpp thread.cpp timeManagement.cpp transposition.cpp uciParameters.cpp syzygy/tbprobe.cpp)
+
+add_executable(tuner tuner.cpp )
+target_link_libraries (tuner libChess)
+add_executable(Vajolet vajolet.cpp )
+target_link_libraries (Vajolet libChess)
+
+
+
+# Make sure the compiler can find include files for our libChess library
+# when other libraries or executables link to libChess
+target_include_directories (libChess PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
