@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
-#include "./../libchess.h"
+#include "libchess.h"
 
 using ::testing::Environment;
 

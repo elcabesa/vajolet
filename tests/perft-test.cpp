@@ -1,8 +1,8 @@
 #include <vector>
 #include "gtest/gtest.h"
-#include "./../perft.h"
-#include "./../position.h"
-#include "./../transposition.h"
+#include "perft.h"
+#include "position.h"
+#include "transposition.h"
 
 typedef struct _positions
 {

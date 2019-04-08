@@ -16,7 +16,7 @@
 */
 
 #include "gtest/gtest.h"
-#include "./../pvLine.h"
+#include "pvLine.h"
 
 TEST(PVline, constructor)
 {

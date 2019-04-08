@@ -4,8 +4,8 @@
 
 #include "gtest/gtest.h"
 
-#include "./../position.h"
-#include "./../syzygy/tbprobe.h"
+#include "position.h"
+#include "syzygy/tbprobe.h"
 
 TEST(Syzygy, test)
 {

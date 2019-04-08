@@ -16,7 +16,7 @@
 */
 
 #include "gtest/gtest.h"
-#include "./../history.h"
+#include "history.h"
 
 TEST(historyTest, clear) {
 	

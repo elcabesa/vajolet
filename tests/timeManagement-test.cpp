@@ -1,6 +1,6 @@
 #include <vector>
 #include "gtest/gtest.h"
-#include "./../timeManagement.h"
+#include "timeManagement.h"
 
 TEST(timeManagement, initNewSearch0time)
 {

@@ -16,7 +16,7 @@
 */
 
 #include "gtest/gtest.h"
-#include "./../move.h"
+#include "move.h"
 
 
 

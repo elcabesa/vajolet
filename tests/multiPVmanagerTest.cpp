@@ -16,7 +16,7 @@
 */
 
 #include "gtest/gtest.h"
-#include "./../multiPVmanager.h"
+#include "multiPVmanager.h"
 
 TEST(MultiPVManager, functionalTest)
 {
