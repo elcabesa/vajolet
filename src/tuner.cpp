@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <random>
 #include "command.h"
-#include "io.h"
+#include "vajo_io.h"
 #include "bitops.h"
 #include "data.h"
 #include "libchess.h"

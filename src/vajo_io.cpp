@@ -17,7 +17,7 @@
 
 #include <mutex>
 
-#include "io.h"
+#include "vajo_io.h"
 
 using namespace std;
 

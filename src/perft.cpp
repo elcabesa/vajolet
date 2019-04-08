@@ -17,7 +17,7 @@
 */
 
 #include "command.h"
-#include "io.h"
+#include "vajo_io.h"
 #include "movepicker.h"
 #include "perft.h"
 #include "position.h"

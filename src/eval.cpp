@@ -18,7 +18,7 @@
 #include <iomanip>
 
 #include "eval.h"
-#include "io.h"
+#include "vajo_io.h"
 #include "parameters.h"
 #include "position.h"
 

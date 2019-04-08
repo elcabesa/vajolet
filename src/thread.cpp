@@ -19,7 +19,7 @@
 #include <thread>
 #include <mutex>
 
-#include "io.h"
+#include "vajo_io.h"
 #include "position.h"
 #include "search.h"
 #include "searchLimits.h"

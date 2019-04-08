@@ -22,7 +22,7 @@
 
 #include "benchmark.h"
 #include "command.h"
-#include "io.h"
+#include "vajo_io.h"
 #include "movepicker.h"
 #include "parameters.h"
 #include "perft.h"

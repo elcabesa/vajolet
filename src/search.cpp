@@ -23,7 +23,7 @@
 
 #include "book.h"
 #include "game.h"
-#include "io.h"
+#include "vajo_io.h"
 #include "movepicker.h"
 #include "multiPVmanager.h"
 #include "position.h"

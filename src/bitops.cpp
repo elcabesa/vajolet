@@ -16,7 +16,7 @@
 */
 #include "bitops.h"
 #include "data.h"
-#include "io.h"
+#include "vajo_io.h"
 
 
 /*! \brief display a bitmap on stdout

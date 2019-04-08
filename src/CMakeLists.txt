@@ -1,5 +1,5 @@
 
-add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp endgame.cpp eval.cpp game.cpp hashKey.cpp io.cpp libchess.cpp magicmoves.cpp Move.cpp movegen.cpp movepicker.cpp parameters.cpp perft.cpp polyglotKey.cpp position.cpp search.cpp searchData.cpp see.cpp thread.cpp timeManagement.cpp transposition.cpp uciParameters.cpp syzygy/tbprobe.cpp)
+add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp endgame.cpp eval.cpp game.cpp hashKey.cpp vajo_io.cpp libchess.cpp magicmoves.cpp Move.cpp movegen.cpp movepicker.cpp parameters.cpp perft.cpp polyglotKey.cpp position.cpp search.cpp searchData.cpp see.cpp thread.cpp timeManagement.cpp transposition.cpp uciParameters.cpp syzygy/tbprobe.cpp)
 
 add_executable(tuner tuner.cpp )
 target_link_libraries (tuner libChess)
