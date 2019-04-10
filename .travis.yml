@@ -26,7 +26,9 @@ script:
   - cd tests
   - ./Vajolet_unit_test
   - ./Vajolet_search_integration_test
+  - cd ..
+  - cd ..
   
 after_success:
-  - coveralls --gcov gcov-7 --root ../src --gcov-options '\-lp' -e tests -e build/googletest-src -e build/CMakeFiles/3.9.2 -e build/CMakeFiles/feature_tests.c -e build/CMakeFiles/feature_tests.cxx -e src/syzygy
+  - coveralls --gcov gcov-7 --root . --gcov-options '\-lp' -e tests -e build/googletest-src -e build/CMakeFiles/3.9.2 -e build/CMakeFiles/feature_tests.c -e build/CMakeFiles/feature_tests.cxx -e src/syzygy
   
