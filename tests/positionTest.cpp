@@ -3,7 +3,6 @@
 
 #include "command.h"
 #include "data.h"
-#include "io.h"
 #include "tSquare.h"
 #include "move.h"
 #include "position.h"
