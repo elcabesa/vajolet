@@ -29,5 +29,5 @@ script:
   - cd ..
   
 after_success:
-  - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp'
+  - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build  -e src/syzygy
   
