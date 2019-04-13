@@ -641,7 +641,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
 			}
 
-			// at depth 1 only print the PV at the ned of search
+			// at depth 1 only print the PV at the end of search
 			if(!_stop && depth == 1)
 			{
 				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), UciOutput::upperbound);
@@ -650,7 +650,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			{
 				auto mpRes = _multiPVmanager.get();
 				bestMove = mpRes[0];
-				_UOI->printPVs( mpRes );
+				_UOI->printPVs(mpRes);
 			}
 		}
 

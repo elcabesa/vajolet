@@ -18,6 +18,7 @@
 //---------------------------------------------
 //	include
 //---------------------------------------------
+#include <algorithm>
 #include <iomanip>
 
 #include "benchmark.h"
@@ -44,7 +45,7 @@ uci concrete output definitions
 class UciMuteOutput: public UciOutput
 {
 public:
-	void printPVs(std::vector<rootMove>& rm) const;
+	void printPVs(std::vector<rootMove>& rm, int maxLinePrint = -1) const;
 	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1) const;
 	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
@@ -59,7 +60,7 @@ class UciStandardOutput: public UciOutput
 {
 public:
 	static bool reduceVerbosity;
-	void printPVs(std::vector<rootMove>& rm) const;
+	void printPVs(std::vector<rootMove>& rm, int maxLinePrint = -1) const;
 	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1) const;
 	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const;
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
@@ -794,13 +795,17 @@ uci standard output implementation
 
 bool UciStandardOutput::reduceVerbosity = false;
 
-void UciStandardOutput::printPVs(std::vector<rootMove>& rmList) const
+void UciStandardOutput::printPVs(std::vector<rootMove>& rmList, int maxLinePrint) const
 {
-
-	int i= 0;
-	for ( auto & rm : rmList )
+	if(maxLinePrint == -1) {
+		maxLinePrint = rmList.size();
+	} else {
+		maxLinePrint = std::min(rmList.size(), (size_t)maxLinePrint); 
+	}
+	for(int i = 0; i < maxLinePrint; ++i)
 	{
-		printPV(rm.score, rm.maxPlyReached, rm.time, rm.PV, rm.nodes, normal, rm.depth, i++ );
+		auto rm = rmList[i];
+		printPV(rm.score, rm.maxPlyReached, rm.time, rm.PV, rm.nodes, normal, rm.depth, i);
 	}
 }
 
@@ -887,7 +892,7 @@ void UciStandardOutput::printGeneralInfo( const unsigned int fullness, const uns
 /*****************************
 uci Mute output implementation
 ******************************/
-void UciMuteOutput::printPVs(std::vector<rootMove>&) const{}
+void UciMuteOutput::printPVs(std::vector<rootMove>&, int ) const{}
 void UciMuteOutput::printPV(const Score, const unsigned int, const long long, PVline&, const unsigned long long, const PVbound, const int, const int) const{}
 void UciMuteOutput::printCurrMoveNumber(const unsigned int, const Move& , const unsigned long long , const long long int ) const {}
 void UciMuteOutput::showCurrLine(const Position & , const unsigned int ) const{}
