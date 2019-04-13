@@ -28,17 +28,33 @@ TEST(MultiPVManager, functionalTest)
 	rootMove rm4( Move(A2,A4), p, -100, 5, 15, 124354, 143);
 	rootMove rm5( Move(G2,G3), p,  -20, 5, 15, 124354, 143);
 	
+	rootMove r(Move::NOMOVE);
+	
 	// initialize
 	x.clean();
 	x.setLinesToBeSearched(5);
 	x.startNewIteration();
 	
 	// insert moves
+	ASSERT_FALSE(x.getNextRootMove(r));
 	x.insertMove(rm1);
-	x.insertMove(rm2);	
+	x.goToNextPV();
+	
+	ASSERT_FALSE(x.getNextRootMove(r));
+	x.insertMove(rm2);
+	x.goToNextPV();
+	
+	ASSERT_FALSE(x.getNextRootMove(r));
 	x.insertMove(rm3);
+	x.goToNextPV();
+	
+	ASSERT_FALSE(x.getNextRootMove(r));
 	x.insertMove(rm4);
+	x.goToNextPV();
+	
+	ASSERT_FALSE(x.getNextRootMove(r));
 	x.insertMove(rm5);
+	x.goToNextPV();
 	
 	// order
 	auto res = x.get();
@@ -60,9 +76,21 @@ TEST(MultiPVManager, functionalTest)
 	rootMove rm8( Move(G1,F3), p,  20, 5, 16, 124354, 143);
 	
 	// insert some move
+	ASSERT_TRUE(x.getNextRootMove(r));
+	ASSERT_EQ(r, rm2);
 	x.insertMove(rm6);
+	x.goToNextPV();
+	
+	ASSERT_TRUE(x.getNextRootMove(r));
+	ASSERT_EQ(r, rm2);
 	x.insertMove(rm7);
+	x.goToNextPV();
+	
+	ASSERT_TRUE(x.getNextRootMove(r));
+	ASSERT_EQ(r, rm1);
 	x.insertMove(rm8);
+	x.goToNextPV();
+	
 	
 	// order
 	res = x.get();
@@ -74,6 +102,8 @@ TEST(MultiPVManager, functionalTest)
 	ASSERT_EQ( res[2], rm7 );
 	ASSERT_EQ( res[3], rm1 );
 	ASSERT_EQ( res[4], rm5 );
+
+	
 	
 	x.clean();
 	x.setLinesToBeSearched(0);
@@ -125,7 +155,7 @@ TEST(MultiPVManager, clean)
 	
 }
 
-TEST(MultiPVManager, getPreviousIterationRootMove)
+TEST(MultiPVManager, getNextRootMove)
 {
 	MultiPVManager x;
 	PVline p;
@@ -153,38 +183,38 @@ TEST(MultiPVManager, getPreviousIterationRootMove)
 	x.startNewIteration();
 
 	rootMove rm (Move::NOMOVE);
-	bool found = x.getPreviousIterationRootMove(rm);
+	bool found = x.getNextRootMove(rm);
 	ASSERT_EQ( found, true );
 	ASSERT_EQ( rm, rm2 );
 	
 	x.goToNextPV();
 	
-	found = x.getPreviousIterationRootMove(rm);
+	found = x.getNextRootMove(rm);
 	ASSERT_EQ( found, true );
 	ASSERT_EQ( rm, rm1 );
 	
 	x.goToNextPV();
 	
-	found = x.getPreviousIterationRootMove(rm);
+	found = x.getNextRootMove(rm);
 	ASSERT_EQ( found, true );
 	ASSERT_EQ( rm, rm3 );
 	
 	x.goToNextPV();
 	
-	found = x.getPreviousIterationRootMove(rm);
+	found = x.getNextRootMove(rm);
 	ASSERT_EQ( found, true );
 	ASSERT_EQ( rm, rm5 );
 	
 	x.goToNextPV();
 	
-	found = x.getPreviousIterationRootMove(rm);
+	found = x.getNextRootMove(rm);
 	ASSERT_EQ( found, true );
 	ASSERT_EQ( rm, rm4 );
 	
 	x.goToNextPV();
 	
 	rootMove rmNull(Move::NOMOVE);
-	found = x.getPreviousIterationRootMove(rmNull);
+	found = x.getNextRootMove(rmNull);
 	ASSERT_EQ( found, false );
 	ASSERT_EQ( rmNull, rootMove(Move::NOMOVE) );
 }

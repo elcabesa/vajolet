@@ -619,7 +619,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			//----------------------------------
 			// reload PV
 			//----------------------------------
-			if( rootMove rm(Move::NOMOVE); _multiPVmanager.getPreviousIterationRootMove(rm) )
+			if( rootMove rm(Move::NOMOVE); _multiPVmanager.getNextRootMove(rm) )
 			{
 				_expectedValue = rm.score;
 				_pvLineFollower.setPVline(rm.PV);
