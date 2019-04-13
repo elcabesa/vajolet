@@ -1,11 +1,11 @@
 #include <vector>
 #include "gtest/gtest.h"
-#include "./../position.h"
-#include "./../search.h"
-#include "./../searchResult.h"
-#include "./../searchLimits.h"
-#include "./../searchTimer.h"
-#include "./../transposition.h"
+#include "position.h"
+#include "search.h"
+#include "searchResult.h"
+#include "searchLimits.h"
+#include "searchTimer.h"
+#include "transposition.h"
 
 
 enum resType

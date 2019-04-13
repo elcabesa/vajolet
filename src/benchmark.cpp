@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "io.h"
+#include "vajo_io.h"
 #include "position.h"
 #include "search.h"
 #include "searchResult.h"

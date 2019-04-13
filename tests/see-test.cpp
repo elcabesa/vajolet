@@ -1,7 +1,7 @@
 #include <list>
 #include "gtest/gtest.h"
-#include "./../parameters.h"
-#include "./../position.h"
+#include "parameters.h"
+#include "position.h"
 
 struct positions
 {

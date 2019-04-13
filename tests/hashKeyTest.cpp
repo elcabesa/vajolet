@@ -16,7 +16,7 @@
 */
 
 #include "gtest/gtest.h"
-#include "./../hashKey.h"
+#include "hashKey.h"
 
 TEST(hashKeyTest, keysNotNull) {
 	

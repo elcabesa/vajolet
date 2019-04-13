@@ -1,14 +1,13 @@
 #include <vector>
 #include "gtest/gtest.h"
 
-#include "./../command.h"
-#include "./../data.h"
-#include "./../io.h"
-#include "./../tSquare.h"
-#include "./../move.h"
-#include "./../position.h"
+#include "command.h"
+#include "data.h"
+#include "tSquare.h"
+#include "move.h"
+#include "position.h"
 
-//#include "./../movePicker.h"
+//#include "movePicker.h"
 
 typedef struct _positions
 {

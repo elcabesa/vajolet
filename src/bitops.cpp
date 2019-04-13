@@ -14,28 +14,43 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-
-#include <mutex>
-
-#include "io.h"
-
-using namespace std;
+#include "bitops.h"
+#include "data.h"
+#include "vajo_io.h"
 
 
-/*! \brief definition of the << operator to be able to use it in a multithread context
-
-	\author STOCKFISH
+/*! \brief display a bitmap on stdout
+	\author Marco Belli
 	\version 1.0
-	\date 14/10/2013
+	\date 21/10/2013
 */
+void displayBitmap(const bitMap b)
+{
+	char boardc[squareNumber];
 
-std::ostream& operator<<(std::ostream& os, SyncCout sc) {
-	static std::mutex m;
-	if (sc == SyncCout::io_lock)
-		m.lock();
+	for ( tSquare sq = A1; sq < squareNumber; ++sq)
+	{
+		if ( isSquareSet( b, sq ) )
+		{
+			boardc[sq] = '1';
+		}
+		else
+		{
+			boardc[sq] = '.';
+		}
+	}
 
-	if (sc == SyncCout::io_unlock)
-		m.unlock();
-
-	return os;
+	sync_cout;
+	for (tRank rank = RANK8 ; rank >= RANK1; --rank)
+	{
+		std::cout <<rank +1<< " ";
+		for (tFile file = FILEA ; file <= FILEH; ++file)
+		{
+			std::cout << boardc[getSquare(file,rank)];
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl << "  abcdefgh" << sync_endl;
 }
+
+

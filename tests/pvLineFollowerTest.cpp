@@ -16,7 +16,7 @@
 */
 
 #include "gtest/gtest.h"
-#include "./../pvLineFollower.h"
+#include "pvLineFollower.h"
 
 
 TEST(PVlineFollower, getNextMove)

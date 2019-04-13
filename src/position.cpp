@@ -17,7 +17,7 @@
 #include <sstream>
 
 #include "command.h"
-#include "io.h"
+#include "vajo_io.h"
 #include "parameters.h"
 #include "position.h"
 #include "vajolet.h"
