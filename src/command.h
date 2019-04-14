@@ -93,7 +93,7 @@ public:
 	virtual ~UciOutput(){};
 	
 	// virtual output methods
-	virtual void printPVs(std::vector<rootMove>& rm) const = 0;
+	virtual void printPVs(std::vector<rootMove>& rm, int maxLinePrint = -1) const = 0;
 	virtual void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1) const = 0;
 	virtual void printPV( const Move& m ) final;
 	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const = 0;

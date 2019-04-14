@@ -29,16 +29,18 @@ public:
 	void clean(){ _res.clear(); _previousRes.clear();}
 	void startNewIteration(){ _previousRes = _res; _res.clear(); _multiPvCounter = 0;}
 	void goToNextPV(){ ++_multiPvCounter; }
-	void insertMove( const rootMove& m ){ _res.push_back(m); }
+	void insertMove( const rootMove& m ){ _res.push_back(m); std::stable_sort(_res.begin(), _res.end());}
 	void setLinesToBeSearched( const unsigned int l ){ _linesToBeSearched = l;}
 	bool thereArePvToBeSearched() const { return _multiPvCounter < _linesToBeSearched; }
 	
 	
-	bool getPreviousIterationRootMove(rootMove& rm) const
+	bool getNextRootMove(rootMove& rm) const
 	{
-		if ( _multiPvCounter < _getPreviousIterationSize() )
-		{			
-			rm = _previousRes[_multiPvCounter]; 
+		auto list = get();
+		
+		if ( _multiPvCounter < list.size())
+		{
+			rm = list[_multiPvCounter];
 			return true;
 		}
 		return false;
@@ -47,12 +49,11 @@ public:
 	unsigned int getLinesToBeSearched() const { return _linesToBeSearched; }
 	unsigned int getPVNumber() const { return _multiPvCounter;}
 	
-	std::vector<rootMove> get()
+	std::vector<rootMove> get() const
 	{	
-		// Sort the PV lines searched so far and update the GUI				
-		std::stable_sort(_res.begin(), _res.end());
-		
+		// Sort the PV lines searched so far and update the GUI	
 		std::vector<rootMove> _multiPVprint = _res;
+
 		// always send all the moves toghether in multiPV
 		int missingLines = _linesToBeSearched - _multiPVprint.size();
 		if( missingLines > 0 )
@@ -83,8 +84,6 @@ private:
 	std::vector<rootMove> _previousRes;
 	unsigned int _linesToBeSearched;
 	unsigned int _multiPvCounter;
-	
-	unsigned int _getPreviousIterationSize() const { return _previousRes.size(); }
 };
 
 

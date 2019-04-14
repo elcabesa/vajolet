@@ -1,6 +1,9 @@
 -------------------------------------------------------------------------
 Release note 2.8
 
+bug Fixes:
+Multi Pv fix
+
 Search:
 changed max mate depth to a more reasonable number (200 ply)
 
