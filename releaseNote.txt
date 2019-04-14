@@ -2,6 +2,7 @@
 Release note 2.8
 
 Search:
+changed max mate depth to a more reasonable number (200 ply)
 
 CI/CD:
 change dir structure
