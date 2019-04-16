@@ -462,27 +462,23 @@ inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, cons
 	eCastle cr = state::calcCastleRight( castleOO, color );
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
-
-		bool castleDenied = false;
-		for( tSquare x = (tSquare)1; x<3; ++x)
+		auto kp = _pos.getCastleKingPath(color == white? wCastleOO : bCastleOO);
+		while(kp)
 		{
-			assert(kingSquare+x<squareNumber);
-			if(_pos.getAttackersTo(kingSquare+x,occupiedSquares) & _pos.getTheirBitmap(Pieces))
+			tSquare x = iterateBit(kp);
+			if(_pos.getTheirBitmap(Pieces) & _pos.getAttackersTo(x, occupiedSquares))
 			{
-				castleDenied = true;
-				break;
+				return;
 			}
 		}
-		if(!castleDenied)
+
+		Move m(Move::NOMOVE);
+		m.setFlag( Move::fcastle );
+		m.setFrom( kingSquare );
+		m.setTo( (tSquare)(kingSquare + 2) );
+		if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 		{
-			Move m(Move::NOMOVE);
-			m.setFlag( Move::fcastle );
-			m.setFrom( kingSquare );
-			m.setTo( (tSquare)(kingSquare + 2) );
-			if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-			{
-				ml.insert(m);
-			}
+			ml.insert(m);
 		}
 	}
 }
@@ -493,26 +489,24 @@ inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 	eCastle cr = state::calcCastleRight( castleOOO, color );
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
-		bool castleDenied = false;
-		for( tSquare x = (tSquare)1; x<3; ++x)
+		auto kp = _pos.getCastleKingPath(color == white? wCastleOOO : bCastleOOO);
+		while(kp)
 		{
-			assert(kingSquare-x<squareNumber);
-			if(_pos.getAttackersTo(kingSquare-x, occupiedSquares) & _pos.getTheirBitmap(Pieces))
+			tSquare x = iterateBit(kp);
+			if(_pos.getTheirBitmap(Pieces) & _pos.getAttackersTo(x, occupiedSquares))
 			{
-				castleDenied = true;
-				break;
+				return;
 			}
 		}
-		if(!castleDenied)
+		
+		Move m(Move::NOMOVE);
+		m.setFlag( Move::fcastle );
+		m.setFrom( kingSquare );
+		m.setTo( (tSquare)(kingSquare - 2) );
+		if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 		{
-			Move m(Move::NOMOVE);
-			m.setFlag( Move::fcastle );
-			m.setFrom( kingSquare );
-			m.setTo( (tSquare)(kingSquare - 2) );
-			if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-			{
-				ml.insert(m);
-			}
+			ml.insert(m);
 		}
+		
 	}
 }

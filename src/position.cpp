@@ -32,6 +32,7 @@ simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 eCastle Position::castleRightsMask[squareNumber];
 std::array<bitMap,9> Position::_castlePath;
+std::array<bitMap,9> Position::_castleKingPath;
 
 void Position::initPstValues(void)
 {
@@ -1021,6 +1022,13 @@ void Position::initCastleRightsMask(void)
 	_castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
 	_castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
 	_castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
+	
+	_castleKingPath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
+	_castleKingPath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1);
+	_castleKingPath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
+	_castleKingPath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8);
+	
+	
 }
 
 
@@ -1826,4 +1834,10 @@ bool Position::isCastlePathFree( const eCastle c ) const
 {
 	assert( c < 9);
 	return !_CastlePathOccupancyBitmap(c);
+}
+
+bitMap Position::getCastleKingPath(const eCastle c ) const
+{
+	assert( c < 9);
+	return _castleKingPath[c];
 }

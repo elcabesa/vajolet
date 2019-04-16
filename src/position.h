@@ -308,6 +308,8 @@ public:
 	
 	bitMap _CastlePathOccupancyBitmap( const eCastle c ) const;
 	bool isCastlePathFree( const eCastle c ) const;
+	
+	bitMap getCastleKingPath(const eCastle c ) const;
 
 	const Movegen& getMoveGen() const
 	{
@@ -364,6 +366,7 @@ private:
 	static simdScore nonPawnValue[lastBitboard];
 	std::unordered_map<tKey, materialStruct> static materialKeyMap;
 	static std::array<bitMap,9> _castlePath;
+	static std::array<bitMap,9> _castleKingPath;
 	
 	//--------------------------------------------------------
 	// private members
