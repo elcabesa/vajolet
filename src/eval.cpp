@@ -1220,7 +1220,7 @@ Score Position::eval(void) const
 
 	if( st.hasCastleRight( wCastleOO )
 		&& !(attackedSquares[blackPieces] & (bitSet(E1) | bitSet(F1) | bitSet(G1) ))
-		&& bitCnt(getOccupationBitmap() & (bitSet(F1) | bitSet(G1))) <= 1
+		&& !moreThanOneBit(_CastlePathOccupancyBitmap(wCastleOO))
 		)
 	{
 		kingSafety[white] = std::max( evalShieldStorm<white>(G1), kingSafety[white]);
@@ -1228,7 +1228,7 @@ Score Position::eval(void) const
 
 	if( st.hasCastleRight( wCastleOOO )
 		&& !(attackedSquares[blackPieces] & (bitSet(E1) | bitSet(D1) | bitSet(C1) ))
-		&& bitCnt(getOccupationBitmap() & (bitSet(D1) | bitSet(C1) | bitSet(B1) )) <=1
+		&& !moreThanOneBit(_CastlePathOccupancyBitmap(wCastleOOO))
 		)
 	{
 		kingSafety[white] = std::max( evalShieldStorm<white>(C1), kingSafety[white]);
@@ -1242,7 +1242,7 @@ Score Position::eval(void) const
 
 	if( st.hasCastleRight( bCastleOO )
 		&& !(attackedSquares[whitePieces] & (bitSet(E8) | bitSet(F8) | bitSet(G8) ))
-		&& bitCnt(getOccupationBitmap() & (bitSet(F8) | bitSet(G8))) <=1
+		&& !moreThanOneBit(_CastlePathOccupancyBitmap(bCastleOO))
 		)
 	{
 		kingSafety[black] = std::max( evalShieldStorm<black>(G8), kingSafety[black]);
@@ -1250,7 +1250,7 @@ Score Position::eval(void) const
 
 	if( st.hasCastleRight( bCastleOOO )
 		&& !(attackedSquares[whitePieces] & (bitSet(E8) | bitSet(D8) | bitSet(C8) ))
-		&& bitCnt(getOccupationBitmap() & (bitSet(D8) | bitSet(C8) | bitSet(B8))) <=1
+		&& !moreThanOneBit(_CastlePathOccupancyBitmap(bCastleOOO))
 		)
 	{
 		kingSafety[black] = std::max(evalShieldStorm<black>(C8), kingSafety[black]);

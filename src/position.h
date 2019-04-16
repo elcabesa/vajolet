@@ -306,6 +306,7 @@ public:
 		return getActualState().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= Position::pieceValue[whiteKnights][0];
 	}
 	
+	bitMap _CastlePathOccupancyBitmap( const eCastle c ) const;
 	bool isCastlePathFree( const eCastle c ) const;
 
 	const Movegen& getMoveGen() const

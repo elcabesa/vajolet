@@ -1816,8 +1816,14 @@ unsigned int Position::getNumberOfLegalMoves() const
 	return moveList.size();
 }
 
+bitMap Position::_CastlePathOccupancyBitmap( const eCastle c ) const
+{
+	assert( c < 9);
+	return _castlePath[c] & getOccupationBitmap();
+}
+
 bool Position::isCastlePathFree( const eCastle c ) const
 {
 	assert( c < 9);
-	return !( _castlePath[c] & getOccupationBitmap() );
+	return !_CastlePathOccupancyBitmap(c);
 }
