@@ -33,9 +33,9 @@ simdScore Position::nonPawnValue[lastBitboard];
 eCastle Position::castleRightsMask[squareNumber];
 std::array<bitMap, 9> Position::_castlePath;
 std::array<bitMap, 9> Position::_castleKingPath;
-std::array<bitMap ,9> Position::_castleRookInvolved;
-std::array<bitMap ,9> Position::_castleKingFinalSquare;
-std::array<bitMap ,9> Position::_castleRookFinalSquare;
+std::array<tSquare ,9> Position::_castleRookInvolved;
+std::array<tSquare ,9> Position::_castleKingFinalSquare;
+std::array<tSquare ,9> Position::_castleRookFinalSquare;
 
 void Position::initPstValues(void)
 {
@@ -761,7 +761,7 @@ void Position::doMove(const Move & m)
 	x.setCurrentMove( m );
 
 	const tSquare from = m.getFrom();
-	const tSquare to = m.getTo();
+	tSquare to = m.getTo();
 	const bitboardIndex piece = getPieceAt(from);
 	assert( isValidPiece( piece ));
 
@@ -786,18 +786,22 @@ void Position::doMove(const Move & m)
 	// do castle additional instruction
 	if( m.isCastleMove() )
 	{
-		bool kingSide = m.isKingSideCastle();
-		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
+		Color color = x.isBlackTurn() ? black : white;
+		eCastle cs = state::calcCastleRight(m.isKingSideCastle() ? castleOO: castleOOO, color);
+		tSquare rFrom = _castleRookInvolved[cs];
 		assert(rFrom<squareNumber);
 		bitboardIndex rook = getPieceAt(rFrom);
 		assert( isRook(rook) );
-		tSquare rTo = kingSide? to+ovest: to+est;
+		
+		tSquare rTo = _castleRookFinalSquare[cs];
 		assert(rTo<squareNumber);
-		movePiece(rook,rFrom,rTo);
+		movePiece(rook, rFrom, rTo);
 		x.addMaterial( pstValue[rook][rTo] - pstValue[rook][rFrom] );
 
 		x.getKey().updatePiece( rFrom, rook );
 		x.getKey().updatePiece( rTo, rook );
+		
+		to = _castleKingFinalSquare[cs];
 
 	}
 	else if( captured ) // do capture
@@ -937,7 +941,7 @@ void Position::undoMove()
 	const state& x = getActualState();
 	const Move &m = x.getCurrentMove();
 	assert( m );
-	const tSquare to = m.getTo();
+	tSquare to = m.getTo();
 	const tSquare from = m.getFrom();
 	bitboardIndex piece = getPieceAt(to);
 	assert( isValidPiece( piece ) );
@@ -949,18 +953,20 @@ void Position::undoMove()
 	}
 	else if( m.isCastleMove() )
 	{
-		bool kingSide = m.isKingSideCastle();
-		tSquare rFrom = kingSide? to+est: to+ovest+ovest;
-		tSquare rTo = kingSide? to+ovest: to+est;
-		assert(rFrom<squareNumber);
-		assert(rTo<squareNumber);
-		bitboardIndex rook = getPieceAt(rTo);
-		assert( isRook(rook) );
-		movePiece(rook,rTo,rFrom);
+		Color color = x.isBlackTurn() ? black : white;
+		eCastle cs = state::calcCastleRight(m.isKingSideCastle() ? castleOO: castleOOO, color);
 
+		tSquare rFrom = _castleRookInvolved[cs];
+		tSquare rTo = _castleRookFinalSquare[cs];
+		assert(rFrom < squareNumber);
+		assert(rTo < squareNumber);
+		bitboardIndex rook = getPieceAt(rTo);
+		assert(isRook(rook));
+		movePiece(rook, rTo, rFrom);
+		to = _castleKingFinalSquare[cs];
 	}
 
-	movePiece(piece,to,from);
+	movePiece(piece, to, from);
 
 	assert( isValidPiece( x.getCapturedPiece() ) || x.getCapturedPiece() == empty );
 	if( bitboardIndex p = x.getCapturedPiece() )
@@ -1018,7 +1024,7 @@ void Position::initCastleRightsMask(void)
 	castleRightsMask[H8] = bCastleOO;
 	
 	for( auto& x : _castlePath ) {
-		x = 0;
+		x = squareNone;
 	}
 	_castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
 	_castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
@@ -1034,7 +1040,7 @@ void Position::initCastleRightsMask(void)
 	_castleKingPath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8);
 	
 	for( auto& x : _castleRookInvolved ) {
-		x = 0;
+		x = squareNone;
 	}
 	_castleRookInvolved.at( wCastleOO  ) = H1;
 	_castleRookInvolved.at( wCastleOOO ) = A1;
@@ -1042,7 +1048,7 @@ void Position::initCastleRightsMask(void)
 	_castleRookInvolved.at( bCastleOOO ) = A8;
 
 	for( auto& x : _castleKingFinalSquare ) {
-		x = 0;
+		x = squareNone;
 	}
 	_castleKingFinalSquare.at( wCastleOO  ) = G1;
 	_castleKingFinalSquare.at( wCastleOOO ) = C1;
@@ -1050,7 +1056,7 @@ void Position::initCastleRightsMask(void)
 	_castleKingFinalSquare.at( bCastleOOO ) = C8;
 
 	for( auto& x : _castleRookFinalSquare ) {
-		x = 0;
+		x = squareNone;
 	}
 	_castleRookFinalSquare.at( wCastleOO  ) = F1;
 	_castleRookFinalSquare.at( wCastleOOO ) = D1;
@@ -1541,8 +1547,8 @@ bool Position::isMoveLegal(const Move &m)const
 		{
 			if( m.isCastleMove() )
 			{
-				Color color = s.isBlackTurn()? black : white;
-				eCastle cs = state::calcCastleRight( m.isKingSideCastle() ? castleOO: castleOOO, color );
+				Color color = s.isBlackTurn() ? black : white;
+				eCastle cs = state::calcCastleRight(m.isKingSideCastle() ? castleOO: castleOOO, color);
 				if( !s.hasCastleRight( cs )
 					|| !isCastlePathFree( cs )
 				)
