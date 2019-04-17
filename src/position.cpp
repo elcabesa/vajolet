@@ -953,7 +953,7 @@ void Position::undoMove()
 	}
 	else if( m.isCastleMove() )
 	{
-		Color color = x.isBlackTurn() ? black : white;
+		Color color = x.isBlackTurn() ? white : black;
 		eCastle cs = state::calcCastleRight(m.isKingSideCastle() ? castleOO: castleOOO, color);
 
 		tSquare rFrom = _castleRookInvolved[cs];
