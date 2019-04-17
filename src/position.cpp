@@ -31,8 +31,11 @@ simdScore Position::pieceValue[lastBitboard];
 simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
 eCastle Position::castleRightsMask[squareNumber];
-std::array<bitMap,9> Position::_castlePath;
-std::array<bitMap,9> Position::_castleKingPath;
+std::array<bitMap, 9> Position::_castlePath;
+std::array<bitMap, 9> Position::_castleKingPath;
+std::array<bitMap ,9> Position::_castleRookInvolved;
+std::array<bitMap ,9> Position::_castleKingFinalSquare;
+std::array<bitMap ,9> Position::_castleRookFinalSquare;
 
 void Position::initPstValues(void)
 {
@@ -1003,7 +1006,7 @@ void Position::undoNullMove()
 */
 void Position::initCastleRightsMask(void)
 {
-	for(int i=0;i<squareNumber;i++)
+	for(int i = 0; i < squareNumber; ++i )
 	{
 		castleRightsMask[i] = eCastle(0);
 	}
@@ -1014,8 +1017,7 @@ void Position::initCastleRightsMask(void)
 	castleRightsMask[A8] = bCastleOOO;
 	castleRightsMask[H8] = bCastleOO;
 	
-	for( auto& x : _castlePath )
-	{
+	for( auto& x : _castlePath ) {
 		x = 0;
 	}
 	_castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
@@ -1023,12 +1025,38 @@ void Position::initCastleRightsMask(void)
 	_castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
 	_castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
 	
+	for( auto& x : _castleKingPath ) {
+		x = 0;
+	}
 	_castleKingPath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
 	_castleKingPath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1);
 	_castleKingPath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
 	_castleKingPath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8);
 	
-	
+	for( auto& x : _castleRookInvolved ) {
+		x = 0;
+	}
+	_castleRookInvolved.at( wCastleOO  ) = H1;
+	_castleRookInvolved.at( wCastleOOO ) = A1;
+	_castleRookInvolved.at( bCastleOO  ) = H8;
+	_castleRookInvolved.at( bCastleOOO ) = A8;
+
+	for( auto& x : _castleKingFinalSquare ) {
+		x = 0;
+	}
+	_castleKingFinalSquare.at( wCastleOO  ) = G1;
+	_castleKingFinalSquare.at( wCastleOOO ) = C1;
+	_castleKingFinalSquare.at( bCastleOO  ) = G8;
+	_castleKingFinalSquare.at( bCastleOOO ) = C8;
+
+	for( auto& x : _castleRookFinalSquare ) {
+		x = 0;
+	}
+	_castleRookFinalSquare.at( wCastleOO  ) = F1;
+	_castleRookFinalSquare.at( wCastleOOO ) = D1;
+	_castleRookFinalSquare.at( bCastleOO  ) = F8;
+	_castleRookFinalSquare.at( bCastleOOO ) = D8;
+
 }
 
 
@@ -1440,6 +1468,9 @@ bool Position::isMoveLegal(const Move &m)const
 	//scacco
 	if( s.isInCheck() )
 	{
+		if (m.isCastleMove()) {
+			return false;
+		}
 		if( s.isInDoubleCheck() )  //scacco doppio posso solo muovere il re
 		{
 			if(!isKing(piece))
@@ -1481,6 +1512,7 @@ bool Position::isMoveLegal(const Move &m)const
 	//arrocco impossibile
 	if( m.isCastleMove() )
 	{
+		// todo castle simplify to if(!isKing(piece))
 		if(!isKing(piece) || (getFileOf(m.getFrom())!=FILEE) || (abs(m.getFrom()-m.getTo())!=2 ) || (getRankOf(m.getFrom())!=RANK1 && getRankOf(m.getFrom())!=RANK8))
 		{
 			return false;
@@ -1517,21 +1549,20 @@ bool Position::isMoveLegal(const Move &m)const
 				{
 					return false;
 				}
-				if(m.getTo()>m.getFrom())
+				
+				// TODO castle add 
+				/*if ( rookSq != m.getTo() )
 				{
-					for(tSquare x=m.getFrom(); x<=m.getTo(); ++x){
-						if(getAttackersTo(x,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
-						{
-							return false;
-						}
-					}
-				}else{
-					for(tSquare x=m.getTo(); x<=m.getFrom(); ++x)
+					return false;
+				}*/
+				
+				auto path = _castleKingPath[cs];
+				while (path)
+				{
+					tSquare sq = iterateBit(path);
+					if(getAttackersTo(sq, bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
 					{
-						if(getAttackersTo(x,bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 			}

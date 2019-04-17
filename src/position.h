@@ -365,8 +365,11 @@ private:
 	static simdScore pstValue[lastBitboard][squareNumber];
 	static simdScore nonPawnValue[lastBitboard];
 	std::unordered_map<tKey, materialStruct> static materialKeyMap;
-	static std::array<bitMap,9> _castlePath;
-	static std::array<bitMap,9> _castleKingPath;
+	static std::array<bitMap ,9> _castlePath;							// path that need to be free to be able to castle
+	static std::array<bitMap, 9> _castleKingPath;					// path to be traversed by the king when castling
+	static std::array<bitMap ,9> _castleRookInvolved;			// rook involved in the castling
+	static std::array<bitMap ,9> _castleKingFinalSquare;	// king destination square of castling
+	static std::array<bitMap ,9> _castleRookFinalSquare;	// rook destination square of castling
 	
 	//--------------------------------------------------------
 	// private members
