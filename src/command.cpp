@@ -331,7 +331,7 @@ std::string UciManager::impl::displayUci( const Move& m )
 	auto to = m.getTo();
 	if (m.isCastleMove() /*&& !chess960*/)
 	{
-		to = m.isKingSideCastle(); getSquare(to > from ? FILEG : FILEC, getRankOf(from));
+		to = getSquare(m.isKingSideCastle() ? FILEG : FILEC, getRankOf(from));
 	}
 
 	//to
