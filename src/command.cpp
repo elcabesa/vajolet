@@ -323,16 +323,20 @@ std::string UciManager::impl::displayUci( const Move& m )
 		return s;
 	}
 	
-	// todo change code to manage chess frc
-
+	auto from = m.getFrom();
 	//from
-	s += _printFileOf( m.getFrom() );
-	s += _printRankOf( m.getFrom() );
+	s += _printFileOf(from);
+	s += _printRankOf(from);
 
+	auto to = m.getTo();
+	if (m.isCastleMove() /*&& !chess960*/)
+	{
+		to = m.isKingSideCastle(); getSquare(to > from ? FILEG : FILEC, getRankOf(from));
+	}
 
 	//to
-	s += _printFileOf( m.getTo() );
-	s += _printRankOf( m.getTo() );
+	s += _printFileOf(to);
+	s += _printRankOf(to);
 	//promotion
 	if( m.isPromotionMove() )
 	{
