@@ -310,6 +310,7 @@ public:
 	bool isCastlePathFree( const eCastle c ) const;
 	
 	bitMap getCastleKingPath(const eCastle c ) const;
+	tSquare getCastleRookInvolved(const eCastle c ) const;
 
 	const Movegen& getMoveGen() const
 	{

@@ -322,6 +322,8 @@ std::string UciManager::impl::displayUci( const Move& m )
 		s = "0000";
 		return s;
 	}
+	
+	// todo change code to manage chess frc
 
 	//from
 	s += _printFileOf( m.getFrom() );

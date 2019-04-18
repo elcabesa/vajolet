@@ -40,6 +40,7 @@ static unsigned long long myperft(Position& p, unsigned int depth)
 		Move m(i);
 		if( p.isMoveLegal(m) )
 		{
+			//std::cout<<UciManager::displayUci(m)<<std::endl;
 			p.doMove(m);
 			tot += myperft(p, depth - 1);
 			p.undoMove();
@@ -67,6 +68,22 @@ TEST(PositionTest, isMoveLegal){
 	
 	Move m(B2, A1, Move::fpromotion, Move::promQueen);
 	EXPECT_FALSE(pos.isMoveLegal(m));
+}
+
+TEST(PositionTest, isMoveLegal2){
+	Position pos;
+	pos.setupFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"); 
+	
+	Move m(E1, A1, Move::fcastle);
+	EXPECT_TRUE(pos.isMoveLegal(m));
+}
+
+TEST(PositionTest, isMoveLegal3){
+	Position pos;
+	pos.setupFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"); 
+	
+	Move m(E1, H1, Move::fcastle);
+	EXPECT_TRUE(pos.isMoveLegal(m));
 }
 
 TEST(PositionTest, setupFromFen){

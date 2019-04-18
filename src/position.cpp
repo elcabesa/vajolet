@@ -802,6 +802,7 @@ void Position::doMove(const Move & m)
 		x.getKey().updatePiece( rTo, rook );
 		
 		to = _castleKingFinalSquare[cs];
+		captured = empty;
 
 	}
 	else if( captured ) // do capture
@@ -944,7 +945,7 @@ void Position::undoMove()
 	tSquare to = m.getTo();
 	const tSquare from = m.getFrom();
 	bitboardIndex piece = getPieceAt(to);
-	assert( isValidPiece( piece ) );
+	assert( isValidPiece( piece ) || m.isCastleMove() );
 
 	if( m.isPromotionMove() ){
 		removePiece(piece,to);
@@ -963,7 +964,10 @@ void Position::undoMove()
 		bitboardIndex rook = getPieceAt(rTo);
 		assert(isRook(rook));
 		movePiece(rook, rTo, rFrom);
+		
 		to = _castleKingFinalSquare[cs];
+		piece = getPieceAt(to);
+		
 	}
 
 	movePiece(piece, to, from);
@@ -1336,11 +1340,13 @@ bool Position::moveGivesCheck(const Move& m)const
 	}
 	else if( m.isCastleMove() )
 	{
+		Color color = s.isBlackTurn() ? black : white;
+		eCastle cs = state::calcCastleRight(m.isKingSideCastle() ? castleOO: castleOOO, color);
+		
 		tSquare kFrom = from;
-		tSquare kTo = to;
-		bool kingSide = m.isKingSideCastle();
-		tSquare rFrom = kingSide ? to + est : to + ovest + ovest;
-		tSquare rTo = kingSide ? to + ovest : to + est;
+		tSquare kTo = _castleKingFinalSquare[cs];
+		tSquare rFrom = _castleRookInvolved[cs];
+		tSquare rTo = _castleRookFinalSquare[cs];
 		assert(rFrom<squareNumber);
 		assert(rTo<squareNumber);
 
@@ -1466,7 +1472,7 @@ bool Position::isMoveLegal(const Move &m)const
 	}
 
 	//casa di destinazione irraggiungibile
-	if( isSquareSet( Us[Pieces], m.getTo() ) )
+	if( isSquareSet(Us[Pieces], m.getTo()) && !m.isCastleMove() )
 	{
 		return false;
 	}
@@ -1518,8 +1524,7 @@ bool Position::isMoveLegal(const Move &m)const
 	//arrocco impossibile
 	if( m.isCastleMove() )
 	{
-		// todo castle simplify to if(!isKing(piece))
-		if(!isKing(piece) || (getFileOf(m.getFrom())!=FILEE) || (abs(m.getFrom()-m.getTo())!=2 ) || (getRankOf(m.getFrom())!=RANK1 && getRankOf(m.getFrom())!=RANK8))
+		if(!isKing(piece))
 		{
 			return false;
 		}
@@ -1549,19 +1554,21 @@ bool Position::isMoveLegal(const Move &m)const
 			{
 				Color color = s.isBlackTurn() ? black : white;
 				eCastle cs = state::calcCastleRight(m.isKingSideCastle() ? castleOO: castleOOO, color);
-				if( !s.hasCastleRight( cs )
-					|| !isCastlePathFree( cs )
+				if( !s.hasCastleRight(cs)
+					|| !isCastlePathFree(cs)
 				)
 				{
 					return false;
 				}
 				
-				// TODO castle add 
-				/*if ( rookSq != m.getTo() )
+				const tSquare rookSq = _castleRookInvolved[cs];
+
+				// malformed move
+				if ( rookSq != m.getTo() )
 				{
 					return false;
-				}*/
-				
+				}
+								
 				auto path = _castleKingPath[cs];
 				while (path)
 				{
@@ -1877,4 +1884,10 @@ bitMap Position::getCastleKingPath(const eCastle c ) const
 {
 	assert( c < 9);
 	return _castleKingPath[c];
+}
+
+tSquare Position::getCastleRookInvolved(const eCastle c ) const
+{
+	assert( c < 9);
+	return _castleRookInvolved[c];
 }

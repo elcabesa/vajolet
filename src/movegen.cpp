@@ -459,10 +459,11 @@ void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml
 template<Movegen::genType type>
 inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
 {
+	// todo unificare questo e il prossimo metodo
 	eCastle cr = state::calcCastleRight( castleOO, color );
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
-		auto kp = _pos.getCastleKingPath(color == white? wCastleOO : bCastleOO);
+		auto kp = _pos.getCastleKingPath(cr);
 		while(kp)
 		{
 			tSquare x = iterateBit(kp);
@@ -473,9 +474,9 @@ inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, cons
 		}
 
 		Move m(Move::NOMOVE);
-		m.setFlag( Move::fcastle );
-		m.setFrom( kingSquare );
-		m.setTo( (tSquare)(kingSquare + 2) );
+		m.setFlag(Move::fcastle);
+		m.setFrom(kingSquare);
+		m.setTo(_pos.getCastleRookInvolved(cr));
 		if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 		{
 			ml.insert(m);
@@ -489,7 +490,7 @@ inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 	eCastle cr = state::calcCastleRight( castleOOO, color );
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
-		auto kp = _pos.getCastleKingPath(color == white? wCastleOOO : bCastleOOO);
+		auto kp = _pos.getCastleKingPath(cr);
 		while(kp)
 		{
 			tSquare x = iterateBit(kp);
@@ -502,7 +503,7 @@ inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 		Move m(Move::NOMOVE);
 		m.setFlag( Move::fcastle );
 		m.setFrom( kingSquare );
-		m.setTo( (tSquare)(kingSquare - 2) );
+		m.setTo(_pos.getCastleRookInvolved(cr));
 		if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 		{
 			ml.insert(m);

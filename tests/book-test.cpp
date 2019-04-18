@@ -105,7 +105,7 @@ TEST(bookTest, probeCastle){
 	p.doMove(Move(F1,C4));
 	p.doMove(Move(F8,C5));
 	
-	std::vector<Move> v ={ Move(C2,C3), Move(E1,G1,Move::fcastle)};
+	std::vector<Move> v ={ Move(C2,C3), Move(E1,H1,Move::fcastle)};
 	
 	PolyglotBook b;
 	for (int i = 0;i<100;++i) {
