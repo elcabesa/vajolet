@@ -415,49 +415,48 @@ std::string UciManager::impl::displayMove(const Position& pos, const Move& m)
 		{
 			s = "O-O-O";
 		}
-		return s;
-
-	}
+	} else {
 
 
-	// 1 ) use the name of the piece if it's not a pawn move
-	if( !pawnMove )
-	{
-		s+= getPieceName( getPieceType( piece ) );
-	}
-	if( fileFlag )
-	{
-		s += _printFileOf( m.getFrom() );
-	}
-	if( rankFlag )
-	{
-		s += _printRankOf( m.getFrom() );
-	}
-
-
-	//capture motation
-	if (capture)
-	{
-		if(pawnMove)
+		// 1 ) use the name of the piece if it's not a pawn move
+		if( !pawnMove )
+		{
+			s+= getPieceName( getPieceType( piece ) );
+		}
+		if( fileFlag )
 		{
 			s += _printFileOf( m.getFrom() );
 		}
-		// capture add x before to square
-		s+="x";
-	}
-	// to square
-	s += _printFileOf( m.getTo() );
-	s += _printRankOf( m.getTo() );
-	// add en passant info
-	if ( isEnPassant )
-	{
-		s+="e.p.";
-	}
-	//promotion add promotion to
-	if(isPromotion)
-	{
-		s += "=";
-		s +=  getPieceName( m.getPromotedPiece() );
+		if( rankFlag )
+		{
+			s += _printRankOf( m.getFrom() );
+		}
+
+
+		//capture motation
+		if (capture)
+		{
+			if(pawnMove)
+			{
+				s += _printFileOf( m.getFrom() );
+			}
+			// capture add x before to square
+			s+="x";
+		}
+		// to square
+		s += _printFileOf( m.getTo() );
+		s += _printRankOf( m.getTo() );
+		// add en passant info
+		if ( isEnPassant )
+		{
+			s+="e.p.";
+		}
+		//promotion add promotion to
+		if(isPromotion)
+		{
+			s += "=";
+			s +=  getPieceName( m.getPromotedPiece() );
+		}
 	}
 	// add check information
 	if( check )

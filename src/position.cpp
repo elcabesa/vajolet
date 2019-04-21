@@ -901,6 +901,7 @@ void Position::doMove(const Move & m)
 	{
 		Color color = x.isBlackTurn() ? black : white;
 		eCastle cs = state::calcCastleRight(m.isKingSideCastle() ? castleOO: castleOOO, color);
+		
 		tSquare rFrom = _castleRookInvolved[cs];
 		assert(rFrom<squareNumber);
 		bitboardIndex rook = getPieceAt(rFrom);
@@ -908,51 +909,66 @@ void Position::doMove(const Move & m)
 		
 		tSquare rTo = _castleRookFinalSquare[cs];
 		assert(rTo<squareNumber);
-		movePiece(rook, rFrom, rTo);
-		x.addMaterial( pstValue[rook][rTo] - pstValue[rook][rFrom] );
-
+		
+		tSquare kFrom = from;
+		tSquare kTo  = _castleKingFinalSquare[cs];
+		assert(kFrom<squareNumber);
+		assert(kTo<squareNumber);
+		
+		removePiece(rook, rFrom);
+		if( kFrom != kTo )
+		{
+			movePiece( piece, kFrom, kTo );
+		}
+		putPiece(rook, rTo);
+		
 		x.getKey().updatePiece( rFrom, rook );
 		x.getKey().updatePiece( rTo, rook );
+		x.getKey().updatePiece( kFrom, piece );
+		x.getKey().updatePiece( kTo, piece );
 		
-		to = _castleKingFinalSquare[cs];
-		captured = empty;
+		x.addMaterial( pstValue[rook][rTo] - pstValue[rook][rFrom] );
+		x.addMaterial( pstValue[piece][kTo] - pstValue[piece][kFrom] );
 
 	}
-	else if( captured ) // do capture
+	else 
 	{
-		tSquare captureSquare = to;
-		if(isPawn(captured))
+		if( captured ) // do capture
 		{
-
-			if( m.isEnPassantMove() )
+			tSquare captureSquare = to;
+			if(isPawn(captured))
 			{
-				captureSquare-=pawnPush( x.isBlackTurn() );
+
+				if( m.isEnPassantMove() )
+				{
+					captureSquare-=pawnPush( x.isBlackTurn() );
+				}
+				assert(captureSquare<squareNumber);
+				x.getPawnKey().updatePiece( captureSquare, captured );
 			}
-			assert(captureSquare<squareNumber);
-			x.getPawnKey().updatePiece( captureSquare, captured );
+
+			// remove piece
+			removePiece(captured,captureSquare);
+			// update material
+			x.removeMaterial( pstValue[captured][captureSquare] );
+			x.removeNonPawnMaterial( nonPawnValue[captured] );
+
+			// update keys
+			x.getKey().updatePiece( captureSquare, captured);
+			assert(getPieceCount(captured)<30);
+			x.getMaterialKey().updatePiece( (tSquare)captured, (bitboardIndex)getPieceCount(captured) ); // ->after removing the piece
+
+			// reset fifty move counter
+			x.resetIrreversibleMoveCount();
 		}
 
-		// remove piece
-		removePiece(captured,captureSquare);
-		// update material
-		x.removeMaterial( pstValue[captured][captureSquare] );
-		x.removeNonPawnMaterial( nonPawnValue[captured] );
+		// update hashKey
+		x.getKey().updatePiece( from, piece );
+		x.getKey().updatePiece( to, piece );
+		movePiece(piece, from, to);
 
-		// update keys
-		x.getKey().updatePiece( captureSquare, captured);
-		assert(getPieceCount(captured)<30);
-		x.getMaterialKey().updatePiece( (tSquare)captured, (bitboardIndex)getPieceCount(captured) ); // ->after removing the piece
-
-		// reset fifty move counter
-		x.resetIrreversibleMoveCount();
+		x.addMaterial( pstValue[piece][to] - pstValue[piece][from] );
 	}
-
-	// update hashKey
-	x.getKey().updatePiece( from, piece );
-	x.getKey().updatePiece( to, piece );
-	movePiece(piece, from, to);
-
-	x.addMaterial( pstValue[piece][to] - pstValue[piece][from] );
 
 	// Update castle rights if needed
 	if ( x.hasCastleRights() && (castleRightsMask[from] | castleRightsMask[to]))
@@ -1060,30 +1076,42 @@ void Position::undoMove()
 	bitboardIndex piece = getPieceAt(to);
 	assert( isValidPiece( piece ) || m.isCastleMove() );
 
-	if( m.isPromotionMove() ){
-		removePiece(piece,to);
-		piece = isBlackPiece( piece) ? blackPawns : whitePawns;
-		putPiece(piece,to);
-	}
-	else if( m.isCastleMove() )
+	
+	if( m.isCastleMove() )
 	{
 		Color color = x.isBlackTurn() ? white : black;
 		eCastle cs = state::calcCastleRight(m.isKingSideCastle() ? castleOO: castleOOO, color);
 
 		tSquare rFrom = _castleRookInvolved[cs];
 		tSquare rTo = _castleRookFinalSquare[cs];
+		
+		tSquare kFrom = from;
+		tSquare kTo = _castleKingFinalSquare[cs];
+		
 		assert(rFrom < squareNumber);
 		assert(rTo < squareNumber);
+		assert(kFrom < squareNumber);
+		assert(kTo < squareNumber);
 		bitboardIndex rook = getPieceAt(rTo);
 		assert(isRook(rook));
-		movePiece(rook, rTo, rFrom);
 		
-		to = _castleKingFinalSquare[cs];
-		piece = getPieceAt(to);
+		auto kPiece = getPieceAt(kTo);
+		removePiece(rook, rTo);
+		if( kFrom != kTo )
+		{
+			movePiece( kPiece, kTo, kFrom );
+		}
+		putPiece(rook, rFrom);
 		
 	}
-
-	movePiece(piece, to, from);
+	else {
+		if( m.isPromotionMove() ){
+			removePiece(piece,to);
+			piece = isBlackPiece( piece) ? blackPawns : whitePawns;
+			putPiece(piece,to);
+		}
+		movePiece(piece, to, from);
+	}
 
 	assert( isValidPiece( x.getCapturedPiece() ) || x.getCapturedPiece() == empty );
 	if( bitboardIndex p = x.getCapturedPiece() )

@@ -285,7 +285,7 @@ public:
 
 	inline bool isCaptureMove(const Move & m) const
 	{
-		return getPieceAt( m.getTo() ) !=empty || m.isEnPassantMove() ;
+		return !m.isCastleMove() && ( getPieceAt( m.getTo() ) !=empty  || m.isEnPassantMove());
 	}
 	inline bool isCaptureMoveOrPromotion(const Move & m) const
 	{

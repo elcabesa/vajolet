@@ -464,10 +464,11 @@ inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, cons
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
 		auto kp = _pos.getCastleKingPath(cr);
+		auto rookSq = _pos.getCastleRookInvolved(cr);
 		while(kp)
 		{
 			tSquare x = iterateBit(kp);
-			if(_pos.getTheirBitmap(Pieces) & _pos.getAttackersTo(x, occupiedSquares))
+			if(_pos.getTheirBitmap(Pieces) & _pos.getAttackersTo(x, occupiedSquares^ bitSet(rookSq)))
 			{
 				return;
 			}
@@ -476,7 +477,7 @@ inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, cons
 		Move m(Move::NOMOVE);
 		m.setFlag(Move::fcastle);
 		m.setFrom(kingSquare);
-		m.setTo(_pos.getCastleRookInvolved(cr));
+		m.setTo(rookSq);
 		if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 		{
 			ml.insert(m);
@@ -491,10 +492,11 @@ inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
 		auto kp = _pos.getCastleKingPath(cr);
+		auto rookSq = _pos.getCastleRookInvolved(cr);
 		while(kp)
 		{
 			tSquare x = iterateBit(kp);
-			if(_pos.getTheirBitmap(Pieces) & _pos.getAttackersTo(x, occupiedSquares))
+			if(_pos.getTheirBitmap(Pieces) & _pos.getAttackersTo(x, occupiedSquares^ bitSet(rookSq) ))
 			{
 				return;
 			}
@@ -503,7 +505,7 @@ inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 		Move m(Move::NOMOVE);
 		m.setFlag( Move::fcastle );
 		m.setFrom( kingSquare );
-		m.setTo(_pos.getCastleRookInvolved(cr));
+		m.setTo(rookSq);
 		if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
 		{
 			ml.insert(m);
