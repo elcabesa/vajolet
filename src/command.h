@@ -58,9 +58,9 @@ public:
 		return instance;
 	}
 	void uciLoop(void);
-	static char getPieceName( const bitboardIndex idx );
-	static std::string displayUci( const Move& m );
-	static std::string displayMove( const Position& pos, const Move& m );
+	static char getPieceName(const bitboardIndex idx);
+	static std::string displayUci(const Move& m, const bool chess960);
+	static std::string displayMove(const Position& pos, const Move& m);
 };
 
 /******************************************
@@ -93,14 +93,14 @@ public:
 	virtual ~UciOutput(){};
 	
 	// virtual output methods
-	virtual void printPVs(std::vector<rootMove>& rm, int maxLinePrint = -1) const = 0;
-	virtual void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1) const = 0;
-	virtual void printPV( const Move& m ) final;
-	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time) const = 0;
+	virtual void printPVs(std::vector<rootMove>& rm, bool ischess960, int maxLinePrint = -1) const = 0;
+	virtual void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1, bool ischess960 = false) const = 0;
+	virtual void printPV( const Move& m, bool isChess960 = false) final;
+	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time, bool isChess960) const = 0;
 	virtual void showCurrLine(const Position & pos, const unsigned int ply) const = 0;
 	virtual void printDepth() const = 0;
 	virtual void printScore(const signed int cp) const = 0;
-	virtual void printBestMove( const Move& bm, const Move& ponder ) const = 0;
+	virtual void printBestMove( const Move& bm, const Move& ponder, bool isChess960 ) const = 0;
 	virtual void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const = 0;
 	
 protected:

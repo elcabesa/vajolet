@@ -30,12 +30,12 @@ const int KRank[8]	= { +1, +0, -2, -3, -4, -5, -6, -7};
 simdScore Position::pieceValue[lastBitboard];
 simdScore Position::pstValue[lastBitboard][squareNumber];
 simdScore Position::nonPawnValue[lastBitboard];
-eCastle Position::castleRightsMask[squareNumber];
+/*eCastle Position::castleRightsMask[squareNumber];
 std::array<bitMap, 9> Position::_castlePath;
 std::array<bitMap, 9> Position::_castleKingPath;
 std::array<tSquare ,9> Position::_castleRookInvolved;
 std::array<tSquare ,9> Position::_castleKingFinalSquare;
-std::array<tSquare ,9> Position::_castleRookFinalSquare;
+std::array<tSquare ,9> Position::_castleRookFinalSquare;*/
 
 void Position::initPstValues(void)
 {
@@ -234,30 +234,126 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	ss >> token;
 
 	x.clearCastleRight();
+	for (auto& cr : castleRightsMask) {cr = (eCastle)0;}
+	for (auto& cp : _castlePath) {cp = 0ull;}
+	for (auto& ckp : _castleKingPath) {ckp = 0ull;}
+	for (auto& sq : _castleRookInvolved) {sq = squareNone;}
+	for (auto& sq : _castleKingFinalSquare) {sq = squareNone;}
+	for (auto& sq : _castleRookFinalSquare) {sq = squareNone;}
+	
 	while ((ss >> token) && !isspace(token))
 	{
 		switch(token){
 		case 'K':
-			x.setCastleRight( wCastleOO );
+			{
+				tSquare whiteKingSq = getSquareOfThePiece(whiteKing);
+				tSquare wRookSquareOO = squareNone;
+				for ( tSquare s = whiteKingSq; s <= H1; ++s) {
+					if (getPieceAt(s) == whiteRooks) {
+						wRookSquareOO = s;
+						break;
+					}
+				}
+				if (getRankOf(whiteKingSq) == RANK1 && wRookSquareOO != squareNone) {
+					setupCastleData (wCastleOO, whiteKingSq, G1, wRookSquareOO, F1);
+				}
+			}
 			break;
 		case 'Q':
-			x.setCastleRight( wCastleOOO );
+			{
+				tSquare whiteKingSq = getSquareOfThePiece(whiteKing);
+				tSquare wRookSquareOOO = squareNone;
+				for ( tSquare s = whiteKingSq; s >= A1; --s) {
+					if (getPieceAt(s) == whiteRooks) {
+						wRookSquareOOO = s;
+						break;
+					}
+				}
+				if (getRankOf(whiteKingSq) == RANK1 && wRookSquareOOO != squareNone) {
+					setupCastleData (wCastleOOO, whiteKingSq, C1, wRookSquareOOO, D1);
+				}
+			}
 			break;
 		case 'k':
-			x.setCastleRight( bCastleOO );
+			{
+				tSquare blackKingSq = getSquareOfThePiece(blackKing);
+				tSquare bRookSquareOO = squareNone;
+				for ( tSquare s = blackKingSq; s <= H8; ++s) {
+					if (getPieceAt(s) == blackRooks) {
+						bRookSquareOO = s;
+						break;
+					}
+				}
+				if (getRankOf(blackKingSq) == RANK8 && bRookSquareOO != squareNone) {
+					setupCastleData (bCastleOO, blackKingSq, G8, bRookSquareOO, F8);
+				}
+			}
 			break;
 		case 'q':
-			x.setCastleRight( bCastleOOO );
+			{
+				tSquare blackKingSq = getSquareOfThePiece(blackKing);
+				tSquare bRookSquareOOO = squareNone;
+				for ( tSquare s = blackKingSq; s >= A8; --s) {
+					if (getPieceAt(s) == blackRooks) {
+						bRookSquareOOO = s;
+						break;
+					}
+				}
+				if (getRankOf(blackKingSq) == RANK8 && bRookSquareOOO != squareNone) {
+					setupCastleData (bCastleOOO, blackKingSq, C8, bRookSquareOOO, D8);
+				}
+			}
 			break;
+		case 'A':
+		case 'B':
+		case 'C':
+		case 'D':
+		case 'E':
+		case 'F':
+		case 'G':
+		case 'H':
+		{
+			tSquare whiteKingSq = getSquareOfThePiece(whiteKing);
+			tSquare rSq = getSquare(tFile((char)token -'A'), RANK1);
+			if ( getPieceAt(rSq) == whiteRooks && getRankOf(whiteKingSq) == RANK1) {
+				if( rSq > whiteKingSq ) {
+					setupCastleData (wCastleOO, whiteKingSq, G1, rSq, F1);
+				} else {
+					setupCastleData (wCastleOOO, whiteKingSq, C1, rSq, D1);
+				}
+			}
+		}
+			break;
+		case 'a':
+		case 'b':
+		case 'c':
+		case 'd':
+		case 'e':
+		case 'f':
+		case 'g':
+		case 'h':
+		{
+			tSquare blackKingSq = getSquareOfThePiece(blackKing);
+			tSquare rSq = getSquare(tFile((char)token -'a'), RANK8);
+			if ( getPieceAt(rSq) == blackRooks && getRankOf(blackKingSq) == RANK8) {
+				if( rSq > blackKingSq ) {
+					setupCastleData (bCastleOO, blackKingSq, G8, rSq, F8);
+				} else {
+					setupCastleData (bCastleOOO, blackKingSq, C8, rSq, D8);
+				}
+			}	
+		}
 		}
 	}
+	
+	//initCastleRightsMask();
 
 	x.resetEpSquare();
 	if (((ss >> col) && (col >= 'a' && col <= 'h'))
 		&& ((ss >> row) && (row == '3' || row == '6')))
 	{
 		x.setEpSquare( (tSquare) ( ( (int) col - 'a') + 8 * (row - '1') ) );
-		if (!( getAttackersTo( x.getEpSquare() ) & bitBoard[ x.getPawnsOfActivePlayer() ] ) )
+		if (!( getAttackersTo( x.getEpSquare() ) & _bitBoard[ x.getPawnsOfActivePlayer() ] ) )
 		{
 			x.resetEpSquare();
 		}
@@ -291,7 +387,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 
 	x.setHiddenCheckers( getHiddenCheckers<true>() );
 	x.setPinnedPieces( getHiddenCheckers<false>() );
-	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & bitBoard[x.getPiecesOfOtherPlayer()] );
+	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & _bitBoard[x.getPiecesOfOtherPlayer()] );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	checkPosConsistency(1);
@@ -355,11 +451,11 @@ void Position::clear()
 {
 	for (tSquare sq = square0; sq < squareNumber; ++sq)
 	{
-		squares[sq] = empty;
+		_squares[sq] = empty;
 	}
 	for (bitboardIndex i = occupiedSquares; i < lastBitboard; ++i)
 	{
-		bitBoard[i] = 0;
+		_bitBoard[i] = 0;
 	}
 	stateInfo.clear();
 	stateInfo.emplace_back(state());
@@ -466,19 +562,36 @@ std::string  Position::getFen() const {
 
 	if( st.hasCastleRight(wCastleOO) )
 	{
-		s += "K";
+		if(isChess960()) {
+			s += char('A' + getFileOf(getCastleRookInvolved(wCastleOO)));
+		} else {
+			s += "K";
+		}
+		
 	}
 	if( st.hasCastleRight(wCastleOOO) )
 	{
-		s += "Q";
+		if(isChess960()) {
+			s += char('A' + getFileOf(getCastleRookInvolved(wCastleOOO)));
+		} else {
+			s += "Q";
+		}
 	}
 	if( st.hasCastleRight(bCastleOO) )
 	{
-		s += "k";
+		if(isChess960()) {
+			s += char('a' + getFileOf(getCastleRookInvolved(bCastleOO)));
+		} else {
+			s += "k";
+		}
 	}
 	if( st.hasCastleRight(bCastleOOO) )
 	{
-		s += "q";
+		if(isChess960()) {
+			s += char('a' + getFileOf(getCastleRookInvolved(bCastleOOO)));
+		} else {
+			s += "q";
+		}
 	}
 	if( !st.hasCastleRights() ){
 		s += "-";
@@ -747,7 +860,7 @@ void Position::doMove(const Move & m)
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	if( ! isMoveLegal(m) )
 	{
-		std::cerr<<"illegal move "<<UciManager::displayUci(m)<<std::endl;
+		std::cerr<<"illegal move "<<UciManager::displayUci(m, isChess960())<<std::endl;
 		exit(-1);
 	}
 #endif
@@ -1009,66 +1122,49 @@ void Position::undoNullMove()
 	checkPosConsistency(0);
 #endif
 }
-/*! \brief init the helper castle mash
-	\author Marco Belli
-	\version 1.0
-	\date 27/10/2013
-*/
-void Position::initCastleRightsMask(void)
-{
-	for(int i = 0; i < squareNumber; ++i )
-	{
-		castleRightsMask[i] = eCastle(0);
-	}
-	castleRightsMask[E1] = wCastleOO | wCastleOOO;
-	castleRightsMask[A1] = wCastleOOO;
-	castleRightsMask[H1] = wCastleOO;
-	castleRightsMask[E8] = bCastleOO | bCastleOOO;
-	castleRightsMask[A8] = bCastleOOO;
-	castleRightsMask[H8] = bCastleOO;
-	
-	for( auto& x : _castlePath ) {
-		x = squareNone;
-	}
-	_castlePath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
-	_castlePath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1) | bitSet(B1);
-	_castlePath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
-	_castlePath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8) | bitSet(B8);
-	
-	for( auto& x : _castleKingPath ) {
-		x = 0;
-	}
-	_castleKingPath.at( wCastleOO  ) = bitSet(F1) | bitSet(G1);
-	_castleKingPath.at( wCastleOOO ) = bitSet(D1) | bitSet(C1);
-	_castleKingPath.at( bCastleOO  ) = bitSet(F8) | bitSet(G8);
-	_castleKingPath.at( bCastleOOO ) = bitSet(D8) | bitSet(C8);
-	
-	for( auto& x : _castleRookInvolved ) {
-		x = squareNone;
-	}
-	_castleRookInvolved.at( wCastleOO  ) = H1;
-	_castleRookInvolved.at( wCastleOOO ) = A1;
-	_castleRookInvolved.at( bCastleOO  ) = H8;
-	_castleRookInvolved.at( bCastleOOO ) = A8;
 
-	for( auto& x : _castleKingFinalSquare ) {
-		x = squareNone;
-	}
-	_castleKingFinalSquare.at( wCastleOO  ) = G1;
-	_castleKingFinalSquare.at( wCastleOOO ) = C1;
-	_castleKingFinalSquare.at( bCastleOO  ) = G8;
-	_castleKingFinalSquare.at( bCastleOOO ) = C8;
+void Position::setupCastleData (const eCastle cr, const tSquare kFrom, const tSquare kTo, const tSquare rFrom, const tSquare rTo) {
+	getActualState().setCastleRight( cr );
 
-	for( auto& x : _castleRookFinalSquare ) {
-		x = squareNone;
-	}
-	_castleRookFinalSquare.at( wCastleOO  ) = F1;
-	_castleRookFinalSquare.at( wCastleOOO ) = D1;
-	_castleRookFinalSquare.at( bCastleOO  ) = F8;
-	_castleRookFinalSquare.at( bCastleOOO ) = D8;
-
+	castleRightsMask[kFrom] = castleRightsMask[kFrom] | cr;
+	castleRightsMask[rFrom] = cr;
+	_castlePath.at (cr) = initCastlePath(kFrom, kTo, rFrom, rTo);
+	_castleKingPath.at (cr) = initKingPath(kFrom, kTo);
+	_castleRookInvolved.at (cr) = rFrom;
+	_castleKingFinalSquare.at (cr) = kTo;
+	_castleRookFinalSquare.at (cr) = rTo;
 }
 
+bitMap Position::initCastlePath(const tSquare kSqFrom, const tSquare kSqTo, const tSquare rSqFrom, const tSquare rSqTo)
+{
+	bitMap b = 0ull;
+	
+	auto kLeft = std::min(kSqFrom, kSqTo);
+	auto kRight = std::max(kSqFrom, kSqTo);
+	auto rLeft = std::min(rSqFrom, rSqTo);
+	auto rRight = std::max(rSqFrom, rSqTo);
+	for (auto sq = kLeft; sq <= kRight; ++sq) {
+		if (sq != kSqFrom && sq != rSqFrom) { b |= bitSet(sq);}
+	}
+	for (auto sq = rLeft; sq <= rRight; ++sq) {
+		if (sq != kSqFrom && sq != rSqFrom) { b |= bitSet(sq);}
+	}
+	return b;
+	
+}
+
+bitMap Position::initKingPath(const tSquare kSqFrom, const tSquare kSqTo)
+{
+	bitMap b = 0ull;
+	
+	auto kLeft = std::min(kSqFrom, kSqTo);
+	auto kRight = std::max(kSqFrom, kSqTo);
+	for (auto sq = kLeft; sq <= kRight; ++sq) {
+		if (sq != kSqFrom ) { b |= bitSet(sq);}
+	}
+	return b;
+	
+}
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
 static void block( std::string errorString, unsigned int type )
@@ -1092,16 +1188,16 @@ void Position::checkPosConsistency(int nn) const
 	}
 
 	// check board
-	if(bitBoard[whitePieces] & bitBoard[blackPieces])
+	if(_bitBoard[whitePieces] & _bitBoard[blackPieces])
 	{
 		block( "white piece & black piece intersected", nn );
 	}
-	if((bitBoard[whitePieces] | bitBoard[blackPieces]) !=bitBoard[occupiedSquares])
+	if((_bitBoard[whitePieces] | _bitBoard[blackPieces]) !=_bitBoard[occupiedSquares])
 	{
 		display();
-		displayBitmap(bitBoard[whitePieces]);
-		displayBitmap(bitBoard[blackPieces]);
-		displayBitmap(bitBoard[occupiedSquares]);
+		displayBitmap(_bitBoard[whitePieces]);
+		displayBitmap(_bitBoard[blackPieces]);
+		displayBitmap(_bitBoard[occupiedSquares]);
 
 		block( "all piece problem", nn );
 	}
@@ -1109,7 +1205,7 @@ void Position::checkPosConsistency(int nn) const
 	{
 		bitboardIndex id = getPieceAt(sq);
 
-		if( id != empty && !isSquareSet( bitBoard[id], sq ) )
+		if( id != empty && !isSquareSet( _bitBoard[id], sq ) )
 		{
 			block( "board inconsistency", nn );
 		}
@@ -1119,9 +1215,9 @@ void Position::checkPosConsistency(int nn) const
 	{
 		for (int j = whiteKing; j <= blackPawns; j++)
 		{
-			if(i!=j && i!= whitePieces && i!= separationBitmap && j!= whitePieces && j!= separationBitmap && (bitBoard[i] & bitBoard[j]))
+			if(i!=j && i!= whitePieces && i!= separationBitmap && j!= whitePieces && j!= separationBitmap && (_bitBoard[i] & _bitBoard[j]))
 			{
-				block( "bitboard intersection", nn );
+				block( "_bitBoard intersection", nn );
 			}
 		}
 	}
@@ -1129,7 +1225,7 @@ void Position::checkPosConsistency(int nn) const
 	{
 		if(i!= whitePieces && i!= separationBitmap)
 		{
-			if(getPieceCount((bitboardIndex)i) != bitCnt(bitBoard[i]))
+			if(getPieceCount((bitboardIndex)i) != bitCnt(_bitBoard[i]))
 			{
 				block( "pieceCount Error", nn );
 			}
@@ -1140,18 +1236,18 @@ void Position::checkPosConsistency(int nn) const
 	bitMap test=0;
 	for (int i = whiteKing; i < whitePieces; i++)
 	{
-		test |=bitBoard[i];
+		test |=_bitBoard[i];
 	}
-	if(test!= bitBoard[whitePieces])
+	if(test!= _bitBoard[whitePieces])
 	{
 		block( "white piece error", nn );
 	}
 	test=0;
 	for (int i = blackKing; i < blackPieces; i++)
 	{
-		test |=bitBoard[i];
+		test |=_bitBoard[i];
 	}
-	if(test!= bitBoard[blackPieces])
+	if(test!= _bitBoard[blackPieces])
 	{
 		block( "black piece error", nn );
 	}
@@ -1244,15 +1340,15 @@ bitMap Position::getHiddenCheckers() const
 	assert(kingSquare<squareNumber);
 	assert( isValidPiece( getPieceOfPlayer( Pawns, next ) ) );
 	bitMap result = 0;
-	bitMap pinners = Movegen::getBishopPseudoAttack(kingSquare) &(bitBoard[ getPieceOfPlayer( Bishops, next )]| bitBoard[getPieceOfPlayer( Queens, next) ] );
-	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(bitBoard[getPieceOfPlayer( Rooks, next )]| bitBoard[getPieceOfPlayer( Queens, next ) ] );
+	bitMap pinners = Movegen::getBishopPseudoAttack(kingSquare) &(_bitBoard[ getPieceOfPlayer( Bishops, next )]| _bitBoard[getPieceOfPlayer( Queens, next) ] );
+	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(_bitBoard[getPieceOfPlayer( Rooks, next )]| _bitBoard[getPieceOfPlayer( Queens, next ) ] );
 
 	while(pinners)
 	{
 		bitMap b = getSquaresBetween( kingSquare, iterateBit(pinners) ) & getOccupationBitmap();
 		if ( !moreThanOneBit(b) )
 		{
-			result |= b & bitBoard[ x.getPiecesOfActivePlayer() ];
+			result |= b & _bitBoard[ x.getPiecesOfActivePlayer() ];
 		}
 	}
 	return result;
@@ -1267,13 +1363,13 @@ bitMap Position::getHiddenCheckers() const
 bitMap Position::getAttackersTo(const tSquare to, const bitMap occupancy) const
 {
 	assert(to<squareNumber);
-	bitMap res = (Movegen::attackFrom<blackPawns>(to) & bitBoard[whitePawns])
-			|(Movegen::attackFrom<whitePawns>(to) & bitBoard[blackPawns])
-			|(Movegen::attackFrom<whiteKnights>(to) & (bitBoard[blackKnights]|bitBoard[whiteKnights]))
-			|(Movegen::attackFrom<whiteKing>(to) & (bitBoard[blackKing]|bitBoard[whiteKing]));
-	bitMap mask = (bitBoard[blackBishops]|bitBoard[whiteBishops]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
+	bitMap res = (Movegen::attackFrom<blackPawns>(to) & _bitBoard[whitePawns])
+			|(Movegen::attackFrom<whitePawns>(to) & _bitBoard[blackPawns])
+			|(Movegen::attackFrom<whiteKnights>(to) & (_bitBoard[blackKnights]|_bitBoard[whiteKnights]))
+			|(Movegen::attackFrom<whiteKing>(to) & (_bitBoard[blackKing]|_bitBoard[whiteKing]));
+	bitMap mask = (_bitBoard[blackBishops]|_bitBoard[whiteBishops]|_bitBoard[blackQueens]|_bitBoard[whiteQueens]);
 	res |= Movegen::attackFrom<whiteBishops>(to,occupancy) & mask;
-	mask = (bitBoard[blackRooks]|bitBoard[whiteRooks]|bitBoard[blackQueens]|bitBoard[whiteQueens]);
+	mask = (_bitBoard[blackRooks]|_bitBoard[whiteRooks]|_bitBoard[blackQueens]|_bitBoard[whiteQueens]);
 	res |=Movegen::attackFrom<whiteRooks>(to,occupancy) & mask;
 
 	return res;
@@ -1320,7 +1416,7 @@ bool Position::moveGivesCheck(const Move& m)const
 		{
 			return true;
 		}
-		bitMap occ= bitBoard[occupiedSquares] ^ bitSet(from);
+		bitMap occ= _bitBoard[occupiedSquares] ^ bitSet(from);
 		assert( isValidPiece( (bitboardIndex)(whiteQueens + m.getPromotionType() ) ) );
 		switch(m.getPromotionType())
 		{
@@ -1350,14 +1446,14 @@ bool Position::moveGivesCheck(const Move& m)const
 		assert(rFrom<squareNumber);
 		assert(rTo<squareNumber);
 
-		bitMap occ = (bitBoard[occupiedSquares] ^ bitSet(kFrom) ^ bitSet(rFrom)) | bitSet(rTo) | bitSet(kTo);
+		bitMap occ = (_bitBoard[occupiedSquares] ^ bitSet(kFrom) ^ bitSet(rFrom)) | bitSet(rTo) | bitSet(kTo);
 		return   isSquareSet( Movegen::getRookPseudoAttack(rTo), kingSquare )
 			     && isSquareSet( Movegen::attackFrom<whiteRooks>(rTo,occ), kingSquare );
 	}
 	else if( m.isEnPassantMove() )
 	{
 		bitMap captureSquare = fileMask(m.getTo()) & rankMask(m.getFrom());
-		bitMap occ = bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(m.getTo())^captureSquare;
+		bitMap occ = _bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(m.getTo())^captureSquare;
 		return
 				(Movegen::attackFrom<whiteRooks>(kingSquare, occ) & (Us[Queens] |Us[Rooks]))
 			   | (Movegen::attackFrom<whiteBishops>(kingSquare, occ) & (Us[Queens] |Us[Bishops]));
@@ -1421,7 +1517,7 @@ bool Position::isDraw(bool isPVline) const
 	// Draw by material?
 
 	const state & s = getActualState();
-	if (  !bitBoard[whitePawns] && !bitBoard[blackPawns]
+	if (  !_bitBoard[whitePawns] && !_bitBoard[blackPawns]
 		&&( ( (s.getNonPawnValue()[0]<= pieceValue[whiteBishops][0]) && s.getNonPawnValue()[2] == 0)
 		|| ( (s.getNonPawnValue()[2]<= pieceValue[whiteBishops][0]) && s.getNonPawnValue()[0] == 0)
 		)
@@ -1573,7 +1669,7 @@ bool Position::isMoveLegal(const Move &m)const
 				while (path)
 				{
 					tSquare sq = iterateBit(path);
-					if(getAttackersTo(sq, bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
+					if(getAttackersTo(sq, _bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
 					{
 						return false;
 					}
@@ -1585,7 +1681,7 @@ bool Position::isMoveLegal(const Move &m)const
 					return false;
 				}
 				//king moves should not leave king in check
-				if((getAttackersTo(m.getTo(),bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces]))
+				if((getAttackersTo(m.getTo(),_bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces]))
 				{
 					return false;
 				}
@@ -1596,7 +1692,7 @@ bool Position::isMoveLegal(const Move &m)const
 		case whiteRooks:
 		case blackRooks:
 			assert(m.getFrom()<squareNumber);
-			if( !isSquareSet( Movegen::getRookPseudoAttack( m.getFrom() ), m.getTo() ) || !isSquareSet( Movegen::attackFrom<whiteRooks>( m.getFrom(), bitBoard[occupiedSquares] ), m.getTo() ) )
+			if( !isSquareSet( Movegen::getRookPseudoAttack( m.getFrom() ), m.getTo() ) || !isSquareSet( Movegen::attackFrom<whiteRooks>( m.getFrom(), _bitBoard[occupiedSquares] ), m.getTo() ) )
 			{
 				return false;
 			}
@@ -1608,8 +1704,8 @@ bool Position::isMoveLegal(const Move &m)const
 			if( !isSquareSet( Movegen::getBishopPseudoAttack( m.getFrom() ) | Movegen::getRookPseudoAttack( m.getFrom() ), m.getTo() )
 				||
 				!isSquareSet( 
-					Movegen::attackFrom<whiteBishops>(m.getFrom(),bitBoard[occupiedSquares]) 
-					| Movegen::attackFrom<whiteRooks>(m.getFrom(),bitBoard[occupiedSquares]), m.getTo()
+					Movegen::attackFrom<whiteBishops>(m.getFrom(),_bitBoard[occupiedSquares]) 
+					| Movegen::attackFrom<whiteRooks>(m.getFrom(),_bitBoard[occupiedSquares]), m.getTo()
 				)
 			)
 			{
@@ -1620,7 +1716,7 @@ bool Position::isMoveLegal(const Move &m)const
 		case whiteBishops:
 		case blackBishops:
 			if( !isSquareSet(Movegen::getBishopPseudoAttack(m.getFrom()), m.getTo() )
-				|| !isSquareSet(Movegen::attackFrom<whiteBishops>(m.getFrom(),bitBoard[occupiedSquares]), m.getTo() )
+				|| !isSquareSet(Movegen::attackFrom<whiteBishops>(m.getFrom(),_bitBoard[occupiedSquares]), m.getTo() )
 			)
 			{
 				return false;
@@ -1640,9 +1736,9 @@ bool Position::isMoveLegal(const Move &m)const
 
 			if(
 				// not valid pawn push
-				( m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || isSquareSet( bitBoard[occupiedSquares], m.getTo() ) )
+				( m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || isSquareSet( _bitBoard[occupiedSquares], m.getTo() ) )
 				// not valid pawn double push
-				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (getRankOf(m.getFrom())!=RANK2) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()-8)))&bitBoard[occupiedSquares]))
+				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (getRankOf(m.getFrom())!=RANK2) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()-8)))&_bitBoard[occupiedSquares]))
 				// not valid pawn attack
 				&& ( !isSquareSet( Movegen::attackFrom<whitePawns>( m.getFrom() ), m.getTo() ) || !isSquareSet( Them[Pieces] | bitSet( s.getEpSquare() ), m.getTo() ) )
 			){
@@ -1657,7 +1753,7 @@ bool Position::isMoveLegal(const Move &m)const
 			{
 				auto epSq = s.getEpSquare();
 				bitMap captureSquare= fileMask(epSq) & rankMask(m.getFrom());
-				bitMap occ= bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(epSq)^captureSquare;
+				bitMap occ= _bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(epSq)^captureSquare;
 				tSquare kingSquare = getSquareOfOurKing();
 				assert(kingSquare<squareNumber);
 				if((Movegen::attackFrom<whiteRooks>(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
@@ -1671,9 +1767,9 @@ bool Position::isMoveLegal(const Move &m)const
 		case blackPawns:
 			if(
 				// not valid pawn push
-				( m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || isSquareSet(bitBoard[occupiedSquares], m.getTo() ) )
+				( m.getFrom() + pawnPush(s.isBlackTurn())!= m.getTo() || isSquareSet(_bitBoard[occupiedSquares], m.getTo() ) )
 				// not valid pawn double push
-				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (getRankOf(m.getFrom())!=RANK7) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()+8)))&bitBoard[occupiedSquares]))
+				&& ((m.getFrom() + 2 * pawnPush(s.isBlackTurn())!= m.getTo()) || (getRankOf(m.getFrom())!=RANK7) || ((bitSet(m.getTo()) | bitSet((tSquare)(m.getTo()+8)))&_bitBoard[occupiedSquares]))
 				// not valid pawn attack
 				&& ( !isSquareSet( Movegen::attackFrom<blackPawns>( m.getFrom() ), m.getTo() ) || !isSquareSet( Them[Pieces] | bitSet(s.getEpSquare()), m.getTo() ) )
 			){
@@ -1690,7 +1786,7 @@ bool Position::isMoveLegal(const Move &m)const
 			{
 				auto epSq = s.getEpSquare();
 				bitMap captureSquare = fileMask(epSq) & rankMask(m.getFrom());
-				bitMap occ = bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(epSq)^captureSquare;
+				bitMap occ = _bitBoard[occupiedSquares]^bitSet(m.getFrom())^bitSet(epSq)^captureSquare;
 				tSquare kingSquare = getSquareOfOurKing();
 				assert(kingSquare<squareNumber);
 				if((Movegen::attackFrom<whiteRooks>(kingSquare, occ) & (Them[Queens] | Them[Rooks]))|
@@ -1710,20 +1806,34 @@ bool Position::isMoveLegal(const Move &m)const
 }
 
 
-Position::Position():_ply(0), _mg(*this)
+Position::Position():_ply(0), _mg(*this), _isChess960(false)
 {
 	stateInfo.clear();
 	stateInfo.emplace_back(state());
 	stateInfo[0].setNextTurn( whiteTurn );
 
 	updateUsThem();
+	
+	// todo create value NOCASTLE = 0
+	for (auto& cr : castleRightsMask) {cr = (eCastle)0;}
+	for (auto& cp : _castlePath) {cp = 0ull;}
+	for (auto& ckp : _castleKingPath) {ckp = 0ull;}
+	for (auto& sq : _castleRookInvolved) {sq = squareNone;}
+	for (auto& sq : _castleKingFinalSquare) {sq = squareNone;}
+	for (auto& sq : _castleRookFinalSquare) {sq = squareNone;}
 
 }
 
 
-Position::Position(const Position& other): _ply(other._ply), _mg(*this), stateInfo(other.stateInfo), squares(other.squares), bitBoard(other.bitBoard)
+Position::Position(const Position& other): _ply(other._ply), _mg(*this), stateInfo(other.stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960)
 {
 	updateUsThem();
+	castleRightsMask = other.castleRightsMask;
+	_castlePath = other._castlePath;
+	_castleKingPath = other._castleKingPath;
+	_castleRookInvolved = other._castleRookInvolved;
+	_castleKingFinalSquare = other._castleKingFinalSquare;
+	_castleRookFinalSquare = other._castleRookFinalSquare;
 }
 
 
@@ -1737,10 +1847,18 @@ Position& Position::operator=(const Position& other)
 	_ply = other._ply;
 
 	stateInfo = other.stateInfo;
-	squares = other.squares;
-	bitBoard = other.bitBoard;
+	_squares = other._squares;
+	_bitBoard = other._bitBoard;
+	_isChess960 = other._isChess960;
 
 	updateUsThem();
+	
+	castleRightsMask = other.castleRightsMask;
+	_castlePath = other._castlePath;
+	_castleKingPath = other._castleKingPath;
+	_castleRookInvolved = other._castleRookInvolved;
+	_castleKingFinalSquare = other._castleKingFinalSquare;
+	_castleRookFinalSquare = other._castleRookFinalSquare;
 
 	return *this;
 }
@@ -1748,8 +1866,8 @@ Position& Position::operator=(const Position& other)
 inline void Position::updateUsThem()
 {
 	auto turn = getNextTurn();
-	Us = &bitBoard[ turn ];
-	Them = &bitBoard[ blackTurn - turn ];
+	Us = &_bitBoard[ turn ];
+	Them = &_bitBoard[ blackTurn - turn ];
 }
 
 /*! \brief put a piece on the board
@@ -1764,12 +1882,12 @@ inline void Position::putPiece(const bitboardIndex piece,const tSquare s)
 	bitboardIndex color = isBlackPiece( piece )? blackPieces: whitePieces;
 	bitMap b = bitSet(s);
 
-	assert( squares[s] == empty );
+	assert( _squares[s] == empty );
 
-	squares[s] = piece;
-	bitBoard[piece] |= b;
-	bitBoard[occupiedSquares] |= b;
-	bitBoard[color] |= b;
+	_squares[s] = piece;
+	_bitBoard[piece] |= b;
+	_bitBoard[occupiedSquares] |= b;
+	_bitBoard[color] |= b;
 }
 
 /*! \brief move a piece on the board
@@ -1788,11 +1906,11 @@ inline void Position::movePiece(const bitboardIndex piece,const tSquare from,con
 	assert(getPieceAt(to)==empty);
 	bitMap fromTo = bitSet(from) ^ bitSet(to);
 	bitboardIndex color = isBlackPiece( piece ) ? blackPieces : whitePieces;
-	bitBoard[occupiedSquares] ^= fromTo;
-	bitBoard[piece] ^= fromTo;
-	bitBoard[color] ^= fromTo;
-	squares[from] = empty;
-	squares[to] = piece;
+	_bitBoard[occupiedSquares] ^= fromTo;
+	_bitBoard[piece] ^= fromTo;
+	_bitBoard[color] ^= fromTo;
+	_squares[from] = empty;
+	_squares[to] = piece;
 
 
 }
@@ -1815,11 +1933,11 @@ inline void Position::removePiece(const bitboardIndex piece,const tSquare s)
 	// are not guaranteed to be invariant to a do_move() + undo_move() sequence.
 	bitboardIndex color = isBlackPiece( piece ) ? blackPieces : whitePieces;
 	bitMap b = bitSet(s);
-	bitBoard[occupiedSquares] ^= b;
-	bitBoard[piece] ^= b;
-	bitBoard[color] ^= b;
+	_bitBoard[occupiedSquares] ^= b;
+	_bitBoard[piece] ^= b;
+	_bitBoard[color] ^= b;
 
-	squares[s] = empty;
+	_squares[s] = empty;
 
 }
 

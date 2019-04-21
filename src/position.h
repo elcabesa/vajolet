@@ -48,7 +48,9 @@ public:
 	// public static methods
 	//--------------------------------------------------------
 	void static initMaterialKeys(void);
-	static void initCastleRightsMask(void);
+	void setupCastleData (const eCastle cr, const tSquare kFrom, const tSquare kTo, const tSquare rFrom, const tSquare rTo);
+	bitMap initCastlePath(const tSquare kSqFrom, const tSquare kSqTo, const tSquare rSqFrom, const tSquare rSqTo);
+	bitMap initKingPath(const tSquare kSqFrom, const tSquare kSqTo);
 	static void initScoreValues(void);
 	static void initPstValues(void);
 	
@@ -68,11 +70,11 @@ public:
 
 	inline bitMap getOccupationBitmap() const
 	{
-		return bitBoard[occupiedSquares];
+		return _bitBoard[occupiedSquares];
 	}
 	inline bitMap getBitmap(const bitboardIndex in) const
 	{
-		return bitBoard[in];
+		return _bitBoard[in];
 	}
 	inline unsigned int getPieceCount(const bitboardIndex in) const
 	{
@@ -81,12 +83,12 @@ public:
 
 	inline bitboardIndex getPieceAt(const tSquare sq) const
 	{
-		return squares[sq];
+		return _squares[sq];
 	}
 
 	inline bitboardIndex getPieceTypeAt(const tSquare sq) const
 	{
-		return getPieceType( squares[sq] );
+		return getPieceType(_squares[sq]);
 	}
 
 	inline tSquare getSquareOfThePiece(const bitboardIndex piece) const
@@ -237,7 +239,7 @@ public:
 	*/
 	inline bitMap getAttackersTo(const tSquare to) const
 	{
-		return getAttackersTo(to, bitBoard[occupiedSquares]);
+		return getAttackersTo(to, _bitBoard[occupiedSquares]);
 	}
 
 	bitMap getAttackersTo(const tSquare to, const bitMap occupancy) const;
@@ -294,8 +296,8 @@ public:
 		if(isPawn(getPieceAt(m.getFrom())))
 		{
 			bool color = isBlackPiece( getPieceAt( m.getFrom() ) );
-			bitMap theirPawns = color? bitBoard[whitePawns]:bitBoard[blackPawns];
-			bitMap ourPawns = color? bitBoard[blackPawns]:bitBoard[whitePawns];
+			bitMap theirPawns = color? _bitBoard[whitePawns]:_bitBoard[blackPawns];
+			bitMap ourPawns = color? _bitBoard[blackPawns]:_bitBoard[whitePawns];
 			return !(theirPawns & PASSED_PAWN[color][m.getFrom()]) && !(ourPawns & SQUARES_IN_FRONT_OF[color][m.getFrom()]);
 		}
 		return false;
@@ -323,6 +325,8 @@ public:
 			&& (getPieceCount(blackBishops) == 1)
 			&& (getSquareColor(getSquareOfThePiece(blackBishops)) != getSquareColor(getSquareOfThePiece(whiteBishops)));
 	}
+
+	bool isChess960() const {return _isChess960;}
 
 	//--------------------------------------------------------
 	// public members
@@ -362,15 +366,15 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	static eCastle castleRightsMask[squareNumber];
+	std::array<eCastle,squareNumber> castleRightsMask;
 	static simdScore pstValue[lastBitboard][squareNumber];
 	static simdScore nonPawnValue[lastBitboard];
 	std::unordered_map<tKey, materialStruct> static materialKeyMap;
-	static std::array<bitMap ,9> _castlePath;							// path that need to be free to be able to castle
-	static std::array<bitMap, 9> _castleKingPath;					// path to be traversed by the king when castling
-	static std::array<tSquare ,9> _castleRookInvolved;			// rook involved in the castling
-	static std::array<tSquare ,9> _castleKingFinalSquare;	// king destination square of castling
-	static std::array<tSquare ,9> _castleRookFinalSquare;	// rook destination square of castling
+	std::array<bitMap ,9> _castlePath;				// path that need to be free to be able to castle
+	std::array<bitMap, 9> _castleKingPath;			// path to be traversed by the king when castling
+	std::array<tSquare ,9> _castleRookInvolved;		// rook involved in the castling
+	std::array<tSquare ,9> _castleKingFinalSquare;	// king destination square of castling
+	std::array<tSquare ,9> _castleRookFinalSquare;	// rook destination square of castling
 	
 	//--------------------------------------------------------
 	// private members
@@ -389,9 +393,10 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::array<bitboardIndex,squareNumber> squares;		// board square rapresentation to speed up, it contain pieces indexed by square
-	std::array<bitMap,lastBitboard> bitBoard;			// bitboards indexed by bitboardIndex enum
-	bitMap *Us,*Them;	/*!< pointer to our & their pieces bitboard*/
+	std::array<bitboardIndex,squareNumber> _squares;		// board square rapresentation to speed up, it contain pieces indexed by square
+	std::array<bitMap,lastBitboard> _bitBoard;			// bitboards indexed by bitboardIndex enum
+	bitMap *Us,*Them;	/*!< pointer to our & their pieces _bitBoard*/
+	bool _isChess960;
 
 	//--------------------------------------------------------
 	// private methods
