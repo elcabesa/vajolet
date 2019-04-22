@@ -1233,7 +1233,7 @@ void Position::checkPosConsistency(int nn) const
 
 		block( "all piece problem", nn );
 	}
-	for(tSquare sq = square0; sq < squareNumber; sq++)
+	for(tSquare sq = square0; sq < squareNumber; ++sq)
 	{
 		bitboardIndex id = getPieceAt(sq);
 
