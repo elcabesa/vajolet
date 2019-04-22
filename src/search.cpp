@@ -1552,7 +1552,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					{
 						if(val < beta && depth > 1 * ONE_PLY)
 						{
-							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes(), _pos.isChess960(), UciOutput::normal);
+							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes(), _pos.isChess960());
 						}
 						if(val > _expectedValue - 800)
 						{
