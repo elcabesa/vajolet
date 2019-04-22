@@ -1113,19 +1113,21 @@ void Position::undoMove()
 			putPiece(piece,to);
 		}
 		movePiece(piece, to, from);
+		
+		assert( isValidPiece( x.getCapturedPiece() ) || x.getCapturedPiece() == empty );
+		if( bitboardIndex p = x.getCapturedPiece() )
+		{
+			tSquare capSq = to;
+			if( m.isEnPassantMove() )
+			{
+				capSq += pawnPush( x.isBlackTurn() );
+			}
+			assert( capSq < squareNumber );
+			putPiece( p, capSq );
+		}
 	}
 
-	assert( isValidPiece( x.getCapturedPiece() ) || x.getCapturedPiece() == empty );
-	if( bitboardIndex p = x.getCapturedPiece() )
-	{
-		tSquare capSq = to;
-		if( m.isEnPassantMove() )
-		{
-			capSq += pawnPush( x.isBlackTurn() );
-		}
-		assert( capSq < squareNumber );
-		putPiece( p, capSq );
-	}
+	
 	removeState();
 
 	std::swap(Us,Them);
