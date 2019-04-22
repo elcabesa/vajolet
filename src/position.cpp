@@ -20,6 +20,7 @@
 #include "vajo_io.h"
 #include "parameters.h"
 #include "position.h"
+#include "uciParameters.h"
 #include "vajolet.h"
 
 /* PST data */
@@ -168,6 +169,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	char col,row,token;
 	tSquare sq = A8;
 	std::istringstream ss(fenStr);
+	_isChess960 = uciParameters::Chess960;
 
 	clear();
 	ss >> std::noskipws;
