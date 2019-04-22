@@ -277,6 +277,77 @@ TEST(timeManagement, normalSearch)
 
 }
 
+TEST(timeManagement, normalSearchMovesToGo)
+{
+
+	SearchLimits s;
+	s.setBTime(10000);
+	s.setWTime(20000);
+	s.setBInc(0);
+	s.setWInc(0);
+	s.setMovesToGo(4);
+	s.checkInfiniteSearch();
+
+	unsigned int allocatedTime = 5000;
+
+	timeManagement tm( s );
+
+	tm.initNewSearch( whiteTurn );
+
+	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( 1000, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( 100000000, 100000000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+
+	tm.notifyIterationHasBeenFinished();
+
+	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( allocatedTime - 2, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( allocatedTime + 2 , 10000 ), true);
+	ASSERT_EQ( tm.isSearchFinished(), true );
+
+
+}
+
+TEST(timeManagement, normalSearchBlack)
+{
+
+	SearchLimits s;
+	s.setBTime(20000);
+	s.setWTime(10000);
+	s.setBInc(0);
+	s.setWInc(0);
+	s.checkInfiniteSearch();
+
+	unsigned int allocatedTime = 571;
+
+	timeManagement tm( s );
+
+	tm.initNewSearch( blackTurn );
+
+	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( 1000, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( 100000000, 100000000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+
+	tm.notifyIterationHasBeenFinished();
+
+	ASSERT_EQ( tm.stateMachineStep( 100, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( allocatedTime - 2, 10000 ), false);
+	ASSERT_EQ( tm.isSearchFinished(), false );
+	ASSERT_EQ( tm.stateMachineStep( allocatedTime + 2 , 10000 ), true);
+	ASSERT_EQ( tm.isSearchFinished(), true );
+
+
+}
+
 TEST(timeManagement, normalSearchEarlyStop)
 {
 

@@ -104,3 +104,41 @@ TEST(PositionTest, isOppositeBishops){
 	pos.setupFromFen("bk6/8/8/8/8/8/8/6KB w - - 0 1"); 
 	EXPECT_FALSE(pos.isOppositeBishops());
 }
+
+
+TEST(PositionTest, getStateSize) {
+	Position pos;
+	pos.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); 
+	pos.doMove(Move(E2,E4));
+	pos.doMove(Move(E7,E5));
+	pos.doMove(Move(D2,D4));
+	
+	EXPECT_EQ(pos.getStateSize(), 4);
+	
+}
+
+TEST(PositionTest, getState) {
+	Position pos;
+	pos.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); 
+	pos.doMove(Move(E2,E4));
+	pos.doMove(Move(E7,E5));
+	pos.doMove(Move(D2,D4));
+	
+	EXPECT_EQ(pos.getState(2).getCurrentMove(), Move(E7,E5));
+	
+}
+
+TEST(PositionTest, getGamePhaseOpening) {
+	Position pos;
+	pos.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); 
+	EXPECT_EQ(pos.getGamePhase(pos.getActualState()), 0);
+	
+}
+
+TEST(PositionTest, getGamePhaseEndgame) {
+	Position pos;
+	pos.setupFromFen("k7/8/8/8/8/8/8/K7 w - - 0 1"); 
+	EXPECT_EQ(pos.getGamePhase(pos.getActualState()), 65536);
+	
+}
+
