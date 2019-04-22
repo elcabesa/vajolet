@@ -491,7 +491,7 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			{
 				if( uciParameters::multiPVLines == 1 )
 				{
-					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound, _pos.isChess960());
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), _pos.isChess960(), UciOutput::upperbound);
 				}
 
 				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
@@ -506,7 +506,7 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			{
 				if( uciParameters::multiPVLines == 1 )
 				{
-					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound, _pos.isChess960());
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), _pos.isChess960(), UciOutput::lowerbound);
 				}
 
 				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
@@ -645,7 +645,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			// at depth 1 only print the PV at the end of search
 			if(!_stop && depth == 1)
 			{
-				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), UciOutput::upperbound, _pos.isChess960());
+				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), _pos.isChess960(), UciOutput::upperbound);
 			}
 			if(!_stop && uciParameters::multiPVLines > 1)
 			{
@@ -1552,7 +1552,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					{
 						if(val < beta && depth > 1 * ONE_PLY)
 						{
-							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes(), UciOutput::normal, -1 ,-1, _pos.isChess960() );
+							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes(), _pos.isChess960(), UciOutput::normal);
 						}
 						if(val > _expectedValue - 800)
 						{

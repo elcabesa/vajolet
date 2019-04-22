@@ -46,7 +46,7 @@ class UciMuteOutput: public UciOutput
 {
 public:
 	void printPVs(std::vector<rootMove>& rm, bool ischess960, int maxLinePrint = -1) const;
-	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1, bool ischess960 = false) const;
+	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, bool ischess960, const PVbound bound = normal, const int depth = -1, const int count = -1) const;
 	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time, bool isChess960) const;
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
 	void printDepth() const;
@@ -61,7 +61,7 @@ class UciStandardOutput: public UciOutput
 public:
 	static bool reduceVerbosity;
 	void printPVs(std::vector<rootMove>& rm, bool ischess960, int maxLinePrint = -1) const;
-	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1, bool ischess960 = false) const;
+	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, bool ischess960, const PVbound bound = normal, const int depth = -1, const int count = -1) const;
 	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time, bool isChess960) const;
 	void showCurrLine(const Position & pos, const unsigned int ply) const;
 	void printDepth() const;
@@ -812,11 +812,11 @@ void UciStandardOutput::printPVs(std::vector<rootMove>& rmList, bool ischess960,
 	for(int i = 0; i < maxLinePrint; ++i)
 	{
 		auto rm = rmList[i];
-		printPV(rm.score, rm.maxPlyReached, rm.time, rm.PV, rm.nodes, normal, rm.depth, i, ischess960);
+		printPV(rm.score, rm.maxPlyReached, rm.time, rm.PV, rm.nodes, ischess960,  normal, rm.depth, i);
 	}
 }
 
-void UciStandardOutput::printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound, const int depth, const int count, bool chess960) const
+void UciStandardOutput::printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, bool ischess960, const PVbound bound, const int depth, const int count) const
 {
 
 	int localDepth = depth == -1? _depth : depth;
@@ -842,7 +842,7 @@ void UciStandardOutput::printPV(const Score res, const unsigned int seldepth, co
 #endif
 
 	std::cout << " pv ";
-	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<UciManager::displayUci(m, chess960)<<" ";});
+	for_each( PV.begin(), PV.end(), [&](Move &m){std::cout<<UciManager::displayUci(m, ischess960)<<" ";});
 	std::cout<<sync_endl;
 }
 
@@ -900,7 +900,7 @@ void UciStandardOutput::printGeneralInfo( const unsigned int fullness, const uns
 uci Mute output implementation
 ******************************/
 void UciMuteOutput::printPVs(std::vector<rootMove>&, bool , int ) const{}
-void UciMuteOutput::printPV(const Score, const unsigned int, const long long, PVline&, const unsigned long long, const PVbound, const int, const int, bool) const{}
+void UciMuteOutput::printPV(const Score, const unsigned int, const long long, PVline&, const unsigned long long, bool, const PVbound, const int, const int) const{}
 void UciMuteOutput::printCurrMoveNumber(const unsigned int, const Move& , const unsigned long long , const long long int, bool ) const {}
 void UciMuteOutput::showCurrLine(const Position & , const unsigned int ) const{}
 void UciMuteOutput::printDepth() const{}
@@ -939,5 +939,5 @@ void UciOutput::printPV( const Move& m, bool ischess960)
 {
 	PVline PV;
 	PV.set(m);
-	printPV(0, 0, 0, PV, 0, normal, 0, 0, ischess960);
+	printPV(0, 0, 0, PV, 0,ischess960, normal, 0, 0);
 }

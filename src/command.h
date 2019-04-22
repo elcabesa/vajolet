@@ -94,7 +94,7 @@ public:
 	
 	// virtual output methods
 	virtual void printPVs(std::vector<rootMove>& rm, bool ischess960, int maxLinePrint = -1) const = 0;
-	virtual void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, const PVbound bound = normal, const int depth = -1, const int count = -1, bool ischess960 = false) const = 0;
+	virtual void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, bool ischess960, const PVbound bound = normal, const int depth = -1, const int count = -1) const = 0;
 	virtual void printPV( const Move& m, bool isChess960 = false) final;
 	virtual void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time, bool isChess960) const = 0;
 	virtual void showCurrLine(const Position & pos, const unsigned int ply) const = 0;
