@@ -232,8 +232,8 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	{
 		if( !s.isInCheck() && s.hasCastleRight( castleOO | castleOOO, color ) )
 		{
-			generateCastleOO<type>( ml, color, kingSquare, occupiedSquares );
-			generateCastleOOO<type>( ml, color, kingSquare, occupiedSquares );
+			generateCastle<type>( ml, color, castleOO, kingSquare, occupiedSquares );
+			generateCastle<type>( ml, color, castleOOO, kingSquare, occupiedSquares );
 		}
 	}
 }
@@ -457,38 +457,9 @@ void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml
 }
 
 template<Movegen::genType type>
-inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
+inline void Movegen::generateCastle( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const eCastle castle,  const tSquare kingSquare, const bitMap occupiedSquares )const
 {
-	// todo unificare questo e il prossimo metodo
-	eCastle cr = state::calcCastleRight( castleOO, color );
-	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
-	{
-		auto kp = _pos.getCastleKingPath(cr);
-		auto rookSq = _pos.getCastleRookInvolved(cr);
-		while(kp)
-		{
-			tSquare x = iterateBit(kp);
-			if(_pos.getTheirBitmap(Pieces) & _pos.getAttackersTo(x, occupiedSquares^ bitSet(rookSq)))
-			{
-				return;
-			}
-		}
-
-		Move m(Move::NOMOVE);
-		m.setFlag(Move::fcastle);
-		m.setFrom(kingSquare);
-		m.setTo(rookSq);
-		if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-		{
-			ml.insert(m);
-		}
-	}
-}
-
-template<Movegen::genType type>
-inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
-{
-	eCastle cr = state::calcCastleRight( castleOOO, color );
+	eCastle cr = state::calcCastleRight( castle, color );
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
 		auto kp = _pos.getCastleKingPath(cr);
@@ -506,7 +477,7 @@ inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 		m.setFlag( Move::fcastle );
 		m.setFrom( kingSquare );
 		m.setTo(rookSq);
-		if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
+		//if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m)) implicit in the call
 		{
 			ml.insert(m);
 		}

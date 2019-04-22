@@ -167,8 +167,7 @@ private:
 	
 	inline void generateEpMove(MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const bitMap occupiedSquares, const tSquare kingSquare) const;
 	
-	template<Movegen::genType type>void generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const;
-	template<Movegen::genType type>void generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const;
+	template<Movegen::genType type>void generateCastle( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const eCastle castle, const tSquare kingSquare, const bitMap occupiedSquares )const;
 };
 
 
