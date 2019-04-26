@@ -83,7 +83,7 @@ public:
 		// todo fare una copia fatta bene
 		_sl = other._sl;
 		_st = other._st;
-		_UOI= UciOutput::create();
+		_UOI = UciOutput::create();
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return * this;
 	}
