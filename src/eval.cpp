@@ -1324,7 +1324,7 @@ Score Position::eval(void) const
 	}
 	
 	if (mulCoeff == 256) {
-		mulCoeff = std::min(160 + (pos.isOppositeBishops() ? 4 : 14) * (getPieceCount(whitePawns)+ getPieceCount(blackPawns)), 256);
+		mulCoeff = std::min(160 + (isOppositeBishops() ? 4 : 14) * (getPieceCount(whitePawns)+ getPieceCount(blackPawns)), 256u);
 	}
 
 	//--------------------------------------

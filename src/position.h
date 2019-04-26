@@ -313,7 +313,7 @@ public:
 		return _mg;
 	}
 	
-	bool isOppositeBishops() {
+	bool isOppositeBishops() const{
 		return 
 			(getPieceCount(whiteBishops) == 1)
 			&& (getPieceCount(blackBishops) == 1)
