@@ -1322,25 +1322,19 @@ Score Position::eval(void) const
 	{
 		mulCoeff = std::min((unsigned int)256, getPieceCount(whitePawns) * 80);
 	}
-
-
-
-
-
-
+	
+	if (mulCoeff == 256) {
+		mulCoeff = std::min(160 + (pos.isOppositeBishops() ? 4 : 14) * (getPieceCount(whitePawns)+ getPieceCount(blackPawns)), 256);
+	}
 
 	//--------------------------------------
 	//	finalizing
 	//--------------------------------------
 	signed int gamePhase = getGamePhase( st );
-	signed long long r = ( (signed long long)res[0] ) * ( 65536 - gamePhase ) + ( (signed long long)res[1] ) * gamePhase;
+	// mulCoeff will multiplicate only endgame
+	signed long long r = (((signed long long)res[0]) * (65536 - gamePhase)) + (((signed long long)res[1]) * gamePhase * mulCoeff / 256);
 
 	Score score = (Score)( (r) / 65536 );
-	if(mulCoeff != 256)
-	{
-		score *= mulCoeff;
-		score /= 256;
-	}
 
 	// final value saturation
 	score = std::min(highSat,score);
