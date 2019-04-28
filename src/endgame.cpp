@@ -485,24 +485,21 @@ bool Position::evalKPsvsK(Score& res) const
 
 bool Position::evalOppositeBishopEndgame(Score& res) const
 {
-	if( getSquareColor(getSquareOfThePiece(blackBishops)) != getSquareColor(getSquareOfThePiece(whiteBishops)))
+	if(isOppositeBishops())
 	{
-		unsigned int pawnCount = 0;
-		int pawnDifference = 0;
-		unsigned int freePawn = 0;
+		unsigned int passedPawnCount = 0;
 
 		bitMap pawns= getBitmap(whitePawns);
 		while(pawns)
 		{
-			pawnCount++;
-			pawnDifference++;
 			tSquare pawn = iterateBit(pawns);
 			if( !(PASSED_PAWN[0][pawn] & getBitmap(blackPawns)))
 			{
-				if(!(Movegen::getBishopPseudoAttack(getSquareOfThePiece(blackBishops)) & SQUARES_IN_FRONT_OF[0][pawn] ))
+				++passedPawnCount;
+				if(!(Movegen::getBishopPseudoAttack(getSquareOfThePiece(blackBishops)) & SQUARES_IN_FRONT_OF[0][pawn]))
 				{
 					res = 256;
-					freePawn++;
+					return true;
 				}
 			}
 		}
@@ -510,26 +507,20 @@ bool Position::evalOppositeBishopEndgame(Score& res) const
 		pawns= getBitmap(blackPawns);
 		while(pawns)
 		{
-			pawnCount++;
-			pawnDifference--;
-
 			tSquare pawn = iterateBit(pawns);
 			if(!( PASSED_PAWN[1][pawn] & getBitmap(whitePawns)))
 			{
-				if(!(Movegen::getBishopPseudoAttack(getSquareOfThePiece(whiteBishops)) & SQUARES_IN_FRONT_OF[1][pawn] ))
+				++passedPawnCount;
+				if(!(Movegen::getBishopPseudoAttack(getSquareOfThePiece(whiteBishops)) & SQUARES_IN_FRONT_OF[1][pawn]))
 				{
-					freePawn++;
 					res = 256;
+					return true;
 				}
 			}
 		}
-
-		if(freePawn == 0 && std::abs(pawnDifference) <= 1 )
-		{
-			res = std::min(20 + pawnCount * 25, (unsigned int)256);
-			return true;
-		}
-
+	
+		res = std::min(32 + passedPawnCount * 25, (unsigned int)256);
+		return true;
 	}
 	return false;
 

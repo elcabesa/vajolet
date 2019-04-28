@@ -77,3 +77,13 @@ TEST(PositionTest, setupFromFen){
 	
 }
 
+TEST(PositionTest, isOppositeBishops){
+	Position pos;
+	pos.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); 
+	EXPECT_FALSE(pos.isOppositeBishops());
+	
+	pos.setupFromFen("bk6/8/8/8/8/8/8/6BK w - - 0 1"); 
+	EXPECT_TRUE(pos.isOppositeBishops());
+	pos.setupFromFen("bk6/8/8/8/8/8/8/6KB w - - 0 1"); 
+	EXPECT_FALSE(pos.isOppositeBishops());
+}

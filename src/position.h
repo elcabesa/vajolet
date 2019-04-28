@@ -312,6 +312,13 @@ public:
 	{
 		return _mg;
 	}
+	
+	bool isOppositeBishops() const{
+		return 
+			(getPieceCount(whiteBishops) == 1)
+			&& (getPieceCount(blackBishops) == 1)
+			&& (getSquareColor(getSquareOfThePiece(blackBishops)) != getSquareColor(getSquareOfThePiece(whiteBishops)));
+	}
 
 	//--------------------------------------------------------
 	// public members
