@@ -16,7 +16,7 @@ TEST(Syzygy, test)
 	
 	ASSERT_TRUE(myfile.is_open());
 	
-	tb_init("D:/vajolet/syzygy");
+	tb_init("C:/Users/elcab/Downloads/syzygy");
 	ASSERT_TRUE(TB_LARGEST > 0);
 	
 	
@@ -59,7 +59,7 @@ TEST(Syzygy, test)
 			pos.hasEpSquare() ? pos.getEpSquare(): 0,
 			pos.isWhiteTurn() );
 
-		//EXPECT_NE(result1, TB_RESULT_FAILED);
+		EXPECT_NE(result1, TB_RESULT_FAILED);
 		int wdl_res = TB_GET_WDL(result1)-2;
 		
 		
@@ -78,7 +78,7 @@ TEST(Syzygy, test)
 			pos.isWhiteTurn(),
 			results);
 			
-		//EXPECT_NE(result2, TB_RESULT_FAILED);
+		EXPECT_NE(result2, TB_RESULT_FAILED);
 		int dtz_res = TB_GET_DTZ(result2);
 		
 		if( result1 != TB_RESULT_FAILED && result2 != TB_RESULT_FAILED )
