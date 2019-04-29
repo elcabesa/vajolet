@@ -45,7 +45,7 @@ void testSimmetry(const Position& pos)
 {
 	static Position ppp;
 
-	ppp.setupFromFen(pos.getSymmetricFen());
+	ppp.setupFromFen(pos.getSymmetricFen(), pos.isChess960());
 
 	Score staticEval = pos.eval<false>();
 	Score test = ppp.eval<false>();
@@ -83,7 +83,7 @@ public:
 		// todo fare una copia fatta bene
 		_sl = other._sl;
 		_st = other._st;
-		_UOI= UciOutput::create();
+		_UOI = UciOutput::create();
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return * this;
 	}
@@ -220,7 +220,8 @@ public:
 		for (auto &res : votes)
 		{
 			Move m(res.first);
-			std::cout<<"Move: "<<UciManager::displayUci(m)<<" votes: "<<res.second;
+			// todo shall it know wheher the move is chess960?
+			std::cout<<"Move: "<<UciManager::displayUci(m, false)<<" votes: "<<res.second;
 			if( bm == m ) std::cout<<" *****";
 			std::cout<<std::endl;
 		}
@@ -230,11 +231,11 @@ public:
 		{
 			if( res == bm)
 			{
-				std::cout<<"bestMove: "<<UciManager::displayUci(res.firstMove)<<" *****"<<std::endl;
+				std::cout<<"bestMove: "<<UciManager::displayUci(res.firstMove, false)<<" *****"<<std::endl;
 			}
 			else
 			{
-				std::cout<<"bestMove: "<<UciManager::displayUci(res.firstMove)<<std::endl;
+				std::cout<<"bestMove: "<<UciManager::displayUci(res.firstMove, false)<<std::endl;
 			}
 			std::cout<<"score: "<<res.score<<std::endl;
 			std::cout<<"depth: "<<res.depth<<std::endl;
@@ -490,7 +491,7 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			{
 				if( uciParameters::multiPVLines == 1 )
 				{
-					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::upperbound);
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), _pos.isChess960(), UciOutput::upperbound);
 				}
 
 				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
@@ -505,7 +506,7 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			{
 				if( uciParameters::multiPVLines == 1 )
 				{
-					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), UciOutput::lowerbound);
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), _pos.isChess960(), UciOutput::lowerbound);
 				}
 
 				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
@@ -644,13 +645,13 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			// at depth 1 only print the PV at the end of search
 			if(!_stop && depth == 1)
 			{
-				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), UciOutput::upperbound);
+				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), _pos.isChess960(), UciOutput::upperbound);
 			}
 			if(!_stop && uciParameters::multiPVLines > 1)
 			{
 				auto mpRes = _multiPVmanager.get();
 				bestMove = mpRes[0];
-				_UOI->printPVs(mpRes);
+				_UOI->printPVs(mpRes, _pos.isChess960());
 			}
 		}
 
@@ -1401,7 +1402,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				!_stop
 				)
 			{
-				_UOI->printCurrMoveNumber(moveNumber, m, getVisitedNodes(), elapsed);
+				_UOI->printCurrMoveNumber(moveNumber, m, getVisitedNodes(), elapsed, _pos.isChess960());
 			}
 		}
 
@@ -1551,7 +1552,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					{
 						if(val < beta && depth > 1 * ONE_PLY)
 						{
-							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes());
+							_UOI->printPV(val, _maxPlyReached, _st.getElapsedTime(), pvLine, getVisitedNodes(), _pos.isChess960());
 						}
 						if(val > _expectedValue - 800)
 						{
@@ -2057,7 +2058,7 @@ void Search::impl::manageNewSearch()
 
 	if( _game.isNewGame(_pos))
 	{
-		_game.CreateNewGame();
+		_game.CreateNewGame(_pos.isChess960());
 
 	}
 	_game.insertNewMoves(_pos);
@@ -2066,11 +2067,11 @@ void Search::impl::manageNewSearch()
 
 	if(legalMoves == 0)
 	{
-		_UOI->printPV( Move::NOMOVE );
+		_UOI->printPV( Move::NOMOVE, _pos.isChess960());
 		
 		_waitStopPondering();
 
-		_UOI->printBestMove( Move::NOMOVE, Move::NOMOVE );
+		_UOI->printBestMove( Move::NOMOVE, Move::NOMOVE, _pos.isChess960() );
 
 		return;
 	}
@@ -2079,13 +2080,13 @@ void Search::impl::manageNewSearch()
 	{
 		Move bestMove = MovePicker( _pos ).getNextMove();
 		
-		_UOI->printPV(bestMove);
+		_UOI->printPV(bestMove, _pos.isChess960());
 		
 		_waitStopPondering();
 		
 		Move ponderMove = _getPonderMoveFromHash( bestMove );
 		
-		_UOI->printBestMove( bestMove, ponderMove );
+		_UOI->printBestMove( bestMove, ponderMove, _pos.isChess960() );
 
 		return;
 
@@ -2100,13 +2101,13 @@ void Search::impl::manageNewSearch()
 		Move bookM = pol.probe( _pos, uciParameters::bestMoveBook);
 		if( bookM )
 		{
-			_UOI->printPV(bookM);
+			_UOI->printPV(bookM, _pos.isChess960());
 			
 			_waitStopPondering();
 			
 			Move ponderMove = _getPonderMoveFromBook( bookM );
 			
-			_UOI->printBestMove(bookM, ponderMove);
+			_UOI->printBestMove(bookM, ponderMove, _pos.isChess960());
 			
 			return;
 		}
@@ -2145,7 +2146,7 @@ void Search::impl::manageNewSearch()
 		ponderMove = _getPonderMoveFromHash( bestMove );
 	}
 	
-	_UOI->printBestMove( bestMove, ponderMove );
+	_UOI->printBestMove( bestMove, ponderMove, _pos.isChess960() );
 
 	_game.savePV(PV, res.depth, res.alpha, res.beta);
 

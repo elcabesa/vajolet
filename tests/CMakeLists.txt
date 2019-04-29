@@ -1,6 +1,6 @@
 enable_testing()
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(Vajolet_unit_test book-test.cpp dataTest.cpp hashKeyTest.cpp historyTest.cpp main.cpp MoveTest.cpp MoveListTest.cpp multiPVmanagerTest.cpp perft-test.cpp pvLineFollowerTest.cpp positionTest.cpp pvLineTest.cpp see-test.cpp timeManagement-test.cpp)
+add_executable(Vajolet_unit_test book-test.cpp dataTest.cpp hashKeyTest.cpp historyTest.cpp main.cpp MoveTest.cpp MoveListTest.cpp multiPVmanagerTest.cpp perft-test.cpp pvLineFollowerTest.cpp positionTest.cpp pvLineTest.cpp searchTimer-test.cpp see-test.cpp timeManagement-test.cpp UciOutput-test.cpp)
 target_link_libraries(Vajolet_unit_test gtest libChess)
 target_include_directories (Vajolet_unit_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 

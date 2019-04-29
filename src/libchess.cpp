@@ -25,7 +25,7 @@ void libChessInit()
 	initData();
 	HashKey::init();
 	Position::initScoreValues();
-	Position::initCastleRightsMask();
+	//Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();
 	Search::initSearchParameters();
 	Position::initMaterialKeys();

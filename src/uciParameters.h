@@ -31,6 +31,7 @@ public:
 	static unsigned int SyzygyProbeDepth;
 	static bool Syzygy50MoveRule;
 	static bool Ponder;
+	static bool Chess960;
 };
 
 #endif

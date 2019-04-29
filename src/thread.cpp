@@ -174,7 +174,7 @@ void my_thread::impl::_searchThread()
 			_limits.checkInfiniteSearch();
 			_timeMan.initNewSearch( _src.getPosition().getNextTurn() );
 			_src.resetStopCondition();
-			_st.resetStartTimers();
+			_st.resetTimers();
 			_timerCond.notify_one();
 			_src.manageNewSearch();
 			_startThink = false;
@@ -239,7 +239,7 @@ inline void my_thread::impl::stopThinking()
 
 inline void my_thread::impl::ponderHit()
 {
-	_st.resetPonderTimer();
+	_st.resetClockTimer();
 	_stopPonder();
 }
 

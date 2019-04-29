@@ -123,7 +123,7 @@ public :
 	inline void update( const bitboardIndex p, const tSquare to, const Move& m)
 	{
 
-		assert( isValidPiece( p ) );
+		//assert( isValidPiece( p ) );
 		assert(to<squareNumber);
 		auto& mm =  _table[p][to];
 		if(mm[0] != m)
@@ -136,7 +136,7 @@ public :
 	inline const Move& getMove( const bitboardIndex p, const tSquare to, const unsigned int pos ) const
 	{
 		assert( pos < 2 );
-		assert( isValidPiece( p ) );
+		//assert( isValidPiece( p ) );
 		assert(to<squareNumber);
 		return _table[p][to][pos];
 	}

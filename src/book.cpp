@@ -242,24 +242,11 @@ Move PolyglotBook::impl::convertMove(Move polyglotMove, const Position& pos)
 				}
 			}	
 		} else if (mm.isCastleMove()) {
-			if (mm.isKingSideCastle()) {
-				if (polyglotMove.getFrom() == mm.getFrom()) {
-					if (getFileOf(polyglotMove.getTo()) == FILEH) {
-						if (getRankOf(polyglotMove.getTo()) == getRankOf(polyglotMove.getFrom())) {
-							return mm;
-						}
-					}
-				}
-			} else {
-				if (polyglotMove.getFrom() == mm.getFrom()) {
-					if (getFileOf(polyglotMove.getTo()) == FILEA) {
-						if (getRankOf(polyglotMove.getTo()) == getRankOf(polyglotMove.getFrom())) {
-							return mm;
-						}
-					}
+			if (polyglotMove.getFrom() == mm.getFrom()) {
+				if (polyglotMove.getTo() == mm.getTo()) {
+					return mm;
 				}
 			}
-			//todo mm has king from-to format, bestMove has king->rook format
 		} else if (mm.isEnPassantMove()) {
 			if (polyglotMove.getFrom() == mm.getFrom() && polyglotMove.getTo() == mm.getTo()) {
 				return mm;

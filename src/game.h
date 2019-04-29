@@ -39,7 +39,7 @@ public:
 		unsigned int depth;
 	};
 
-	void CreateNewGame();
+	void CreateNewGame(bool isChess960);
 	void insertNewMoves(Position &pos);
 	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
 	void printGamesInfo();
@@ -50,6 +50,7 @@ public:
 
 private:
 	std::vector<GamePosition> _positions;
+	bool _isChess960;
 public:
 
 };

@@ -232,8 +232,8 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	{
 		if( !s.isInCheck() && s.hasCastleRight( castleOO | castleOOO, color ) )
 		{
-			generateCastleOO<type>( ml, color, kingSquare, occupiedSquares );
-			generateCastleOOO<type>( ml, color, kingSquare, occupiedSquares );
+			generateCastle<type>( ml, color, castleOO, kingSquare, occupiedSquares );
+			generateCastle<type>( ml, color, castleOOO, kingSquare, occupiedSquares );
 		}
 	}
 }
@@ -457,62 +457,30 @@ void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml
 }
 
 template<Movegen::genType type>
-inline void Movegen::generateCastleOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
+inline void Movegen::generateCastle( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const eCastle castle,  const tSquare kingSquare, const bitMap occupiedSquares )const
 {
-	eCastle cr = state::calcCastleRight( castleOO, color );
+	eCastle cr = state::calcCastleRight( castle, color );
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
 	{
-
-		bool castleDenied = false;
-		for( tSquare x = (tSquare)1; x<3; ++x)
+		auto kp = _pos.getCastleKingPath(cr);
+		auto rookSq = _pos.getCastleRookInvolved(cr);
+		while(kp)
 		{
-			assert(kingSquare+x<squareNumber);
-			if(_pos.getAttackersTo(kingSquare+x,occupiedSquares) & _pos.getTheirBitmap(Pieces))
+			tSquare x = iterateBit(kp);
+			if(_pos.getTheirBitmap(Pieces) & _pos.getAttackersTo(x, occupiedSquares^ bitSet(rookSq) ))
 			{
-				castleDenied = true;
-				break;
+				return;
 			}
 		}
-		if(!castleDenied)
+		
+		Move m(Move::NOMOVE);
+		m.setFlag( Move::fcastle );
+		m.setFrom( kingSquare );
+		m.setTo(rookSq);
+		//if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m)) implicit in the call
 		{
-			Move m(Move::NOMOVE);
-			m.setFlag( Move::fcastle );
-			m.setFrom( kingSquare );
-			m.setTo( (tSquare)(kingSquare + 2) );
-			if(type !=Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-			{
-				ml.insert(m);
-			}
+			ml.insert(m);
 		}
-	}
-}
-
-template<Movegen::genType type>
-inline void Movegen::generateCastleOOO( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const tSquare kingSquare, const bitMap occupiedSquares )const
-{
-	eCastle cr = state::calcCastleRight( castleOOO, color );
-	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )
-	{
-		bool castleDenied = false;
-		for( tSquare x = (tSquare)1; x<3; ++x)
-		{
-			assert(kingSquare-x<squareNumber);
-			if(_pos.getAttackersTo(kingSquare-x, occupiedSquares) & _pos.getTheirBitmap(Pieces))
-			{
-				castleDenied = true;
-				break;
-			}
-		}
-		if(!castleDenied)
-		{
-			Move m(Move::NOMOVE);
-			m.setFlag( Move::fcastle );
-			m.setFrom( kingSquare );
-			m.setTo( (tSquare)(kingSquare - 2) );
-			if(type != Movegen::quietChecksMg || _pos.moveGivesCheck(m))
-			{
-				ml.insert(m);
-			}
-		}
+		
 	}
 }

@@ -21,9 +21,10 @@
 #include "game.h"
 #include "position.h"
 
-void Game::CreateNewGame(void)
+void Game::CreateNewGame(bool isChess960)
 {
 	_positions.clear();
+	_isChess960 = isChess960;
 }
 
 void Game::insertNewMoves(Position &pos)
@@ -56,10 +57,10 @@ void Game::printGamesInfo()
 	{
 		if( p.m )
 		{
-			std::cout<<"Move: "<<UciManager::displayUci(p.m)<<"  PV:";
+			std::cout<<"Move: "<<UciManager::displayUci(p.m, _isChess960)<<"  PV:";
 			for( auto m : p.PV )
 			{
-				std::cout<<UciManager::displayUci(m)<<" ";
+				std::cout<<UciManager::displayUci(m, _isChess960)<<" ";
 			}
 
 		}
