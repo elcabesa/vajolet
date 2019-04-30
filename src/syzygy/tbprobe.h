@@ -31,28 +31,8 @@ extern "C"
 {
 #endif
 
-#ifndef TB_NO_STDINT
 #include <stdint.h>
-#else
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned uint32_t;
-typedef long long unsigned uint64_t;
-typedef char int8_t;
-typedef short int16_t;
-typedef int int32_t;
-typedef long long int64_t;
-#endif
 
-#ifndef TB_NO_STDBOOL
-#include <stdbool.h>
-#else
-#ifndef __cplusplus
-typedef uint8_t bool;
-#define true    1
-#define false   0
-#endif
-#endif
 
 /*
  * Internal definitions.  Do not call these functions directly.
@@ -202,7 +182,6 @@ void tb_free(void);
  *
  * NOTES:
  * - Engines should use this function during search.
- * - This function is thread safe assuming TB_NO_THREADS is disabled.
  */
 static inline unsigned tb_probe_wdl(
     uint64_t _white,

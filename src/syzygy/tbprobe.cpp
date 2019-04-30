@@ -22,31 +22,22 @@ SOFTWARE.
 */
 
 #include <assert.h>
-#ifdef __cplusplus
 #include <atomic>
-#else
-#include <stdatomic.h>
-#endif
+#include <mutex>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef TB_NO_STDBOOL
-#typedef uint8 bool
-#else
-#include <stdbool.h>
-#endif
 #include "tbprobe.h"
 
-#ifdef __cplusplus
 using namespace std;
-#endif
+
 
 #define TB_PIECES 7
-#define TB_HASHBITS  (TB_PIECES < 7 ?  11 : 12)
-#define TB_MAX_PIECE (TB_PIECES < 7 ? 254 : 650)
-#define TB_MAX_PAWN  (TB_PIECES < 7 ? 256 : 861)
-#define TB_MAX_SYMS  4096
+#define TB_HASHBITS  (12)
+#define TB_MAX_PIECE (650)
+#define TB_MAX_PAWN  (861)
+#define TB_MAX_SYMS  (4096)
 
 #ifndef _WIN32
 #include <fcntl.h>
@@ -66,207 +57,54 @@ typedef size_t map_t;
 typedef HANDLE map_t;
 #endif
 
-#define DECOMP64
 
-// Threading support
-#ifndef TB_NO_THREADS
-#if defined(__cplusplus) && (__cplusplus >= 201103L)
-
-#include <mutex>
 #define LOCK_T std::mutex
 #define LOCK_INIT(x)
 #define LOCK_DESTROY(x)
 #define LOCK(x) x.lock()
 #define UNLOCK(x) x.unlock()
 
-#else
-#ifndef _WIN32
-#define LOCK_T pthread_mutex_t
-#define LOCK_INIT(x) pthread_mutex_init(&(x), NULL)
-#define LOCK_DESTROY(x) pthread_mutex_destroy(&(x))
-#define LOCK(x) pthread_mutex_lock(&(x))
-#define UNLOCK(x) pthread_mutex_unlock(&(x))
-#else
-#define LOCK_T HANDLE
-#define LOCK_INIT(x) do { x = CreateMutex(NULL, FALSE, NULL); } while (0)
-#define LOCK_DESTROY(x) CloseHandle(x)
-#define LOCK(x) WaitForSingleObject(x, INFINITE)
-#define UNLOCK(x) ReleaseMutex(x)
-#endif
 
-#endif
-#else /* TB_NO_THREADS */
-#define LOCK_T          int
-#define LOCK_INIT(x)    /* NOP */
-#define LOCK_DESTROY(x) /* NOP */
-#define LOCK(x)         /* NOP */
-#define UNLOCK(x)       /* NOP */
-#endif
+#define popcount(x) __builtin_popcountll(x)
+#define lsb(b) __builtin_ctzll(b)
 
-// population count implementation
-#undef TB_SOFTWARE_POP_COUNT
-
-#if defined(TB_CUSTOM_POP_COUNT)
-#define popcount(x) TB_CUSTOM_POP_COUNT(x)
-#elif defined(TB_NO_HW_POP_COUNT)
-#define TB_SOFTWARE_POP_COUNT
-#elif defined (__GNUC__) && defined(__x86_64__) && defined(__SSE4_2__)
-#include <popcntintrin.h>
-#define popcount(x)             _mm_popcnt_u64((x))
-#elif defined(_MSC_VER) && (_MSC_VER >= 1500) && defined(_M_AMD64)
-#include <nmmintrin.h>
-#define popcount(x)             _mm_popcnt_u64((x))
-#else
-#define TB_SOFTWARE_POP_COUNT
-#endif
-
-#ifdef TB_SOFTWARE_POP_COUNT
-// Not a recognized compiler/architecture that has popcount:
-// fall back to a software popcount. This one is still reasonably
-// fast.
-static inline unsigned tb_software_popcount(uint64_t x)
-{
-    x = x - ((x >> 1) & 0x5555555555555555ull);
-    x = (x & 0x3333333333333333ull) + ((x >> 2) & 0x3333333333333333ull);
-    x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0full;
-    return (x * 0x0101010101010101ull) >> 56;
-}
-
-#define popcount(x) tb_software_popcount(x)
-#endif
-
-// LSB (least-significant bit) implementation
-#ifdef TB_CUSTOM_LSB
-#define lsb(b) TB_CUSTOM_LSB(b)
-#else
-#if defined(__GNUC__)
-static inline unsigned lsb(uint64_t b) {
-    assert(b != 0);
-    return __builtin_ffsll(b)-1;
-}
-#elif defined(_MSC_VER)
-static inline unsigned lsb(uint64_t b) {
-    assert(b != 0);
-    DWORD index;
-#ifdef _WIN64
-    _BitScanForward64(&index,b);
-    return (unsigned)index;
-#else
-    if (b & 0xffffffffULL) {
-      _BitScanForward(&index,(unsigned long)(b & 0xffffffffULL));
-      return (unsigned)index;
-    }
-    else {
-      _BitScanForward(&index,(unsigned long)(b >> 32));
-      return 32 + (unsigned)index;
-    }
-#endif
-}
-#else
-/* not a compiler/architecture with recognized builtins */
-static uint32_t get_bit32(uint64_t x) {
-  return (uint32_t)(((int32_t)(x))&-((int32_t)(x)));
-}
-static const unsigned MAGIC32 = 0xe89b2be;
-static const uint32_t MagicTable32[32] = {31,0,9,1,10,20,13,2,7,11,21,23,17,14,3,25,30,8,19,12,6,22,16,24,29,18,5,15,28,4,27,26};
-static unsigned lsb(uint64_t b) {
-  if (b & 0xffffffffULL)
-    return MagicTable32[(get_bit32(b & 0xffffffffULL)*MAGIC32)>>27];
-  else
-    return MagicTable32[(get_bit32(b >> 32)*MAGIC32)>>27]+32;
-}
-#endif
-#endif
-
-#define max(a,b) a > b ? a : b
-#define min(a,b) a < b ? a : b
-
-#include "stdendian.h"
-
-#if _BYTE_ORDER == _BIG_ENDIAN
-/*
-static uint64_t from_le_u64(uint64_t input) {
-  return bswap64(input);
-}
-*/
-static uint32_t from_le_u32(uint32_t input) {
-  return bswap32(input);
-}
-
-static uint16_t from_le_u16(uint16_t input) {
-  return bswap16(input);
-}
-
-static uint64_t from_be_u64(uint64_t x) {
-  return x;
-}
-
-static uint32_t from_be_u32(uint32_t x) {
-  return x;
-}
-/*
-static uint16_t from_be_u16(uint16_t x) {
-  return x;
-}
-*/
-#else
-/*
-static uint64_t from_le_u64(uint64_t x) {
-  return x;
-}
-*/
-static uint32_t from_le_u32(uint32_t x) {
-  return x;
-}
-
-static uint16_t from_le_u16(uint16_t x) {
-  return x;
-}
 
 static uint64_t from_be_u64(uint64_t input) {
-  return bswap64(input);
+  return __builtin_bswap64(input);
 }
 
 static uint32_t from_be_u32(uint32_t input) {
-  return bswap32(input);
+  return __builtin_bswap32(input);
 }
-/*
-static uint16_t from_be_u16(const uint16_t input) {
-  return bswap16(input);
-}
-*/
-#endif
 
 inline static uint32_t read_le_u32(void *p)
 {
-  return from_le_u32(*(uint32_t *)p);
+  return *(uint32_t *)p;
 }
 
 inline static uint16_t read_le_u16(void *p)
 {
-  return from_le_u16(*(uint16_t *)p);
+  return *(uint16_t *)p;
 }
 
 static size_t file_size(FD fd) {
 #ifdef _WIN32
-  LARGE_INTEGER fileSize;
-  if (GetFileSizeEx(fd, &fileSize)==0) {
-    return 0;
-  }
-  return (size_t)fileSize.QuadPart;
+	LARGE_INTEGER fileSize;
+	if (!GetFileSizeEx(fd, &fileSize)) {
+		return 0;
+	}
+	return (size_t)fileSize.QuadPart;
 #else
-  struct stat buf;
-  if (fstat(fd,&buf)) {
-    return 0;
-  } else {
-    return buf.st_size;
-  }
+	struct stat buf;
+	if (fstat(fd, &buf)) {
+		return 0;
+	} else {
+		return buf.st_size;
+	}
 #endif
 }
 
-#ifndef TB_NO_THREADS
 static LOCK_T tbMutex;
-#endif
 static int initialized = 0;
 static int numPaths = 0;
 static char *pathString = NULL;
@@ -1434,13 +1272,8 @@ static struct PairsData *setup_pairs(uint8_t **ptr, size_t tb_size,
   d->base[h - 1] = 0;
   for (int i = h - 2; i >= 0; i--)
     d->base[i] = (d->base[i + 1] + read_le_u16((uint8_t *)(d->offset + i)) - read_le_u16((uint8_t *)(d->offset + i + 1))) / 2;
-#ifdef DECOMP64
   for (int i = 0; i < h; i++)
     d->base[i] <<= 64 - (minLen + i);
-#else
-  for (int i = 0; i < h; i++)
-    d->base[i] <<= 32 - (minLen + i);
-#endif
   d->offset -= d->minLen;
 
   return d;
@@ -1584,10 +1417,9 @@ static uint8_t *decompress_pairs(struct PairsData *d, size_t idx)
   int litIdx = (idx & (((size_t)1 << d->idxBits) - 1)) - ((size_t)1 << (d->idxBits - 1));
   uint32_t block;
   memcpy(&block, d->indexTable + 6 * mainIdx, sizeof(block));
-  block = from_le_u32(block);
 
   uint16_t idxOffset = *(uint16_t *)(d->indexTable + 6 * mainIdx + 4);
-  litIdx += from_le_u16(idxOffset);
+  litIdx += idxOffset;
 
   if (litIdx < 0)
     while (litIdx < 0)
@@ -1604,7 +1436,6 @@ static uint8_t *decompress_pairs(struct PairsData *d, size_t idx)
   uint8_t *symLen = d->symLen;
   uint32_t sym, bitCnt;
 
-#ifdef DECOMP64
   uint64_t code = from_be_u64(*(uint64_t *)ptr);
 
   ptr += 2;
@@ -1612,7 +1443,7 @@ static uint8_t *decompress_pairs(struct PairsData *d, size_t idx)
   for (;;) {
     int l = m;
     while (code < base[l]) l++;
-    sym = from_le_u16(offset[l]);
+    sym = offset[l];
     sym += (uint32_t)((code - base[l]) >> (64 - l));
     if (litIdx < (int)symLen[sym] + 1) break;
     litIdx -= (int)symLen[sym] + 1;
@@ -1624,32 +1455,6 @@ static uint8_t *decompress_pairs(struct PairsData *d, size_t idx)
       code |= (uint64_t)tmp << bitCnt;
     }
   }
-#else
-  uint32_t next = 0;
-  uint32_t data = *ptr++;
-  uint32_t code = from_be_u32(data);
-  bitCnt = 0; // number of bits in next
-  for (;;) {
-    int l = m;
-    while (code < base[l]) l++;
-    sym = offset[l] + ((code - base[l]) >> (32 - l));
-    if (litIdx < (int)symLen[sym] + 1) break;
-    litIdx -= (int)symLen[sym] + 1;
-    code <<= l;
-    if (bitCnt < l) {
-      if (bitCnt) {
-	code |= (next >> (32 - l));
-	l -= bitCnt;
-      }
-      data = *ptr++;
-      next = from_be_u32(data);
-      bitCnt = 32;
-    }
-    code |= (next >> (32 - l));
-    next <<= l;
-    bitCnt -= l;
-  }
-#endif
   uint8_t *symPat = d->symPat;
   while (symLen[sym] != 0) {
     uint8_t *w = symPat + (3 * sym);
@@ -1782,7 +1587,7 @@ int probe_table(const Pos *pos, int s, int *success, const int type)
 
   if (type == DTM) {
     if (!be->dtmLossOnly)
-      v = (int)from_le_u16(be->hasPawns
+      v = (int)(be->hasPawns
                        ? PAWN(be)->dtmMap[PAWN(be)->dtmMapIdx[t][bside][s] + v]
                         : PIECE(be)->dtmMap[PIECE(be)->dtmMapIdx[bside][s] + v]);
   } else {
@@ -1793,7 +1598,7 @@ int probe_table(const Pos *pos, int s, int *success, const int type)
            ? ((uint8_t *)PAWN(be)->dtzMap)[PAWN(be)->dtzMapIdx[t][m] + v]
            : ((uint8_t *)PIECE(be)->dtzMap)[PIECE(be)->dtzMapIdx[m] + v];
       else
-        v = (int)from_le_u16(be->hasPawns
+        v = (int)(be->hasPawns
                          ? ((uint16_t *)PAWN(be)->dtzMap)[PAWN(be)->dtzMapIdx[t][m] + v]
                           : ((uint16_t *)PIECE(be)->dtzMap)[PIECE(be)->dtzMapIdx[m] + v]);
     }
@@ -2559,52 +2364,3 @@ static uint16_t probe_root(Pos *pos, int *score, unsigned *results)
         return 0;
     }
 }
-
-#ifndef TB_NO_HELPER_API
-
-unsigned tb_pop_count(uint64_t bb)
-{
-    return popcount(bb);
-}
-
-unsigned tb_lsb(uint64_t bb)
-{
-    return lsb(bb);
-}
-
-uint64_t tb_pop_lsb(uint64_t bb)
-{
-    return poplsb(bb);
-}
-
-uint64_t tb_king_attacks(unsigned sq)
-{
-    return king_attacks(sq);
-}
-
-uint64_t tb_queen_attacks(unsigned sq, uint64_t occ)
-{
-    return queen_attacks(sq, occ);
-}
-
-uint64_t tb_rook_attacks(unsigned sq, uint64_t occ)
-{
-    return rook_attacks(sq, occ);
-}
-
-uint64_t tb_bishop_attacks(unsigned sq, uint64_t occ)
-{
-    return bishop_attacks(sq, occ);
-}
-
-uint64_t tb_knight_attacks(unsigned sq)
-{
-    return knight_attacks(sq);
-}
-
-uint64_t tb_pawn_attacks(unsigned sq, bool color)
-{
-    return pawn_attacks(sq, color);
-}
-
-#endif      /* TB_NO_HELPER_API */
