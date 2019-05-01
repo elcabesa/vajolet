@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,6 +19,8 @@ TEST(Syzygy, test)
 	
 	tb_init("C:/Users/elcab/Downloads/syzygy");
 	ASSERT_TRUE(TB_LARGEST > 0);
+	
+	auto start = std::chrono::system_clock::now();
 	
 	
 	unsigned long int num = 0;
@@ -105,7 +108,9 @@ TEST(Syzygy, test)
 		
 		if( num %10000 == 0 )
 		{
-			std::cout<<testedNum<<"/"<<num<<" ("<< (testedNum*100.0/num) <<"%)"<<std::endl;
+			auto now = std::chrono::system_clock::now();
+			auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
+			std::cout<<testedNum<<"/"<<num<<" ("<< (testedNum*100.0/num) <<"%) nps: "<<1000.0*testedNum/milliseconds.count()<<std::endl;
 		}
 		
 	}

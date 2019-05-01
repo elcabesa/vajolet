@@ -40,58 +40,5 @@
 #define TB_VALUE_DRAW 0
 #define TB_MAX_MATE_PLY 255
 
-/***************************************************************************/
-/* ENGINE INTEGRATION CONFIG                                               */
-/***************************************************************************/
-
-/*
- * If you are integrating tbprobe into an engine, you can replace some of
- * tbprobe's built-in functionality with that already provided by the engine.
- * This is OPTIONAL.  If no definition are provided then tbprobe will use its
- * own internal defaults.  That said, for engines it is generally a good idea
- * to avoid redundancy.
- */
-
-/*
- * Define TB_KING_ATTACKS(square) to return the king attacks bitboard for a
- * king at `square'.
- */
-/* #define TB_KING_ATTACKS(square)          <DEFINITION> */
-
-/*
- * Define TB_KNIGHT_ATTACKS(square) to return the knight attacks bitboard for
- * a knight at `square'.
- */
-/* #define TB_KNIGHT_ATTACKS(square)        <DEFINITION> */
-
-/*
- * Define TB_ROOK_ATTACKS(square, occ) to return the rook attacks bitboard
- * for a rook at `square' assuming the given `occ' occupancy bitboard.
- */
-/* #define TB_ROOK_ATTACKS(square, occ)     <DEFINITION> */
-
-/*
- * Define TB_BISHOP_ATTACKS(square, occ) to return the bishop attacks bitboard
- * for a bishop at `square' assuming the given `occ' occupancy bitboard.
- */
-/* #define TB_BISHOP_ATTACKS(square, occ)   <DEFINITION> */
-
-/*
- * Define TB_QUEEN_ATTACKS(square, occ) to return the queen attacks bitboard
- * for a queen at `square' assuming the given `occ' occupancy bitboard.
- * NOTE: If no definition is provided then tbprobe will use:
- *       TB_ROOK_ATTACKS(square, occ) | TB_BISHOP_ATTACKS(square, occ)
- */
-/* #define TB_QUEEN_ATTACKS(square, occ)    <DEFINITION> */
-
-/*
- * Define TB_PAWN_ATTACKS(square, color) to return the pawn attacks bitboard
- * for a `color' pawn at `square'.
- * NOTE: This definition must work for pawns on ranks 1 and 8.  For example,
- *       a white pawn on e1 attacks d2 and f2.  A black pawn on e1 attacks
- *       nothing.  Etc.
- * NOTE: This definition must not include en passant captures.
- */
-/* #define TB_PAWN_ATTACKS(square, color)   <DEFINITION> */
 
 #endif

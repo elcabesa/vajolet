@@ -26,10 +26,9 @@
 
 #include "tbconfig.h"
 
-#ifdef __cplusplus
 extern "C"
 {
-#endif
+
 
 #include <stdint.h>
 
@@ -347,32 +346,7 @@ int tb_probe_root_wdl(uint64_t _white,
     bool useRule50,
     struct TbRootMoves *_results);
 
-/****************************************************************************/
-/* HELPER API                                                               */
-/****************************************************************************/
-
-/*
- * The HELPER API provides some useful additional functions.  It is optional
- * and can be disabled by defining TB_NO_HELPER_API.  Engines should disable
- * the HELPER API.
- */
-
-#ifndef TB_NO_HELPER_API
-
-extern unsigned tb_pop_count(uint64_t _bb);
-extern unsigned tb_lsb(uint64_t _bb);
-extern uint64_t tb_pop_lsb(uint64_t _bb);
-extern uint64_t tb_king_attacks(unsigned _square);
-extern uint64_t tb_queen_attacks(unsigned _square, uint64_t _occ);
-extern uint64_t tb_rook_attacks(unsigned _square, uint64_t _occ);
-extern uint64_t tb_bishop_attacks(unsigned _square, uint64_t _occ);
-extern uint64_t tb_knight_attacks(unsigned _square);
-extern uint64_t tb_pawn_attacks(unsigned _square, bool _color);
-
-#endif
-
-#ifdef __cplusplus
 }
-#endif
+
 
 #endif

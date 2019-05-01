@@ -144,10 +144,7 @@ static PieceType char_to_piece_type(char c) {
 #define board(s)                ((uint64_t)1 << (s))
 #define square(r, f)            (8 * (r) + (f))
 
-#ifdef TB_KING_ATTACKS
-#define king_attacks(s)         TB_KING_ATTACKS(s)
-#define king_attacks_init()     /* NOP */
-#else       /* TB_KING_ATTACKS */
+
 
 static uint64_t king_attacks_table[64];
 
@@ -180,12 +177,6 @@ static void king_attacks_init(void)
     }
 }
 
-#endif      /* TB_KING_ATTACKS */
-
-#ifdef TB_KNIGHT_ATTACKS
-#define knight_attacks(s)       TB_KNIGHT_ATTACKS(s)
-#define knight_attacks_init()   /* NOP */
-#else       /* TB_KNIGHT_ATTACKS */
 
 static uint64_t knight_attacks_table[64];
 
@@ -226,12 +217,6 @@ static void knight_attacks_init(void)
     }
 }
 
-#endif      /* TB_KNIGHT_ATTACKS */
-
-#ifdef TB_BISHOP_ATTACKS
-#define bishop_attacks(s, occ)  TB_BISHOP_ATTACKS(s, occ)
-#define bishop_attacks_init()   /* NOP */
-#else       /* TB_BISHOP_ATTACKS */
 
 static uint64_t diag_attacks_table[64][64];
 static uint64_t anti_attacks_table[64][64];
@@ -384,12 +369,7 @@ static void bishop_attacks_init(void)
     }
 }
 
-#endif      /* TB_BISHOP_ATTACKS */
 
-#ifdef TB_ROOK_ATTACKS
-#define rook_attacks(s, occ)    TB_ROOK_ATTACKS(s, occ)
-#define rook_attacks_init()     /* NOP */
-#else       /* TB_ROOK_ATTACKS */
 
 static uint64_t rank_attacks_table[64][64];
 static uint64_t file_attacks_table[64][64];
@@ -500,19 +480,9 @@ static void rook_attacks_init(void)
     }
 }
 
-#endif      /* TB_ROOK_ATTACKS */
 
-#ifdef TB_QUEEN_ATTACKS
-#define queen_attacks(s, occ)   TB_QUEEN_ATTACKS(s, occ)
-#else       /* TB_QUEEN_ATTACKS */
 #define queen_attacks(s, occ)   \
     (rook_attacks((s), (occ)) | bishop_attacks((s), (occ)))
-#endif      /* TB_QUEEN_ATTACKS */
-
-#ifdef TB_PAWN_ATTACKS
-#define pawn_attacks(s, c)      TB_PAWN_ATTACKS(s, c)
-#define pawn_attacks_init()     /* NOP */
-#else       /* TB_PAWN_ATTACKS */
 
 static uint64_t pawn_attacks_table[2][64];
 
@@ -547,7 +517,6 @@ static void pawn_attacks_init(void)
     }
 }
 
-#endif      /* TB_PAWN_ATTACKS */
 
 /*
  * Given a position, produce a 64-bit material signature key.
