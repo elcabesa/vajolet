@@ -2,13 +2,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <thread>
 
 #include "gtest/gtest.h"
 
 #include "position.h"
 #include "syzygy/tbprobe.h"
 
-TEST(Syzygy, test)
+void syzygyTest()
 {
 	Position pos;
 	
@@ -17,7 +18,7 @@ TEST(Syzygy, test)
 	
 	ASSERT_TRUE(myfile.is_open());
 	
-	tb_init("C:/Users/elcab/Downloads/syzygy");
+	tb_init("F:/syzygy");
 	ASSERT_TRUE(TB_LARGEST > 0);
 	
 	auto start = std::chrono::system_clock::now();
@@ -43,8 +44,6 @@ TEST(Syzygy, test)
 		delimiter = line.find_first_of(',');
 		ASSERT_NE(std::string::npos, delimiter);
 		std::string wdl = line.substr(0, delimiter);
-		
-		
 		
 		pos.setupFromFen(fen); 
 		
@@ -116,9 +115,17 @@ TEST(Syzygy, test)
 	}
 	std::cout<<num<<std::endl;
 	myfile.close();
-	
-
-
 }
 
+/*TEST(Syzygy, test)
+{
+	syzygyTest();
+}*/
 
+
+TEST(Syzygy, multiThreadTest)
+{
+	std::thread t(&syzygyTest);
+	syzygyTest();
+	t.join();
+}
