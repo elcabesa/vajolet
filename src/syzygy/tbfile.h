@@ -62,6 +62,12 @@ public:
 	TBFile (const std::string& f);
 	~TBFile();
 	
+	// todo implement them https://en.cppreference.com/w/cpp/language/rule_of_three
+	TBFile(const TBFile& other) = delete; // copy constructor
+	TBFile(TBFile&& other) noexcept = delete; // move constructor
+	TBFile& operator=(const TBFile& other) = delete; // copy assignment
+    TBFile& operator=(TBFile&& other) noexcept = delete; // move assignment
+	
 };
 
 #endif
