@@ -102,3 +102,23 @@ TEST(search, search) {
 
 	}
 }
+
+TEST(search, searchExludeMove) {
+	
+	Search::initSearchParameters();
+	transpositionTable::getInstance().setSize(1);
+	Position::initMaterialKeys();
+	
+	SearchTimer st;
+	SearchLimits sl;
+	sl.moveListInsert(Move(F1,C4));
+	sl.moveListInsert(Move(C3,A4));
+	
+	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
+
+	src.getPosition().setupFromFen("rn1qkbnr/pbpp1ppp/1p6/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 2 4");
+	sl.setDepth(10);
+	auto res = src.startThinking();
+
+	EXPECT_EQ( res.PV.getMove(0), Move(F1,C4));
+}
