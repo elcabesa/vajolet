@@ -39,23 +39,25 @@
 // time only existence of the file is checked.
 class TBFile {
 private:
-	uint8_t* baseAddress;
+	uint8_t* _baseAddress;
 #ifndef _WIN32
-	uint64_t mapping;
+	uint64_t _mapping;
 #else
-	HANDLE mapping;
+	HANDLE _mapping;
 #endif
-
 	static std::string _paths;
+	
 	static std::string _getFileName(const std::string& f);
+	
 	void _unmap();
 
 public:
-
-	uint8_t& operator[](std::size_t idx);
-	const uint8_t& operator[](std::size_t idx) const;
 	static void setPaths(std::string path);
 	static bool exist(const std::string& f);
+	
+	uint8_t& operator[](std::size_t idx);
+	const uint8_t& operator[](std::size_t idx) const;
+	
 	TBFile (const std::string& f);
 	~TBFile();
 	

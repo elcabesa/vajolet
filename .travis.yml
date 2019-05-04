@@ -29,5 +29,5 @@ script:
   - cd ..
   
 after_success:
-  - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src -e src/syzygy
+  - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src 
   
