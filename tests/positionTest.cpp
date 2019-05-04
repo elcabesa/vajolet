@@ -142,3 +142,10 @@ TEST(PositionTest, getGamePhaseEndgame) {
 	
 }
 
+TEST(PositionTest, evalTrace) {
+	Position pos;
+	pos.setupFromFen("k7/8/8/8/8/8/8/K7 w - - 0 1"); 
+	EXPECT_EQ(pos.eval<true>(), pos.eval<false>());
+	
+}
+
