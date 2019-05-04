@@ -75,7 +75,7 @@ TEST(tbfile, functional) {
 	ASSERT_TRUE(TBFile::exist("open2.txt"));
 	
 	TBFile f("open.txt");
-	TBFile f2("open2.txt");
+	const TBFile f2("open2.txt");
 	
 	ASSERT_TRUE(f.isValid());
 	ASSERT_TRUE(f2.isValid());
@@ -94,5 +94,7 @@ TEST(tbfile, functional) {
 	EXPECT_EQ(f[6],'n');
 	EXPECT_EQ(f[7],'d');
 	EXPECT_EQ(f[8],'o');
+	
+	
 	
 }
