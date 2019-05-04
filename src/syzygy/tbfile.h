@@ -57,6 +57,7 @@ public:
 	
 	uint8_t& operator[](std::size_t idx);
 	const uint8_t& operator[](std::size_t idx) const;
+	bool isValid() const;
 	
 	TBFile (const std::string& f);
 	~TBFile();
