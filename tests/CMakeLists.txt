@@ -18,6 +18,8 @@ target_include_directories (Vajolet_search_integration_test PRIVATE ${CMAKE_SOUR
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Perfect2017.bin
     ${CMAKE_CURRENT_BINARY_DIR}/book.bin COPYONLY)
+	
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
 
 add_test(NAME unit_test COMMAND Vajolet_unit_test)
 add_test(NAME syzygy_test COMMAND Vajolet_syzygy_test)

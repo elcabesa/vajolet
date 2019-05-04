@@ -109,6 +109,17 @@ private:
 		}
 		return "";
 	}
+	
+	void _unmap() {
+		if( baseAddress != nullptr) {
+#ifndef _WIN32
+			munmap(baseAddress, mapping);
+#else
+			UnmapViewOfFile(baseAddress);
+			CloseHandle(mapping);
+#endif
+		}
+	}
 
 public:
 
@@ -185,7 +196,7 @@ public:
 #endif
 		// todo remove from here
 		// todo check size is multiple of 16
-		constexpr uint8_t Magics[][4] =
+		/*constexpr uint8_t Magics[][4] =
 			{ { 0xD7, 0x66, 0x0C, 0xA5 },
 			{ 0x71, 0xE8, 0x23, 0x5D } };
 
@@ -195,24 +206,12 @@ public:
 				baseAddress = nullptr;
 				mapping = 0;
 				return;
-		}
+		}*/
 
 		//return data + 4; // Skip Magics's header
 	}
 
-	
-	void unmap() {
-		if( baseAddress != nullptr) {
-#ifndef _WIN32
-			munmap(baseAddress, mapping);
-#else
-			UnmapViewOfFile(baseAddress);
-			CloseHandle(mapping);
-#endif
-		}
-  }
-	
-	~TBFile() { unmap(); }
+	~TBFile() { _unmap(); }
 	
 };
 
