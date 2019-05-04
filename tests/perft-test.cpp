@@ -54,3 +54,22 @@ TEST(PerftTest, perftHash) {
 		}
 	}
 }
+
+TEST(PerftTest, divide) {
+	
+	std::streambuf* oldCoutStreamBuf = std::cout.rdbuf();
+	std::ostringstream strCout;
+	std::cout.rdbuf( strCout.rdbuf() );
+	
+	Position pos;
+	for (auto & p : perftPos)
+	{
+		pos.setupFromFen(p.Fen); 
+		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
+		{
+			EXPECT_EQ(Perft(pos).divide(i+1), p.PerftValue[i]);
+		}
+	}
+	
+	std::cout.rdbuf( oldCoutStreamBuf );
+}
