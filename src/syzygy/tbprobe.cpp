@@ -79,8 +79,12 @@ enum  TBType { WDL, DTM, DTZ };
 // time only existence of the file is checked.
 class TBFile {
 private:
-	void* baseAddress;
+	uint8_t* baseAddress;
+#ifndef _WIN32
 	uint64_t mapping;
+#else
+	HANDLE mapping;
+#endif
 
 	static std::string _paths;
 	
@@ -107,6 +111,9 @@ private:
 	}
 
 public:
+
+	uint8_t& operator[](std::size_t idx) { return baseAddress[idx]; }
+    const uint8_t& operator[](std::size_t idx) const { return baseAddress[idx]; }
 	static void setPaths(std::string path) { _paths = path; }
 	
 	static bool exist(const std::string& f) { return _getFileName(f) != ""; }
@@ -129,8 +136,7 @@ public:
 
 #ifndef _WIN32
 		struct stat statbuf;
-		std::ifstream _stream;
-		int fd = _stream.open(fname, O_RDONLY);
+		int fd = open(fname.c_str(), O_RDONLY);
 		if (fd == -1) {
 			baseAddress = nullptr;
 			mapping = 0;
@@ -141,7 +147,7 @@ public:
 		mapping = statbuf.st_size;
 		baseAddress = mmap(nullptr, statbuf.st_size, PROT_READ, MAP_SHARED, fd, 0);
 		madvise(baseAddress, statbuf.st_size, MADV_RANDOM);
-		_stream.close(fd);
+		close(fd);
 
 		if (baseAddress == MAP_FAILED) {
 			std::cerr << "Could not mmap() " << fname << std::endl;
@@ -168,8 +174,8 @@ public:
 			exit(1);
 		}
 		
-		mapping = (uint64_t)mmap;
-		baseAddress = MapViewOfFile(mmap, FILE_MAP_READ, 0, 0, 0);
+		mapping = mmap;
+		baseAddress = static_cast<uint8_t*>(MapViewOfFile(mmap, FILE_MAP_READ, 0, 0, 0));
 
 		if (!baseAddress) {
 			std::cerr << "MapViewOfFile() failed, name = " << fname
@@ -177,12 +183,13 @@ public:
 			exit(1);
 		}
 #endif
-		uint8_t* data = (uint8_t*)baseAddress;
+		// todo remove from here
+		// todo check size is multiple of 16
+		constexpr uint8_t Magics[][4] =
+			{ { 0xD7, 0x66, 0x0C, 0xA5 },
+			{ 0x71, 0xE8, 0x23, 0x5D } };
 
-		constexpr uint8_t Magics[][4] = { { 0xD7, 0x66, 0x0C, 0xA5 },
-																			{ 0x71, 0xE8, 0x23, 0x5D } };
-
-		if (memcmp(data, Magics[type == WDL], 4)) {
+		if (memcmp(baseAddress, Magics[type == WDL], 4)) {
 				std::cerr << "Corrupted table in file " << fname << std::endl;
 				unmap();
 				baseAddress = nullptr;
@@ -200,7 +207,7 @@ public:
 			munmap(baseAddress, mapping);
 #else
 			UnmapViewOfFile(baseAddress);
-			CloseHandle((HANDLE)mapping);
+			CloseHandle(mapping);
 #endif
 		}
   }
