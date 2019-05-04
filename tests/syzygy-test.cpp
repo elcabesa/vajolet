@@ -18,7 +18,7 @@ void syzygyTest()
 	
 	ASSERT_TRUE(myfile.is_open());
 	
-	tb_init("F:/syzygy");
+	tb_init("C:/Users/elcab/Downloads/syzygy");
 	ASSERT_TRUE(TB_LARGEST > 0);
 	
 	auto start = std::chrono::system_clock::now();

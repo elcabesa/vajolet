@@ -145,7 +145,7 @@ public:
 		
 		fstat(fd, &statbuf);
 		mapping = statbuf.st_size;
-		baseAddress = mmap(nullptr, statbuf.st_size, PROT_READ, MAP_SHARED, fd, 0);
+		baseAddress = static_cast<uint8_t*>(mmap(nullptr, statbuf.st_size, PROT_READ, MAP_SHARED, fd, 0));
 		madvise(baseAddress, statbuf.st_size, MADV_RANDOM);
 		close(fd);
 
