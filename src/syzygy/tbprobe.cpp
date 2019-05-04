@@ -129,6 +129,7 @@ public:
 
 #ifndef _WIN32
 		struct stat statbuf;
+		std::ifstream _stream;
 		int fd = _stream.open(fname, O_RDONLY);
 		if (fd == -1) {
 			baseAddress = nullptr;
@@ -139,7 +140,7 @@ public:
 		fstat(fd, &statbuf);
 		mapping = statbuf.st_size;
 		baseAddress = mmap(nullptr, statbuf.st_size, PROT_READ, MAP_SHARED, fd, 0);
-		madvise(*baseAddress, statbuf.st_size, MADV_RANDOM);
+		madvise(baseAddress, statbuf.st_size, MADV_RANDOM);
 		_stream.close(fd);
 
 		if (baseAddress == MAP_FAILED) {
