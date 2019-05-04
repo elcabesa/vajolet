@@ -23,11 +23,14 @@ SOFTWARE.
 
 #include <assert.h>
 #include <atomic>
+#include <fstream>
+#include <iostream>
 #include <mutex>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sstream>
 #include "tbprobe.h"
 
 using namespace std;
@@ -67,7 +70,143 @@ typedef HANDLE map_t;
 
 #define popcount(x) __builtin_popcountll(x)
 #define lsb(b) __builtin_ctzll(b)
+#define poplsb(x) ((x) & ((x) - 1))
 
+enum  TBType { WDL, DTM, DTZ };
+
+// class TBFile memory maps/unmaps the single .rtbw and .rtbz files. Files are
+// memory mapped for best performance. Files are mapped at first access: at init
+// time only existence of the file is checked.
+class TBFile {
+private:
+	void* baseAddress;
+	uint64_t mapping;
+
+	static std::string _paths;
+	
+	static std::string _getFileName(const std::string& f) {
+		std::string _fname;
+		std::ifstream _stream;
+#ifndef _WIN32
+		constexpr char SepChar = ':';
+#else
+		constexpr char SepChar = ';';
+#endif
+		std::stringstream ss(_paths);
+		std::string path;
+
+		while (std::getline(ss, path, SepChar)) {
+			_fname = path + "/" + f;
+			_stream.open(_fname);
+			if (_stream.is_open()) {
+				_stream.close();
+				return _fname;
+			}
+		}
+		return "";
+	}
+
+public:
+	static void setPaths(std::string path) { _paths = path; }
+	
+	static bool exist(const std::string& f) { return _getFileName(f) != ""; }
+
+	// Look for and open the file among the Paths directories where the .rtbw
+	// and .rtbz files can be found. Multiple directories are separated by ";"
+	// on Windows and by ":" on Unix-based operating systems.
+	//
+	// Example:
+	// C:\tb\wdl345;C:\tb\wdl6;D:\tb\dtz345;D:\tb\dtz6
+	
+	// todo type can be undestood from file name extension
+	TBFile (const std::string& f, TBType type) {
+		auto fname = _getFileName(f);
+		if (fname == "") {
+			baseAddress = nullptr;
+			mapping = 0;
+			return;
+		}
+
+#ifndef _WIN32
+		struct stat statbuf;
+		int fd = _stream.open(fname, O_RDONLY);
+		if (fd == -1) {
+			baseAddress = nullptr;
+			mapping = 0;
+			return;
+		}
+		
+		fstat(fd, &statbuf);
+		mapping = statbuf.st_size;
+		baseAddress = mmap(nullptr, statbuf.st_size, PROT_READ, MAP_SHARED, fd, 0);
+		madvise(*baseAddress, statbuf.st_size, MADV_RANDOM);
+		_stream.close(fd);
+
+		if (baseAddress == MAP_FAILED) {
+			std::cerr << "Could not mmap() " << fname << std::endl;
+			exit(1);
+		}
+#else
+		// Note FILE_FLAG_RANDOM_ACCESS is only a hint to Windows and as such may get ignored.
+		HANDLE fd = CreateFile(fname.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
+			OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, nullptr);
+			
+		if (fd == INVALID_HANDLE_VALUE) {
+			baseAddress = nullptr;
+			mapping = 0;
+			return;
+		}
+
+		DWORD size_high;
+		DWORD size_low = GetFileSize(fd, &size_high);
+		HANDLE mmap = CreateFileMapping(fd, nullptr, PAGE_READONLY, size_high, size_low, nullptr);
+		CloseHandle(fd);
+
+		if (!mmap) {
+			std::cerr << "CreateFileMapping() failed" << std::endl;
+			exit(1);
+		}
+		
+		mapping = (uint64_t)mmap;
+		baseAddress = MapViewOfFile(mmap, FILE_MAP_READ, 0, 0, 0);
+
+		if (!baseAddress) {
+			std::cerr << "MapViewOfFile() failed, name = " << fname
+								<< ", error = " << GetLastError() << std::endl;
+			exit(1);
+		}
+#endif
+		uint8_t* data = (uint8_t*)baseAddress;
+
+		constexpr uint8_t Magics[][4] = { { 0xD7, 0x66, 0x0C, 0xA5 },
+																			{ 0x71, 0xE8, 0x23, 0x5D } };
+
+		if (memcmp(data, Magics[type == WDL], 4)) {
+				std::cerr << "Corrupted table in file " << fname << std::endl;
+				unmap();
+				baseAddress = nullptr;
+				mapping = 0;
+				return;
+		}
+
+		//return data + 4; // Skip Magics's header
+	}
+
+	
+	void unmap() {
+		if( baseAddress != nullptr) {
+#ifndef _WIN32
+			munmap(baseAddress, mapping);
+#else
+			UnmapViewOfFile(baseAddress);
+			CloseHandle((HANDLE)mapping);
+#endif
+		}
+  }
+	
+	~TBFile() { unmap(); }
+	
+};
 
 static uint64_t from_be_u64(uint64_t input) {
   return __builtin_bswap64(input);
@@ -205,7 +344,7 @@ static void unmap_file(void *data, map_t mapping)
 }
 #endif
 
-#define poplsb(x)               ((x) & ((x) - 1))
+
 
 int TB_MaxCardinality = 0, TB_MaxCardinalityDTM = 0;
 unsigned TB_LARGEST = 0;
@@ -214,7 +353,7 @@ unsigned TB_LARGEST = 0;
 static const char *tbSuffix[] = { ".rtbw", ".rtbm", ".rtbz" };
 static uint32_t tbMagic[] = { 0x5d23e871, 0x88ac504b, 0xa50c66d7 };
 
-enum { WDL, DTM, DTZ };
+
 enum { PIECE_ENC, FILE_ENC, RANK_ENC };
 
 // Attack and move generation code
