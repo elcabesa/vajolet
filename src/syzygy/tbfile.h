@@ -59,6 +59,7 @@ public:
 	const uint8_t& operator[](std::size_t idx) const;
 	bool isValid() const;
 	
+	TBFile ();
 	TBFile (const std::string& f);
 	~TBFile();
 	
@@ -66,7 +67,7 @@ public:
 	TBFile(const TBFile& other) = delete; // copy constructor
 	TBFile(TBFile&& other) noexcept = delete; // move constructor
 	TBFile& operator=(const TBFile& other) = delete; // copy assignment
-    TBFile& operator=(TBFile&& other) noexcept = delete; // move assignment
+	TBFile& operator=(TBFile&& other) noexcept;
 	
 };
 

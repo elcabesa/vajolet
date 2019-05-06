@@ -20,6 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#include <utility>
 
 #include "tbfile.h"
 
@@ -66,6 +67,12 @@ uint8_t& TBFile::operator[](std::size_t idx) { return _baseAddress[idx]; }
 const uint8_t& TBFile::operator[](std::size_t idx) const { return _baseAddress[idx]; }
 void TBFile::setPaths(std::string path) { _paths = path; }
 bool TBFile::exist(const std::string& f) { return _getFileName(f) != ""; }
+
+
+TBFile::TBFile () {
+	_baseAddress = nullptr;
+	_mapping = 0;
+}
 
 // Look for and open the file among the Paths directories where the .rtbw
 // and .rtbz files can be found. Multiple directories are separated by ";"
@@ -148,3 +155,10 @@ TBFile::TBFile (const std::string& f) {
 }
 
 TBFile::~TBFile() { _unmap(); }
+
+TBFile& TBFile::operator=(TBFile&& other) noexcept {
+	
+	std::swap(_baseAddress, other._baseAddress);
+	std::exchange(_mapping, other._mapping);
+	return *this;
+}

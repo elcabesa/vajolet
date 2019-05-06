@@ -10,7 +10,6 @@
 TEST(tbfile, exist) {
 	EXPECT_FALSE(TBFile::exist("ciao.txt"));
 	EXPECT_FALSE(TBFile::exist("open.txt"));
-	
 	TBFile::setPaths("data");
 	
 	EXPECT_FALSE(TBFile::exist("ciao.txt"));
@@ -94,9 +93,6 @@ TEST(tbfile, functional) {
 	EXPECT_EQ(f[6],'n');
 	EXPECT_EQ(f[7],'d');
 	EXPECT_EQ(f[8],'o');
-	
-	
-	
 }
 
 TEST(tbfile, twoMappedFile) {
@@ -133,8 +129,41 @@ TEST(tbfile, twoMappedFile) {
 	EXPECT_EQ(f[6],'n');
 	EXPECT_EQ(f[7],'d');
 	EXPECT_EQ(f[8],'o');
+}
 
+TEST(tbfile, emptyConstructor) {
 	
+	TBFile::setPaths("data");
+	TBFile f;
+	ASSERT_FALSE(f.isValid());
+
+}
+
+TEST(tbfile, moveAssignment) {
 	
+	TBFile::setPaths("data");
+	TBFile f;
+	ASSERT_FALSE(f.isValid());
+	f = TBFile("open.txt");
 	
+	ASSERT_TRUE(f.isValid());
+	EXPECT_EQ(f[0],'c');
+	EXPECT_EQ(f[1],'i');
+	EXPECT_EQ(f[2],'a');
+	EXPECT_EQ(f[3],'o');
+	EXPECT_EQ(f[4],'M');
+	EXPECT_EQ(f[5],'o');
+	EXPECT_EQ(f[6],'n');
+	EXPECT_EQ(f[7],'d');
+	EXPECT_EQ(f[8],'o');
+	
+	f = TBFile("open2.txt");
+	
+	EXPECT_EQ(f[0],'p');
+	EXPECT_EQ(f[1],'i');
+	EXPECT_EQ(f[2],'p');
+	EXPECT_EQ(f[3],'p');
+	EXPECT_EQ(f[4],'o');
+	
+
 }
