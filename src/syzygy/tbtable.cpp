@@ -34,7 +34,7 @@ TBTable::TBTable(const std::string& code) {
 	_hasPawns = pos.getBitmap(whitePawns) | pos.getBitmap(blackPawns);
 	
 	_hasUniquePieces = false;
-	for (bitboardIndex idx = empty; idx < lastBitboard; ++ idx) {
+	for (bitboardIndex idx = empty; idx < lastBitboard; ++idx) {
 		if (isValidPiece(idx) && !isKing(idx)) {
 			if (pos.getPieceCount(idx) == 1) {
 				_hasUniquePieces = true;
@@ -54,5 +54,16 @@ TBTable::TBTable(const std::string& code) {
 	_pawnCount[1] = pos.getPieceCount(leadingWhite ? blackPawns : whitePawns);
 
 	_key2 = pos.setup(code, black).getMaterialKey();
+}
+
+TBTable::TBTable(const TBTable& other) {
+	// Use the corresponding WDL table to avoid recalculating all from scratch
+	_key = other._key;
+	_key2 = other._key2;
+	_pieceCount = other._pieceCount;
+	_hasPawns = other._hasPawns;
+	_hasUniquePieces = other._hasUniquePieces;
+	_pawnCount[0] = other._pawnCount[0];
+	_pawnCount[1] = other._pawnCount[1];
 }
 

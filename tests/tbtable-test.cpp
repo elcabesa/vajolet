@@ -76,3 +76,20 @@ TEST(tbtable, constructor5) {
 	ASSERT_TRUE(tbt.hasPawns());
 	ASSERT_TRUE(tbt.hasUniquePieces());
 }
+
+TEST(tbtable, copyConstructor) {
+	TBTable t("KBPPvKB");
+	TBTable tbt(t);
+	
+	
+	ASSERT_NE(tbt.getKey(), HashKey(0));
+	ASSERT_NE(tbt.getKey2(), HashKey(0));
+	ASSERT_NE(tbt.getKey(), tbt.getKey2());
+	ASSERT_EQ(tbt.getKey(), tbt.getKey());
+	ASSERT_EQ(tbt.getKey2(), tbt.getKey2());
+	ASSERT_EQ(tbt.getPieceCount(), 6);
+	ASSERT_EQ(tbt.getPawnCount(0), 2 );
+	ASSERT_EQ(tbt.getPawnCount(1), 0 );
+	ASSERT_TRUE(tbt.hasPawns());
+	ASSERT_TRUE(tbt.hasUniquePieces());
+}
