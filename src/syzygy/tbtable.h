@@ -19,6 +19,7 @@
 #ifndef TBTABLE_H
 #define TBTABLE_H
 
+#include "hashKey.h"
 #include "tbtypes.h"
 #include "tbfile.h"
 
@@ -33,8 +34,14 @@
 class TBTable {
 private:
 	TBFile _file;
+	HashKey _key;
+	HashKey _key2;
+	unsigned int _pieceCount;
+	unsigned int _pawnCount[2]; // [Lead color / other color]
+	bool _hasPawns;
+	bool _hasUniquePieces;
 public:
-	TBTable();
+	TBTable(const std::string& code);
 
 	//typedef typename std::conditional<Type == WDL, WDLScore, int>::type Ret;
 
@@ -45,12 +52,7 @@ public:
 	//void* baseAddress;
 	//uint8_t* map;
 	//uint64_t mapping;
-	//Key key;
-	//Key key2;
-	//int pieceCount;
-	//bool hasPawns;
-	//bool hasUniquePieces;
-	//uint8_t pawnCount[2]; // [Lead color / other color]
+	
 	//PairsData items[Sides][4]; // [wtm / btm][FILE_A..FILE_D or 0]
 
 	/*PairsData* get(int stm, int f) {
@@ -68,6 +70,13 @@ public:
 			TBFile::unmap(baseAddress, mapping);
 		}
 	}*/
+	
+	const HashKey& getKey() const { return _key; };
+	const HashKey& getKey2() const { return _key2; };
+	unsigned int getPieceCount() const { return _pieceCount; };
+	unsigned int getPawnCount(unsigned int x) const { assert(x<2); return _pawnCount[x];};
+	bool hasPawns() const { return _hasPawns; };
+	bool hasUniquePieces() const { return _hasUniquePieces; };
 };
 
 #endif

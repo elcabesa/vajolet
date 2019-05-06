@@ -21,9 +21,38 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include "eCastle.h"
+#include "position.h"
+
 #include "tbtable.h"
 
-TBTable::TBTable() {
+TBTable::TBTable(const std::string& code) {
+	Position pos;
 	
+	_key = pos.setup(code, white).getMaterialKey();
+	_pieceCount = pos.getPieceCount(occupiedSquares);
+	_hasPawns = pos.getBitmap(whitePawns) | pos.getBitmap(blackPawns);
+	
+	_hasUniquePieces = false;
+	for (bitboardIndex idx = empty; idx < lastBitboard; ++ idx) {
+		if (isValidPiece(idx) && !isKing(idx)) {
+			if (pos.getPieceCount(idx) == 1) {
+				_hasUniquePieces = true;
+				break;
+			}
+		}
+	}
+	
+	// Set the leading color. In case both sides have pawns the leading color
+	// is the side with less pawns because this leads to better compression.
+	bool leadingWhite = 
+		!pos.getPieceCount(blackPawns)
+		|| ( pos.getPieceCount(whitePawns)
+		&& pos.getPieceCount(blackPawns) >= pos.getPieceCount(whitePawns));
+		
+	_pawnCount[0] = pos.getPieceCount(leadingWhite ? whitePawns : blackPawns);
+	_pawnCount[1] = pos.getPieceCount(leadingWhite ? blackPawns : whitePawns);
+
+	_key2 = pos.setup(code, black).getMaterialKey();
 }
 
