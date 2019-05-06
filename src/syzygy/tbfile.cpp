@@ -86,6 +86,7 @@ TBFile::TBFile (const std::string& f) {
 	if (fname == "") {
 		_baseAddress = nullptr;
 		_mapping = 0;
+		_size = 0;
 		return;
 	}
 
@@ -95,6 +96,7 @@ TBFile::TBFile (const std::string& f) {
 	if (fd == -1) {
 		_baseAddress = nullptr;
 		_mapping = 0;
+		_size = 0;
 		return;
 	}
 	
@@ -117,6 +119,7 @@ TBFile::TBFile (const std::string& f) {
 	if (fd == INVALID_HANDLE_VALUE) {
 		_baseAddress = nullptr;
 		_mapping = 0;
+		_size = 0;
 		return;
 	}
 
