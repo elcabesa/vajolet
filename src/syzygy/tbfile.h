@@ -45,6 +45,7 @@ private:
 #else
 	HANDLE _mapping;
 #endif
+	uint64_t _size;
 	static std::string _paths;
 	
 	static std::string _getFileName(const std::string& f);
@@ -58,6 +59,7 @@ public:
 	uint8_t& operator[](std::size_t idx);
 	const uint8_t& operator[](std::size_t idx) const;
 	bool isValid() const;
+	uint64_t size() const { return _size; };
 	
 	TBFile ();
 	TBFile (const std::string& f);

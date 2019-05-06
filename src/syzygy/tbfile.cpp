@@ -72,6 +72,7 @@ bool TBFile::exist(const std::string& f) { return _getFileName(f) != ""; }
 TBFile::TBFile () {
 	_baseAddress = nullptr;
 	_mapping = 0;
+	_size = 0;
 }
 
 // Look for and open the file among the Paths directories where the .rtbw
@@ -99,6 +100,7 @@ TBFile::TBFile (const std::string& f) {
 	
 	fstat(fd, &statbuf);
 	_mapping = statbuf.st_size;
+	_size = statbuf.st_size;
 	_baseAddress = static_cast<uint8_t*>(mmap(nullptr, statbuf.st_size, PROT_READ, MAP_SHARED, fd, 0));
 	madvise(_baseAddress, statbuf.st_size, MADV_RANDOM);
 	close(fd);
@@ -120,6 +122,7 @@ TBFile::TBFile (const std::string& f) {
 
 	DWORD size_high;
 	DWORD size_low = GetFileSize(fd, &size_high);
+	_size = (static_cast<uint64_t>(size_high) << 32)  + size_low;
 	HANDLE mmap = CreateFileMapping(fd, nullptr, PAGE_READONLY, size_high, size_low, nullptr);
 	CloseHandle(fd);
 

@@ -41,7 +41,7 @@ private:
 	bool _hasPawns;
 	bool _hasUniquePieces;
 public:
-	TBTable(const std::string& code);
+	explicit TBTable(const std::string& code);
 
 	//typedef typename std::conditional<Type == WDL, WDLScore, int>::type Ret;
 

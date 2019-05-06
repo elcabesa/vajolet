@@ -8,6 +8,7 @@
 #endif
 
 TEST(tbfile, exist) {
+	TBFile::setPaths("");
 	EXPECT_FALSE(TBFile::exist("ciao.txt"));
 	EXPECT_FALSE(TBFile::exist("open.txt"));
 	TBFile::setPaths("data");
@@ -62,8 +63,12 @@ TEST(tbfile, constructor) {
 	EXPECT_EQ(f[7],'d');
 	EXPECT_EQ(f[8],'o');
 	
+	ASSERT_EQ(f.size(), 9);
+	
+	
 	TBFile f2("nono.txt");
 	ASSERT_FALSE(f2.isValid());
+	ASSERT_EQ(f2.size(), 0);
 	
 }
 
