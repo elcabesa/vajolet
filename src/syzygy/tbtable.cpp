@@ -25,11 +25,13 @@
 #include "position.h"
 
 #include "tbtable.h"
+#include "tbvalidater.h"
 
 TBTable::TBTable(const std::string& code) {
+	_fileName = code;
 	Position pos;
 	
-	_key = pos.setup(code, white).getMaterialKey();
+	_key = pos.setup(getEndGame(), white).getMaterialKey();
 	_pieceCount = pos.getPieceCount(occupiedSquares);
 	_hasPawns = pos.getBitmap(whitePawns) | pos.getBitmap(blackPawns);
 	
@@ -53,11 +55,13 @@ TBTable::TBTable(const std::string& code) {
 	_pawnCount[0] = pos.getPieceCount(leadingWhite ? whitePawns : blackPawns);
 	_pawnCount[1] = pos.getPieceCount(leadingWhite ? blackPawns : whitePawns);
 
-	_key2 = pos.setup(code, black).getMaterialKey();
+	_key2 = pos.setup(getEndGame(), black).getMaterialKey();
 }
 
 TBTable::TBTable(const TBTable& other) {
 	// Use the corresponding WDL table to avoid recalculating all from scratch
+	// todo remember to change file name extension
+	_fileName = other._fileName;
 	_key = other._key;
 	_key2 = other._key2;
 	_pieceCount = other._pieceCount;
@@ -67,3 +71,31 @@ TBTable::TBTable(const TBTable& other) {
 	_pawnCount[1] = other._pawnCount[1];
 }
 
+TBType TBTable::getType() {
+	// todo change it to use template type
+
+	std::size_t dot = _fileName.rfind('.');
+	if (dot != std::string::npos) {
+		std::string extension = _fileName.substr(dot + 1);
+		if( extension == "rtbw" ) { return WDL; }
+		if( extension == "rtbz" ) { return DTZ; }
+	}
+	return WDL;
+}
+
+std::string TBTable::getEndGame() {
+	std::size_t dot = _fileName.rfind('.');
+	if (dot != std::string::npos) {
+		return _fileName.substr(0, dot);
+	}
+	return std::string("");
+}
+
+void TBTable::mapFile() {
+	std::call_once(_mappedFlag, &TBTable::_mapFile, this);
+}
+
+void TBTable::_mapFile() {
+	_file = TBFile(_fileName);
+	TBValidater::validate(_file, getType(), _fileName);
+}

@@ -16,25 +16,25 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef TBTYPES_H
-#define TBTYPES_H
+#include "tbtypes.h"
 
-constexpr int TBPIECES = 7; // Max number of supported pieces
-
-enum WDLScore {
-	WDLLoss        = -2, // Loss
-	WDLBlessedLoss = -1, // Loss, but draw under 50-move rule
-	WDLDraw        =  0, // Draw
-	WDLCursedWin   =  1, // Win, but draw under 50-move rule
-	WDLWin         =  2, // Win
-
-	WDLScoreNone  = -1000
+class LR {
+private:
+	uint8_t _lr[3];	// The first 12 bits is the left-hand symbol, the second 12
+									// bits is the right-hand symbol. If symbol has length 1,
+									// then the left-hand symbol is the stored value.
+public:	
+	Sym getLeft() { return ((_lr[1] & 0xF) << 8) | _lr[0]; }
+	Sym getRight() { return (_lr[2] << 4) | (_lr[1] >> 4); }
+	
+	LR() = delete;
+	~LR() = delete;
+	LR(const LR& other) = delete;
+	LR(LR&& other) noexcept = delete;
+	LR& operator=(const LR& other) = delete;
+	LR& operator=(LR&& other) noexcept = delete;
 };
 
-inline WDLScore operator-(WDLScore d) { return WDLScore(-int(d)); }
+static_assert(sizeof(LR) == 3, "LR tree entry must be 3 bytes");
 
-enum TBType {WDL, DTZ}; // Used as template parameter
 
-using Sym = uint16_t;
-
-#endif

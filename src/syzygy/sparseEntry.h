@@ -16,25 +16,10 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef TBTYPES_H
-#define TBTYPES_H
-
-constexpr int TBPIECES = 7; // Max number of supported pieces
-
-enum WDLScore {
-	WDLLoss        = -2, // Loss
-	WDLBlessedLoss = -1, // Loss, but draw under 50-move rule
-	WDLDraw        =  0, // Draw
-	WDLCursedWin   =  1, // Win, but draw under 50-move rule
-	WDLWin         =  2, // Win
-
-	WDLScoreNone  = -1000
+// Numbers in little endian used by sparseIndex[] to point into blockLength[]
+struct SparseEntry {
+    char block[4];   // Number of block
+    char offset[2];  // Offset within the block
 };
 
-inline WDLScore operator-(WDLScore d) { return WDLScore(-int(d)); }
-
-enum TBType {WDL, DTZ}; // Used as template parameter
-
-using Sym = uint16_t;
-
-#endif
+static_assert(sizeof(SparseEntry) == 6, "SparseEntry must be 6 bytes");

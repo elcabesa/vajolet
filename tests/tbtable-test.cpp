@@ -3,7 +3,7 @@
 
 
 TEST(tbtable, constructor1) {
-	TBTable tbt("KBNvKB");
+	TBTable tbt("KBNvKB.rtbw");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -18,7 +18,7 @@ TEST(tbtable, constructor1) {
 }
 
 TEST(tbtable, constructor2) {
-	TBTable tbt("KBBvKBB");
+	TBTable tbt("KBBvKBB.rtbw");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -33,7 +33,7 @@ TEST(tbtable, constructor2) {
 }
 
 TEST(tbtable, constructor3) {
-	TBTable tbt("KBPPvKPPP");
+	TBTable tbt("KBPPvKPPP.rtbw");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -48,7 +48,7 @@ TEST(tbtable, constructor3) {
 }
 
 TEST(tbtable, constructor4) {
-	TBTable tbt("KBvKPPP");
+	TBTable tbt("KBvKPPP.rtbw");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -63,7 +63,7 @@ TEST(tbtable, constructor4) {
 }
 
 TEST(tbtable, constructor5) {
-	TBTable tbt("KBPPvKB");
+	TBTable tbt("KBPPvKB.rtbz");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -78,10 +78,9 @@ TEST(tbtable, constructor5) {
 }
 
 TEST(tbtable, copyConstructor) {
-	TBTable t("KBPPvKB");
+	TBTable t("KBPPvKB.rtbz");
 	TBTable tbt(t);
-	
-	
+
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
 	ASSERT_NE(tbt.getKey(), tbt.getKey2());
@@ -92,4 +91,24 @@ TEST(tbtable, copyConstructor) {
 	ASSERT_EQ(tbt.getPawnCount(1), 0 );
 	ASSERT_TRUE(tbt.hasPawns());
 	ASSERT_TRUE(tbt.hasUniquePieces());
+}
+
+TEST(tbtable, map) {
+	TBTable tbt("KNNvKB.rtbw");
+}
+
+TEST(tbtable, map2) {
+	TBTable tbt("KNNvKB.rtbz");
+}
+
+TEST(tbtable, getType) {
+	ASSERT_EQ(TBTable("KBPPvKB.rtbz").getType(), DTZ);
+	ASSERT_EQ(TBTable("KBPvK.rtbz").getType(), DTZ);
+	ASSERT_EQ(TBTable("KBPPvKB.rtbw").getType(), WDL);
+}
+
+TEST(tbtable, getEndGame) {
+	ASSERT_EQ(TBTable("KBPPvKB.rtbz").getEndGame(), "KBPPvKB");
+	ASSERT_EQ(TBTable("KBPvK.rtbz").getEndGame(), "KBPvK");
+	ASSERT_EQ(TBTable("KBPPvKB.rtbw").getEndGame(), "KBPPvKB");
 }
