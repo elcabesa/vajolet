@@ -22,7 +22,7 @@
 #include <vector>
 #include <array>
 
-#include "bitboardIndex.h"
+#include "bitBoardIndex.h"
 #include "LR.h"
 #include "sparseEntry.h"
 #include "tbtypes.h"
