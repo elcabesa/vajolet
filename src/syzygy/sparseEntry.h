@@ -16,10 +16,24 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <array>
+
 // Numbers in little endian used by sparseIndex[] to point into blockLength[]
-struct SparseEntry {
-    char block[4];   // Number of block
-    char offset[2];  // Offset within the block
+class SparseEntry {
+private:
+	char _block[4];		// Number of block
+	char _offset[2];	// Offset within the block
+public:
+	uint64_t getBlock() { return __builtin_bswap64(*reinterpret_cast<uint64_t *>(_block)); }
+	uint32_t getOffset() { return __builtin_bswap32(*reinterpret_cast<uint32_t *>(_block)); }
+	
+	SparseEntry() = delete;
+	~SparseEntry() = delete;
+	SparseEntry(const SparseEntry& other) = delete;
+	SparseEntry(SparseEntry&& other) noexcept = delete;
+	SparseEntry& operator=(const SparseEntry& other) = delete;
+	SparseEntry& operator=(SparseEntry&& other) noexcept = delete;
+
 };
 
 static_assert(sizeof(SparseEntry) == 6, "SparseEntry must be 6 bytes");
