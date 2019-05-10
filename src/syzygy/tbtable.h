@@ -49,9 +49,7 @@ private:
 	std::once_flag _mappedFlag;
 	void _mapFile();
 public:
-//explicit TBTable(const std::string& code);
 	explicit TBTable(const std::string& code);
-//xplicit TBTable(const TBTable<WDL>& wdl);
 	explicit TBTable(const TBTable& other);
 
 	// todo readd?

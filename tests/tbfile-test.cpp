@@ -179,7 +179,28 @@ TEST(tbfile, addressof) {
 	ASSERT_TRUE(TBFile::exist("open.txt"));
 
 	TBFile f("open.txt");
-	uint8_t * data = &f;
+	const uint8_t * data = &f;
+	
+	ASSERT_TRUE(f.isValid());
+	
+	EXPECT_EQ(*data,'c');
+	EXPECT_EQ(*(++data),'i');
+	EXPECT_EQ(*(++data),'a');
+	EXPECT_EQ(*(++data),'o');
+	EXPECT_EQ(*(++data),'M');
+	EXPECT_EQ(*(++data),'o');
+	EXPECT_EQ(*(++data),'n');
+	EXPECT_EQ(*(++data),'d');
+	EXPECT_EQ(*(++data),'o');
+}
+
+TEST(tbfile, constAddressof) {
+	
+	TBFile::setPaths("data");
+	ASSERT_TRUE(TBFile::exist("open.txt"));
+
+	const TBFile f("open.txt");
+	const uint8_t * data = &f;
 	
 	ASSERT_TRUE(f.isValid());
 	

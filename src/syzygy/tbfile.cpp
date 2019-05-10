@@ -63,10 +63,10 @@ bool TBFile::isValid() const {
 	return _baseAddress != nullptr;
 }
 
-uint8_t& TBFile::operator[](std::size_t idx) { return _baseAddress[idx]; }
 const uint8_t& TBFile::operator[](std::size_t idx) const { return _baseAddress[idx]; }
+const uint8_t& TBFile::operator[](std::size_t idx) { return _baseAddress[idx]; }
 const uint8_t* TBFile::operator&() const volatile { return _baseAddress;}
-uint8_t* TBFile::operator&() volatile { return _baseAddress;}
+const uint8_t* TBFile::operator&() volatile { return _baseAddress;}
 
 void TBFile::setPaths(std::string path) { _paths = path; }
 bool TBFile::exist(const std::string& f) { return _getFileName(f) != ""; }
