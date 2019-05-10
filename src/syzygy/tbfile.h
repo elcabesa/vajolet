@@ -58,6 +58,8 @@ public:
 	
 	uint8_t& operator[](std::size_t idx);
 	const uint8_t& operator[](std::size_t idx) const;
+	const uint8_t* operator&() const volatile;
+	uint8_t* operator&() volatile;
 	bool isValid() const;
 	uint64_t size() const { return _size; };
 	
