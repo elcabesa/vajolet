@@ -82,6 +82,17 @@ void TBTable::mapFile() {
 void TBTable::_mapFile() {
 	_file = TBFile(_getCompleteFileName());
 	TBValidater::validate(_file, getType(), _getCompleteFileName());
+	
+	const int splitBit = 1;
+	const int HasPawnsBit = 2;
+	
+	const uint8_t* data = &_file +4;
+
+    assert(_hasPawns == !!(*data & HasPawnsBit));
+    assert((_key != _key2) == !!(*data & splitBit));
+	
+	++data;	 // First byte stores flags
+	
 }
 
 std::string TBTable::_getCompleteFileName() const {
