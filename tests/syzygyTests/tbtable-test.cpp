@@ -95,16 +95,18 @@ TEST(tbtable, copyConstructor) {
 	ASSERT_TRUE(tbt.hasUniquePieces());
 }
 
-/*
+
 TEST(tbtable, map) {
 	TBTableWDL tbt("KNNvKB");
+	tbt.mapFile();
 }
 
 TEST(tbtable, map2) {
 	TBTableWDL t("KNNvKB");
 	TBTableDTZ tbt(t);
+	tbt.mapFile();
 }
-*/
+
 TEST(tbtable, getType) {
 	
 	TBTableWDL t("KBPPvKB");
