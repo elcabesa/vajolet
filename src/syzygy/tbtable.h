@@ -36,7 +36,7 @@
 // first access, when the corresponding file is memory mapped.
 class TBTable {
 private:
-	std::string _fileName;
+	std::string _endgame;
 	TBFile _file;
 	HashKey _key;
 	HashKey _key2;
@@ -47,9 +47,11 @@ private:
 	
 	std::once_flag _mappedFlag;
 	void _mapFile();
+	std::string _getCompleteFileName() const;
 protected:
-	explicit TBTable(const std::string& code);
-	explicit TBTable(const TBTable& other);
+	const std::string _extension;
+	explicit TBTable(const std::string& code, std::string ext);
+	explicit TBTable(const TBTable& other, std::string ext);
 	virtual ~TBTable() {}
     TBTable(TBTable&& other) noexcept =  delete;
     TBTable& operator=(const TBTable& other) =  delete;

@@ -27,8 +27,8 @@
 #include "tbtable.h"
 #include "tbvalidater.h"
 
-TBTable::TBTable(const std::string& code) {
-	_fileName = code;
+TBTable::TBTable(const std::string& code, std::string ext): _extension(ext) {
+	_endgame = code;
 	Position pos;
 	
 	_key = pos.setup(getEndGame(), white).getMaterialKey();
@@ -58,10 +58,10 @@ TBTable::TBTable(const std::string& code) {
 	_key2 = pos.setup(getEndGame(), black).getMaterialKey();
 }
 
-TBTable::TBTable(const TBTable& other) {
+TBTable::TBTable(const TBTable& other, std::string ext): _extension(ext) {
 	// Use the corresponding WDL table to avoid recalculating all from scratch
 	// todo remember to change file name extension
-	_fileName = other._fileName;
+	_endgame = other._endgame;
 	_key = other._key;
 	_key2 = other._key2;
 	_pieceCount = other._pieceCount;
@@ -72,11 +72,7 @@ TBTable::TBTable(const TBTable& other) {
 }
 
 std::string TBTable::getEndGame() const{
-	std::size_t dot = _fileName.rfind('.');
-	if (dot != std::string::npos) {
-		return _fileName.substr(0, dot);
-	}
-	return std::string("");
+	return _endgame;
 }
 
 void TBTable::mapFile() {
@@ -84,6 +80,11 @@ void TBTable::mapFile() {
 }
 
 void TBTable::_mapFile() {
-	_file = TBFile(_fileName);
-	TBValidater::validate(_file, getType(), _fileName);
+	_file = TBFile(_getCompleteFileName());
+	TBValidater::validate(_file, getType(), _getCompleteFileName());
+}
+
+std::string TBTable::_getCompleteFileName() const {
+	return _endgame + "." +  _extension;
+	
 }
