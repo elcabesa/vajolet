@@ -5,7 +5,7 @@
 
 
 TEST(tbtable, constructor1) {
-	TBTableWDL tbt("KBNvKB.rtbw");
+	TBTableWDL tbt("KBNvKB");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -20,7 +20,7 @@ TEST(tbtable, constructor1) {
 }
 
 TEST(tbtable, constructor2) {
-	TBTableWDL tbt("KBBvKBB.rtbw");
+	TBTableWDL tbt("KBBvKBB");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -35,7 +35,7 @@ TEST(tbtable, constructor2) {
 }
 
 TEST(tbtable, constructor3) {
-	TBTableWDL tbt("KBPPvKPPP.rtbw");
+	TBTableWDL tbt("KBPPvKPPP");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -50,7 +50,7 @@ TEST(tbtable, constructor3) {
 }
 
 TEST(tbtable, constructor4) {
-	TBTableWDL tbt("KBvKPPP.rtbw");
+	TBTableWDL tbt("KBvKPPP");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -65,7 +65,7 @@ TEST(tbtable, constructor4) {
 }
 
 TEST(tbtable, constructor5) {
-	TBTableWDL tbt("KBPPvKB.rtbw");
+	TBTableWDL tbt("KBPPvKB");
 	
 	ASSERT_NE(tbt.getKey(), HashKey(0));
 	ASSERT_NE(tbt.getKey2(), HashKey(0));
@@ -80,7 +80,7 @@ TEST(tbtable, constructor5) {
 }
 
 TEST(tbtable, copyConstructor) {
-	TBTableWDL t("KBPPvKB.rtbw");
+	TBTableWDL t("KBPPvKB");
 	TBTableDTZ tbt(t);
 
 	ASSERT_NE(tbt.getKey(), HashKey(0));
@@ -97,17 +97,17 @@ TEST(tbtable, copyConstructor) {
 
 /*
 TEST(tbtable, map) {
-	TBTableWDL tbt("KNNvKB.rtbw");
+	TBTableWDL tbt("KNNvKB");
 }
 
 TEST(tbtable, map2) {
-	TBTableWDL t("KNNvKB.rtbz");
+	TBTableWDL t("KNNvKB");
 	TBTableDTZ tbt(t);
 }
 */
 TEST(tbtable, getType) {
 	
-	TBTableWDL t("KBPPvKB.rtbw");
+	TBTableWDL t("KBPPvKB");
 	TBTableDTZ t2(t);
 	
 	ASSERT_EQ(t2.getType(), DTZ);
@@ -116,7 +116,7 @@ TEST(tbtable, getType) {
 
 
 TEST(tbtable, getEndGame) {
-	ASSERT_EQ(TBTableWDL("KBPPvKB.rtbw").getEndGame(), "KBPPvKB");
-	ASSERT_EQ(TBTableWDL("KBPvK.rtb").getEndGame(), "KBPvK");
-	ASSERT_EQ(TBTableWDL("KBPPvKB.rtbw").getEndGame(), "KBPPvKB");
+	ASSERT_EQ(TBTableWDL("KBPPvKB").getEndGame(), "KBPPvKB");
+	ASSERT_EQ(TBTableWDL("KBPvK").getEndGame(), "KBPvK");
+	ASSERT_EQ(TBTableWDL("KBPPvKB").getEndGame(), "KBPPvKB");
 }
