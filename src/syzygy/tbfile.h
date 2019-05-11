@@ -48,10 +48,9 @@ private:
 	uint64_t _size;
 	static std::string _paths;
 	
-	static std::string _getFileName(const std::string& f);
 	
+	static std::string _getFileName(const std::string& f);
 	void _unmap();
-
 public:
 	static void setPaths(std::string path);
 	static bool exist(const std::string& f);

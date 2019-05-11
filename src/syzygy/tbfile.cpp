@@ -156,6 +156,7 @@ TBFile& TBFile::operator=(TBFile&& other) noexcept {
 	
 	std::swap(_baseAddress, other._baseAddress);
 	std::exchange(_mapping, other._mapping);
+	std::exchange(_size, other._size);
 	return *this;
 }
 

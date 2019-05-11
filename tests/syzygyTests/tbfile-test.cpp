@@ -162,6 +162,8 @@ TEST(tbfile, moveAssignment) {
 	EXPECT_EQ(f[7],'d');
 	EXPECT_EQ(f[8],'o');
 	
+	ASSERT_EQ(f.size(), 9);
+	
 	f = TBFile("open2.txt");
 	
 	EXPECT_EQ(f[0],'p');
@@ -169,6 +171,8 @@ TEST(tbfile, moveAssignment) {
 	EXPECT_EQ(f[2],'p');
 	EXPECT_EQ(f[3],'p');
 	EXPECT_EQ(f[4],'o');
+	
+	ASSERT_EQ(f.size(), 5);
 	
 
 }

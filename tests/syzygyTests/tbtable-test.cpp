@@ -97,11 +97,13 @@ TEST(tbtable, copyConstructor) {
 
 
 TEST(tbtable, map) {
+	TBFile::setPaths("data");
 	TBTableWDL tbt("KNNvKB");
 	tbt.mapFile();
 }
 
 TEST(tbtable, map2) {
+	TBFile::setPaths("data");
 	TBTableWDL t("KNNvKB");
 	TBTableDTZ tbt(t);
 	tbt.mapFile();
