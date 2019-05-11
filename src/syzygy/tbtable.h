@@ -73,8 +73,8 @@ public:
 	bool hasPawns() const { return _hasPawns; };
 	bool hasUniquePieces() const { return _hasUniquePieces; };
 	void mapFile();
-	TBType getType();
-	std::string getEndGame();
+	virtual TBType getType() const = 0;
+	std::string getEndGame() const;
 	
 	
 };

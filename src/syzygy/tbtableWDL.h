@@ -27,6 +27,7 @@ class TBTableWDL: public TBTable {
 
 public:
 	explicit TBTableWDL(const std::string& code);
+	TBType getType() const;
 };
 
 #endif

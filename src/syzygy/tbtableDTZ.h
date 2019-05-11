@@ -29,6 +29,7 @@ class TBTableDTZ: public TBTable {
 
 public:
 	explicit TBTableDTZ(const TBTableWDL& other);
+	TBType getType() const;
 };
 
 #endif

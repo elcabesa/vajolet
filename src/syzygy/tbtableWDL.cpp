@@ -26,3 +26,8 @@
 
 TBTableWDL::TBTableWDL(const std::string& code): TBTable(code) {
 }
+
+
+TBType TBTableWDL::getType() const{
+	return WDL;
+}

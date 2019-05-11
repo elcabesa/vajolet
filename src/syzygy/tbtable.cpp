@@ -71,19 +71,7 @@ TBTable::TBTable(const TBTable& other) {
 	_pawnCount[1] = other._pawnCount[1];
 }
 
-TBType TBTable::getType() {
-	// todo change it to use template type
-
-	std::size_t dot = _fileName.rfind('.');
-	if (dot != std::string::npos) {
-		std::string extension = _fileName.substr(dot + 1);
-		if( extension == "rtbw" ) { return WDL; }
-		if( extension == "rtbz" ) { return DTZ; }
-	}
-	return WDL;
-}
-
-std::string TBTable::getEndGame() {
+std::string TBTable::getEndGame() const{
 	std::size_t dot = _fileName.rfind('.');
 	if (dot != std::string::npos) {
 		return _fileName.substr(0, dot);

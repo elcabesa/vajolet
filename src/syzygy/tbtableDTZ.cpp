@@ -26,3 +26,7 @@
 
 TBTableDTZ:: TBTableDTZ(const TBTableWDL& other): TBTable(reinterpret_cast<const TBTable&>(other)) {
 }
+
+TBType TBTableDTZ::getType() const{
+	return DTZ;
+}

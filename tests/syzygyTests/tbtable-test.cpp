@@ -104,13 +104,17 @@ TEST(tbtable, map2) {
 	TBTableWDL t("KNNvKB.rtbz");
 	TBTableDTZ tbt(t);
 }
+*/
 TEST(tbtable, getType) {
-	ASSERT_EQ(TBTable("KBPPvKB.rtbz").getType(), DTZ);
-	ASSERT_EQ(TBTable("KBPvK.rtbz").getType(), DTZ);
-	ASSERT_EQ(TBTable("KBPPvKB.rtbw").getType(), WDL);
+	
+	TBTableWDL t("KBPPvKB.rtbw");
+	TBTableDTZ t2(t);
+	
+	ASSERT_EQ(t2.getType(), DTZ);
+	ASSERT_EQ(t.getType(), WDL);
 }
 
-*/
+
 TEST(tbtable, getEndGame) {
 	ASSERT_EQ(TBTableWDL("KBPPvKB.rtbw").getEndGame(), "KBPPvKB");
 	ASSERT_EQ(TBTableWDL("KBPvK.rtb").getEndGame(), "KBPvK");
