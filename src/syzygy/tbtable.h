@@ -19,7 +19,9 @@
 #ifndef TBTABLE_H
 #define TBTABLE_H
 
+#include <cassert>
 #include <mutex>          // std::call_once, std::once_flag
+#include <string>
 
 #include "hashKey.h"
 #include "tbpairs.h"
@@ -32,9 +34,6 @@
 // There are 2 types of TBTable, corresponding to a WDL or a DTZ file. TBTable
 // is populated at init time but the nested PairsData records are populated at
 // first access, when the corresponding file is memory mapped.
-
-// todo readd template
-/*template<TBType Type>*/
 class TBTable {
 private:
 	std::string _fileName;
@@ -48,9 +47,15 @@ private:
 	
 	std::once_flag _mappedFlag;
 	void _mapFile();
-public:
+protected:
 	explicit TBTable(const std::string& code);
 	explicit TBTable(const TBTable& other);
+	virtual ~TBTable() {}
+    TBTable(TBTable&& other) noexcept =  delete;
+    TBTable& operator=(const TBTable& other) =  delete;
+    TBTable& operator=(TBTable&& other) noexcept =  delete;
+public:
+	
 
 	// todo readd?
 	//typedef typename std::conditional<Type == WDL, WDLScore, int>::type Ret;
