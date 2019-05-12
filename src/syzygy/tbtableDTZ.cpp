@@ -24,7 +24,7 @@
 #include "tbtableWDL.h"
 
 
-TBTableDTZ:: TBTableDTZ(const TBTableWDL& other): TBTable(reinterpret_cast<const TBTable&>(other), "rtbz") {
+TBTableDTZ:: TBTableDTZ(const TBTableWDL& other): TBTable(reinterpret_cast<const TBTable&>(other), "rtbz", 1) {
 }
 
 TBType TBTableDTZ::getType() const{

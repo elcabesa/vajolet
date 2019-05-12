@@ -27,7 +27,7 @@
 #include "tbtable.h"
 #include "tbvalidater.h"
 
-TBTable::TBTable(const std::string& code, std::string ext): _extension(ext) {
+TBTable::TBTable(const std::string& code, std::string ext, unsigned int sides): _sides(sides), _extension(ext) {
 	_endgame = code;
 	Position pos;
 	
@@ -58,9 +58,8 @@ TBTable::TBTable(const std::string& code, std::string ext): _extension(ext) {
 	_key2 = pos.setup(getEndGame(), black).getMaterialKey();
 }
 
-TBTable::TBTable(const TBTable& other, std::string ext): _extension(ext) {
+TBTable::TBTable(const TBTable& other, std::string ext, unsigned int sides): _sides(sides), _extension(ext) {
 	// Use the corresponding WDL table to avoid recalculating all from scratch
-	// todo remember to change file name extension
 	_endgame = other._endgame;
 	_key = other._key;
 	_key2 = other._key2;
@@ -83,19 +82,56 @@ void TBTable::_mapFile() {
 	_file = TBFile(_getCompleteFileName());
 	TBValidater::validate(_file, getType(), _getCompleteFileName());
 	
+	// Populate entry's PairsData records with data from the just memory mapped file.
+	// Called at first access.
+	
 	const int splitBit = 1;
 	const int HasPawnsBit = 2;
 	
 	const uint8_t* data = &_file +4;
-
-    assert(_hasPawns == !!(*data & HasPawnsBit));
-    assert((_key != _key2) == !!(*data & splitBit));
+	
+	assert(_hasPawns == !!(*data & HasPawnsBit));
+	assert((_key != _key2) == !!(*data & splitBit));
 	
 	++data;	 // First byte stores flags
 	
+	const int sides = ((_sides == 2) && (_key != _key2)) ? 2 : 1;
+    const tFile maxFile = _hasPawns ? FILED : FILEA;
+
+	// todo rename in a more significant name e.g. pawnsOnBothSides
+    const bool pp = _hasPawns && _pawnCount[1]; // Pawns on both sides
+
+    assert(!pp || _pawnCount[0]);
+	
+	for (tFile f = FILEA; f <= maxFile; ++f) {
+
+		/*
+		todo a cosa serve? se lo tolgo cambi qualcosa? altrimenti pairdata è non inizializzato?
+        for (unsigned int i = 0; i < _sides; ++i) {
+			
+            *_getPairsData(i, f) = PairsData();
+		}*/
+
+        int order[][2] = { { *data & 0xF, pp ? *(data + 1) & 0xF : 0xF },
+                           { *data >>  4, pp ? *(data + 1) >>  4 : 0xF } };
+        data += 1 + pp;
+
+        for (unsigned int k = 0; k < _pieceCount; ++k, ++data) {
+            for (unsigned int i = 0; i < _sides; ++i) {
+                _getPairsData(i, f)->setPiece(k, (i > 0 ? *data >>  4 : *data & 0xF));
+			}
+		}
+/*
+        for (int i = 0; i < sides; ++i)
+            set_groups(e, e.get(i, f), order[i], f);*/
+    }
 }
 
 std::string TBTable::_getCompleteFileName() const {
 	return _endgame + "." +  _extension;
 	
+}
+
+PairsData* TBTable::_getPairsData(const unsigned int stm, const tFile f) {
+	return &_items[stm % _sides][_hasPawns ? f : 0];
 }

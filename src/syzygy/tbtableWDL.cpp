@@ -24,7 +24,7 @@
 #include "tbtableWDL.h"
 
 
-TBTableWDL::TBTableWDL(const std::string& code): TBTable(code, "rtbw") {
+TBTableWDL::TBTableWDL(const std::string& code): TBTable(code, "rtbw", 2) {
 }
 
 

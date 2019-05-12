@@ -1,4 +1,6 @@
 #include "gtest/gtest.h"
+
+#include "tSquare.h"
 #include "syzygy/tbtable.h"
 #include "syzygy/tbtableWDL.h"
 #include "syzygy/tbtableDTZ.h"
@@ -100,6 +102,21 @@ TEST(tbtable, map) {
 	TBFile::setPaths("data");
 	TBTableWDL tbt("KNNvKB");
 	tbt.mapFile();
+	
+	auto pd = tbt._getPairsData(0, FILEA);
+	ASSERT_EQ(pd->getPiece(0), whiteKing);
+	ASSERT_EQ(pd->getPiece(1), blackKing);
+	ASSERT_EQ(pd->getPiece(2), blackBishops);
+	ASSERT_EQ(pd->getPiece(3), whiteKnights);
+	ASSERT_EQ(pd->getPiece(4), whiteKnights);
+	
+	pd = tbt._getPairsData(1, FILEA);
+	ASSERT_EQ(pd->getPiece(0), whiteKing);
+	ASSERT_EQ(pd->getPiece(1), blackKing);
+	ASSERT_EQ(pd->getPiece(2), blackBishops);
+	ASSERT_EQ(pd->getPiece(3), whiteKnights);
+	ASSERT_EQ(pd->getPiece(4), whiteKnights);
+
 }
 
 TEST(tbtable, map2) {
@@ -107,6 +124,13 @@ TEST(tbtable, map2) {
 	TBTableWDL t("KNNvKB");
 	TBTableDTZ tbt(t);
 	tbt.mapFile();
+	
+	auto pd = tbt._getPairsData(0, FILEA);
+	ASSERT_EQ(pd->getPiece(0), whiteKing);
+	ASSERT_EQ(pd->getPiece(1), blackKing);
+	ASSERT_EQ(pd->getPiece(2), blackBishops);
+	ASSERT_EQ(pd->getPiece(3), whiteKnights);
+	ASSERT_EQ(pd->getPiece(4), whiteKnights);
 }
 
 TEST(tbtable, getType) {

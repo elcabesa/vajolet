@@ -25,8 +25,10 @@
 
 #include "hashKey.h"
 #include "tbpairs.h"
+#include "tbpairs.h"
 #include "tbtypes.h"
 #include "tbfile.h"
+#include "tSquare.h"
 
 
 
@@ -44,29 +46,31 @@ private:
 	unsigned int _pawnCount[2]; // [Lead color / other color]
 	bool _hasPawns;
 	bool _hasUniquePieces;
+	const unsigned int _sides;
+	PairsData _items[2][4]; // [wtm / btm][FILE_A..FILE_D or 0]
 	
 	std::once_flag _mappedFlag;
 	void _mapFile();
 	std::string _getCompleteFileName() const;
+public:
+	PairsData* _getPairsData(const unsigned int stm, const tFile f);
+	
+	
 protected:
 	const std::string _extension;
-	explicit TBTable(const std::string& code, std::string ext);
-	explicit TBTable(const TBTable& other, std::string ext);
+	explicit TBTable(const std::string& code, std::string ext, unsigned int sides);
+	explicit TBTable(const TBTable& other, std::string ext, unsigned int sides);
 	virtual ~TBTable() {}
     TBTable(TBTable&& other) noexcept =  delete;
     TBTable& operator=(const TBTable& other) =  delete;
     TBTable& operator=(TBTable&& other) noexcept =  delete;
 public:
 	
-
 	// todo readd?
 	//typedef typename std::conditional<Type == WDL, WDLScore, int>::type Ret;
-	//static constexpr int Sides = Type == WDL ? 2 : 1;
+	
 	//uint8_t* map;
-	//PairsData items[Sides][4]; // [wtm / btm][FILE_A..FILE_D or 0]
-	/*PairsData* get(int stm, int f) {
-		return &items[stm % Sides][hasPawns ? f : 0];
-	*/
+	
 
 	const HashKey& getKey() const { return _key; };
 	const HashKey& getKey2() const { return _key2; };
