@@ -99,7 +99,7 @@ void TBTable::_mapFile() {
     const tFile maxFile = _hasPawns ? FILED : FILEA;
 
 	// todo rename in a more significant name e.g. pawnsOnBothSides
-    const bool pp = _hasPawns && _pawnCount[1]; // Pawns on both sides
+    const bool pp = hasPawnOnBothSides(); // Pawns on both sides
 
     assert(!pp || _pawnCount[0]);
 	
@@ -134,4 +134,8 @@ std::string TBTable::_getCompleteFileName() const {
 
 PairsData* TBTable::_getPairsData(const unsigned int stm, const tFile f) {
 	return &_items[stm % _sides][_hasPawns ? f : 0];
+}
+
+bool TBTable::hasPawnOnBothSides() const {
+	return _hasPawns && _pawnCount[1];
 }

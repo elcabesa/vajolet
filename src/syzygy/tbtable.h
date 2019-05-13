@@ -81,6 +81,7 @@ public:
 	void mapFile();
 	virtual TBType getType() const = 0;
 	std::string getEndGame() const;
+	bool hasPawnOnBothSides() const;
 	
 	
 };

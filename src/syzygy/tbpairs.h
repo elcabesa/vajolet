@@ -23,15 +23,20 @@
 #include <array>
 
 #include "bitBoardIndex.h"
+#include "tSquare.h"
 #include "LR.h"
 #include "sparseEntry.h"
 #include "tbtypes.h"
+
+class TBTable;
 
 // struct PairsData contains low level indexing information to access TB data.
 // There are 8, 4 or 2 PairsData records for each TBTable, according to type of
 // table and if positions have pawns or not. It is populated at first access.
 class PairsData {
 private:
+
+	static int _LeadPawnsSize[6][4];// [leadPawnsCnt][FILE_A..FILE_D]
 
     uint8_t _flags;                 // Table flags, see enum TBFlag
     uint8_t _maxSymLen;             // Maximum length in bits of the Huffman symbols
@@ -55,8 +60,12 @@ private:
     std::array<uint16_t, 4> _map_idx;           // WDLWin, WDLLoss, WDLCursedWin, WDLBlessedLoss (used in DTZ)
 	
 	static bitboardIndex _tbPieceConvert(uint8_t rawData);
+	
+	void _setGroups(const TBTable& tbt, const int order[], const tFile f);
 
 public:
+	static void initData();
+	
 	PairsData() {}
     ~PairsData(){}
     PairsData(const PairsData& other) = delete;
