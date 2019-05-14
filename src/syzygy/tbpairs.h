@@ -64,7 +64,6 @@ private:
 	void _setGroups(const TBTable& tbt, const int order[], const tFile f);
 
 public:
-	static void initData();
 	
 	PairsData() {}
     ~PairsData(){}
