@@ -30,7 +30,7 @@
 #include "eval.h"
 #include "parameters.h"
 #include "uciParameters.h"
-#include "syzygy/tbprobe.h"
+#include "syzygy2/tbprobe.h"
 #include "eval.h"
 
 #include <fstream>

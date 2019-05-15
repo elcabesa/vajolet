@@ -1,5 +1,5 @@
 target_sources(libChess PRIVATE 
-	${CMAKE_CURRENT_SOURCE_DIR}/tbprobe.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/tbCommonData.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/tbfile.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/tbpairs.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/tbtable.cpp 

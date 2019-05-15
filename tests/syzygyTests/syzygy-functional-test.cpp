@@ -7,7 +7,7 @@
 #include "gtest/gtest.h"
 
 #include "position.h"
-#include "syzygy/tbprobe.h"
+#include "syzygy2/tbprobe.h"
 
 void syzygyTest()
 {

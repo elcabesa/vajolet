@@ -16,6 +16,9 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#ifndef TBLR_H
+#define TBLR_H
+
 #include "tbtypes.h"
 
 class LR {
@@ -37,4 +40,4 @@ public:
 
 static_assert(sizeof(LR) == 3, "LR tree entry must be 3 bytes");
 
-
+#endif

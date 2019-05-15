@@ -36,7 +36,7 @@
 #include "thread.h"
 #include "uciParameters.h"
 #include "searchResult.h"
-#include "syzygy/tbprobe.h"
+#include "syzygy2/tbprobe.h"
 #include "transposition.h"
 #include "vajolet.h"
 

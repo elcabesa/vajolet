@@ -19,6 +19,7 @@
 #ifndef MOVEGEN_H_
 #define MOVEGEN_H_
 
+#include "bitops.h"
 #include "magicmoves.h"
 #include "MoveList.h"
 

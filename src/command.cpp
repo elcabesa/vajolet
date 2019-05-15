@@ -32,7 +32,7 @@
 #include "rootMove.h"
 #include "searchTimer.h"
 #include "searchLimits.h"
-#include "syzygy/tbprobe.h"
+#include "syzygy2/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"

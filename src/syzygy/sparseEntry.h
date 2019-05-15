@@ -16,6 +16,9 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#ifndef TBSPARSE_ENTRY_H
+#define TBSPARSE_ENTRY_H
+
 #include <array>
 
 // Numbers in little endian used by sparseIndex[] to point into blockLength[]
@@ -37,3 +40,5 @@ public:
 };
 
 static_assert(sizeof(SparseEntry) == 6, "SparseEntry must be 6 bytes");
+
+#endif

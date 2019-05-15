@@ -1,4 +1,3 @@
-
 add_library(libChess 
 	benchmark.cpp
 	bitops.cpp 
@@ -27,6 +26,7 @@ add_library(libChess
 	uciParameters.cpp
 	vajo_io.cpp)
 add_subdirectory(syzygy)
+add_subdirectory(syzygy2)
 
 add_executable(tuner tuner.cpp )
 target_link_libraries (tuner libChess)
