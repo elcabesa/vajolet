@@ -19,7 +19,7 @@
 #ifndef TBCOMMON_DATA_H
 #define TBCOMMON_DATA_H
 
-#include "tsquare.h"
+#include "tSquare.h"
 
 class TBCommonData {
 private:
