@@ -21,6 +21,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <iostream>
+
 #include <cassert>
 #include <vector>
 
@@ -113,11 +115,11 @@ void TBCommonData::_initBinomial() {
 	// are Binomial[k][n] ways to choose k elements from a set of n elements.
 	_Binomial[0][0] = 1;
 
-	for (int n = 1; n < squareNumber; ++n) { // Squares
-			for (int k = 0; k < 6 && k <= n; ++k) {// Pieces
-				_Binomial[k][n] = (k > 0 ? _Binomial[k - 1][n - 1] : 0)
-												+ (k < n ? _Binomial[k    ][n - 1] : 0);
-			}
+	for (tSquare n = B1; n < squareNumber; ++n) { // Squares
+		for (int k = 0; k < 6 && k <= n; ++k) {// Pieces
+			_Binomial[k][n] = (k > 0 ? _Binomial[k - 1][n - 1] : 0)
+		                    + (k < n ? _Binomial[k    ][n - 1] : 0);
+		}
 	}
 }
 

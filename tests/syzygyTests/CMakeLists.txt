@@ -3,6 +3,7 @@
 target_sources(Vajolet_unit_test PRIVATE 
 	${CMAKE_CURRENT_SOURCE_DIR}/LR-test.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/sparseEntry-test.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/tbCommonData-test.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/tbfile-test.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/tbpairs-test.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/tbtable-test.cpp
