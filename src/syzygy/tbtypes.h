@@ -19,6 +19,8 @@
 #ifndef TBTYPES_H
 #define TBTYPES_H
 
+#include <cstdint>
+
 constexpr int TBPIECES = 7; // Max number of supported pieces
 
 enum WDLScore {

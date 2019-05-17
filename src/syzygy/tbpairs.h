@@ -57,6 +57,10 @@ private:
 	
 	static bitboardIndex _tbPieceConvert(uint8_t rawData);
 	
+	static const unsigned int SingleValueFlag = 128;
+	
+	uint8_t _setSymlen(const Sym s, std::vector<bool>& visited);
+	
 	
 
 public:
@@ -71,6 +75,7 @@ public:
 	void setPiece(unsigned int idx, uint8_t rawData);
 	bitboardIndex getPiece(unsigned int idx) const;
 	void setGroups(const TBTable& tbt, const int order[], const tFile f);
+	const uint8_t* setSizes(const uint8_t* data);
 };
 
 #endif

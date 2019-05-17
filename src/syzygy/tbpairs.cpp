@@ -15,7 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#include <algorithm>
 #include <cassert>
+
 #include "tbCommonData.h"
 #include "tbtable.h"
 #include "tbpairs.h"
@@ -114,4 +116,97 @@ void PairsData::setGroups(const TBTable& tbt, const int order[], const tFile f) 
 		}
 
 	_groupIdx[n] = idx;
+}
+
+const uint8_t* PairsData::setSizes(const uint8_t* data) {
+	_flags = *data++;
+
+	if (_flags & SingleValueFlag) {
+		_blocksNum = _blockLengthSize = 0;
+		_span = _sparseIndexSize = 0; // Broken MSVC zero-init
+		_minSymLen = *data++; // Here we store the single value
+		return data;
+	}
+
+	// groupLen[] is a zero-terminated list of group lengths, the last groupIdx[]
+	// element stores the biggest index that is the tb size.
+	uint64_t tbSize = _groupIdx[*std::find(_groupLen.begin(), _groupLen.end(), 0)];
+
+	_sizeofBlock = 1ULL << (*data++);
+	_span = 1ULL << (*data++);
+	_sparseIndexSize = (tbSize + _span - 1) / _span; // Round up
+	auto padding = *data++;
+	_blocksNum = *((uint32_t*)data);
+	data += sizeof(uint32_t);
+	_blockLengthSize = _blocksNum + padding; // Padded to ensure SparseIndex[]
+												 // does not point out of range.
+	_maxSymLen = *data++;
+	_minSymLen = *data++;
+	_lowestSym = (Sym*)data;
+	_base64.resize(_maxSymLen - _minSymLen + 1);
+
+	// The canonical code is ordered such that longer symbols (in terms of
+	// the number of bits of their Huffman code) have lower numeric value,
+	// so that d->lowestSym[i] >= d->lowestSym[i+1] (when read as LittleEndian).
+	// Starting from this we compute a base64[] table indexed by symbol length
+	// and containing 64 bit values so that d->base64[i] >= d->base64[i+1].
+	// See http://www.eecs.harvard.edu/~michaelm/E210/huffman.pdf
+	for (int i = _base64.size() - 2; i >= 0; --i) {
+		_base64[i] = (_base64[i + 1] + *((Sym*)(&_lowestSym[i]))
+										 - *((Sym*)(&_lowestSym[i + 1]))) / 2;
+
+		assert(_base64[i] * 2 >= _base64[i+1]);
+	}
+
+	// Now left-shift by an amount so that d->base64[i] gets shifted 1 bit more
+	// than d->base64[i+1] and given the above assert condition, we ensure that
+	// d->base64[i] >= d->base64[i+1]. Moreover for any symbol s64 of length i
+	// and right-padded to 64 bits holds d->base64[i-1] >= s64 >= d->base64[i].
+	for (size_t i = 0; i < _base64.size(); ++i)
+		_base64[i] <<= 64 - i - _minSymLen; // Right-padding to 64 bits
+
+	data += _base64.size() * sizeof(Sym);
+	
+	_symlen.resize(*((uint16_t*)(data)));
+	data += sizeof(uint16_t);
+	
+	_btree = (LR*)data;
+
+	// The compression scheme used is "Recursive Pairing", that replaces the most
+	// frequent adjacent pair of symbols in the source message by a new symbol,
+	// reevaluating the frequencies of all of the symbol pairs with respect to
+	// the extended alphabet, and then repeating the process.
+	// See http://www.larsson.dogma.net/dcc99.pdf
+	std::vector<bool> visited(_symlen.size());
+
+	for (Sym sym = 0; sym < _symlen.size(); ++sym)
+		if (!visited[sym])
+			_symlen[sym] = _setSymlen(sym, visited);
+
+	return data + _symlen.size() * sizeof(LR) + (_symlen.size() & 1);
+}
+
+
+// In Recursive Pairing each symbol represents a pair of childern symbols. So
+// read d->btree[] symbols data and expand each one in his left and right child
+// symbol until reaching the leafs that represent the symbol value.
+uint8_t PairsData::_setSymlen(const Sym s, std::vector<bool>& visited) {
+	visited[s] = true; // We can set it now because tree is acyclic
+	Sym sr = _btree[s].getRight();
+
+	if (sr == 0xFFF) {
+		return 0;
+	}
+
+	Sym sl = _btree[s].getLeft();
+
+	if (!visited[sl]) {
+		_symlen[sl] = _setSymlen(sl, visited);
+	}
+
+	if (!visited[sr]) {
+		_symlen[sr] = _setSymlen(sr, visited);
+	}
+
+	return _symlen[sl] + _symlen[sr] + 1;
 }

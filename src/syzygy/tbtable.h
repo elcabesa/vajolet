@@ -53,6 +53,7 @@ private:
 	void _mapFile();
 	std::string _getCompleteFileName() const;
 public:
+	// todo change to reference if *_getPairsData(i, f) = PairsData(); is removed
 	PairsData* _getPairsData(const unsigned int stm, const tFile f);
 	
 	

@@ -88,7 +88,7 @@ void TBTable::_mapFile() {
 	const int splitBit = 1;
 	const int HasPawnsBit = 2;
 	
-	const uint8_t* data = &_file +4;
+	const uint8_t* data = &_file + 4;
 	
 	assert(_hasPawns == !!(*data & HasPawnsBit));
 	assert((_key != _key2) == !!(*data & splitBit));
@@ -125,7 +125,15 @@ void TBTable::_mapFile() {
 		for (int i = 0; i < sides; ++i) {
 			_getPairsData(i, f)->setGroups(*this, order[i], f);
 		}
+		
+		for (tFile f = FILEA; f <= maxFile; ++f) {
+			for (int i = 0; i < sides; i++) {
+				data = _getPairsData(i, f)->setSizes(data);
+			}
+		}
     }
+	
+	data += (uintptr_t)data & 1; // Word alignment
 }
 
 std::string TBTable::_getCompleteFileName() const {
