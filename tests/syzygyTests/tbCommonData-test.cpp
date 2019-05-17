@@ -88,3 +88,20 @@ TEST(tbCommonData, getMapPawns) {
 	EXPECT_EQ(TBCommonData::getMapPawns(F8), 0);
 }
 
+TEST(tbCommonData, getLeadPawnIdx) {
+	EXPECT_EQ(TBCommonData::getLeadPawnIdx(1, A2), 0);
+	EXPECT_NE(TBCommonData::getLeadPawnIdx(1, A3), 0);
+	
+	EXPECT_EQ(TBCommonData::getLeadPawnIdx(0, F3), 0);
+	EXPECT_EQ(TBCommonData::getLeadPawnIdx(1, D8), 0);
+}
+
+TEST(tbCommonData, getLeadPawnsSize) {	
+	EXPECT_NE(TBCommonData::getLeadPawnsSize(1, FILEA), 0);
+	EXPECT_NE(TBCommonData::getLeadPawnsSize(3, FILEC), 0);
+	
+	EXPECT_EQ(TBCommonData::getLeadPawnsSize(0, FILED), 0);
+	EXPECT_EQ(TBCommonData::getLeadPawnsSize(0, FILEC), 0);
+	
+	
+}
