@@ -65,3 +65,26 @@ TEST(tbCommonData, getMapB1H1H7) {
 	EXPECT_EQ(TBCommonData::getMapB1H1H7(B5), 0);
 	EXPECT_EQ(TBCommonData::getMapB1H1H7(E7), 0);
 }
+
+TEST(tbCommonData, getMapKK) {
+	EXPECT_EQ(TBCommonData::getMapKK(B1, D1), 0);
+	EXPECT_EQ(TBCommonData::getMapKK(B1, E1), 1);
+	EXPECT_EQ(TBCommonData::getMapKK(B1, C3), 12);
+	EXPECT_EQ(TBCommonData::getMapKK(C1, E1), 59);
+	
+	EXPECT_EQ(TBCommonData::getMapKK(B2, B2), 0);
+	EXPECT_EQ(TBCommonData::getMapKK(F7, A2), 0);
+	EXPECT_EQ(TBCommonData::getMapKK(B2, D8), 0);
+}
+
+TEST(tbCommonData, getMapPawns) {
+	EXPECT_EQ(TBCommonData::getMapPawns(A2), 47);
+	EXPECT_EQ(TBCommonData::getMapPawns(H2), 46);
+	EXPECT_EQ(TBCommonData::getMapPawns(A3), 45);
+	EXPECT_EQ(TBCommonData::getMapPawns(H3), 44);
+	
+	EXPECT_EQ(TBCommonData::getMapPawns(A1), 0);
+	EXPECT_EQ(TBCommonData::getMapPawns(D1), 0);
+	EXPECT_EQ(TBCommonData::getMapPawns(F8), 0);
+}
+

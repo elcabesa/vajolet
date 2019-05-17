@@ -27,7 +27,7 @@ private:
 	static unsigned int _MapA1D1D4[squareNumber];
 	static unsigned int _MapKK[10][squareNumber]; // [MapA1D1D4][SQUARE_NB]
 	static unsigned int _Binomial[6][squareNumber]; // [k][n] k elements from a set of n elements
-	static tSquare _MapPawns[squareNumber];
+	static unsigned int _MapPawns[squareNumber];
 	static unsigned int _LeadPawnIdx[6][squareNumber]; // [leadPawnsCnt][SQUARE_NB]
 	static unsigned int _LeadPawnsSize[6][4];       // [leadPawnsCnt][FILE_A..FILE_D]
 	
@@ -48,7 +48,7 @@ public:
 	static unsigned int getMapA1D1D4(const tSquare sq);
 	static unsigned int getMapKK(const tSquare sq1, const tSquare sq2);
 	static unsigned int getBinomial(const unsigned int idx, const tSquare sq);
-	static tSquare getMapPawns(const tSquare sq);
+	static unsigned int getMapPawns(const tSquare sq);
 	static unsigned int getLeadPawnIdx(const unsigned int idx, const tSquare sq);
 	static unsigned int getLeadPawnsSize(const unsigned int idx, const tFile file);
 	

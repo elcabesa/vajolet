@@ -34,7 +34,7 @@ unsigned int TBCommonData::_MapB1H1H7[squareNumber] = {0};
 unsigned int TBCommonData::_MapA1D1D4[squareNumber] = {0};
 unsigned int TBCommonData::_MapKK[10][squareNumber] = {0};
 unsigned int TBCommonData::_Binomial[6][squareNumber] = {0};
-tSquare TBCommonData::_MapPawns[squareNumber] = {A1};
+unsigned int  TBCommonData::_MapPawns[squareNumber] = {0};
 unsigned int TBCommonData::_LeadPawnIdx[6][squareNumber] = {0};
 unsigned int TBCommonData::_LeadPawnsSize[6][4] = {0};
 
@@ -128,8 +128,18 @@ void TBCommonData::_initPawnsData() {
 	// available squares when the leading one is in 's'. Moreover the pawn with
 	// highest MapPawns[] is the leading pawn, the one nearest the edge and,
 	// among pawns with same file, the one with lowest rank.
-	tSquare availableSquares = H6; // Available squares when lead pawn is in a2
-
+	int availableSquares = 47; // Available squares when lead pawn is in a2
+	for (tFile f = FILEA; f <= FILED; ++f) {
+		for (tRank r = RANK2; r <= RANK7; ++r) {
+			tSquare sq = getSquare(f, r);
+			// If sq is the leading pawn square, any other pawn cannot be
+			// below or more toward the edge of sq. There are 47 available
+			// squares when sq = a2 and reduced by 2 for any rank increase
+			// due to mirroring: sq == a3 -> no a2, h2, so MapPawns[a3] = 45
+			_MapPawns[sq] = availableSquares--;
+			_MapPawns[sq ^ 7] = availableSquares--; // Horizontal flip
+		}
+	}
 	// Init the tables for the encoding of leading pawns group: with 7-men TB we
 	// can have up to 5 leading pawns (KPPPPPK).
 	for (int leadPawnsCnt = 1; leadPawnsCnt <= 5; ++leadPawnsCnt) {
@@ -142,20 +152,8 @@ void TBCommonData::_initPawnsData() {
 			// the leading pawn on rank 2 and increasing the rank.
 			for (tRank r = RANK2; r <= RANK7; ++r) {
 				tSquare sq = getSquare(f, r);
-
-				// Compute MapPawns[] at first pass.
-				// If sq is the leading pawn square, any other pawn cannot be
-				// below or more toward the edge of sq. There are 47 available
-				// squares when sq = a2 and reduced by 2 for any rank increase
-				// due to mirroring: sq == a3 -> no a2, h2, so MapPawns[a3] = 45
-				if (leadPawnsCnt == 1) {
-						_MapPawns[sq] = availableSquares;
-						--availableSquares;
-						_MapPawns[sq ^ 7] = availableSquares; // Horizontal flip
-						--availableSquares;
-				}
 				_LeadPawnIdx[leadPawnsCnt][sq] = idx;
-				idx += getBinomial(leadPawnsCnt - 1, getMapPawns(sq));
+				idx += getBinomial(leadPawnsCnt - 1, static_cast<tSquare>(getMapPawns(sq)));
 			}
 			// After a file is traversed, store the cumulated per-file index
 			_LeadPawnsSize[leadPawnsCnt][f] = idx;
@@ -186,7 +184,7 @@ unsigned int TBCommonData::getBinomial(const unsigned int idx, const tSquare sq)
 	return _Binomial[idx][sq];
 }
 
-tSquare TBCommonData::getMapPawns(const tSquare sq) {
+unsigned int TBCommonData::getMapPawns(const tSquare sq) {
 	assert(sq < squareNumber);
 	return _MapPawns[sq];
 }
