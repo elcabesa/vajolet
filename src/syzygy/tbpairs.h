@@ -50,7 +50,6 @@ private:
 	uint8_t* _data;                 // Start of Huffman compressed data
 	std::vector<uint64_t> _base64;  // base64[l - min_sym_len] is the 64bit-padded lowest symbol of length l
 	std::vector<uint8_t> _symlen;   // Number of values (-1) represented by a given Huffman symbol: 1..256
-	// todo pay attenction that vajolet piece encoding is different from stockfish one
 	std::array<bitboardIndex, TBPIECES> _pieces;// Position pieces: the order of pieces defines the groups
 	std::array<uint64_t, TBPIECES+1> _groupIdx; // Start index used for the encoding of the group's pieces
 	std::array<int, TBPIECES+1> _groupLen;      // Number of pieces in a given group: KRKN -> (3, 1)
@@ -58,7 +57,7 @@ private:
 	
 	static bitboardIndex _tbPieceConvert(uint8_t rawData);
 	
-	void _setGroups(const TBTable& tbt, const int order[], const tFile f);
+	
 
 public:
 	
@@ -71,6 +70,7 @@ public:
 	
 	void setPiece(unsigned int idx, uint8_t rawData);
 	bitboardIndex getPiece(unsigned int idx) const;
+	void setGroups(const TBTable& tbt, const int order[], const tFile f);
 };
 
 #endif

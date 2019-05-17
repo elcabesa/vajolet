@@ -16,6 +16,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 #include <cassert>
+#include "tbCommonData.h"
 #include "tbtable.h"
 #include "tbpairs.h"
 
@@ -62,7 +63,7 @@ bitboardIndex PairsData::getPiece(unsigned int idx) const {
 //
 // The actual grouping depends on the TB generator and can be inferred from the
 // sequence of pieces in piece[] array.
-void PairsData::_setGroups(const TBTable& tbt, const int order[], const tFile f) {
+void PairsData::setGroups(const TBTable& tbt, const int order[], const tFile f) {
 	int n = 0, firstLen = tbt.hasPawns() ? 0 : tbt.hasUniquePieces() ? 3 : 2;
 	_groupLen[n] = 1;
 
@@ -88,7 +89,7 @@ void PairsData::_setGroups(const TBTable& tbt, const int order[], const tFile f)
 	// pawns/pieces -> remainig pawns -> remaining pieces. In particular the
 	// first group is at order[0] position and the remaining pawns, when present,
 	// are at order[1] position.
-/*	bool pp = tbt.hasPawnOnBothSides(); // Pawns on both sides
+	bool pp = tbt.hasPawnOnBothSides(); // Pawns on both sides
 	int next = pp ? 2 : 1;
 	int freeSquares = 64 - _groupLen[0] - (pp ? _groupLen[1] : 0);
 	uint64_t idx = 1;
@@ -97,20 +98,20 @@ void PairsData::_setGroups(const TBTable& tbt, const int order[], const tFile f)
 		if (k == order[0]) // Leading pawns or pieces
 		{
 			_groupIdx[0] = idx;
-			idx *= tbt.hasPawns() ? _LeadPawnsSize[_groupLen[0]][f]
+			idx *= tbt.hasPawns() ? TBCommonData::getLeadPawnsSize(_groupLen[0], f)
 				  : tbt.hasUniquePieces() ? 31332 : 462;
 		}
 		else if (k == order[1]) // Remaining pawns
 		{
 			_groupIdx[1] = idx;
-			idx *= Binomial[_groupLen[1]][48 - _groupLen[0]];
+			idx *= TBCommonData::getBinomial(_groupLen[1], static_cast<tSquare>(48 - _groupLen[0]));
 		}
 		else // Remainig pieces
 		{
 			_groupIdx[next] = idx;
-			idx *= Binomial[_groupLen[next]][freeSquares];
+			idx *=  TBCommonData::getBinomial(_groupLen[next], static_cast<tSquare>(freeSquares));
 			freeSquares -= _groupLen[next++];
 		}
 
-	_groupIdx[n] = idx;*/
+	_groupIdx[n] = idx;
 }

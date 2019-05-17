@@ -121,9 +121,10 @@ void TBTable::_mapFile() {
                 _getPairsData(i, f)->setPiece(k, (i > 0 ? *data >>  4 : *data & 0xF));
 			}
 		}
-/*
-        for (int i = 0; i < sides; ++i)
-            set_groups(e, e.get(i, f), order[i], f);*/
+
+		for (int i = 0; i < sides; ++i) {
+			_getPairsData(i, f)->setGroups(*this, order[i], f);
+		}
     }
 }
 
