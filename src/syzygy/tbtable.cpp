@@ -144,6 +144,24 @@ void TBTable::_mapFile() {
 		}
 		data += (uintptr_t)data & 1; // Word alignment
 	}
+	
+	for (tFile f = FILEA; f <= maxFile; ++f) {
+        for (int i = 0; i < sides; i++) {
+            data = getPairsData(i, f)->setSparseIndex(data);
+        }
+	}
+
+    for (tFile f = FILEA; f <= maxFile; ++f) {
+        for (int i = 0; i < sides; i++) {
+            data = getPairsData(i, f)->setBlockLength(data);
+        }
+	}
+
+    for (tFile f = FILEA; f <= maxFile; ++f) {
+        for (int i = 0; i < sides; i++) {
+            data = getPairsData(i, f)->setData(data);
+        }
+	}
 
 }
 

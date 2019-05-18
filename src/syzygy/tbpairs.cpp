@@ -267,3 +267,21 @@ const uint8_t* PairsData::setDtzMap(const uint8_t* map, const uint8_t* data) {
 	}
 	return data;
 }
+
+const uint8_t* PairsData::setSparseIndex(const uint8_t* data) {
+	_sparseIndex = (SparseEntry*)data;
+	data += _sparseIndexSize * sizeof(SparseEntry);
+	return data;
+}
+
+const uint8_t* PairsData::setBlockLength(const uint8_t* data) {
+	_blockLength = (uint16_t*)data;
+	data += _blockLengthSize * sizeof(uint16_t);
+	return data;
+}
+const uint8_t* PairsData::setData(const uint8_t* data) {
+	data = (uint8_t*)(((uintptr_t)data + 0x3F) & ~0x3F); // 64 byte alignment
+	_data = data;
+	data += _blocksNum * _sizeofBlock;
+	return data;
+}

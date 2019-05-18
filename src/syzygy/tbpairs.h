@@ -47,7 +47,7 @@ private:
 	uint32_t _blockLengthSize;      // Size of blockLength[] table: padded so it's bigger than blocksNum
 	SparseEntry* _sparseIndex;      // Partial indices into blockLength[]
 	size_t _sparseIndexSize;        // Size of SparseIndex[] table
-	uint8_t* _data;                 // Start of Huffman compressed data
+	const uint8_t* _data;                 // Start of Huffman compressed data
 	std::vector<uint64_t> _base64;  // base64[l - min_sym_len] is the 64bit-padded lowest symbol of length l
 	std::vector<uint8_t> _symlen;   // Number of values (-1) represented by a given Huffman symbol: 1..256
 	std::array<bitboardIndex, TBPIECES> _pieces;// Position pieces: the order of pieces defines the groups
@@ -82,6 +82,9 @@ public:
 	void setGroups(const TBTable& tbt, const int order[], const tFile f);
 	const uint8_t* setSizes(const uint8_t* data);
 	const uint8_t* setDtzMap(const uint8_t* map, const uint8_t* data);
+	const uint8_t* setSparseIndex(const uint8_t* data);
+	const uint8_t* setBlockLength(const uint8_t* data);
+	const uint8_t* setData(const uint8_t* data);
 	int getGroupLen(unsigned int group) const;
 	uint64_t getGroupIdx(unsigned int group) const;
 	uint8_t getFlags() const;
