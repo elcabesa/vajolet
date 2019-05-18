@@ -246,3 +246,24 @@ uint8_t PairsData::getSymLen(unsigned int idx) const {
 	assert(idx < _symlen.size());
 	return _symlen[idx];
 }
+
+
+const uint8_t* PairsData::setDtzMap(const uint8_t* map, const uint8_t* data) {
+
+	if (_flags & MappedFlag) {
+		if (_flags & WideFlag) {
+			data += (uintptr_t)data & 1;  // Word alignment, we may have a mixed table
+			for (int i = 0; i < 4; ++i) { // Sequence like 3,x,x,x,1,x,0,2,x,x
+				_map_idx[i] = (uint16_t)((uint16_t *)data - (uint16_t *)map + 1);
+				data += 2 * (*((uint16_t*)data)) + 2;
+			}
+		}
+		else {
+			for (int i = 0; i < 4; ++i) {
+				_map_idx[i] = (uint16_t)(data - map + 1);
+				data += (*data) + 1;
+			}
+		}
+	}
+	return data;
+}

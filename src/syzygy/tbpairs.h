@@ -57,16 +57,21 @@ private:
 	
 	static bitboardIndex _tbPieceConvert(uint8_t rawData);
 	
+	// Each table has a set of flags: all of them refer to DTZ tables, the last one to WDL tables
 	static const unsigned int SingleValueFlag = 128;
+	static const unsigned int WideFlag = 16;
+	static const unsigned int  LossPliesFlag = 8;
+	static const unsigned int WinPliesFlag = 4;
+	static const unsigned int MappedFlag = 2;
+	static const unsigned int STMFlag = 1;
+	
 	
 	uint8_t _setSymlen(const Sym s, std::vector<bool>& visited);
 	
-	
 
 public:
-	
 	PairsData() {}
-	~PairsData(){}
+	~PairsData() {}
 	PairsData(const PairsData& other) = delete;
 	PairsData(PairsData&& other) noexcept = delete;// move constructor
 	PairsData& operator=(const PairsData& other) =delete; // copy assignment
@@ -76,6 +81,7 @@ public:
 	bitboardIndex getPiece(unsigned int idx) const;
 	void setGroups(const TBTable& tbt, const int order[], const tFile f);
 	const uint8_t* setSizes(const uint8_t* data);
+	const uint8_t* setDtzMap(const uint8_t* map, const uint8_t* data);
 	int getGroupLen(unsigned int group) const;
 	uint64_t getGroupIdx(unsigned int group) const;
 	uint8_t getFlags() const;
@@ -91,5 +97,6 @@ public:
 	uint8_t getSymLen(unsigned int idx) const;
 
 };
+
 
 #endif

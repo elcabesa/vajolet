@@ -48,6 +48,7 @@ private:
 	bool _hasUniquePieces;
 	const unsigned int _sides;
 	PairsData _items[2][4]; // [wtm / btm][FILE_A..FILE_D or 0]
+	const uint8_t* _map;
 	
 	std::once_flag _mappedFlag;
 	void _mapFile();
@@ -67,7 +68,6 @@ public:
 	// todo readd?
 	//typedef typename std::conditional<Type == WDL, WDLScore, int>::type Ret;
 	
-	//uint8_t* map;
 	
 
 	const HashKey& getKey() const { return _key; };
@@ -82,6 +82,8 @@ public:
 	bool hasPawnOnBothSides() const;
 	// todo change to reference if *getPairsData(i, f) = PairsData(); is removed
 	PairsData* getPairsData(const unsigned int stm, const tFile f);
+	void setMap(const uint8_t* x);
+	const uint8_t* getMap(void) const;
 	
 	
 };

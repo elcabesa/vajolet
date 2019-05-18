@@ -134,6 +134,17 @@ void TBTable::_mapFile() {
 			data = getPairsData(i, f)->setSizes(data);
 		}
 	}
+	
+	// todo use virtual method?
+	// it's only needed for DTZ talbe
+	if (getType() == DTZ) {
+		setMap(data);
+		for (tFile f = FILEA; f <= maxFile; ++f) {
+			getPairsData(0, f)->setDtzMap(getMap(), data);
+		}
+		data += (uintptr_t)data & 1; // Word alignment
+	}
+
 }
 
 std::string TBTable::_getCompleteFileName() const {
@@ -147,4 +158,12 @@ PairsData* TBTable::getPairsData(const unsigned int stm, const tFile f) {
 
 bool TBTable::hasPawnOnBothSides() const {
 	return _hasPawns && _pawnCount[1];
+}
+
+void TBTable::setMap(const uint8_t* x) {
+	_map = x;
+}
+
+const uint8_t* TBTable::getMap(void) const {
+	return _map;
 }
