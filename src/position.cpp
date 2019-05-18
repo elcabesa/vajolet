@@ -397,6 +397,9 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	return *this;
 }
 
+/// Position::setup() is an overload to initialize the position object with
+/// the given endgame code string like "KBPKN". It is mainly a helper to
+/// get the material key out of an endgame code.
 const Position& Position::setup(const std::string& code, const Color c)
 {
 

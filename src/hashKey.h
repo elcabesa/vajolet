@@ -44,6 +44,10 @@ private:
 
 public:
 	static void init();       // initialize the random data
+	
+	size_t operator()(const HashKey& p) const {
+		return p._key;
+	}
 
 	inline HashKey getExclusionKey() const
 	{

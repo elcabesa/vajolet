@@ -81,8 +81,8 @@ void TBTable::mapFile() {
 // Populate entry's PairsData records with data from the just memory mapped file.
 // Called at first access.
 void TBTable::_mapFile() {
-	_file = TBFile(_getCompleteFileName());
-	TBValidater::validate(_file, getType(), _getCompleteFileName());
+	_file = TBFile(getCompleteFileName());
+	TBValidater::validate(_file, getType(), getCompleteFileName());
 	
 	// Populate entry's PairsData records with data from the just memory mapped file.
 	// Called at first access.
@@ -167,7 +167,7 @@ void TBTable::_mapFile() {
 
 }
 
-std::string TBTable::_getCompleteFileName() const {
+std::string TBTable::getCompleteFileName() const {
 	return _endgame + "." +  _extension;
 	
 }

@@ -52,7 +52,7 @@ private:
 	
 	std::once_flag _mappedFlag;
 	void _mapFile();
-	std::string _getCompleteFileName() const;
+	
 	
 	
 protected:
@@ -69,7 +69,7 @@ public:
 	//typedef typename std::conditional<Type == WDL, WDLScore, int>::type Ret;
 	
 	
-
+	std::string getCompleteFileName() const;
 	const HashKey& getKey() const { return _key; };
 	const HashKey& getKey2() const { return _key2; };
 	unsigned int getPieceCount() const { return _pieceCount; };
