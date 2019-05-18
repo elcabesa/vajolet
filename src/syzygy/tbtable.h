@@ -52,9 +52,6 @@ private:
 	std::once_flag _mappedFlag;
 	void _mapFile();
 	std::string _getCompleteFileName() const;
-public:
-	// todo change to reference if *_getPairsData(i, f) = PairsData(); is removed
-	PairsData* _getPairsData(const unsigned int stm, const tFile f);
 	
 	
 protected:
@@ -83,6 +80,8 @@ public:
 	virtual TBType getType() const = 0;
 	std::string getEndGame() const;
 	bool hasPawnOnBothSides() const;
+	// todo change to reference if *getPairsData(i, f) = PairsData(); is removed
+	PairsData* getPairsData(const unsigned int stm, const tFile f);
 	
 	
 };

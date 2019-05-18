@@ -67,18 +67,24 @@ bitboardIndex PairsData::getPiece(unsigned int idx) const {
 // sequence of pieces in piece[] array.
 void PairsData::setGroups(const TBTable& tbt, const int order[], const tFile f) {
 	int n = 0, firstLen = tbt.hasPawns() ? 0 : tbt.hasUniquePieces() ? 3 : 2;
+	
+	for (unsigned int i = 0; i < TBPIECES + 1; ++i) {
+		_groupLen[i] = 0;
+		_groupIdx[i] = 0;
+	}
 	_groupLen[n] = 1;
 
 	// Number of pieces per group is stored in groupLen[], for instance in KRKN
 	// the encoder will default on '111', so groupLen[] will be (3, 1).
-	for (unsigned int i = 1; i < tbt.getPieceCount(); ++i)
+	for (unsigned int i = 1; i < tbt.getPieceCount(); ++i) {
 		if (--firstLen > 0 || _pieces[i] == _pieces[i - 1]) {
 			_groupLen[n]++;
 		} else {
 			_groupLen[++n] = 1;
 		}
+	}
+	++n;
 
-	_groupLen[++n] = 0; // Zero-terminated
 
 	// The sequence in pieces[] defines the groups, but not the order in which
 	// they are encoded. If the pieces in a group g can be combined on the board
@@ -96,7 +102,7 @@ void PairsData::setGroups(const TBTable& tbt, const int order[], const tFile f) 
 	int freeSquares = 64 - _groupLen[0] - (pp ? _groupLen[1] : 0);
 	uint64_t idx = 1;
 
-	for (int k = 0; next < n || k == order[0] || k == order[1]; ++k)
+	for (int k = 0; next < n || k == order[0] || k == order[1]; ++k) {
 		if (k == order[0]) // Leading pawns or pieces
 		{
 			_groupIdx[0] = idx;
@@ -114,6 +120,7 @@ void PairsData::setGroups(const TBTable& tbt, const int order[], const tFile f) 
 			idx *=  TBCommonData::getBinomial(_groupLen[next], static_cast<tSquare>(freeSquares));
 			freeSquares -= _groupLen[next++];
 		}
+	}
 
 	_groupIdx[n] = idx;
 }
@@ -130,8 +137,7 @@ const uint8_t* PairsData::setSizes(const uint8_t* data) {
 
 	// groupLen[] is a zero-terminated list of group lengths, the last groupIdx[]
 	// element stores the biggest index that is the tb size.
-	uint64_t tbSize = _groupIdx[*std::find(_groupLen.begin(), _groupLen.end(), 0)];
-
+	uint64_t tbSize = _groupIdx[std::distance(_groupLen.begin(), std::find(_groupLen.begin(), _groupLen.end(), 0))];
 	_sizeofBlock = 1ULL << (*data++);
 	_span = 1ULL << (*data++);
 	_sparseIndexSize = (tbSize + _span - 1) / _span; // Round up
@@ -209,4 +215,34 @@ uint8_t PairsData::_setSymlen(const Sym s, std::vector<bool>& visited) {
 	}
 
 	return _symlen[sl] + _symlen[sr] + 1;
+}
+
+int PairsData::getGroupLen(unsigned int group) const {
+	assert(group <TBPIECES+1);
+	return _groupLen[group];
+}
+
+uint64_t PairsData::getGroupIdx(unsigned int group) const {
+	assert(group <TBPIECES+1);
+	return _groupIdx[group];
+}
+
+uint8_t PairsData::getFlags() const {return _flags;}
+uint8_t PairsData::getMaxSymLen() const {return _maxSymLen;}
+uint8_t PairsData::getMinSymLen() const {return _minSymLen;}
+uint32_t PairsData::getBlocksNum() const {return _blocksNum;}
+size_t PairsData::getSizeofBlock() const {return _sizeofBlock;}
+size_t PairsData::getSpan() const {return _span;}
+size_t PairsData::getSparseIndexSize() const {return _sparseIndexSize;}
+uint32_t PairsData::getBlockLengthSize() const {return _blockLengthSize;}
+Sym* PairsData::getLowestSym() const {return _lowestSym;}
+
+uint64_t PairsData::getBase64(unsigned int idx) const {
+	assert(idx < _base64.size());
+	return _base64[idx];
+}
+
+uint8_t PairsData::getSymLen(unsigned int idx) const {
+	assert(idx < _symlen.size());
+	return _symlen[idx];
 }

@@ -109,7 +109,7 @@ void TBTable::_mapFile() {
 		todo a cosa serve? se lo tolgo cambi qualcosa? altrimenti pairdata è non inizializzato?
         for (unsigned int i = 0; i < _sides; ++i) {
 			
-            *_getPairsData(i, f) = PairsData();
+            *getPairsData(i, f) = PairsData();
 		}*/
 
         int order[][2] = { { *data & 0xF, pp ? *(data + 1) & 0xF : 0xF },
@@ -118,22 +118,22 @@ void TBTable::_mapFile() {
 
         for (unsigned int k = 0; k < _pieceCount; ++k, ++data) {
             for (unsigned int i = 0; i < _sides; ++i) {
-                _getPairsData(i, f)->setPiece(k, (i > 0 ? *data >>  4 : *data & 0xF));
+                getPairsData(i, f)->setPiece(k, (i > 0 ? *data >>  4 : *data & 0xF));
 			}
 		}
 
 		for (int i = 0; i < sides; ++i) {
-			_getPairsData(i, f)->setGroups(*this, order[i], f);
-		}
-		
-		for (tFile f = FILEA; f <= maxFile; ++f) {
-			for (int i = 0; i < sides; i++) {
-				data = _getPairsData(i, f)->setSizes(data);
-			}
+			getPairsData(i, f)->setGroups(*this, order[i], f);
 		}
     }
 	
 	data += (uintptr_t)data & 1; // Word alignment
+	
+	for (tFile f = FILEA; f <= maxFile; ++f) {
+		for (int i = 0; i < sides; i++) {
+			data = getPairsData(i, f)->setSizes(data);
+		}
+	}
 }
 
 std::string TBTable::_getCompleteFileName() const {
@@ -141,7 +141,7 @@ std::string TBTable::_getCompleteFileName() const {
 	
 }
 
-PairsData* TBTable::_getPairsData(const unsigned int stm, const tFile f) {
+PairsData* TBTable::getPairsData(const unsigned int stm, const tFile f) {
 	return &_items[stm % _sides][_hasPawns ? f : 0];
 }
 

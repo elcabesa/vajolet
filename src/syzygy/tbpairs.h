@@ -76,6 +76,20 @@ public:
 	bitboardIndex getPiece(unsigned int idx) const;
 	void setGroups(const TBTable& tbt, const int order[], const tFile f);
 	const uint8_t* setSizes(const uint8_t* data);
+	int getGroupLen(unsigned int group) const;
+	uint64_t getGroupIdx(unsigned int group) const;
+	uint8_t getFlags() const;
+	uint8_t getMaxSymLen() const;
+	uint8_t getMinSymLen() const;
+	uint32_t getBlocksNum() const;
+	size_t getSizeofBlock() const;
+	size_t getSpan() const;
+	size_t getSparseIndexSize() const;
+	uint32_t getBlockLengthSize() const;
+	Sym* getLowestSym() const;
+	uint64_t getBase64(unsigned int idx) const;
+	uint8_t getSymLen(unsigned int idx) const;
+
 };
 
 #endif
