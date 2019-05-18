@@ -41,12 +41,14 @@ class TBTables {
 	std::unordered_map<HashKey, Entry, HashKey> _hashTable;
 	std::deque<TBTableWDL> _wdlTable;
     std::deque<TBTableDTZ> _dtzTable;
+	
+	void _add(const std::vector<bitboardIndex>& pieces);
 
 public:
 	TBTables();
 	void clear();
+	void init();
 	size_t size() const;
-	void add(const std::vector<bitboardIndex>& pieces);
 	const TBTableWDL& getWDL(const HashKey& k) const;
 	const TBTableDTZ& getDTZ(const HashKey& k) const;
 	size_t getMaxCardinality() const;

@@ -17,6 +17,7 @@
 */
 
 #include <string>
+#include "bitBoardIndex.h"
 #include "command.h"
 #include "tbfile.h"
 #include "tbtables.h"
@@ -35,7 +36,7 @@ size_t TBTables::size() const {
 
 // If the corresponding file exists two new objects TBTable<WDL> and TBTable<DTZ>
 // are created and added to the lists and hash table. Called at init time.
-void TBTables::add(const std::vector<bitboardIndex>& pieces) {
+void TBTables::_add(const std::vector<bitboardIndex>& pieces) {
 	std::string code;
 
     for (auto p : pieces){
@@ -70,4 +71,50 @@ const TBTableDTZ& TBTables::getDTZ(const HashKey& k) const {
 
 size_t TBTables::getMaxCardinality() const {
 	return MaxCardinality;
+}
+
+void TBTables::init() {
+	// Add entries in TB tables if the corresponding ".rtbw" file exsists
+	for (bitboardIndex p1 = Pawns; p1 > King; --p1) {
+		
+		_add({King, p1, King});
+
+		for (bitboardIndex p2 = Pawns; p2 >= p1; --p2) {
+			_add({King, p1, p2, King});
+			_add({King, p1, King, p2});
+
+			for (bitboardIndex p3 = Pawns; p3 > King; --p3) {
+				_add({King, p1, p2, King, p3});
+			}
+
+			for (bitboardIndex p3 = Pawns; p3 >= p2; --p3) {
+				_add({King, p1, p2, p3, King});
+
+				for (bitboardIndex p4 = Pawns; p4 >= p3; --p4) {
+					_add({King, p1, p2, p3, p4, King});
+
+					for (bitboardIndex p5 = Pawns; p5 >= p4; --p5) {
+						_add({King, p1, p2, p3, p4, p5, King});
+					}
+					for (bitboardIndex p5 = Pawns; p5 > King; --p5) {
+						_add({King, p1, p2, p3, p4, King, p5});
+					}
+				}
+
+				for (bitboardIndex p4 = Pawns; p4 > King; --p4) {
+					_add({King, p1, p2, p3, King, p4});
+
+					for (bitboardIndex p5 = Pawns; p5 >= p4; --p5) {
+						_add({King, p1, p2, p3, King, p4, p5});
+					}
+				}
+			}
+
+			for (bitboardIndex p3 = Pawns; p3 >= p1; --p3) {
+				for (bitboardIndex p4 = Pawns; p4 >= (p1 == p3 ? p2 : p3); --p4) {
+					_add({King, p1, p2, King, p3, p4});
+				}
+			}
+		}
+	}
 }

@@ -9,22 +9,10 @@ TEST(tbtables, constructor1) {
 	TBTables t;
 }
 
-TEST(tbtables, add) {
+TEST(tbtables, init) {
 	TBFile::setPaths("data");
 	TBTables t;
-	std::vector<bitboardIndex> pieces = {King, Knights, Knights, King, Bishops};
-	t.add(pieces);
-	ASSERT_EQ(t.getMaxCardinality(), 5);
-	ASSERT_EQ(t.size(), 1);
-}
-
-TEST(tbtables, add2) {
-	TBFile::setPaths("data");
-	TBTables t;
-	std::vector<bitboardIndex> pieces = {King, Knights, Knights, King, Bishops};
-	t.add(pieces);
-	std::vector<bitboardIndex> pieces2 = {King, Knights, King};
-	t.add(pieces2);
+	t.init();
 	ASSERT_EQ(t.getMaxCardinality(), 5);
 	ASSERT_EQ(t.size(), 1);
 }
@@ -32,9 +20,7 @@ TEST(tbtables, add2) {
 TEST(tbtables, clear) {
 	TBFile::setPaths("data");
 	TBTables t;
-	std::vector<bitboardIndex> pieces = {King, Knights, Knights, King, Bishops};
-	t.add(pieces);
-	
+	t.init();
 	t.clear();
 	
 	ASSERT_EQ(t.getMaxCardinality(), 0);
@@ -46,8 +32,7 @@ TEST(tbtables, getWDL) {
 	p.setup("KNNKB", white);
 	TBFile::setPaths("data");
 	TBTables t;
-	std::vector<bitboardIndex> pieces = {King, Knights, Knights, King, Bishops};
-	t.add(pieces);
+	t.init();
 	ASSERT_EQ(t.getWDL(p.getMaterialKey()).getCompleteFileName(), "KNNvKB.rtbw");
 }
 
@@ -56,21 +41,22 @@ TEST(tbtables, getDTZ) {
 	p.setup("KNNKB", white);
 	TBFile::setPaths("data");
 	TBTables t;
-	std::vector<bitboardIndex> pieces = {King, Knights, Knights, King, Bishops};
-	t.add(pieces);
+	t.init();
 	ASSERT_EQ(t.getDTZ(p.getMaterialKey()).getCompleteFileName(), "KNNvKB.rtbz");
 }
 
 TEST(tbtablesDeath, getWDL) {
 	Position p;
-	p.setup("KNNKB", white);
+	p.setup("KNKB", white);
 	TBTables t;
+	t.init();
 	ASSERT_THROW(t.getWDL(p.getMaterialKey()), std::out_of_range);
 }
 
 TEST(tbtablesDeath, getDTZ) {
 	Position p;
-	p.setup("KNNKB", white);
+	p.setup("KNKB", white);
 	TBTables t;
+	t.init();
 	ASSERT_THROW(t.getDTZ(p.getMaterialKey()), std::out_of_range);
 }
