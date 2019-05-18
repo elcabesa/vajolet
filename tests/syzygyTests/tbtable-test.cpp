@@ -278,10 +278,7 @@ TEST(tbtable, map) {
 	ASSERT_EQ(pd->getSymLen(202), 65);
 	ASSERT_EQ(pd->getSymLen(204), 255);
 	
-	
-	
 
-	
 	pd = tbt.getPairsData(1, FILEA);
 	ASSERT_EQ(pd->getPiece(0), whiteKing);
 	ASSERT_EQ(pd->getPiece(1), blackKing);
@@ -316,6 +313,63 @@ TEST(tbtable, map) {
 	ASSERT_EQ(pd->getMaxSymLen(), 10);
 	ASSERT_EQ(pd->getMinSymLen(), 1);
 	/*ASSERT_EQ((uint64_t)pd->getLowestSym(), 0x1802b2);*/
+	
+	ASSERT_EQ(pd->getBase64(0), 9223372036854775808ull);
+	ASSERT_EQ(pd->getBase64(1), 9223372036854775808ull);
+	ASSERT_EQ(pd->getBase64(2), 9223372036854775808ull);
+	ASSERT_EQ(pd->getBase64(3), 9223372036854775808ull);
+	ASSERT_EQ(pd->getBase64(4), 8646911284551352320ull);
+	ASSERT_EQ(pd->getBase64(5), 5188146770730811392ull);
+	ASSERT_EQ(pd->getBase64(6), 2594073385365405696ull);
+	ASSERT_EQ(pd->getBase64(7), 72057594037927936ull);
+	ASSERT_EQ(pd->getBase64(8), 36028797018963968ull);
+	ASSERT_EQ(pd->getBase64(9), 0ull);
+	
+	
+	ASSERT_EQ(pd->getSymLen(0), 63);
+	ASSERT_EQ(pd->getSymLen(1), 95);
+	ASSERT_EQ(pd->getSymLen(3), 159);
+	ASSERT_EQ(pd->getSymLen(4), 223);
+	ASSERT_EQ(pd->getSymLen(5), 11);
+	ASSERT_EQ(pd->getSymLen(6), 6);
+	ASSERT_EQ(pd->getSymLen(7), 0);
+	ASSERT_EQ(pd->getSymLen(8), 231);
+	ASSERT_EQ(pd->getSymLen(9), 8);
+	ASSERT_EQ(pd->getSymLen(10), 8);
+	ASSERT_EQ(pd->getSymLen(11), 215);
+	ASSERT_EQ(pd->getSymLen(12), 239);
+	ASSERT_EQ(pd->getSymLen(13), 247);
+	ASSERT_EQ(pd->getSymLen(15), 8);
+	ASSERT_EQ(pd->getSymLen(16), 4);
+	ASSERT_EQ(pd->getSymLen(17), 14);
+	ASSERT_EQ(pd->getSymLen(18), 143);
+	ASSERT_EQ(pd->getSymLen(19), 159);
+	ASSERT_EQ(pd->getSymLen(21), 7);
+	ASSERT_EQ(pd->getSymLen(22), 3);
+	ASSERT_EQ(pd->getSymLen(23), 111);
+	ASSERT_EQ(pd->getSymLen(24), 175);
+	ASSERT_EQ(pd->getSymLen(26), 199);
+	ASSERT_EQ(pd->getSymLen(27), 183);
+	ASSERT_EQ(pd->getSymLen(29), 55);
+	ASSERT_EQ(pd->getSymLen(30), 6);
+	ASSERT_EQ(pd->getSymLen(31), 8);
+	ASSERT_EQ(pd->getSymLen(32), 119);
+	ASSERT_EQ(pd->getSymLen(35), 79);
+	ASSERT_EQ(pd->getSymLen(36), 87);
+	ASSERT_EQ(pd->getSymLen(38), 2);
+	ASSERT_EQ(pd->getSymLen(40), 8);
+	ASSERT_EQ(pd->getSymLen(41), 2);
+	ASSERT_EQ(pd->getSymLen(42), 39);
+	ASSERT_EQ(pd->getSymLen(43), 6);
+	ASSERT_EQ(pd->getSymLen(54), 65);
+	ASSERT_EQ(pd->getSymLen(58), 7);
+	ASSERT_EQ(pd->getSymLen(61), 5);
+	ASSERT_EQ(pd->getSymLen(63), 108);
+	ASSERT_EQ(pd->getSymLen(65), 2);
+	ASSERT_EQ(pd->getSymLen(66), 3);
+	ASSERT_EQ(pd->getSymLen(67), 3);
+	ASSERT_EQ(pd->getSymLen(69), 255);
+	
 
 }
 

@@ -78,6 +78,8 @@ void TBTable::mapFile() {
 	std::call_once(_mappedFlag, &TBTable::_mapFile, this);
 }
 
+// Populate entry's PairsData records with data from the just memory mapped file.
+// Called at first access.
 void TBTable::_mapFile() {
 	_file = TBFile(_getCompleteFileName());
 	TBValidater::validate(_file, getType(), _getCompleteFileName());
