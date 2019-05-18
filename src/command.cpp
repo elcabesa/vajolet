@@ -32,6 +32,8 @@
 #include "rootMove.h"
 #include "searchTimer.h"
 #include "searchLimits.h"
+// todo remove
+#include "syzygy/syzygy.h"
 #include "syzygy2/tbprobe.h"
 #include "thread.h"
 #include "transposition.h"
@@ -93,8 +95,14 @@ private:
 		unsigned long elements = transpositionTable::getInstance().setSize(size);
 		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
 	}
-	static void clearHash(){ transpositionTable::getInstance().clear(); }
-	static void setTTPath( std::string s ){ tb_init(s.c_str());}
+	static void clearHash() {transpositionTable::getInstance().clear();}
+	static void setTTPath( std::string s ) {
+		tb_init(s.c_str());
+		auto&  szg = Syzygy::getInstance();
+		szg.setPath(s);
+		sync_cout<<"info string syzygy path set to "<<s<<sync_endl;
+		sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;
+	}
 	std::string unusedVersion;
 	unsigned int unusedSize;
 	static const char _PIECE_NAMES_FEN[];
