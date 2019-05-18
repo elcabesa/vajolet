@@ -18,7 +18,7 @@
 #include "libchess.h"
 #include "position.h"
 #include "search.h"
-#include "syzygy/tbCommonData.h"
+#include "syzygy/syzygy.h"
 
 
 void libChessInit()
@@ -29,5 +29,5 @@ void libChessInit()
 	Movegen::initMovegenConstant();
 	Search::initSearchParameters();
 	Position::initMaterialKeys();
-	TBCommonData::init();
+	Syzygy::getInstance();
 }

@@ -16,7 +16,12 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include "tbCommonData.h"
 #include "syzygy.h"
+
+Syzygy::Syzygy() {
+	TBCommonData::init();
+}
 
 void Syzygy::setPath(const std::string s) {
 	TBFile::setPaths(s); 

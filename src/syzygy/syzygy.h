@@ -30,11 +30,12 @@ public:
 		static Syzygy instance;
 		return instance;
 	}
-  
+	
+	
   	void setPath(const std::string s);
 	size_t getSize() const;
 private:
-	Syzygy()= default;
+	Syzygy();
 	~Syzygy()= default;
 	Syzygy(const Syzygy&)= delete;
 	Syzygy& operator=(const Syzygy&)= delete;

@@ -117,10 +117,10 @@ void syzygyTest()
 	myfile.close();
 }
 
-/*TEST(Syzygy, test)
+TEST(Syzygy, test)
 {
 	syzygyTest();
-}*/
+}
 
 
 TEST(Syzygy, multiThreadTest)
