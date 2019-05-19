@@ -56,20 +56,18 @@ private:
 	std::array<uint16_t, 4> _map_idx;           // WDLWin, WDLLoss, WDLCursedWin, WDLBlessedLoss (used in DTZ)
 	
 	static bitboardIndex _tbPieceConvert(uint8_t rawData);
-	
-	// Each table has a set of flags: all of them refer to DTZ tables, the last one to WDL tables
-	static const unsigned int SingleValueFlag = 128;
-	static const unsigned int WideFlag = 16;
-	static const unsigned int  LossPliesFlag = 8;
-	static const unsigned int WinPliesFlag = 4;
-	static const unsigned int MappedFlag = 2;
-	static const unsigned int STMFlag = 1;
-	
-	
 	uint8_t _setSymlen(const Sym s, std::vector<bool>& visited);
 	
 
 public:
+
+	// Each table has a set of flags: all of them refer to DTZ tables, the last one to WDL tables
+	static const unsigned int SingleValueFlag = 128;
+	static const unsigned int WideFlag = 16;
+	static const unsigned int LossPliesFlag = 8;
+	static const unsigned int WinPliesFlag = 4;
+	static const unsigned int MappedFlag = 2;
+	static const unsigned int STMFlag = 1;
 	PairsData() {}
 	~PairsData() {}
 	PairsData(const PairsData& other) = delete;
@@ -98,6 +96,8 @@ public:
 	Sym* getLowestSym() const;
 	uint64_t getBase64(unsigned int idx) const;
 	uint8_t getSymLen(unsigned int idx) const;
+	Sym decompress(const uint64_t idx) const;
+	const std::array<uint16_t, 4>& getMapIdx() const;
 
 };
 

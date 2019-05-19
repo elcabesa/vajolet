@@ -24,10 +24,12 @@
 #include "tbtable.h"
 
 class TBTableWDL: public TBTable {
-
+	int _mapScore(const tFile f, int value, const int wdl) const;
+	bool _checkDtzStm(unsigned int stm, tFile f) const;
 public:
 	explicit TBTableWDL(const std::string& code);
 	TBType getType() const;
+	
 };
 
 #endif

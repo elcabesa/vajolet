@@ -285,3 +285,138 @@ const uint8_t* PairsData::setData(const uint8_t* data) {
 	data += _blocksNum * _sizeofBlock;
 	return data;
 }
+
+// TB tables are compressed with canonical Huffman code. The compressed data is divided into
+// blocks of size d->sizeofBlock, and each block stores a variable number of symbols.
+// Each symbol represents either a WDL or a (remapped) DTZ value, or a pair of other symbols
+// (recursively). If you keep expanding the symbols in a block, you end up with up to 65536
+// WDL or DTZ values. Each symbol represents up to 256 values and will correspond after
+// Huffman coding to at least 1 bit. So a block of 32 bytes corresponds to at most
+// 32 x 8 x 256 = 65536 values. This maximum is only reached for tables that consist mostly
+// of draws or mostly of wins, but such tables are actually quite common. In principle, the
+// blocks in WDL tables are 64 bytes long (and will be aligned on cache lines). But for
+// mostly-draw or mostly-win tables this can leave many 64-byte blocks only half-filled, so
+// in such cases blocks are 32 bytes long. The blocks of DTZ tables are up to 1024 bytes long.
+// The generator picks the size that leads to the smallest table. The "book" of symbols and
+// Huffman codes is the same for all blocks in the table. A non-symmetric pawnless TB file
+// will have one table for wtm and one for btm, a TB file with pawns will have tables per
+// file a,b,c,d also in this case one set for wtm and one for btm.
+Sym PairsData::decompress(const uint64_t idx) const {
+
+    // Special case where all table positions store the same value
+    if (_flags & SingleValueFlag)
+        return _minSymLen;
+
+    // First we need to locate the right block that stores the value at index "idx".
+    // Because each block n stores blockLength[n] + 1 values, the index i of the block
+    // that contains the value at position idx is:
+    //
+    //                    for (i = -1, sum = 0; sum <= idx; i++)
+    //                        sum += blockLength[i + 1] + 1;
+    //
+    // This can be slow, so we use SparseIndex[] populated with a set of SparseEntry that
+    // point to known indices into blockLength[]. Namely SparseIndex[k] is a SparseEntry
+    // that stores the blockLength[] index and the offset within that block of the value
+    // with index I(k), where:
+    //
+    //       I(k) = k * d->span + d->span / 2      (1)
+
+    // First step is to get the 'k' of the I(k) nearest to our idx, using definition (1)
+    uint32_t k = idx / _span;
+
+    // Then we read the corresponding SparseIndex[] entry
+    uint32_t block = _sparseIndex[k].getBlock();
+    int offset     = _sparseIndex[k].getOffset();
+
+    // Now compute the difference idx - I(k). From definition of k we know that
+    //
+    //       idx = k * d->span + idx % d->span    (2)
+    //
+    // So from (1) and (2) we can compute idx - I(K):
+    int diff = (idx % _span) - (_span / 2);
+
+    // Sum the above to offset to find the offset corresponding to our idx
+    offset += diff;
+
+    // Move to previous/next block, until we reach the correct block that contains idx,
+    // that is when 0 <= offset <= d->blockLength[block]
+    while (offset < 0)
+        offset += _blockLength[--block] + 1;
+
+    while (offset > _blockLength[block])
+        offset -= _blockLength[block++] + 1;
+
+    // Finally, we find the start address of our block of canonical Huffman symbols
+    uint32_t* ptr = (uint32_t*)(_data + ((uint64_t)block * _sizeofBlock));
+
+    // Read the first 64 bits in our block, this is a (truncated) sequence of
+    // unknown number of symbols of unknown length but we know the first one
+    // is at the beginning of this 64 bits sequence.
+    uint64_t buf64 = __builtin_bswap64(*reinterpret_cast<uint64_t *>(ptr));
+	ptr += 2;
+    int buf64Size = 64;
+    Sym sym;
+
+    while (true) {
+        int len = 0; // This is the symbol length - d->min_sym_len
+
+        // Now get the symbol length. For any symbol s64 of length l right-padded
+        // to 64 bits we know that d->base64[l-1] >= s64 >= d->base64[l] so we
+        // can find the symbol length iterating through base64[].
+        while (buf64 < _base64[len]) {
+            ++len;
+		}
+
+        // All the symbols of a given length are consecutive integers (numerical
+        // sequence property), so we can compute the offset of our symbol of
+        // length len, stored at the beginning of buf64.
+        sym = (buf64 - _base64[len]) >> (64 - len - _minSymLen);
+
+        // Now add the value of the lowest symbol of length len to get our symbol
+        sym += _lowestSym[len];
+
+        // If our offset is within the number of values represented by symbol sym
+        // we are done...
+        if (offset < _symlen[sym] + 1) {
+            break;
+		}
+
+        // ...otherwise update the offset and continue to iterate
+        offset -= _symlen[sym] + 1;
+        len += _minSymLen; // Get the real length
+        buf64 <<= len;       // Consume the just processed symbol
+        buf64Size -= len;
+
+        if (buf64Size <= 32) { // Refill the buffer
+            buf64Size += 32;
+            buf64 |= (static_cast<uint64_t>(__builtin_bswap32(*reinterpret_cast<uint32_t *>(ptr)))) << (64 - buf64Size);
+			ptr++;
+        }
+    }
+
+    // Ok, now we have our symbol that expands into d->symlen[sym] + 1 symbols.
+    // We binary-search for our value recursively expanding into the left and
+    // right child symbols until we reach a leaf node where symlen[sym] + 1 == 1
+    // that will store the value we need.
+    while (_symlen[sym]) {
+
+        Sym left = _btree[sym].getLeft();
+
+        // If a symbol contains 36 sub-symbols (d->symlen[sym] + 1 = 36) and
+        // expands in a pair (d->symlen[left] = 23, d->symlen[right] = 11), then
+        // we know that, for instance the ten-th value (offset = 10) will be on
+        // the left side because in Recursive Pairing child symbols are adjacent.
+        if (offset < _symlen[left] + 1)
+            sym = left;
+        else {
+            offset -= _symlen[left] + 1;
+            sym = _btree[sym].getRight();
+        }
+    }
+
+    return _btree[sym].getLeft();
+}
+
+const std::array<uint16_t, 4>& PairsData::getMapIdx() const {
+	return _map_idx;
+}

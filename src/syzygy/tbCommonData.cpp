@@ -42,6 +42,10 @@ int TBCommonData::_offsetA1H8(const tSquare sq) {
 	return int(getRankOf(sq)) - int(getFileOf(sq));
 }
 
+bool TBCommonData::pawnsComp(tSquare i, tSquare j) {
+	return _MapPawns[i] < _MapPawns[j];
+}
+
 bool TBCommonData::isOnDiagonalA1H8(const tSquare sq) {
 	return (0 == _offsetA1H8(sq));
 }

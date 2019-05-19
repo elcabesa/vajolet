@@ -27,8 +27,8 @@ private:
 	char _block[4];		// Number of block
 	char _offset[2];	// Offset within the block
 public:
-	uint32_t getBlock() { return __builtin_bswap32(*reinterpret_cast<uint32_t *>(_block)); }
-	uint16_t getOffset() { return __builtin_bswap16(*reinterpret_cast<uint16_t *>(_offset)); }
+	uint32_t getBlock() {return *reinterpret_cast<uint32_t *>(_block);}
+	uint16_t getOffset() {return *reinterpret_cast<uint16_t *>(_offset);}
 	
 	SparseEntry() = delete;
 	~SparseEntry() = delete;

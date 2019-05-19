@@ -31,6 +31,7 @@
 #include "tSquare.h"
 
 
+class Position;
 
 // struct TBTable contains indexing information to access the corresponding TBFile.
 // There are 2 types of TBTable, corresponding to a WDL or a DTZ file. TBTable
@@ -48,14 +49,17 @@ private:
 	bool _hasUniquePieces;
 	const unsigned int _sides;
 	PairsData _items[2][4]; // [wtm / btm][FILE_A..FILE_D or 0]
-	const uint8_t* _map;
+	
 	
 	std::once_flag _mappedFlag;
 	void _mapFile();
+	virtual int _mapScore(const tFile f, int value, const int wdl) const = 0;
+	virtual bool _checkDtzStm(unsigned int stm, tFile f) const = 0;
 	
 	
 	
 protected:
+	const uint8_t* _map;
 	const std::string _extension;
 	explicit TBTable(const std::string& code, std::string ext, unsigned int sides);
 	explicit TBTable(const TBTable& other, std::string ext, unsigned int sides);
@@ -65,7 +69,7 @@ protected:
     TBTable& operator=(TBTable&& other) noexcept =  delete;
 public:
 	
-	// todo readd?
+	// todo readd, non sembra servire?
 	//typedef typename std::conditional<Type == WDL, WDLScore, int>::type Ret;
 	
 	
@@ -76,15 +80,16 @@ public:
 	unsigned int getPawnCount(unsigned int x) const { assert(x<2); return _pawnCount[x];};
 	bool hasPawns() const { return _hasPawns; };
 	bool hasUniquePieces() const { return _hasUniquePieces; };
-	void mapFile();
+	bool mapFile();
 	virtual TBType getType() const = 0;
 	std::string getEndGame() const;
 	bool hasPawnOnBothSides() const;
 	// todo change to reference if *getPairsData(i, f) = PairsData(); is removed
 	PairsData* getPairsData(const unsigned int stm, const tFile f);
+	const PairsData* getPairsData(const unsigned int stm, const tFile f) const ;
 	void setMap(const uint8_t* x);
 	const uint8_t* getMap(void) const;
-	
+	int probe(const Position& pos, WDLScore wdl, ProbeState& result);
 	
 };
 

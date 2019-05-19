@@ -118,3 +118,31 @@ void TBTables::init() {
 		}
 	}
 }
+
+
+int TBTables::probeWDL(const Position& pos, ProbeState* result, WDLScore wdl) const {
+	/*
+	if (pos.count<ALL_PIECES>() == 2) // KvK
+        return Ret(WDLDraw);
+
+    TBTable<Type>* entry = TBTables.get<Type>(pos.material_key());
+
+    if (!entry || !mapped(*entry, pos))
+        return *result = FAIL, Ret();
+
+    return do_probe_table(pos, entry, wdl, result);*/
+	
+}
+int TBTables::probeDTZ(const Position& pos, ProbeState* result, WDLScore wdl) const {
+	
+	/*if (pos.count<ALL_PIECES>() == 2) // KvK
+        return Ret(WDLDraw);
+
+    TBTable<Type>* entry = TBTables.get<Type>(pos.material_key());
+
+    if (!entry || !mapped(*entry, pos))
+        return *result = FAIL, Ret();
+
+    return do_probe_table(pos, entry, wdl, result);*/
+	
+}

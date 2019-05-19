@@ -51,6 +51,8 @@ public:
 	static unsigned int getMapPawns(const tSquare sq);
 	static unsigned int getLeadPawnIdx(const unsigned int idx, const tSquare sq);
 	static unsigned int getLeadPawnsSize(const unsigned int idx, const tFile file);
+	// Comparison function to sort leading pawns in ascending MapPawns[] order
+	static bool pawnsComp(tSquare i, tSquare j);
 	
 };
 

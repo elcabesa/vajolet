@@ -101,7 +101,7 @@ TEST(tbtable, copyConstructor) {
 TEST(tbtable, map) {
 	TBFile::setPaths("data");
 	TBTableWDL tbt("KNNvKB");
-	tbt.mapFile();
+	ASSERT_TRUE(tbt.mapFile());
 	
 	auto pd = tbt.getPairsData(0, FILEA);
 	ASSERT_EQ(pd->getPiece(0), whiteKing);
@@ -377,7 +377,7 @@ TEST(tbtable, map2) {
 	TBFile::setPaths("data");
 	TBTableWDL t("KNNvKB");
 	TBTableDTZ tbt(t);
-	tbt.mapFile();
+	ASSERT_TRUE(tbt.mapFile());
 	
 	auto pd = tbt.getPairsData(0, FILEA);
 	ASSERT_EQ(pd->getPiece(0), whiteKing);
@@ -392,6 +392,13 @@ TEST(tbtable, map2) {
 	ASSERT_EQ(pd->getPiece(2), blackBishops);
 	ASSERT_EQ(pd->getPiece(3), whiteKnights);
 	ASSERT_EQ(pd->getPiece(4), whiteKnights);
+}
+
+TEST(tbtable, map3) {
+	TBFile::setPaths("data");
+	TBTableWDL t("KRRvKR");
+	TBTableDTZ tbt(t);
+	ASSERT_FALSE(tbt.mapFile());
 }
 
 TEST(tbtable, getType) {
@@ -409,3 +416,4 @@ TEST(tbtable, getEndGame) {
 	ASSERT_EQ(TBTableWDL("KBPvK").getEndGame(), "KBPvK");
 	ASSERT_EQ(TBTableWDL("KBPPvKB").getEndGame(), "KBPPvKB");
 }
+

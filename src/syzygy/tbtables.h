@@ -28,6 +28,7 @@
 #include "tbtableDTZ.h"
 #include "tbtableWDL.h"
 
+class Position;
 
 // class TBTables creates and keeps ownership of the TBTable objects, one for
 // each TB file found. It supports a fast, hash based, table lookup. Populated
@@ -52,6 +53,8 @@ public:
 	const TBTableWDL& getWDL(const HashKey& k) const;
 	const TBTableDTZ& getDTZ(const HashKey& k) const;
 	size_t getMaxCardinality() const;
+	int probeWDL(const Position& pos, ProbeState* result, WDLScore wdl = WDLDraw) const;
+	int probeDTZ(const Position& pos, ProbeState* result, WDLScore wdl = WDLDraw) const;
 };
 
 #endif

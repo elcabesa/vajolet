@@ -30,3 +30,40 @@ TBTableDTZ:: TBTableDTZ(const TBTableWDL& other): TBTable(reinterpret_cast<const
 TBType TBTableDTZ::getType() const{
 	return DTZ;
 }
+
+int TBTableDTZ::_mapScore(const tFile f, int value, const int wdl) const {
+
+	constexpr int WDLMap[] = { 1, 3, 0, 2, 0 };
+
+	auto flags = getPairsData(0, f)->getFlags();
+	const auto& idx = getPairsData(0, f)->getMapIdx();
+	
+	if (flags & PairsData::MappedFlag) {
+		if (flags & PairsData::WideFlag) {
+			value = ((uint16_t *)_map)[idx[WDLMap[wdl + 2]] + value];
+		} else {
+			value = _map[idx[WDLMap[wdl + 2]] + value];
+		}
+	}
+
+	// DTZ tables store distance to zero in number of moves or plies. We
+	// want to return plies, so we have convert to plies when needed.
+	if (   (wdl == WDLWin  && !(flags & PairsData::WinPliesFlag))
+		|| (wdl == WDLLoss && !(flags & PairsData::LossPliesFlag))
+		||  wdl == WDLCursedWin
+		||  wdl == WDLBlessedLoss) {
+		value *= 2;
+	}
+
+	return value + 1;
+}
+
+
+
+bool TBTableDTZ::_checkDtzStm(unsigned int stm, tFile f) const {
+
+	auto flags = getPairsData(stm, f)->getFlags();
+	return	(flags & PairsData::STMFlag) == stm
+			|| ((getKey() == getKey2()) && !hasPawns());
+}
+
