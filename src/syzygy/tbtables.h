@@ -50,11 +50,12 @@ public:
 	void clear();
 	void init();
 	size_t size() const;
-	const TBTableWDL& getWDL(const HashKey& k) const;
-	const TBTableDTZ& getDTZ(const HashKey& k) const;
+	TBTableWDL& getWDL(const HashKey& k) const;
+	TBTableDTZ& getDTZ(const HashKey& k) const;
+	bool exists(const HashKey& k) const;
 	size_t getMaxCardinality() const;
-	int probeWDL(const Position& pos, ProbeState* result, WDLScore wdl = WDLDraw) const;
-	int probeDTZ(const Position& pos, ProbeState* result, WDLScore wdl = WDLDraw) const;
+	int probeWDL(const Position& pos, ProbeState& result, WDLScore wdl = WDLDraw) const;
+	int probeDTZ(const Position& pos, ProbeState& result, WDLScore wdl = WDLDraw) const;
 };
 
 #endif

@@ -80,7 +80,7 @@ public:
 	unsigned int getPawnCount(unsigned int x) const { assert(x<2); return _pawnCount[x];};
 	bool hasPawns() const { return _hasPawns; };
 	bool hasUniquePieces() const { return _hasUniquePieces; };
-	bool mapFile();
+	bool mapFile(); 
 	virtual TBType getType() const = 0;
 	std::string getEndGame() const;
 	bool hasPawnOnBothSides() const;

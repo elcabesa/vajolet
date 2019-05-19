@@ -19,6 +19,7 @@
 #include <string>
 #include "bitBoardIndex.h"
 #include "command.h"
+#include "position.h"
 #include "tbfile.h"
 #include "tbtables.h"
 
@@ -60,14 +61,19 @@ void TBTables::_add(const std::vector<bitboardIndex>& pieces) {
 	_hashTable.insert(p2);
 }
 
-const TBTableWDL& TBTables::getWDL(const HashKey& k) const {
+TBTableWDL& TBTables::getWDL(const HashKey& k) const {
 	
 	return *(_hashTable.at(k).first);
 }
 
-const TBTableDTZ& TBTables::getDTZ(const HashKey& k) const {
+TBTableDTZ& TBTables::getDTZ(const HashKey& k) const {
 	return *(_hashTable.at(k).second);
 }
+
+bool TBTables::exists(const HashKey& k) const {
+	return _hashTable.find(k) != _hashTable.end();
+}
+
 
 size_t TBTables::getMaxCardinality() const {
 	return MaxCardinality;
@@ -120,29 +126,44 @@ void TBTables::init() {
 }
 
 
-int TBTables::probeWDL(const Position& pos, ProbeState* result, WDLScore wdl) const {
-	/*
-	if (pos.count<ALL_PIECES>() == 2) // KvK
-        return Ret(WDLDraw);
+int TBTables::probeWDL(const Position& pos, ProbeState& result, WDLScore wdl) const {
 
-    TBTable<Type>* entry = TBTables.get<Type>(pos.material_key());
+	if (pos.getPieceCount(occupiedSquares) == 2) {// KvK
+        return WDLDraw;
+	}
 
-    if (!entry || !mapped(*entry, pos))
-        return *result = FAIL, Ret();
+	const auto& k = pos.getMaterialKey();
+	if (!exists(k)) {
+		result = FAIL;
+		return 0;
+	}
+	
+	auto& table = getWDL(k);
+	if (!table.mapFile()) {
+		result = FAIL;
+		return 0;
+	}
 
-    return do_probe_table(pos, entry, wdl, result);*/
+    return table.probe(pos, wdl, result);
 	
 }
-int TBTables::probeDTZ(const Position& pos, ProbeState* result, WDLScore wdl) const {
+int TBTables::probeDTZ(const Position& pos, ProbeState& result, WDLScore wdl) const {
 	
-	/*if (pos.count<ALL_PIECES>() == 2) // KvK
-        return Ret(WDLDraw);
+	if (pos.getPieceCount(occupiedSquares) == 2) {// KvK
+        return WDLDraw;
+	}
 
-    TBTable<Type>* entry = TBTables.get<Type>(pos.material_key());
-
-    if (!entry || !mapped(*entry, pos))
-        return *result = FAIL, Ret();
-
-    return do_probe_table(pos, entry, wdl, result);*/
+	const auto& k = pos.getMaterialKey();
+	if (!exists(k)) {
+		result = FAIL;
+		return 0;
+	}
 	
+	auto& table = getDTZ(k);
+	if (!table.mapFile()) {
+		result = FAIL;
+		return 0;
+	}
+
+    return table.probe(pos, wdl, result);
 }

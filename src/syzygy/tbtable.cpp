@@ -82,7 +82,7 @@ bool TBTable::mapFile() {
 
 // Populate entry's PairsData records with data from the just memory mapped file.
 // Called at first access.
-void TBTable::_mapFile() {
+void TBTable::_mapFile(){
 	if (!TBFile::exist(getCompleteFileName()))
 		return;
 	
