@@ -104,3 +104,21 @@ WDLScore Syzygy::_search(Position& pos, ProbeState& result, const bool CheckZero
 	}
 	return result = OK, value;
 }
+
+// Probe the WDL table for a particular position.
+// If *result != FAIL, the probe was successful.
+// The return value is from the point of view of the side to move:
+// -2 : loss
+// -1 : loss, but draw under 50-move rule
+//  0 : draw
+//  1 : win, but draw under 50-move rule
+//  2 : win
+WDLScore Syzygy::probeWdl(Position& pos, ProbeState& result) const{
+
+    result = OK;
+    return _search(pos, result, false);
+}
+
+size_t Syzygy::getMaxCardinality() const {
+	return _t.getMaxCardinality();
+}

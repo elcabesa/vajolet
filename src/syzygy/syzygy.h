@@ -34,6 +34,8 @@ public:
 	
 	void setPath(const std::string s);
 	size_t getSize() const;
+	size_t getMaxCardinality() const;
+	WDLScore probeWdl(Position& pos, ProbeState& result) const;
 private:
 	Syzygy();
 	~Syzygy()= default;
