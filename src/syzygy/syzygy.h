@@ -32,13 +32,15 @@ public:
 	}
 	
 	
-  	void setPath(const std::string s);
+	void setPath(const std::string s);
 	size_t getSize() const;
 private:
 	Syzygy();
 	~Syzygy()= default;
 	Syzygy(const Syzygy&)= delete;
 	Syzygy& operator=(const Syzygy&)= delete;
+	
+	WDLScore _search(Position& pos, ProbeState& result, const bool CheckZeroingMoves) const;
 
 	TBTables _t;
   
