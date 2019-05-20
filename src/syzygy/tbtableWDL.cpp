@@ -40,6 +40,6 @@ int TBTableWDL::_mapScore(const tFile, int value, const int) const {
 	return value - 2;
 }
 
-bool TBTableWDL::_checkDtzStm(unsigned int stm, tFile f) const {
+bool TBTableWDL::_checkDtzStm(unsigned int, tFile) const {
 	return true;
 }
