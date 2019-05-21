@@ -20,9 +20,13 @@
 #define SYZYGY_H
 
 #include <string>
+#include <vector>
 
 #include "tbfile.h"
 #include "tbtables.h"
+
+class Position;
+class Move;
 
 class Syzygy{
 public:
@@ -36,6 +40,7 @@ public:
 	size_t getSize() const;
 	size_t getMaxCardinality() const;
 	WDLScore probeWdl(Position& pos, ProbeState& result) const;
+	int probeDtz(Position& pos, ProbeState& result)const;
 private:
 	Syzygy();
 	~Syzygy()= default;
@@ -43,6 +48,12 @@ private:
 	Syzygy& operator=(const Syzygy&)= delete;
 	
 	WDLScore _search(Position& pos, ProbeState& result, const bool CheckZeroingMoves) const;
+	static int _dtzBeforeZeroing(WDLScore wdl);
+	static int _signOf(int val);
+	
+	bool _rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const;
+	bool _rootProbeWdl(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const;
+	static int _WDLToValue(int value);
 
 	TBTables _t;
   

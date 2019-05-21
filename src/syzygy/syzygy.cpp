@@ -17,6 +17,7 @@
 */
 #include "movepicker.h"
 #include "position.h"
+#include "rootMove.h"
 #include "tbCommonData.h"
 #include "syzygy.h"
 
@@ -121,4 +122,226 @@ WDLScore Syzygy::probeWdl(Position& pos, ProbeState& result) const{
 
 size_t Syzygy::getMaxCardinality() const {
 	return _t.getMaxCardinality();
+}
+
+
+
+// DTZ tables don't store valid scores for moves that reset the rule50 counter
+// like captures and pawn moves but we can easily recover the correct dtz of the
+// previous move if we know the position's WDL score.
+int Syzygy::_dtzBeforeZeroing(WDLScore wdl) {
+	return 
+		wdl == WDLWin         ?  1   :
+		wdl == WDLCursedWin   ?  101 :
+		wdl == WDLBlessedLoss ? -101 :
+		wdl == WDLLoss        ? -1   : 0;
+}
+
+// Return the sign of a number (-1, 0, 1)
+int Syzygy::_signOf(int val) {
+    return (0 < val) - (val < 0);
+}
+
+// Probe the DTZ table for a particular position.
+// If *result != FAIL, the probe was successful.
+// The return value is from the point of view of the side to move:
+//         n < -100 : loss, but draw under 50-move rule
+// -100 <= n < -1   : loss in n ply (assuming 50-move counter == 0)
+//        -1        : loss, the side to move is mated
+//         0        : draw
+//     1 < n <= 100 : win in n ply (assuming 50-move counter == 0)
+//   100 < n        : win, but draw under 50-move rule
+//
+// The return value n can be off by 1: a return value -n can mean a loss
+// in n+1 ply and a return value +n can mean a win in n+1 ply. This
+// cannot happen for tables with positions exactly on the "edge" of
+// the 50-move rule.
+//
+// This implies that if dtz > 0 is returned, the position is certainly
+// a win if dtz + 50-move-counter <= 99. Care must be taken that the engine
+// picks moves that preserve dtz + 50-move-counter <= 99.
+//
+// If n = 100 immediately after a capture or pawn move, then the position
+// is also certainly a win, and during the whole phase until the next
+// capture or pawn move, the inequality to be preserved is
+// dtz + 50-movecounter <= 100.
+//
+// In short, if a move is available resulting in dtz + 50-move-counter <= 99,
+// then do not accept moves leading to dtz + 50-move-counter == 100.
+int Syzygy::probeDtz(Position& pos, ProbeState& result) const {
+
+	result = OK;
+	WDLScore wdl = _search(pos, result, true);
+
+	if (result == FAIL || wdl == WDLDraw) {// DTZ tables don't store draws
+		return 0;
+	}
+
+	// DTZ stores a 'don't care' value in this case, or even a plain wrong
+	// one as in case the best move is a losing ep, so it cannot be probed.
+	if (result == ZEROING_BEST_MOVE) {
+		return _dtzBeforeZeroing(wdl);
+	}
+
+	int dtz = _t.probeDTZ(pos, result, wdl);
+
+	if (result == FAIL) {
+		return 0;
+	}
+
+	if (result != CHANGE_STM) {
+		return (dtz + 100 * (wdl == WDLBlessedLoss || wdl == WDLCursedWin)) * _signOf(wdl);
+	}
+
+	// DTZ stores results for the other side, so we need to do a 1-ply search and
+	// find the winning move that minimizes DTZ.
+	int minDTZ = 0xFFFF;
+
+	Move m;
+	MovePicker mp(pos);
+	while((m = mp.getNextMove())) {
+		bool zeroing = pos.isCaptureMove(m) || pos.getPieceAt(m.getFrom());
+		
+		pos.doMove(m);
+
+		// For zeroing moves we want the dtz of the move _before_ doing it,
+		// otherwise we will get the dtz of the next move sequence. Search the
+		// position after the move to get the score sign (because even in a
+		// winning position we could make a losing capture or going for a draw).
+		dtz = zeroing 
+			? -_dtzBeforeZeroing(_search(pos, result, false))
+			: -_t.probeDTZ(pos, result);
+
+		// If the move mates, force minDTZ to 1
+		if (dtz == 1 && pos.isInCheck() && pos.getNumberOfLegalMoves() == 0) {
+			minDTZ = 1;
+		}
+
+		// Convert result from 1-ply search. Zeroing moves are already accounted
+		// by dtz_before_zeroing() that returns the DTZ of the previous move.
+		if (!zeroing) {
+			dtz += _signOf(dtz);
+		}
+
+		// Skip the draws and if we are winning only pick positive dtz
+		if (dtz < minDTZ && _signOf(dtz) == _signOf(wdl)) {
+			minDTZ = dtz;
+		}
+
+		pos.undoMove();
+
+		if (result == FAIL) {
+			return 0;
+		}
+	}
+
+	// When there are no legal moves, the position is mate: we return -1
+	return minDTZ == 0xFFFF ? -1 : minDTZ;
+}
+
+// Use the DTZ tables to rank root moves.
+//
+// A return value false indicates that not all probes were successful.
+bool Syzygy::_rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const {
+	ProbeState result;
+
+	// Obtain 50-move counter for the root position
+	int cnt50 = pos.getActualState().getIrreversibleMoveCount();
+
+	// Check whether a position was repeated since the last zeroing move.
+	bool rep = pos.hasRepeated(true);
+
+	int dtz, bound = Syzygy50MoveRule ? 900 : 1;
+
+	// Probe and rank each move
+	for (auto& m : rootMoves)
+	{
+			pos.doMove(m);
+
+			// Calculate dtz for the current move counting from the root position
+			if (pos.getActualState().getIrreversibleMoveCount() == 0)
+			{
+					// In case of a zeroing move, dtz is one of -101/-1/0/1/101
+					WDLScore wdl = (WDLScore)-_t.probeWDL(pos, result);
+					dtz = _dtzBeforeZeroing(wdl);
+			}
+			else
+			{
+					// Otherwise, take dtz for the new position and correct by 1 ply
+					dtz = -_t.probeDTZ(pos, result);
+					dtz =  dtz > 0 ? dtz + 1
+							 : dtz < 0 ? dtz - 1 : dtz;
+			}
+
+			// Make sure that a mating move is assigned a dtz value of 1
+			if (pos.isInCheck() && dtz == 2 && pos.getNumberOfLegalMoves() == 0) {
+				dtz = 1;
+			}
+
+			pos.undoMove();
+
+			if (result == FAIL)
+					return false;
+
+			// Better moves are ranked higher. Certain wins are ranked equally.
+			// Losing moves are ranked equally unless a 50-move draw is in sight.
+			int r =  dtz > 0 ? (dtz + cnt50 <= 99 && !rep ? 1000 : 1000 - (dtz + cnt50))
+						 : dtz < 0 ? (-dtz * 2 + cnt50 < 100 ? -1000 : -1000 + (-dtz + cnt50))
+						 : 0;
+			m.tbRank = r;
+
+			// Determine the score to be displayed for this move. Assign at least
+			// 1 cp to cursed wins and let it grow to 49 cp as the positions gets
+			// closer to a real win.
+			m.tbScore =  r >= bound ? VALUE_MATE - MAX_PLY - 1
+								 : r >  0     ? Value((std::max( 3, r - 800) * int(PawnValueEg)) / 200)
+								 : r == 0     ? VALUE_DRAW
+								 : r > -bound ? Value((std::min(-3, r + 800) * int(PawnValueEg)) / 200)
+								 :             -VALUE_MATE + MAX_PLY + 1;
+	}
+
+	return true;
+}
+
+// Use the WDL tables to rank root moves.
+// This is a fallback for the case that some or all DTZ tables are missing.
+//
+// A return value false indicates that not all probes were successful.
+bool Syzygy::_rootProbeWdl(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const {
+	static const int WDLToRank[] = { -1000, -899, 0, 899, 1000 };
+	ProbeState result;
+	
+	// Probe and rank each move
+	for (auto& m : rootMoves)
+	{
+			pos.doMove(m);
+
+			WDLScore wdl = (WDLScore)-_t.probeWDL(pos, result);
+
+			pos.undoMove();
+
+			if (result == FAIL)
+					return false;
+
+			m.tbRank = WDLToRank[wdl + 2];
+
+			if (!Syzygy50MoveRule)
+					wdl =  wdl > WDLDraw ? WDLWin
+							 : wdl < WDLDraw ? WDLLoss : WDLDraw;
+			m.tbScore = _WDLToValue(wdl + 2);
+	}
+
+	return true;
+}
+
+int Syzygy::_WDLToValue(int value) {
+	assert(value >= -2 && value <= 2);
+	const int retValues[] = {
+	-VALUE_MATE + MAX_PLY + 1,
+	VALUE_DRAW - 2,
+	VALUE_DRAW,
+	VALUE_DRAW + 2,
+	VALUE_MATE - MAX_PLY - 1};
+	
+	return retValues[value + 2];
 }
