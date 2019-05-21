@@ -322,7 +322,7 @@ int TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
 	// Look for the first piece of the leading group not on the A1-D4 diagonal
 	// and ensure it is mapped below the diagonal.
 	for (int i = 0; i < d->getGroupLen(0); ++i) {
-		if (!TBCommonData::isOnDiagonalA1H8(squares[i])) {
+		if (TBCommonData::isOnDiagonalA1H8(squares[i])) {
 			continue;
 		}
 

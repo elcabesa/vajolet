@@ -10,6 +10,11 @@
 #include "syzygy2/tbprobe.h"
 #include "syzygy/syzygy.h"
 
+void initializeTest() {
+	auto& szg =Syzygy::getInstance();
+	szg.setPath("C:/Users/elcab/Downloads/syzygy");
+	ASSERT_EQ(szg.getMaxCardinality(), 5);
+}
 void syzygyTest()
 {
 	Position pos;
@@ -18,16 +23,10 @@ void syzygyTest()
 	std::ifstream myfile ("testsyzygy.csv");
 	
 	ASSERT_TRUE(myfile.is_open());
-	
-	auto& szg =Syzygy::getInstance();
-	
-	szg.setPath("C:/Users/elcab/Downloads/syzygy");
-	
-	ASSERT_EQ(szg.getMaxCardinality(), 5);
-	
+
 	auto start = std::chrono::system_clock::now();
 	
-	
+	auto& szg =Syzygy::getInstance();
 	unsigned long int num = 0;
 	unsigned long int testedNum = 0;
 	ProbeState result;
@@ -55,7 +54,7 @@ void syzygyTest()
 		WDLScore score = szg.probeWdl(pos, result);
 
 		EXPECT_NE(result, FAIL);
-		//EXPECT_EQ(score, std::stoi(wdl));
+		EXPECT_EQ(score, std::stoi(wdl));
 		if (score == std::stoi(wdl)) {++testedNum;}
 		/*int wdl_res = TB_GET_WDL(result1)-2;
 		
@@ -222,12 +221,14 @@ void syzygyOldTest()
 
 TEST(Syzygy, test)
 {
+	initializeTest();
 	syzygyTest();
 }
 
 
 TEST(Syzygy, multiThreadTest)
 {
+	initializeTest();
 	std::thread t(&syzygyTest);
 	syzygyTest();
 	t.join();
