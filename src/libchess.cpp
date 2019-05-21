@@ -30,15 +30,4 @@ void libChessInit()
 	Search::initSearchParameters();
 	Position::initMaterialKeys();
 	Syzygy::getInstance();
-	
-	Syzygy::getInstance().setPath("C:/Users/elcab/Downloads/syzygy");
-	std::cout<<"TBSIZE: "<<Syzygy::getInstance().getSize()<<std::endl;
-	std::cout<<"CARDINALITY: "<<Syzygy::getInstance().getMaxCardinality()<<std::endl;
-	Position pos;
-	pos.setupFromFen("8/b2B4/8/8/6R1/5K2/7k/8 w - -");
-	ProbeState result;
-	WDLScore score =Syzygy::getInstance().probeWdl(pos, result);
-	std::cout<<"result: "<<score<<std::endl;
-	
-	
 }
