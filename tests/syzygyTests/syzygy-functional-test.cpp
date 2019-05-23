@@ -33,7 +33,7 @@ void syzygyTest()
 	while ( std::getline (myfile,line) )
 	{
 		++num;
-		std::cout << line << std::endl;
+		//std::cout << line << std::endl;
 		
 		size_t delimiter = line.find_first_of(',');
 		ASSERT_NE(std::string::npos, delimiter);
