@@ -210,7 +210,7 @@ int Syzygy::probeDtz(Position& pos, ProbeState& result) const {
 		// winning position we could make a losing capture or going for a draw).
 		dtz = zeroing 
 			? -_dtzBeforeZeroing(_search(pos, result, false))
-			: -_t.probeDTZ(pos, result);
+			: -probeDtz(pos, result);
 
 		// If the move mates, force minDTZ to 1
 		if (dtz == 1 && pos.isInCheck() && pos.getNumberOfLegalMoves() == 0) {
