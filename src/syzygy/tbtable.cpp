@@ -126,7 +126,7 @@ void TBTable::_mapFile(){
         data += 1 + pp;
 
         for (unsigned int k = 0; k < _pieceCount; ++k, ++data) {
-            for (unsigned int i = 0; i < _sides; ++i) {
+            for (unsigned int i = 0; i < sides; ++i) {
                 getPairsData(i, f)->setPiece(k, (i > 0 ? *data >>  4 : *data & 0xF));
 			}
 		}
@@ -149,7 +149,7 @@ void TBTable::_mapFile(){
 	if (getType() == DTZ) {
 		setMap(data);
 		for (tFile f = FILEA; f <= maxFile; ++f) {
-			getPairsData(0, f)->setDtzMap(getMap(), data);
+			data = getPairsData(0, f)->setDtzMap(getMap(), data);
 		}
 		data += (uintptr_t)data & 1; // Word alignment
 	}

@@ -33,7 +33,7 @@ void syzygyTest()
 	while ( std::getline (myfile,line) )
 	{
 		++num;
-		//std::cout << line << std::endl;
+		std::cout << line << std::endl;
 		
 		size_t delimiter = line.find_first_of(',');
 		ASSERT_NE(std::string::npos, delimiter);
@@ -53,9 +53,15 @@ void syzygyTest()
 		
 		WDLScore score = szg.probeWdl(pos, result);
 
-		EXPECT_NE(result, FAIL);
-		EXPECT_EQ(score, std::stoi(wdl));
+		ASSERT_NE(result, FAIL);
+		ASSERT_EQ(score, std::stoi(wdl));
 		if (score == std::stoi(wdl)) {++testedNum;}
+		
+		int dtz2 = szg.probeDtz(pos, result);
+
+		ASSERT_NE(result, FAIL);
+		ASSERT_EQ(dtz2, std::stoi(dtz));
+		//if (score == std::stoi(wdl)) {++testedNum;}
 		/*int wdl_res = TB_GET_WDL(result1)-2;
 		
 		unsigned results[TB_MAX_MOVES];

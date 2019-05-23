@@ -185,9 +185,11 @@ const uint8_t* PairsData::setSizes(const uint8_t* data) {
 	// See http://www.larsson.dogma.net/dcc99.pdf
 	std::vector<bool> visited(_symlen.size());
 
-	for (Sym sym = 0; sym < _symlen.size(); ++sym)
-		if (!visited[sym])
+	for (Sym sym = 0; sym < _symlen.size(); ++sym) {
+		if (!visited[sym]) {
 			_symlen[sym] = _setSymlen(sym, visited);
+		}
+	}
 
 	return data + _symlen.size() * sizeof(LR) + (_symlen.size() & 1);
 }

@@ -200,7 +200,7 @@ int Syzygy::probeDtz(Position& pos, ProbeState& result) const {
 	Move m;
 	MovePicker mp(pos);
 	while((m = mp.getNextMove())) {
-		bool zeroing = pos.isCaptureMove(m) || pos.getPieceAt(m.getFrom());
+		bool zeroing = pos.isCaptureMove(m) || isPawn(pos.getPieceAt(m.getFrom()));
 		
 		pos.doMove(m);
 
@@ -243,7 +243,7 @@ int Syzygy::probeDtz(Position& pos, ProbeState& result) const {
 //
 // A return value false indicates that not all probes were successful.
 bool Syzygy::_rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const {
-	ProbeState result;
+	/*ProbeState result;
 
 	// Obtain 50-move counter for the root position
 	int cnt50 = pos.getActualState().getIrreversibleMoveCount();
@@ -299,7 +299,7 @@ bool Syzygy::_rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy
 								 : r > -bound ? Value((std::min(-3, r + 800) * int(PawnValueEg)) / 200)
 								 :             -VALUE_MATE + MAX_PLY + 1;
 	}
-
+*/
 	return true;
 }
 
@@ -308,7 +308,7 @@ bool Syzygy::_rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy
 //
 // A return value false indicates that not all probes were successful.
 bool Syzygy::_rootProbeWdl(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const {
-	static const int WDLToRank[] = { -1000, -899, 0, 899, 1000 };
+	/*static const int WDLToRank[] = { -1000, -899, 0, 899, 1000 };
 	ProbeState result;
 	
 	// Probe and rank each move
@@ -330,12 +330,12 @@ bool Syzygy::_rootProbeWdl(Position& pos, std::vector<Move>& rootMoves, bool Syz
 							 : wdl < WDLDraw ? WDLLoss : WDLDraw;
 			m.tbScore = _WDLToValue(wdl + 2);
 	}
-
+*/
 	return true;
 }
 
 int Syzygy::_WDLToValue(int value) {
-	assert(value >= -2 && value <= 2);
+	/*assert(value >= -2 && value <= 2);
 	const int retValues[] = {
 	-VALUE_MATE + MAX_PLY + 1,
 	VALUE_DRAW - 2,
@@ -343,5 +343,6 @@ int Syzygy::_WDLToValue(int value) {
 	VALUE_DRAW + 2,
 	VALUE_MATE - MAX_PLY - 1};
 	
-	return retValues[value + 2];
+	return retValues[value + 2];*/
+	return 0;
 }
