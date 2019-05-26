@@ -219,7 +219,7 @@ private:
 };
 
 void inline extMove::setScore( const Score  s){ _score = s;}
-Score extMove::getScore() const { return _score;}
+Score inline extMove::getScore() const { return _score;}
 
 
 /*!	\brief return the offset of a pawn push
