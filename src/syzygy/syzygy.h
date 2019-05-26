@@ -51,9 +51,8 @@ private:
 	static int _dtzBeforeZeroing(WDLScore wdl);
 	static int _signOf(int val);
 	
-	bool _rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const;
-	bool _rootProbeWdl(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const;
-	static int _WDLToValue(int value);
+	bool _rootProbe(Position& pos, std::vector<extMove>& rootMoves) const;
+	bool _rootProbeWdl(Position& pos, std::vector<extMove>& rootMoves) const;
 
 	TBTables _t;
   

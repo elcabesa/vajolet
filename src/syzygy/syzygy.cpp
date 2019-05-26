@@ -242,8 +242,7 @@ int Syzygy::probeDtz(Position& pos, ProbeState& result) const {
 // Use the DTZ tables to rank root moves.
 //
 // A return value false indicates that not all probes were successful.
-bool Syzygy::_rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const {
-	/*ProbeState result;
+bool Syzygy::_rootProbe(Position& pos, std::vector<extMove>& rootMoves) const {
 
 	// Obtain 50-move counter for the root position
 	int cnt50 = pos.getActualState().getIrreversibleMoveCount();
@@ -251,55 +250,48 @@ bool Syzygy::_rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy
 	// Check whether a position was repeated since the last zeroing move.
 	bool rep = pos.hasRepeated(true);
 
-	int dtz, bound = Syzygy50MoveRule ? 900 : 1;
-
 	// Probe and rank each move
 	for (auto& m : rootMoves)
 	{
-			pos.doMove(m);
+		ProbeState result;
+		int dtz;
+		pos.doMove(m);
 
-			// Calculate dtz for the current move counting from the root position
-			if (pos.getActualState().getIrreversibleMoveCount() == 0)
-			{
-					// In case of a zeroing move, dtz is one of -101/-1/0/1/101
-					WDLScore wdl = (WDLScore)-_t.probeWDL(pos, result);
-					dtz = _dtzBeforeZeroing(wdl);
-			}
-			else
-			{
-					// Otherwise, take dtz for the new position and correct by 1 ply
-					dtz = -_t.probeDTZ(pos, result);
-					dtz =  dtz > 0 ? dtz + 1
-							 : dtz < 0 ? dtz - 1 : dtz;
-			}
+		// Calculate dtz for the current move counting from the root position
+		if (pos.getActualState().getIrreversibleMoveCount() == 0)
+		{
+				// In case of a zeroing move, dtz is one of -101/-1/0/1/101
+				WDLScore wdl = (WDLScore)-probeWdl(pos, result);
+				dtz = _dtzBeforeZeroing(wdl);
+		}
+		else
+		{
+				// Otherwise, take dtz for the new position and correct by 1 ply
+				dtz = -probeDtz(pos, result);
+				dtz =  dtz > 0 ? dtz + 1
+						 : dtz < 0 ? dtz - 1 : dtz;
+		}
 
-			// Make sure that a mating move is assigned a dtz value of 1
-			if (pos.isInCheck() && dtz == 2 && pos.getNumberOfLegalMoves() == 0) {
-				dtz = 1;
-			}
+		// Make sure that a mating move is assigned a dtz value of 1
+		if (pos.isInCheck() && dtz == 2 && pos.getNumberOfLegalMoves() == 0) {
+			dtz = 1;
+		}
 
-			pos.undoMove();
+		pos.undoMove();
 
-			if (result == FAIL)
-					return false;
+		if (result == FAIL) {
+			return false;
+		}
 
-			// Better moves are ranked higher. Certain wins are ranked equally.
-			// Losing moves are ranked equally unless a 50-move draw is in sight.
-			int r =  dtz > 0 ? (dtz + cnt50 <= 99 && !rep ? 1000 : 1000 - (dtz + cnt50))
-						 : dtz < 0 ? (-dtz * 2 + cnt50 < 100 ? -1000 : -1000 + (-dtz + cnt50))
-						 : 0;
-			m.tbRank = r;
+		// Better moves are ranked higher. Certain wins are ranked equally.
+		// Losing moves are ranked equally unless a 50-move draw is in sight.
+		Score r =  dtz > 0 ? (dtz + cnt50 <= 99 && !rep ? 1000 : 1000 - (dtz + cnt50))
+					 : dtz < 0 ? (-dtz * 2 + cnt50 < 100 ? -1000 : -1000 + (-dtz + cnt50))
+					 : 0;
+		m.setScore(r);
 
-			// Determine the score to be displayed for this move. Assign at least
-			// 1 cp to cursed wins and let it grow to 49 cp as the positions gets
-			// closer to a real win.
-			m.tbScore =  r >= bound ? VALUE_MATE - MAX_PLY - 1
-								 : r >  0     ? Value((std::max( 3, r - 800) * int(PawnValueEg)) / 200)
-								 : r == 0     ? VALUE_DRAW
-								 : r > -bound ? Value((std::min(-3, r + 800) * int(PawnValueEg)) / 200)
-								 :             -VALUE_MATE + MAX_PLY + 1;
 	}
-*/
+
 	return true;
 }
 
@@ -307,42 +299,28 @@ bool Syzygy::_rootProbe(Position& pos, std::vector<Move>& rootMoves, bool Syzygy
 // This is a fallback for the case that some or all DTZ tables are missing.
 //
 // A return value false indicates that not all probes were successful.
-bool Syzygy::_rootProbeWdl(Position& pos, std::vector<Move>& rootMoves, bool Syzygy50MoveRule) const {
-	/*static const int WDLToRank[] = { -1000, -899, 0, 899, 1000 };
-	ProbeState result;
+bool Syzygy::_rootProbeWdl(Position& pos, std::vector<extMove>& rootMoves) const {
+	static const Score WDLToRank[] = { -1000, -899, 0, 899, 1000 };
+	
 	
 	// Probe and rank each move
 	for (auto& m : rootMoves)
 	{
-			pos.doMove(m);
+		ProbeState result;
+		pos.doMove(m);
 
-			WDLScore wdl = (WDLScore)-_t.probeWDL(pos, result);
+		WDLScore wdl = (WDLScore)-probeWdl(pos, result);
 
-			pos.undoMove();
+		pos.undoMove();
 
-			if (result == FAIL)
-					return false;
+		if (result == FAIL) {
+			return false;
+		}
 
-			m.tbRank = WDLToRank[wdl + 2];
+		m.setScore(WDLToRank[wdl + 2]);
 
-			if (!Syzygy50MoveRule)
-					wdl =  wdl > WDLDraw ? WDLWin
-							 : wdl < WDLDraw ? WDLLoss : WDLDraw;
-			m.tbScore = _WDLToValue(wdl + 2);
 	}
-*/
+
 	return true;
 }
 
-int Syzygy::_WDLToValue(int value) {
-	/*assert(value >= -2 && value <= 2);
-	const int retValues[] = {
-	-VALUE_MATE + MAX_PLY + 1,
-	VALUE_DRAW - 2,
-	VALUE_DRAW,
-	VALUE_DRAW + 2,
-	VALUE_MATE - MAX_PLY - 1};
-	
-	return retValues[value + 2];*/
-	return 0;
-}
