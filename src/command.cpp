@@ -98,7 +98,6 @@ private:
 	static void setTTPath( std::string s ) {
 		auto&  szg = Syzygy::getInstance();
 		szg.setPath(s);
-		sync_cout<<"info string syzygy path set to "<<s<<sync_endl;
 		sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;
 	}
 	std::string unusedVersion;
