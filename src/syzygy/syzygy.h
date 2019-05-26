@@ -41,6 +41,8 @@ public:
 	size_t getMaxCardinality() const;
 	WDLScore probeWdl(Position& pos, ProbeState& result) const;
 	int probeDtz(Position& pos, ProbeState& result)const;
+	bool rootProbe(Position& pos, std::vector<extMove>& rootMoves) const;
+	bool rootProbeWdl(Position& pos, std::vector<extMove>& rootMoves) const;
 private:
 	Syzygy();
 	~Syzygy()= default;
@@ -50,9 +52,6 @@ private:
 	WDLScore _search(Position& pos, ProbeState& result, const bool CheckZeroingMoves) const;
 	static int _dtzBeforeZeroing(WDLScore wdl);
 	static int _signOf(int val);
-	
-	bool _rootProbe(Position& pos, std::vector<extMove>& rootMoves) const;
-	bool _rootProbeWdl(Position& pos, std::vector<extMove>& rootMoves) const;
 
 	TBTables _t;
   

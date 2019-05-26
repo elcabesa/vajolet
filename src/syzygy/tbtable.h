@@ -69,10 +69,6 @@ protected:
     TBTable& operator=(TBTable&& other) noexcept =  delete;
 public:
 	
-	// todo readd, non sembra servire?
-	//typedef typename std::conditional<Type == WDL, WDLScore, int>::type Ret;
-	
-	
 	std::string getCompleteFileName() const;
 	const HashKey& getKey() const { return _key; };
 	const HashKey& getKey2() const { return _key2; };
@@ -84,9 +80,8 @@ public:
 	virtual TBType getType() const = 0;
 	std::string getEndGame() const;
 	bool hasPawnOnBothSides() const;
-	// todo change to reference if *getPairsData(i, f) = PairsData(); is removed
-	PairsData* getPairsData(const unsigned int stm, const tFile f);
-	const PairsData* getPairsData(const unsigned int stm, const tFile f) const ;
+	PairsData& getPairsData(const unsigned int stm, const tFile f);
+	const PairsData& getPairsData(const unsigned int stm, const tFile f) const;
 	void setMap(const uint8_t* x);
 	const uint8_t* getMap(void) const;
 	int probe(const Position& pos, WDLScore wdl, ProbeState& result);

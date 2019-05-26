@@ -36,7 +36,8 @@
 #include "thread.h"
 #include "uciParameters.h"
 #include "searchResult.h"
-#include "syzygy2/tbprobe.h"
+//#include "syzygy2/tbprobe.h"
+#include "syzygy/syzygy.h"
 #include "transposition.h"
 #include "vajolet.h"
 
@@ -153,10 +154,10 @@ private:
 	//--------------------------------------------------------
 	// private methods
 	//--------------------------------------------------------
-	void cleanMemoryBeforeStartingNewSearch(void);
-	void generateRootMovesList( std::vector<Move>& rm, const std::list<Move>& ml);
-	void filterRootMovesByTablebase( std::vector<Move>& rm );
-	SearchResult manageQsearch(void);
+	void cleanMemoryBeforeStartingNewSearch();
+	void generateRootMovesList(std::vector<Move>& rm, const std::list<Move>& ml);
+	void filterRootMovesByTablebase(std::vector<Move>& rm);
+	SearchResult manageQsearch();
 
 
 
@@ -325,84 +326,37 @@ void Search::impl::cleanMemoryBeforeStartingNewSearch(void)
 	_rootMovesAlreadySearched.clear();
 }
 
-void Search::impl::filterRootMovesByTablebase( std::vector<Move>& rm )
+void Search::impl::filterRootMovesByTablebase(std::vector<Move>& rm)
 {
-	unsigned results[TB_MAX_MOVES];
+	if(rm.size() > 0) {
+		bool found = false;
+		
+		std::vector<extMove> rm2;
+		for (auto m: rm) {
+			extMove em(m);
+			rm2.push_back(em);
+		}
 
-	unsigned int piecesCnt = bitCnt (_pos.getBitmap(whitePieces) | _pos.getBitmap(blackPieces));
-
-	if ( piecesCnt <= TB_LARGEST )
-	{
-		unsigned result = tb_probe_root(_pos.getBitmap(whitePieces),
-			_pos.getBitmap(blackPieces),
-			_pos.getBitmap(blackKing) | _pos.getBitmap(whiteKing),
-			_pos.getBitmap(blackQueens) | _pos.getBitmap(whiteQueens),
-			_pos.getBitmap(blackRooks) | _pos.getBitmap(whiteRooks),
-			_pos.getBitmap(blackBishops) | _pos.getBitmap(whiteBishops),
-			_pos.getBitmap(blackKnights) | _pos.getBitmap(whiteKnights),
-			_pos.getBitmap(blackPawns) | _pos.getBitmap(whitePawns),
-			_pos.getActualState().getIrreversibleMoveCount(),
-			_pos.getActualState().getCastleRights(),
-			_pos.hasEpSquare() ? _pos.getEpSquare(): 0,
-			_pos.isWhiteTurn(),
-			results);
-
-		if (result != TB_RESULT_FAILED)
-		{
-
-			const unsigned wdl = TB_GET_WDL(result);
-			assert(wdl<5);
-
-			unsigned r;
-			for (int i = 0; (r = results[i]) != TB_RESULT_FAILED; i++)
-			{
-				const unsigned moveWdl = TB_GET_WDL(r);
-
-				unsigned ep = TB_GET_EP(r);
-				Move m( (tSquare)TB_GET_FROM(r), (tSquare)TB_GET_TO(r) );
-				if (ep)
-				{
-					m.setFlag( Move::fenpassant );
-				}
-				switch (TB_GET_PROMOTES(r))
-				{
-				case TB_PROMOTES_QUEEN:
-					m.setFlag( Move::fpromotion );
-					m.setPromotion( Move::promQueen );
-					break;
-				case TB_PROMOTES_ROOK:
-					m.setFlag( Move::fpromotion );
-					m.setPromotion( Move::promRook );
-					break;
-				case TB_PROMOTES_BISHOP:
-					m.setFlag( Move::fpromotion );
-					m.setPromotion( Move::promBishop );
-					break;
-				case TB_PROMOTES_KNIGHT:
-					m.setFlag( Move::fpromotion );
-					m.setPromotion( Move::promKnight );
-					break;
-				default:
-					break;
-				}
-
-
-
-				auto position = std::find(rm.begin(), rm.end(), m);
-				if (position != rm.end()) // == myVector.end() means the element was not found
-				{
-					if (moveWdl >= wdl)
-					{
-						// preserve move
+		unsigned int piecesCnt = bitCnt (_pos.getBitmap(whitePieces) | _pos.getBitmap(blackPieces));
+		Syzygy& szg = Syzygy::getInstance();
+		if (piecesCnt <= szg.getMaxCardinality() && _pos.getCastleRights() == noCastle) {
+			
+			found = szg.rootProbe(_pos, rm2) || szg.rootProbeWdl(_pos, rm2);
+			
+			if (found) {
+				std::sort(rm2.begin(), rm2.end());
+				std::reverse(rm2.begin(), rm2.end());
+				Score Max = rm2[0].getScore();
+				
+				for (auto m: rm2) {
+					if (m.getScore() < Max) {
+						auto it = std::find(rm.begin(), rm.end(), m);
+						if (it != rm.end()) {
+							rm.erase(it);
+						}
 					}
-					else
-					{
-						rm.erase(position);
-					}
-
 				}
-
-			}
+			}	
 		}
 	}
 }
@@ -678,14 +632,14 @@ SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVl
 	//--------------------------------
 	// generate the list of root moves to be searched
 	//--------------------------------
-	generateRootMovesList( _rootMovesToBeSearched, _sl.getMoveList() );
+	generateRootMovesList(_rootMovesToBeSearched, _sl.getMoveList());
 	
 	//--------------------------------
 	//	tablebase probing, filtering rootmoves to be searched
 	//--------------------------------
-	if( !_sl.isSearchMovesMode() && uciParameters::multiPVLines==1)
+	if(!_sl.isSearchMovesMode() && uciParameters::multiPVLines==1)
 	{
-		filterRootMovesByTablebase( _rootMovesToBeSearched );
+		filterRootMovesByTablebase(_rootMovesToBeSearched);
 	}
 	
 
@@ -834,58 +788,47 @@ inline const HashKey Search::impl::_getSearchKey( const bool excludedMove ) cons
 	return excludedMove ? _pos.getExclusionKey() : _pos.getKey();
 }
 
-inline Search::impl::tableBaseRes Search::impl::_checkTablebase( const unsigned int ply, const int depth )
+inline Search::impl::tableBaseRes Search::impl::_checkTablebase(const unsigned int ply, const int depth)
 {
 	tableBaseRes res{typeScoreLowerThanAlpha, SCORE_NONE};
-	if( TB_LARGEST )
-	{
+	Syzygy& szg = Syzygy::getInstance();
+	
+	if (szg.getMaxCardinality()) {
+		
 		res.TTtype = typeScoreLowerThanAlpha;
 		unsigned int piecesCnt = bitCnt (_pos.getBitmap(whitePieces) | _pos.getBitmap(blackPieces));
 
-		if (    piecesCnt <= TB_LARGEST
-			&& (piecesCnt <  TB_LARGEST || depth >= (int)( uciParameters::SyzygyProbeDepth * ONE_PLY ) )
-			&&  _pos.getActualState().getIrreversibleMoveCount() == 0)
-		{
-			unsigned result = tb_probe_wdl(_pos.getBitmap(whitePieces),
-				_pos.getBitmap(blackPieces),
-				_pos.getBitmap(blackKing) | _pos.getBitmap(whiteKing),
-				_pos.getBitmap(blackQueens) | _pos.getBitmap(whiteQueens),
-				_pos.getBitmap(blackRooks) | _pos.getBitmap(whiteRooks),
-				_pos.getBitmap(blackBishops) | _pos.getBitmap(whiteBishops),
-				_pos.getBitmap(blackKnights) | _pos.getBitmap(whiteKnights),
-				_pos.getBitmap(blackPawns) | _pos.getBitmap(whitePawns),
-				_pos.getActualState().getIrreversibleMoveCount(),
-				_pos.getActualState().getCastleRights(),
-				_pos.hasEpSquare() ? _pos.getEpSquare(): 0,
-				_pos.isWhiteTurn() );
-
-			if(result != TB_RESULT_FAILED)
-			{
+		if (piecesCnt <= szg.getMaxCardinality()
+			&& (piecesCnt < szg.getMaxCardinality() || depth >= (int)( uciParameters::SyzygyProbeDepth * ONE_PLY ) )
+			&& _pos.getActualState().getIrreversibleMoveCount() == 0
+			&& _pos.getCastleRights() == noCastle ) {
+			
+			ProbeState err;			
+			WDLScore wdl = szg.probeWdl(_pos, err);
+			
+			if (err != FAIL) {
 				++_tbHits;
 
-				unsigned wdl = TB_GET_WDL(result);
-				assert(wdl<5);
-				if( uciParameters::Syzygy50MoveRule )
-				{
+				if (uciParameters::Syzygy50MoveRule) {
 					switch(wdl)
 					{
-					case 0:
-						res.value = SCORE_MATED +100 +ply;
+					case WDLLoss:
+						res.value = SCORE_MATED + 100 + ply;
 						res.TTtype = typeScoreLowerThanAlpha;
 						break;
-					case 1:
+					case WDLBlessedLoss:
 						res.TTtype = typeExact;
 						res.value = -100;
 						break;
-					case 2:
+					case WDLDraw:
 						res.TTtype = typeExact;
 						res.value = 0;
 						break;
-					case 3:
+					case WDLCursedWin:
 						res.TTtype = typeExact;
 						res.value = 100;
 						break;
-					case 4:
+					case WDLWin:
 						res.TTtype = typeScoreHigherThanBeta;
 						res.value = SCORE_MATE -100 -ply;
 						break;
@@ -898,19 +841,19 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase( const unsigned 
 				{
 					switch(wdl)
 					{
-					case 0:
-					case 1:
+					case WDLLoss:
+					case WDLBlessedLoss:
 						res.TTtype = typeScoreLowerThanAlpha;
-						res.value = SCORE_MATED +100 +ply;
+						res.value = SCORE_MATED + 100 + ply;
 						break;
-					case 2:
+					case WDLDraw:
 						res.TTtype = typeExact;
 						res.value = 0;
 						break;
-					case 3:
-					case 4:
+					case WDLCursedWin:
+					case WDLWin:
 						res.TTtype = typeScoreHigherThanBeta;
-						res.value = SCORE_MATE -100 -ply;
+						res.value = SCORE_MATE - 100 - ply;
 						break;
 					default:
 						res.value = 0;
@@ -1022,7 +965,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	//--------------------------------------
 	if constexpr (!PVnode)
 	{
-		auto res = _checkTablebase( ply,depth );
+		auto res = _checkTablebase(ply, depth);
 		if( res.value != SCORE_NONE )
 		{
 			if(	res.TTtype == typeExact || (res.TTtype == typeScoreHigherThanBeta  && res.value >=beta) || (res.TTtype == typeScoreLowerThanAlpha && res.value <=alpha)	)

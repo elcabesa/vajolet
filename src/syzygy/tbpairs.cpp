@@ -97,9 +97,9 @@ void PairsData::setGroups(const TBTable& tbt, const int order[], const tFile f) 
 	// pawns/pieces -> remainig pawns -> remaining pieces. In particular the
 	// first group is at order[0] position and the remaining pawns, when present,
 	// are at order[1] position.
-	bool pp = tbt.hasPawnOnBothSides(); // Pawns on both sides
-	int next = pp ? 2 : 1;
-	int freeSquares = 64 - _groupLen[0] - (pp ? _groupLen[1] : 0);
+	bool pawnOnBothsides = tbt.hasPawnOnBothSides(); // Pawns on both sides
+	int next = pawnOnBothsides ? 2 : 1;
+	int freeSquares = 64 - _groupLen[0] - (pawnOnBothsides ? _groupLen[1] : 0);
 	uint64_t idx = 1;
 
 	for (int k = 0; next < n || k == order[0] || k == order[1]; ++k) {

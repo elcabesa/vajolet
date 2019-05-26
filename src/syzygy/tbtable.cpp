@@ -104,71 +104,61 @@ void TBTable::_mapFile(){
 	
 	++data;	 // First byte stores flags
 	
-	const int sides = ((_sides == 2) && (_key != _key2)) ? 2 : 1;
+	const unsigned int sides = ((_sides == 2) && (_key != _key2)) ? 2 : 1;
     const tFile maxFile = _hasPawns ? FILED : FILEA;
 
-	// todo rename in a more significant name e.g. pawnsOnBothSides
-    const bool pp = hasPawnOnBothSides(); // Pawns on both sides
+    const bool pawnsOnBothSides = hasPawnOnBothSides(); // Pawns on both sides
 
-    assert(!pp || _pawnCount[0]);
+    assert(!pawnsOnBothSides || _pawnCount[0]);
 	
 	for (tFile f = FILEA; f <= maxFile; ++f) {
 
-		/*
-		todo a cosa serve? se lo tolgo cambi qualcosa? altrimenti pairdata è non inizializzato?
-        for (unsigned int i = 0; i < _sides; ++i) {
-			
-            *getPairsData(i, f) = PairsData();
-		}*/
-
-        int order[][2] = { { *data & 0xF, pp ? *(data + 1) & 0xF : 0xF },
-                           { *data >>  4, pp ? *(data + 1) >>  4 : 0xF } };
-        data += 1 + pp;
+        int order[][2] = { { *data & 0xF, pawnsOnBothSides ? *(data + 1) & 0xF : 0xF },
+                           { *data >>  4, pawnsOnBothSides ? *(data + 1) >>  4 : 0xF } };
+        data += 1 + pawnsOnBothSides;
 
         for (unsigned int k = 0; k < _pieceCount; ++k, ++data) {
             for (unsigned int i = 0; i < sides; ++i) {
-                getPairsData(i, f)->setPiece(k, (i > 0 ? *data >>  4 : *data & 0xF));
+                getPairsData(i, f).setPiece(k, (i > 0 ? *data >>  4 : *data & 0xF));
 			}
 		}
 
-		for (int i = 0; i < sides; ++i) {
-			getPairsData(i, f)->setGroups(*this, order[i], f);
+		for (unsigned int i = 0; i < sides; ++i) {
+			getPairsData(i, f).setGroups(*this, order[i], f);
 		}
     }
 	
 	data += (uintptr_t)data & 1; // Word alignment
 	
 	for (tFile f = FILEA; f <= maxFile; ++f) {
-		for (int i = 0; i < sides; i++) {
-			data = getPairsData(i, f)->setSizes(data);
+		for (unsigned int i = 0; i < sides; i++) {
+			data = getPairsData(i, f).setSizes(data);
 		}
 	}
-	
-	// todo use virtual method?
 	// it's only needed for DTZ talbe
 	if (getType() == DTZ) {
 		setMap(data);
 		for (tFile f = FILEA; f <= maxFile; ++f) {
-			data = getPairsData(0, f)->setDtzMap(getMap(), data);
+			data = getPairsData(0, f).setDtzMap(getMap(), data);
 		}
 		data += (uintptr_t)data & 1; // Word alignment
 	}
 	
 	for (tFile f = FILEA; f <= maxFile; ++f) {
-        for (int i = 0; i < sides; i++) {
-            data = getPairsData(i, f)->setSparseIndex(data);
+        for (unsigned int i = 0; i < sides; i++) {
+            data = getPairsData(i, f).setSparseIndex(data);
         }
 	}
 
     for (tFile f = FILEA; f <= maxFile; ++f) {
-        for (int i = 0; i < sides; i++) {
-            data = getPairsData(i, f)->setBlockLength(data);
+        for (unsigned int i = 0; i < sides; i++) {
+            data = getPairsData(i, f).setBlockLength(data);
         }
 	}
 
     for (tFile f = FILEA; f <= maxFile; ++f) {
-        for (int i = 0; i < sides; i++) {
-            data = getPairsData(i, f)->setData(data);
+        for (unsigned int i = 0; i < sides; i++) {
+            data = getPairsData(i, f).setData(data);
         }
 	}
 
@@ -179,12 +169,12 @@ std::string TBTable::getCompleteFileName() const {
 	
 }
 
-PairsData* TBTable::getPairsData(const unsigned int stm, const tFile f) {
-	return &_items[stm % _sides][_hasPawns ? f : 0];
+PairsData& TBTable::getPairsData(const unsigned int stm, const tFile f) {
+	return _items[stm % _sides][_hasPawns ? f : 0];
 }
 
-const PairsData* TBTable::getPairsData(const unsigned int stm, const tFile f) const {
-	return &_items[stm % _sides][_hasPawns ? f : 0];
+const PairsData& TBTable::getPairsData(const unsigned int stm, const tFile f) const {
+	return _items[stm % _sides][_hasPawns ? f : 0];
 }
 
 bool TBTable::hasPawnOnBothSides() const {
@@ -210,7 +200,6 @@ int TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
 	bitboardIndex pieces[TBPIECES];
 	uint64_t idx;
 	int next = 0, size = 0, leadPawnsCnt = 0;
-	PairsData* d;
 	bitMap b, leadPawns = 0;
 	tFile tbFile = FILEA;
 
@@ -237,7 +226,7 @@ int TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
 
 		// In all the 4 tables, pawns are at the beginning of the piece sequence and
 		// their color is the reference one. So we just pick the first one.
-		bitboardIndex pc = bitboardIndex(getPairsData(0, FILEA)->getPiece(0) ^ flipColor);
+		bitboardIndex pc = bitboardIndex(getPairsData(0, FILEA).getPiece(0) ^ flipColor);
 
 		assert(isPawn(pc));
 
@@ -275,13 +264,13 @@ int TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
 
 	assert(size >= 2);
 
-	d = getPairsData(stm, tbFile);
+	const PairsData& d = getPairsData(stm, tbFile);
 
 	// Then we reorder the pieces to have the same sequence as the one stored
 	// in pieces[i]: the sequence that ensures the best compression.
 	for (int i = leadPawnsCnt; i < size; ++i) {
 		for (int j = i; j < size; ++j) {
-			if (d->getPiece(i) == pieces[j]) {
+			if (d.getPiece(i) == pieces[j]) {
 				std::swap(pieces[i], pieces[j]);
 				std::swap(squares[i], squares[j]);
 				break;
@@ -321,7 +310,7 @@ int TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
 
 	// Look for the first piece of the leading group not on the A1-D4 diagonal
 	// and ensure it is mapped below the diagonal.
-	for (int i = 0; i < d->getGroupLen(0); ++i) {
+	for (int i = 0; i < d.getGroupLen(0); ++i) {
 		if (TBCommonData::isOnDiagonalA1H8(squares[i])) {
 			continue;
 		}
@@ -406,20 +395,20 @@ int TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
 	}
 
 encode_remaining:
-	idx *= d->getGroupIdx(0);
-	tSquare* groupSq = squares + d->getGroupLen(0);
+	idx *= d.getGroupIdx(0);
+	tSquare* groupSq = squares + d.getGroupLen(0);
 
 	// Encode remainig pawns then pieces according to square, in ascending order
 	bool remainingPawns = hasPawns() && getPawnCount(1);
 
-	while (d->getGroupLen(++next))
+	while (d.getGroupLen(++next))
 	{
-		std::sort(groupSq, groupSq + d->getGroupLen(next));
+		std::sort(groupSq, groupSq + d.getGroupLen(next));
 		uint64_t n = 0;
 
 		// Map down a square if "comes later" than a square in the previous
 		// groups (similar to what done earlier for leading group pieces).
-		for (int i = 0; i < d->getGroupLen(next); ++i)
+		for (int i = 0; i < d.getGroupLen(next); ++i)
 		{
 			auto f = [&](tSquare s) { return groupSq[i] > s; };
 			auto adjust = std::count_if(squares, groupSq, f);
@@ -427,10 +416,10 @@ encode_remaining:
 		}
 
 		remainingPawns = false;
-		idx += n * d->getGroupIdx(next);
-		groupSq += d->getGroupLen(next);
+		idx += n * d.getGroupIdx(next);
+		groupSq += d.getGroupLen(next);
 	}
 
 	// Now that we have the index, decompress the pair and get the score
-	return _mapScore(tbFile, d->decompress(idx), wdl);
+	return _mapScore(tbFile, d.decompress(idx), wdl);
 }

@@ -35,8 +35,8 @@ int TBTableDTZ::_mapScore(const tFile f, int value, const int wdl) const {
 
 	constexpr int WDLMap[] = { 1, 3, 0, 2, 0 };
 
-	auto flags = getPairsData(0, f)->getFlags();
-	const auto& idx = getPairsData(0, f)->getMapIdx();
+	auto flags = getPairsData(0, f).getFlags();
+	const auto& idx = getPairsData(0, f).getMapIdx();
 	
 	if (flags & PairsData::MappedFlag) {
 		if (flags & PairsData::WideFlag) {
@@ -62,7 +62,7 @@ int TBTableDTZ::_mapScore(const tFile f, int value, const int wdl) const {
 
 bool TBTableDTZ::_checkDtzStm(unsigned int stm, tFile f) const {
 
-	auto flags = getPairsData(stm, f)->getFlags();
+	auto flags = getPairsData(stm, f).getFlags();
 	return	(flags & PairsData::STMFlag) == stm
 			|| ((getKey() == getKey2()) && !hasPawns());
 }

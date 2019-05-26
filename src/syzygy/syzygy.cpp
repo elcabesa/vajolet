@@ -242,7 +242,7 @@ int Syzygy::probeDtz(Position& pos, ProbeState& result) const {
 // Use the DTZ tables to rank root moves.
 //
 // A return value false indicates that not all probes were successful.
-bool Syzygy::_rootProbe(Position& pos, std::vector<extMove>& rootMoves) const {
+bool Syzygy::rootProbe(Position& pos, std::vector<extMove>& rootMoves) const {
 
 	// Obtain 50-move counter for the root position
 	int cnt50 = pos.getActualState().getIrreversibleMoveCount();
@@ -299,7 +299,7 @@ bool Syzygy::_rootProbe(Position& pos, std::vector<extMove>& rootMoves) const {
 // This is a fallback for the case that some or all DTZ tables are missing.
 //
 // A return value false indicates that not all probes were successful.
-bool Syzygy::_rootProbeWdl(Position& pos, std::vector<extMove>& rootMoves) const {
+bool Syzygy::rootProbeWdl(Position& pos, std::vector<extMove>& rootMoves) const {
 	static const Score WDLToRank[] = { -1000, -899, 0, 899, 1000 };
 	
 	

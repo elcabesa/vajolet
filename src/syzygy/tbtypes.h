@@ -43,7 +43,6 @@ enum ProbeState {
 
 inline WDLScore operator-(WDLScore d) { return WDLScore(-int(d)); }
 
-// todo posso toglierlo da qui e metterlo dentro TBTABLE?
 enum TBType {WDL, DTZ}; // Used as template parameter
 
 using Sym = uint16_t;
