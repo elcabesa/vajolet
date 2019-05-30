@@ -10,7 +10,7 @@ typedef struct _positions
      const std::vector<unsigned long long> PerftValue;
 }positions;
 
-static const std::vector<positions> perftPos ={
+static const std::vector<positions> perftPos = {
 	{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", {20ull, 400ull, 8902ull, 197281ull, 4865609ull, 119060324ull}},
 	{"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", {48ull, 2039ull, 97862ull, 4085603ull, 193690690ull, 8031647685ull}},
 	{"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", {14ull, 191ull, 2812ull, 43238ull, 674624ull, 11030083ull, 178633661ull}},
@@ -22,10 +22,10 @@ static const std::vector<positions> perftPos ={
 	{"r1k2r1q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K2R1Q w KQkq - 0 1", {28ull, 738ull, 20218ull, 541480ull, 15194841ull, 418430598ull, 12094237108ull}},
 	{"8/8/8/4B2b/6nN/8/5P2/2R1K2k w Q - 0 1", {34ull, 318ull, 9002ull, 118388ull, 3223406ull, 44554839ull, 1205627532ull}},
 	{"2r5/8/8/8/8/8/6PP/k2KR3 w K - 0 1", {17ull, 242ull, 3931ull, 57700ull, 985298ull, 14751778ull, 259604208ull, 3914405614ull}},
-	{"4r3/3k4/8/8/8/8/6PP/qR1K1R2 w KQ - 0 1", {19ull, 628ull, 12858ull, 405636ull, 8992652ull, 281330710ull, 6447669114ull}}
+	{"4r3/3k4/8/8/8/8/6PP/qR1K1R2 w KQ - 0 1", {19ull, 628ull, 12858ull, 405636ull, 8992652ull, 281330710ull, 6447669114ull}},
+	{"qr1kbb1r/1pp2ppp/3npn2/3pN3/1p3P2/4PN2/P1PP2PP/QR1KBB1R w HBhb - 0 1", {42ull, 1446ull, 60244ull, 2144112ull, 87972564ull, 3206947488ull}}
 	
 };
-
 
 TEST(PerftTest, perft) {
 	Position pos;
