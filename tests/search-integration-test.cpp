@@ -6,11 +6,12 @@
 #include "searchLimits.h"
 #include "searchTimer.h"
 #include "transposition.h"
+#include "syzygy/syzygy.h"
 
 
-enum resType
+enum _resType
 {
-	near,
+	_near,
 	bigger,
 	smaller,
 	equal
@@ -22,7 +23,7 @@ typedef struct _positions
      unsigned int depth;
      Move bm;
      Move am;
-     resType res;
+     _resType res;
      Score score;
 
 }positions;
@@ -58,9 +59,8 @@ static const std::vector<positions> _p =
 
 TEST(search, search) {
 	
-	Search::initSearchParameters();
+	Syzygy::getInstance().setPath("");
 	transpositionTable::getInstance().setSize(1);
-	Position::initMaterialKeys();
 	
 	SearchTimer st;
 	SearchLimits sl;
@@ -91,7 +91,7 @@ TEST(search, search) {
 		case smaller:
 			EXPECT_LT( res.Res, p.score) << "problem with position: '"<< p.Fen <<"' expected smaller";
 			break;
-		case near:
+		case _near:
 			EXPECT_GT( res.Res, p.score - 200) << "problem with position: '"<< p.Fen <<"' expected similar";
 			EXPECT_LT( res.Res, p.score + 200) << "problem with position: '"<< p.Fen <<"' expected similar";
 			break;
@@ -105,9 +105,8 @@ TEST(search, search) {
 
 TEST(search, searchExludeMove) {
 	
-	Search::initSearchParameters();
+	Syzygy::getInstance().setPath("");
 	transpositionTable::getInstance().setSize(1);
-	Position::initMaterialKeys();
 	
 	SearchTimer st;
 	SearchLimits sl;
@@ -121,4 +120,28 @@ TEST(search, searchExludeMove) {
 	auto res = src.startThinking();
 
 	EXPECT_EQ( res.PV.getMove(0), Move(F1,C4));
+}
+
+TEST(search, syzygy) {
+	
+	auto& szg = Syzygy::getInstance();
+	szg.setPath("data/syzygy");
+
+	transpositionTable::getInstance().setSize(1);
+	
+	ASSERT_EQ(szg.getMaxCardinality(), 4);
+	ASSERT_EQ(szg.getSize(), 35);
+	
+	SearchTimer st;
+	SearchLimits sl;
+	
+	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
+	
+	src.getPosition().setupFromFen("8/8/8/6P1/8/5K2/1r6/k7 b - - 0 1");
+	
+	sl.setDepth(1);
+	auto res = src.startThinking();
+	
+	EXPECT_EQ( res.PV.getMove(0), Move(B2, B4));
+
 }
