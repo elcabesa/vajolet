@@ -145,3 +145,27 @@ TEST(search, syzygy) {
 	EXPECT_EQ( res.PV.getMove(0), Move(B2, B4));
 
 }
+
+TEST(search, syzygy2) {
+	
+	auto& szg = Syzygy::getInstance();
+	szg.setPath("data/syzygy");
+
+	transpositionTable::getInstance().setSize(1);
+	
+	ASSERT_EQ(szg.getMaxCardinality(), 4);
+	ASSERT_EQ(szg.getSize(), 35);
+	
+	SearchTimer st;
+	SearchLimits sl;
+	
+	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
+	
+	src.getPosition().setupFromFen("8/8/8/1k4p1/1P4Pp/K6P/8/8 w - - 0 1");
+	
+	sl.setDepth(15);
+	auto res = src.startThinking();
+	
+	EXPECT_EQ( res.PV.getMove(0), Move(A3, B3));
+
+}
