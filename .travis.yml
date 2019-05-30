@@ -26,6 +26,7 @@ script:
   - ./Vajolet_unit_test
   - ./Vajolet_search_integration_test
   - cd ..
+  - ./Vajolet bench
   
 after_success:
   - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src 
