@@ -155,3 +155,13 @@ TEST(PositionTest, evalTrace) {
 	
 }
 
+TEST(PositionTest, getFen) {
+	Position pos;
+	for (auto & p : perftPos)
+	{
+		pos.setupFromFen(p.Fen); 
+		
+		EXPECT_EQ(pos.getFen(), p.Fen);
+
+	}
+}
