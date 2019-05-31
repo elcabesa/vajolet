@@ -78,6 +78,7 @@ public:
 	~impl();
 	
 	void uciLoop();
+	bool uciParser(std::string& cmd);
 	static char getPieceName(const bitboardIndex idx);
 	static std::string displayUci(const Move& m, const bool chess960);
 	static std::string displayMove(const Position& pos, const Move& m);
@@ -684,6 +685,107 @@ void UciManager::impl::_setoption(std::istringstream& is)
 	}
 }
 
+bool UciManager::impl::uciParser(std::string& cmd) {
+	
+	my_thread &thr = my_thread::getInstance();
+	bool quit = false;
+	
+	std::string token;
+	
+	std::istringstream is(cmd);
+	token.clear();
+	is >> std::skipws >> token;
+
+
+	if(token== "uci")
+	{
+		_printUciInfo();
+	}
+	else if (token == "stop")
+	{
+		thr.stopThinking();
+	}
+	else if (token == "ucinewgame")
+	{
+	}
+	else if (token == "d")
+	{
+		_pos.display();
+	}
+	else if (token == "position")
+	{
+		_position(is);
+	}
+	else if(token == "setoption")
+	{
+		_setoption(is);
+	}
+	else if (token == "eval")
+	{
+		Score s = _pos.eval<true>();
+		sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
+		sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0*100 << "%" << sync_endl;
+
+	}
+	else if (token == "isready")
+	{
+		sync_cout << "readyok" << sync_endl;
+	}
+	else if (token == "perft" && (is>>token))
+	{
+		int n = 1;
+		try
+		{
+			n = std::stoi(token);
+		}
+		catch(...)
+		{
+			n = 1;
+		}
+		n = std::max(n,1);
+		_doPerft(n);
+	}
+	else if (token == "divide" && (is>>token))
+	{
+		int n = 1;
+		try
+		{
+			n = std::stoi(token);
+		}
+		catch(...)
+		{
+			n = 1;
+		}
+		
+		unsigned long long res = Perft(_pos).divide(n);
+		sync_cout << "divide Res= " << res << sync_endl;
+	}
+	else if (token == "go")
+	{
+		_go(is);
+	}
+	else if (token == "bench")
+	{
+		benchmark();
+	}
+	else if (token == "ponderhit")
+	{
+		thr.ponderHit();
+	}
+	else if (token == "quit")
+	{
+		thr.stopThinking();
+		quit = true;
+	}
+	else
+	{
+		sync_cout << "unknown command" << sync_endl;
+	}
+	
+	return quit;
+	
+}
+
 
 /*	\brief manage the uci loop
 	\author Marco Belli
@@ -692,102 +794,19 @@ void UciManager::impl::_setoption(std::istringstream& is)
 */
 void UciManager::impl::uciLoop()
 {
-	// todo manage command parsin with a list?
 	_printNameAndVersionMessage();
-	my_thread &thr = my_thread::getInstance();
 	
-	std::string token, cmd;
+	std::string cmd;
 
+	bool quit = false;
 	do
 	{
-		if (!std::getline(std::cin, cmd)) // Block here waiting for input
+		if (!std::getline(std::cin, cmd)) {// Block here waiting for input
 			cmd = "quit";
-		std::istringstream is(cmd);
-
-		token.clear();
-		is >> std::skipws >> token;
-
-
-		if(token== "uci")
-		{
-			_printUciInfo();
 		}
-		else if (token == "quit" || token == "stop")
-		{
-			thr.stopThinking();
-		}
-		else if (token == "ucinewgame")
-		{
-		}
-		else if (token == "d")
-		{
-			_pos.display();
-		}
-		else if (token == "position")
-		{
-			_position(is);
-		}
-		else if(token == "setoption")
-		{
-			_setoption(is);
-		}
-		else if (token == "eval")
-		{
-			Score s = _pos.eval<true>();
-			sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
-			sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0*100 << "%" << sync_endl;
-
-		}
-		else if (token == "isready")
-		{
-			sync_cout << "readyok" << sync_endl;
-		}
-		else if (token == "perft" && (is>>token))
-		{
-			int n = 1;
-			try
-			{
-				n = std::stoi(token);
-			}
-			catch(...)
-			{
-				n = 1;
-			}
-			n = std::max(n,1);
-			_doPerft(n);
-		}
-		else if (token == "divide" && (is>>token))
-		{
-			int n = 1;
-			try
-			{
-				n = std::stoi(token);
-			}
-			catch(...)
-			{
-				n = 1;
-			}
-			
-			unsigned long long res = Perft(_pos).divide(n);
-			sync_cout << "divide Res= " << res << sync_endl;
-		}
-		else if (token == "go")
-		{
-			_go(is);
-		}
-		else if (token == "bench")
-		{
-			benchmark();
-		}
-		else if (token == "ponderhit")
-		{
-			thr.ponderHit();
-		}
-		else
-		{
-			sync_cout << "unknown command" << sync_endl;
-		}
-	}while(token!="quit");
+		
+		quit = uciParser(cmd);
+	}while(!quit);
 }
 
 
