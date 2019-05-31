@@ -38,4 +38,5 @@ TEST_F(commandTest, uciTest) {
 	ASSERT_NE(found, std::string::npos);
 	
 	EXPECT_EQ(buffer.str().substr(found + 9, 4), "h7h8");
+	
 }
