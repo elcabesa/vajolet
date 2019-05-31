@@ -2,6 +2,7 @@ enable_testing()
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(Vajolet_unit_test 
 	book-test.cpp
+    commandTest.cpp
 	dataTest.cpp
 	hashKeyTest.cpp
 	historyTest.cpp

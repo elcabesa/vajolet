@@ -32,7 +32,6 @@
 #include "rootMove.h"
 #include "searchTimer.h"
 #include "searchLimits.h"
-// todo remove
 #include "syzygy/syzygy.h"
 #include "thread.h"
 #include "transposition.h"
@@ -77,7 +76,7 @@ public:
 	explicit impl();
 	~impl();
 	
-	void uciLoop();
+	void uciLoop(std::istream& is);
 	bool uciParser(std::string& cmd);
 	static char getPieceName(const bitboardIndex idx);
 	static std::string displayUci(const Move& m, const bool chess960);
@@ -792,7 +791,7 @@ bool UciManager::impl::uciParser(std::string& cmd) {
 	\version 1.0
 	\date 21/10/2013
 */
-void UciManager::impl::uciLoop()
+void UciManager::impl::uciLoop(std::istream& is)
 {
 	_printNameAndVersionMessage();
 	
@@ -801,7 +800,7 @@ void UciManager::impl::uciLoop()
 	bool quit = false;
 	do
 	{
-		if (!std::getline(std::cin, cmd)) {// Block here waiting for input
+		if (!std::getline(is, cmd)) {// Block here waiting for input
 			cmd = "quit";
 		}
 		
@@ -815,7 +814,7 @@ UciManager::UciManager(): pimpl{std::make_unique<impl>()}{}
 
 UciManager::~UciManager() = default;
 
-void UciManager::uciLoop() { pimpl->uciLoop();}
+void UciManager::uciLoop(std::istream& is) { pimpl->uciLoop(is);}
 char UciManager::getPieceName( const bitboardIndex idx ) { return impl::getPieceName(idx);}
 std::string UciManager::displayUci(const Move& m, const bool chess960) { return  impl::displayUci(m, chess960);}
 std::string UciManager::displayMove( const Position& pos, const Move& m ) {  return impl::displayMove(pos, m);}
