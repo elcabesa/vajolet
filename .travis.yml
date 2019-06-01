@@ -30,7 +30,7 @@ script:
   - cd ..
   
 after_success:
-  - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src 
+  - coveralls --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src 
   
 deploy:
   provider: pages
