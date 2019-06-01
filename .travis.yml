@@ -3,23 +3,18 @@ sudo: required
 language:
   - cpp
 compiler:
-  - gcc
+  - clang
 addons:
   apt:
     sources:
       - llvm-toolchain-xenial-8
-      - ubuntu-toolchain-r-test
     packages:
-      - gcc-7
-      - g++-7
       - clang-8
 
 before_install:
   - pip install --user cpp-coveralls
 
 script:
-  - export CC=/usr/bin/gcc-7
-  - export CXX=/usr/bin/g++-7
   - mkdir build
   - cd build
   - cmake -DVAJOLET_CPU_TYPE=64NEW -DCMAKE_BUILD_TYPE=Debug ..
