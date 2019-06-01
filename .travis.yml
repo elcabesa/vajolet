@@ -39,5 +39,6 @@ deploy:
   keep_history: true
   repo: https://github.com/elcabesa/vajoletBuilds.git
   local_dir: build/src/
+  target_branch: master
   on:
     all_branches: true
