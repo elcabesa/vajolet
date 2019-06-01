@@ -38,4 +38,5 @@ deploy:
   github_token: $GITHUB_TOKEN
   keep_history: true
   repo: https://github.com/elcabesa/vajoletBuilds.git
-  
+  on:
+    all_branches: true
