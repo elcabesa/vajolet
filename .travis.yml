@@ -33,10 +33,10 @@ after_success:
   - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src 
   
 deploy:
-  provider: releases
-  api_key:
-    secure: "$githubToken"
-  file: "build/src/Vajolet"
+  provider: pages
   skip_cleanup: true
-  draft: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  on:
+    branch: master
   
