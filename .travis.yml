@@ -37,7 +37,7 @@ deploy:
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   keep_history: true
-  repo: elcabesa/vajoletBuilds
+  repo: https://github.com/elcabesa/vajoletBuilds.git
 
   on:
     branch: master
