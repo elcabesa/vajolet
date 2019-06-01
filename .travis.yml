@@ -31,14 +31,3 @@ script:
   
 after_success:
   - coveralls --gcov llvm-cov --root .. --gcov-options '\gcov -lp' -e tests -e build/CMakeFiles -e build/googletest-src 
-  
-deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  keep_history: true
-  repo: https://github.com/elcabesa/vajoletBuilds.git
-  local_dir: build/src/
-  target_branch: master
-  on:
-    all_branches: true
