@@ -32,3 +32,11 @@ script:
 after_success:
   - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src 
   
+deploy:
+  provider: releases
+  api_key:
+    secure: "2d44e875f1ce2fd6ea8eb9cf3026e9f5fbb196b2"
+  file: "build/src/Vajolet"
+  skip_cleanup: true
+  draft: true
+  
