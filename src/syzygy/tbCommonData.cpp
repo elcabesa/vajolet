@@ -32,11 +32,11 @@
 
 unsigned int TBCommonData::_MapB1H1H7[squareNumber] = {0};
 unsigned int TBCommonData::_MapA1D1D4[squareNumber] = {0};
-unsigned int TBCommonData::_MapKK[10][squareNumber] = {0};
-unsigned int TBCommonData::_Binomial[6][squareNumber] = {0};
+unsigned int TBCommonData::_MapKK[10][squareNumber] = {{0}};
+unsigned int TBCommonData::_Binomial[6][squareNumber] = {{0}};
 unsigned int  TBCommonData::_MapPawns[squareNumber] = {0};
-unsigned int TBCommonData::_LeadPawnIdx[6][squareNumber] = {0};
-unsigned int TBCommonData::_LeadPawnsSize[6][4] = {0};
+unsigned int TBCommonData::_LeadPawnIdx[6][squareNumber] = {{0}};
+unsigned int TBCommonData::_LeadPawnsSize[6][4] = {{0}};
 
 int TBCommonData::_offsetA1H8(const tSquare sq) {
 	return int(getRankOf(sq)) - int(getFileOf(sq));
