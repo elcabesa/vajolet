@@ -30,7 +30,7 @@ script:
   - cd ..
   
 after_success:
-  - coveralls --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src 
+  - coveralls --gcov llvm-cov --root .. --gcov-options '\-lp' -e tests -e build/CMakeFiles -e build/googletest-src 
   
 deploy:
   provider: pages
@@ -38,7 +38,4 @@ deploy:
   github_token: $GITHUB_TOKEN
   keep_history: true
   repo: https://github.com/elcabesa/vajoletBuilds.git
-
-  on:
-    branch: master
   
