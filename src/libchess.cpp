@@ -18,6 +18,7 @@
 #include "libchess.h"
 #include "position.h"
 #include "search.h"
+#include "syzygy/syzygy.h"
 
 
 void libChessInit()
@@ -25,8 +26,8 @@ void libChessInit()
 	initData();
 	HashKey::init();
 	Position::initScoreValues();
-	//Position::initCastleRightsMask();
 	Movegen::initMovegenConstant();
 	Search::initSearchParameters();
 	Position::initMaterialKeys();
+	Syzygy::getInstance();
 }

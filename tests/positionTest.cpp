@@ -142,3 +142,26 @@ TEST(PositionTest, getGamePhaseEndgame) {
 	
 }
 
+TEST(PositionTest, evalTrace) {
+	std::streambuf* oldCoutStreamBuf = std::cout.rdbuf();
+	std::ostringstream strCout;
+	std::cout.rdbuf( strCout.rdbuf() );
+	
+	Position pos;
+	pos.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); 
+	EXPECT_EQ(pos.eval<true>(), pos.eval<false>());
+	
+	std::cout.rdbuf( oldCoutStreamBuf );
+	
+}
+
+TEST(PositionTest, getFen) {
+	Position pos;
+	for (auto & p : perftPos)
+	{
+		pos.setupFromFen(p.Fen); 
+		
+		EXPECT_EQ(pos.getFen(), p.Fen);
+
+	}
+}

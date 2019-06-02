@@ -44,7 +44,15 @@ CPP_SRCS := \
 ./src/transposition.cpp \
 ./src/uciParameters.cpp \
 ./src/vajolet.cpp \
-./src/syzygy/tbprobe.cpp 
+./src/syzygy/syzygy.cpp \
+./src/syzygy/tbCommonData.cpp \
+./src/syzygy/tbfile.cpp \
+./src/syzygy/tbpairs.cpp \
+./src/syzygy/tbtable.cpp \
+./src/syzygy/tbtableDTZ.cpp \
+./src/syzygy/tbtables.cpp \
+./src/syzygy/tbtableWDL.cpp \
+./src/syzygy/tbvalidater.cpp 
 
 C_SRCS := 
 S_UPPER_SRCS := 
@@ -80,7 +88,15 @@ OBJS :=  \
 ./src/transposition.o \
 ./src/uciParameters.o \
 ./src/vajolet.o \
-./src/syzygy/tbprobe.o 
+./src/syzygy/syzygy.o \
+./src/syzygy/tbCommonData.o \
+./src/syzygy/tbfile.o \
+./src/syzygy/tbpairs.o \
+./src/syzygy/tbtable.o \
+./src/syzygy/tbtableDTZ.o \
+./src/syzygy/tbtables.o \
+./src/syzygy/tbtableWDL.o \
+./src/syzygy/tbvalidater.o 
 C_UPPER_DEPS := 
 CXX_DEPS := 
 CPP_DEPS := \
@@ -111,14 +127,22 @@ CPP_DEPS := \
 ./src/transposition.d \
 ./src/uciParameters.cd \
 ./src/vajolet.d \
-./src/syzygy/tbprobe.d 
+./src/syzygy/syzygy.d \
+./src/syzygy/tbCommonData.d \
+./src/syzygy/tbfile.d \
+./src/syzygy/tbpairs.d \
+./src/syzygy/tbtable.d \
+./src/syzygy/tbtableDTZ.d \
+./src/syzygy/tbtables.d \
+./src/syzygy/tbtableWDL.d \
+./src/syzygy/tbvalidater.d 
 C_DEPS := 
 
 # Each subdirectory must supply rules for building sources it contributes
 %.o: ./%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++1z -O3 -DNDEBUG -msse4.2 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	g++ -std=c++1z -O3 -DNDEBUG -mbmi -mbmi2 -msse4.2 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -Isrc -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

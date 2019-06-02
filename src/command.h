@@ -18,7 +18,7 @@
 #ifndef COMMAND_H_
 #define COMMAND_H_
 
-
+#include <istream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -57,7 +57,7 @@ public:
 		// Instantiated on first use.
 		return instance;
 	}
-	void uciLoop(void);
+	void uciLoop(std::istream& is);
 	static char getPieceName(const bitboardIndex idx);
 	static std::string displayUci(const Move& m, const bool chess960);
 	static std::string displayMove(const Position& pos, const Move& m);

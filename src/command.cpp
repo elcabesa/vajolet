@@ -32,7 +32,7 @@
 #include "rootMove.h"
 #include "searchTimer.h"
 #include "searchLimits.h"
-#include "syzygy/tbprobe.h"
+#include "syzygy/syzygy.h"
 #include "thread.h"
 #include "transposition.h"
 #include "uciParameters.h"
@@ -76,7 +76,8 @@ public:
 	explicit impl();
 	~impl();
 	
-	void uciLoop();
+	void uciLoop(std::istream& is);
+	bool uciParser(std::string& cmd);
 	static char getPieceName(const bitboardIndex idx);
 	static std::string displayUci(const Move& m, const bool chess960);
 	static std::string displayMove(const Position& pos, const Move& m);
@@ -93,8 +94,12 @@ private:
 		unsigned long elements = transpositionTable::getInstance().setSize(size);
 		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
 	}
-	static void clearHash(){ transpositionTable::getInstance().clear(); }
-	static void setTTPath( std::string s ){ tb_init(s.c_str());}
+	static void clearHash() {transpositionTable::getInstance().clear();}
+	static void setTTPath( std::string s ) {
+		auto&  szg = Syzygy::getInstance();
+		szg.setPath(s);
+		sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;
+	}
 	std::string unusedVersion;
 	unsigned int unusedSize;
 	static const char _PIECE_NAMES_FEN[];
@@ -679,110 +684,128 @@ void UciManager::impl::_setoption(std::istringstream& is)
 	}
 }
 
+bool UciManager::impl::uciParser(std::string& cmd) {
+	
+	my_thread &thr = my_thread::getInstance();
+	bool quit = false;
+	
+	std::string token;
+	
+	std::istringstream is(cmd);
+	token.clear();
+	is >> std::skipws >> token;
+
+
+	if(token== "uci")
+	{
+		_printUciInfo();
+	}
+	else if (token == "stop")
+	{
+		thr.stopThinking();
+	}
+	else if (token == "ucinewgame")
+	{
+	}
+	else if (token == "d")
+	{
+		_pos.display();
+	}
+	else if (token == "position")
+	{
+		_position(is);
+	}
+	else if(token == "setoption")
+	{
+		_setoption(is);
+	}
+	else if (token == "eval")
+	{
+		Score s = _pos.eval<true>();
+		sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
+		sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0*100 << "%" << sync_endl;
+
+	}
+	else if (token == "isready")
+	{
+		sync_cout << "readyok" << sync_endl;
+	}
+	else if (token == "perft" && (is>>token))
+	{
+		int n = 1;
+		try
+		{
+			n = std::stoi(token);
+		}
+		catch(...)
+		{
+			n = 1;
+		}
+		n = std::max(n,1);
+		_doPerft(n);
+	}
+	else if (token == "divide" && (is>>token))
+	{
+		int n = 1;
+		try
+		{
+			n = std::stoi(token);
+		}
+		catch(...)
+		{
+			n = 1;
+		}
+		
+		unsigned long long res = Perft(_pos).divide(n);
+		sync_cout << "divide Res= " << res << sync_endl;
+	}
+	else if (token == "go")
+	{
+		_go(is);
+	}
+	else if (token == "bench")
+	{
+		benchmark();
+	}
+	else if (token == "ponderhit")
+	{
+		thr.ponderHit();
+	}
+	else if (token == "quit")
+	{
+		thr.stopThinking();
+		quit = true;
+	}
+	else
+	{
+		sync_cout << "unknown command" << sync_endl;
+	}
+	
+	return quit;
+	
+}
+
 
 /*	\brief manage the uci loop
 	\author Marco Belli
 	\version 1.0
 	\date 21/10/2013
 */
-void UciManager::impl::uciLoop()
+void UciManager::impl::uciLoop(std::istream& is)
 {
-	// todo manage command parsin with a list?
 	_printNameAndVersionMessage();
-	my_thread &thr = my_thread::getInstance();
 	
-	std::string token, cmd;
+	std::string cmd;
 
+	bool quit = false;
 	do
 	{
-		if (!std::getline(std::cin, cmd)) // Block here waiting for input
+		if (!std::getline(is, cmd)) {// Block here waiting for input
 			cmd = "quit";
-		std::istringstream is(cmd);
-
-		token.clear();
-		is >> std::skipws >> token;
-
-
-		if(token== "uci")
-		{
-			_printUciInfo();
 		}
-		else if (token == "quit" || token == "stop")
-		{
-			thr.stopThinking();
-		}
-		else if (token == "ucinewgame")
-		{
-		}
-		else if (token == "d")
-		{
-			_pos.display();
-		}
-		else if (token == "position")
-		{
-			_position(is);
-		}
-		else if(token == "setoption")
-		{
-			_setoption(is);
-		}
-		else if (token == "eval")
-		{
-			Score s = _pos.eval<true>();
-			sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
-			sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0*100 << "%" << sync_endl;
-
-		}
-		else if (token == "isready")
-		{
-			sync_cout << "readyok" << sync_endl;
-		}
-		else if (token == "perft" && (is>>token))
-		{
-			int n = 1;
-			try
-			{
-				n = std::stoi(token);
-			}
-			catch(...)
-			{
-				n = 1;
-			}
-			n = std::max(n,1);
-			_doPerft(n);
-		}
-		else if (token == "divide" && (is>>token))
-		{
-			int n = 1;
-			try
-			{
-				n = std::stoi(token);
-			}
-			catch(...)
-			{
-				n = 1;
-			}
-			
-			unsigned long long res = Perft(_pos).divide(n);
-			sync_cout << "divide Res= " << res << sync_endl;
-		}
-		else if (token == "go")
-		{
-			_go(is);
-		}
-		else if (token == "bench")
-		{
-			benchmark();
-		}
-		else if (token == "ponderhit")
-		{
-			thr.ponderHit();
-		}
-		else
-		{
-			sync_cout << "unknown command" << sync_endl;
-		}
-	}while(token!="quit");
+		
+		quit = uciParser(cmd);
+	}while(!quit);
 }
 
 
@@ -791,7 +814,7 @@ UciManager::UciManager(): pimpl{std::make_unique<impl>()}{}
 
 UciManager::~UciManager() = default;
 
-void UciManager::uciLoop() { pimpl->uciLoop();}
+void UciManager::uciLoop(std::istream& is) { pimpl->uciLoop(is);}
 char UciManager::getPieceName( const bitboardIndex idx ) { return impl::getPieceName(idx);}
 std::string UciManager::displayUci(const Move& m, const bool chess960) { return  impl::displayUci(m, chess960);}
 std::string UciManager::displayMove( const Position& pos, const Move& m ) {  return impl::displayMove(pos, m);}

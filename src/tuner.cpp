@@ -30,7 +30,7 @@
 #include "eval.h"
 #include "parameters.h"
 #include "uciParameters.h"
-#include "syzygy/tbprobe.h"
+#include "syzygy/syzygy.h"
 #include "eval.h"
 
 #include <fstream>
@@ -200,7 +200,10 @@ int main()
 	libChessInit();
 
 	transpositionTable::getInstance().setSize(1);
-	tb_init(uciParameters::SyzygyPath.c_str());
+	auto&  szg = Syzygy::getInstance();
+	szg.setPath(uciParameters::SyzygyPath);
+	sync_cout<<"info string syzygy path set to "<<uciParameters::SyzygyPath<<sync_endl;
+	sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;
 	
 	enablePawnHash =false;
 

@@ -1,10 +1,28 @@
 enable_testing()
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(Vajolet_unit_test book-test.cpp dataTest.cpp hashKeyTest.cpp historyTest.cpp main.cpp MoveTest.cpp MoveListTest.cpp multiPVmanagerTest.cpp perft-test.cpp pvLineFollowerTest.cpp positionTest.cpp pvLineTest.cpp searchTimer-test.cpp see-test.cpp timeManagement-test.cpp UciOutput-test.cpp)
+add_executable(Vajolet_unit_test 
+	book-test.cpp
+    commandTest.cpp
+	dataTest.cpp
+	hashKeyTest.cpp
+	historyTest.cpp
+	main.cpp
+	MoveTest.cpp
+	MoveListTest.cpp
+	multiPVmanagerTest.cpp
+	perft-test.cpp
+	pvLineFollowerTest.cpp
+	positionTest.cpp
+	pvLineTest.cpp
+	searchTimer-test.cpp
+	see-test.cpp
+	timeManagement-test.cpp
+	UciOutput-test.cpp)
+
 target_link_libraries(Vajolet_unit_test gtest libChess)
 target_include_directories (Vajolet_unit_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-add_executable(Vajolet_syzygy_test main.cpp syzygy-test.cpp)
+add_executable(Vajolet_syzygy_test main.cpp)
 target_link_libraries(Vajolet_syzygy_test gtest libChess)
 target_include_directories (Vajolet_syzygy_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
@@ -16,8 +34,12 @@ add_executable(Vajolet_search_integration_test main.cpp search-integration-test.
 target_link_libraries(Vajolet_search_integration_test gtest libChess)
 target_include_directories (Vajolet_search_integration_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+add_subdirectory(syzygyTests)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Perfect2017.bin
     ${CMAKE_CURRENT_BINARY_DIR}/book.bin COPYONLY)
+	
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
 
 add_test(NAME unit_test COMMAND Vajolet_unit_test)
 add_test(NAME syzygy_test COMMAND Vajolet_syzygy_test)

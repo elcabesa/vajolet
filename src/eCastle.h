@@ -26,7 +26,7 @@ using Color = enum eColor
 
 enum eCastle	// castleRights
 {
-
+	noCastle   = 0,
 	wCastleOO  = 1,
 	wCastleOOO = 2,
 	bCastleOO  = 4,

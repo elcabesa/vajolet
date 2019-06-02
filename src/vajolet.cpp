@@ -75,6 +75,6 @@ int main( int argc, char* argv[] )
 	//----------------------------------
 	//	main loop
 	//----------------------------------
-	UciManager::getInstance().uciLoop();
+	UciManager::getInstance().uciLoop(std::cin);
 	return 0;
 }

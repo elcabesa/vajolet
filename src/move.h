@@ -212,12 +212,14 @@ public:
 	*	setter methods
 	******************************************************************/
 	void setScore( const Score s );
+	Score getScore() const;
 	
 private:
 	Score _score;
 };
 
 void inline extMove::setScore( const Score  s){ _score = s;}
+Score inline extMove::getScore() const { return _score;}
 
 
 /*!	\brief return the offset of a pawn push
