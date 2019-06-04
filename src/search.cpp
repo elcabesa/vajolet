@@ -31,6 +31,7 @@
 #include "rootMove.h"
 #include "search.h"
 #include "searchData.h"
+#include "searchLogger.h"
 #include "searchTimer.h"
 #include "timeManagement.h"
 #include "thread.h"
@@ -433,7 +434,8 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 		_pvLineFollower.restart();
 		PVline newPV;
 		newPV.clear();
-
+		
+		logWriter log(_pos.getFen(), depth);
 		Score res = alphaBeta<Search::impl::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
 		if(_validIteration || !_stop)
