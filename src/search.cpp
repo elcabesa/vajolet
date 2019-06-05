@@ -424,19 +424,20 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 	}
 
 	int globalReduction = 0;
+	unsigned int iteration = 0;
 
 	//----------------------------------
 	// aspiration window
 	//----------------------------------
 	do
-	{
+	{	++iteration;
 		_maxPlyReached = 0;
 		_validIteration = false;
 		_pvLineFollower.restart();
 		PVline newPV;
 		newPV.clear();
 
-		_lw = std::unique_ptr<logWriter>(new logWriter(_pos.getFen(), depth));
+		_lw = std::unique_ptr<logWriter>(new logWriter(_pos.getFen(), depth, iteration));
 		Score res = alphaBeta<Search::impl::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
 		if(_validIteration || !_stop)

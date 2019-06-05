@@ -27,7 +27,7 @@ class Move;
 
 class logWriter {
 public:
-	logWriter(std::string fen, const unsigned int depth);
+	logWriter(std::string fen, const unsigned int depth, unsigned int iteration);
 	~logWriter();
 	void writeString(const std::string & st);
 	void writeChar(const char c);
@@ -54,6 +54,7 @@ public:
 	void logTTprobe(const ttEntry& tte);
 	void logReturnValue(Score val);
 private:
+	void _indentate(unsigned int ply);
 	logWriter& _lw;
 	unsigned int _ply;
 };

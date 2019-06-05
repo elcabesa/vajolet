@@ -21,11 +21,11 @@
 #include "searchLogger.h"
 #include "transposition.h"
 
-logWriter::logWriter(std::string fen, const unsigned int depth) {
+logWriter::logWriter(std::string fen, const unsigned int depth, unsigned int iteration) {
 	std::string fileName("log_");
 	std::replace(fen.begin(), fen.end(), ' ', '_');
 	std::replace(fen.begin(), fen.end(), '/', '-');
-	fileName += fen + "_" + std::to_string(depth) + ".log";
+	fileName += fen + "_" + std::to_string(depth) + "_" + std::to_string(iteration) + ".log";
 	_log.open(fileName, std::ofstream::trunc);
 }
 
@@ -53,8 +53,7 @@ void logWriter::writeMove(const Move& m) {
 
 
 logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta): _lw(lw), _ply(ply) {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i < _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(ply);
 	_lw.writeChar('{');
 	_lw.writeNumber(ply);
 	_lw.writeChar(',');
@@ -67,71 +66,65 @@ logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score 
 }
 
 logNode::~logNode() {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i < _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply);
 	_lw.writeChar('}');
+}
+
+void logNode::_indentate(unsigned int ply) {
+	_lw.writeChar('\n');
+	for(unsigned int i = 0; i < ply; ++i) {_lw.writeChar('\t');}
 }
 
 
 void logNode::testIsDraw() {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("testIsDraw");
 }
 
 void logNode::testCanUseTT() {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("testCanUseTT");
 }
 
 void logNode::testStandPat() {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("testStandPat");
 }
 
 void logNode::testMated() {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("is mated?");
 }
 
 void logNode::testMove(Move& m) {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("testing move ");
 	_lw.writeMove(m);
 }
 
 void logNode::skipMove() {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("...skipped");
 }
 
 void logNode::raisedAlpha() {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("raised alpha");
 }
 
 void logNode::raisedbestScore() {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("raised bestScore");
 }
 
 void logNode::logReturnValue(Score val) {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("return: ");
 	_lw.writeNumber(val);
 }
 
 void logNode::logTTprobe(const ttEntry& tte) {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("TTprobe v: ");
 	_lw.writeNumber(tte.getValue());
 	_lw.writeString(" sv: ");
@@ -142,19 +135,16 @@ void logNode::logTTprobe(const ttEntry& tte) {
 	_lw.writeNumber(tte.getDepth());
 	_lw.writeString(" type: ");
 	_lw.writeNumber(tte.getType());
-	
 }
 
 void logNode::calcStaticEval(Score eval) {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("Static Eval: ");
 	_lw.writeNumber(eval);
 }
 
 void logNode::calcBestScore(Score eval) {
-	_lw.writeChar('\n');
-	for(unsigned int i = 0; i <= _ply; ++i) {_lw.writeChar('\t');}
+	_indentate(_ply + 1);
 	_lw.writeString("BestScore: ");
 	_lw.writeNumber(eval);
 }
