@@ -20,13 +20,42 @@
 #include <fstream>
 #include <iostream>
 
+#include "score.h"
+
+class ttEntry;
+class Move;
+
 class logWriter {
 public:
-	logWriter(const std::string fen, const unsigned int depth);
+	logWriter(std::string fen, const unsigned int depth);
 	~logWriter();
 	void writeString(const std::string & st);
+	void writeChar(const char c);
+	void writeNumber(const long long x);
+	void writeMove(const Move& m);
 private:
 	std::ofstream _log;
+};
+
+class logNode {
+public:
+	logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta);
+	~logNode();
+	void testIsDraw();
+	void testCanUseTT();
+	void testStandPat();
+	void testMated();
+	void raisedAlpha();
+	void raisedbestScore();
+	void testMove(Move& m);
+	void skipMove();
+	void calcStaticEval(Score eval);
+	void calcBestScore(Score eval);
+	void logTTprobe(const ttEntry& tte);
+	void logReturnValue(Score val);
+private:
+	logWriter& _lw;
+	unsigned int _ply;
 };
 
 #endif

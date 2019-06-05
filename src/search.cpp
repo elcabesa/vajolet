@@ -100,6 +100,7 @@ public:
 	Position& getPosition();
 
 private:
+	std::unique_ptr<logWriter> _lw;
 	//--------------------------------------------------------
 	// private enum definition
 	//--------------------------------------------------------
@@ -434,8 +435,8 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 		_pvLineFollower.restart();
 		PVline newPV;
 		newPV.clear();
-		
-		logWriter log(_pos.getFen(), depth);
+
+		_lw = std::unique_ptr<logWriter>(new logWriter(_pos.getFen(), depth));
 		Score res = alphaBeta<Search::impl::nodeType::ROOT_NODE>(0, (depth-globalReduction) * ONE_PLY, alpha, beta, newPV);
 
 		if(_validIteration || !_stop)
@@ -869,6 +870,7 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase(const unsigned i
 
 template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
+	logNode ln(*_lw, ply, depth, alpha, beta);
 	//--------------------------------------
 	// node asserts
 	//--------------------------------------
@@ -1613,6 +1615,7 @@ inline void Search::impl::_updateNodeStatistics(const unsigned int ply)
 
 template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
+	logNode ln(*_lw, ply, depth, alpha, beta);
 	//---------------------------------------
 	//	node asserts
 	//---------------------------------------
@@ -1631,8 +1634,12 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	_sd.setInCheck(ply, inCheck);
 
 	_updateNodeStatistics(ply);
-
-	if( _manageDraw( PVnode, pvLine) ) return getDrawValue();
+	
+	ln.testIsDraw();
+	if( _manageDraw( PVnode, pvLine) ) {
+		ln.logReturnValue(getDrawValue());
+		return getDrawValue();
+	}
 	//---------------------------------------
 	//	MATE DISTANCE PRUNING
 	//---------------------------------------
@@ -1651,6 +1658,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 
 	const HashKey& posKey = _getSearchKey();
 	ttEntry* const tte = transpositionTable::getInstance().probe( _pos.getKey() );
+	ln.logTTprobe(*tte);
 	Move ttMove( tte->getPackedMove() );
 	if(!_pos.isMoveLegal(ttMove)) {
 		ttMove = Move::NOMOVE;
@@ -1671,6 +1679,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	short int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
+	ln.testCanUseTT();
 	if( _canUseTTeValue( PVnode, beta, ttValue, tte, TTdepth ) )
 	{
 		transpositionTable::getInstance().refresh(*tte);
@@ -1678,6 +1687,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 		{
 			_appendTTmoveIfLegal( ttMove, pvLine);
 		}
+		ln.logReturnValue(ttValue);
 		return ttValue;
 	}
 
@@ -1686,6 +1696,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 
 
 	Score staticEval = (tte->getType() != typeVoid) ? tte->getStaticValue() : _pos.eval<false>();
+	ln.calcStaticEval(staticEval);
 #ifdef DEBUG_EVAL_SIMMETRY
 	testSimmetry(_pos);
 #endif
@@ -1710,6 +1721,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 				bestScore = ttValue;
 			}
 		}
+		ln.calcBestScore(bestScore);
 
 		if(bestScore > alpha)
 		{
@@ -1721,6 +1733,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 				pvLine.clear();
 			}
 
+			ln.testStandPat();
 			if( bestScore >= beta)
 			{
 				if( !_pos.isCaptureMoveOrPromotion(ttMove) )
@@ -1731,8 +1744,10 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 				{
 					transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove, staticEval);
 				}
+				ln.logReturnValue(bestScore);
 				return bestScore;
 			}
+			ln.raisedAlpha();
 			alpha = bestScore;
 			TTtype = typeExact;
 
@@ -1759,6 +1774,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 
 	while ( ( m = mp.getNextMove() ) )
 	{
+		ln.testMove(m);
 		assert(alpha < beta);
 		assert(beta <= SCORE_INFINITE);
 		assert(alpha >= -SCORE_INFINITE);
@@ -1770,12 +1786,14 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 			// allow only queen promotion at deeper search
 			if( (TTdepth < -1 * ONE_PLY) && ( m.isPromotionMove() ) && (m.getPromotionType() != Move::promQueen))
 			{
+				ln.skipMove();
 				continue;
 			}
 
 			// at very deep search allow only recapture
 			if(depth < -7 * ONE_PLY && _pos.getActualState().getCurrentMove().getTo() != m.getTo())
 			{
+				ln.skipMove();
 				continue;
 			}
 
@@ -1809,12 +1827,14 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 						if (futilityValue <= alpha)
 						{
 							bestScore = std::max(bestScore, futilityValue);
+							ln.skipMove();
 							continue;
 						}
 						
 						if (futilityBase <= alpha && _pos.seeSign(m) <= 0)
 						{
 							bestScore = std::max(bestScore, futilityBase);
+							ln.skipMove();
 							continue;
 						}
 
@@ -1831,6 +1851,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 							//!moveGiveCheck &&
 							_pos.seeSign(m) < 0)
 					{
+						ln.skipMove();
 						continue;
 					}
 				//}
@@ -1844,9 +1865,11 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 
 		if(val > bestScore)
 		{
+			ln.raisedbestScore();
 			bestScore = val;
 			if( bestScore > alpha )
 			{
+				ln.raisedAlpha();
 				bestMove = m;
 				TTtype = typeExact;
 				alpha = bestScore;
@@ -1866,19 +1889,23 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 					{
 						transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
 					}
+					ln.logReturnValue(bestScore);
 					return bestScore;
 				}
 			}
 		}
 	}
 
+	
 	if(bestScore == -SCORE_INFINITE)
 	{
+		ln.testMated();
 		assert(inCheck);
 		if constexpr (PVnode)
 		{
 			pvLine.clear();
 		}
+		ln.logReturnValue(matedIn(ply));
 		return matedIn(ply);
 	}
 
@@ -1888,6 +1915,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	{
 		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove, staticEval);
 	}
+	ln.logReturnValue(bestScore);
 	return bestScore;
 
 }
