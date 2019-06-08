@@ -1650,6 +1650,9 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	const HashKey& posKey = _getSearchKey();
 	ttEntry* const tte = transpositionTable::getInstance().probe( _pos.getKey() );
 	Move ttMove( tte->getPackedMove() );
+	if(!_pos.isMoveLegal(ttMove)) {
+		ttMove = Move::NOMOVE;
+	} 
 
 	MovePicker mp(_pos, _sd, ply, ttMove);
 	
@@ -1746,7 +1749,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	//	try the captures
 	//----------------------------
 	Move m;
-	Move bestMove = ttMove;
+	Move bestMove(Move::NOMOVE);
 
 	PVline childPV;
 
