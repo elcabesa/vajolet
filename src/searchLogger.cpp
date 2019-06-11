@@ -81,6 +81,16 @@ void logNode::testIsDraw() {
 	_lw.writeString("testIsDraw");
 }
 
+void logNode::testMateDistancePruning() {
+	_indentate(_ply + 1);
+	_lw.writeString("testMateDistancePruning");
+}
+
+void logNode::testCheckTablebase() {
+	_indentate(_ply + 1);
+	_lw.writeString("testcheckTablebase");
+}
+
 void logNode::testCanUseTT() {
 	_indentate(_ply + 1);
 	_lw.writeString("testCanUseTT");
@@ -112,6 +122,11 @@ void logNode::raisedAlpha() {
 	_lw.writeString("raised alpha");
 }
 
+void logNode::isImproving() {
+	_indentate(_ply + 1);
+	_lw.writeString("is improving");
+}
+
 void logNode::raisedbestScore() {
 	_indentate(_ply + 1);
 	_lw.writeString("raised bestScore");
@@ -140,6 +155,12 @@ void logNode::logTTprobe(const ttEntry& tte) {
 void logNode::calcStaticEval(Score eval) {
 	_indentate(_ply + 1);
 	_lw.writeString("Static Eval: ");
+	_lw.writeNumber(eval);
+}
+
+void logNode::refineEval(Score eval) {
+	_indentate(_ply + 1);
+	_lw.writeString("refined Eval: ");
 	_lw.writeNumber(eval);
 }
 

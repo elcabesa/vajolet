@@ -912,11 +912,19 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 		//---------------------------------------
 		//	Manage Draw
 		//---------------------------------------
-		if( _manageDraw( PVnode, pvLine) ) return getDrawValue();
+		ln.testIsDraw();
+		if( _manageDraw( PVnode, pvLine) ) {
+			ln.logReturnValue(getDrawValue());
+			return getDrawValue();
+		}
 		//---------------------------------------
 		//	MATE DISTANCE PRUNING
 		//---------------------------------------
-		if( _MateDistancePruning( ply, alpha, beta) ) return alpha;
+		ln.testMateDistancePruning();
+		if( _MateDistancePruning( ply, alpha, beta) ) {
+			ln.logReturnValue(alpha);
+			return alpha;
+		}
 	}
 
 	const Move& excludedMove = _sd.getExcludedMove(ply);
@@ -929,6 +937,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	Move ttMove( tte->getPackedMove() );
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
+	ln.testCanUseTT();
 	if (	type != nodeType::ROOT_NODE
 			&& _canUseTTeValue( PVnode, beta, ttValue, tte, depth )
 		)
@@ -949,6 +958,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			_sd.saveKillers(ply, ttMove);
 			_updateCounterMove( ttMove );
 		}
+		ln.logReturnValue(ttValue);
 		return ttValue;
 	}
 	
@@ -969,6 +979,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	//--------------------------------------
 	if constexpr (!PVnode)
 	{
+		ln.testCheckTablebase();
 		auto res = _checkTablebase(ply, depth);
 		if( res.value != SCORE_NONE )
 		{
@@ -980,7 +991,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					std::min( 100 * ONE_PLY , depth + 6 * ONE_PLY),
 					ttMove,
 					_pos.eval<false>());
-
+				ln.logReturnValue(res.value);
 				return res.value;
 			}
 		}
@@ -997,6 +1008,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	{
 		staticEval = _pos.eval<false>();
 		eval = staticEval;
+		ln.calcStaticEval(staticEval);
 
 #ifdef DEBUG_EVAL_SIMMETRY
 		testSimmetry(_pos);
@@ -1008,6 +1020,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 		eval = staticEval;
 		assert(staticEval < SCORE_INFINITE);
 		assert(staticEval > -SCORE_INFINITE);
+		ln.calcStaticEval(staticEval);
 
 		if (ttValue != SCORE_NONE)
 		{
@@ -1016,6 +1029,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					|| (tte->isTypeGoodForAlphaCutoff() && (ttValue < eval) )
 				)
 			{
+				ln.refineEval(ttValue);
 				eval = ttValue;
 			}
 		}

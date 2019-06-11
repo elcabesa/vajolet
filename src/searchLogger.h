@@ -42,15 +42,19 @@ public:
 	logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta);
 	~logNode();
 	void testIsDraw();
+	void testMateDistancePruning();
 	void testCanUseTT();
+	void testCheckTablebase();
 	void testStandPat();
 	void testMated();
 	void raisedAlpha();
 	void raisedbestScore();
+	void isImproving();
 	void testMove(Move& m);
 	void skipMove();
 	void calcStaticEval(Score eval);
 	void calcBestScore(Score eval);
+	void refineEval(Score eval);
 	void logTTprobe(const ttEntry& tte);
 	void logReturnValue(Score val);
 private:
