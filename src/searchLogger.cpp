@@ -81,6 +81,31 @@ void logNode::testIsDraw() {
 	_lw.writeString("testIsDraw");
 }
 
+void logNode::testPruning() {
+	_indentate(_ply + 1);
+	_lw.writeString("testPruning");
+}
+
+void logNode::testRazoring() {
+	_indentate(_ply + 1);
+	_lw.writeString("testRazoring");
+}
+
+void logNode::testStaticNullMovePruning() {
+	_indentate(_ply + 1);
+	_lw.writeString("testStaticNullMovePruning");
+}
+
+void logNode::testNullMovePruning() {
+	_indentate(_ply + 1);
+	_lw.writeString("testNullMovePruning");
+}
+
+void logNode::testDoVerification() {
+	_indentate(_ply + 1);
+	_lw.writeString("testDoVerification");
+}
+
 void logNode::testMateDistancePruning() {
 	_indentate(_ply + 1);
 	_lw.writeString("testMateDistancePruning");
@@ -106,7 +131,7 @@ void logNode::testMated() {
 	_lw.writeString("is mated?");
 }
 
-void logNode::testMove(Move& m) {
+void logNode::testMove(const Move& m) {
 	_indentate(_ply + 1);
 	_lw.writeString("testing move ");
 	_lw.writeMove(m);

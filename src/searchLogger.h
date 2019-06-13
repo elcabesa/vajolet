@@ -47,10 +47,15 @@ public:
 	void testCheckTablebase();
 	void testStandPat();
 	void testMated();
+	void testPruning();
+	void testRazoring();
+	void testStaticNullMovePruning();
+	void testNullMovePruning();
+	void testDoVerification();
 	void raisedAlpha();
 	void raisedbestScore();
 	void isImproving();
-	void testMove(Move& m);
+	void testMove(const Move& m);
 	void skipMove();
 	void calcStaticEval(Score eval);
 	void calcBestScore(Score eval);

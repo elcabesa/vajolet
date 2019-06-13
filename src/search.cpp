@@ -1050,12 +1050,14 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 	{
 		if(!inCheck )
 		{
+			ln.testPruning();
 
 			//------------------------
 			// razoring
 			//------------------------
 			// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
 			//------------------------
+			ln.testRazoring();
 			if (!_sd.skipNullMove(ply)
 				&&  depth < 4 * ONE_PLY
 				&&  eval + razorMargin(depth, type == nodeType::CUT_NODE) <= alpha
@@ -1067,6 +1069,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				Score v = qsearch<nodeType::CUT_NODE>(ply,0 , alpha, alpha+1, childPV);
 				if (v <= alpha)
 				{
+					ln.logReturnValue(v);
 					return v;
 				}
 			}
@@ -1076,6 +1079,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			//---------------------------
 			//	at very low deep and with an evaluation well above beta, bet that we can found a move with a result above beta
 			//---------------------------
+			ln.testStaticNullMovePruning();
 			if (!_sd.skipNullMove(ply)
 				&& depth < 8 * ONE_PLY
 				&& eval - futility( depth, improving ) >= beta
@@ -1084,6 +1088,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			)
 			{
 				assert((depth>>ONE_PLY_SHIFT)<8);
+				ln.logReturnValue(eval);
 				return eval;
 			}
 
@@ -1094,7 +1099,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			// if the evaluation is above beta and after passing the move the result of a search is still above beta we bet there will be a beta cutoff
 			// this search let us know about threat move by the opponent.
 			//---------------------------
-
+			ln.testNullMovePruning();
 			if( depth >= ONE_PLY
 				&& eval >= beta
 				&& !_sd.skipNullMove(ply)
@@ -1109,7 +1114,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 				{
 					red += ONE_PLY;
 				}
-
+				ln.testMove(Move::NOMOVE);
 				_pos.doNullMove();
 				_sd.setSkipNullMove(newPly, true);
 
@@ -1138,9 +1143,11 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 
 					if (depth < 12 * ONE_PLY)
 					{
+						ln.logReturnValue(nullVal);
 						return nullVal;
 					}
 
+					ln.testDoVerification();
 					// Do verification search at high depths
 					_sd.setSkipNullMove(ply, true);
 					assert(depth - red >= ONE_PLY);
@@ -1149,6 +1156,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 					_sd.setSkipNullMove(ply, false);
 					if (val >= beta)
 					{
+						ln.logReturnValue(nullVal);
 						return nullVal;
 					}
 
