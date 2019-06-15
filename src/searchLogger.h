@@ -32,6 +32,7 @@ public:
 	void writeString(const std::string & st);
 	void writeChar(const char c);
 	void writeNumber(const long long x);
+	void writeFloat(const float x);
 	void writeMove(const Move& m);
 private:
 	std::ofstream _log;
@@ -41,27 +42,21 @@ class logNode {
 public:
 	logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta);
 	~logNode();
-	void testIsDraw();
-	void testMateDistancePruning();
-	void testCanUseTT();
-	void testCheckTablebase();
-	void testStandPat();
-	void testMated();
-	void testPruning();
-	void testRazoring();
-	void testStaticNullMovePruning();
-	void testNullMovePruning();
-	void testDoVerification();
 	void raisedAlpha();
 	void raisedbestScore();
 	void isImproving();
+	void ExtendedDepth();
 	void testMove(const Move& m);
-	void skipMove();
+	void skipMove(const std::string& s);
+	void doLmrSearch();
+	void doFullDepthSearchSearch();
+	void doFullWidthSearchSearch();
 	void calcStaticEval(Score eval);
 	void calcBestScore(Score eval);
 	void refineEval(Score eval);
 	void logTTprobe(const ttEntry& tte);
 	void logReturnValue(Score val);
+	void test(const std::string& s);
 private:
 	void _indentate(unsigned int ply);
 	logWriter& _lw;

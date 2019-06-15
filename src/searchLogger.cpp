@@ -47,6 +47,10 @@ void logWriter::writeNumber(const long long x) {
 	_log << x;
 }
 
+void logWriter::writeFloat(const float x) {
+	_log << x;
+}
+
 void logWriter::writeMove(const Move& m) {
 	_log << UciManager::displayUci(m, false);
 }
@@ -57,7 +61,7 @@ logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score 
 	_lw.writeChar('{');
 	_lw.writeNumber(ply);
 	_lw.writeChar(',');
-	_lw.writeNumber(depth);
+	_lw.writeFloat(depth/16.0);
 	_lw.writeChar(',');
 	_lw.writeNumber(alpha);
 	_lw.writeChar(',');
@@ -75,60 +79,10 @@ void logNode::_indentate(unsigned int ply) {
 	for(unsigned int i = 0; i < ply; ++i) {_lw.writeChar('\t');}
 }
 
-
-void logNode::testIsDraw() {
+void logNode::test(const std::string& s) {
 	_indentate(_ply + 1);
-	_lw.writeString("testIsDraw");
-}
-
-void logNode::testPruning() {
-	_indentate(_ply + 1);
-	_lw.writeString("testPruning");
-}
-
-void logNode::testRazoring() {
-	_indentate(_ply + 1);
-	_lw.writeString("testRazoring");
-}
-
-void logNode::testStaticNullMovePruning() {
-	_indentate(_ply + 1);
-	_lw.writeString("testStaticNullMovePruning");
-}
-
-void logNode::testNullMovePruning() {
-	_indentate(_ply + 1);
-	_lw.writeString("testNullMovePruning");
-}
-
-void logNode::testDoVerification() {
-	_indentate(_ply + 1);
-	_lw.writeString("testDoVerification");
-}
-
-void logNode::testMateDistancePruning() {
-	_indentate(_ply + 1);
-	_lw.writeString("testMateDistancePruning");
-}
-
-void logNode::testCheckTablebase() {
-	_indentate(_ply + 1);
-	_lw.writeString("testcheckTablebase");
-}
-
-void logNode::testCanUseTT() {
-	_indentate(_ply + 1);
-	_lw.writeString("testCanUseTT");
-}
-
-void logNode::testStandPat() {
-	_indentate(_ply + 1);
-	_lw.writeString("testStandPat");
-}
-
-void logNode::testMated() {
-	_indentate(_ply + 1);
-	_lw.writeString("is mated?");
+	_lw.writeString("test");
+	_lw.writeString(s);
 }
 
 void logNode::testMove(const Move& m) {
@@ -137,9 +91,10 @@ void logNode::testMove(const Move& m) {
 	_lw.writeMove(m);
 }
 
-void logNode::skipMove() {
+void logNode::skipMove(const std::string& s) {
 	_indentate(_ply + 1);
-	_lw.writeString("...skipped");
+	_lw.writeString("...skipped due to ");
+	_lw.writeString(s);
 }
 
 void logNode::raisedAlpha() {
@@ -193,4 +148,24 @@ void logNode::calcBestScore(Score eval) {
 	_indentate(_ply + 1);
 	_lw.writeString("BestScore: ");
 	_lw.writeNumber(eval);
+}
+
+void logNode::ExtendedDepth() {
+	_indentate(_ply + 1);
+	_lw.writeString("extended depth");
+}
+
+void logNode::doLmrSearch() {
+	_indentate(_ply + 1);
+	_lw.writeString("do lmr search");
+}
+
+void logNode::doFullDepthSearchSearch() {
+	_indentate(_ply + 1);
+	_lw.writeString("do full depth search");
+}
+
+void logNode::doFullWidthSearchSearch() {
+	_indentate(_ply + 1);
+	_lw.writeString("do full width search");
 }
