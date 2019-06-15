@@ -2,6 +2,8 @@
 
 cmake_minimum_required (VERSION 3.12)
 
+#project configuration
+project (Vajolet)
 
 IF( VAJOLET_CPU_TYPE STREQUAL "64OLD")
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3 -m64" )
@@ -13,9 +15,8 @@ ELSE()
 ENDIF()
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -pedantic -Wall -Wextra" )
-
-if (WIN32)
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -femulated-tls" )
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -femulated-tls" )
 endif()
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG ")
@@ -24,8 +25,13 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
 
 
 if (WIN32)
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--allow-multiple-definition -static -pthread -femulated-tls")
-	set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--allow-multiple-definition -static -pthread -femulated-tls")		
+	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -femulated-tls")
+		set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -femulated-tls")
+	endif()
+
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--allow-multiple-definition -static -pthread")
+	set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--allow-multiple-definition -static -pthread")		
 else()
 	
 	if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -75,9 +81,6 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
-
-#sudoku solver project configration
-project (Vajolet)
 
 add_subdirectory(src)
 add_subdirectory(tests)
