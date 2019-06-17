@@ -34,9 +34,9 @@ public:
 	void stop();
 
 	unsigned int getResolution() const;
-	virtual bool isSearchFinished() const;
+	virtual bool isSearchFinished() const = 0;
 
-	virtual bool stateMachineStep( const long long int time, const unsigned long long visitedNodes );
+	virtual bool stateMachineStep( const long long int time, const unsigned long long visitedNodes ) = 0;
 	
 	static std::unique_ptr<timeManagement> create (SearchLimits& limits, const eNextMove nm);
 	
