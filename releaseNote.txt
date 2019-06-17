@@ -1,11 +1,16 @@
 -------------------------------------------------------------------------
 Release note 2.8
 
+New feature:
+chess FRC
+new syzygy code
+
 bug Fixes:
 Multi Pv fix
 
-Search:
+Improvements:
 changed max mate depth to a more reasonable number (200 ply)
+improve endgame scaling code
 
 CI/CD:
 change dir structure
