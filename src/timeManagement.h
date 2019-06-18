@@ -18,25 +18,15 @@
 #ifndef TIME_MANAGEMENT_H_
 #define TIME_MANAGEMENT_H_
 
+#include <memory>
 #include "position.h"
 #include "searchLimits.h"
 
 class timeManagement
 {
 public:
-	enum searchState
-	{
-		infiniteSearch,
-		fixedTimeSearch,
-		standardSearchPonder,
-		standardSearch,
-		standardSearchExtendedTime,
-		searchFinished
-	};
-
-	explicit timeManagement( SearchLimits& limits ):_limits(limits){}
-
-	void initNewSearch( const eNextMove nm );
+	explicit timeManagement( SearchLimits& limits ):_firstIterationFinished(false), _idLoopIterationFinished(false), _idLoopFailLow(false), _idLoopFailOver(false), _stop(false), _limits(limits){}
+	virtual ~timeManagement(){}
 
 	void notifyIterationHasBeenFinished();
 	void notifyFailLow();
@@ -44,34 +34,28 @@ public:
 	void stop();
 
 	unsigned int getResolution() const;
-	bool isSearchFinished() const;
+	virtual bool isSearchFinished() const = 0;
 
-	bool stateMachineStep( const long long int time, const unsigned long long visitedNodes );
+	virtual bool stateMachineStep( const long long int time, const unsigned long long visitedNodes ) = 0;
+	
+	static std::unique_ptr<timeManagement> create (SearchLimits& limits, const eNextMove nm);
 	
 
-private:
-	void _resetSearchVariables();
+protected:
 	void _clearIdLoopIterationFinished();
 	bool _isSearchInFailLowOverState() const;
 	bool _hasFirstIterationFinished() const;
 	bool _isIdLoopIterationFinished() const;
-	void _chooseSearchType( enum searchState s);
 
 	bool _firstIterationFinished;
 	bool _idLoopIterationFinished;
 	bool _idLoopFailLow;
 	bool _idLoopFailOver;
 	
-	long long _allocatedTime;
-	long long _minSearchTime;
-	long long _maxAllocatedTime;
 	unsigned int _resolution;
 
 	bool _stop;
-
-	searchState _searchState;
 	const SearchLimits& _limits;
-
 };
 
 #endif

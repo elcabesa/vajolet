@@ -65,7 +65,7 @@ private:
 	SearchLimits _limits; // todo limits belong to threads
 	SearchTimer _st;
 	Search _src;
-	timeManagement _timeMan;
+	std::unique_ptr<timeManagement> _timeMan;
 	std::unique_ptr<UciOutput> _UOI;
 	long long _lastHasfullMessageTime;
 
@@ -91,7 +91,7 @@ volatile bool my_thread::impl::_quit = false;
 volatile bool my_thread::impl::_startThink = false;
 
 
-my_thread::impl::impl(): _src(_st, _limits), _timeMan(_limits), _UOI(UciOutput::create())
+my_thread::impl::impl(): _src(_st, _limits), _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create())
 {
 	if( !_initThreads() )
 	{
@@ -105,7 +105,7 @@ my_thread::impl::~impl()
 	_quitThreads();
 }
 
-timeManagement& my_thread::impl::getTimeMan(){ return _timeMan; }
+timeManagement& my_thread::impl::getTimeMan(){ return *_timeMan; }
 
 void my_thread::impl::_printTimeDependentOutput(long long int time) {
 
@@ -131,7 +131,7 @@ void my_thread::impl::_timerThread()
 		_timerStatus = ready;
 		_timerCond.notify_one();
 		
-		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan.isSearchFinished() ) || _quit;} );
+		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan->isSearchFinished() ) || _quit;} );
 		
 		_timerStatus = running;
 		_timerCond.notify_one();
@@ -140,7 +140,7 @@ void my_thread::impl::_timerThread()
 		{
 			long long int time = _st.getClockTime();
 			
-			bool stop = _timeMan.stateMachineStep( time, _src.getVisitedNodes() );
+			bool stop = _timeMan->stateMachineStep( time, _src.getVisitedNodes() );
 			if( stop )
 			{
 				_src.stopSearch();
@@ -149,7 +149,7 @@ void my_thread::impl::_timerThread()
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
 			_printTimeDependentOutput( time );
 #endif
-			std::this_thread::sleep_for(std::chrono::milliseconds( _timeMan.getResolution() ));
+			std::this_thread::sleep_for(std::chrono::milliseconds( _timeMan->getResolution() ));
 		}
 	}
 	_src.stopSearch();
@@ -172,7 +172,7 @@ void my_thread::impl::_searchThread()
 		if(!_quit)
 		{
 			_limits.checkInfiniteSearch();
-			_timeMan.initNewSearch( _src.getPosition().getNextTurn() );
+			_timeMan = timeManagement::create(_limits, _src.getPosition().getNextTurn());
 			_src.resetStopCondition();
 			_st.resetTimers();
 			_timerCond.notify_one();
@@ -233,7 +233,7 @@ inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 
 inline void my_thread::impl::stopThinking()
 {
-	_timeMan.stop();
+	_timeMan->stop();
 	_stopPonder();
 }
 
