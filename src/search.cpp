@@ -1317,7 +1317,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			if(newDepth < 7 * ONE_PLY)
 			{
 				Score localEval = eval + futilityMargin[newDepth >> ONE_PLY_SHIFT];
-				if(localEval<beta)
+				if(localEval <= alpha)
 				{
 					if constexpr ( !PVnode )
 					{
@@ -1804,13 +1804,13 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 							futilityValue += Position::pieceValue[m.getPromotionType() + whiteQueens][1] - Position::pieceValue[whitePawns][1];
 						}
 
-						if (futilityValue < beta)
+						if (futilityValue <= alpha)
 						{
 							bestScore = std::max(bestScore, futilityValue);
 							continue;
 						}
 						
-						if (futilityBase < beta && _pos.seeSign(m) <= 0)
+						if (futilityBase <= alpha && _pos.seeSign(m) <= 0)
 						{
 							bestScore = std::max(bestScore, futilityBase);
 							continue;
