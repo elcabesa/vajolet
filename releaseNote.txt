@@ -7,6 +7,8 @@ new syzygy code
 
 bug Fixes:
 Multi Pv fix
+validation of TTmove in qSearch
+PVline follower in qSearch
 
 Improvements:
 changed max mate depth to a more reasonable number (200 ply)

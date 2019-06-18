@@ -1650,6 +1650,19 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	const HashKey& posKey = _getSearchKey();
 	ttEntry* const tte = transpositionTable::getInstance().probe( _pos.getKey() );
 	Move ttMove( tte->getPackedMove() );
+	if(!_pos.isMoveLegal(ttMove)) {
+		ttMove = Move::NOMOVE;
+	}
+	
+	// overwrite ttMove with move from move from PVlineToBeFollowed
+	if constexpr ( PVnode )
+	{
+		if (_pvLineFollower.getNextMove(ply, ttMove))
+		{
+			assert(_pos.isMoveLegal(ttMove));
+		}
+	}
+	
 
 	MovePicker mp(_pos, _sd, ply, ttMove);
 	
@@ -1666,14 +1679,6 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 		return ttValue;
 	}
 
-	// overwrite ttMove with move from move from PVlineToBeFollowed
-	if constexpr ( PVnode )
-	{
-		if (_pvLineFollower.getNextMove(ply, ttMove))
-		{
-			assert(_pos.isMoveLegal(ttMove));
-		}
-	}
 
 	ttType TTtype = typeScoreLowerThanAlpha;
 
@@ -1746,7 +1751,7 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 	//	try the captures
 	//----------------------------
 	Move m;
-	Move bestMove = ttMove;
+	Move bestMove(Move::NOMOVE);
 
 	PVline childPV;
 
