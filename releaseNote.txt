@@ -9,10 +9,11 @@ bug Fixes:
 Multi Pv fix
 validation of TTmove in qSearch
 PVline follower in qSearch
+futility in Pv nodes
 
 Improvements:
 changed max mate depth to a more reasonable number (200 ply)
-improve endgame scaling code
+improve endgame scaling coderefactor time managemrn
 
 CI/CD:
 change dir structure
