@@ -1780,14 +1780,14 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 			//----------------------------
 			//	futility pruning (delta pruning)
 			//----------------------------
-			if constexpr ( !PVnode )
-			{
-				if(
-					m != ttMove
+			//if constexpr ( !PVnode )
+			//{
+				//if(
+					//m != ttMove
 					//&& m.bit.flags != Move::fpromotion
 					//&& !_pos.moveGivesCheck(m)
-					)
-				{
+					//)
+				//{
 					bool moveGiveCheck = _pos.moveGivesCheck(m);
 					if(
 						!moveGiveCheck
@@ -1831,8 +1831,8 @@ template<Search::impl::nodeType type> Score Search::impl::qsearch(unsigned int p
 					{
 						continue;
 					}
-				}
-			}
+				//}
+			//}
 
 		}
 		
