@@ -34,12 +34,22 @@ add_executable(Vajolet_search_integration_test main.cpp search-integration-test.
 target_link_libraries(Vajolet_search_integration_test gtest libChess)
 target_include_directories (Vajolet_search_integration_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+add_executable(Vajolet_perft_validation main.cpp perft-test-very-long.cpp )
+target_link_libraries(Vajolet_perft_validation gtest libChess)
+target_include_directories (Vajolet_perft_validation PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
 add_subdirectory(syzygyTests)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Perfect2017.bin
     ${CMAKE_CURRENT_BINARY_DIR}/book.bin COPYONLY)
 	
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/fischer.txt
+    ${CMAKE_CURRENT_BINARY_DIR}/fischer.txt COPYONLY)
+	
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/perft.txt
+    ${CMAKE_CURRENT_BINARY_DIR}/perft.txt COPYONLY)
 
 add_test(NAME unit_test COMMAND Vajolet_unit_test)
 add_test(NAME syzygy_test COMMAND Vajolet_syzygy_test)
