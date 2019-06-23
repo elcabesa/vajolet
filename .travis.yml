@@ -20,7 +20,7 @@ script:
   - mkdir build
   - cd build
   - cmake -DVAJOLET_CPU_TYPE=64NEW -DCMAKE_BUILD_TYPE=Debug ..
-  - make
+  - make VERBOSE=1
   - cd tests
   - ./Vajolet_unit_test
   - ./Vajolet_search_integration_test
