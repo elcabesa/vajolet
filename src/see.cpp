@@ -118,12 +118,12 @@ Score Position::see(const Move& m) const
 				attackers ^= att;
 
 				if (nextAttacker == Pawns || nextAttacker == Bishops || nextAttacker == Queens){
-					attackers |= Movegen::attackFrom<whiteBishops>(to,occupied)& (getBitmap(whiteBishops) |getBitmap(blackBishops) |getBitmap(whiteQueens) |getBitmap(blackQueens));
+					attackers |= Movegen::attackFrom<whiteBishops>(to,occupied) & (getBitmap(whiteBishops) | getBitmap(blackBishops) | getBitmap(whiteQueens) | getBitmap(blackQueens));
 				}
 
 				if (nextAttacker == Rooks || nextAttacker == Queens){
 					assert(to<squareNumber);
-					attackers |= Movegen::attackFrom<whiteRooks>(to,occupied)& (getBitmap(whiteRooks) |getBitmap(blackRooks) |getBitmap(whiteQueens) |getBitmap(blackQueens));
+					attackers |= Movegen::attackFrom<whiteRooks>(to,occupied) & (getBitmap(whiteRooks) | getBitmap(blackRooks) | getBitmap(whiteQueens) | getBitmap(blackQueens));
 				}
 				attackers &= occupied;
 				captured = nextAttacker;

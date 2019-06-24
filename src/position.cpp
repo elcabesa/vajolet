@@ -1375,8 +1375,9 @@ bitMap Position::getHiddenCheckers() const
 	assert(kingSquare<squareNumber);
 	assert( isValidPiece( getPieceOfPlayer( Pawns, next ) ) );
 	bitMap result = 0;
-	bitMap pinners = Movegen::getBishopPseudoAttack(kingSquare) &(_bitBoard[ getPieceOfPlayer( Bishops, next )]| _bitBoard[getPieceOfPlayer( Queens, next) ] );
-	pinners |= Movegen::getRookPseudoAttack(kingSquare) &(_bitBoard[getPieceOfPlayer( Rooks, next )]| _bitBoard[getPieceOfPlayer( Queens, next ) ] );
+	bitMap pinners = 
+		  (Movegen::getBishopPseudoAttack(kingSquare) & (_bitBoard[getPieceOfPlayer(Bishops, next)] | _bitBoard[getPieceOfPlayer(Queens, next)]))
+		| (Movegen::getRookPseudoAttack(kingSquare)   & (_bitBoard[getPieceOfPlayer(Rooks, next)]   | _bitBoard[getPieceOfPlayer(Queens, next)]));
 
 	while(pinners)
 	{
@@ -1482,8 +1483,7 @@ bool Position::moveGivesCheck(const Move& m)const
 		assert(rTo<squareNumber);
 
 		bitMap occ = (_bitBoard[occupiedSquares] ^ bitSet(kFrom) ^ bitSet(rFrom)) | bitSet(rTo) | bitSet(kTo);
-		return   isSquareSet( Movegen::getRookPseudoAttack(rTo), kingSquare )
-			     && isSquareSet( Movegen::attackFrom<whiteRooks>(rTo,occ), kingSquare );
+		return isSquareSet( Movegen::attackFrom<whiteRooks>(rTo,occ), kingSquare );
 	}
 	else if( m.isEnPassantMove() )
 	{
@@ -1727,7 +1727,7 @@ bool Position::isMoveLegal(const Move &m)const
 		case whiteRooks:
 		case blackRooks:
 			assert(m.getFrom()<squareNumber);
-			if( !isSquareSet( Movegen::getRookPseudoAttack( m.getFrom() ), m.getTo() ) || !isSquareSet( Movegen::attackFrom<whiteRooks>( m.getFrom(), _bitBoard[occupiedSquares] ), m.getTo() ) )
+			if (!isSquareSet(Movegen::attackFrom<whiteRooks>(m.getFrom(), _bitBoard[occupiedSquares]), m.getTo()))
 			{
 				return false;
 			}
@@ -1736,13 +1736,7 @@ bool Position::isMoveLegal(const Move &m)const
 		case whiteQueens:
 		case blackQueens:
 			assert(m.getFrom()<squareNumber);
-			if( !isSquareSet( Movegen::getBishopPseudoAttack( m.getFrom() ) | Movegen::getRookPseudoAttack( m.getFrom() ), m.getTo() )
-				||
-				!isSquareSet( 
-					Movegen::attackFrom<whiteBishops>(m.getFrom(),_bitBoard[occupiedSquares]) 
-					| Movegen::attackFrom<whiteRooks>(m.getFrom(),_bitBoard[occupiedSquares]), m.getTo()
-				)
-			)
+			if ( !isSquareSet(Movegen::attackFrom<whiteQueens>(m.getFrom(),_bitBoard[occupiedSquares]) , m.getTo()))
 			{
 				return false;
 			}
@@ -1750,9 +1744,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 		case whiteBishops:
 		case blackBishops:
-			if( !isSquareSet(Movegen::getBishopPseudoAttack(m.getFrom()), m.getTo() )
-				|| !isSquareSet(Movegen::attackFrom<whiteBishops>(m.getFrom(),_bitBoard[occupiedSquares]), m.getTo() )
-			)
+			if( !isSquareSet(Movegen::attackFrom<whiteBishops>(m.getFrom(),_bitBoard[occupiedSquares]), m.getTo()))
 			{
 				return false;
 			}
@@ -1760,7 +1752,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 		case whiteKnights:
 		case blackKnights:
-			if( !isSquareSet( Movegen::attackFrom<whiteKnights>( m.getFrom() ), m.getTo() ) )
+			if( !isSquareSet( Movegen::attackFrom<whiteKnights>(m.getFrom()), m.getTo()))
 			{
 				return false;
 			}

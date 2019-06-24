@@ -496,6 +496,7 @@ bool Position::evalOppositeBishopEndgame(Score& res) const
 			if( !(PASSED_PAWN[0][pawn] & getBitmap(blackPawns)))
 			{
 				++passedPawnCount;
+				// todo getBishopPseudoAttack can be moved outside loop
 				if(!(Movegen::getBishopPseudoAttack(getSquareOfThePiece(blackBishops)) & SQUARES_IN_FRONT_OF[0][pawn]))
 				{
 					res = 256;
@@ -511,6 +512,7 @@ bool Position::evalOppositeBishopEndgame(Score& res) const
 			if(!( PASSED_PAWN[1][pawn] & getBitmap(whitePawns)))
 			{
 				++passedPawnCount;
+				// todo getBishopPseudoAttack can be moved outside loop
 				if(!(Movegen::getBishopPseudoAttack(getSquareOfThePiece(whiteBishops)) & SQUARES_IN_FRONT_OF[1][pawn]))
 				{
 					res = 256;
