@@ -1219,7 +1219,7 @@ Score Position::eval(void) const
 	kingSafety[white] = evalShieldStorm<white>(getSquareOfThePiece(whiteKing));
 
 	if( st.hasCastleRight( wCastleOO )
-		&& !(attackedSquares[blackPieces] & (bitSet(E1) | getCastleKingPath(wCastleOO)))
+		&& !(attackedSquares[blackPieces] & getCastleKingPath(wCastleOO))
 		&& !moreThanOneBit(_CastlePathOccupancyBitmap(wCastleOO))
 		)
 	{
@@ -1227,7 +1227,7 @@ Score Position::eval(void) const
 	}
 
 	if( st.hasCastleRight( wCastleOOO )
-		&& !(attackedSquares[blackPieces] & (bitSet(E1) | getCastleKingPath(wCastleOOO)))
+		&& !(attackedSquares[blackPieces] & getCastleKingPath(wCastleOOO))
 		&& !moreThanOneBit(_CastlePathOccupancyBitmap(wCastleOOO))
 		)
 	{
@@ -1241,7 +1241,7 @@ Score Position::eval(void) const
 	kingSafety[black] = evalShieldStorm<black>(getSquareOfThePiece(blackKing));
 
 	if( st.hasCastleRight( bCastleOO )
-		&& !(attackedSquares[whitePieces] & (bitSet(E8) | getCastleKingPath(bCastleOO)))
+		&& !(attackedSquares[whitePieces] & getCastleKingPath(bCastleOO))
 		&& !moreThanOneBit(_CastlePathOccupancyBitmap(bCastleOO))
 		)
 	{
@@ -1249,7 +1249,7 @@ Score Position::eval(void) const
 	}
 
 	if( st.hasCastleRight( bCastleOOO )
-		&& !(attackedSquares[whitePieces] & (bitSet(E8) | getCastleKingPath(bCastleOOO)))
+		&& !(attackedSquares[whitePieces] & getCastleKingPath(bCastleOOO))
 		&& !moreThanOneBit(_CastlePathOccupancyBitmap(bCastleOOO))
 		)
 	{

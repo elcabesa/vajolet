@@ -14,6 +14,7 @@ TEST(PerftTest, frcTest) {
 	
 	Position pos;
 	
+	unsigned int n = 0;
 	while (std::getline(infile, line))
 	{
 		std::size_t found = line.find_first_of(",");
@@ -27,7 +28,7 @@ TEST(PerftTest, frcTest) {
 			
 			unsigned long long ull = std::stoull (line.substr(start, found-start));
 			unsigned long long int res = Perft(pos).perft(6);
-			std::cout<<"perft(6) = "<<res<<std::endl;
+			std::cout<<++n<<" perft(6) = "<<res<<std::endl;
 			ASSERT_EQ(ull, res);
 		}
 	}
@@ -41,8 +42,10 @@ TEST(PerftTest, perft) {
 	
 	Position pos;
 	
+	unsigned int n = 0;
 	while (std::getline(infile, line))
 	{
+		++n;
 		std::size_t found = line.find_first_of(",");
 		std::string fen = line.substr(0, found);
 		pos.setupFromFen( fen ); 
@@ -55,7 +58,7 @@ TEST(PerftTest, perft) {
 			
 			unsigned long long ull = std::stoull (line.substr(start, found-start));
 			unsigned long long int res = Perft(pos).perft(++i);
-			std::cout<<"perft("<<i<<") = "<<res<<std::endl;
+			std::cout<<n<<" perft("<<i<<") = "<<res<<std::endl;
 			ASSERT_EQ(ull, res);
 		}
 	}
