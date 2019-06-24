@@ -596,7 +596,7 @@ void UciManager::impl::_doPerft(const unsigned int n)
 	
 	unsigned long long res = Perft(_pos).perft(n);
 
-	long long int totalTime = std::max( st.getElapsedTime(), 1ll) ;
+	long long int totalTime = std::max( st.getElapsedTime(), static_cast<uint64_t>(1)) ;
 
 	sync_cout << "Perft " << n << " leaf nodes: " << res << sync_endl;
 	sync_cout << totalTime << "ms " << ((double)res) / (double)totalTime << " kN/s" << sync_endl;
