@@ -15,6 +15,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -45,28 +46,29 @@ static const std::vector<std::string> positions = {
   "3q2k1/pb3p1p/4pbp1/2r5/PpN2N2/1P2P2P/5PP1/Q2R2K1 b - - 4 26"
 };
 
-static std::string getNodesPerSecond(const unsigned long long nodeCount, const long long int time) {
-	if (time == 0) {
-		return "---";
+static std::string getNodesPerSecond(const uint64_t nodeCount, const int64_t time) {
+	if (0 == time) {
+		return std::string("---");
 	} else {
 		return std::to_string(1000 * nodeCount / time);
 	}
 }
 
-void benchmark() {
-
-	unsigned long long nodeCount = 0;
-	int i = 0;
-	
-	//  initialize search parameters
+static Search initSearch(SearchTimer& st) {
 	transpositionTable::getInstance().setSize(32);
-	SearchTimer st;
 	SearchLimits sl;
 	sl.setDepth(15);
-	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
-	
+	return Search(st, sl, UciOutput::create(UciOutput::mute));
+}
+
+void benchmark() {
+	// initialize search parameters
+	SearchTimer st;
+	Search src = initSearch(st);
 	
 	// iterate positions
+	uint64_t nodeCount = 0;
+	unsigned int i = 0;
 	for (auto pos: positions) {	
 		src.getPosition().setupFromFen(pos);
 		sync_cout << "Position: " << (++i) << '/' << positions.size() << sync_endl;
@@ -75,12 +77,12 @@ void benchmark() {
 	}
 	
 	// get total time
-	const long long int totalTime = st.getElapsedTime();
+	const auto totalTime = st.getElapsedTime();
 
 	// print result
 	sync_cout << "\n==========================="
        << "\nTotal time (ms) : " << totalTime
        << "\nNodes searched  : " << nodeCount
-       << "\nNodes/second    : " << getNodesPerSecond( nodeCount, totalTime ) << sync_endl;
-
+       << "\nNodes/second    : " << getNodesPerSecond( nodeCount, totalTime ) 
+	   << sync_endl;
 }

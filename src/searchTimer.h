@@ -18,6 +18,7 @@
 #ifndef SEARCH_TIMER_H_
 #define SEARCH_TIMER_H_
 
+#include <cstdint>
 #include <chrono>
 
 class SearchTimer
@@ -33,8 +34,8 @@ public:
 	SearchTimer& operator=(const SearchTimer& other ) {_startTime = other._startTime; _ponderTime = other._ponderTime; return *this;}
 	SearchTimer& operator=(const SearchTimer&&) = delete;
 
-	long long int getElapsedTime() const { return (std::chrono::duration_cast<std::chrono::milliseconds>( _getTime() - _startTime )).count(); }
-	long long int getClockTime() const { return (std::chrono::duration_cast<std::chrono::milliseconds>( _getTime() - _ponderTime )).count(); }
+	int64_t getElapsedTime() const { return (std::chrono::duration_cast<std::chrono::milliseconds>( _getTime() - _startTime )).count(); }
+	int64_t getClockTime() const { return (std::chrono::duration_cast<std::chrono::milliseconds>( _getTime() - _ponderTime )).count(); }
 	void resetTimers(){ _ponderTime = _startTime = _getTime(); }
 	void resetClockTimer(){ _ponderTime = _getTime(); }
 };
