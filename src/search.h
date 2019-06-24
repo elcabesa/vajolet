@@ -49,15 +49,13 @@ public:
 	Search(Search&&) =delete;
 	Search& operator=(Search&&) = delete;
 
-	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
-
 	void stopSearch();
 	void resetStopCondition();
 
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 	void showLine();
-	void manageNewSearch();
+	SearchResult manageNewSearch();
 	Position& getPosition();
 
 private:

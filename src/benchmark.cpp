@@ -26,6 +26,7 @@
 #include "searchLimits.h"
 #include "searchTimer.h"
 #include "transposition.h"
+#include "uciParameters.h"
 
 static const std::vector<std::string> positions = {
 	"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -55,9 +56,12 @@ static std::string getNodesPerSecond(const uint64_t nodeCount, const int64_t tim
 }
 
 static Search initSearch(SearchTimer& st) {
+	uciParameters::useOwnBook = false;
 	transpositionTable::getInstance().setSize(32);
+	
 	SearchLimits sl;
 	sl.setDepth(15);
+	
 	return Search(st, sl, UciOutput::create(UciOutput::mute));
 }
 
@@ -72,7 +76,7 @@ void benchmark() {
 	for (auto pos: positions) {	
 		src.getPosition().setupFromFen(pos);
 		sync_cout << "Position: " << (++i) << '/' << positions.size() << sync_endl;
-		src.startThinking();
+		src.manageNewSearch();
 		nodeCount += src.getVisitedNodes();
 	}
 	

@@ -73,7 +73,7 @@ TEST(search, search) {
 	{
 		src.getPosition().setupFromFen(p.Fen);
 		sl.setDepth(p.depth);
-		auto res = src.startThinking();
+		auto res = src.manageNewSearch();
 		if( p.bm != Move::NOMOVE)
 		{
 			EXPECT_EQ( res.PV.getMove(0), p.bm);
@@ -117,7 +117,7 @@ TEST(search, searchExludeMove) {
 
 	src.getPosition().setupFromFen("rn1qkbnr/pbpp1ppp/1p6/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 2 4");
 	sl.setDepth(10);
-	auto res = src.startThinking();
+	auto res = src.manageNewSearch();
 
 	EXPECT_EQ( res.PV.getMove(0), Move(F1,C4));
 }
@@ -140,7 +140,7 @@ TEST(search, syzygy) {
 	src.getPosition().setupFromFen("8/8/8/6P1/8/5K2/1r6/k7 b - - 0 1");
 	
 	sl.setDepth(1);
-	auto res = src.startThinking();
+	auto res = src.manageNewSearch();
 	
 	EXPECT_EQ( res.PV.getMove(0), Move(B2, B4));
 
@@ -164,7 +164,7 @@ TEST(search, syzygy2) {
 	src.getPosition().setupFromFen("8/8/8/1k4p1/1P4Pp/K6P/8/8 w - - 0 1");
 	
 	sl.setDepth(15);
-	auto res = src.startThinking();
+	auto res = src.manageNewSearch();
 	
 	EXPECT_EQ( res.PV.getMove(0), Move(A3, B3));
 
