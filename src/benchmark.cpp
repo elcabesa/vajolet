@@ -55,20 +55,16 @@ static std::string getNodesPerSecond(const uint64_t nodeCount, const int64_t tim
 	}
 }
 
-static Search initSearch(SearchTimer& st) {
+void benchmark() {
+	// initialize search parameters
 	uciParameters::useOwnBook = false;
 	transpositionTable::getInstance().setSize(32);
 	
+	SearchTimer st;
 	SearchLimits sl;
 	sl.setDepth(15);
+	Search src = Search(st, sl, UciOutput::create(UciOutput::mute));
 	
-	return Search(st, sl, UciOutput::create(UciOutput::mute));
-}
-
-void benchmark() {
-	// initialize search parameters
-	SearchTimer st;
-	Search src = initSearch(st);
 	
 	// iterate positions
 	uint64_t nodeCount = 0;
