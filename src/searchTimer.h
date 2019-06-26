@@ -18,6 +18,7 @@
 #ifndef SEARCH_TIMER_H_
 #define SEARCH_TIMER_H_
 
+#include <cstdint>
 #include <chrono>
 
 class SearchTimer
@@ -25,18 +26,18 @@ class SearchTimer
 	std::chrono::time_point<std::chrono::steady_clock> _startTime;
 	std::chrono::time_point<std::chrono::steady_clock> _ponderTime;
 
-	static std::chrono::time_point<std::chrono::steady_clock> _getTime(){ return std::chrono::steady_clock::now(); }
+	static auto _getTime(){return std::chrono::steady_clock::now();}
 public:
-	explicit SearchTimer():_startTime(_getTime()), _ponderTime(_startTime){};
+	explicit SearchTimer():_startTime(_getTime()), _ponderTime(_startTime) {};
 	explicit SearchTimer(const SearchTimer &other) = delete;
 	explicit SearchTimer(const SearchTimer &&other) = delete;
 	SearchTimer& operator=(const SearchTimer& other ) {_startTime = other._startTime; _ponderTime = other._ponderTime; return *this;}
 	SearchTimer& operator=(const SearchTimer&&) = delete;
 
-	long long int getElapsedTime() const { return (std::chrono::duration_cast<std::chrono::milliseconds>( _getTime() - _startTime )).count(); }
-	long long int getClockTime() const { return (std::chrono::duration_cast<std::chrono::milliseconds>( _getTime() - _ponderTime )).count(); }
-	void resetTimers(){ _ponderTime = _startTime = _getTime(); }
-	void resetClockTimer(){ _ponderTime = _getTime(); }
+	int64_t getElapsedTime() const {return (std::chrono::duration_cast<std::chrono::milliseconds>(_getTime() - _startTime )).count();}
+	int64_t getClockTime()   const {return (std::chrono::duration_cast<std::chrono::milliseconds>(_getTime() - _ponderTime)).count();}
+	void resetTimers() {_ponderTime = _startTime = _getTime();}
+	void resetClockTimer() {_ponderTime = _getTime();}
 };
 
 #endif

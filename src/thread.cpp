@@ -23,6 +23,7 @@
 #include "position.h"
 #include "search.h"
 #include "searchLimits.h"
+#include "searchResult.h"
 #include "searchTimer.h"
 #include "timeManagement.h"
 #include "thread.h"

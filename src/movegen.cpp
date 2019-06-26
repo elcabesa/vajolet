@@ -159,7 +159,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	// king
 	//------------------------------------------------------
 	bitboardIndex piece = s.getKingOfActivePlayer();
-	generateKingMoves<type>( ml, kingSquare, occupiedSquares, kingTarget, enemy );
+	_generateKingMoves<type>( ml, kingSquare, occupiedSquares, kingTarget, enemy );
 	
 	// if the king is in check from 2 enemy, it can only run away, we should not search any other move
 	if((type == Movegen::allEvasionMg || type == Movegen::captureEvasionMg || type == Movegen::quietEvasionMg) && s.isInDoubleCheck() )
@@ -169,22 +169,22 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	//------------------------------------------------------
 	// queen
 	//------------------------------------------------------
-	generatePieceMoves<type>( ml, &_attackFromQueen, ++piece, kingSquare, occupiedSquares, target );
+	_generatePieceMoves<type>( ml, &_attackFromQueen, ++piece, kingSquare, occupiedSquares, target );
 	
 	//------------------------------------------------------
 	// rook
 	//------------------------------------------------------
-	generatePieceMoves<type>( ml, &_attackFromRook, ++piece, kingSquare, occupiedSquares, target );
+	_generatePieceMoves<type>( ml, &_attackFromRook, ++piece, kingSquare, occupiedSquares, target );
 	
 	//------------------------------------------------------
 	// bishop
 	//------------------------------------------------------
-	generatePieceMoves<type>( ml, &_attackFromBishop, ++piece, kingSquare, occupiedSquares, target );
+	_generatePieceMoves<type>( ml, &_attackFromBishop, ++piece, kingSquare, occupiedSquares, target );
 
 	//------------------------------------------------------
 	// knight
 	//------------------------------------------------------
-	generatePieceMoves<type>( ml, &_attackFromKnight, ++piece, kingSquare, occupiedSquares, target );
+	_generatePieceMoves<type>( ml, &_attackFromKnight, ++piece, kingSquare, occupiedSquares, target );
 
 	
 	//------------------------------------------------------
@@ -193,18 +193,18 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	if constexpr ( type != Movegen::captureMg && type != Movegen::captureEvasionMg )
 	{
 		//push
-		bitMap pawnPushed = generatePawnPushes<type,false>( ml, color, nonPromotionPawns, kingSquare, occupiedSquares, target );
+		bitMap pawnPushed = _generatePawnPushes<type,false>( ml, color, nonPromotionPawns, kingSquare, occupiedSquares, target );
 		//double push
-		generatePawnDoublePushes<type>( ml, color, pawnPushed, kingSquare, occupiedSquares, target );
+		_generatePawnDoublePushes<type>( ml, color, pawnPushed, kingSquare, occupiedSquares, target );
 	}
 
 	if constexpr (type!= Movegen::quietMg && type!=Movegen::quietChecksMg && type != Movegen::quietEvasionMg)
 	{
 		//left capture
-		generatePawnCaptureLeft<type,false>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
+		_generatePawnCaptureLeft<type,false>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
 
 		//right capture
-		generatePawnCaptureRight<type,false>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
+		_generatePawnCaptureRight<type,false>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
 
 	}
 	
@@ -212,19 +212,19 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	if(type != Movegen::captureMg && type != Movegen::captureEvasionMg)
 	{
 		//push
-		generatePawnPushes<type,true>( ml, color, promotionPawns, kingSquare, occupiedSquares, target );
+		_generatePawnPushes<type,true>( ml, color, promotionPawns, kingSquare, occupiedSquares, target );
 	}
 
 	if( type!= Movegen::quietMg && type!= Movegen::quietChecksMg && type!= Movegen::quietEvasionMg)
 	{
 		//left capture
-		generatePawnCaptureLeft<type,true>( ml, color, promotionPawns, kingSquare, target, enemy );
+		_generatePawnCaptureLeft<type,true>( ml, color, promotionPawns, kingSquare, target, enemy );
 
 		//right capture
-		generatePawnCaptureRight<type,true>( ml, color, promotionPawns, kingSquare, target, enemy );
+		_generatePawnCaptureRight<type,true>( ml, color, promotionPawns, kingSquare, target, enemy );
 
 		// ep capture
-		generateEpMove( ml, color, nonPromotionPawns, occupiedSquares, kingSquare );
+		_generateEpMove( ml, color, nonPromotionPawns, occupiedSquares, kingSquare );
 	}
 
 	//king castle
@@ -232,8 +232,8 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	{
 		if( !s.isInCheck() && s.hasCastleRight( castleOO | castleOOO, color ) )
 		{
-			generateCastle<type>( ml, color, castleOO, kingSquare, occupiedSquares );
-			generateCastle<type>( ml, color, castleOOO, kingSquare, occupiedSquares );
+			_generateCastle<type>( ml, color, castleOO, kingSquare, occupiedSquares );
+			_generateCastle<type>( ml, color, castleOOO, kingSquare, occupiedSquares );
 		}
 	}
 }
@@ -242,7 +242,7 @@ template void Movegen::generateMoves<Movegen::quietMg>( MoveList<MAX_MOVE_PER_PO
 template void Movegen::generateMoves<Movegen::quietChecksMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
 
 template<Movegen::genType type>
-inline void Movegen::insertStandardMove( MoveList<MAX_MOVE_PER_POSITION>& ml, const Move& m ) const
+inline void Movegen::_insertStandardMove( MoveList<MAX_MOVE_PER_POSITION>& ml, const Move& m ) const
 {
 	if( type !=Movegen::quietChecksMg || _pos.moveGivesCheck( m ) )
 	{
@@ -250,7 +250,7 @@ inline void Movegen::insertStandardMove( MoveList<MAX_MOVE_PER_POSITION>& ml, co
 	}
 }
 
-void Movegen::insertPromotionMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, Move& m ) const
+void Movegen::_insertPromotionMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, Move& m ) const
 {
 	for(Move::epromotion prom=Move::promQueen; prom<= Move::promKnight; prom=(Move::epromotion)( prom+1) )
 	{
@@ -260,7 +260,7 @@ void Movegen::insertPromotionMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, Move& m
 }
 
 template<Movegen::genType type>
-inline void Movegen::generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap kingTarget, const bitMap enemy )const
+inline void Movegen::_generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap kingTarget, const bitMap enemy )const
 {
 	Move m(Move::NOMOVE);
 	
@@ -274,13 +274,13 @@ inline void Movegen::generateKingMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, con
 		if( !(_pos.getAttackersTo(to, occupiedSquares & ~_pos.getOurBitmap(King)) & enemy) )
 		{
 			m.setTo( to );
-			insertStandardMove<type>( ml, m );
+			_insertStandardMove<type>( ml, m );
 		}
 	}
 }
 
 template<Movegen::genType type>
-inline void Movegen::generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&), const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const
+inline void Movegen::_generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bitMap (*attack)(const tSquare,const bitMap&), const bitboardIndex piece, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const
 {
 	
 	Move m(Move::NOMOVE);
@@ -299,14 +299,14 @@ inline void Movegen::generatePieceMoves( MoveList<MAX_MOVE_PER_POSITION>& ml, bi
 			if( !_pos.getActualState().isPinned( from ) || squaresAligned(from, to, kingSquare))
 			{
 				m.setTo( to );
-				insertStandardMove<type>( ml, m );
+				_insertStandardMove<type>( ml, m );
 			}
 		}
 	}
 }
 
 template<Movegen::genType type, bool promotion>
-inline bitMap Movegen::generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const
+inline bitMap Movegen::_generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const
 {
 	bitMap pawnPushed;
 	//push
@@ -331,11 +331,11 @@ inline bitMap Movegen::generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, 
 			m.setFrom( from );
 			if( promotion )
 			{
-				insertPromotionMoves( ml, m );
+				_insertPromotionMoves( ml, m );
 			}
 			else
 			{
-				insertStandardMove<type>( ml, m );
+				_insertStandardMove<type>( ml, m );
 			}
 		}
 	}
@@ -343,7 +343,7 @@ inline bitMap Movegen::generatePawnPushes( MoveList<MAX_MOVE_PER_POSITION>& ml, 
 }
 
 template<Movegen::genType type>
-inline void Movegen::generatePawnDoublePushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const
+inline void Movegen::_generatePawnDoublePushes( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap occupiedSquares, const bitMap target )const
 {
 	//double push
 	const bitMap& thirdRankMask = rankMask( color ? A6:A3);
@@ -352,36 +352,36 @@ inline void Movegen::generatePawnDoublePushes( MoveList<MAX_MOVE_PER_POSITION>& 
 	while(moves)
 	{
 		tSquare to = iterateBit(moves);
-		tSquare from = to - 2*pawnPush( color );
+		tSquare from = to - 2 * pawnPush( color );
 
 		if( !_pos.getActualState().isPinned( from ) || squaresAligned(from ,to ,kingSquare))
 		{
 			m.setTo( to );
 			m.setFrom( from );
-			insertStandardMove<type>( ml, m );
+			_insertStandardMove<type>( ml, m );
 		}
 	}
 }
 template<Movegen::genType type, bool promotion>
-inline void Movegen::generatePawnCaptureLeft( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const
+inline void Movegen::_generatePawnCaptureLeft( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const
 {
 	//left capture
 	int delta = color? -9: 7;
 	bitMap moves = ( color? (pawns&~fileMask(A1))>>9: (pawns&~fileMask(A1))<<7) & enemy & target;
-	generatePawnCapture<type, promotion>( ml, delta, moves, kingSquare );
+	_generatePawnCapture<type, promotion>( ml, delta, moves, kingSquare );
 }
 
 template<Movegen::genType type, bool promotion>
-inline void Movegen::generatePawnCaptureRight( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const
+inline void Movegen::_generatePawnCaptureRight( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const tSquare kingSquare, const bitMap target, const bitMap enemy )const
 {
 	//right capture
 	int delta= color? -7: 9;
 	bitMap moves = ( color? (pawns&~fileMask(H1))>>7: (pawns&~fileMask(H1))<<9) & enemy & target;
-	generatePawnCapture<type, promotion>( ml, delta, moves, kingSquare );
+	_generatePawnCapture<type, promotion>( ml, delta, moves, kingSquare );
 }
 
 template<Movegen::genType type, bool promotion>
-inline void Movegen::generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, int delta, bitMap moves, const tSquare kingSquare)const
+inline void Movegen::_generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, int delta, bitMap moves, const tSquare kingSquare)const
 {
 	Move m(Move::NOMOVE);
 	if( promotion )
@@ -400,7 +400,7 @@ inline void Movegen::generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, i
 			
 			if( promotion )
 			{
-				insertPromotionMoves( ml, m );
+				_insertPromotionMoves( ml, m );
 			}
 			else
 			{
@@ -410,7 +410,7 @@ inline void Movegen::generatePawnCapture( MoveList<MAX_MOVE_PER_POSITION>& ml, i
 	}
 }
 
-inline void Movegen::generateEpMove(MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const bitMap occupiedSquares, const tSquare kingSquare) const
+inline void Movegen::_generateEpMove(MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const bitMap& pawns, const bitMap occupiedSquares, const tSquare kingSquare) const
 {
 	if( _pos.getActualState().hasEpSquare() )
 	{
@@ -457,7 +457,7 @@ void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml
 }
 
 template<Movegen::genType type>
-inline void Movegen::generateCastle( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const eCastle castle,  const tSquare kingSquare, const bitMap occupiedSquares )const
+inline void Movegen::_generateCastle( MoveList<MAX_MOVE_PER_POSITION>& ml, const Color color, const eCastle castle,  const tSquare kingSquare, const bitMap occupiedSquares )const
 {
 	eCastle cr = state::calcCastleRight( castle, color );
 	if( _pos.getActualState().hasCastleRight( cr ) && _pos.isCastlePathFree( cr ) )

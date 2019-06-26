@@ -87,7 +87,7 @@ public:
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return * this;
 	}
-	SearchResult startThinking(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
+	SearchResult go(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
 
 	void stopSearch(){ _stop = true;}
 	void resetStopCondition(){ _stop = false;}
@@ -95,7 +95,7 @@ public:
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 	void showLine(){ _showLine= true;}
-	void manageNewSearch();
+	SearchResult manageNewSearch();
 	Position& getPosition();
 
 private:
@@ -617,7 +617,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 
 }
 
-SearchResult Search::impl::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed)
+SearchResult Search::impl::go(int depth, Score alpha, Score beta, PVline pvToBeFollowed)
 {
 	//------------------------------------
 	//init the new search
@@ -1995,7 +1995,7 @@ Position& Search::impl::getPosition()
 	return _pos;
 }
 
-void Search::impl::manageNewSearch()
+SearchResult Search::impl::manageNewSearch()
 {
 	/*************************************************
 	 *	first of all check the number of legal moves
@@ -2020,7 +2020,8 @@ void Search::impl::manageNewSearch()
 
 		_UOI->printBestMove( Move::NOMOVE, Move::NOMOVE, _pos.isChess960() );
 
-		return;
+		PVline pvLine;
+		return SearchResult(-SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, 0 );
 	}
 	
 	if( legalMoves == 1 && !_sl.isInfiniteSearch() )
@@ -2035,7 +2036,9 @@ void Search::impl::manageNewSearch()
 		
 		_UOI->printBestMove( bestMove, ponderMove, _pos.isChess960() );
 
-		return;
+		PVline pvLine;
+		pvLine.set(bestMove, ponderMove);
+		return SearchResult(-SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, 0 );
 
 	}
 
@@ -2056,7 +2059,9 @@ void Search::impl::manageNewSearch()
 			
 			_UOI->printBestMove(bookM, ponderMove, _pos.isChess960());
 			
-			return;
+			PVline pvLine;
+			pvLine.set(bookM, ponderMove);
+			return SearchResult(-SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, 0 );
 		}
 	}
 	
@@ -2070,11 +2075,11 @@ void Search::impl::manageNewSearch()
 	//	newPV.resize(gp.depth/2 + 1);
 	//	newPV.pop_front();
 	//	newPV.pop_front();
-	//	res = src.startThinking( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
+	//	res = src.go( gp.depth/2 + 1, gp.alpha, gp.beta, newPV );
 	//}
 	//else
 	
-	SearchResult res = startThinking( );
+	SearchResult res = go();
 	
 	PVline PV = res.PV;
 
@@ -2096,6 +2101,8 @@ void Search::impl::manageNewSearch()
 	_UOI->printBestMove( bestMove, ponderMove, _pos.isChess960() );
 
 	_game.savePV(PV, res.depth, res.alpha, res.beta);
+	
+	return res;
 
 }
 
@@ -2104,12 +2111,11 @@ void Search::impl::manageNewSearch()
 void Search::initSearchParameters(){ Search::impl::initSearchParameters(); }
 Search::Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, std::move(UOI))}{}
 Search::~Search() = default;
-SearchResult Search::startThinking(int depth, Score alpha, Score beta, PVline pvToBeFollowed ){ return pimpl->startThinking(depth, alpha, beta, pvToBeFollowed); }
 void Search::stopSearch(){ pimpl->stopSearch(); }
 
 void Search::resetStopCondition(){ pimpl->resetStopCondition(); }
 unsigned long long Search::getVisitedNodes() const{ return pimpl->getVisitedNodes(); }
 unsigned long long Search::getTbHits() const{ return pimpl->getTbHits(); }
 void Search::showLine(){ pimpl->showLine(); }
-void Search::manageNewSearch(){ pimpl->manageNewSearch(); }
+SearchResult Search::manageNewSearch(){ return pimpl->manageNewSearch(); }
 Position& Search::getPosition(){ return pimpl->getPosition(); }

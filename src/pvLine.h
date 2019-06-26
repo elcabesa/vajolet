@@ -45,6 +45,13 @@ public:
 		emplace_back( move );
 	}
 	
+	inline void set(const Move&  bestMove, const Move&  ponderMove)
+	{
+		clear();
+		emplace_back(bestMove);
+		emplace_back(ponderMove);
+	}
+	
 	inline const Move& getMove( const unsigned int n ) const
 	{
 		if( size() > n )
