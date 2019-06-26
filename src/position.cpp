@@ -1195,7 +1195,7 @@ bitMap Position::initKingPath(const tSquare kSqFrom, const tSquare kSqTo)
 	auto kLeft = std::min(kSqFrom, kSqTo);
 	auto kRight = std::max(kSqFrom, kSqTo);
 	for (auto sq = kLeft; sq <= kRight; ++sq) {
-		if (sq != kSqFrom ) { b |= bitSet(sq);}
+		b |= bitSet(sq);
 	}
 	return b;
 	
