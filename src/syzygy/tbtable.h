@@ -53,7 +53,7 @@ private:
 	
 	std::once_flag _mappedFlag;
 	void _mapFile();
-	virtual int _mapScore(const tFile f, int value, const int wdl) const = 0;
+	virtual WDLScore _mapScore(const tFile f, int value, const WDLScore wdl) const = 0;
 	virtual bool _checkDtzStm(unsigned int stm, tFile f) const = 0;
 	
 	
@@ -84,7 +84,7 @@ public:
 	const PairsData& getPairsData(const unsigned int stm, const tFile f) const;
 	void setMap(const uint8_t* x);
 	const uint8_t* getMap(void) const;
-	int probe(const Position& pos, WDLScore wdl, ProbeState& result);
+	WDLScore probe(const Position& pos, WDLScore wdl, ProbeState& result);
 	
 };
 

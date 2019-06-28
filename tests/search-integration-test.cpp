@@ -66,7 +66,7 @@ TEST(search, search) {
 	SearchLimits sl;
 
 
-	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
+	Search src( st, sl, UciOutput::create( UciOutput::type::mute ) );
 
 
 	for (auto & p : _p)
@@ -113,7 +113,7 @@ TEST(search, searchExludeMove) {
 	sl.moveListInsert(Move(F1,C4));
 	sl.moveListInsert(Move(C3,A4));
 	
-	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
+	Search src( st, sl, UciOutput::create( UciOutput::type::mute ) );
 
 	src.getPosition().setupFromFen("rn1qkbnr/pbpp1ppp/1p6/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 2 4");
 	sl.setDepth(10);
@@ -135,7 +135,7 @@ TEST(search, syzygy) {
 	SearchTimer st;
 	SearchLimits sl;
 	
-	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
+	Search src( st, sl, UciOutput::create( UciOutput::type::mute ) );
 	
 	src.getPosition().setupFromFen("8/8/8/6P1/8/5K2/1r6/k7 b - - 0 1");
 	
@@ -159,7 +159,7 @@ TEST(search, syzygy2) {
 	SearchTimer st;
 	SearchLimits sl;
 	
-	Search src( st, sl, UciOutput::create( UciOutput::mute ) );
+	Search src( st, sl, UciOutput::create( UciOutput::type::mute ) );
 	
 	src.getPosition().setupFromFen("8/8/8/1k4p1/1P4Pp/K6P/8/8 w - - 0 1");
 	

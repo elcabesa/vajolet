@@ -343,7 +343,7 @@ private:
 	//--------------------------------------------------------
 	struct materialStruct
 	{
-		using tType = enum
+		using tType = enum class type
 		{
 			exact,
 			multiplicativeFunction,

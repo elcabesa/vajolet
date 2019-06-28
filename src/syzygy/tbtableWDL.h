@@ -24,7 +24,7 @@
 #include "tbtable.h"
 
 class TBTableWDL: public TBTable {
-	int _mapScore(const tFile f, int value, const int wdl) const;
+	WDLScore _mapScore(const tFile f, int value, const WDLScore wdl) const;
 	bool _checkDtzStm(unsigned int stm, tFile f) const;
 public:
 	explicit TBTableWDL(const std::string& code);

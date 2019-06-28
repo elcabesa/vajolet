@@ -406,8 +406,8 @@ TEST(tbtable, getType) {
 	TBTableWDL t("KBPPvKB");
 	TBTableDTZ t2(t);
 	
-	ASSERT_EQ(t2.getType(), DTZ);
-	ASSERT_EQ(t.getType(), WDL);
+	ASSERT_EQ(t2.getType(), TBType::DTZ);
+	ASSERT_EQ(t.getType(), TBType::WDL);
 }
 
 

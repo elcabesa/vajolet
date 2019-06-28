@@ -62,16 +62,16 @@ public:
 	Score getStaticValue()const { return staticValue; }
 	unsigned short getPackedMove()const { return packedMove; }
 	signed short int getDepth()const { return depth; }
-	unsigned char getType()const { return type; }
+	ttType getType()const { return static_cast<ttType>(type); }
 	unsigned char getGeneration()const { return generation; }
 
 	bool isTypeGoodForBetaCutoff() const
 	{
-		return (getType() ==  typeScoreHigherThanBeta) || (getType() == typeExact);
+		return (getType() ==  ttType::typeScoreHigherThanBeta) || (getType() == ttType::typeExact);
 	}
 	bool isTypeGoodForAlphaCutoff() const
 	{
-		return (getType() ==  typeScoreLowerThanAlpha || getType() == typeExact);
+		return (getType() ==  ttType::typeScoreLowerThanAlpha || getType() == ttType::typeExact);
 	}
 	
 };

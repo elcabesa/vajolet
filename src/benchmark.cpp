@@ -63,7 +63,7 @@ void benchmark() {
 	SearchTimer st;
 	SearchLimits sl;
 	sl.setDepth(15);
-	Search src = Search(st, sl, UciOutput::create(UciOutput::mute));
+	Search src( st, sl, UciOutput::create( UciOutput::type::mute ) );
 	
 	
 	// iterate positions

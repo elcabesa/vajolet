@@ -29,15 +29,15 @@ TBTableWDL::TBTableWDL(const std::string& code): TBTable(code, "rtbw", 2) {
 
 
 TBType TBTableWDL::getType() const{
-	return WDL;
+	return TBType::WDL;
 }
 
 // DTZ scores are sorted by frequency of occurrence and then assigned the
 // values 0, 1, 2, ... in order of decreasing frequency. This is done for each
 // of the four WDLScore values. The mapping information necessary to reconstruct
 // the original values is stored in the TB file and read during map[] init.
-int TBTableWDL::_mapScore(const tFile, int value, const int) const {
-	return value - 2;
+WDLScore TBTableWDL::_mapScore(const tFile, int value, const WDLScore) const {
+	return static_cast<WDLScore>(value - 2);
 }
 
 bool TBTableWDL::_checkDtzStm(unsigned int, tFile) const {

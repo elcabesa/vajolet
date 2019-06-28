@@ -23,7 +23,7 @@
 
 constexpr int TBPIECES = 7; // Max number of supported pieces
 
-enum WDLScore {
+enum class WDLScore {
 	WDLLoss        = -2, // Loss
 	WDLBlessedLoss = -1, // Loss, but draw under 50-move rule
 	WDLDraw        =  0, // Draw
@@ -34,7 +34,7 @@ enum WDLScore {
 };
 
 // Possible states after a probing operation
-enum ProbeState {
+enum class ProbeState {
     FAIL              =  0, // Probe failed (missing file table)
     OK                =  1, // Probe succesful
     CHANGE_STM        = -1, // DTZ should check the other side
@@ -42,8 +42,9 @@ enum ProbeState {
 };
 
 inline WDLScore operator-(WDLScore d) { return WDLScore(-int(d)); }
+static inline int transformWdlToOffset(WDLScore d) { return static_cast<int>(d) + 2;  }
 
-enum TBType {WDL, DTZ}; // Used as template parameter
+enum class TBType {WDL, DTZ}; // Used as template parameter
 
 using Sym = uint16_t;
 

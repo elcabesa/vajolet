@@ -107,40 +107,40 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	// populate the target squares bitmaps
 	bitMap kingTarget;
 	bitMap target;
-	if constexpr (type==Movegen::allEvasionMg)
+	if constexpr (type==Movegen::genType::allEvasionMg)
 	{
 		assert(s.getCheckers());
 		target = ( s.getCheckers() | getSquaresBetween(kingSquare, firstOne( s.getCheckers() ) ) ) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = ~_pos.getOurBitmap(Pieces);
 	}
-	else if constexpr (type==Movegen::captureEvasionMg)
+	else if constexpr (type==Movegen::genType::captureEvasionMg)
 	{
 		assert(s.getCheckers());
 		target = ( s.getCheckers() ) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = target | _pos.getTheirBitmap(Pieces);
 	}
-	else if constexpr (type==Movegen::quietEvasionMg)
+	else if constexpr (type==Movegen::genType::quietEvasionMg)
 	{
 		assert( s.getCheckers() );
 		target = ( getSquaresBetween( kingSquare, firstOne( s.getCheckers() ) ) ) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = ~occupiedSquares;
 	}
-	else if constexpr (type== Movegen::allNonEvasionMg)
+	else if constexpr (type== Movegen::genType::allNonEvasionMg)
 	{
 		target= ~_pos.getOurBitmap(Pieces);
 		kingTarget= target;
 	}
-	else if constexpr (type== Movegen::captureMg)
+	else if constexpr (type== Movegen::genType::captureMg)
 	{
 		target = _pos.getTheirBitmap(Pieces);
 		kingTarget = target;
 	}
-	else if constexpr (type== Movegen::quietMg)
+	else if constexpr (type== Movegen::genType::quietMg)
 	{
 		target = ~occupiedSquares;
 		kingTarget = target;
 	}
-	else if constexpr (type== Movegen::quietChecksMg)
+	else if constexpr (type== Movegen::genType::quietChecksMg)
 	{
 		target = ~occupiedSquares;
 		kingTarget = target;
@@ -162,7 +162,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	_generateKingMoves<type>( ml, kingSquare, occupiedSquares, kingTarget, enemy );
 	
 	// if the king is in check from 2 enemy, it can only run away, we should not search any other move
-	if((type == Movegen::allEvasionMg || type == Movegen::captureEvasionMg || type == Movegen::quietEvasionMg) && s.isInDoubleCheck() )
+	if((type == Movegen::genType::allEvasionMg || type == Movegen::genType::captureEvasionMg || type == Movegen::genType::quietEvasionMg) && s.isInDoubleCheck() )
 	{
 		return;
 	}
@@ -190,7 +190,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	//------------------------------------------------------
 	// Pawns
 	//------------------------------------------------------
-	if constexpr ( type != Movegen::captureMg && type != Movegen::captureEvasionMg )
+	if constexpr ( type != Movegen::genType::captureMg && type != Movegen::genType::captureEvasionMg )
 	{
 		//push
 		bitMap pawnPushed = _generatePawnPushes<type,false>( ml, color, nonPromotionPawns, kingSquare, occupiedSquares, target );
@@ -198,7 +198,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 		_generatePawnDoublePushes<type>( ml, color, pawnPushed, kingSquare, occupiedSquares, target );
 	}
 
-	if constexpr (type!= Movegen::quietMg && type!=Movegen::quietChecksMg && type != Movegen::quietEvasionMg)
+	if constexpr (type!= Movegen::genType::quietMg && type!=Movegen::genType::quietChecksMg && type != Movegen::genType::quietEvasionMg)
 	{
 		//left capture
 		_generatePawnCaptureLeft<type,false>( ml, color, nonPromotionPawns, kingSquare, target, enemy );
@@ -209,13 +209,13 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	}
 	
 	// PROMOTIONS
-	if(type != Movegen::captureMg && type != Movegen::captureEvasionMg)
+	if(type != Movegen::genType::captureMg && type != Movegen::genType::captureEvasionMg)
 	{
 		//push
 		_generatePawnPushes<type,true>( ml, color, promotionPawns, kingSquare, occupiedSquares, target );
 	}
 
-	if( type!= Movegen::quietMg && type!= Movegen::quietChecksMg && type!= Movegen::quietEvasionMg)
+	if( type!= Movegen::genType::quietMg && type!= Movegen::genType::quietChecksMg && type!= Movegen::genType::quietEvasionMg)
 	{
 		//left capture
 		_generatePawnCaptureLeft<type,true>( ml, color, promotionPawns, kingSquare, target, enemy );
@@ -228,7 +228,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	}
 
 	//king castle
-	if(type !=Movegen::allEvasionMg && type!=Movegen::captureEvasionMg && type!=Movegen::quietEvasionMg && type!= Movegen::captureMg)
+	if(type !=Movegen::genType::allEvasionMg && type!=Movegen::genType::captureEvasionMg && type!=Movegen::genType::quietEvasionMg && type!= Movegen::genType::captureMg)
 	{
 		if( !s.isInCheck() && s.hasCastleRight( castleOO | castleOOO, color ) )
 		{
@@ -237,14 +237,14 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 		}
 	}
 }
-template void Movegen::generateMoves<Movegen::captureMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
-template void Movegen::generateMoves<Movegen::quietMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
-template void Movegen::generateMoves<Movegen::quietChecksMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
+template void Movegen::generateMoves<Movegen::genType::captureMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
+template void Movegen::generateMoves<Movegen::genType::quietMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
+template void Movegen::generateMoves<Movegen::genType::quietChecksMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const;
 
 template<Movegen::genType type>
 inline void Movegen::_insertStandardMove( MoveList<MAX_MOVE_PER_POSITION>& ml, const Move& m ) const
 {
-	if( type !=Movegen::quietChecksMg || _pos.moveGivesCheck( m ) )
+	if( type !=Movegen::genType::quietChecksMg || _pos.moveGivesCheck( m ) )
 	{
 		ml.insert( m );
 	}
@@ -440,13 +440,13 @@ inline void Movegen::_generateEpMove(MoveList<MAX_MOVE_PER_POSITION>& ml, const 
 }
 
 template<>
-void Movegen::generateMoves<Movegen::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
+void Movegen::generateMoves<Movegen::genType::allMg>( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 {
 
 	if(_pos.isInCheck())
 	{
-		generateMoves<Movegen::captureEvasionMg>( ml);
-		generateMoves<Movegen::quietEvasionMg>( ml );
+		generateMoves<Movegen::genType::captureEvasionMg>( ml);
+		generateMoves<Movegen::genType::quietEvasionMg>( ml );
 	}
 	else
 	{

@@ -52,6 +52,7 @@ private:
 	WDLScore _search(Position& pos, ProbeState& result, const bool CheckZeroingMoves) const;
 	static int _dtzBeforeZeroing(WDLScore wdl);
 	static int _signOf(int val);
+	static int _signOf(WDLScore val);
 
 	TBTables _t;
   

@@ -54,8 +54,8 @@ public:
 	TBTableDTZ& getDTZ(const HashKey& k) const;
 	bool exists(const HashKey& k) const;
 	size_t getMaxCardinality() const;
-	int probeWDL(const Position& pos, ProbeState& result, WDLScore wdl = WDLDraw) const;
-	int probeDTZ(const Position& pos, ProbeState& result, WDLScore wdl = WDLDraw) const;
+	WDLScore probeWDL(const Position& pos, ProbeState& result, WDLScore wdl = WDLScore::WDLDraw) const;
+	WDLScore probeDTZ(const Position& pos, ProbeState& result, WDLScore wdl = WDLScore::WDLDraw) const;
 };
 
 #endif

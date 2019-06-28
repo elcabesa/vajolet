@@ -50,7 +50,7 @@ size_t Syzygy::getSize() const {
 // the state to ZEROING_BEST_MOVE.
 WDLScore Syzygy::_search(Position& pos, ProbeState& result, const bool CheckZeroingMoves) const {
 	
-	WDLScore value, bestValue = WDLLoss;
+	WDLScore value, bestValue = WDLScore::WDLLoss;
 	size_t totalCount = pos.getNumberOfLegalMoves(), moveCount = 0;
 	
 	Move m;
@@ -67,15 +67,15 @@ WDLScore Syzygy::_search(Position& pos, ProbeState& result, const bool CheckZero
 		value = -_search(pos, result, false);
 		pos.undoMove();
 
-		if (result == FAIL) {
-				return WDLDraw;
+		if (result == ProbeState::FAIL) {
+				return WDLScore::WDLDraw;
 		}
 
 		if (value > bestValue) {
 			bestValue = value;
 
-			if (value >= WDLWin) {
-					result = ZEROING_BEST_MOVE; // Winning DTZ-zeroing move
+			if (value >= WDLScore::WDLWin) {
+					result = ProbeState::ZEROING_BEST_MOVE; // Winning DTZ-zeroing move
 					return value;
 			}
 		}
@@ -94,16 +94,16 @@ WDLScore Syzygy::_search(Position& pos, ProbeState& result, const bool CheckZero
 	} else {
 		value = (WDLScore)_t.probeWDL(pos, result);
 
-		if (result == FAIL) {
-			return WDLDraw;
+		if (result == ProbeState::FAIL) {
+			return WDLScore::WDLDraw;
 		}
 	}
 
 	// DTZ stores a "don't care" value if bestValue is a win
 	if (bestValue >= value) {
-		return result = (   bestValue > WDLDraw || noMoreMoves ? ZEROING_BEST_MOVE : OK), bestValue;
+		return result = (   bestValue > WDLScore::WDLDraw || noMoreMoves ? ProbeState::ZEROING_BEST_MOVE : ProbeState::OK), bestValue;
 	}
-	return result = OK, value;
+	return result = ProbeState::OK, value;
 }
 
 // Probe the WDL table for a particular position.
@@ -116,8 +116,8 @@ WDLScore Syzygy::_search(Position& pos, ProbeState& result, const bool CheckZero
 //  2 : win
 WDLScore Syzygy::probeWdl(Position& pos, ProbeState& result) const{
 
-    result = OK;
-    return _search(pos, result, false);
+	result = ProbeState::OK;
+	return _search(pos, result, false);
 }
 
 size_t Syzygy::getMaxCardinality() const {
@@ -131,15 +131,20 @@ size_t Syzygy::getMaxCardinality() const {
 // previous move if we know the position's WDL score.
 int Syzygy::_dtzBeforeZeroing(WDLScore wdl) {
 	return 
-		wdl == WDLWin         ?  1   :
-		wdl == WDLCursedWin   ?  101 :
-		wdl == WDLBlessedLoss ? -101 :
-		wdl == WDLLoss        ? -1   : 0;
+		wdl == WDLScore::WDLWin         ?  1   :
+		wdl == WDLScore::WDLCursedWin   ?  101 :
+		wdl == WDLScore::WDLBlessedLoss ? -101 :
+		wdl == WDLScore::WDLLoss        ? -1   : 0;
 }
 
 // Return the sign of a number (-1, 0, 1)
 int Syzygy::_signOf(int val) {
-    return (0 < val) - (val < 0);
+	return (0 < val) - (val < 0);
+}
+
+// Return the sign of a number (-1, 0, 1)
+int Syzygy::_signOf(WDLScore val) {
+	return _signOf(static_cast<int>(val));
 }
 
 // Probe the DTZ table for a particular position.
@@ -170,27 +175,27 @@ int Syzygy::_signOf(int val) {
 // then do not accept moves leading to dtz + 50-move-counter == 100.
 int Syzygy::probeDtz(Position& pos, ProbeState& result) const {
 
-	result = OK;
+	result = ProbeState::OK;
 	WDLScore wdl = _search(pos, result, true);
 
-	if (result == FAIL || wdl == WDLDraw) {// DTZ tables don't store draws
+	if (result == ProbeState::FAIL || wdl == WDLScore::WDLDraw) {// DTZ tables don't store draws
 		return 0;
 	}
 
 	// DTZ stores a 'don't care' value in this case, or even a plain wrong
 	// one as in case the best move is a losing ep, so it cannot be probed.
-	if (result == ZEROING_BEST_MOVE) {
+	if (result == ProbeState::ZEROING_BEST_MOVE) {
 		return _dtzBeforeZeroing(wdl);
 	}
 
-	int dtz = _t.probeDTZ(pos, result, wdl);
+	int dtz = static_cast<int>(_t.probeDTZ(pos, result, wdl));
 
-	if (result == FAIL) {
+	if (result == ProbeState::FAIL) {
 		return 0;
 	}
 
-	if (result != CHANGE_STM) {
-		return (dtz + 100 * (wdl == WDLBlessedLoss || wdl == WDLCursedWin)) * _signOf(wdl);
+	if (result != ProbeState::CHANGE_STM) {
+		return (dtz + 100 * (wdl == WDLScore::WDLBlessedLoss || wdl == WDLScore::WDLCursedWin)) * _signOf(wdl);
 	}
 
 	// DTZ stores results for the other side, so we need to do a 1-ply search and
@@ -230,7 +235,7 @@ int Syzygy::probeDtz(Position& pos, ProbeState& result) const {
 
 		pos.undoMove();
 
-		if (result == FAIL) {
+		if (result == ProbeState::FAIL) {
 			return 0;
 		}
 	}
@@ -279,7 +284,7 @@ bool Syzygy::rootProbe(Position& pos, std::vector<extMove>& rootMoves) const {
 
 		pos.undoMove();
 
-		if (result == FAIL) {
+		if (result == ProbeState::FAIL) {
 			return false;
 		}
 
@@ -309,15 +314,15 @@ bool Syzygy::rootProbeWdl(Position& pos, std::vector<extMove>& rootMoves) const 
 		ProbeState result;
 		pos.doMove(m);
 
-		WDLScore wdl = (WDLScore)-probeWdl(pos, result);
+		WDLScore wdl = -probeWdl(pos, result);
 
 		pos.undoMove();
 
-		if (result == FAIL) {
+		if (result == ProbeState::FAIL) {
 			return false;
 		}
 
-		m.setScore(WDLToRank[wdl + 2]);
+		m.setScore(WDLToRank[transformWdlToOffset(wdl)]);
 
 	}
 

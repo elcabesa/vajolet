@@ -26,7 +26,7 @@
 class TBTableWDL;
 
 class TBTableDTZ: public TBTable {
-	int _mapScore(const tFile f, int value, const int wdl) const;
+	WDLScore _mapScore(const tFile f, int value, const WDLScore wdl) const;
 	bool _checkDtzStm(unsigned int stm, tFile f) const;
 public:
 	explicit TBTableDTZ(const TBTableWDL& other);
