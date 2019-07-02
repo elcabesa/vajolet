@@ -871,7 +871,8 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase(const unsigned i
 
 template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
-	if(log) logNode ln(*_lw, ply, depth, alpha, beta);
+	std::unique_ptr<logNode> ln;
+	if(log) ln =  std::unique_ptr<logNode>(new logNode(*_lw, ply, depth, alpha, beta));
 	//--------------------------------------
 	// node asserts
 	//--------------------------------------
@@ -912,17 +913,17 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		//---------------------------------------
 		//	Manage Draw
 		//---------------------------------------
-		if (log) ln.test("IsDraw");
+		if (log) ln->test("IsDraw");
 		if( _manageDraw( PVnode, pvLine) ) {
-			if (log) ln.logReturnValue(getDrawValue());
+			if (log)ln->logReturnValue(getDrawValue());
 			return getDrawValue();
 		}
 		//---------------------------------------
 		//	MATE DISTANCE PRUNING
 		//---------------------------------------
-		if (log) ln.test("MateDistancePruning");
+		if (log) ln->test("MateDistancePruning");
 		if( _MateDistancePruning( ply, alpha, beta) ) {
-			if (log) ln.logReturnValue(alpha);
+			if (log) ln->logReturnValue(alpha);
 			return alpha;
 		}
 	}
@@ -937,7 +938,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	Move ttMove( tte->getPackedMove() );
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
-	if (log) ln.test("CanUseTT");
+	if (log) ln->test("CanUseTT");
 	if (	type != nodeType::ROOT_NODE
 			&& _canUseTTeValue( PVnode, beta, ttValue, tte, depth )
 		)
@@ -958,7 +959,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			_sd.saveKillers(ply, ttMove);
 			_updateCounterMove( ttMove );
 		}
-		if (log) ln.logReturnValue(ttValue);
+		if (log) ln->logReturnValue(ttValue);
 		return ttValue;
 	}
 	
@@ -979,7 +980,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	//--------------------------------------
 	if constexpr (!PVnode)
 	{
-		if (log) ln.test("CheckTablebase");
+		if (log) ln->test("CheckTablebase");
 		auto res = _checkTablebase(ply, depth);
 		if( res.value != SCORE_NONE )
 		{
@@ -991,7 +992,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 					std::min( 100 * ONE_PLY , depth + 6 * ONE_PLY),
 					ttMove,
 					_pos.eval<false>());
-				if (log) ln.logReturnValue(res.value);
+				if (log) ln->logReturnValue(res.value);
 				return res.value;
 			}
 		}
@@ -1008,7 +1009,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	{
 		staticEval = _pos.eval<false>();
 		eval = staticEval;
-		if (log) ln.calcStaticEval(staticEval);
+		if (log) ln->calcStaticEval(staticEval);
 
 #ifdef DEBUG_EVAL_SIMMETRY
 		testSimmetry(_pos);
@@ -1020,7 +1021,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		eval = staticEval;
 		assert(staticEval < SCORE_INFINITE);
 		assert(staticEval > -SCORE_INFINITE);
-		if (log) ln.calcStaticEval(staticEval);
+		if (log) ln->calcStaticEval(staticEval);
 
 		if (ttValue != SCORE_NONE)
 		{
@@ -1029,7 +1030,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 					|| (tte->isTypeGoodForAlphaCutoff() && (ttValue < eval) )
 				)
 			{
-				if (log) ln.refineEval(ttValue);
+				if (log) ln->refineEval(ttValue);
 				eval = ttValue;
 			}
 		}
@@ -1055,7 +1056,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			//------------------------
 			// at very low deep and with an evaluation well below alpha, if a qsearch don't raise the evaluation then prune the node.
 			//------------------------
-			if (log) ln.test("Razoring");
+			if (log) ln->test("Razoring");
 			if (!_sd.skipNullMove(ply)
 				&&  depth < 4 * ONE_PLY
 				&&  eval + razorMargin(depth, type == nodeType::CUT_NODE) <= alpha
@@ -1067,7 +1068,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				Score v = qsearch<nodeType::CUT_NODE, log>(ply,0 , alpha, alpha+1, childPV);
 				if (v <= alpha)
 				{
-					if (log) ln.logReturnValue(v);
+					if (log) ln->logReturnValue(v);
 					return v;
 				}
 			}
@@ -1077,7 +1078,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			//---------------------------
 			//	at very low deep and with an evaluation well above beta, bet that we can found a move with a result above beta
 			//---------------------------
-			if (log) ln.test("StaticNullMovePruning");
+			if (log) ln->test("StaticNullMovePruning");
 			if (!_sd.skipNullMove(ply)
 				&& depth < 8 * ONE_PLY
 				&& eval - futility( depth, improving ) >= beta
@@ -1086,7 +1087,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			)
 			{
 				assert((depth>>ONE_PLY_SHIFT)<8);
-				if (log) ln.logReturnValue(eval);
+				if (log) ln->logReturnValue(eval);
 				return eval;
 			}
 
@@ -1097,7 +1098,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			// if the evaluation is above beta and after passing the move the result of a search is still above beta we bet there will be a beta cutoff
 			// this search let us know about threat move by the opponent.
 			//---------------------------
-			if (log) ln.test("NullMovePruning");
+			if (log) ln->test("NullMovePruning");
 			if( depth >= ONE_PLY
 				&& eval >= beta
 				&& !_sd.skipNullMove(ply)
@@ -1112,7 +1113,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				{
 					red += ONE_PLY;
 				}
-				if (log) ln.testMove(Move::NOMOVE);
+				if (log) ln->testMove(Move::NOMOVE);
 				_pos.doNullMove();
 				_sd.setSkipNullMove(newPly, true);
 
@@ -1141,11 +1142,11 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 					if (depth < 12 * ONE_PLY)
 					{
-						if (log) ln.logReturnValue(nullVal);
+						if (log) ln->logReturnValue(nullVal);
 						return nullVal;
 					}
 
-					if (log) ln.test("DoVerification");
+					if (log) ln->test("DoVerification");
 					// Do verification search at high depths
 					_sd.setSkipNullMove(ply, true);
 					assert(depth - red >= ONE_PLY);
@@ -1154,7 +1155,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 					_sd.setSkipNullMove(ply, false);
 					if (val >= beta)
 					{
-						if (log) ln.logReturnValue(nullVal);
+						if (log) ln->logReturnValue(nullVal);
 						return nullVal;
 					}
 
@@ -1167,7 +1168,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			//------------------------
 			//	at high depth we try the capture moves. if a reduced search of this moves gives us a result above beta we bet we can found with a regular search a move exceeding beta
 			//------------------------
-			if (log) ln.test("ProbCut");
+			if (log) ln->test("ProbCut");
 			if( depth >= 5 * ONE_PLY
 				&&  !_sd.skipNullMove(ply)
 				// && abs(beta)<SCORE_KNOWN_WIN
@@ -1191,7 +1192,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 						continue;
 					}
 					
-					if (log) ln.testMove(m);
+					if (log) ln->testMove(m);
 
 					++pbCount;
 					_pos.doMove(m);
@@ -1203,7 +1204,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 					if(s >= rBeta)
 					{
-						if (log) ln.logReturnValue(s);
+						if (log) ln->logReturnValue(s);
 						return s;
 					}
 
@@ -1214,7 +1215,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	}
 
 
-	if (log) ln.test("IID");
+	if (log) ln->test("IID");
 	//------------------------
 	//	IID
 	//------------------------
@@ -1265,19 +1266,19 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	while (bestScore <beta  && ( m = mp.getNextMove() ) )
 	{
 		
-		if (log) ln.testMove(m);
+		if (log) ln->testMove(m);
 
 		assert( m );
 		if(m == excludedMove)
 		{
-			if (log) ln.skipMove("Excluded Move");
+			if (log) ln->skipMove("Excluded Move");
 			continue;
 		}
 
 		// Search only the moves in the Search list
 		if( type == nodeType::ROOT_NODE && ( std::count(_rootMovesAlreadySearched.begin(), _rootMovesAlreadySearched.end(), m ) || !std::count(_rootMovesToBeSearched.begin(), _rootMovesToBeSearched.end(), m) ) )
 		{
-			if (log) ln.skipMove(" not in the root nodes");
+			if (log) ln->skipMove(" not in the root nodes");
 			continue;
 		}
 		++moveNumber;
@@ -1293,19 +1294,19 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		int ext = 0;
 		if(PVnode && isDangerous )
 		{
-			if (log) ln.ExtendedDepth();
+			if (log) ln->ExtendedDepth();
 			ext = ONE_PLY;
 		}
 		else if( moveGivesCheck && _pos.seeSign(m) >= 0 && !FutilityMoveCountFlag)
 		{
-			if (log) ln.ExtendedDepth();
+			if (log) ln->ExtendedDepth();
 			ext = ONE_PLY / 2;
 		}
 
 		//------------------------------
 		//	SINGULAR EXTENSION NODE
 		//------------------------------
-		if (log) ln.test("SingularExtension");
+		if (log) ln->test("SingularExtension");
 		if( singularExtensionNode
 			&& !ext
 			&& m == ttMove
@@ -1325,7 +1326,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 			if(temp < rBeta)
 			{
-				if (log) ln.ExtendedDepth();
+				if (log) ln->ExtendedDepth();
 				ext = ONE_PLY;
 		    }
 		}
@@ -1336,7 +1337,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		//---------------------------------------
 		//	FUTILITY PRUNING
 		//---------------------------------------
-		if (log) ln.test("Pruning");
+		if (log) ln->test("Pruning");
 		if( type != nodeType::ROOT_NODE
 			&& !captureOrPromotion
 			&& !inCheck
@@ -1349,7 +1350,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			if(FutilityMoveCountFlag)
 			{
 				assert((newDepth>>ONE_PLY_SHIFT)<11);
-				if (log) ln.skipMove("futility move Count flag");
+				if (log) ln->skipMove("futility move Count flag");
 				continue;
 			}
 
@@ -1363,14 +1364,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 						bestScore = std::max(bestScore, localEval);
 					}
 					assert((newDepth>>ONE_PLY_SHIFT)<7);
-					if (log) ln.skipMove("futiliy margin");
+					if (log) ln->skipMove("futiliy margin");
 					continue;
 				}
 			}
 
 			if(newDepth < 4 * ONE_PLY && _pos.seeSign(m) < 0)
 			{
-				if (log) ln.skipMove("negative see");
+				if (log) ln->skipMove("negative see");
 				continue;
 			}
 		}
@@ -1428,7 +1429,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 					if(reduction != 0)
 					{
-						if (log) ln.doLmrSearch();
+						if (log) ln->doLmrSearch();
 						val = -alphaBeta<nodeType::CUT_NODE, log>(ply + 1, d, -alpha - 1, -alpha, childPV);
 						if(val <= alpha)
 						{
@@ -1441,7 +1442,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				if(doFullDepthSearch)
 				{
 					
-					if (log) ln.doFullDepthSearchSearch();
+					if (log) ln->doFullDepthSearchSearch();
 					if(newDepth < ONE_PLY)
 					{
 						val = -qsearch<nodeType::CUT_NODE, log>(ply + 1, newDepth, -alpha - 1, -alpha, childPV);
@@ -1453,10 +1454,10 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 					if( val > alpha && val < beta )
 					{
-						if (log) ln.doFullWidthSearchSearch();
+						if (log) ln->doFullWidthSearchSearch();
 						if( newDepth < ONE_PLY )
 						{
-							val = -qsearch<nodeType::PV_NOD, logE>(ply + 1, newDepth, -beta, -alpha, childPV);
+							val = -qsearch<nodeType::PV_NODE, log>(ply + 1, newDepth, -beta, -alpha, childPV);
 						}
 						else
 						{
@@ -1485,7 +1486,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 				if(reduction != 0)
 				{
-					if (log) ln.doLmrSearch();
+					if (log) ln->doLmrSearch();
 					val = -alphaBeta<childNodesType, log>(ply + 1, d, -alpha - 1, -alpha, childPV);
 					if(val <= alpha)
 					{
@@ -1496,7 +1497,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 			if(doFullDepthSearch)
 			{
-				if (log) ln.doFullDepthSearchSearch();
+				if (log) ln->doFullDepthSearchSearch();
 				if(moveNumber<5)
 				{
 					if(newDepth < ONE_PLY)
@@ -1526,12 +1527,12 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 		if(!_stop && val > bestScore)
 		{
-			if (log) ln.raisedbestScore();
+			if (log) ln->raisedbestScore();
 			bestScore = val;
 
 			if(bestScore > alpha)
 			{
-				if (log) ln.raisedAlpha();
+				if (log) ln->raisedAlpha();
 				bestMove = m;
 				if constexpr (PVnode)
 				{
@@ -1575,10 +1576,10 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	// draw
 	if(!moveNumber)
 	{
-		if (log) ln.test("IsMated");
+		if (log) ln->test("IsMated");
 		if( excludedMove )
 		{
-			if (log) ln.logReturnValue(alpha);
+			if (log) ln->logReturnValue(alpha);
 			return alpha;
 		}
 		else if(!inCheck)
@@ -1646,7 +1647,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			}
 		}
 	}
-	if (log) ln.logReturnValue(bestScore);
+	if (log) ln->logReturnValue(bestScore);
 	return bestScore;
 
 }
@@ -1660,7 +1661,8 @@ inline void Search::impl::_updateNodeStatistics(const unsigned int ply)
 
 template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
-	if(log)  logNode ln(*_lw, ply, depth, alpha, beta);
+	std::unique_ptr<logNode> ln;
+	if(log) ln =  std::unique_ptr<logNode>(new logNode(*_lw, ply, depth, alpha, beta));
 	//---------------------------------------
 	//	node asserts
 	//---------------------------------------
@@ -1680,9 +1682,9 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 	_updateNodeStatistics(ply);
 	
-	if (log) ln.test("IsDraw");
+	if (log) ln->test("IsDraw");
 	if( _manageDraw( PVnode, pvLine) ) {
-		if (log) ln.logReturnValue(getDrawValue());
+		if (log) ln->logReturnValue(getDrawValue());
 		return getDrawValue();
 	}
 	//---------------------------------------
@@ -1703,7 +1705,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 	const HashKey& posKey = _getSearchKey();
 	ttEntry* const tte = transpositionTable::getInstance().probe( _pos.getKey() );
-	if (log) ln.logTTprobe(*tte);
+	if (log) ln->logTTprobe(*tte);
 	Move ttMove( tte->getPackedMove() );
 	if(!_pos.isMoveLegal(ttMove)) {
 		ttMove = Move::NOMOVE;
@@ -1724,7 +1726,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 	short int TTdepth = mp.setupQuiescentSearch(inCheck, depth) * ONE_PLY;
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
-	if (log) ln.test("CanUseTT");
+	if (log) ln->test("CanUseTT");
 	if( _canUseTTeValue( PVnode, beta, ttValue, tte, TTdepth ) )
 	{
 		transpositionTable::getInstance().refresh(*tte);
@@ -1732,7 +1734,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 		{
 			_appendTTmoveIfLegal( ttMove, pvLine);
 		}
-		if (log) ln.logReturnValue(ttValue);
+		if (log) ln->logReturnValue(ttValue);
 		return ttValue;
 	}
 
@@ -1741,7 +1743,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 
 	Score staticEval = (tte->getType() != typeVoid) ? tte->getStaticValue() : _pos.eval<false>();
-	if (log) ln.calcStaticEval(staticEval);
+	if (log) ln->calcStaticEval(staticEval);
 #ifdef DEBUG_EVAL_SIMMETRY
 	testSimmetry(_pos);
 #endif
@@ -1766,7 +1768,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 				bestScore = ttValue;
 			}
 		}
-		if (log) ln.calcBestScore(bestScore);
+		if (log) ln->calcBestScore(bestScore);
 
 		if(bestScore > alpha)
 		{
@@ -1778,7 +1780,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 				pvLine.clear();
 			}
 
-			if (log) ln.test("StandPat");
+			if (log) ln->test("StandPat");
 			if( bestScore >= beta)
 			{
 				if( !_pos.isCaptureMoveOrPromotion(ttMove) )
@@ -1789,10 +1791,10 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 				{
 					transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove, staticEval);
 				}
-				if (log) ln.logReturnValue(bestScore);
+				if (log) ln->logReturnValue(bestScore);
 				return bestScore;
 			}
-			if (log) ln.raisedAlpha();
+			if (log) ln->raisedAlpha();
 			alpha = bestScore;
 			TTtype = typeExact;
 
@@ -1819,7 +1821,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 	while ( ( m = mp.getNextMove() ) )
 	{
-		if (log) ln.testMove(m);
+		if (log) ln->testMove(m);
 		assert(alpha < beta);
 		assert(beta <= SCORE_INFINITE);
 		assert(alpha >= -SCORE_INFINITE);
@@ -1831,14 +1833,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 			// allow only queen promotion at deeper search
 			if( (TTdepth < -1 * ONE_PLY) && ( m.isPromotionMove() ) && (m.getPromotionType() != Move::promQueen))
 			{
-				if (log) ln.skipMove("not allowed underpomotion");
+				if (log) ln->skipMove("not allowed underpomotion");
 				continue;
 			}
 
 			// at very deep search allow only recapture
 			if(depth < -7 * ONE_PLY && _pos.getActualState().getCurrentMove().getTo() != m.getTo())
 			{
-				if (log) ln.skipMove("only allowed recapture");
+				if (log) ln->skipMove("only allowed recapture");
 				continue;
 			}
 
@@ -1872,14 +1874,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 						if (futilityValue <= alpha)
 						{
 							bestScore = std::max(bestScore, futilityValue);
-							if (log) ln.skipMove("futility margin");
+							if (log) ln->skipMove("futility margin");
 							continue;
 						}
 						
 						if (futilityBase <= alpha && _pos.seeSign(m) <= 0)
 						{
 							bestScore = std::max(bestScore, futilityBase);
-							if (log) ln.skipMove("futile & not gaining");
+							if (log) ln->skipMove("futile & not gaining");
 							continue;
 						}
 
@@ -1896,7 +1898,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 							//!moveGiveCheck &&
 							_pos.seeSign(m) < 0)
 					{
-						if (log) ln.skipMove("negative see");
+						if (log) ln->skipMove("negative see");
 						continue;
 					}
 				//}
@@ -1910,11 +1912,11 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 		if(val > bestScore)
 		{
-			if (log) ln.raisedbestScore();
+			if (log) ln->raisedbestScore();
 			bestScore = val;
 			if( bestScore > alpha )
 			{
-				if (log) ln.raisedAlpha();
+				if (log) ln->raisedAlpha();
 				bestMove = m;
 				TTtype = typeExact;
 				alpha = bestScore;
@@ -1934,7 +1936,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 					{
 						transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
 					}
-					if (log) ln.logReturnValue(bestScore);
+					if (log) ln->logReturnValue(bestScore);
 					return bestScore;
 				}
 			}
@@ -1944,13 +1946,13 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 	
 	if(bestScore == -SCORE_INFINITE)
 	{
-		if (log) ln.test("IsMated");
+		if (log) ln->test("IsMated");
 		assert(inCheck);
 		if constexpr (PVnode)
 		{
 			pvLine.clear();
 		}
-		if (log) ln.logReturnValue(matedIn(ply));
+		if (log) ln->logReturnValue(matedIn(ply));
 		return matedIn(ply);
 	}
 
@@ -1960,7 +1962,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 	{
 		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove, staticEval);
 	}
-	if (log) ln.logReturnValue(bestScore);
+	if (log) ln->logReturnValue(bestScore);
 	return bestScore;
 
 }
