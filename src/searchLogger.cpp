@@ -56,9 +56,10 @@ void logWriter::writeMove(const Move& m) {
 }
 
 
-logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta): _lw(lw), _ply(ply) {
+logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta, std::string type): _lw(lw), _ply(ply) {
 	_indentate(ply);
-	_lw.writeChar('{');
+	_lw.writeString(type);
+	_lw.writeChar('(');
 	_lw.writeNumber(ply);
 	_lw.writeChar(',');
 	_lw.writeFloat(depth/16.0);
@@ -66,7 +67,8 @@ logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score 
 	_lw.writeNumber(alpha);
 	_lw.writeChar(',');
 	_lw.writeNumber(beta);
-	_lw.writeChar(';');
+	_lw.writeChar(')');
+	_lw.writeChar('{');
 }
 
 logNode::~logNode() {

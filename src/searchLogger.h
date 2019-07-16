@@ -40,7 +40,7 @@ private:
 
 class logNode {
 public:
-	logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta);
+	logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta, std::string type);
 	~logNode();
 	void raisedAlpha();
 	void raisedbestScore();

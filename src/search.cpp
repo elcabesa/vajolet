@@ -591,7 +591,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			//----------------------------------
 			// aspiration window
 			//----------------------------------
-			rootMove res = aspirationWindow<false>( depth, alpha, beta, masterThread);
+			rootMove res = aspirationWindow<true>( depth, alpha, beta, masterThread);
 			if( res.firstMove != Move::NOMOVE )
 			{
 				bestMove = res;
@@ -872,7 +872,7 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase(const unsigned i
 template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
 	std::unique_ptr<logNode> ln;
-	if(log) ln =  std::unique_ptr<logNode>(new logNode(*_lw, ply, depth, alpha, beta));
+	if(log) ln =  std::unique_ptr<logNode>(new logNode(*_lw, ply, depth, alpha, beta, "alphaBeta"));
 	//--------------------------------------
 	// node asserts
 	//--------------------------------------
@@ -1662,7 +1662,7 @@ inline void Search::impl::_updateNodeStatistics(const unsigned int ply)
 template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsigned int ply, int depth, Score alpha, Score beta, PVline& pvLine)
 {
 	std::unique_ptr<logNode> ln;
-	if(log) ln =  std::unique_ptr<logNode>(new logNode(*_lw, ply, depth, alpha, beta));
+	if(log) ln =  std::unique_ptr<logNode>(new logNode(*_lw, ply, depth, alpha, beta, "qSearch"));
 	//---------------------------------------
 	//	node asserts
 	//---------------------------------------
