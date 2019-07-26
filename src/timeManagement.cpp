@@ -22,9 +22,9 @@ infinite search or node limited
 ****************************************************************/
 class InfiniteSearchTimeManagement: public timeManagement{
 public:
-	InfiniteSearchTimeManagement(SearchLimits& limits);
-	bool stateMachineStep(const long long int time, const unsigned long long visitedNodes);
-	bool isSearchFinished() const;
+	explicit InfiniteSearchTimeManagement(SearchLimits& limits);
+	bool stateMachineStep(const long long int time, const unsigned long long visitedNodes) override;
+	bool isSearchFinished() const override;
 private:
 	bool _searchFinished;
 };
@@ -54,9 +54,9 @@ fixed time limited search
 ****************************************************************/
 class FixedTimeManagement: public timeManagement{
 public:
-	FixedTimeManagement(SearchLimits& limits);
-	bool stateMachineStep(const long long int time, const unsigned long long visitedNodes);
-	bool isSearchFinished() const;
+	explicit FixedTimeManagement(SearchLimits& limits);
+	bool stateMachineStep(const long long int time, const unsigned long long visitedNodes) override;
+	bool isSearchFinished() const override;
 private:
 	bool _searchFinished;
 	long long _allocatedTime;
@@ -88,9 +88,9 @@ standard time search
 ****************************************************************/
 class NormalTimeManagement: public timeManagement{
 public:
-	NormalTimeManagement(SearchLimits& limits, const eNextMove nm);
-	bool stateMachineStep(const long long int time, const unsigned long long visitedNodes);
-	bool isSearchFinished() const;
+	explicit NormalTimeManagement(SearchLimits& limits, const eNextMove nm);
+	bool stateMachineStep(const long long int time, const unsigned long long visitedNodes) override;
+	bool isSearchFinished() const override;
 private:
 	long long _allocatedTime;
 	long long _minSearchTime;

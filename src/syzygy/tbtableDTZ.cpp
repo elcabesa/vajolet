@@ -32,13 +32,11 @@ TBType TBTableDTZ::getType() const{
 }
 
 WDLScore TBTableDTZ::_mapScore(const tFile f, int value, const WDLScore wdl) const {
-
-	constexpr int WDLMap[] = { 1, 3, 0, 2, 0 };
-
 	auto flags = getPairsData(0, f).getFlags();
 	const auto& idx = getPairsData(0, f).getMapIdx();
 	
 	if (flags & PairsData::MappedFlag) {
+		constexpr int WDLMap[] = { 1, 3, 0, 2, 0 };
 		if (flags & PairsData::WideFlag) {
 			value = ((uint16_t *)_map)[idx[WDLMap[transformWdlToOffset(wdl)]] + value];
 		} else {
