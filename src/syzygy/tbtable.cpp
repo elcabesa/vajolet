@@ -28,8 +28,7 @@
 #include "tbtable.h"
 #include "tbvalidater.h"
 
-TBTable::TBTable(const std::string& code, std::string ext, unsigned int sides): _sides(sides), _extension(ext) {
-	_endgame = code;
+TBTable::TBTable(const std::string& code, std::string ext, unsigned int sides): _endgame(code), _sides(sides), _map(nullptr), _extension(ext)  {
 	Position pos;
 	
 	_key = pos.setup(getEndGame(), white).getMaterialKey();
@@ -59,14 +58,8 @@ TBTable::TBTable(const std::string& code, std::string ext, unsigned int sides): 
 	_key2 = pos.setup(getEndGame(), black).getMaterialKey();
 }
 
-TBTable::TBTable(const TBTable& other, std::string ext, unsigned int sides): _sides(sides), _extension(ext) {
+TBTable::TBTable(const TBTable& other, std::string ext, unsigned int sides): _endgame(other._endgame), _key(other._key), _key2(other._key2), _pieceCount(other._pieceCount), _hasPawns(other._hasPawns), _hasUniquePieces(other._hasUniquePieces), _sides(sides), _map(nullptr), _extension(ext) {
 	// Use the corresponding WDL table to avoid recalculating all from scratch
-	_endgame = other._endgame;
-	_key = other._key;
-	_key2 = other._key2;
-	_pieceCount = other._pieceCount;
-	_hasPawns = other._hasPawns;
-	_hasUniquePieces = other._hasUniquePieces;
 	_pawnCount[0] = other._pawnCount[0];
 	_pawnCount[1] = other._pawnCount[1];
 }
