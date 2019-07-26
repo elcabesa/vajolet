@@ -24,7 +24,7 @@
 #include "tbfile.h"
 #include "tbvalidater.h"
 
-bool TBValidater::validate(const TBFile& tb, const TBType type, const std::string fname) {
+bool TBValidater::validate(const TBFile& tb, const TBType type, const std::string& fname) {
 	constexpr uint8_t Magics[][4] = 
 		{ 
 			{ 0xD7, 0x66, 0x0C, 0xA5 },

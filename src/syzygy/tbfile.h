@@ -52,7 +52,7 @@ private:
 	static std::string _getFileName(const std::string& f);
 	void _unmap();
 public:
-	static void setPaths(std::string path);
+	static void setPaths(const std::string& path);
 	static bool exist(const std::string& f);
 	
 	const uint8_t& operator[](std::size_t idx) const;

@@ -9,7 +9,7 @@ struct positions
 	const Move m;
 	const Score score;
 	
-	positions( const std::string f, const Move mo, const Score s ): Fen(f), m(mo), score(s){}
+	positions( const std::string f, const Move& mo, const Score s ): Fen(f), m(mo), score(s){}
 	 
 };
 

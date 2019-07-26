@@ -61,8 +61,8 @@ private:
 protected:
 	const uint8_t* _map;
 	const std::string _extension;
-	explicit TBTable(const std::string& code, std::string ext, unsigned int sides);
-	explicit TBTable(const TBTable& other, std::string ext, unsigned int sides);
+	explicit TBTable(const std::string& code, const std::string& ext, unsigned int sides);
+	explicit TBTable(const TBTable& other, const std::string& ext, unsigned int sides);
 	virtual ~TBTable() {}
     TBTable(TBTable&& other) noexcept =  delete;
     TBTable& operator=(const TBTable& other) =  delete;

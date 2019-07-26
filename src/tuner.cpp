@@ -154,7 +154,7 @@ struct parameter
 	long double totalGradient[4];
 	long double totalError[4];
 	bool requireUpdate;
-	parameter(std::string _name, simdScore* _pointer,unsigned int _count, bool _r= false):name(_name),count(_count),pointer(_pointer),requireUpdate(_r)
+	parameter(const std::string& _name, simdScore* _pointer,unsigned int _count, bool _r= false):name(_name),count(_count),pointer(_pointer),requireUpdate(_r)
 	{
 		for( int i = 0; i <4 ; ++i)
 		{

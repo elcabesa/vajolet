@@ -25,7 +25,7 @@ Syzygy::Syzygy() {
 	TBCommonData::init();
 }
 
-void Syzygy::setPath(const std::string s) {
+void Syzygy::setPath(const std::string& s) {
 	TBFile::setPaths(s); 
 	_t.clear();
 	_t.init();
