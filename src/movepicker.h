@@ -84,7 +84,7 @@ public:
 		getQsearchTTquiet,
 		generateQuiescentCaptures,
 		iterateQuiescentCaptures,
-		generateQuietCheks,
+		generateQuietChecks,
 		iterateQuietChecks,
 		finishedQuiescentQuietStage,
 

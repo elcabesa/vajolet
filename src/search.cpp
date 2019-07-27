@@ -85,7 +85,7 @@ public:
 		_st = other._st;
 		_UOI = UciOutput::create();
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
-		return * this;
+		return *this;
 	}
 	SearchResult go(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
 
@@ -192,8 +192,8 @@ private:
 	Game _game;
 
 
-	Move _getPonderMoveFromHash( const Move bestMove );
-	Move _getPonderMoveFromBook( const Move bookMove );
+	Move _getPonderMoveFromHash( const Move& bestMove );
+	Move _getPonderMoveFromBook( const Move& bookMove );
 	void _waitStopPondering() const;
 
 
@@ -210,7 +210,7 @@ std::mutex  Search::impl::_mutex;
 class voteSystem
 {
 public:
-	voteSystem( const std::vector<rootMove>& res):_results(res){}
+	explicit voteSystem( const std::vector<rootMove>& res): _results(res) {}
 
 	void print( const std::map<unsigned short, int>& votes, const Score minScore, const rootMove& bm ) const
 	{
@@ -328,7 +328,6 @@ void Search::impl::cleanMemoryBeforeStartingNewSearch(void)
 void Search::impl::filterRootMovesByTablebase(std::vector<Move>& rm)
 {
 	if(rm.size() > 0) {
-		bool found = false;
 		
 		std::vector<extMove> rm2;
 		for (auto m: rm) {
@@ -340,7 +339,7 @@ void Search::impl::filterRootMovesByTablebase(std::vector<Move>& rm)
 		Syzygy& szg = Syzygy::getInstance();
 		if (piecesCnt <= szg.getMaxCardinality() && _pos.getCastleRights() == noCastle) {
 			
-			found = szg.rootProbe(_pos, rm2) || szg.rootProbeWdl(_pos, rm2);
+			bool found = szg.rootProbe(_pos, rm2) || szg.rootProbeWdl(_pos, rm2);
 			
 			if (found) {
 				std::sort(rm2.begin(), rm2.end());
@@ -479,7 +478,6 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			{
 				bestMove = rootMove( newPV.getMove(0), newPV, res, _maxPlyReached, depth, getVisitedNodes(), elapsedTime );
 				return bestMove;
-				break;
 			}
 			
 			delta += delta / 2;
@@ -1568,10 +1566,8 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			auto& history = _sd.getHistory();
 			history.update( _pos.isWhiteTurn() ? white: black, bestMove, bonus);
 
-			for (unsigned int i = 0; i < quietMoveCount; ++i)
-			{
-				Move m = quietMoveList[i];
-				history.update( _pos.isWhiteTurn() ? white: black, m, -bonus);
+			for (unsigned int i = 0; i < quietMoveCount; ++i) {
+				history.update( _pos.isWhiteTurn() ? white: black, quietMoveList[i], -bonus);
 			}
 			
 			_updateCounterMove( bestMove );
@@ -1589,10 +1585,10 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 
 				for (unsigned int i = 0; i < captureMoveCount; i++)
 				{
-					Move m = captureMoveList[i];
-					//if( _pos.isCaptureMove( m ) )
+					Move mm = captureMoveList[i];
+					//if( _pos.isCaptureMove( mm ) )
 					{
-						capt.update( _pos.getPieceAt(m.getFrom()), m, _pos.getPieceAt(m.getTo()), -bonus);
+						capt.update( _pos.getPieceAt(mm.getFrom()), mm, _pos.getPieceAt(mm.getTo()), -bonus);
 					}
 				}
 			}
@@ -1952,7 +1948,7 @@ void Search::impl::initSearchParameters(void)
 	}
 }
 
-Move Search::impl::_getPonderMoveFromHash(const Move bestMove )
+Move Search::impl::_getPonderMoveFromHash(const Move& bestMove )
 {
 	Move ponderMove(0);
 	_pos.doMove( bestMove );
@@ -1969,7 +1965,7 @@ Move Search::impl::_getPonderMoveFromHash(const Move bestMove )
 	return ponderMove;
 }
 
-Move Search::impl::_getPonderMoveFromBook(const Move bookMove )
+Move Search::impl::_getPonderMoveFromBook(const Move& bookMove )
 {
 	Move ponderMove(0);
 	_pos.doMove( bookMove );

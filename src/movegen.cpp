@@ -107,13 +107,13 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	// populate the target squares bitmaps
 	bitMap kingTarget;
 	bitMap target;
-	if constexpr (type==Movegen::genType::allEvasionMg)
+	/*if constexpr (type==Movegen::genType::allEvasionMg)
 	{
 		assert(s.getCheckers());
 		target = ( s.getCheckers() | getSquaresBetween(kingSquare, firstOne( s.getCheckers() ) ) ) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = ~_pos.getOurBitmap(Pieces);
 	}
-	else if constexpr (type==Movegen::genType::captureEvasionMg)
+	else */if constexpr (type==Movegen::genType::captureEvasionMg)
 	{
 		assert(s.getCheckers());
 		target = ( s.getCheckers() ) & ~_pos.getOurBitmap(Pieces);
@@ -125,11 +125,11 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 		target = ( getSquaresBetween( kingSquare, firstOne( s.getCheckers() ) ) ) & ~_pos.getOurBitmap(Pieces);
 		kingTarget = ~occupiedSquares;
 	}
-	else if constexpr (type== Movegen::genType::allNonEvasionMg)
+	/*else if constexpr (type== Movegen::genType::allNonEvasionMg)
 	{
 		target= ~_pos.getOurBitmap(Pieces);
 		kingTarget= target;
-	}
+	}*/
 	else if constexpr (type== Movegen::genType::captureMg)
 	{
 		target = _pos.getTheirBitmap(Pieces);
@@ -162,7 +162,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	_generateKingMoves<type>( ml, kingSquare, occupiedSquares, kingTarget, enemy );
 	
 	// if the king is in check from 2 enemy, it can only run away, we should not search any other move
-	if((type == Movegen::genType::allEvasionMg || type == Movegen::genType::captureEvasionMg || type == Movegen::genType::quietEvasionMg) && s.isInDoubleCheck() )
+	if((/*type == Movegen::genType::allEvasionMg || */type == Movegen::genType::captureEvasionMg || type == Movegen::genType::quietEvasionMg) && s.isInDoubleCheck() )
 	{
 		return;
 	}
@@ -228,7 +228,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	}
 
 	//king castle
-	if(type !=Movegen::genType::allEvasionMg && type!=Movegen::genType::captureEvasionMg && type!=Movegen::genType::quietEvasionMg && type!= Movegen::genType::captureMg)
+	if(/*type !=Movegen::genType::allEvasionMg && */type!=Movegen::genType::captureEvasionMg && type!=Movegen::genType::quietEvasionMg && type!= Movegen::captureMg)
 	{
 		if( !s.isInCheck() && s.hasCastleRight( castleOO | castleOOO, color ) )
 		{

@@ -50,7 +50,7 @@ void Game::savePV(PVline PV,unsigned int depth, Score alpha, Score beta)
 	_positions.back().beta = beta;
 }
 
-
+/*
 void Game::printGamesInfo()
 {
 	for(auto p : _positions)
@@ -66,8 +66,7 @@ void Game::printGamesInfo()
 		}
 		std::cout<<std::endl;
 	}
-
-}
+}*/
 
 bool Game::isNewGame(const Position &pos) const
 {
@@ -90,7 +89,7 @@ bool Game::isNewGame(const Position &pos) const
 	}
 	return false;
 }
-
+/*
 bool Game::isPonderRight() const
 {
 	if( _positions.size() > 2)
@@ -100,13 +99,12 @@ bool Game::isPonderRight() const
 		{
 			return true;
 		}
-
 	}
 	return false;
-}
-
+}*/
+/*
 Game::GamePosition Game::getNewSearchParameters() const
 {
 	GamePosition previous =*(_positions.end()-3);
 	return previous;
-}
+}*/

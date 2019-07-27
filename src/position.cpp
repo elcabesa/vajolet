@@ -50,107 +50,70 @@ void Position::initPstValues(void)
 			tRank rank = getRankOf(s);
 			tFile file = getFileOf(s);
 
-			if(piece > occupiedSquares && piece < whitePieces )
-			{
-
-				if( isPawn( piece ) )
-				{
-					pstValue[piece][s] = simdScore{0,0,0,0};
-					if(s==D3)
-					{
-						pstValue[piece][s] = PawnD3;
+			if (isValidPiece(piece)) {
+				if (!isBlackPiece(piece)) {
+					if (isPawn(piece)) {
+						pstValue[piece][s] = simdScore{0,0,0,0};
+						if (s == D3) {
+							pstValue[piece][s] = PawnD3;
+						} else if (s == D4) {
+							pstValue[piece][s] = PawnD4;
+						} else if (s == D5) {
+							pstValue[piece][s] = PawnD5;
+						} else if (s == E3) {
+							pstValue[piece][s] = PawnE3;
+						} else if (s == E4)	{
+							pstValue[piece][s] = PawnE4;
+						} else if (s == E5)	{
+							pstValue[piece][s] = PawnE5;
+						}
+						pstValue[piece][s] += PawnRankBonus * static_cast<int>(rank - 2);
+						pstValue[piece][s] += Center[file] * PawnCentering;
+					} else if (isKnight(piece)) {
+						pstValue[piece][s] = KnightPST * (Center[file] + Center[rank]);
+						if (rank == RANK1) {
+							pstValue[piece][s] -= KnightBackRankOpening;
+						}
+					} else if (isBishop(piece))	{
+						pstValue[piece][s] = BishopPST * (Center[file] + Center[rank]);
+						if (rank == RANK1) {
+							pstValue[piece][s] -= BishopBackRankOpening;
+						}
+						if (((int)file == (int)rank) || (file + rank == 7)) {
+							pstValue[piece][s] += BishopOnBigDiagonals;
+						}
+					} else if (isRook(piece)) {
+						pstValue[piece][s] = RookPST * Center[file];
+						if (rank == RANK1) {
+							pstValue[piece][s] -= RookBackRankOpening;
+						}
+					} else if (isQueen(piece)) {
+						pstValue[piece][s] = QueenPST * (Center[file] + Center[rank]);
+						if (rank == RANK1) {
+							pstValue[piece][s] -= QueenBackRankOpening;
+						}
+					} else if (isKing(piece)) {
+						pstValue[piece][s] = simdScore{
+								(KFile[file]+KRank[rank]) * KingPST[0],
+								(Center[file]+Center[rank]) * KingPST[1],
+								0,0};
 					}
-					if(s==D4)
+					// add piece value to pst
+					if(!isKing( piece ) )
 					{
-						pstValue[piece][s] = PawnD4;
+						pstValue[piece][s] += pieceValue[piece];
 					}
-					if(s==D5)
-					{
-						pstValue[piece][s] = PawnD5;
-					}
-					if(s==E3)
-					{
-						pstValue[piece][s] = PawnE3;
-					}
-					if(s==E4)
-					{
-						pstValue[piece][s] = PawnE4;
-					}
-					if(s==E5)
-					{
-						pstValue[piece][s] = PawnE5;
-					}
-					pstValue[piece][s] += PawnRankBonus * static_cast<int>(rank - 2);
-					pstValue[piece][s] += Center[file] * PawnCentering;
+				} else {
+					tRank r = getRelativeRankOf(s, black);
+					tFile f = file;
+					pstValue[piece][s] = -pstValue[piece - separationBitmap][getSquare(f, r)];
 				}
-				if( isKnight( piece ) )
-				{
-					pstValue[piece][s] = KnightPST * (Center[file] + Center[rank]);
-					if(rank==RANK1)
-					{
-						pstValue[piece][s] -= KnightBackRankOpening;
-					}
-				}
-				if( isBishop( piece ) )
-				{
-					pstValue[piece][s] = BishopPST * (Center[file] + Center[rank]);
-					if(rank==RANK1)
-					{
-						pstValue[piece][s] -= BishopBackRankOpening;
-					}
-					if(((int)file==(int)rank) || (file+rank==7))
-					{
-						pstValue[piece][s] += BishopOnBigDiagonals;
-					}
-				}
-				if( isRook( piece ) )
-				{
-					pstValue[piece][s] = RookPST * (Center[file]);
-					if(rank==RANK1)
-					{
-						pstValue[piece][s] -= RookBackRankOpening;
-					}
-				}
-				if( isQueen( piece) )
-				{
-					pstValue[piece][s] = QueenPST * (Center[file] + Center[rank]);
-					if(rank==RANK1)
-					{
-						pstValue[piece][s] -= QueenBackRankOpening;
-					}
-				}
-				if( isKing( piece ) )
-				{
-					pstValue[piece][s] = simdScore{
-							(KFile[file]+KRank[rank]) * KingPST[0],
-							(Center[file]+Center[rank]) * KingPST[1],
-							0,0};
-				}
-				if(!isKing( piece ) )
-				{
-					pstValue[piece][s] += pieceValue[piece];
-				}
-
-				if( !isPawn( piece ) && !isKing( piece ) )
-				{
+				
+				if (!isPawn(piece) && !isKing(piece)) {
 					nonPawnValue[piece][0] = pieceValue[piece][0];
 					nonPawnValue[piece][1] = pieceValue[piece][1];
 				}
-
-			}
-			else if( isBlackPiece( piece ) && piece <blackPieces )
-			{
-				tRank r = getRelativeRankOf( s, black );
-				tFile f = file;
-				pstValue[piece][s] = -pstValue[ piece - separationBitmap ][getSquare(f,r)];
-
-				if( !isPawn( piece ) && !isKing( piece ) )
-				{
-					nonPawnValue[piece][2] = pieceValue[piece][0];
-					nonPawnValue[piece][3] = pieceValue[piece][1];
-				}
-			}
-			else{
+			} else {
 				pstValue[piece][s] = simdScore{0,0,0,0};
 			}
 		}
@@ -239,9 +202,9 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	for (auto& cr : castleRightsMask) {cr = (eCastle)0;}
 	for (auto& cp : _castlePath) {cp = 0ull;}
 	for (auto& ckp : _castleKingPath) {ckp = 0ull;}
-	for (auto& sq : _castleRookInvolved) {sq = squareNone;}
-	for (auto& sq : _castleKingFinalSquare) {sq = squareNone;}
-	for (auto& sq : _castleRookFinalSquare) {sq = squareNone;}
+	for (auto& csq : _castleRookInvolved) {csq = squareNone;}
+	for (auto& csq : _castleKingFinalSquare) {csq = squareNone;}
+	for (auto& csq : _castleRookFinalSquare) {csq = squareNone;}
 	
 	while ((ss >> token) && !isspace(token))
 	{
@@ -524,11 +487,10 @@ void Position::display()const
 std::string  Position::getFen() const {
 
 	std::string s;
-	int emptyFiles = 0;
 	const state& st = getActualState();
 	for ( tRank rank = RANK8; rank >= RANK1; --rank)
 	{
-		emptyFiles = 0;
+		int emptyFiles = 0;
 		for ( tFile file = FILEA; file <= FILEH; ++file)
 		{
 			if(getPieceAt(getSquare(file,rank)) != empty)
@@ -615,12 +577,11 @@ std::string  Position::getFen() const {
 std::string Position::getSymmetricFen() const {
 
 	std::string s;
-	int emptyFiles=0;
 	const state& st =getActualState();
-	for (tRank rank = RANK1; rank <=RANK8 ; rank++)
+	for (tRank rank = RANK1; rank <=RANK8 ; ++rank)
 	{
-		emptyFiles=0;
-		for (tFile file = FILEA; file <=FILEH; file++)
+		int emptyFiles = 0;
+		for (tFile file = FILEA; file <=FILEH; ++file)
 		{
 			if(getPieceAt(getSquare(file,rank))!=empty)
 			{
@@ -759,11 +720,11 @@ HashKey Position::calcPawnKey(void) const
 HashKey Position::calcMaterialKey(void) const
 {
 	HashKey hash(0);
-	for ( bitboardIndex i = whiteKing; i < lastBitboard; i++)
+	for ( bitboardIndex i = whiteKing; i < lastBitboard; ++i)
 	{
 		if ( isValidPiece( i ) )
 		{
-			for (unsigned int cnt = 0; cnt < getPieceCount( i ); cnt++)
+			for (unsigned int cnt = 0; cnt < getPieceCount( i ); ++cnt)
 			{
 				// todo invertire? hash.add( cnt, i );
 				hash.updatePiece( (tSquare)i, (bitboardIndex)cnt );
@@ -1202,7 +1163,7 @@ bitMap Position::initKingPath(const tSquare kSqFrom, const tSquare kSqTo)
 }
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-static void block( std::string errorString, unsigned int type )
+static void block( const std::string& errorString, unsigned int type )
 {
 	std::cerr<< errorString <<std::endl;
 	std::cerr<<( type ? "DO error" : "undoError" ) <<std::endl;

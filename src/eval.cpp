@@ -186,8 +186,6 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 	const bitMap theirPawns = isBlackPiece(piece) ? getBitmap(whitePawns) : getBitmap(blackPawns);
 	const bitboardIndex pieceType = getPieceType( piece );
 
-	(void)theirPawns;
-
 	while(tempPieces)
 	{
 		tSquare sq = iterateBit(tempPieces);
@@ -294,8 +292,6 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 		case blackRooks:
 		{
 			bitMap enemyBackRank = isBlackPiece(piece) ? rankMask(A1) : rankMask(A8);
-			bitMap enemyPawns = isBlackPiece(piece) ?  getBitmap(whitePawns) : getBitmap(blackPawns);
-			bitMap ourPawns = isBlackPiece(piece) ? getBitmap(blackPawns) : getBitmap(whitePawns);
 			//--------------------------------
 			// torre in 7a con re in 8a
 			//--------------------------------
@@ -306,7 +302,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 			//--------------------------------
 			// torre su traversa che contiene pedoni
 			//--------------------------------
-			if(relativeRank > RANK5 && (rankMask(sq) & enemyPawns))
+			if(relativeRank > RANK5 && (rankMask(sq) & theirPawns))
 			{
 				res += rookOnPawns;
 			}
@@ -315,7 +311,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 			//--------------------------------
 			if( !(fileMask(sq) & ourPawns) )
 			{
-				if( !(fileMask(sq) & enemyPawns) )
+				if( !(fileMask(sq) & theirPawns) )
 				{
 					res += rookOnOpen;
 				}else

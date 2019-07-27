@@ -62,8 +62,8 @@ public:
 	bool isValid() const;
 	uint64_t size() const { return _size; };
 	
-	TBFile ();
-	TBFile (const std::string& f);
+	explicit TBFile ();
+	explicit TBFile (const std::string& f);
 	~TBFile();
 
 	TBFile(const TBFile& other) = delete; // copy constructor
