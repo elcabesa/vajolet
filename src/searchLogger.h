@@ -46,8 +46,9 @@ public:
 	void raisedbestScore();
 	void isImproving();
 	void ExtendedDepth();
-	void testMove(const Move& m);
-	void skipMove(const std::string& s);
+	void doMove(const Move& m);
+	void undoMove();
+	void skipMove(const Move& m, const std::string& s);
 	void doLmrSearch();
 	void doFullDepthSearchSearch();
 	void doFullWidthSearchSearch();

@@ -1113,8 +1113,9 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				{
 					red += ONE_PLY;
 				}
-				if (log) ln->testMove(Move::NOMOVE);
+				
 				_pos.doNullMove();
+				if (log) ln->doMove(Move::NOMOVE);
 				_sd.setSkipNullMove(newPly, true);
 
 				//uint64_t nullKey = _pos.getKey();
@@ -1130,6 +1131,8 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				}
 
 				_pos.undoNullMove();
+				if (log) ln->undoMove();
+				
 				_sd.setSkipNullMove(newPly, false);
 
 				if (nullVal >= beta)
@@ -1192,15 +1195,16 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 						continue;
 					}
 					
-					if (log) ln->testMove(m);
-
 					++pbCount;
+					
 					_pos.doMove(m);
+					if (log) ln->doMove(m);
 
 					assert(rDepth>=ONE_PLY);
 					s = -alphaBeta<childNodesType, log>(ply + 1, rDepth, -rBeta, -rBeta + 1, childPV);
 
 					_pos.undoMove();
+					if (log) ln->undoMove();
 
 					if(s >= rBeta)
 					{
@@ -1265,20 +1269,17 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 	while (bestScore <beta  && ( m = mp.getNextMove() ) )
 	{
-		
-		if (log) ln->testMove(m);
-
 		assert( m );
 		if(m == excludedMove)
 		{
-			if (log) ln->skipMove("Excluded Move");
+			if (log) ln->skipMove(m, "Excluded Move");
 			continue;
 		}
 
 		// Search only the moves in the Search list
 		if( type == nodeType::ROOT_NODE && ( std::count(_rootMovesAlreadySearched.begin(), _rootMovesAlreadySearched.end(), m ) || !std::count(_rootMovesToBeSearched.begin(), _rootMovesToBeSearched.end(), m) ) )
 		{
-			if (log) ln->skipMove(" not in the root nodes");
+			if (log) ln->skipMove(m, " not in the root nodes");
 			continue;
 		}
 		++moveNumber;
@@ -1306,7 +1307,6 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		//------------------------------
 		//	SINGULAR EXTENSION NODE
 		//------------------------------
-		if (log) ln->test("SingularExtension");
 		if( singularExtensionNode
 			&& !ext
 			&& m == ttMove
@@ -1314,6 +1314,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			&& abs(beta) < SCORE_MATE_IN_MAX_PLY
 		)
 		{
+			if (log) ln->test("SingularExtension");
 
 			PVline childPv;
 
@@ -1337,7 +1338,6 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		//---------------------------------------
 		//	FUTILITY PRUNING
 		//---------------------------------------
-		if (log) ln->test("Pruning");
 		if( type != nodeType::ROOT_NODE
 			&& !captureOrPromotion
 			&& !inCheck
@@ -1345,18 +1345,19 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			&& !isDangerous
 			&& bestScore > SCORE_MATED_IN_MAX_PLY
 		){
+			if (log) ln->test("Pruning");
 			assert(moveNumber > 1);
 
 			if(FutilityMoveCountFlag)
 			{
 				assert((newDepth>>ONE_PLY_SHIFT)<11);
-				if (log) ln->skipMove("futility move Count flag");
+				if (log) ln->skipMove(m, "futility move Count flag");
 				continue;
 			}
 
 			if(newDepth < 7 * ONE_PLY)
 			{
-				Score localEval = eval + futilityMargin[newDepth >> ONE_PLY_SHIFT];
+				Score localEval = staticEval + futilityMargin[newDepth >> ONE_PLY_SHIFT];
 				if(localEval <= alpha)
 				{
 					if constexpr ( !PVnode )
@@ -1364,14 +1365,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 						bestScore = std::max(bestScore, localEval);
 					}
 					assert((newDepth>>ONE_PLY_SHIFT)<7);
-					if (log) ln->skipMove("futiliy margin");
+					if (log) ln->skipMove(m, "futiliy margin");
 					continue;
 				}
 			}
 
 			if(newDepth < 4 * ONE_PLY && _pos.seeSign(m) < 0)
 			{
-				if (log) ln->skipMove("negative see");
+				if (log) ln->skipMove(m, "negative see");
 				continue;
 			}
 		}
@@ -1392,6 +1393,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 
 		_pos.doMove(m);
+		if (log) ln->doMove(m);
 		Score val;
 		PVline childPV;
 
@@ -1524,6 +1526,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		}
 
 		_pos.undoMove();
+		if (log) ln->undoMove();
 
 		if(!_stop && val > bestScore)
 		{
@@ -1821,7 +1824,6 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 	while ( ( m = mp.getNextMove() ) )
 	{
-		if (log) ln->testMove(m);
 		assert(alpha < beta);
 		assert(beta <= SCORE_INFINITE);
 		assert(alpha >= -SCORE_INFINITE);
@@ -1833,14 +1835,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 			// allow only queen promotion at deeper search
 			if( (TTdepth < -1 * ONE_PLY) && ( m.isPromotionMove() ) && (m.getPromotionType() != Move::promQueen))
 			{
-				if (log) ln->skipMove("not allowed underpomotion");
+				if (log) ln->skipMove(m, "not allowed underpomotion");
 				continue;
 			}
 
 			// at very deep search allow only recapture
 			if(depth < -7 * ONE_PLY && _pos.getActualState().getCurrentMove().getTo() != m.getTo())
 			{
-				if (log) ln->skipMove("only allowed recapture");
+				if (log) ln->skipMove(m, "only allowed recapture");
 				continue;
 			}
 
@@ -1874,14 +1876,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 						if (futilityValue <= alpha)
 						{
 							bestScore = std::max(bestScore, futilityValue);
-							if (log) ln->skipMove("futility margin");
+							if (log) ln->skipMove(m, "futility margin");
 							continue;
 						}
 						
 						if (futilityBase <= alpha && _pos.seeSign(m) <= 0)
 						{
 							bestScore = std::max(bestScore, futilityBase);
-							if (log) ln->skipMove("futile & not gaining");
+							if (log) ln->skipMove(m, "futile & not gaining");
 							continue;
 						}
 
@@ -1898,7 +1900,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 							//!moveGiveCheck &&
 							_pos.seeSign(m) < 0)
 					{
-						if (log) ln->skipMove("negative see");
+						if (log) ln->skipMove(m, "negative see");
 						continue;
 					}
 				//}
@@ -1907,8 +1909,10 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 		}
 		
 		_pos.doMove(m);
+		if (log) ln->doMove(m);
 		Score val = -qsearch<childNodesType, log>(ply+1, depth - ONE_PLY, -beta, -alpha, childPV);
 		_pos.undoMove();
+		if (log) ln->undoMove();
 
 		if(val > bestScore)
 		{
@@ -2016,7 +2020,7 @@ void Search::impl::initSearchParameters(void)
 	 ***************************************************/
 	for (unsigned int d = 0; d < 7; ++d)
 	{
-		futilityMargin[d] = d*10000;
+		futilityMargin[d] = 10000 + d * 10000;
 	}
 
 	/***************************************************

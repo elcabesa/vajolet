@@ -87,15 +87,22 @@ void logNode::test(const std::string& s) {
 	_lw.writeString(s);
 }
 
-void logNode::testMove(const Move& m) {
+void logNode::doMove(const Move& m) {
 	_indentate(_ply + 1);
-	_lw.writeString("testing move ");
+	_lw.writeString("do move ");
 	_lw.writeMove(m);
+	_lw.writeChar('{');
 }
 
-void logNode::skipMove(const std::string& s) {
+void logNode::undoMove() {
 	_indentate(_ply + 1);
-	_lw.writeString("...skipped due to ");
+	_lw.writeChar('}');
+}
+
+void logNode::skipMove(const Move& m, const std::string& s) {
+	_indentate(_ply + 1);
+	_lw.writeMove(m);
+	_lw.writeString(" skipped due to ");
 	_lw.writeString(s);
 }
 
