@@ -120,6 +120,7 @@ private:
 	static unsigned int FutilityMoveCounts[2][16];
 	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
 	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
+	static std::mutex _mutex;
 
 	//--------------------------------------------------------
 	// private members
@@ -128,16 +129,16 @@ private:
 
 	bool _validIteration = false;
 	Score _expectedValue = 0;
-	eNextMove _initialTurn;
+	eNextMove _initialTurn = whiteTurn;
 	bool _showLine = false;
 	
 	PVlineFollower _pvLineFollower;
 
 
 	SearchData _sd;
-	unsigned long long _visitedNodes;
-	unsigned long long _tbHits;
-	unsigned int _maxPlyReached;
+	unsigned long long _visitedNodes = 0;
+	unsigned long long _tbHits = 0;
+	unsigned int _maxPlyReached = 0;
 
 	MultiPVManager _multiPVmanager;
 	Position _pos;
@@ -146,6 +147,7 @@ private:
 	SearchTimer& _st;
 	std::vector<Move> _rootMovesToBeSearched;
 	std::vector<Move> _rootMovesAlreadySearched;
+	Game _game;
 
 
 	volatile bool _stop = false;
@@ -186,11 +188,6 @@ private:
 
 	using tableBaseRes = struct{ ttType TTtype; Score value;};
 	tableBaseRes _checkTablebase( const unsigned int ply, const int depth );
-
-	static std::mutex _mutex;
-
-	Game _game;
-
 
 	Move _getPonderMoveFromHash( const Move& bestMove );
 	Move _getPonderMoveFromBook( const Move& bookMove );
@@ -650,7 +647,7 @@ SearchResult Search::impl::go(int depth, Score alpha, Score beta, PVline pvToBeF
 	for (auto& hs : helperSearch)
 	{
 		// mute helper thread
-		hs.setUOI(UciOutput::create( UciOutput::type::mute ) );
+		hs.setUOI(UciOutput::create(UciOutput::type::mute));
 		
 		// setup helper thread
 		hs.cleanMemoryBeforeStartingNewSearch();
@@ -686,6 +683,7 @@ SearchResult Search::impl::go(int depth, Score alpha, Score beta, PVline pvToBeF
 		helperSearch[i-1].resetStopCondition();
 		helperSearch[i-1]._pos = _pos;
 		helperSearch[i-1]._pvLineFollower.setPVline(pvToBeFollowed);
+		helperSearch[i-1]._initialTurn = _initialTurn;
 		helperThread.emplace_back( std::thread(&Search::impl::idLoop, &helperSearch[i-1], std::ref(helperResults), i, std::ref(toBeExcludedMove), depth, alpha, beta, false));
 	}
 
