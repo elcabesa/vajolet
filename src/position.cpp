@@ -103,15 +103,21 @@ void Position::initPstValues(void)
 					{
 						pstValue[piece][s] += pieceValue[piece];
 					}
+
+					if (!isPawn(piece) && !isKing(piece)) {
+						nonPawnValue[piece][0] = pieceValue[piece][0];
+						nonPawnValue[piece][1] = pieceValue[piece][1];
+					}
+
 				} else {
 					tRank r = getRelativeRankOf(s, black);
 					tFile f = file;
 					pstValue[piece][s] = -pstValue[piece - separationBitmap][getSquare(f, r)];
-				}
-				
-				if (!isPawn(piece) && !isKing(piece)) {
-					nonPawnValue[piece][0] = pieceValue[piece][0];
-					nonPawnValue[piece][1] = pieceValue[piece][1];
+
+					if(!isPawn(piece) && !isKing(piece)) {
+						nonPawnValue[piece][2] = pieceValue[piece][0];
+						nonPawnValue[piece][3] = pieceValue[piece][1];
+					}
 				}
 			} else {
 				pstValue[piece][s] = simdScore{0,0,0,0};
