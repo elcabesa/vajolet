@@ -38,6 +38,7 @@ CPP_SRCS := \
 ./src/position.cpp \
 ./src/search.cpp \
 ./src/searchData.cpp \
+./src/searchLogger.cpp \
 ./src/see.cpp \
 ./src/thread.cpp \
 ./src/timeManagement.cpp \
@@ -82,6 +83,7 @@ OBJS :=  \
 ./src/position.o \
 ./src/search.o \
 ./src/searchData.o \
+./src/searchLogger.o \
 ./src/see.o \
 ./src/thread.o \
 ./src/timeManagement.o \
@@ -121,6 +123,7 @@ CPP_DEPS := \
 ./src/position.d \
 ./src/search.d \
 ./src/searchData.d \
+./src/searchLogger.d \
 ./src/see.d \
 ./src/thread.d \
 ./src/timeManagement.d \
