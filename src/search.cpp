@@ -591,7 +591,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			//----------------------------------
 			// aspiration window
 			//----------------------------------
-			rootMove res = aspirationWindow<true>( depth, alpha, beta, masterThread);
+			rootMove res = aspirationWindow<false>( depth, alpha, beta, masterThread);
 			if( res.firstMove != Move::NOMOVE )
 			{
 				bestMove = res;
