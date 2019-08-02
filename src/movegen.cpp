@@ -228,7 +228,7 @@ void Movegen::generateMoves( MoveList<MAX_MOVE_PER_POSITION>& ml ) const
 	}
 
 	//king castle
-	if(/*type !=Movegen::genType::allEvasionMg && */type!=Movegen::genType::captureEvasionMg && type!=Movegen::genType::quietEvasionMg && type!= Movegen::captureMg)
+	if(/*type !=Movegen::genType::allEvasionMg && */type!=Movegen::genType::captureEvasionMg && type!=Movegen::genType::quietEvasionMg && type!= Movegen::genType::captureMg)
 	{
 		if( !s.isInCheck() && s.hasCastleRight( castleOO | castleOOO, color ) )
 		{
