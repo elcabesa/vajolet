@@ -39,7 +39,7 @@ bool TBValidater::validate(const TBFile& tb, const TBType type, const std::strin
 	
 	
 	for (int i = 0; i< 4; ++i) {
-		if (Magics[type == WDL][i] != tb[i]) {
+		if (Magics[type == TBType::WDL][i] != tb[i]) {
 			std::cerr << "Corrupted table in file " << fname << std::endl;
 			exit(EXIT_FAILURE);
 		}

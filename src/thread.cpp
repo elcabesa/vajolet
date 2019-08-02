@@ -40,15 +40,15 @@ private:
 
 	const unsigned int _initTimeout = 1;
 	
-	enum threadStatus
+	enum class threadStatus
 	{
 		initalizing,
 		ready,
 		running
 	};
 	
-	volatile threadStatus _searchStatus = initalizing;
-	volatile threadStatus _timerStatus = initalizing;
+	volatile threadStatus _searchStatus = threadStatus::initalizing;
+	volatile threadStatus _timerStatus = threadStatus::initalizing;
 	
 	std::thread _searcher;
 	std::thread _timer;
@@ -129,12 +129,12 @@ void my_thread::impl::_timerThread()
 	
 	while (!_quit)
 	{
-		_timerStatus = ready;
+		_timerStatus = threadStatus::ready;
 		_timerCond.notify_one();
 		
 		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan->isSearchFinished() ) || _quit;} );
 		
-		_timerStatus = running;
+		_timerStatus = threadStatus::running;
 		_timerCond.notify_one();
 
 		if (!_quit)
@@ -162,12 +162,12 @@ void my_thread::impl::_searchThread()
 	
 	while (!_quit)
 	{
-		_searchStatus = ready;
+		_searchStatus = threadStatus::ready;
 		_searchCond.notify_one();
 		
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
 		
-		_searchStatus = running;
+		_searchStatus = threadStatus::running;
 		_searchCond.notify_one();
 		
 		if(!_quit)
@@ -194,8 +194,8 @@ bool my_thread::impl::_initThreads()
 	_src.stopSearch();
 	
 	// wait initialization
-	if( !_timerCond.wait_for( lckt, std::chrono::seconds( _initTimeout ), [&]{ return _timerStatus == ready;} ) ) return false;
-	if( !_searchCond.wait_for( lcks, std::chrono::seconds( _initTimeout ), [&]{ return _searchStatus == ready;} ) ) return false;
+	if( !_timerCond.wait_for( lckt, std::chrono::seconds( _initTimeout ), [&]{ return _timerStatus == threadStatus::ready;} ) ) return false;
+	if( !_searchCond.wait_for( lcks, std::chrono::seconds( _initTimeout ), [&]{ return _searchStatus == threadStatus::ready;} ) ) return false;
 
 	return true;
 }
@@ -221,9 +221,9 @@ inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 	_lastHasfullMessageTime = 0;
 	std::lock( _tMutex, _sMutex );
 	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
-	_searchCond.wait( lcks, [&]{ return _searchStatus == ready; } );
+	_searchCond.wait( lcks, [&]{ return _searchStatus == threadStatus::ready; } );
 	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
-	_timerCond.wait( lckt, [&]{ return _timerStatus == ready; } );
+	_timerCond.wait( lckt, [&]{ return _timerStatus == threadStatus::ready; } );
 
 	_limits = l;
 	_src.getPosition() = p;

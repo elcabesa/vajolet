@@ -126,43 +126,43 @@ void TBTables::init() {
 }
 
 
-int TBTables::probeWDL(const Position& pos, ProbeState& result, WDLScore wdl) const {
+WDLScore TBTables::probeWDL(const Position& pos, ProbeState& result, WDLScore wdl) const {
 
 	if (pos.getPieceCount(occupiedSquares) == 2) {// KvK
-        return WDLDraw;
+        return WDLScore::WDLDraw;
 	}
 
 	const auto& k = pos.getMaterialKey();
 	if (!exists(k)) {
-		result = FAIL;
-		return 0;
+		result = ProbeState::FAIL;
+		return WDLScore::WDLDraw;
 	}
 	
 	auto& table = getWDL(k);
 	if (!table.mapFile()) {
-		result = FAIL;
-		return 0;
+		result = ProbeState::FAIL;
+		return WDLScore::WDLDraw;
 	}
 
     return table.probe(pos, wdl, result);
 	
 }
-int TBTables::probeDTZ(const Position& pos, ProbeState& result, WDLScore wdl) const {
+WDLScore TBTables::probeDTZ(const Position& pos, ProbeState& result, WDLScore wdl) const {
 	
 	if (pos.getPieceCount(occupiedSquares) == 2) {// KvK
-        return WDLDraw;
+        return WDLScore::WDLDraw;
 	}
 
 	const auto& k = pos.getMaterialKey();
 	if (!exists(k)) {
-		result = FAIL;
-		return 0;
+		result = ProbeState::FAIL;
+		return WDLScore::WDLDraw;
 	}
 	
 	auto& table = getDTZ(k);
 	if (!table.mapFile()) {
-		result = FAIL;
-		return 0;
+		result = ProbeState::FAIL;
+		return WDLScore::WDLDraw;
 	}
 
     return table.probe(pos, wdl, result);

@@ -28,7 +28,8 @@ class Position;
 class Movegen
 {
 public:
-	enum genType {
+	enum class genType
+	{
 		captureMg,			// generate capture moves
 		quietMg,			// generate quiet moves
 		quietChecksMg,		// generate quiet moves giving check

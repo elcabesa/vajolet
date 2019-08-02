@@ -28,10 +28,10 @@ TBTableDTZ:: TBTableDTZ(const TBTableWDL& other): TBTable(reinterpret_cast<const
 }
 
 TBType TBTableDTZ::getType() const{
-	return DTZ;
+	return TBType::DTZ;
 }
 
-int TBTableDTZ::_mapScore(const tFile f, int value, const int wdl) const {
+WDLScore TBTableDTZ::_mapScore(const tFile f, int value, const WDLScore wdl) const {
 
 	constexpr int WDLMap[] = { 1, 3, 0, 2, 0 };
 
@@ -40,22 +40,22 @@ int TBTableDTZ::_mapScore(const tFile f, int value, const int wdl) const {
 	
 	if (flags & PairsData::MappedFlag) {
 		if (flags & PairsData::WideFlag) {
-			value = ((uint16_t *)_map)[idx[WDLMap[wdl + 2]] + value];
+			value = ((uint16_t *)_map)[idx[WDLMap[transformWdlToOffset(wdl)]] + value];
 		} else {
-			value = _map[idx[WDLMap[wdl + 2]] + value];
+			value = _map[idx[WDLMap[transformWdlToOffset(wdl)]] + value];
 		}
 	}
 
 	// DTZ tables store distance to zero in number of moves or plies. We
 	// want to return plies, so we have convert to plies when needed.
-	if (   (wdl == WDLWin  && !(flags & PairsData::WinPliesFlag))
-		|| (wdl == WDLLoss && !(flags & PairsData::LossPliesFlag))
-		||  wdl == WDLCursedWin
-		||  wdl == WDLBlessedLoss) {
+	if (   (wdl == WDLScore::WDLWin  && !(flags & PairsData::WinPliesFlag))
+		|| (wdl == WDLScore::WDLLoss && !(flags & PairsData::LossPliesFlag))
+		||  wdl == WDLScore::WDLCursedWin
+		||  wdl == WDLScore::WDLBlessedLoss) {
 		value *= 2;
 	}
 
-	return value + 1;
+	return static_cast<WDLScore>(value + 1);
 }
 
 

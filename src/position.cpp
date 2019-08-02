@@ -2009,7 +2009,7 @@ inline void  Position::removeState()
 unsigned int Position::getNumberOfLegalMoves() const
 {
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
-	_mg.generateMoves<Movegen::allMg>( moveList );
+	_mg.generateMoves<Movegen::genType::allMg>( moveList );
 	return moveList.size();
 }
 

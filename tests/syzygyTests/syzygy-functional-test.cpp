@@ -52,13 +52,13 @@ void syzygyTest()
 		
 		WDLScore score = szg.probeWdl(pos, result);
 
-		ASSERT_NE(result, FAIL);
-		ASSERT_EQ(score, std::stoi(wdl));
-		if (score == std::stoi(wdl)) {++testedNum;}
+		ASSERT_NE(result, ProbeState::FAIL);
+		ASSERT_EQ(static_cast<int>(score), std::stoi(wdl));
+		if (static_cast<int>(score) == std::stoi(wdl)) {++testedNum;}
 		
 		int dtz2 = szg.probeDtz(pos, result);
 
-		ASSERT_NE(result, FAIL);
+		ASSERT_NE(result, ProbeState::FAIL);
 		ASSERT_EQ(dtz2, std::stoi(dtz));
 		
 		if( num %10000 == 0 )

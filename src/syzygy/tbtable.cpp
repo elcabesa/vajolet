@@ -136,7 +136,7 @@ void TBTable::_mapFile(){
 		}
 	}
 	// it's only needed for DTZ talbe
-	if (getType() == DTZ) {
+	if (getType() == TBType::DTZ) {
 		setMap(data);
 		for (tFile f = FILEA; f <= maxFile; ++f) {
 			data = getPairsData(0, f).setDtzMap(getMap(), data);
@@ -195,7 +195,7 @@ const uint8_t* TBTable::getMap(void) const {
 //
 //      idx = Binomial[1][s1] + Binomial[2][s2] + ... + Binomial[k][sk]
 //
-int TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
+WDLScore TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
 	tSquare squares[TBPIECES];
 	bitboardIndex pieces[TBPIECES];
 	uint64_t idx;
@@ -249,8 +249,8 @@ int TBTable::probe(const Position& pos, WDLScore wdl, ProbeState& result) {
 	// move or only for black to move, so check for side to move to be stm,
 	// early exit otherwise.
 	if (!_checkDtzStm(stm, tbFile)) {
-		result = CHANGE_STM;
-		return 0; // don't care, this value is not used
+		result = ProbeState::CHANGE_STM;
+		return WDLScore::WDLDraw; // don't care, this value is not used
 	}
 
 	// Now we are ready to get all the position pieces (but the lead pawns) and

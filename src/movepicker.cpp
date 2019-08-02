@@ -23,11 +23,11 @@ MovePicker::MovePicker( const Position& p, const SearchData& sd, unsigned int pl
 {
 	if( _pos.isInCheck() )
 	{
-		_stagedGeneratorState = getTTevasion;
+		_stagedGeneratorState = eStagedGeneratorState::getTTevasion;
 	}
 	else
 	{
-		_stagedGeneratorState = getTT;
+		_stagedGeneratorState = eStagedGeneratorState::getTT;
 	}
 }
 
@@ -38,10 +38,10 @@ Move MovePicker::getNextMove()
 	{
 		switch( _stagedGeneratorState )
 		{
-		case generateCaptureMoves:
-		case generateQuiescentMoves:
-		case generateQuiescentCaptures:
-		case generateProbCutCaptures:
+		case eStagedGeneratorState::generateCaptureMoves:
+		case eStagedGeneratorState::generateQuiescentMoves:
+		case eStagedGeneratorState::generateQuiescentCaptures:
+		case eStagedGeneratorState::generateProbCutCaptures:
 
 			_mg.generateMoves<Movegen::genType::captureMg>( _moveList );
 			
@@ -52,7 +52,7 @@ Move MovePicker::getNextMove()
 			_stagedGeneratorState++;
 			break;
 
-		case generateQuietMoves:
+		case eStagedGeneratorState::generateQuietMoves:
 
 			_moveList.reset();
 
@@ -69,9 +69,9 @@ Move MovePicker::getNextMove()
 			_stagedGeneratorState++;
 			break;
 
-		case generateCaptureEvasionMoves:
+		case eStagedGeneratorState::generateCaptureEvasionMoves:
 
-			_mg.generateMoves<Movegen::captureEvasionMg>( _moveList );
+			_mg.generateMoves<Movegen::genType::captureEvasionMg>( _moveList );
 			_moveList.ignoreMove( _ttMove );
 
 			// non usate dalla generazione delle mosse, ma usate dalla ricerca!!
@@ -83,9 +83,9 @@ Move MovePicker::getNextMove()
 			_stagedGeneratorState++;
 			break;
 
-		case generateQuietEvasionMoves:
+		case eStagedGeneratorState::generateQuietEvasionMoves:
 
-			_mg.generateMoves<Movegen::quietEvasionMg>( _moveList );
+			_mg.generateMoves<Movegen::genType::quietEvasionMg>( _moveList );
 			_moveList.ignoreMove( _ttMove );
 
 			_scoreQuietEvasion();
@@ -93,10 +93,10 @@ Move MovePicker::getNextMove()
 			_stagedGeneratorState++;
 			break;
 
-		case generateQuietCheks:
+		case eStagedGeneratorState::generateQuietCheks:
 
 			_moveList.reset();
-			_mg.generateMoves<Movegen::quietChecksMg>( _moveList );
+			_mg.generateMoves<Movegen::genType::quietChecksMg>( _moveList );
 			_moveList.ignoreMove( _ttMove );
 
 			_scoreQuietMoves();
@@ -104,12 +104,12 @@ Move MovePicker::getNextMove()
 			_stagedGeneratorState++;
 			break;
 
-		case iterateQuietMoves:
-		case iterateQuiescentCaptures:
-		case iterateCaptureEvasionMoves:
-		case iterateQuiescentMoves:
-		case iterateQuietChecks:
-		case iterateQuietEvasionMoves:
+		case eStagedGeneratorState::iterateQuietMoves:
+		case eStagedGeneratorState::iterateQuiescentCaptures:
+		case eStagedGeneratorState::iterateCaptureEvasionMoves:
+		case eStagedGeneratorState::iterateQuiescentMoves:
+		case eStagedGeneratorState::iterateQuietChecks:
+		case eStagedGeneratorState::iterateQuietEvasionMoves:
 
 			if( Move mm; ( mm = _moveList.findNextBestMove() ) )
 			{
@@ -121,7 +121,7 @@ Move MovePicker::getNextMove()
 			}
 			break;
 			
-		case iterateGoodCaptureMoves:
+		case eStagedGeneratorState::iterateGoodCaptureMoves:
 
 			if( Move mm; ( mm = _moveList.findNextBestMove() ) )
 			{
@@ -156,7 +156,7 @@ Move MovePicker::getNextMove()
 			}
 			break;
 			
-		case iterateProbCutCaptures:
+		case eStagedGeneratorState::iterateProbCutCaptures:
 			if( Move mm; ( mm = _moveList.findNextBestMove() ) )
 			{
 				if( _pos.see( mm ) >= _captureThreshold)
@@ -170,11 +170,11 @@ Move MovePicker::getNextMove()
 			}
 			break;
 			
-		case iterateBadCaptureMoves:
+		case eStagedGeneratorState::iterateBadCaptureMoves:
 			return _badCaptureList.getNextMove();
 			break;
 			
-		case getKillers:
+		case eStagedGeneratorState::getKillers:
 			if( _killerPos < 2 )
 			{
 				if( Move& t = _killerMoves[ _killerPos++ ]; ( t != _ttMove) && !_pos.isCaptureMove( t ) && _pos.isMoveLegal( t ) )
@@ -189,7 +189,7 @@ Move MovePicker::getNextMove()
 			}
 			break;
 			
-		case getCounters:
+		case eStagedGeneratorState::getCounters:
 			if( _killerPos < 2 )
 			{
 				if( Move& t = _counterMoves[ _killerPos++ ]; ( t != _ttMove ) && !isKillerMove(t) && !_pos.isCaptureMove( t ) && _pos.isMoveLegal( t ) )
@@ -203,11 +203,11 @@ Move MovePicker::getNextMove()
 			}
 			break;
 			
-		case getTT:
-		case getTTevasion:
-		case getQsearchTT:
-		case getQsearchTTquiet:
-		case getProbCutTT:
+		case eStagedGeneratorState::getTT:
+		case eStagedGeneratorState::getTTevasion:
+		case eStagedGeneratorState::getQsearchTT:
+		case eStagedGeneratorState::getQsearchTTquiet:
+		case eStagedGeneratorState::getProbCutTT:
 			_stagedGeneratorState++;
 			if( _pos.isMoveLegal( _ttMove ) )
 			{
@@ -267,20 +267,20 @@ short int MovePicker::setupQuiescentSearch( const bool inCheck, const int depth 
 {
 	if( inCheck)
 	{
-		_stagedGeneratorState = getTTevasion;
+		_stagedGeneratorState = eStagedGeneratorState::getTTevasion;
 		return -1;
 	}
 	else
 	{
 		if( depth >= 0 )
 		{
-			_stagedGeneratorState = getQsearchTTquiet;
+			_stagedGeneratorState = eStagedGeneratorState::getQsearchTTquiet;
 			return -1;
 		}
 		else
 		{
 			
-			_stagedGeneratorState = getQsearchTT;
+			_stagedGeneratorState = eStagedGeneratorState::getQsearchTT;
 			if( _ttMove && /*_pos.isMoveLegal(ttMove)&& */ !_pos.isCaptureMove( _ttMove ) )
 			{
 				_ttMove = Move::NOMOVE;
@@ -294,11 +294,11 @@ void MovePicker::setupProbCutSearch( const bitboardIndex capturePiece )
 {
 	//if( _pos.isInCheck() )
 	//{
-	//	_stagedGeneratorState = getTTevasion;
+	//	_stagedGeneratorState = eStagedGeneratorState::getTTevasion;
 	//}
 	//else
 	//{
-		_stagedGeneratorState = getProbCutTT;
+		_stagedGeneratorState = eStagedGeneratorState::getProbCutTT;
 	//}
 
 	_captureThreshold = Position::pieceValue[capturePiece][0];

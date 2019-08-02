@@ -572,130 +572,130 @@ void Position::initMaterialKeys(void)
 		Score val;
 	} Endgames[] = {
 			// DRAWN
-			{"k7/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },		//k vs k
+			{"k7/8/8/8/8/8/8/7K w - -",materialStruct::type::exact, nullptr, 0 },		//k vs k
 
-			{"kb6/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },	//kb vs k
-			{"k7/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/7K w - -",materialStruct::type::exact, nullptr, 0 },	//kb vs k
+			{"k7/8/8/8/8/8/8/6BK w - -",materialStruct::type::exact, nullptr, 0 },
 
-			{"kn6/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },	//kn vs k
-			{"k7/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/7K w - -",materialStruct::type::exact, nullptr, 0 },	//kn vs k
+			{"k7/8/8/8/8/8/8/6NK w - -",materialStruct::type::exact, nullptr, 0 },
 
-			{"kn6/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },	//kn vs kn
-			{"kn6/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },	//kn vs kb
-			{"kb6/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
-			{"kb6/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },	//kb vs kb
+			{"kn6/8/8/8/8/8/8/6NK w - -",materialStruct::type::exact, nullptr, 0 },	//kn vs kn
+			{"kn6/8/8/8/8/8/8/6BK w - -",materialStruct::type::exact, nullptr, 0 },	//kn vs kb
+			{"kb6/8/8/8/8/8/8/6NK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/6BK w - -",materialStruct::type::exact, nullptr, 0 },	//kb vs kb
 
-			{"knn5/8/8/8/8/8/8/7K w - -",materialStruct::exact, nullptr, 0 },	//knn vs k
-			{"k7/8/8/8/8/8/8/5NNK w - -",materialStruct::exact, nullptr, 0 },
+			{"knn5/8/8/8/8/8/8/7K w - -",materialStruct::type::exact, nullptr, 0 },	//knn vs k
+			{"k7/8/8/8/8/8/8/5NNK w - -",materialStruct::type::exact, nullptr, 0 },
 
-			{"knn5/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
-			{"knn5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
-			{"kbn5/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
-			{"kbn5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
-			{"kbb5/8/8/8/8/8/8/6NK w - -",materialStruct::exact, nullptr, 0 },
-			{"kbb5/8/8/8/8/8/8/6BK w - -",materialStruct::exact, nullptr, 0 },
+			{"knn5/8/8/8/8/8/8/6NK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"knn5/8/8/8/8/8/8/6BK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kbn5/8/8/8/8/8/8/6NK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kbn5/8/8/8/8/8/8/6BK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kbb5/8/8/8/8/8/8/6NK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kbb5/8/8/8/8/8/8/6BK w - -",materialStruct::type::exact, nullptr, 0 },
 
-			{"knp5/8/8/8/8/8/8/7K w - -",materialStruct::multiplicativeFunction, &Position::evalKNPvsK, 0 },
-			{"k7/8/8/8/8/8/8/5KNP w - -",materialStruct::multiplicativeFunction, &Position::evalKNPvsK, 0 },
+			{"knp5/8/8/8/8/8/8/7K w - -",materialStruct::type::multiplicativeFunction, &Position::evalKNPvsK, 0 },
+			{"k7/8/8/8/8/8/8/5KNP w - -",materialStruct::type::multiplicativeFunction, &Position::evalKNPvsK, 0 },
 
-			{"kn6/8/8/8/8/8/8/5NNK w - -",materialStruct::exact, nullptr, 0 },
-			{"kb6/8/8/8/8/8/8/5NNK w - -",materialStruct::exact, nullptr, 0 },
-			{"kn6/8/8/8/8/8/8/5BNK w - -",materialStruct::exact, nullptr, 0 },
-			{"kb6/8/8/8/8/8/8/5BNK w - -",materialStruct::exact, nullptr, 0 },
-			{"kn6/8/8/8/8/8/8/5BBK w - -",materialStruct::exact, nullptr, 0 },
-			{"kb6/8/8/8/8/8/8/5BBK w - -",materialStruct::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/5NNK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/5NNK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/5BNK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/5BNK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kn6/8/8/8/8/8/8/5BBK w - -",materialStruct::type::exact, nullptr, 0 },
+			{"kb6/8/8/8/8/8/8/5BBK w - -",materialStruct::type::exact, nullptr, 0 },
 
-			{"kb6/8/8/8/8/8/7P/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kb6/8/8/8/8/8/6PP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kb6/8/8/8/8/8/5PPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kb6/8/8/8/8/8/4PPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kb6/8/8/8/8/8/3PPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kb6/8/8/8/8/8/2PPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kb6/8/8/8/8/8/1PPPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kb6/8/8/8/8/8/PPPPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/7P/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/6PP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/5PPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/4PPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/3PPPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/2PPPPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/1PPPPPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kb6/8/8/8/8/8/PPPPPPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
 
-			{"k7/7p/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/6pp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/5ppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/4pppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/3ppppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/2pppppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/1ppppppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/pppppppp/8/8/8/8/8/6BK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/7p/8/8/8/8/8/6BK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/6pp/8/8/8/8/8/6BK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/5ppp/8/8/8/8/8/6BK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/4pppp/8/8/8/8/8/6BK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/3ppppp/8/8/8/8/8/6BK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/2pppppp/8/8/8/8/8/6BK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/1ppppppp/8/8/8/8/8/6BK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/pppppppp/8/8/8/8/8/6BK w - -",materialStruct::type::saturationH, nullptr, 0 },
 
-			{"kn6/8/8/8/8/8/7P/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kn6/8/8/8/8/8/6PP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kn6/8/8/8/8/8/5PPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kn6/8/8/8/8/8/4PPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kn6/8/8/8/8/8/3PPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kn6/8/8/8/8/8/2PPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kn6/8/8/8/8/8/1PPPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
-			{"kn6/8/8/8/8/8/PPPPPPPP/7K w - -",materialStruct::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/7P/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/6PP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/5PPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/4PPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/3PPPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/2PPPPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/1PPPPPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
+			{"kn6/8/8/8/8/8/PPPPPPPP/7K w - -",materialStruct::type::saturationL, nullptr, 0 },
 
-			{"k7/7p/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/6pp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/5ppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/4pppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/3ppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/2pppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/1ppppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
-			{"k7/pppppppp/8/8/8/8/8/6NK w - -",materialStruct::saturationH, nullptr, 0 },
+			{"k7/7p/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/6pp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/5ppp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/4pppp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/3ppppp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/2pppppp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/1ppppppp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
+			{"k7/pppppppp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
 
-			{"k7/8/8/8/8/8/8/5BPK w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/4BPPK w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/3BPPPK w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"kbp5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"kbpp4/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"kbppp3/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/5BPK w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/4BPPK w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/3BPPPK w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"kbp5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"kbpp4/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"kbppp3/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
 			
-			{"k7/8/8/8/8/8/8/5BNK w - -",materialStruct::exactFunction, &Position::evalKBNvsK, 0 },
-			{"kbn5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKBNvsK, 0 },
+			{"k7/8/8/8/8/8/8/5BNK w - -",materialStruct::type::exactFunction, &Position::evalKBNvsK, 0 },
+			{"kbn5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKBNvsK, 0 },
 
-			{"k7/8/8/8/8/8/8/6QK w - -",materialStruct::exactFunction, &Position::evalKQvsK, 0 },
-			{"kq6/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKQvsK, 0 },
+			{"k7/8/8/8/8/8/8/6QK w - -",materialStruct::type::exactFunction, &Position::evalKQvsK, 0 },
+			{"kq6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKQvsK, 0 },
 
-			{"k7/8/8/8/8/8/8/6RK w - -",materialStruct::exactFunction, &Position::evalKRvsK, 0 },
-			{"kr6/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKRvsK, 0 },
+			{"k7/8/8/8/8/8/8/6RK w - -",materialStruct::type::exactFunction, &Position::evalKRvsK, 0 },
+			{"kr6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKRvsK, 0 },
 
-			{"k7/8/8/8/8/8/8/6PK w - -",materialStruct::exactFunction, &Position::evalKPvsK, 0 },
-			{"kp6/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPvsK, 0 },
+			{"k7/8/8/8/8/8/8/6PK w - -",materialStruct::type::exactFunction, &Position::evalKPvsK, 0 },
+			{"kp6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPvsK, 0 },
 			
-			{"k7/8/8/8/8/8/8/5PPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/4PPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/3PPPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/2PPPPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/1PPPPPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/PPPPPPPK w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kpp5/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kppp4/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kpppp3/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kppppp2/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::exactFunction, &Position::evalKPsvsK, 0 },
-			
-			
+			{"k7/8/8/8/8/8/8/5PPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/4PPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/3PPPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/2PPPPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/1PPPPPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/PPPPPPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kpp5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kppp4/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kpppp3/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kppppp2/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
 			
 			
-
-			{"kr6/8/8/8/8/8/8/6NK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"kr6/8/8/8/8/8/8/6BK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"kb6/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"kn6/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-
-			{"knn5/8/8/8/8/8/8/7K w - -",materialStruct::multiplicativeFunction, &Position::evalKNNvsK, 0 },
-			{"k7/8/8/8/8/8/8/5NNK w - -",materialStruct::multiplicativeFunction, &Position::evalKNNvsK, 0 },
-
-			{"kr6/8/8/8/8/8/8/5PRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
-			{"krp5/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
 			
-			{"kr6/8/8/8/8/8/8/5NRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"krn5/8/8/8/8/8/8/6RK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
 			
-			{"krn5/8/8/8/8/8/8/4NNRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"krnn4/8/8/8/8/8/8/5NRK w - -",materialStruct::multiplicativeFunction, &Position::evalKRvsKm, 0 },
 
-			{"kq6/8/8/8/8/8/8/6PK w - -",materialStruct::exactFunction, &Position::evalKQvsKP, 0 },
-			{"kp6/8/8/8/8/8/8/6QK w - -",materialStruct::exactFunction, &Position::evalKQvsKP, 0 }
+			{"kr6/8/8/8/8/8/8/6NK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"kr6/8/8/8/8/8/8/6BK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"kb6/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"kn6/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+
+			{"knn5/8/8/8/8/8/8/7K w - -",materialStruct::type::multiplicativeFunction, &Position::evalKNNvsK, 0 },
+			{"k7/8/8/8/8/8/8/5NNK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKNNvsK, 0 },
+
+			{"kr6/8/8/8/8/8/8/5PRK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
+			{"krp5/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
+			
+			{"kr6/8/8/8/8/8/8/5NRK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"krn5/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			
+			{"krn5/8/8/8/8/8/8/4NNRK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"krnn4/8/8/8/8/8/8/5NRK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+
+			{"kq6/8/8/8/8/8/8/6PK w - -",materialStruct::type::exactFunction, &Position::evalKQvsKP, 0 },
+			{"kp6/8/8/8/8/8/8/6QK w - -",materialStruct::type::exactFunction, &Position::evalKQvsKP, 0 }
 
 	};
 
@@ -728,7 +728,7 @@ void Position::initMaterialKeys(void)
 				if(wp!=8){s+=std::to_string(8-wp);}
 				s+="/6BK w - -";
 				tKey key = p.setupFromFen(s).getMaterialKey().getKey();
-				t.type=materialStruct::multiplicativeFunction;
+				t.type=materialStruct::type::multiplicativeFunction;
 				t.pointer=&Position::evalOppositeBishopEndgame;
 				t.val=0;
 				materialKeyMap.insert({key,t});

@@ -102,7 +102,7 @@ private:
 	//--------------------------------------------------------
 	// private enum definition
 	//--------------------------------------------------------
-	enum nodeType
+	enum class nodeType
 	{
 		ROOT_NODE,
 		PV_NODE,
@@ -444,7 +444,7 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			{
 				if( uciParameters::multiPVLines == 1 )
 				{
-					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), _pos.isChess960(), UciOutput::upperbound);
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), _pos.isChess960(), UciOutput::PVbound::upperbound);
 				}
 
 				alpha = (Score) std::max((signed long long int)(res) - delta, (signed long long int)-SCORE_INFINITE);
@@ -459,7 +459,7 @@ rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score bet
 			{
 				if( uciParameters::multiPVLines == 1 )
 				{
-					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), _pos.isChess960(), UciOutput::lowerbound);
+					_UOI->printPV(res, _maxPlyReached, elapsedTime, newPV, getVisitedNodes(), _pos.isChess960(), UciOutput::PVbound::lowerbound);
 				}
 
 				beta = (Score) std::min((signed long long int)(res) + delta, (signed long long int)SCORE_INFINITE);
@@ -598,7 +598,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			// at depth 1 only print the PV at the end of search
 			if(!_stop && depth == 1)
 			{
-				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), _pos.isChess960(), UciOutput::upperbound);
+				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), _pos.isChess960(), UciOutput::PVbound::upperbound);
 			}
 			if(!_stop && uciParameters::multiPVLines > 1)
 			{
@@ -652,7 +652,7 @@ SearchResult Search::impl::go(int depth, Score alpha, Score beta, PVline pvToBeF
 	for (auto& hs : helperSearch)
 	{
 		// mute helper thread
-		hs.setUOI(UciOutput::create( UciOutput::mute ) );
+		hs.setUOI(UciOutput::create( UciOutput::type::mute ) );
 		
 		// setup helper thread
 		hs.cleanMemoryBeforeStartingNewSearch();
@@ -805,29 +805,29 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase(const unsigned i
 			ProbeState err;			
 			WDLScore wdl = szg.probeWdl(_pos, err);
 			
-			if (err != FAIL) {
+			if (err != ProbeState::FAIL) {
 				++_tbHits;
 
 				if (uciParameters::Syzygy50MoveRule) {
 					switch(wdl)
 					{
-					case WDLLoss:
+					case WDLScore::WDLLoss:
 						res.value = SCORE_MATED + 100 + ply;
 						res.TTtype = typeScoreLowerThanAlpha;
 						break;
-					case WDLBlessedLoss:
+					case WDLScore::WDLBlessedLoss:
 						res.TTtype = typeExact;
 						res.value = -100;
 						break;
-					case WDLDraw:
+					case WDLScore::WDLDraw:
 						res.TTtype = typeExact;
 						res.value = 0;
 						break;
-					case WDLCursedWin:
+					case WDLScore::WDLCursedWin:
 						res.TTtype = typeExact;
 						res.value = 100;
 						break;
-					case WDLWin:
+					case WDLScore::WDLWin:
 						res.TTtype = typeScoreHigherThanBeta;
 						res.value = SCORE_MATE -100 -ply;
 						break;
@@ -840,17 +840,17 @@ inline Search::impl::tableBaseRes Search::impl::_checkTablebase(const unsigned i
 				{
 					switch(wdl)
 					{
-					case WDLLoss:
-					case WDLBlessedLoss:
+					case WDLScore::WDLLoss:
+					case WDLScore::WDLBlessedLoss:
 						res.TTtype = typeScoreLowerThanAlpha;
 						res.value = SCORE_MATED + 100 + ply;
 						break;
-					case WDLDraw:
+					case WDLScore::WDLDraw:
 						res.TTtype = typeExact;
 						res.value = 0;
 						break;
-					case WDLCursedWin:
-					case WDLWin:
+					case WDLScore::WDLCursedWin:
+					case WDLScore::WDLWin:
 						res.TTtype = typeScoreHigherThanBeta;
 						res.value = SCORE_MATE - 100 - ply;
 						break;
@@ -1039,13 +1039,13 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			//------------------------
 			if (!_sd.skipNullMove(ply)
 				&&  depth < 4 * ONE_PLY
-				&&  eval + razorMargin(depth,type==CUT_NODE) <= alpha
-				&&  alpha >= -SCORE_INFINITE+razorMargin(depth,type==CUT_NODE)
-				&&  ( !ttMove || type == ALL_NODE)
+				&&  eval + razorMargin(depth, type == nodeType::CUT_NODE) <= alpha
+				&&  alpha >= -SCORE_INFINITE+razorMargin(depth, type == nodeType::CUT_NODE)
+				&&  ( !ttMove || type == nodeType::ALL_NODE)
 			)
 			{
 				PVline childPV;
-				Score v = qsearch<CUT_NODE>(ply,0 , alpha, alpha+1, childPV);
+				Score v = qsearch<nodeType::CUT_NODE>(ply,0 , alpha, alpha+1, childPV);
 				if (v <= alpha)
 				{
 					return v;
@@ -1284,7 +1284,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			rBeta = std::max( rBeta, -SCORE_MATE + 1 );
 
 			_sd.setExcludedMove(ply, m);
-			Score temp = alphaBeta<ALL_NODE>(ply, depth/2, rBeta - 1, rBeta, childPv);
+			Score temp = alphaBeta<nodeType::ALL_NODE>(ply, depth/2, rBeta - 1, rBeta, childPv);
 			_sd.setExcludedMove(ply, Move::NOMOVE);
 
 			if(temp < rBeta)
@@ -1334,7 +1334,7 @@ template<Search::impl::nodeType type> Score Search::impl::alphaBeta(unsigned int
 			}
 		}
 
-		if(type == ROOT_NODE)
+		if(type == nodeType::ROOT_NODE)
 		{
 			long long int elapsed = _st.getElapsedTime();
 			if(

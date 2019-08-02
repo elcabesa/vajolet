@@ -96,7 +96,7 @@ private:
 	long long _minSearchTime;
 	long long _maxAllocatedTime;
 	
-	enum searchState
+	enum class searchState
 	{
 		_standardSearchPonder,
 		_standardSearch,
@@ -107,7 +107,7 @@ private:
 	searchState _searchState;
 };
 
-NormalTimeManagement::NormalTimeManagement(SearchLimits& limits, const eNextMove nm):timeManagement(limits), _allocatedTime(0), _minSearchTime(0), _maxAllocatedTime(0), _searchState(_standardSearch) {
+NormalTimeManagement::NormalTimeManagement(SearchLimits& limits, const eNextMove nm):timeManagement(limits), _allocatedTime(0), _minSearchTime(0), _maxAllocatedTime(0), _searchState(searchState::_standardSearch) {
 	
 	long long time;
 	long long increment;
@@ -146,11 +146,11 @@ NormalTimeManagement::NormalTimeManagement(SearchLimits& limits, const eNextMove
 	_minSearchTime = std::max(0ll, _minSearchTime);
 	_allocatedTime = std::max(0ll, _allocatedTime);
 	
-	_searchState = _limits.isPondering() ? _standardSearchPonder : _standardSearch;
+	_searchState = _limits.isPondering() ? searchState::_standardSearchPonder : searchState::_standardSearch;
 }
 
 bool NormalTimeManagement::isSearchFinished() const {
-	return _searchState == _searchFinished;
+	return _searchState == searchState::_searchFinished;
 }
 
 bool NormalTimeManagement::stateMachineStep(const long long int time, const unsigned long long) {
@@ -158,7 +158,7 @@ bool NormalTimeManagement::stateMachineStep(const long long int time, const unsi
 	
 	switch( _searchState )
 	{
-	case _standardSearch:
+	case searchState::_standardSearch:
 
 		//sync_cout<<"standardSearch"<<sync_endl;
 		if(
@@ -166,37 +166,37 @@ bool NormalTimeManagement::stateMachineStep(const long long int time, const unsi
 				|| ( _isIdLoopIterationFinished() && time >= _minSearchTime && time >= _allocatedTime * 0.7 )
 		)
 		{
-			_searchState = _searchFinished;
+			_searchState = searchState::_searchFinished;
 			stopSearch = true;
 		}
 		else if( time >= _allocatedTime )
 		{
 			if( _isSearchInFailLowOverState() )
 			{
-				_searchState = _standardSearchExtendedTime;
+				_searchState = searchState::_standardSearchExtendedTime;
 			}
 			else if( _hasFirstIterationFinished() )
 			{
-				_searchState = _searchFinished;
+				_searchState = searchState::_searchFinished;
 				stopSearch = true;
 			}
 		}
 		break;
 
-	case _standardSearchPonder:
+	case searchState::_standardSearchPonder:
 		//sync_cout<<"standardSearchPonder"<<sync_endl;
 		if( _stop )
 		{
-			_searchState = _searchFinished;
+			_searchState = searchState::_searchFinished;
 			stopSearch = true;
 		}
 		else if( !_limits.isPondering() )
 		{
-			_searchState = _standardSearch;
+			_searchState = searchState::_standardSearch;
 		}
 		break;
 
-	case _standardSearchExtendedTime:
+	case searchState::_standardSearchExtendedTime:
 		//sync_cout<<"standardSearchExtendedTime"<<sync_endl;
 		if(
 				_stop
@@ -204,12 +204,12 @@ bool NormalTimeManagement::stateMachineStep(const long long int time, const unsi
 				|| _isIdLoopIterationFinished()
 		)
 		{
-			_searchState = _searchFinished;
+			_searchState = searchState::_searchFinished;
 			stopSearch = true;
 		}
 		break;
 
-	case _searchFinished:
+	case searchState::_searchFinished:
 		//sync_cout<<"searchFinished"<<sync_endl;
 	default:
 		stopSearch = true;

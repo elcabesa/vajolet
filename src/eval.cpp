@@ -716,10 +716,10 @@ Score Position::eval(void) const
 		bool (Position::*pointer)(Score &) const = materialData->pointer;
 		switch(materialData->type)
 		{
-			case materialStruct::exact:
+			case materialStruct::type::exact:
 				return isBlackTurn() ? -materialData->val : materialData->val;
 				break;
-			case materialStruct::multiplicativeFunction:
+			case materialStruct::type::multiplicativeFunction:
 			{
 				Score r = 0;
 				if( (this->*pointer)(r))
@@ -728,7 +728,7 @@ Score Position::eval(void) const
 				}
 				break;
 			}
-			case materialStruct::exactFunction:
+			case materialStruct::type::exactFunction:
 			{
 				Score r = 0;
 				if( (this->*pointer)(r))
@@ -737,10 +737,10 @@ Score Position::eval(void) const
 				}
 				break;
 			}
-			case materialStruct::saturationH:
+			case materialStruct::type::saturationH:
 				highSat = materialData->val;
 				break;
-			case materialStruct::saturationL:
+			case materialStruct::type::saturationL:
 				lowSat = materialData->val;
 				break;
 		}

@@ -52,7 +52,7 @@ public:
 	//--------------------------------------------------------
 	// enum
 	//--------------------------------------------------------
-	enum eStagedGeneratorState
+	enum class eStagedGeneratorState
 	{
 		getTT,
 		generateCaptureMoves,
