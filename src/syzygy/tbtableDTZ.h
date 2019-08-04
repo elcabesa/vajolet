@@ -26,11 +26,11 @@
 class TBTableWDL;
 
 class TBTableDTZ: public TBTable {
-	WDLScore _mapScore(const tFile f, int value, const WDLScore wdl) const;
-	bool _checkDtzStm(unsigned int stm, tFile f) const;
+	WDLScore _mapScore(const tFile f, int value, const WDLScore wdl) const override;
+	bool _checkDtzStm(unsigned int stm, tFile f) const override;
 public:
 	explicit TBTableDTZ(const TBTableWDL& other);
-	TBType getType() const;	
+	TBType getType() const override;	
 };
 
 #endif

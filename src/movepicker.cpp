@@ -18,7 +18,8 @@
 #include "movepicker.h"
 #include "position.h"
 #include "searchData.h"
-
+// cppcheck-suppress uninitMemberVar symbolName=MovePicker::_killerPos
+// cppcheck-suppress uninitMemberVar symbolName=MovePicker::_captureThreshold
 MovePicker::MovePicker( const Position& p, const SearchData& sd, unsigned int ply, const Move& ttm ): _pos(p), _mg(p.getMoveGen()), _sd(sd), _ply(ply), _ttMove(ttm)
 {
 	if( _pos.isInCheck() )
@@ -49,7 +50,7 @@ Move MovePicker::getNextMove()
 			
 			_scoreCaptureMoves();
 			
-			_stagedGeneratorState++;
+			++_stagedGeneratorState;
 			break;
 
 		case eStagedGeneratorState::generateQuietMoves:
@@ -66,7 +67,7 @@ Move MovePicker::getNextMove()
 
 			_scoreQuietMoves();
 
-			_stagedGeneratorState++;
+			++_stagedGeneratorState;
 			break;
 
 		case eStagedGeneratorState::generateCaptureEvasionMoves:
@@ -80,7 +81,7 @@ Move MovePicker::getNextMove()
 
 			_scoreCaptureMoves();
 
-			_stagedGeneratorState++;
+			++_stagedGeneratorState;
 			break;
 
 		case eStagedGeneratorState::generateQuietEvasionMoves:
@@ -90,10 +91,10 @@ Move MovePicker::getNextMove()
 
 			_scoreQuietEvasion();
 			
-			_stagedGeneratorState++;
+			++_stagedGeneratorState;
 			break;
 
-		case eStagedGeneratorState::generateQuietCheks:
+		case eStagedGeneratorState::generateQuietChecks:
 
 			_moveList.reset();
 			_mg.generateMoves<Movegen::genType::quietChecksMg>( _moveList );
@@ -101,7 +102,7 @@ Move MovePicker::getNextMove()
 
 			_scoreQuietMoves();
 
-			_stagedGeneratorState++;
+			++_stagedGeneratorState;
 			break;
 
 		case eStagedGeneratorState::iterateQuietMoves:
@@ -117,7 +118,7 @@ Move MovePicker::getNextMove()
 			}
 			else
 			{
-				_stagedGeneratorState++;
+				++_stagedGeneratorState;
 			}
 			break;
 			
@@ -152,7 +153,7 @@ Move MovePicker::getNextMove()
 				}
 
 				_killerPos = 0;
-				_stagedGeneratorState++;
+				++_stagedGeneratorState;
 			}
 			break;
 			
@@ -185,7 +186,7 @@ Move MovePicker::getNextMove()
 			else
 			{
 				_killerPos = 0;
-				_stagedGeneratorState++;
+				++_stagedGeneratorState;
 			}
 			break;
 			
@@ -199,7 +200,7 @@ Move MovePicker::getNextMove()
 			}
 			else
 			{
-				_stagedGeneratorState++;
+				++_stagedGeneratorState;
 			}
 			break;
 			
@@ -208,7 +209,7 @@ Move MovePicker::getNextMove()
 		case eStagedGeneratorState::getQsearchTT:
 		case eStagedGeneratorState::getQsearchTTquiet:
 		case eStagedGeneratorState::getProbCutTT:
-			_stagedGeneratorState++;
+			++_stagedGeneratorState;
 			if( _pos.isMoveLegal( _ttMove ) )
 			{
 				return _ttMove;

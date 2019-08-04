@@ -45,14 +45,14 @@ uci concrete output definitions
 class UciMuteOutput: public UciOutput
 {
 public:
-	void printPVs(std::vector<rootMove>& rm, bool ischess960, int maxLinePrint = -1) const;
-	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, bool ischess960, const PVbound bound = PVbound::normal, const int depth = -1, const int count = -1) const;
-	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time, bool isChess960) const;
-	void showCurrLine(const Position & pos, const unsigned int ply) const;
-	void printDepth() const;
-	void printScore(const signed int cp) const;
-	void printBestMove( const Move& m, const Move& ponder, bool isChess960) const;
-	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
+	void printPVs(std::vector<rootMove>& rm, bool ischess960, int maxLinePrint = -1) const override;
+	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, bool ischess960, const PVbound bound = PVbound::normal, const int depth = -1, const int count = -1) const override;
+	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time, bool isChess960) const override;
+	void showCurrLine(const Position & pos, const unsigned int ply) const override;
+	void printDepth() const override;
+	void printScore(const signed int cp) const override;
+	void printBestMove( const Move& m, const Move& ponder, bool isChess960) const override;
+	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const override;
 };
 
 
@@ -60,14 +60,14 @@ class UciStandardOutput: public UciOutput
 {
 public:
 	static bool reduceVerbosity;
-	void printPVs(std::vector<rootMove>& rm, bool ischess960, int maxLinePrint = -1) const;
-	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, bool ischess960, const PVbound bound = PVbound::normal, const int depth = -1, const int count = -1) const;
-	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time, bool isChess960) const;
-	void showCurrLine(const Position & pos, const unsigned int ply) const;
-	void printDepth() const;
-	void printScore(const signed int cp) const;
-	void printBestMove( const Move& m, const Move& ponder, bool isChess960) const;
-	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const;
+	void printPVs(std::vector<rootMove>& rm, bool ischess960, int maxLinePrint = -1) const override;
+	void printPV(const Score res, const unsigned int seldepth, const long long time, PVline& PV, const unsigned long long nodes, bool ischess960, const PVbound bound = PVbound::normal, const int depth = -1, const int count = -1) const override;
+	void printCurrMoveNumber(const unsigned int moveNumber, const Move &m, const unsigned long long visitedNodes, const long long int time, bool isChess960) const override;
+	void showCurrLine(const Position & pos, const unsigned int ply) const override;
+	void printDepth() const override;
+	void printScore(const signed int cp) const override;
+	void printBestMove( const Move& m, const Move& ponder, bool isChess960) const override;
+	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const override;
 };
 
 class UciManager::impl
@@ -112,27 +112,27 @@ private:
 	class UciOption
 	{
 	public:
-		virtual bool setValue( std::string v, bool verbose = true) = 0;
+		virtual bool setValue( const std::string& v, bool verbose = true) = 0;
 		virtual std::string print() const =0;
 		virtual ~UciOption(){}
 		bool operator==(const std::string& rhs){ return _name == rhs; }
 	protected:
-		UciOption( std::string name):_name(name){}	
+		UciOption(const std::string& name):_name(name){}	
 		const std::string _name;
 	};
 
 	class StringUciOption final: public UciOption
 	{
 	public:
-		StringUciOption( std::string name, std::string& value, void (*callbackFunc)(std::string), const std::string defVal):UciOption(name),_defaultValue(defVal),_value(value), _callbackFunc(callbackFunc){ setValue(_defaultValue, false); }
-		std::string print() const{
+		StringUciOption( const std::string& name, std::string& value, void (*callbackFunc)(std::string), const std::string& defVal):UciOption(name),_defaultValue(defVal),_value(value), _callbackFunc(callbackFunc){ setValue(_defaultValue, false); }
+		std::string print() const override{
 			std::string s = "option name ";
 			s += _name;
 			s += " type string default ";
 			s += _defaultValue;
 			return s;
 		};	
-		bool setValue( std::string s, bool verbose = true)
+		bool setValue( const std::string& s, bool verbose = true) override
 		{
 			_value = s;
 			if(_callbackFunc)
@@ -154,7 +154,7 @@ private:
 	class SpinUciOption final: public UciOption
 	{
 	public:
-		SpinUciOption( std::string name, unsigned int& value, void (*callbackFunc)(unsigned int), const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal):
+		SpinUciOption( const std::string& name, unsigned int& value, void (*callbackFunc)(unsigned int), const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal):
 			UciOption(name),
 			_defValue(defVal),
 			_minValue(minVal),
@@ -164,7 +164,7 @@ private:
 		{ 
 			setValue( std::to_string(_defValue), false );
 		}
-		std::string print() const{
+		std::string print() const override{
 			std::string s = "option name ";
 			s += _name;
 			s += " type spin default ";
@@ -176,7 +176,7 @@ private:
 			return s;
 		};
 
-		bool setValue( std::string s, bool verbose = true)
+		bool setValue( const std::string& s, bool verbose = true) override
 		{
 			int value;
 			try
@@ -214,18 +214,18 @@ private:
 	class CheckUciOption final: public UciOption
 	{
 	public:
-		CheckUciOption( std::string name, bool& value, const bool defVal):UciOption(name),_defaultValue(defVal), _value(value)
+		CheckUciOption( const std::string& name, bool& value, const bool defVal):UciOption(name),_defaultValue(defVal), _value(value)
 		{
 			setValue( _defaultValue ? "true" : "false", false );
 		}
-		std::string print() const{
+		std::string print() const override{
 			std::string s = "option name ";
 			s += _name;
 			s += " type check default ";
 			s += ( _defaultValue ? "true" : "false" );
 			return s;
 		};	
-		bool setValue( std::string s, bool verbose = true)
+		bool setValue( const std::string& s, bool verbose = true) override
 		{
 			if( s == "true" )
 			{
@@ -259,14 +259,14 @@ private:
 	class ButtonUciOption final: public UciOption
 	{
 	public:
-		ButtonUciOption( std::string name, void (*callbackFunc)()):UciOption(name), _callbackFunc(callbackFunc){}
-		std::string print() const{
+		ButtonUciOption( const std::string& name, void (*callbackFunc)()):UciOption(name), _callbackFunc(callbackFunc){}
+		std::string print() const  override{
 			std::string s = "option name ";
 			s += _name;
 			s += " type button";
 			return s;
 		};
-		bool setValue( std::string, bool verbose = true ){if(_callbackFunc){_callbackFunc();} (void)verbose; return true;}
+		bool setValue( const std::string&, bool verbose = true ) override {if(_callbackFunc){_callbackFunc();}(void)verbose; return true;}
 	private:
 		void (*_callbackFunc)();
 	};
@@ -366,7 +366,6 @@ std::string UciManager::impl::displayMove(const Position& pos, const Move& m)
 	const bool isEnPassant = m.isEnPassantMove();
 	const bool isCastle = m.isCastleMove();
 
-	bool disambigusFlag = false;
 	bool fileFlag = false;
 	bool rankFlag = false;
 
@@ -382,6 +381,7 @@ std::string UciManager::impl::displayMove(const Position& pos, const Move& m)
 
 	{
 		// calc disambigus data
+		bool disambigusFlag = false;
 		Move mm;
 		MovePicker mp( pos );
 		while ( ( mm = mp.getNextMove() ) )

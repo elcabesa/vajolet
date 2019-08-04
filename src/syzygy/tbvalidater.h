@@ -30,7 +30,7 @@ class TBFile;
 
 class TBValidater {
 public:
-	static bool validate(const TBFile& tb, const TBType type, const std::string fname);
+	static bool validate(const TBFile& tb, const TBType type, const std::string& fname);
 };
 
 #endif

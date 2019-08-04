@@ -52,7 +52,7 @@ private:
 	static std::string _getFileName(const std::string& f);
 	void _unmap();
 public:
-	static void setPaths(std::string path);
+	static void setPaths(const std::string& path);
 	static bool exist(const std::string& f);
 	
 	const uint8_t& operator[](std::size_t idx) const;
@@ -62,8 +62,8 @@ public:
 	bool isValid() const;
 	uint64_t size() const { return _size; };
 	
-	TBFile ();
-	TBFile (const std::string& f);
+	explicit TBFile ();
+	explicit TBFile (const std::string& f);
 	~TBFile();
 
 	TBFile(const TBFile& other) = delete; // copy constructor

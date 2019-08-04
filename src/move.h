@@ -197,8 +197,11 @@ public:
 	*	constructors
 	******************************************************************/
 	explicit extMove(){};
+	// cppcheck-suppress uninitMemberVar symbolName=extMove::_score
 	explicit extMove( const Move& m ): Move(m){}
+	// cppcheck-suppress uninitMemberVar symbolName=extMove::_score
 	explicit extMove( const unsigned short i ): Move(i){}
+	// cppcheck-suppress uninitMemberVar symbolName=extMove::_score
 	extMove( const tSquare _from, const tSquare _to, const eflags _flag=fnone, const epromotion _prom=promQueen): Move( _from, _to, _flag, _prom ){}
 	
 	/*****************************************************************

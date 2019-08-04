@@ -343,6 +343,7 @@ void initmagicmoves(void)
 		uint64_t temp=magicmoves_b_mask[i];
 		while(temp)
 		{
+			// cppcheck-suppress oppositeExpression
 			uint64_t bit=temp&-temp;
 			squares[numsquares++]=initmagicmoves_bitpos64_database[(bit*C64(0x07EDD5E59A4E28C2))>>58];
 			temp^=bit;
@@ -360,6 +361,7 @@ void initmagicmoves(void)
 		uint64_t temp=magicmoves_r_mask[i];
 		while(temp)
 		{
+			// cppcheck-suppress oppositeExpression
 			uint64_t bit=temp&-temp;
 			squares[numsquares++]=initmagicmoves_bitpos64_database[(bit*C64(0x07EDD5E59A4E28C2))>>58];
 			temp^=bit;

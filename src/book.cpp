@@ -59,8 +59,8 @@ private:
 	size_t find_first(uint64_t key);
 	
 	std::vector<Entry> getMovesFromBook(const Position& pos);
-	Move find_best(const std::vector<Entry> moves);
-	Move find_random(const std::vector<Entry> moves);
+	Move find_best(const std::vector<Entry>& moves);
+	Move find_random(const std::vector<Entry>& moves);
 	Move convertMove(Move polyglotMove, const Position& pos);
 	
 };
@@ -159,7 +159,7 @@ std::vector<PolyglotBook::impl::Entry> PolyglotBook::impl::getMovesFromBook(cons
 	return moves;
 }
 
-Move PolyglotBook::impl::find_best(const std::vector<PolyglotBook::impl::Entry> moves)
+Move PolyglotBook::impl::find_best(const std::vector<PolyglotBook::impl::Entry>& moves)
 {
 	Move bestMove(Move::NOMOVE);
 	uint16_t bestCount = 0;
@@ -173,13 +173,10 @@ Move PolyglotBook::impl::find_best(const std::vector<PolyglotBook::impl::Entry> 
 }
 
 
-Move PolyglotBook::impl::find_random(const std::vector<PolyglotBook::impl::Entry> moves)
+Move PolyglotBook::impl::find_random(const std::vector<PolyglotBook::impl::Entry>& moves)
 {
 	Move bestMove(Move::NOMOVE);
-	unsigned int sum = 0;
-	for (const auto& m : moves) {
-		sum += m.count;
-	}
+	unsigned int sum = std::accumulate(moves.begin(), moves.end(), 0u, [](unsigned int lhs, PolyglotBook::impl::Entry rhs){return lhs + rhs.count;});
 
 	std::mt19937_64 rnd;
 	std::uniform_int_distribution<unsigned int> uint_dist(0, sum - 1);

@@ -26,6 +26,7 @@
 class MultiPVManager
 {
 public:
+	MultiPVManager(): _linesToBeSearched(0), _multiPvCounter(0){};
 	void clean(){ _res.clear(); _previousRes.clear();}
 	void startNewIteration(){ _previousRes = _res; _res.clear(); _multiPvCounter = 0;}
 	void goToNextPV(){ ++_multiPvCounter; }

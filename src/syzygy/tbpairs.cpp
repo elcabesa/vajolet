@@ -142,13 +142,13 @@ const uint8_t* PairsData::setSizes(const uint8_t* data) {
 	_span = 1ULL << (*data++);
 	_sparseIndexSize = (tbSize + _span - 1) / _span; // Round up
 	auto padding = *data++;
-	_blocksNum = *((uint32_t*)data);
+	_blocksNum = *reinterpret_cast<const uint32_t*>(data);
 	data += sizeof(uint32_t);
 	_blockLengthSize = _blocksNum + padding; // Padded to ensure SparseIndex[]
 												 // does not point out of range.
 	_maxSymLen = *data++;
 	_minSymLen = *data++;
-	_lowestSym = (Sym*)data;
+	_lowestSym = reinterpret_cast<Sym*>(const_cast<uint8_t*>(data));
 	_base64.resize(_maxSymLen - _minSymLen + 1);
 
 	// The canonical code is ordered such that longer symbols (in terms of
@@ -158,8 +158,7 @@ const uint8_t* PairsData::setSizes(const uint8_t* data) {
 	// and containing 64 bit values so that d->base64[i] >= d->base64[i+1].
 	// See http://www.eecs.harvard.edu/~michaelm/E210/huffman.pdf
 	for (int i = _base64.size() - 2; i >= 0; --i) {
-		_base64[i] = (_base64[i + 1] + *((Sym*)(&_lowestSym[i]))
-										 - *((Sym*)(&_lowestSym[i + 1]))) / 2;
+		_base64[i] = (_base64[i + 1] + _lowestSym[i] - _lowestSym[i + 1]) / 2;
 
 		assert(_base64[i] * 2 >= _base64[i+1]);
 	}
@@ -173,10 +172,10 @@ const uint8_t* PairsData::setSizes(const uint8_t* data) {
 
 	data += _base64.size() * sizeof(Sym);
 	
-	_symlen.resize(*((uint16_t*)(data)));
+	_symlen.resize(*reinterpret_cast<const uint16_t*>(data));
 	data += sizeof(uint16_t);
 	
-	_btree = (LR*)data;
+	_btree = reinterpret_cast<LR*>(const_cast<uint8_t*>(data));
 
 	// The compression scheme used is "Recursive Pairing", that replaces the most
 	// frequent adjacent pair of symbols in the source message by a new symbol,
@@ -271,13 +270,13 @@ const uint8_t* PairsData::setDtzMap(const uint8_t* map, const uint8_t* data) {
 }
 
 const uint8_t* PairsData::setSparseIndex(const uint8_t* data) {
-	_sparseIndex = (SparseEntry*)data;
+	_sparseIndex = reinterpret_cast<SparseEntry*>(const_cast<uint8_t*>(data));
 	data += _sparseIndexSize * sizeof(SparseEntry);
 	return data;
 }
 
 const uint8_t* PairsData::setBlockLength(const uint8_t* data) {
-	_blockLength = (uint16_t*)data;
+	_blockLength = reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(data));
 	data += _blockLengthSize * sizeof(uint16_t);
 	return data;
 }

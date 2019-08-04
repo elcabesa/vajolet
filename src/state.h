@@ -36,7 +36,19 @@ class state
 
 public:
 	// todo modifiche a keys inseririle dentro alle altre chiamate
-
+	
+	// cppcheck-suppress uninitMemberVar symbolName=state::_castleRights
+	// cppcheck-suppress uninitMemberVar symbolName=state::_pinnedPieces
+	// cppcheck-suppress uninitMemberVar symbolName=state::_checkers
+	// cppcheck-suppress uninitMemberVar symbolName=state::_nextMove
+	// cppcheck-suppress uninitMemberVar symbolName=state::_hiddenCheckersCandidate
+	// cppcheck-suppress uninitMemberVar symbolName=state::_material
+	// cppcheck-suppress uninitMemberVar symbolName=state::_nonPawnMaterial
+	// cppcheck-suppress uninitMemberVar symbolName=state::_fiftyMoveCnt
+	// cppcheck-suppress uninitMemberVar symbolName=state::_pliesFromNull
+	// cppcheck-suppress uninitMemberVar symbolName=state::_checkingSquares
+	// cppcheck-suppress uninitMemberVar symbolName=state::_capturedPiece
+	// cppcheck-suppress uninitMemberVar symbolName=state::_epSquare
 	explicit state(){}
 
 	inline HashKey& getKey()
@@ -379,9 +391,6 @@ public:
 	{
 		_capturedPiece = empty;
 	}
-	
-	
-	
 
 private:
 	eCastle _castleRights; /*!<  actual castle rights*/

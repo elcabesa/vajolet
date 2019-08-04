@@ -39,14 +39,15 @@ public:
 		unsigned int depth;
 	};
 
+	Game(): _isChess960(false){}
 	void CreateNewGame(bool isChess960);
 	void insertNewMoves(Position &pos);
 	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
-	void printGamesInfo();
+	/*void printGamesInfo();*/
 
 	bool isNewGame(const Position &pos) const;
-	bool isPonderRight() const;
-	GamePosition getNewSearchParameters() const;
+	/*bool isPonderRight() const;*/
+	/*GamePosition getNewSearchParameters() const;*/
 
 private:
 	std::vector<GamePosition> _positions;

@@ -68,7 +68,10 @@ public:
 	static const unsigned int WinPliesFlag = 4;
 	static const unsigned int MappedFlag = 2;
 	static const unsigned int STMFlag = 1;
-	PairsData() {}
+	PairsData(): _flags(0), _maxSymLen(0), _minSymLen(0), _blocksNum(0), _sizeofBlock(0), _span(0),
+		_lowestSym(nullptr), _btree(nullptr), _blockLength(nullptr), _blockLengthSize(0), _sparseIndex(nullptr),
+		_sparseIndexSize(0), _data(nullptr), _pieces{empty, empty, empty, empty, empty, empty, empty},
+		_groupIdx{0,0,0,0,0,0,0,0}, _groupLen{0,0,0,0,0,0,0,0}, _map_idx{0,0,0,0} {}
 	~PairsData() {}
 	PairsData(const PairsData& other) = delete;
 	PairsData(PairsData&& other) noexcept = delete;// move constructor
