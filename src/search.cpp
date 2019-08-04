@@ -907,7 +907,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			nodeType::PV_NODE;
 	(void)childNodesType;	// to suppress warning in root node and PV nodes
 
-
+	if (log) ln->startSection("early returns");
 	if(type != nodeType::ROOT_NODE )
 	{
 		//---------------------------------------
@@ -915,7 +915,8 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		//---------------------------------------
 		if (log) ln->test("IsDraw");
 		if( _manageDraw( PVnode, pvLine) ) {
-			if (log)ln->logReturnValue(getDrawValue());
+			if (log) ln->logReturnValue(getDrawValue());
+			if (log) ln->endSection();
 			return getDrawValue();
 		}
 		//---------------------------------------
@@ -924,6 +925,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		if (log) ln->test("MateDistancePruning");
 		if( _MateDistancePruning( ply, alpha, beta) ) {
 			if (log) ln->logReturnValue(alpha);
+			if (log) ln->endSection();
 			return alpha;
 		}
 	}
@@ -960,6 +962,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			_updateCounterMove( ttMove );
 		}
 		if (log) ln->logReturnValue(ttValue);
+		if (log) ln->endSection();
 		return ttValue;
 	}
 	
@@ -993,12 +996,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 					ttMove,
 					_pos.eval<false>());
 				if (log) ln->logReturnValue(res.value);
+				if (log) ln->endSection();
 				return res.value;
 			}
 		}
 	}
-
-
+	
+	if (log) ln->endSection();
+	if (log) ln->startSection("calc eval");
 	//---------------------------------
 	// calc the eval & static eval
 	//---------------------------------
@@ -1043,12 +1048,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	{
 		improving = true;
 	}
-
+	
+	if (log) ln->endSection();
 	//-----------------------------
 	// reduction && pruning
 	//-----------------------------
 	if constexpr ( !PVnode )
 	{
+		if (log) ln->startSection("pruning");
 		if(!inCheck )
 		{
 			//------------------------
@@ -1069,6 +1076,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				if (v <= alpha)
 				{
 					if (log) ln->logReturnValue(v);
+					if (log) ln->endSection();
 					return v;
 				}
 			}
@@ -1088,6 +1096,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			{
 				assert((depth>>ONE_PLY_SHIFT)<8);
 				if (log) ln->logReturnValue(eval);
+				if (log) ln->endSection();
 				return eval;
 			}
 
@@ -1146,6 +1155,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 					if (depth < 12 * ONE_PLY)
 					{
 						if (log) ln->logReturnValue(nullVal);
+						if (log) ln->endSection();
 						return nullVal;
 					}
 
@@ -1159,6 +1169,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 					if (val >= beta)
 					{
 						if (log) ln->logReturnValue(nullVal);
+						if (log) ln->endSection();
 						return nullVal;
 					}
 
@@ -1209,6 +1220,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 					if(s >= rBeta)
 					{
 						if (log) ln->logReturnValue(s);
+						if (log) ln->endSection();
 						return s;
 					}
 
@@ -1216,10 +1228,8 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			}
 		}
 
+		if (log) ln->endSection();
 	}
-
-
-	if (log) ln->test("IID");
 	//------------------------
 	//	IID
 	//------------------------
@@ -1227,6 +1237,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		&& !ttMove
 		&& (PVnode || staticEval + 10000 >= beta))
 	{
+		if (log) ln->test("IID");
 		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
 
 		bool skipBackup = _sd.skipNullMove(ply);
@@ -1245,6 +1256,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 
 
+	if (log) ln->startSection("move loop");
 
 	Score bestScore = -SCORE_INFINITE;
 
@@ -1575,7 +1587,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		}
 	}
 
-
+	if (log) ln->endSection();
 	// draw
 	if(!moveNumber)
 	{
@@ -1684,10 +1696,11 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 	_sd.setInCheck(ply, inCheck);
 
 	_updateNodeStatistics(ply);
-	
+	if (log) ln->startSection("early returns");
 	if (log) ln->test("IsDraw");
 	if( _manageDraw( PVnode, pvLine) ) {
 		if (log) ln->logReturnValue(getDrawValue());
+		if (log) ln->endSection();
 		return getDrawValue();
 	}
 	//---------------------------------------
@@ -1738,12 +1751,15 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 			_appendTTmoveIfLegal( ttMove, pvLine);
 		}
 		if (log) ln->logReturnValue(ttValue);
+		if (log) ln->endSection();
 		return ttValue;
 	}
 
+	if (log) ln->endSection();
 
 	ttType TTtype = typeScoreLowerThanAlpha;
 
+	if (log) ln->startSection("calc eval");
 
 	Score staticEval = (tte->getType() != typeVoid) ? tte->getStaticValue() : _pos.eval<false>();
 	if (log) ln->calcStaticEval(staticEval);
@@ -1795,6 +1811,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 					transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove, staticEval);
 				}
 				if (log) ln->logReturnValue(bestScore);
+				if (log) ln->endSection();
 				return bestScore;
 			}
 			if (log) ln->raisedAlpha();
@@ -1812,6 +1829,9 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 		bestScore = -SCORE_INFINITE;
 		futilityBase = -SCORE_INFINITE;
 	}
+	
+	if (log) ln->endSection();
+	if (log) ln->startSection("move loop");
 
 
 	//----------------------------
@@ -1941,13 +1961,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 						transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
 					}
 					if (log) ln->logReturnValue(bestScore);
+					if (log) ln->endSection();
 					return bestScore;
 				}
 			}
 		}
 	}
 
-	
+	if (log) ln->endSection();
 	if(bestScore == -SCORE_INFINITE)
 	{
 		if (log) ln->test("IsMated");

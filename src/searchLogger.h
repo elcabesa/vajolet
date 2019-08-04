@@ -19,6 +19,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 #include "score.h"
 
@@ -58,10 +59,12 @@ public:
 	void logTTprobe(const ttEntry& tte);
 	void logReturnValue(Score val);
 	void test(const std::string& s);
+	void startSection(const std::string& s);
+	void endSection();
 private:
 	void _indentate(unsigned int ply);
 	logWriter& _lw;
-	unsigned int _ply;
+	static unsigned int _ply;
 };
 
 #endif

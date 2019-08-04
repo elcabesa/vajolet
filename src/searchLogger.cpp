@@ -55,9 +55,10 @@ void logWriter::writeMove(const Move& m) {
 	_log << UciManager::displayUci(m, false);
 }
 
+unsigned int logNode::_ply = 0;
 
-logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta, std::string type): _lw(lw), _ply(ply) {
-	_indentate(ply);
+logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score beta, std::string type): _lw(lw) {
+	_indentate(_ply);
 	_lw.writeString(type);
 	_lw.writeChar('(');
 	_lw.writeNumber(ply);
@@ -69,9 +70,25 @@ logNode::logNode(logWriter& lw, unsigned int ply, int depth, Score alpha, Score 
 	_lw.writeNumber(beta);
 	_lw.writeChar(')');
 	_lw.writeChar('{');
+	++_ply;
 }
 
 logNode::~logNode() {
+	--_ply;
+	_indentate(_ply);
+	_lw.writeChar('}');
+}
+
+void logNode::startSection(const std::string& s) {
+	_indentate(_ply);
+	_lw.writeString("section ");
+	_lw.writeString(s);
+	_lw.writeChar('{');
+	++_ply;
+	
+}
+void logNode::endSection() {
+	--_ply;
 	_indentate(_ply);
 	_lw.writeChar('}');
 }
@@ -82,53 +99,56 @@ void logNode::_indentate(unsigned int ply) {
 }
 
 void logNode::test(const std::string& s) {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("test");
 	_lw.writeString(s);
 }
 
 void logNode::doMove(const Move& m) {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("do move ");
 	_lw.writeMove(m);
 	_lw.writeChar('{');
+	++_ply;
 }
 
 void logNode::undoMove() {
-	_indentate(_ply + 1);
+	--_ply;
+	_indentate(_ply);
 	_lw.writeChar('}');
+	
 }
 
 void logNode::skipMove(const Move& m, const std::string& s) {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeMove(m);
 	_lw.writeString(" skipped due to ");
 	_lw.writeString(s);
 }
 
 void logNode::raisedAlpha() {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("raised alpha");
 }
 
 void logNode::isImproving() {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("is improving");
 }
 
 void logNode::raisedbestScore() {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("raised bestScore");
 }
 
 void logNode::logReturnValue(Score val) {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("return: ");
 	_lw.writeNumber(val);
 }
 
 void logNode::logTTprobe(const ttEntry& tte) {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("TTprobe v: ");
 	_lw.writeNumber(tte.getValue());
 	_lw.writeString(" sv: ");
@@ -142,39 +162,39 @@ void logNode::logTTprobe(const ttEntry& tte) {
 }
 
 void logNode::calcStaticEval(Score eval) {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("Static Eval: ");
 	_lw.writeNumber(eval);
 }
 
 void logNode::refineEval(Score eval) {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("refined Eval: ");
 	_lw.writeNumber(eval);
 }
 
 void logNode::calcBestScore(Score eval) {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("BestScore: ");
 	_lw.writeNumber(eval);
 }
 
 void logNode::ExtendedDepth() {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("extended depth");
 }
 
 void logNode::doLmrSearch() {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("do lmr search");
 }
 
 void logNode::doFullDepthSearchSearch() {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("do full depth search");
 }
 
 void logNode::doFullWidthSearchSearch() {
-	_indentate(_ply + 1);
+	_indentate(_ply);
 	_lw.writeString("do full width search");
 }
