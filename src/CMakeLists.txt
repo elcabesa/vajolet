@@ -19,6 +19,7 @@ add_library(libChess
 	position.cpp
 	search.cpp
 	searchData.cpp
+	searchLogger.cpp
 	see.cpp
 	thread.cpp
 	timeManagement.cpp

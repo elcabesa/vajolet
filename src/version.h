@@ -22,6 +22,6 @@
 
 const std::string programName = "Vajolet2";
 const std::string version = "2.8.0";
-const std::string preRelease = "-PRE-14";
+const std::string preRelease = "-PRE-15";
 
 #endif
