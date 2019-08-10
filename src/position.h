@@ -45,7 +45,9 @@ class pawnTable;
 class Position
 {
 public:
-
+	//--------------------------------------------------------
+	// enu definition
+	//--------------------------------------------------------
 	enum class pawnHash{
 		on,
 		off
@@ -71,6 +73,7 @@ public:
 	explicit Position(const Position& other, const pawnHash usePawnHash = pawnHash::on);
 	~Position();
 	Position& operator=(const Position& other);
+	
 	
 	void setupCastleData (const eCastle cr, const tSquare kFrom, const tSquare kTo, const tSquare rFrom, const tSquare rTo);
 	bitMap initCastlePath(const tSquare kSqFrom, const tSquare kSqTo, const tSquare rSqFrom, const tSquare rSqTo);
@@ -375,19 +378,23 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::array<eCastle,squareNumber> _castleRightsMask;
+	
 	static simdScore _pstValue[lastBitboard][squareNumber];
 	static simdScore _nonPawnValue[lastBitboard];
 	std::unordered_map<tKey, materialStruct> static _materialKeyMap;
+	
+	
+	//--------------------------------------------------------
+	// private members
+	//--------------------------------------------------------	
+	std::array<eCastle, squareNumber> _castleRightsMask;
+	
 	std::array<bitMap ,9> _castlePath;				// path that need to be free to be able to castle
 	std::array<bitMap, 9> _castleKingPath;			// path to be traversed by the king when castling
 	std::array<tSquare ,9> _castleRookInvolved;		// rook involved in the castling
 	std::array<tSquare ,9> _castleKingFinalSquare;	// king destination square of castling
 	std::array<tSquare ,9> _castleRookFinalSquare;	// rook destination square of castling
 	
-	//--------------------------------------------------------
-	// private members
-	//--------------------------------------------------------	
 	unsigned int _ply;
 	const Movegen _mg;
 
