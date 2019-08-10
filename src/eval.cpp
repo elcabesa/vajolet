@@ -17,13 +17,10 @@
 
 #include <iomanip>
 
-#include "eval.h"
 #include "vajo_io.h"
 #include "parameters.h"
 #include "position.h"
-
-
-bool enablePawnHash= true;
+#include "tables.h"
 
 static const int KingExposed[] = {
      2,  0,  2,  5,  5,  2,  0,  2,
@@ -46,9 +43,9 @@ const Position::materialStruct * Position::getMaterialData() const
 {
 	tKey key = getMaterialKey().getKey();
 
-	auto got= materialKeyMap.find(key);
+	auto got= _materialKeyMap.find(key);
 
-	if( got == materialKeyMap.end())
+	if( got == _materialKeyMap.end())
 	{
 		return nullptr;
 	}
@@ -623,6 +620,70 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 	return res;
 }
 
+
+simdScore Position::calcPawnValues(bitMap& weakPawns, bitMap& passedPawns, bitMap * const attackedSquares , bitMap * const weakSquares, bitMap * const holes) const {
+	simdScore pawnResult = simdScore{0,0,0,0};
+	bitMap pawns = getBitmap(whitePawns);
+
+	while(pawns)
+	{
+		tSquare sq = iterateBit(pawns);
+		pawnResult += evalPawn<white>(sq, weakPawns, passedPawns);
+	}
+
+	pawns = getBitmap(blackPawns);
+
+	while(pawns)
+	{
+		tSquare sq = iterateBit(pawns);
+		pawnResult -= evalPawn<black>(sq, weakPawns, passedPawns);
+	}
+
+
+
+	bitMap temp = getBitmap(whitePawns);
+	bitMap pawnAttack = (temp & ~fileMask(H1) ) << 9;
+	pawnAttack |= (temp & ~fileMask(A1) ) << 7;
+
+	attackedSquares[whitePawns] = pawnAttack;
+	pawnAttack |= pawnAttack << 8;
+	pawnAttack |= pawnAttack << 16;
+	pawnAttack |= pawnAttack << 32;
+
+	weakSquares[white] = ~pawnAttack;
+
+
+	temp = getBitmap(blackPawns);
+	pawnAttack = ( temp & ~fileMask(H1) ) >> 7;
+	pawnAttack |= ( temp & ~fileMask(A1) ) >> 9;
+
+	attackedSquares[blackPawns] = pawnAttack;
+
+	pawnAttack |= pawnAttack >> 8;
+	pawnAttack |= pawnAttack >> 16;
+	pawnAttack |= pawnAttack >> 32;
+
+	weakSquares[black] = ~pawnAttack;
+
+	temp = getBitmap(whitePawns) << 8;
+	temp |= temp << 8;
+	temp |= temp << 16;
+	temp |= temp << 32;
+
+	holes[white] = weakSquares[white] & temp;
+
+
+
+	temp = getBitmap(blackPawns) >> 8;
+	temp |= temp >> 8;
+	temp |= temp >> 16;
+	temp |= temp >> 32;
+
+	holes[black] = weakSquares[black] & temp;
+	pawnResult -= ( (int)bitCnt( holes[white] ) - (int)bitCnt( holes[black] ) ) * holesPenalty;
+	return pawnResult;
+}
+
 /*! \brief do a pretty simple evalutation
 	\author Marco Belli
 	\version 1.0
@@ -825,93 +886,21 @@ Score Position::eval(void) const
 	//----------------------------------------------
 	//	PAWNS EVALUTATION
 	//----------------------------------------------
-	simdScore pawnResult;
-	const HashKey& pawnKey = getPawnKey();
-	const pawnEntry& probePawn = pawnHashTable.probe( pawnKey );
-	if( enablePawnHash && ( probePawn.key == pawnKey ) )
-	{
-		pawnResult = simdScore{probePawn.res[0], probePawn.res[1], 0, 0};
-		weakPawns = probePawn.weakPawns;
-		passedPawns = probePawn.passedPawns;
-		attackedSquares[whitePawns] = probePawn.pawnAttacks[0];
-		attackedSquares[blackPawns] = probePawn.pawnAttacks[1];
-		weakSquares[white] = probePawn.weakSquares[0];
-		weakSquares[black] = probePawn.weakSquares[1];
-		holes[white] = probePawn.holes[0];
-		holes[black] = probePawn.holes[1];
+	if(const HashKey& pawnKey = getPawnKey(); _pawnHashTable) {
+		
+		if (simdScore tableScore; _pawnHashTable->getValues(pawnKey, tableScore, weakPawns, passedPawns, attackedSquares, weakSquares, holes)) {
+			res += tableScore;
+		} else {
+			simdScore pawnResult = calcPawnValues(weakPawns, passedPawns, attackedSquares, weakSquares, holes);
+			
+			_pawnHashTable->insert(pawnKey, pawnResult, weakPawns, passedPawns, attackedSquares, weakSquares, holes);			
+			res += pawnResult;
+
+		}
+	} else {
+		res += calcPawnValues(weakPawns, passedPawns, attackedSquares, weakSquares, holes);
 	}
-	else
-	{
-
-
-		pawnResult = simdScore{0,0,0,0};
-		bitMap pawns = getBitmap(whitePawns);
-
-		while(pawns)
-		{
-			tSquare sq = iterateBit(pawns);
-			pawnResult += evalPawn<white>(sq, weakPawns, passedPawns);
-		}
-
-		pawns = getBitmap(blackPawns);
-
-		while(pawns)
-		{
-			tSquare sq = iterateBit(pawns);
-			pawnResult -= evalPawn<black>(sq, weakPawns, passedPawns);
-		}
-
-
-
-		bitMap temp = getBitmap(whitePawns);
-		bitMap pawnAttack = (temp & ~fileMask(H1) ) << 9;
-		pawnAttack |= (temp & ~fileMask(A1) ) << 7;
-
-		attackedSquares[whitePawns] = pawnAttack;
-		pawnAttack |= pawnAttack << 8;
-		pawnAttack |= pawnAttack << 16;
-		pawnAttack |= pawnAttack << 32;
-
-		weakSquares[white] = ~pawnAttack;
-
-
-		temp = getBitmap(blackPawns);
-		pawnAttack = ( temp & ~fileMask(H1) ) >> 7;
-		pawnAttack |= ( temp & ~fileMask(A1) ) >> 9;
-
-		attackedSquares[blackPawns] = pawnAttack;
-
-		pawnAttack |= pawnAttack >> 8;
-		pawnAttack |= pawnAttack >> 16;
-		pawnAttack |= pawnAttack >> 32;
-
-		weakSquares[black] = ~pawnAttack;
-
-		temp = getBitmap(whitePawns) << 8;
-		temp |= temp << 8;
-		temp |= temp << 16;
-		temp |= temp << 32;
-
-		holes[white] = weakSquares[white] & temp;
-
-
-
-		temp = getBitmap(blackPawns) >> 8;
-		temp |= temp >> 8;
-		temp |= temp >> 16;
-		temp |= temp >> 32;
-
-		holes[black] = weakSquares[black] & temp;
-		pawnResult -= ( (int)bitCnt( holes[white] ) - (int)bitCnt( holes[black] ) ) * holesPenalty;
-
-		if(enablePawnHash)
-		{
-			pawnHashTable.insert(pawnKey, pawnResult, weakPawns, passedPawns, attackedSquares[whitePawns], attackedSquares[blackPawns], weakSquares[white], weakSquares[black], holes[white], holes[black] );
-		}
-
-	}
-
-	res += pawnResult;
+	
 	//---------------------------------------------
 	// center control
 	//---------------------------------------------

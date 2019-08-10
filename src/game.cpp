@@ -27,7 +27,7 @@ void Game::CreateNewGame(bool isChess960)
 	_isChess960 = isChess960;
 }
 
-void Game::insertNewMoves(Position &pos)
+void Game::insertNewMoves(const Position &pos)
 {
 	unsigned int actualPosition = _positions.size();
 	for(unsigned int i = actualPosition; i < pos.getStateSize(); i++)// todo usare iteratore dello stato

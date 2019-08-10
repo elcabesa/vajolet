@@ -20,6 +20,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -29,28 +30,31 @@
 #include "hashKey.h"
 #include "movegen.h"
 #include "move.h"
-#include "tables.h"
 #include "score.h"
 #include "state.h"
 #include "vajolet.h"
+//---------------------------------------------------
+// forward declarations
+//---------------------------------------------------
+class pawnEntry;
+class pawnTable;
 
 //---------------------------------------------------
 //	class
 //---------------------------------------------------
-
-
-
 class Position
 {
 public:
 
+	enum class pawnHash{
+		on,
+		off
+	};
+
 	//--------------------------------------------------------
 	// public static methods
 	//--------------------------------------------------------
-	void static initMaterialKeys(void);
-	void setupCastleData (const eCastle cr, const tSquare kFrom, const tSquare kTo, const tSquare rFrom, const tSquare rTo);
-	bitMap initCastlePath(const tSquare kSqFrom, const tSquare kSqTo, const tSquare rSqFrom, const tSquare rSqTo);
-	bitMap initKingPath(const tSquare kSqFrom, const tSquare kSqTo);
+	static void initMaterialKeys(void);
 	static void initScoreValues(void);
 	static void initPstValues(void);
 	
@@ -63,9 +67,14 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	explicit Position();
-	explicit Position(const Position& other);
+	explicit Position(const pawnHash usePawnHash = pawnHash::on);
+	explicit Position(const Position& other, const pawnHash usePawnHash = pawnHash::on);
+	~Position();
 	Position& operator=(const Position& other);
+	
+	void setupCastleData (const eCastle cr, const tSquare kFrom, const tSquare kTo, const tSquare rFrom, const tSquare rTo);
+	bitMap initCastlePath(const tSquare kSqFrom, const tSquare kSqTo, const tSquare rSqFrom, const tSquare rSqTo);
+	bitMap initKingPath(const tSquare kSqFrom, const tSquare kSqTo);
 	
 
 	inline bitMap getOccupationBitmap() const
@@ -113,7 +122,7 @@ public:
 
 	unsigned int getStateSize() const
 	{
-		return stateInfo.size();
+		return _stateInfo.size();
 	}
 	
 	unsigned int getNumberOfLegalMoves() const;
@@ -217,17 +226,17 @@ public:
 	*/
 	inline const state& getActualState(void)const
 	{
-		return stateInfo.back();
+		return _stateInfo.back();
 	}
 	
 	inline state& getActualState(void)
 	{
-		return stateInfo.back();
+		return _stateInfo.back();
 	}
 
 	inline const state& getState(unsigned int n)const
 	{
-		return stateInfo[n];	
+		return _stateInfo[n];	
 	}
 	
 	bool isMoveLegal(const Move &m) const;
@@ -366,10 +375,10 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::array<eCastle,squareNumber> castleRightsMask;
-	static simdScore pstValue[lastBitboard][squareNumber];
-	static simdScore nonPawnValue[lastBitboard];
-	std::unordered_map<tKey, materialStruct> static materialKeyMap;
+	std::array<eCastle,squareNumber> _castleRightsMask;
+	static simdScore _pstValue[lastBitboard][squareNumber];
+	static simdScore _nonPawnValue[lastBitboard];
+	std::unordered_map<tKey, materialStruct> static _materialKeyMap;
 	std::array<bitMap ,9> _castlePath;				// path that need to be free to be able to castle
 	std::array<bitMap, 9> _castleKingPath;			// path to be traversed by the king when castling
 	std::array<tSquare ,9> _castleRookInvolved;		// rook involved in the castling
@@ -384,9 +393,9 @@ private:
 
 
 	/*used for search*/
-	mutable pawnTable pawnHashTable;
+	mutable std::unique_ptr<pawnTable> _pawnHashTable;
 
-	std::vector<state> stateInfo;
+	std::vector<state> _stateInfo;
 
 	/*! \brief board rapresentation
 		\author Marco Belli
@@ -432,6 +441,8 @@ private:
 
 	template<Color c> Score evalShieldStorm(tSquare ksq) const;
 	template<Color c> simdScore evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
+	
+	simdScore calcPawnValues(bitMap& weakPawns, bitMap& passedPawns, bitMap * const attackedSquares , bitMap * const weakSquares, bitMap * const holes) const;
 
 	const materialStruct* getMaterialData() const;
 	bool evalKxvsK(Score& res) const;

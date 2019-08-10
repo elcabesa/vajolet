@@ -27,11 +27,9 @@
 #include "transposition.h"
 #include "search.h"
 #include "score.h"
-#include "eval.h"
 #include "parameters.h"
 #include "uciParameters.h"
 #include "syzygy/syzygy.h"
-#include "eval.h"
 
 #include <fstream>
 #include "hashKey.h"
@@ -124,9 +122,9 @@ long double calcSigleError2(Position &p, long double res)
 
 
 
-long double calcError2(void)
+long double calcError2()
 {
-	Position p;
+	Position p(Position::pawnHash::off);
 	long double totalError = 0.0;
 
 	for(const auto& v : positions)
@@ -204,8 +202,6 @@ int main()
 	szg.setPath(uciParameters::SyzygyPath);
 	sync_cout<<"info string syzygy path set to "<<uciParameters::SyzygyPath<<sync_endl;
 	sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;
-	
-	enablePawnHash =false;
 
 	//----------------------------------
 	//	main loop

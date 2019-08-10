@@ -20,6 +20,7 @@
 #include "vajo_io.h"
 #include "parameters.h"
 #include "position.h"
+#include "tables.h"
 #include "uciParameters.h"
 #include "vajolet.h"
 
@@ -29,9 +30,9 @@ const int KFile[8]	= { +3, +4, +2, +0, +0, +2, +4, +3};
 const int KRank[8]	= { +1, +0, -2, -3, -4, -5, -6, -7};
 
 simdScore Position::pieceValue[lastBitboard];
-simdScore Position::pstValue[lastBitboard][squareNumber];
-simdScore Position::nonPawnValue[lastBitboard];
-/*eCastle Position::castleRightsMask[squareNumber];
+simdScore Position::_pstValue[lastBitboard][squareNumber];
+simdScore Position::_nonPawnValue[lastBitboard];
+/*eCastle Position::_castleRightsMask[squareNumber];
 std::array<bitMap, 9> Position::_castlePath;
 std::array<bitMap, 9> Position::_castleKingPath;
 std::array<tSquare ,9> Position::_castleRookInvolved;
@@ -45,55 +46,55 @@ void Position::initPstValues(void)
 		for(tSquare s = A1; s < squareNumber; ++s)
 		{
 			assert(s<squareNumber);
-			nonPawnValue[piece] = simdScore{0,0,0,0};
-			pstValue[piece][s] = simdScore{0,0,0,0};
+			_nonPawnValue[piece] = simdScore{0,0,0,0};
+			_pstValue[piece][s] = simdScore{0,0,0,0};
 			tRank rank = getRankOf(s);
 			tFile file = getFileOf(s);
 
 			if (isValidPiece(piece)) {
 				if (!isBlackPiece(piece)) {
 					if (isPawn(piece)) {
-						pstValue[piece][s] = simdScore{0,0,0,0};
+						_pstValue[piece][s] = simdScore{0,0,0,0};
 						if (s == D3) {
-							pstValue[piece][s] = PawnD3;
+							_pstValue[piece][s] = PawnD3;
 						} else if (s == D4) {
-							pstValue[piece][s] = PawnD4;
+							_pstValue[piece][s] = PawnD4;
 						} else if (s == D5) {
-							pstValue[piece][s] = PawnD5;
+							_pstValue[piece][s] = PawnD5;
 						} else if (s == E3) {
-							pstValue[piece][s] = PawnE3;
+							_pstValue[piece][s] = PawnE3;
 						} else if (s == E4)	{
-							pstValue[piece][s] = PawnE4;
+							_pstValue[piece][s] = PawnE4;
 						} else if (s == E5)	{
-							pstValue[piece][s] = PawnE5;
+							_pstValue[piece][s] = PawnE5;
 						}
-						pstValue[piece][s] += PawnRankBonus * static_cast<int>(rank - 2);
-						pstValue[piece][s] += Center[file] * PawnCentering;
+						_pstValue[piece][s] += PawnRankBonus * static_cast<int>(rank - 2);
+						_pstValue[piece][s] += Center[file] * PawnCentering;
 					} else if (isKnight(piece)) {
-						pstValue[piece][s] = KnightPST * (Center[file] + Center[rank]);
+						_pstValue[piece][s] = KnightPST * (Center[file] + Center[rank]);
 						if (rank == RANK1) {
-							pstValue[piece][s] -= KnightBackRankOpening;
+							_pstValue[piece][s] -= KnightBackRankOpening;
 						}
 					} else if (isBishop(piece))	{
-						pstValue[piece][s] = BishopPST * (Center[file] + Center[rank]);
+						_pstValue[piece][s] = BishopPST * (Center[file] + Center[rank]);
 						if (rank == RANK1) {
-							pstValue[piece][s] -= BishopBackRankOpening;
+							_pstValue[piece][s] -= BishopBackRankOpening;
 						}
 						if (((int)file == (int)rank) || (file + rank == 7)) {
-							pstValue[piece][s] += BishopOnBigDiagonals;
+							_pstValue[piece][s] += BishopOnBigDiagonals;
 						}
 					} else if (isRook(piece)) {
-						pstValue[piece][s] = RookPST * Center[file];
+						_pstValue[piece][s] = RookPST * Center[file];
 						if (rank == RANK1) {
-							pstValue[piece][s] -= RookBackRankOpening;
+							_pstValue[piece][s] -= RookBackRankOpening;
 						}
 					} else if (isQueen(piece)) {
-						pstValue[piece][s] = QueenPST * (Center[file] + Center[rank]);
+						_pstValue[piece][s] = QueenPST * (Center[file] + Center[rank]);
 						if (rank == RANK1) {
-							pstValue[piece][s] -= QueenBackRankOpening;
+							_pstValue[piece][s] -= QueenBackRankOpening;
 						}
 					} else if (isKing(piece)) {
-						pstValue[piece][s] = simdScore{
+						_pstValue[piece][s] = simdScore{
 								(KFile[file]+KRank[rank]) * KingPST[0],
 								(Center[file]+Center[rank]) * KingPST[1],
 								0,0};
@@ -101,26 +102,26 @@ void Position::initPstValues(void)
 					// add piece value to pst
 					if(!isKing( piece ) )
 					{
-						pstValue[piece][s] += pieceValue[piece];
+						_pstValue[piece][s] += pieceValue[piece];
 					}
 
 					if (!isPawn(piece) && !isKing(piece)) {
-						nonPawnValue[piece][0] = pieceValue[piece][0];
-						nonPawnValue[piece][1] = pieceValue[piece][1];
+						_nonPawnValue[piece][0] = pieceValue[piece][0];
+						_nonPawnValue[piece][1] = pieceValue[piece][1];
 					}
 
 				} else {
 					tRank r = getRelativeRankOf(s, black);
 					tFile f = file;
-					pstValue[piece][s] = -pstValue[piece - separationBitmap][getSquare(f, r)];
+					_pstValue[piece][s] = -_pstValue[piece - separationBitmap][getSquare(f, r)];
 
 					if(!isPawn(piece) && !isKing(piece)) {
-						nonPawnValue[piece][2] = pieceValue[piece][0];
-						nonPawnValue[piece][3] = pieceValue[piece][1];
+						_nonPawnValue[piece][2] = pieceValue[piece][0];
+						_nonPawnValue[piece][3] = pieceValue[piece][1];
 					}
 				}
 			} else {
-				pstValue[piece][s] = simdScore{0,0,0,0};
+				_pstValue[piece][s] = simdScore{0,0,0,0};
 			}
 		}
 	}
@@ -205,7 +206,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	ss >> token;
 
 	x.clearCastleRight();
-	for (auto& cr : castleRightsMask) {cr = (eCastle)0;}
+	for (auto& cr : _castleRightsMask) {cr = (eCastle)0;}
 	for (auto& cp : _castlePath) {cp = 0ull;}
 	for (auto& ckp : _castleKingPath) {ckp = 0ull;}
 	for (auto& csq : _castleRookInvolved) {csq = squareNone;}
@@ -431,8 +432,8 @@ void Position::clear()
 	{
 		_bitBoard[i] = 0;
 	}
-	stateInfo.clear();
-	stateInfo.emplace_back(state());
+	_stateInfo.clear();
+	_stateInfo.emplace_back(state());
 
 }
 
@@ -753,7 +754,7 @@ simdScore Position::calcMaterialValue(void) const{
 	{
 		tSquare s = iterateBit(b);
 		bitboardIndex val = getPieceAt(s);
-		score += pstValue[val][s];
+		score += _pstValue[val][s];
 	}
 	return score;
 
@@ -899,8 +900,8 @@ void Position::doMove(const Move & m)
 		x.getKey().updatePiece( kFrom, piece );
 		x.getKey().updatePiece( kTo, piece );
 		
-		x.addMaterial( pstValue[rook][rTo] - pstValue[rook][rFrom] );
-		x.addMaterial( pstValue[piece][kTo] - pstValue[piece][kFrom] );
+		x.addMaterial( _pstValue[rook][rTo] - _pstValue[rook][rFrom] );
+		x.addMaterial( _pstValue[piece][kTo] - _pstValue[piece][kFrom] );
 
 	}
 	else 
@@ -922,8 +923,8 @@ void Position::doMove(const Move & m)
 			// remove piece
 			removePiece(captured,captureSquare);
 			// update material
-			x.removeMaterial( pstValue[captured][captureSquare] );
-			x.removeNonPawnMaterial( nonPawnValue[captured] );
+			x.removeMaterial( _pstValue[captured][captureSquare] );
+			x.removeNonPawnMaterial( _nonPawnValue[captured] );
 
 			// update keys
 			x.getKey().updatePiece( captureSquare, captured);
@@ -939,13 +940,13 @@ void Position::doMove(const Move & m)
 		x.getKey().updatePiece( to, piece );
 		movePiece(piece, from, to);
 
-		x.addMaterial( pstValue[piece][to] - pstValue[piece][from] );
+		x.addMaterial( _pstValue[piece][to] - _pstValue[piece][from] );
 	}
 
 	// Update castle rights if needed
-	if ( x.hasCastleRights() && (castleRightsMask[from] | castleRightsMask[to]))
+	if ( x.hasCastleRights() && (_castleRightsMask[from] | _castleRightsMask[to]))
 	{
-		eCastle cr = castleRightsMask[from] | castleRightsMask[to];
+		eCastle cr = _castleRightsMask[from] | _castleRightsMask[to];
 		assert((x.getCastleRights() & cr)<16);
 		x.getKey().setCastlingRight( x.getCastleRights() & cr );
 		x.clearCastleRight( cr );
@@ -970,8 +971,8 @@ void Position::doMove(const Move & m)
 			removePiece(piece,to);
 			putPiece(promotedPiece,to);
 
-			x.addMaterial( pstValue[promotedPiece][to] - pstValue[piece][to] );
-			x.addNonPawnMaterial( nonPawnValue[promotedPiece] );
+			x.addMaterial( _pstValue[promotedPiece][to] - _pstValue[piece][to] );
+			x.addNonPawnMaterial( _nonPawnValue[promotedPiece] );
 
 
 			x.getKey().updatePiece( to, piece );
@@ -1128,8 +1129,8 @@ void Position::undoNullMove()
 void Position::setupCastleData (const eCastle cr, const tSquare kFrom, const tSquare kTo, const tSquare rFrom, const tSquare rTo) {
 	getActualState().setCastleRight( cr );
 
-	castleRightsMask[kFrom] = castleRightsMask[kFrom] | cr;
-	castleRightsMask[rFrom] = cr;
+	_castleRightsMask[kFrom] = _castleRightsMask[kFrom] | cr;
+	_castleRightsMask[rFrom] = cr;
 	_castlePath.at (cr) = initCastlePath(kFrom, kTo, rFrom, rTo);
 	_castleKingPath.at (cr) = initKingPath(kFrom, kTo);
 	_castleRookInvolved.at (cr) = rFrom;
@@ -1490,7 +1491,7 @@ bool Position::hasRepeated(bool isPVline) const
 	const state &s = getActualState();
 	unsigned int counter = 1;
 	const HashKey& actualkey = s.getKey();
-	auto it = stateInfo.rbegin();
+	auto it = _stateInfo.rbegin();
 	
 
 	int e = std::min( s.getIrreversibleMoveCount(), s.getPliesFromNullCount() );
@@ -1800,34 +1801,45 @@ bool Position::isMoveLegal(const Move &m)const
 }
 
 
-Position::Position():_ply(0), _mg(*this), _isChess960(false)
+Position::~Position() = default;
+
+Position::Position(const pawnHash usePawnHash):_ply(0), _mg(*this), _isChess960(false)
 {
-	stateInfo.clear();
-	stateInfo.emplace_back(state());
-	stateInfo[0].setNextTurn( whiteTurn );
+	
+	_stateInfo.clear();
+	_stateInfo.emplace_back(state());
+	_stateInfo[0].setNextTurn( whiteTurn );
 
 	updateUsThem();
 	
 	// todo create value NOCASTLE = 0
-	for (auto& cr : castleRightsMask) {cr = (eCastle)0;}
+	for (auto& cr : _castleRightsMask) {cr = (eCastle)0;}
 	for (auto& cp : _castlePath) {cp = 0ull;}
 	for (auto& ckp : _castleKingPath) {ckp = 0ull;}
 	for (auto& sq : _castleRookInvolved) {sq = squareNone;}
 	for (auto& sq : _castleKingFinalSquare) {sq = squareNone;}
 	for (auto& sq : _castleRookFinalSquare) {sq = squareNone;}
-
+	
+	if (usePawnHash == pawnHash::on) {
+		_pawnHashTable = std::make_unique<pawnTable>();
+	}
 }
 
 
-Position::Position(const Position& other): _ply(other._ply), _mg(*this), stateInfo(other.stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960)
+Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960)
 {
+	
 	updateUsThem();
-	castleRightsMask = other.castleRightsMask;
+	_castleRightsMask = other._castleRightsMask;
 	_castlePath = other._castlePath;
 	_castleKingPath = other._castleKingPath;
 	_castleRookInvolved = other._castleRookInvolved;
 	_castleKingFinalSquare = other._castleKingFinalSquare;
 	_castleRookFinalSquare = other._castleRookFinalSquare;
+	
+	if (usePawnHash == pawnHash::on) {
+		_pawnHashTable = std::make_unique<pawnTable>();
+	}
 }
 
 
@@ -1840,14 +1852,14 @@ Position& Position::operator=(const Position& other)
 
 	_ply = other._ply;
 
-	stateInfo = other.stateInfo;
+	_stateInfo = other._stateInfo;
 	_squares = other._squares;
 	_bitBoard = other._bitBoard;
 	_isChess960 = other._isChess960;
 
 	updateUsThem();
 	
-	castleRightsMask = other.castleRightsMask;
+	_castleRightsMask = other._castleRightsMask;
 	_castlePath = other._castlePath;
 	_castleKingPath = other._castleKingPath;
 	_castleRookInvolved = other._castleRookInvolved;
@@ -1959,7 +1971,7 @@ std::string Position::_printEpSquare( const state& st)
 */
 inline void Position::insertState( state & s )
 {
-	stateInfo.emplace_back(s);
+	_stateInfo.emplace_back(s);
 }
 
 /*! \brief  remove the last state
@@ -1970,7 +1982,7 @@ inline void Position::insertState( state & s )
 */
 inline void  Position::removeState()
 {
-	stateInfo.pop_back();
+	_stateInfo.pop_back();
 }
 
 unsigned int Position::getNumberOfLegalMoves() const

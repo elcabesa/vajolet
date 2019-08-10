@@ -23,6 +23,7 @@
 #include <array>
 #include <cstdint>
 
+#include "bitBoardIndex.h"
 #include "bitops.h"
 #include "score.h"
 
@@ -41,32 +42,64 @@ public:
 class pawnTable
 {
 public:
-	void insert(const HashKey& key,simdScore res,bitMap weak, bitMap passed,bitMap whiteAttack, bitMap blackAttack, bitMap weakSquareWhite,bitMap weakSquareBlack, bitMap whiteHoles, bitMap blackHoles){
+	void insert(
+		const HashKey& key,
+		const simdScore res,
+		const bitMap weakPawns,
+		const bitMap passedPawns,
+		const bitMap* const attackedSquares,
+		const bitMap* const weakSquares,
+		const bitMap* const holes) {
 
-		pawnEntry& x = probe(key);
+		pawnEntry& x = _probe(key);
 
 		x.key = key;
-		x.res[0]=res[0];
-		x.res[1]=res[1];
+		x.res[0] = res[0];
+		x.res[1] = res[1];
 
-		x.weakPawns=weak;
-		x.passedPawns=passed;
+		x.weakPawns = weakPawns;
+		x.passedPawns = passedPawns;
 
-		x.pawnAttacks[0]=whiteAttack;
-		x.pawnAttacks[1]=blackAttack;
-		x.weakSquares[0]=weakSquareWhite;
-		x.weakSquares[1]=weakSquareBlack;
-		x.holes[0]=whiteHoles;
-		x.holes[1]=blackHoles;
+		x.pawnAttacks[0] = attackedSquares[whitePawns];
+		x.pawnAttacks[1] = attackedSquares[blackPawns];
+		
+		x.weakSquares[0] = weakSquares[white];
+		x.weakSquares[1] = weakSquares[black];
+		x.holes[0] = holes[white];
+		x.holes[1] = holes[black];
 	}
-
-	pawnEntry& probe(const HashKey& key)
-	{
-		return _pawnTable[ _getIndex( key ) ];
+	
+	bool getValues(
+		const HashKey& pawnKey,
+		simdScore& res,
+		bitMap& weakPawns,
+		bitMap& passedPawns,
+		bitMap *const attackedSquares,
+		bitMap * const weakSquares,
+		bitMap * const holes) const {
+	
+	const pawnEntry& probePawn = _probe(pawnKey);
+	
+	if (probePawn.key == pawnKey) {
+		weakPawns = probePawn.weakPawns;
+		passedPawns = probePawn.passedPawns;
+		attackedSquares[whitePawns] = probePawn.pawnAttacks[0];
+		attackedSquares[blackPawns] = probePawn.pawnAttacks[1];
+		weakSquares[white] = probePawn.weakSquares[0];
+		weakSquares[black] = probePawn.weakSquares[1];
+		holes[white] = probePawn.holes[0];
+		holes[black] = probePawn.holes[1];
+		res = {probePawn.res[0], probePawn.res[1], 0, 0};
+		return true;
+	} else {
+		return false;
 	}
+}
 private:
 	static const int _size = 8192;
 	unsigned int _getIndex( const HashKey& key ) const { return ( (unsigned int)key.getKey() ) % _size; }
+	const pawnEntry& _probe(const HashKey& key) const { return _pawnTable[_getIndex(key)]; }
+	pawnEntry& _probe(const HashKey& key) { return _pawnTable[_getIndex(key)]; }
 	std::array<pawnEntry,_size> _pawnTable;
 };
 
