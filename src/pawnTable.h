@@ -25,6 +25,7 @@
 
 #include "bitBoardIndex.h"
 #include "bitops.h"
+#include "hashKey.h"
 #include "score.h"
 
 class pawnEntry

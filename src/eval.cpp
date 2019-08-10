@@ -19,8 +19,9 @@
 
 #include "vajo_io.h"
 #include "parameters.h"
+#include "pawnTable.h"
 #include "position.h"
-#include "tables.h"
+
 
 static const int KingExposed[] = {
      2,  0,  2,  5,  5,  2,  0,  2,

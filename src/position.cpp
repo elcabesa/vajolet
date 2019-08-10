@@ -20,7 +20,7 @@
 #include "vajo_io.h"
 #include "parameters.h"
 #include "position.h"
-#include "tables.h"
+#include "pawnTable.h"
 #include "uciParameters.h"
 #include "vajolet.h"
 
