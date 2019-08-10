@@ -74,12 +74,12 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 	bitMap b = rankMask(sq) | rankMask(sq - pawnPush(c));
 
 	// Flag the pawn as passed, isolated, doubled or member of a pawn
-    // chain (but not the backward one).
-    chain    = (ourPawns	& ISOLATED_PAWN[sq] & b);
+	// chain (but not the backward one).
+	chain    = (ourPawns	& ISOLATED_PAWN[sq] & b);
 	isolated = !(ourPawns	& ISOLATED_PAWN[sq]);
-    doubled  = (ourPawns	& SQUARES_IN_FRONT_OF[c][sq]);
-    opposed  = (theirPawns	& SQUARES_IN_FRONT_OF[c][sq]);
-    passed   = !(theirPawns	& PASSED_PAWN[c][sq]);
+	doubled  = (ourPawns	& SQUARES_IN_FRONT_OF[c][sq]);
+	opposed  = (theirPawns	& SQUARES_IN_FRONT_OF[c][sq]);
+	passed   = !(theirPawns	& PASSED_PAWN[c][sq]);
 
 	backward = false;
 	if(
@@ -115,15 +115,15 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 		weakPawns |= bitSet( sq );
 	}
 
-    if( doubled )
-    {
-    	res -= doubledPawnPenalty;
+	if( doubled )
+	{
+		res -= doubledPawnPenalty;
 	}
 
-    if (backward)
-    {
-    	if(opposed)
-    	{
+	if (backward)
+	{
+		if(opposed)
+		{
 			res -= backwardPawnPenalty / 2;
 		}
 		else
@@ -133,10 +133,10 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 		weakPawns |= bitSet( sq );
 	}
 
-    if(chain)
-    {
+	if(chain)
+	{
 		if(opposed)
-    	{
+		{
 			res += chainedPawnBonusOffsetOpp + chainedPawnBonusOpp * ( relativeRank - 1 ) * ( relativeRank ) ;
 		}
 		else
