@@ -1312,6 +1312,10 @@ Score Position::eval(void) const
 	if (mulCoeff == 256) {
 		mulCoeff = std::min(160 + (isOppositeBishops() ? 4 : 14) * (getPieceCount(whitePawns)+ getPieceCount(blackPawns)), 256u);
 	}
+	
+	if (trace) {
+		sync_cout << "mulCoeff:" <<  mulCoeff / 2.56 << sync_endl;
+	}
 
 	//--------------------------------------
 	//	finalizing
