@@ -21,7 +21,7 @@
 
 #include "bitops.h"
 #include "magicmoves.h"
-#include "MoveList.h"
+#include "moveList.h"
 
 class Position;
 

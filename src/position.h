@@ -46,7 +46,7 @@ class Position
 {
 public:
 	//--------------------------------------------------------
-	// enu definition
+	// enum definition
 	//--------------------------------------------------------
 	enum class pawnHash{
 		on,
