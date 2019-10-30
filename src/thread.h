@@ -18,9 +18,14 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
+#include <condition_variable>
+#include <memory>
+
+
 class Position;
 class timeManagement;
 class SearchLimits;
+
 
 class my_thread
 {
@@ -46,5 +51,6 @@ public :
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();
+	std::condition_variable& finished();
 };
 #endif /* THREAD_H_ */

@@ -58,6 +58,7 @@ private:
 	
 	std::condition_variable _searchCond;
 	std::condition_variable _timerCond;
+	std::condition_variable _finishedSearch;
 	
 	volatile static bool _quit;
 	volatile static bool _startThink;
@@ -86,6 +87,7 @@ public:
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();
+	std::condition_variable& finished();
 };
 
 volatile bool my_thread::impl::_quit = false;
@@ -179,6 +181,7 @@ void my_thread::impl::_searchThread()
 			_timerCond.notify_one();
 			_src.manageNewSearch();
 			_startThink = false;
+			_finishedSearch.notify_one();
 			
 		}
 	}
@@ -246,6 +249,10 @@ inline void my_thread::impl::ponderHit()
 
 inline void my_thread::impl::_stopPonder(){ _limits.setPonder(false);}
 
+std::condition_variable& my_thread::impl::finished() {
+	return _finishedSearch;
+}
+
 
 
 /*********************************************
@@ -263,3 +270,5 @@ void my_thread::ponderHit() { pimpl->ponderHit();}
 timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
 
 void my_thread::startThinking( const Position& p, SearchLimits& l){	pimpl->startThinking( p, l); }
+
+std::condition_variable& my_thread::finished() { return pimpl->finished(); }

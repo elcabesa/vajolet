@@ -15,4 +15,28 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <condition_variable>
+#include <mutex>
+
+#include "position.h"
 #include "selfplay.h"
+#include "searchLimits.h"
+#include "thread.h"
+#include "vajo_io.h"
+
+void SelfPlay::playGame() {
+	std::mutex m;
+	std::unique_lock<std::mutex> lock(m);
+	
+	Position p;
+	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	SearchLimits sl;
+	sl.setDepth(15);
+	
+	my_thread::getInstance().startThinking(p, sl);
+	my_thread::getInstance().finished().wait(lock);
+	sync_cout<<"end"<<sync_endl;
+	my_thread::getInstance().startThinking(p, sl);
+	my_thread::getInstance().finished().wait(lock);
+	
+}

@@ -14,6 +14,34 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#include "selfplay.h"
 
-int main() {}
+#include "libchess.h"
+#include "selfplay.h"
+#include "transposition.h"
+#include "vajo_io.h"
+
+/*!	\brief	print the startup information
+	\author Marco Belli
+	\version 1.0
+	\date 21/10/2013
+*/
+static void printStartInfo(void)
+{
+	sync_cout<<"Vajolet tuner"<<sync_endl;
+}
+
+int main() {
+	printStartInfo();
+	//----------------------------------
+	//	init global data
+	//----------------------------------
+	libChessInit();
+	transpositionTable::getInstance().setSize(1);
+	
+	SelfPlay s;
+	s.playGame();
+	
+	sync_cout<<"end"<<sync_endl;
+	
+	return 0;
+}

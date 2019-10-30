@@ -17,4 +17,10 @@
 #ifndef SELFPLAY_H_
 #define SELFPLAY_H_
 
+class SelfPlay {
+public:
+	void playGame();
+	
+};
+
 #endif /* SELFPLAY_H_ */
