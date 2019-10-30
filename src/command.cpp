@@ -288,7 +288,7 @@ private:
 const char UciManager::impl::_PIECE_NAMES_FEN[] = {' ','K','Q','R','B','N','P',' ',' ','k','q','r','b','n','p',' '};
 const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-UciManager::impl::impl()
+UciManager::impl::impl(): _pos(Position::pawnHash::off)
 {
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
@@ -372,7 +372,7 @@ std::string UciManager::impl::displayMove(const Position& pos, const Move& m)
 
 	// calc legal reply to this move
 	{
-		Position p(pos);
+		Position p(pos, Position::pawnHash::off);
 		p.doMove(m);
 		legalReplies = p.getNumberOfLegalMoves();
 		p.undoMove();

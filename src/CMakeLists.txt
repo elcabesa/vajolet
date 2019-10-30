@@ -10,7 +10,7 @@ add_library(libChess
 	hashKey.cpp
 	libchess.cpp
 	magicmoves.cpp
-	Move.cpp
+	move.cpp
 	movegen.cpp
 	movepicker.cpp
 	parameters.cpp

@@ -41,7 +41,7 @@ public:
 
 	Game(): _isChess960(false){}
 	void CreateNewGame(bool isChess960);
-	void insertNewMoves(Position &pos);
+	void insertNewMoves(const Position &pos);
 	void savePV(PVline PV,unsigned int depth, Score alpha, Score beta);
 	/*void printGamesInfo();*/
 

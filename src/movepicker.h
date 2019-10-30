@@ -19,7 +19,7 @@
 #define MOVEPICK_H_
 
 #include "bitBoardIndex.h"
-#include "MoveList.h"
+#include "moveList.h"
 #include "move.h"
 #include "score.h"
 
