@@ -29,7 +29,7 @@ CPP_SRCS := \
 ./src/vajo_io.cpp \
 ./src/libchess.cpp \
 ./src/magicmoves.cpp \
-./src/Move.cpp \
+./src/move.cpp \
 ./src/movegen.cpp \
 ./src/movepicker.cpp \
 ./src/parameters.cpp \
@@ -74,7 +74,7 @@ OBJS :=  \
 ./src/vajo_io.o \
 ./src/libchess.o \
 ./src/magicmoves.o \
-./src/Move.o \
+./src/move.o \
 ./src/movegen.o \
 ./src/movepicker.o \
 ./src/parameters.o \
@@ -114,7 +114,7 @@ CPP_DEPS := \
 ./src/vajo_io.d \
 ./src/libchess.d \
 ./src/magicmoves.d \
-./src/Move.d \
+./src/move.d \
 ./src/movegen.d \
 ./src/movepicker.d \
 ./src/parameters.d \
@@ -128,7 +128,7 @@ CPP_DEPS := \
 ./src/thread.d \
 ./src/timeManagement.d \
 ./src/transposition.d \
-./src/uciParameters.cd \
+./src/uciParameters.d \
 ./src/vajolet.d \
 ./src/syzygy/syzygy.d \
 ./src/syzygy/tbCommonData.d \
