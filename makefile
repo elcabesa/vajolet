@@ -145,7 +145,7 @@ C_DEPS :=
 %.o: ./%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++1z -O3 -DNDEBUG -msse4.2 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -Isrc -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	g++ -std=c++1z -O3 -DNDEBUG -msse4.2 -m64 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -Isrc -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -192,7 +192,7 @@ all: vajolet
 vajolet: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -s -pthread -o $(EXE) $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -s -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static -o $(EXE) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
