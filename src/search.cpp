@@ -1875,7 +1875,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 					if(
 						!moveGiveCheck
 						&& !_pos.isPassedPawnMove(m)
-						&& abs(staticEval)<SCORE_KNOWN_WIN
+						&& futilityBase>-SCORE_KNOWN_WIN
 					)
 					{
 						Score futilityValue = futilityBase
