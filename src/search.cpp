@@ -44,7 +44,7 @@
 #ifdef DEBUG_EVAL_SIMMETRY
 void testSimmetry(const Position& pos)
 {
-	static Position ppp(false);
+	static Position ppp(Position::pawnHash::off);
 
 	ppp.setupFromFen(pos.getSymmetricFen(), pos.isChess960());
 
