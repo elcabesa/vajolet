@@ -2,19 +2,14 @@ pushd ..
 mkdir release
 popd
 
-create-nopopcnt-build-clang.bat
-copy ..\build\src\Vajolet.exe ..\release\Vajolet2_2.7_old.exe
-clean.bat
+CALL create-nopopcnt-build-clang.bat
+copy ..\build\src\Vajolet.exe ..\release\Vajolet2_2.8_old.exe
+CALL clean.bat
 
-create-popcnt-build-clang.bat
-copy ..\build\src\Vajolet.exe ..\release\Vajolet2_2.7.exe
-clean.bat
+CALL create-popcnt-build-clang.bat
+copy ..\build\src\Vajolet.exe ..\release\Vajolet2_2.8.exe
+CALL clean.bat
 
-create-bmi-build-clang.bat
-copy ..\build\src\Vajolet.exe ..\release\Vajolet2_2.7_bmi.exe
-clean.bat
-
-
-
-
-
+CALL create-bmi-build-clang.bat
+copy ..\build\src\Vajolet.exe ..\release\Vajolet2_2.8_bmi.exe
+CALL clean.bat
