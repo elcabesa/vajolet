@@ -29,7 +29,7 @@ CPP_SRCS := \
 ./src/vajo_io.cpp \
 ./src/libchess.cpp \
 ./src/magicmoves.cpp \
-./src/Move.cpp \
+./src/move.cpp \
 ./src/movegen.cpp \
 ./src/movepicker.cpp \
 ./src/parameters.cpp \
@@ -74,7 +74,7 @@ OBJS :=  \
 ./src/vajo_io.o \
 ./src/libchess.o \
 ./src/magicmoves.o \
-./src/Move.o \
+./src/move.o \
 ./src/movegen.o \
 ./src/movepicker.o \
 ./src/parameters.o \
@@ -114,7 +114,7 @@ CPP_DEPS := \
 ./src/vajo_io.d \
 ./src/libchess.d \
 ./src/magicmoves.d \
-./src/Move.d \
+./src/move.d \
 ./src/movegen.d \
 ./src/movepicker.d \
 ./src/parameters.d \
@@ -128,7 +128,7 @@ CPP_DEPS := \
 ./src/thread.d \
 ./src/timeManagement.d \
 ./src/transposition.d \
-./src/uciParameters.cd \
+./src/uciParameters.d \
 ./src/vajolet.d \
 ./src/syzygy/syzygy.d \
 ./src/syzygy/tbCommonData.d \
@@ -145,7 +145,7 @@ C_DEPS :=
 %.o: ./%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++1z -O3 -DNDEBUG -msse4.2 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -Isrc -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	g++ -std=c++1z -O3 -DNDEBUG -msse4.2 -m64 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -Isrc -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -192,7 +192,7 @@ all: vajolet
 vajolet: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -s -pthread -o $(EXE) $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -s -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static -o $(EXE) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

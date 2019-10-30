@@ -90,7 +90,7 @@ public:
 		weakSquares[black] = probePawn.weakSquares[1];
 		holes[white] = probePawn.holes[0];
 		holes[black] = probePawn.holes[1];
-		res = {probePawn.res[0], probePawn.res[1], 0, 0};
+		res = simdScore{probePawn.res[0], probePawn.res[1], 0, 0};
 		return true;
 	} else {
 		return false;
