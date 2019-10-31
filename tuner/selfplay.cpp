@@ -18,9 +18,11 @@
 #include <condition_variable>
 #include <mutex>
 
+#include "command.h"
 #include "position.h"
 #include "selfplay.h"
 #include "searchLimits.h"
+#include "searchResult.h"
 #include "thread.h"
 #include "vajo_io.h"
 
@@ -28,15 +30,20 @@ void SelfPlay::playGame() {
 	std::mutex m;
 	std::unique_lock<std::mutex> lock(m);
 	
-	Position p;
-	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	my_thread::getInstance().setMute(true);
+	
+	
+	Position p(Position::pawnHash::off);
+	
 	SearchLimits sl;
 	sl.setDepth(15);
 	
-	my_thread::getInstance().startThinking(p, sl);
-	my_thread::getInstance().finished().wait(lock);
-	sync_cout<<"end"<<sync_endl;
-	my_thread::getInstance().startThinking(p, sl);
-	my_thread::getInstance().finished().wait(lock);
-	
+	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	for (int i = 0; i < 15; ++i) {
+		my_thread::getInstance().startThinking(p, sl);
+		my_thread::getInstance().finished().wait(lock);
+		auto res = my_thread::getInstance().getResult();
+		sync_cout<<"MOVE "<<UciManager::displayUci(res.PV.getMove(0), false)<<sync_endl;
+		p.doMove(res.PV.getMove(0));
+	}
 }

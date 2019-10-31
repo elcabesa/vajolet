@@ -70,6 +70,7 @@ private:
 	std::unique_ptr<timeManagement> _timeMan;
 	std::unique_ptr<UciOutput> _UOI;
 	long long _lastHasfullMessageTime;
+	SearchResult _srcRes;
 
 
 	bool _initThreads();
@@ -88,13 +89,15 @@ public:
 	void ponderHit();
 	timeManagement& getTimeMan();
 	std::condition_variable& finished();
+	const SearchResult& getResult() const;
+	void setMute(bool mute);
 };
 
 volatile bool my_thread::impl::_quit = false;
 volatile bool my_thread::impl::_startThink = false;
 
 
-my_thread::impl::impl(): _src(_st, _limits), _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create())
+my_thread::impl::impl(): _src(_st, _limits), _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create()), _srcRes(0, 0, 0, PVline(), 0) 
 {
 	if( !_initThreads() )
 	{
@@ -179,7 +182,7 @@ void my_thread::impl::_searchThread()
 			_src.resetStopCondition();
 			_st.resetTimers();
 			_timerCond.notify_one();
-			_src.manageNewSearch();
+			_srcRes = _src.manageNewSearch();
 			_startThink = false;
 			_finishedSearch.notify_one();
 			
@@ -253,6 +256,20 @@ std::condition_variable& my_thread::impl::finished() {
 	return _finishedSearch;
 }
 
+const SearchResult& my_thread::impl::getResult() const {
+	return _srcRes;
+}
+
+void my_thread::impl::setMute(bool mute) {
+	if (mute) {
+		_UOI = UciOutput::create(UciOutput::type::mute);
+		_src.setUOI(UciOutput::create(UciOutput::type::mute));
+	} else {
+		_UOI = UciOutput::create();
+		_src.setUOI(UciOutput::create());
+	}
+}
+
 
 
 /*********************************************
@@ -272,3 +289,7 @@ timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
 void my_thread::startThinking( const Position& p, SearchLimits& l){	pimpl->startThinking( p, l); }
 
 std::condition_variable& my_thread::finished() { return pimpl->finished(); }
+
+const SearchResult& my_thread::getResult() const { return pimpl->getResult(); }
+
+void my_thread::setMute(bool mute) { pimpl->setMute(mute); }

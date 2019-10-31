@@ -57,6 +57,7 @@ public:
 	void showLine();
 	SearchResult manageNewSearch();
 	Position& getPosition();
+	void setUOI( std::unique_ptr<UciOutput> UOI );
 
 private:
 	class impl;

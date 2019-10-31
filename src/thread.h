@@ -25,6 +25,7 @@
 class Position;
 class timeManagement;
 class SearchLimits;
+class SearchResult;
 
 
 class my_thread
@@ -52,5 +53,7 @@ public :
 	void ponderHit();
 	timeManagement& getTimeMan();
 	std::condition_variable& finished();
+	const SearchResult& getResult() const;
+	void setMute(bool mute);
 };
 #endif /* THREAD_H_ */
