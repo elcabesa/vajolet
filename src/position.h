@@ -154,6 +154,9 @@ public:
 	bool moveGivesCheck(const Move& m)const ;
 	bool moveGivesDoubleCheck(const Move& m)const;
 	bool moveGivesSafeDoubleCheck(const Move& m)const;
+	bool isCheckMate() const;
+	bool isStaleMate() const;
+	
 	Score see(const Move& m) const;
 	Score seeSign(const Move& m) const;
 	

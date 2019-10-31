@@ -39,11 +39,47 @@ void SelfPlay::playGame() {
 	sl.setDepth(15);
 	
 	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	for (int i = 0; i < 15; ++i) {
+	int i = 0;
+	while( !isGameFinished(p)) {
 		my_thread::getInstance().startThinking(p, sl);
 		my_thread::getInstance().finished().wait(lock);
 		auto res = my_thread::getInstance().getResult();
-		sync_cout<<"MOVE "<<UciManager::displayUci(res.PV.getMove(0), false)<<sync_endl;
+		
+		int count = i/2;
+		if( i%2 == 0) {
+			std::cout<< count <<" "<<UciManager::displayMove(p, res.PV.getMove(0));
+		} else {
+			std::cout<< " "<<UciManager::displayMove(p, res.PV.getMove(0))<<std::endl;
+		}
+		
 		p.doMove(res.PV.getMove(0));
+		++i;
 	}
+}
+
+bool SelfPlay::isGameFinished(const Position& p) {
+	// checkmate
+	if (p.isCheckMate()) {
+		std::cout<<std::endl<<"CHECKMATE"<<std::endl;
+		return true;
+	}
+	
+	// patta ripetizione
+	// num mosse
+	if (p.isDraw(true)) {
+		std::cout<<std::endl<<"DRAW"<<std::endl;
+		return true;
+	}
+	
+	// stallo
+	if (p.isStaleMate()) {
+		std::cout<<std::endl<<"STALEMATE"<<std::endl;
+		return true;
+	}
+	
+	// early stop
+	// near 0 for x moves after ply y
+	// abs(v) > x  for y moves
+	
+	return false;
 }

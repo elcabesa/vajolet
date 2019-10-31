@@ -39,7 +39,7 @@ int main() {
 	transpositionTable::getInstance().setSize(1);
 	
 	SelfPlay s;
-	s.playGame();
+	for( int i = 0; i< 10; ++i) {	s.playGame(); }
 	
 	sync_cout<<"end"<<sync_endl;
 	

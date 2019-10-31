@@ -2032,3 +2032,17 @@ tSquare Position::getCastleRookInvolved(const eCastle c ) const
 	assert( c < 9);
 	return _castleRookInvolved[c];
 }
+
+bool Position::isCheckMate() const {
+	unsigned int legalReplies = getNumberOfLegalMoves();
+	bool inCheck = isInCheck();
+	
+	return inCheck && !legalReplies;
+}
+bool Position::isStaleMate() const {
+	unsigned int legalReplies = getNumberOfLegalMoves();
+	bool inCheck = isInCheck();
+	
+	return !inCheck && !legalReplies;
+	
+}

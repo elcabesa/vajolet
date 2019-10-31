@@ -17,10 +17,13 @@
 #ifndef SELFPLAY_H_
 #define SELFPLAY_H_
 
+class Position;
+
 class SelfPlay {
 public:
 	void playGame();
-	
+private:
+	bool isGameFinished(const Position& p);
 };
 
 #endif /* SELFPLAY_H_ */
