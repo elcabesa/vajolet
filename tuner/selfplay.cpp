@@ -15,6 +15,7 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
 
@@ -41,15 +42,23 @@ void SelfPlay::playGame() {
 	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	int i = 0;
 	while( !isGameFinished(p)) {
+		auto begin = std::chrono::high_resolution_clock::now();
 		my_thread::getInstance().startThinking(p, sl);
 		my_thread::getInstance().finished().wait(lock);
+		
+		auto end = std::chrono::high_resolution_clock::now();
+		auto dur = end - begin;
+		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+		
 		auto res = my_thread::getInstance().getResult();
 		
 		int count = i/2;
 		if( i%2 == 0) {
-			std::cout<< count <<" "<<UciManager::displayMove(p, res.PV.getMove(0));
-		} else {
-			std::cout<< " "<<UciManager::displayMove(p, res.PV.getMove(0))<<std::endl;
+			std::cout<< count;
+		}
+		std::cout<<" "<<UciManager::displayMove(p, res.PV.getMove(0))<<"("<<ms<<")";
+		if( i%2 != 0) {
+			std::cout<<std::endl;
 		}
 		
 		p.doMove(res.PV.getMove(0));
