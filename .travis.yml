@@ -1,31 +1,33 @@
-dist: trusty
+dist: xenial
 sudo: required
 language:
   - cpp
 compiler:
-  - gcc
+  - clang
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+      - llvm-toolchain-xenial-8
     packages:
-      - gcc-7
-      - g++-7
-      - cmake
+      - clang-8
 
 before_install:
   - pip install --user cpp-coveralls
 
 script:
-  - export CC=/usr/bin/gcc-7
-  - export CXX=/usr/bin/g++-7
+  - export CXX="clang++-8" 
+  - export CC="clang-8"
   - mkdir build
   - cd build
   - cmake -DVAJOLET_CPU_TYPE=64NEW -DCMAKE_BUILD_TYPE=Debug ..
   - make
+  - cd tests
   - ./Vajolet_unit_test
   - ./Vajolet_search_integration_test
+  - cd ..
+  - cd src
+  - ./Vajolet bench
+  - cd ..
   
 after_success:
-  - coveralls --gcov gcov-7 --root .. --gcov-options '\-lp' -e tests -e build/googletest-src -e build/CMakeFiles/3.9.2 -e build/CMakeFiles/feature_tests.c -e build/CMakeFiles/feature_tests.cxx -e syzygy
-  
+  - coveralls --gcov llvm-cov --root .. --gcov-options '\gcov -lp' -e tests -e build/CMakeFiles -e build/googletest-src 

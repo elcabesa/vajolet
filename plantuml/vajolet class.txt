@@ -393,7 +393,7 @@ SearchResult *-- PVline
 'searchTimer file
 '------------------------
 
-class SearchTimer <<Func_Tested>>{
+class SearchTimer <<Unit_Tested>>{
   -std::chrono::time_point<std::chrono::steady_clock> startTime;
   -std::chrono::time_point<std::chrono::steady_clock> ponderTime;
 }
@@ -487,17 +487,27 @@ class timeManagement <<Unit_Tested>>{
   -bool _idLoopIterationFinished;
   -bool _idLoopFailLow;
   -bool _idLoopFailOver;
-	
-  -long long _allocatedTime;
-  -long long _minSearchTime;
-  -long long _maxAllocatedTime;
+
   -unsigned int _resolution
   -bool _stop;
-  -searchState _searchState;
   -const SearchLimits& _limits;
+  std::unique_ptr<timeManagement> create (SearchLimits& limits, const eNextMove nm)
 }
 
 timeManagement o-- SearchLimits
+
+class InfiniteSearchTimeManagement <<Unit_Tested>>{
+}
+class FixedTimeManagement <<Unit_Tested>>{
+}
+class NormalTimeManagement <<Unit_Tested>>{
+}
+
+timeManagement <|-- InfiniteSearchTimeManagement
+timeManagement <|-- FixedTimeManagement
+timeManagement <|-- NormalTimeManagement
+
+
 
 '------------------------
 'transposition file

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
-#include "./../libchess.h"
+#include "libchess.h"
 
 using ::testing::Environment;
 
@@ -19,7 +19,7 @@ protected:
 
 
 int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  ::testing::AddGlobalTestEnvironment( new EnvironmentInvocationCatcher);
-  return RUN_ALL_TESTS();
+	::testing::InitGoogleTest(&argc, argv);
+	::testing::AddGlobalTestEnvironment( new EnvironmentInvocationCatcher);
+	return RUN_ALL_TESTS();
 }

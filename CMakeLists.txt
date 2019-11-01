@@ -1,4 +1,8 @@
-cmake_minimum_required (VERSION 2.8)
+#cmake configuration
+
+cmake_minimum_required (VERSION 3.12)
+
+#project configuration
 project (Vajolet)
 
 IF( VAJOLET_CPU_TYPE STREQUAL "64OLD")
@@ -10,17 +14,23 @@ ELSEIF( VAJOLET_CPU_TYPE STREQUAL "64BMI2")
 ELSE()
 ENDIF()
 
-
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -pedantic -Wall -Wextra" )
-
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}  ")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ")
-	
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
+if (WIN32)
+	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -femulated-tls" )
+	endif()
 endif()
 
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG ")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
+
 if (WIN32)
+	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -femulated-tls")
+		set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -femulated-tls")
+	endif()
+
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--allow-multiple-definition -static -pthread")
 	set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--allow-multiple-definition -static -pthread")		
 else()
@@ -38,14 +48,9 @@ else()
 	
 endif()
 
+SET(BUILD_GMOCK OFF CACHE BOOL "don't build GMOCK")
+
 set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
-
-add_library(libChess benchmark.cpp bitops.cpp book.cpp command.cpp data.cpp endgame.cpp eval.cpp game.cpp hashKey.cpp io.cpp libchess.cpp magicmoves.cpp Move.cpp movegen.cpp movepicker.cpp parameters.cpp perft.cpp polyglotKey.cpp position.cpp search.cpp searchData.cpp see.cpp thread.cpp timeManagement.cpp transposition.cpp uciParameters.cpp syzygy/tbprobe.cpp)
-
-add_executable(tuner tuner.cpp )
-target_link_libraries (tuner libChess)
-add_executable(Vajolet vajolet.cpp )
-target_link_libraries (Vajolet libChess)
 
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -78,28 +83,5 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-enable_testing()
-# Now simply link against gtest or gtest_main as needed. Eg
-add_executable(Vajolet_unit_test tests/book-test.cpp tests/dataTest.cpp tests/hashKeyTest.cpp tests/historyTest.cpp tests/main.cpp tests/MoveTest.cpp tests/MoveListTest.cpp tests/multiPVmanagerTest.cpp tests/perft-test.cpp tests/pvLineFollowerTest.cpp tests/positionTest.cpp tests/pvLineTest.cpp tests/see-test.cpp tests/timeManagement-test.cpp)
-target_link_libraries(Vajolet_unit_test gtest libChess)
-
-add_executable(Vajolet_syzygy_test tests/main.cpp tests/syzygy-test.cpp)
-target_link_libraries(Vajolet_syzygy_test gtest libChess)
-
-add_executable(Vajolet_long_tests tests/main.cpp tests/perft-test-long.cpp)
-target_link_libraries(Vajolet_long_tests gtest libChess)
-
-add_executable(Vajolet_search_integration_test tests/main.cpp tests/search-integration-test.cpp )
-target_link_libraries(Vajolet_search_integration_test gtest libChess)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tests/Perfect2017.bin
-    ${CMAKE_CURRENT_BINARY_DIR}/book.bin COPYONLY)
-
-add_test(NAME unit_test COMMAND Vajolet_unit_test)
-add_test(NAME syzygy_test COMMAND Vajolet_syzygy_test)
-add_test(NAME long_tests COMMAND Vajolet_long_tests)
-add_test(NAME search_integration_tests COMMAND Vajolet_search_integration_test)
-
-
-
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS Vajolet_unit_test Vajolet_syzygy_test Vajolet_long_tests Vajolet_search_integration_test)
+add_subdirectory(src)
+add_subdirectory(tests)

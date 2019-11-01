@@ -1,2 +1,0 @@
-rd /s /q "build"
-
