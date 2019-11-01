@@ -17,8 +17,15 @@
 
 #include "libchess.h"
 #include "selfplay.h"
+#include "thread.h"
 #include "transposition.h"
 #include "vajo_io.h"
+
+void signalHandler(int signum)
+{
+	my_thread::getInstance().stopThinking();
+	exit(signum);
+}
 
 /*!	\brief	print the startup information
 	\author Marco Belli
@@ -31,6 +38,15 @@ static void printStartInfo(void)
 }
 
 int main() {
+	
+	signal(SIGINT, signalHandler); 
+#ifdef SIGBREAK	
+	signal(SIGBREAK, signalHandler); 
+#endif
+#ifdef SIGHUP		
+	signal(SIGHUP, signalHandler);  
+#endif
+	
 	printStartInfo();
 	//----------------------------------
 	//	init global data
@@ -38,8 +54,7 @@ int main() {
 	libChessInit();
 	transpositionTable::getInstance().setSize(1);
 	
-	SelfPlay s;
-	for( int i = 0; i< 10; ++i) {	s.playGame(); }
+	for( int i = 0; i < 1; ++i) { SelfPlay s; s.playGame(); }
 	
 	sync_cout<<"end"<<sync_endl;
 	

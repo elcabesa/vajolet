@@ -15,73 +15,83 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <chrono>
 #include <condition_variable>
 #include <mutex>
 
 #include "command.h"
-#include "position.h"
+#include "clock.h"
 #include "selfplay.h"
-#include "searchLimits.h"
+
 #include "searchResult.h"
 #include "thread.h"
 #include "vajo_io.h"
 
+SelfPlay::SelfPlay() : _p(Position::pawnHash::off), _c(_time, _increment) {
+	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	
+	_sl.setWTime(_c.getWhiteTime());
+	_sl.setBTime(_c.getBlackTime());
+	
+	_sl.setWInc(_increment * 1000);
+	_sl.setBInc(_increment * 1000);
+}
+
 void SelfPlay::playGame() {
+	// init locks
 	std::mutex m;
 	std::unique_lock<std::mutex> lock(m);
 	
-	my_thread::getInstance().setMute(true);
-	
-	
-	Position p(Position::pawnHash::off);
-	
-	SearchLimits sl;
-	sl.setDepth(15);
-	
-	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	// init vajolet search & time management
+	my_thread &thr = my_thread::getInstance();
+	thr.setMute(true);
+
 	int i = 0;
-	while( !isGameFinished(p)) {
-		auto begin = std::chrono::high_resolution_clock::now();
-		my_thread::getInstance().startThinking(p, sl);
-		my_thread::getInstance().finished().wait(lock);
-		
-		auto end = std::chrono::high_resolution_clock::now();
-		auto dur = end - begin;
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-		
-		auto res = my_thread::getInstance().getResult();
+	_c.start();
+	while (!_isGameFinished()) {
+		// set time limit
+		_sl.setWTime(_c.getWhiteTime());
+		_sl.setBTime(_c.getBlackTime());
 		
 		int count = i/2;
 		if( i%2 == 0) {
-			std::cout<< count;
-		}
-		std::cout<<" "<<UciManager::displayMove(p, res.PV.getMove(0))<<"("<<ms<<")";
-		if( i%2 != 0) {
-			std::cout<<std::endl;
+			std::cout<< count + 1<<"."<<std::endl;
 		}
 		
-		p.doMove(res.PV.getMove(0));
+		// do the search
+		auto begin = std::chrono::high_resolution_clock::now();
+		thr.startThinking(_p, _sl);
+		thr.finished().wait(lock);
+		auto end = std::chrono::high_resolution_clock::now();
+		
+		auto dur = end - begin;
+		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+		
+		auto res = thr.getResult();
+		
+		_c.switchTurn();
+		std::cout<<UciManager::displayMove(_p, res.PV.getMove(0))<<"("<<ms<<") depth: " <<res.depth<<" score: "<<((i%2 == 0) ? res.Res: -res.Res) <<" white_time: "<<_c.getWhiteTime()<<" black_time: "<<_c.getBlackTime()<<std::endl;
+		_p.doMove(res.PV.getMove(0));
+		
 		++i;
 	}
 }
 
-bool SelfPlay::isGameFinished(const Position& p) {
+bool SelfPlay::_isGameFinished() {
 	// checkmate
-	if (p.isCheckMate()) {
+	if (_p.isCheckMate()) {
 		std::cout<<std::endl<<"CHECKMATE"<<std::endl;
 		return true;
 	}
 	
 	// patta ripetizione
 	// num mosse
-	if (p.isDraw(true)) {
+	if (_p.isDraw(true)) {
 		std::cout<<std::endl<<"DRAW"<<std::endl;
 		return true;
 	}
 	
 	// stallo
-	if (p.isStaleMate()) {
+	if (_p.isStaleMate()) {
 		std::cout<<std::endl<<"STALEMATE"<<std::endl;
 		return true;
 	}

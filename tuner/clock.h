@@ -14,27 +14,37 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef SELFPLAY_H_
-#define SELFPLAY_H_
+#ifndef CLOCK_H_
+#define CLOCK_H_
 
-#include "clock.h"
-#include "position.h"
-#include "searchLimits.h"
+#include <chrono>
 
-
-class SelfPlay {
-	
+class Clock {
+	using _time_t = std::chrono::time_point<std::chrono::high_resolution_clock>;
 public:
-	SelfPlay();
-	void playGame();
-private:
-	const float _time = 200;
-	const float _increment = 1;
+	enum class turn {
+		white,
+		black
+	};
 	
-	bool _isGameFinished();
-	Position _p;
-	Clock _c;
-	SearchLimits _sl;
+	Clock(float time, float increment);
+	
+	void reset();
+	int getWhiteTime() const;
+	int getBlackTime() const;
+	void start();
+	void stop();
+	void switchTurn();
+private:
+	turn _turn;
+	const int _time;
+	const int _increment;
+	int _whiteTime;
+	int _blackTime;
+	_time_t _begin;
+	
+	void _updateClock();
+	void _switchTurn();
 };
 
-#endif /* SELFPLAY_H_ */
+#endif /* CLOCK_H_ */
