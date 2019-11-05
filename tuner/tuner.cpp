@@ -15,7 +15,11 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <iostream>
+#include <fstream>
+
 #include "libchess.h"
+#include "PGNGameCollection.h"
 #include "selfplay.h"
 #include "thread.h"
 #include "transposition.h"
@@ -47,6 +51,7 @@ int main() {
 	signal(SIGHUP, signalHandler);  
 #endif
 	
+	//pgn::GameCollection gc;
 	printStartInfo();
 	//----------------------------------
 	//	init global data
@@ -54,9 +59,13 @@ int main() {
 	libChessInit();
 	transpositionTable::getInstance().setSize(1);
 	
-	for( int i = 0; i < 1; ++i) { SelfPlay s; s.playGame(); }
-	
-	sync_cout<<"end"<<sync_endl;
-	
+	for( int i = 0; i < 100; ++i) { 
+		SelfPlay s;
+		auto g = s.playGame(i + 1);
+		std::ofstream myfile;
+		myfile.open ("tournament.pgn", std::fstream::app);	
+		myfile<<g;
+		myfile.close();
+	}
 	return 0;
 }

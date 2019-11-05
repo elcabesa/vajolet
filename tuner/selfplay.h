@@ -17,21 +17,26 @@
 #ifndef SELFPLAY_H_
 #define SELFPLAY_H_
 
+#include <string>
 #include "clock.h"
 #include "position.h"
 #include "searchLimits.h"
 
+namespace pgn { class Game;};
 
 class SelfPlay {
 	
 public:
 	SelfPlay();
-	void playGame();
+	pgn::Game playGame(unsigned int round);
 private:
 	const float _time = 200;
 	const float _increment = 1;
 	
 	bool _isGameFinished();
+	std::string _getGameResult();
+	void _addGameTags(pgn::Game& g, int round);
+	void _addGameResult(pgn::Game& g, const std::string & s);
 	Position _p;
 	Clock _c;
 	SearchLimits _sl;
