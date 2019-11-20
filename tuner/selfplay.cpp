@@ -60,7 +60,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	_addGameTags(pgnGame, round);
 	
 	int i = 0;
-	int count = i/2;
+	int count = 0;
 	_c.start();
 	
 	pgn::Ply whitePly;
@@ -73,9 +73,9 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		_sl.setBTime(_c.getBlackTime());
 		
 		count = i/2;
-		if( i%2 == 0) {
+		/*if( i%2 == 0) {
 			std::cout<< count + 1<<"."<<std::endl;
-		}
+		}*/
 		
 		// do the search
 		auto begin = std::chrono::high_resolution_clock::now();
@@ -91,7 +91,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		
 		
 		_c.switchTurn();
-		std::cout<<UciManager::displayMove(_p, res.PV.getMove(0))<<"("<<ms<<") depth: " <<res.depth<<" score: "<<((i%2 == 0) ? res.Res: -res.Res) <<" white_time: "<<_c.getWhiteTime()<<" black_time: "<<_c.getBlackTime()<<std::endl;
+		/*std::cout<<UciManager::displayMove(_p, res.PV.getMove(0))<<"("<<ms<<") depth: " <<res.depth<<" score: "<<((i%2 == 0) ? res.Res: -res.Res) <<" white_time: "<<_c.getWhiteTime()<<" black_time: "<<_c.getBlackTime()<<std::endl;*/
 		
 		
 		if( i%2 == 0) {
@@ -124,20 +124,20 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 bool SelfPlay::_isGameFinished() {
 	// checkmate
 	if (_p.isCheckMate()) {
-		std::cout<<std::endl<<"CHECKMATE"<<std::endl;
+		/*std::cout<<std::endl<<"CHECKMATE"<<std::endl;*/
 		return true;
 	}
 	
 	// patta ripetizione
 	// num mosse
 	if (_p.isDraw(true)) {
-		std::cout<<std::endl<<"DRAW"<<std::endl;
+		/*std::cout<<std::endl<<"DRAW"<<std::endl;*/
 		return true;
 	}
 	
 	// stallo
 	if (_p.isStaleMate()) {
-		std::cout<<std::endl<<"STALEMATE"<<std::endl;
+		/*std::cout<<std::endl<<"STALEMATE"<<std::endl;*/
 		return true;
 	}
 	
@@ -183,9 +183,10 @@ void SelfPlay::_addGameTags(pgn::Game& g, int round) {
 	g.tags().insert(pgn::Tag("Round",std::to_string(round)));
 	g.tags().insert(pgn::Tag("White","Vajolet"));
 	g.tags().insert(pgn::Tag("Black","Vajolet"));
-	g.tags().insert(pgn::Tag("Result","1-0"));
+	g.tags().insert(pgn::Tag("Result","*"));
 	
 }
 void SelfPlay::_addGameResult(pgn::Game& g, const std::string & s) {
 	g.tags().insert(pgn::Tag("Result",s));
+	g.result() = s;
 }

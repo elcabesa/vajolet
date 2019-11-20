@@ -3,6 +3,7 @@
 add_executable(Vajolet_tuner 
 	clock.cpp
 	selfplay.cpp
+	tournament.cpp
 	tuner.cpp)
 
 target_link_libraries(Vajolet_tuner  libChess)

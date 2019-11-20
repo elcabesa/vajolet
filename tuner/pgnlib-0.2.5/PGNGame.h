@@ -48,7 +48,7 @@ namespace pgn
 			std::string date() const;
 			std::string white() const;
 			std::string black() const;
-			GameResult result() const;
+			GameResult& result() const;
 			void bindBeforeGameComment(const CommentText &ct);
 			void bindAfterGameComment(const CommentText &ct);
 		

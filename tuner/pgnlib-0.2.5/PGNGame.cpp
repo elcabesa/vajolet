@@ -192,7 +192,7 @@ std::string pgn::Game::black() const
 	return hdata->black; 
 }
 
-pgn::GameResult pgn::Game::result() const 
+pgn::GameResult& pgn::Game::result() const 
 { 
 	return hdata->result; 
 }

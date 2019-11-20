@@ -17,15 +17,11 @@
 
 #include <csignal>
 #include <iostream>
-#include <fstream>
 
 #include "libchess.h"
-#include "PGNGameCollection.h"
-#include "selfplay.h"
 #include "thread.h"
+#include "tournament.h"
 #include "transposition.h"
-#include "tunerPars.h"
-#include "vajo_io.h"
 
 void signalHandler(int signum)
 {
@@ -40,7 +36,7 @@ void signalHandler(int signum)
 */
 static void printStartInfo(void)
 {
-	sync_cout<<"Vajolet tuner"<<sync_endl;
+	std::cout <<"Vajolet tuner"<< std::endl;
 }
 
 int main() {
@@ -61,13 +57,11 @@ int main() {
 	libChessInit();
 	transpositionTable::getInstance().setSize(1);
 	
-	for( int i = 0; i < TunerParameters::gameNumber; ++i) { 
-		SelfPlay s;
-		auto g = s.playGame(i + 1);
-		std::ofstream myfile;
-		myfile.open ("tournament.pgn", std::fstream::app);	
-		myfile<<g<<std::endl;
-		myfile.close();
-	}
+	//----------------------------------
+	//	play tournament
+	//----------------------------------
+	Tournament t;
+	t.play();
+	
 	return 0;
 }
