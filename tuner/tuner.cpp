@@ -24,6 +24,7 @@
 #include "selfplay.h"
 #include "thread.h"
 #include "transposition.h"
+#include "tunerPars.h"
 #include "vajo_io.h"
 
 void signalHandler(int signum)
@@ -60,12 +61,12 @@ int main() {
 	libChessInit();
 	transpositionTable::getInstance().setSize(1);
 	
-	for( int i = 0; i < 100; ++i) { 
+	for( int i = 0; i < TunerParameters::gameNumber; ++i) { 
 		SelfPlay s;
 		auto g = s.playGame(i + 1);
 		std::ofstream myfile;
 		myfile.open ("tournament.pgn", std::fstream::app);	
-		myfile<<g;
+		myfile<<g<<std::endl;
 		myfile.close();
 	}
 	return 0;

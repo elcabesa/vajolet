@@ -14,29 +14,16 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef SELFPLAY_H_
-#define SELFPLAY_H_
+#ifndef PARAMETER_H_
+#define PARAMETER_H_
 
-#include <string>
-#include "clock.h"
-#include "position.h"
-#include "searchLimits.h"
-
-namespace pgn { class Game;};
-
-class SelfPlay {
-	
+//todo read data from a json
+class TunerParameters {
 public:
-	SelfPlay();
-	pgn::Game playGame(unsigned int round);
-private:	
-	bool _isGameFinished();
-	std::string _getGameResult();
-	void _addGameTags(pgn::Game& g, int round);
-	void _addGameResult(pgn::Game& g, const std::string & s);
-	Position _p;
-	Clock _c;
-	SearchLimits _sl;
+	static constexpr int gameNumber = 25000;
+	
+	static constexpr float gameTime = 5;
+	static constexpr float gameTimeIncrement = 0.05;
 };
 
-#endif /* SELFPLAY_H_ */
+#endif

@@ -32,16 +32,17 @@
 #include "selfplay.h"
 #include "searchResult.h"
 #include "thread.h"
+#include "tunerPars.h"
 #include "vajo_io.h"
 
-SelfPlay::SelfPlay() : _p(Position::pawnHash::off), _c(_time, _increment) {
+SelfPlay::SelfPlay() : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement) {
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());
 	_sl.setBTime(_c.getBlackTime());
 	
-	_sl.setWInc(_increment * 1000);
-	_sl.setBInc(_increment * 1000);
+	_sl.setWInc(TunerParameters::gameTimeIncrement * 1000);
+	_sl.setBInc(TunerParameters::gameTimeIncrement * 1000);
 }
 
 pgn::Game SelfPlay::playGame(unsigned int round) {
