@@ -32,6 +32,9 @@ public:
 	void reset();
 	int getWhiteTime() const;
 	int getBlackTime() const;
+	bool isWhiteTurn() const;
+	bool isBlackTurn() const;
+	turn getTurn() const;
 	void start();
 	void stop();
 	void switchTurn();

@@ -126,7 +126,9 @@ extern simdScore queenVsRook2MinorsImbalance;
 
 extern simdScore mobilityBonus[separationBitmap][32];
 
-
-
+class SearchParameters {
+public:
+	int razorMargin = 20000;
+};
 
 #endif /* EVAL_H_ */

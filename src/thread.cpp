@@ -91,6 +91,7 @@ public:
 	std::condition_variable& finished();
 	const SearchResult& getResult() const;
 	void setMute(bool mute);
+	SearchParameters& getSearchParameters();
 };
 
 volatile bool my_thread::impl::_quit = false;
@@ -270,6 +271,8 @@ void my_thread::impl::setMute(bool mute) {
 	}
 }
 
+SearchParameters& my_thread::impl::getSearchParameters() { return _src.getSearchParameters(); };
+
 
 
 /*********************************************
@@ -293,3 +296,5 @@ std::condition_variable& my_thread::finished() { return pimpl->finished(); }
 const SearchResult& my_thread::getResult() const { return pimpl->getResult(); }
 
 void my_thread::setMute(bool mute) { pimpl->setMute(mute); }
+
+SearchParameters& my_thread::getSearchParameters() { return pimpl->getSearchParameters(); }

@@ -64,3 +64,15 @@ void Clock::_switchTurn() {
 		_turn = turn::white;
 	}
 }
+
+bool Clock::isWhiteTurn() const {
+	return _turn == turn::white;
+}
+
+bool Clock::isBlackTurn() const {
+	return _turn == turn::black;
+}
+
+Clock::turn Clock::getTurn() const {
+	return _turn;
+}

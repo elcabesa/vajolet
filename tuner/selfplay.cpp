@@ -20,7 +20,7 @@
 #include <string>
 
 #include "command.h"
-#include "clock.h"
+#include "parameters.h"
 #include "PGNGame.h"
 #include "PGNGameResult.h"
 #include "PGNMove.h"
@@ -28,7 +28,6 @@
 #include "PGNPly.h"
 #include "PGNTag.h"
 #include "PGNTagList.h"
-
 #include "selfplay.h"
 #include "searchResult.h"
 #include "thread.h"
@@ -59,8 +58,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	pgn::Game pgnGame;
 	_addGameTags(pgnGame, round);
 	
-	int i = 0;
-	int count = 0;
+	int moveCount = 1;
 	_c.start();
 	
 	pgn::Ply whitePly;
@@ -72,49 +70,51 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		_sl.setWTime(_c.getWhiteTime());
 		_sl.setBTime(_c.getBlackTime());
 		
-		count = i/2;
-		/*if( i%2 == 0) {
-			std::cerr<< count + 1<<"."<<std::endl;
+		/*if( _c.isWhiteTurn()) {
+			std::cout<< moveCount <<"."<<std::endl;
 		}*/
 		
 		// do the search
-		auto begin = std::chrono::high_resolution_clock::now();
+		/*auto begin = std::chrono::high_resolution_clock::now();*/
+		
+		// todo remove
+		thr.getSearchParameters().razorMargin++;
+		
 		thr.startThinking(_p, _sl);
 		thr.finished().wait(lock);
-		auto end = std::chrono::high_resolution_clock::now();
+		/*auto end = std::chrono::high_resolution_clock::now();
 		
 		auto dur = end - begin;
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();*/
 		
 		auto res = thr.getResult();
 		
-		/*std::cerr << UciManager::displayUci(res.PV.getMove(0), false)<<"."<<std::endl;*/
+		/*std::cout << UciManager::displayUci(res.PV.getMove(0), false)<<"."<<std::endl;*/
 
-		_c.switchTurn();
-		/*std::cerr<<UciManager::displayMove(_p, res.PV.getMove(0))<<"("<<ms<<") depth: " <<res.depth<<" score: "<<((i%2 == 0) ? res.Res: -res.Res) <<" white_time: "<<_c.getWhiteTime()<<" black_time: "<<_c.getBlackTime()<<std::endl;*/
+		
+		/*std::cout<<UciManager::displayMove(_p, res.PV.getMove(0))<<"("<<ms<<") depth: " <<res.depth<<" score: "<<((_c.isWhiteTurn()) ? res.Res: -res.Res) <<" white_time: "<<_c.getWhiteTime()<<" black_time: "<<_c.getBlackTime()<<std::endl;*/
 		
 		
-		if( i%2 == 0) {
+		if(_c.isWhiteTurn()) {
 			whitePly = pgn::Ply(UciManager::displayMove(_p, res.PV.getMove(0)));
 			pendingMove =true;
-		}
-		else {
+		}	else {
 			blackPly = pgn::Ply(UciManager::displayMove(_p, res.PV.getMove(0)));
-			pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, count + 1));
-
+			pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
+			
+			++moveCount;
 			whitePly = pgn::Ply();
 			blackPly = pgn::Ply();
 			pendingMove = false;
 		}
 		
-		_p.doMove(res.PV.getMove(0));
-		/*_p.display();*/
+		_c.switchTurn();
 		
-		++i;
+		_p.doMove(res.PV.getMove(0));
 	}
-	
-	if(pendingMove) {
-		pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, count + 1));
+	// white move still to be written
+	if(_c.isBlackTurn()) {
+		pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
 	}
 	 // todo calulate the right result
 	_addGameResult(pgnGame,_getGameResult());

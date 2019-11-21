@@ -25,6 +25,7 @@
 class Position;
 class timeManagement;
 class SearchLimits;
+class SearchParameters;
 class SearchResult;
 
 
@@ -55,5 +56,7 @@ public :
 	std::condition_variable& finished();
 	const SearchResult& getResult() const;
 	void setMute(bool mute);
+	SearchParameters& getSearchParameters();
+	
 };
 #endif /* THREAD_H_ */
