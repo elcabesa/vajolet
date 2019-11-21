@@ -146,7 +146,7 @@ private:
 
 
 
-	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*(1248/ONE_PLY)+cut*20000; }
+	signed int razorMargin(unsigned int depth,bool cut) const {return 20000 + depth * (1248 / ONE_PLY) + cut * 20000; }
 
 	template<nodeType type, bool log>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
 	template<nodeType type, bool log>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);

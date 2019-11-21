@@ -54,7 +54,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	my_thread &thr = my_thread::getInstance();
 	thr.setMute(true);
 	
-	
+	//std::cerr<< "ROUND " << round <<std::endl;
 	
 	pgn::Game pgnGame;
 	_addGameTags(pgnGame, round);
@@ -74,7 +74,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		
 		count = i/2;
 		/*if( i%2 == 0) {
-			std::cout<< count + 1<<"."<<std::endl;
+			std::cerr<< count + 1<<"."<<std::endl;
 		}*/
 		
 		// do the search
@@ -88,10 +88,10 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		
 		auto res = thr.getResult();
 		
-		
-		
+		/*std::cerr << UciManager::displayUci(res.PV.getMove(0), false)<<"."<<std::endl;*/
+
 		_c.switchTurn();
-		/*std::cout<<UciManager::displayMove(_p, res.PV.getMove(0))<<"("<<ms<<") depth: " <<res.depth<<" score: "<<((i%2 == 0) ? res.Res: -res.Res) <<" white_time: "<<_c.getWhiteTime()<<" black_time: "<<_c.getBlackTime()<<std::endl;*/
+		/*std::cerr<<UciManager::displayMove(_p, res.PV.getMove(0))<<"("<<ms<<") depth: " <<res.depth<<" score: "<<((i%2 == 0) ? res.Res: -res.Res) <<" white_time: "<<_c.getWhiteTime()<<" black_time: "<<_c.getBlackTime()<<std::endl;*/
 		
 		
 		if( i%2 == 0) {
@@ -108,6 +108,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		}
 		
 		_p.doMove(res.PV.getMove(0));
+		/*_p.display();*/
 		
 		++i;
 	}
