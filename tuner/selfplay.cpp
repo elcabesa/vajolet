@@ -49,11 +49,9 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	std::mutex m;
 	std::unique_lock<std::mutex> lock(m);
 	
-	// init vajolet search & time management
+	// init search & time management
 	my_thread &thr = my_thread::getInstance();
 	thr.setMute(true);
-	
-	//std::cerr<< "ROUND " << round <<std::endl;
 	
 	pgn::Game pgnGame;
 	_addGameTags(pgnGame, round);
@@ -70,31 +68,11 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		_sl.setWTime(_c.getWhiteTime());
 		_sl.setBTime(_c.getBlackTime());
 		
-		/*if( _c.isWhiteTurn()) {
-			std::cout<< moveCount <<"."<<std::endl;
-		}*/
-		
-		// do the search
-		/*auto begin = std::chrono::high_resolution_clock::now();*/
-		
-		// todo remove
-		thr.getSearchParameters().razorMargin++;
-		
 		thr.startThinking(_p, _sl);
 		thr.finished().wait(lock);
-		/*auto end = std::chrono::high_resolution_clock::now();
-		
-		auto dur = end - begin;
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();*/
-		
-		auto res = thr.getResult();
-		
-		/*std::cout << UciManager::displayUci(res.PV.getMove(0), false)<<"."<<std::endl;*/
 
-		
-		/*std::cout<<UciManager::displayMove(_p, res.PV.getMove(0))<<"("<<ms<<") depth: " <<res.depth<<" score: "<<((_c.isWhiteTurn()) ? res.Res: -res.Res) <<" white_time: "<<_c.getWhiteTime()<<" black_time: "<<_c.getBlackTime()<<std::endl;*/
-		
-		
+		auto res = thr.getResult();
+
 		if(_c.isWhiteTurn()) {
 			whitePly = pgn::Ply(UciManager::displayMove(_p, res.PV.getMove(0)));
 			pendingMove =true;
@@ -108,15 +86,15 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			pendingMove = false;
 		}
 		
-		_c.switchTurn();
-		
 		_p.doMove(res.PV.getMove(0));
+		
+		_c.switchTurn();
 	}
 	// white move still to be written
 	if(_c.isBlackTurn()) {
 		pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
 	}
-	 // todo calulate the right result
+	
 	_addGameResult(pgnGame,_getGameResult());
 	
 	return pgnGame;
@@ -125,20 +103,17 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 bool SelfPlay::_isGameFinished() {
 	// checkmate
 	if (_p.isCheckMate()) {
-		/*std::cout<<std::endl<<"CHECKMATE"<<std::endl;*/
 		return true;
 	}
 	
 	// patta ripetizione
 	// num mosse
 	if (_p.isDraw(true)) {
-		/*std::cout<<std::endl<<"DRAW"<<std::endl;*/
 		return true;
 	}
 	
 	// stallo
 	if (_p.isStaleMate()) {
-		/*std::cout<<std::endl<<"STALEMATE"<<std::endl;*/
 		return true;
 	}
 	

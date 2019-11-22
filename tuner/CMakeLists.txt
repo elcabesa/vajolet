@@ -2,6 +2,7 @@
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(Vajolet_tuner 
 	clock.cpp
+	player.cpp
 	selfplay.cpp
 	tournament.cpp
 	tuner.cpp)

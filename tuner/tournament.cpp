@@ -28,28 +28,28 @@ public:
 	Stats() {};
 	void insert(const pgn::Game& g) {
 		const auto& res = g.result();
-		whiteWin += res.isWhiteWin();
-		blackWin += res.isBlackWin();
-		draw += res.isDrawn();
-		unknown += res.isUnknown();
+		_whiteWin += res.isWhiteWin();
+		_blackWin += res.isBlackWin();
+		_draw += res.isDrawn();
+		_unknown += res.isUnknown();
 	}
 	
 	std::string print() {
 		std::string s;
-		s += std::to_string(whiteWin);
+		s += std::to_string(_whiteWin);
 		s += "/";
-		s += std::to_string(blackWin);
+		s += std::to_string(_blackWin);
 		s += "/";
-		s += std::to_string(draw);
+		s += std::to_string(_draw);
 		s += " ";
-		s += std::to_string(unknown);
+		s += std::to_string(_unknown);
 		return s;
 	}
 private:
-	int whiteWin = 0;
-	int blackWin = 0;
-	int draw = 0;
-	int unknown = 0;
+	int _whiteWin = 0;
+	int _blackWin = 0;
+	int _draw = 0;
+	int _unknown = 0;
 };
 
 
