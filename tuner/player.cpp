@@ -15,12 +15,16 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <cmath>
 #include <string>
 
 #include "player.h"
 
 
-const SearchParameters& Player::getSearchParameters() const { return _sp; }
+Player::Player(std::string name): _name(name){}
+
+const SearchParameters& Player::getSearchParametersConst() const { return _sp; }
+SearchParameters& Player::getSearchParameters() { return _sp; }
 
 void Player::insertResult(int res) {
 	_win += (res == 1);
@@ -38,5 +42,21 @@ std::string Player::print() const {
 	s += std::to_string(_draw);
 	s += " ";
 	s += std::to_string(_unknown);
+	s += " ";
+	s += std::to_string(_getElo());
+	s += " elo";
 	return s;
+}
+
+const std::string& Player::getName() const {
+	return _name;
+}
+
+double Player::_getWinProbability() const {
+	return (_draw * 0.5 + _win) / (_win + _lost + _draw);
+}
+
+double Player::_getElo() const {
+	double p = _getWinProbability();
+	return 400.0 * log10(p / (1.0 - p));
 }

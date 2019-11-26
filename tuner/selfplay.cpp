@@ -21,6 +21,7 @@
 
 #include "command.h"
 #include "parameters.h"
+#include "player.h"
 #include "PGNGame.h"
 #include "PGNGameResult.h"
 #include "PGNMove.h"
@@ -34,7 +35,7 @@
 #include "tunerPars.h"
 #include "vajo_io.h"
 
-SelfPlay::SelfPlay() : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement) {
+SelfPlay::SelfPlay(const Player& white, const Player& black) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black) {
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());
@@ -67,6 +68,12 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		// set time limit
 		_sl.setWTime(_c.getWhiteTime());
 		_sl.setBTime(_c.getBlackTime());
+		
+		if(_c.isWhiteTurn()) {
+			thr.getSearchParameters() = _white.getSearchParametersConst();
+		} else {
+			thr.getSearchParameters() = _black.getSearchParametersConst();
+		}
 		
 		thr.startThinking(_p, _sl);
 		thr.finished().wait(lock);
@@ -157,8 +164,8 @@ void SelfPlay::_addGameTags(pgn::Game& g, int round) {
 	g.tags().insert(pgn::Tag("Site","Florence"));
 	g.tags().insert(pgn::Tag("Date","2019.11.01"));
 	g.tags().insert(pgn::Tag("Round",std::to_string(round)));
-	g.tags().insert(pgn::Tag("White","Vajolet"));
-	g.tags().insert(pgn::Tag("Black","Vajolet"));
+	g.tags().insert(pgn::Tag("White",_white.getName()));
+	g.tags().insert(pgn::Tag("Black",_black.getName()));
 	g.tags().insert(pgn::Tag("Result","*"));
 	
 }

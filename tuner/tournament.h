@@ -18,6 +18,7 @@
 #define TOURNAMENT_H_
 
 #include <string>
+#include "player.h"
 
 namespace pgn { class Game;};
 
@@ -31,6 +32,7 @@ private:
 	void _createNewTournamentPgn();
 
 	static const std::string _pgnName;
+	Player _p1, _p2;
 };
 
 #endif /* TOURNAMENT_H_ */

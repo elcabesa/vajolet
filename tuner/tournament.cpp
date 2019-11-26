@@ -55,7 +55,11 @@ private:
 
 const std::string Tournament::_pgnName = "tournament.pgn";
 
-Tournament::Tournament() {}
+Tournament::Tournament(): _p1("dev"), _p2("ref") {
+	_p1.getSearchParameters().razorMargin = 20000;
+	_p1.getSearchParameters().razorMarginDepth = 0;
+	_p1.getSearchParameters().razorMarginCut = 0;
+}
 
 void Tournament::play() {
 	std::cout<<"start tournament ("<< TunerParameters::gameNumber << " games)" << std::endl;
@@ -63,12 +67,39 @@ void Tournament::play() {
 	Stats stats;
 	
 	for(int i = 0; i < TunerParameters::gameNumber; ++i) {
+		Player* whitePlayer;
+		Player* blackPlayer;
+		
 		unsigned int round = i + 1;
-		std::cout<< "\rstarting game " <<round  <<" of "<< TunerParameters::gameNumber << "(" << round * 100.0 / TunerParameters::gameNumber << "%) ";
-		auto g = SelfPlay().playGame(round);
+		
+		if( round % 2) {
+			whitePlayer = &_p1;
+			blackPlayer = &_p2;
+		} else {
+			whitePlayer = &_p2;
+			blackPlayer = &_p1;
+		}
+		std::cout<< "starting game " <<round  <<" of "<< TunerParameters::gameNumber << "(" << round * 100.0 / TunerParameters::gameNumber << "%) ";
+		auto g = SelfPlay(*whitePlayer, *blackPlayer).playGame(round);
 		
 		stats.insert(g);
-		std::cout<< stats.print();
+		std::cout<< stats.print()<<" ";
+		if(g.result().isWhiteWin()) {
+			whitePlayer->insertResult(1);
+			blackPlayer->insertResult(-1);
+		} else if(g.result().isBlackWin()) {
+			whitePlayer->insertResult(-1);
+			blackPlayer->insertResult(1);
+		} else if(g.result().isDrawn()) {
+			whitePlayer->insertResult(0);
+			blackPlayer->insertResult(0);
+		} else {
+			whitePlayer->insertResult(-2);
+			blackPlayer->insertResult(-2);
+		}
+		std::cout<< _p1.print()<<" ";
+		std::cout<< _p2.print()<<" ";
+		std::cout<<std::endl;
 		
 		_saveGamePgn(g);
 	}

@@ -17,20 +17,28 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
+#include <string>
 #include "parameters.h"
 
 class Player {
 public:
-	
-	const SearchParameters& getSearchParameters() const;
+
+	Player(std::string name);
+	const SearchParameters& getSearchParametersConst() const;
+	SearchParameters& getSearchParameters();
 	void insertResult(int res);
 	std::string print() const;
+	const std::string& getName() const;
+	
 private:
 	SearchParameters _sp;
 	int _win = 0;
 	int _lost = 0;
 	int _draw = 0;
 	int _unknown = 0;
+	std::string _name;
+	double _getWinProbability() const;
+	double _getElo() const;
 };
 
 #endif /* PLAYER_H_ */
