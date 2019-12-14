@@ -303,4 +303,6 @@ const SearchResult& my_thread::getResult() const { return pimpl->getResult(); }
 
 void my_thread::setMute(bool mute) { pimpl->setMute(mute); }
 
+SearchParameters& my_thread::getSearchParameters() { return pimpl->getSearchParameters(); };
+
 const SearchResult& my_thread::synchronousSearch(const Position& p, SearchLimits& l) { return pimpl->synchronousSearch(p, l); }
