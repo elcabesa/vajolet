@@ -55,6 +55,7 @@ private:
 	
 	std::mutex _sMutex;
 	std::mutex _tMutex;
+	std::mutex _gMutex;
 	
 	std::condition_variable _searchCond;
 	std::condition_variable _timerCond;
@@ -84,7 +85,7 @@ private:
 public:
 	explicit impl();
 	~impl();
-	void startThinking( const Position& p, SearchLimits& l);
+	void startThinking(const Position& p, SearchLimits& l);
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();
@@ -92,6 +93,7 @@ public:
 	const SearchResult& getResult() const;
 	void setMute(bool mute);
 	SearchParameters& getSearchParameters();
+	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
 };
 
 volatile bool my_thread::impl::_quit = false;
@@ -136,12 +138,12 @@ void my_thread::impl::_timerThread()
 	while (!_quit)
 	{
 		_timerStatus = threadStatus::ready;
-		_timerCond.notify_one();
+		_timerCond.notify_all();
 		
 		_timerCond.wait(lk, [&]{return (_startThink && !_timeMan->isSearchFinished() ) || _quit;} );
 		
 		_timerStatus = threadStatus::running;
-		_timerCond.notify_one();
+		_timerCond.notify_all();
 
 		if (!_quit)
 		{
@@ -169,12 +171,12 @@ void my_thread::impl::_searchThread()
 	while (!_quit)
 	{
 		_searchStatus = threadStatus::ready;
-		_searchCond.notify_one();
+		_searchCond.notify_all();
 		
 		_searchCond.wait(lk, [&]{return _startThink||_quit;} );
 		
 		_searchStatus = threadStatus::running;
-		_searchCond.notify_one();
+		_searchCond.notify_all();
 		
 		if(!_quit)
 		{
@@ -182,12 +184,11 @@ void my_thread::impl::_searchThread()
 			_timeMan = timeManagement::create(_limits, _src.getPosition().getNextTurn());
 			_src.resetStopCondition();
 			_st.resetTimers();
-			_timerCond.notify_one();
+			_timerCond.notify_all();
 			_srcRes = _src.manageNewSearch();
 			_startThink = false;
-			_finishedSearch.notify_one();
-			
 		}
+		_finishedSearch.notify_all();
 	}
 }
 
@@ -216,8 +217,8 @@ inline void my_thread::impl::_quitThreads()
 	lks.unlock();
 	lkt.unlock();
 
-	_searchCond.notify_one();
-	_timerCond.notify_one();
+	_searchCond.notify_all();
+	_timerCond.notify_all();
 	_timer.join();
 	_searcher.join();
 }
@@ -226,7 +227,7 @@ inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 {
 	_src.stopSearch();
 	_lastHasfullMessageTime = 0;
-	std::lock( _tMutex, _sMutex );
+	std::lock(_tMutex, _sMutex);
 	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
 	_searchCond.wait( lcks, [&]{ return _searchStatus == threadStatus::ready; } );
 	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
@@ -235,8 +236,7 @@ inline void my_thread::impl::startThinking( const Position& p, SearchLimits& l)
 	_limits = l;
 	_src.getPosition() = p;
 	_startThink = true;
-	_searchCond.notify_one();
-	
+	_searchCond.notify_all();
 }
 
 inline void my_thread::impl::stopThinking()
@@ -274,6 +274,12 @@ void my_thread::impl::setMute(bool mute) {
 SearchParameters& my_thread::impl::getSearchParameters() { return _src.getSearchParameters(); };
 
 
+const SearchResult& my_thread::impl::synchronousSearch(const Position& p, SearchLimits& l) {
+	startThinking(p, l);
+	std::unique_lock<std::mutex> lk(_gMutex);
+	_finishedSearch.wait(lk, [&]{return _startThink == false;});
+	return getResult();
+}
 
 /*********************************************
 * my_thread class
@@ -289,7 +295,7 @@ void my_thread::ponderHit() { pimpl->ponderHit();}
 
 timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
 
-void my_thread::startThinking( const Position& p, SearchLimits& l){	pimpl->startThinking( p, l); }
+void my_thread::startThinking(const Position& p, SearchLimits& l){ pimpl->startThinking( p, l); }
 
 std::condition_variable& my_thread::finished() { return pimpl->finished(); }
 
@@ -297,4 +303,4 @@ const SearchResult& my_thread::getResult() const { return pimpl->getResult(); }
 
 void my_thread::setMute(bool mute) { pimpl->setMute(mute); }
 
-SearchParameters& my_thread::getSearchParameters() { return pimpl->getSearchParameters(); }
+const SearchResult& my_thread::synchronousSearch(const Position& p, SearchLimits& l) { return pimpl->synchronousSearch(p, l); }

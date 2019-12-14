@@ -15,8 +15,6 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <condition_variable>
-#include <mutex>
 #include <string>
 
 #include "command.h"
@@ -46,9 +44,6 @@ SelfPlay::SelfPlay(const Player& white, const Player& black) : _p(Position::pawn
 }
 
 pgn::Game SelfPlay::playGame(unsigned int round) {
-	// init locks
-	std::mutex m;
-	std::unique_lock<std::mutex> lock(m);
 	
 	// init search & time management
 	my_thread &thr = my_thread::getInstance();
@@ -75,11 +70,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			thr.getSearchParameters() = _black.getSearchParametersConst();
 		}
 		
-		thr.startThinking(_p, _sl);
-		thr.finished().wait(lock);
-
-		auto res = thr.getResult();
-
+		auto res = thr.synchronousSearch(_p, _sl);
 		if(_c.isWhiteTurn()) {
 			whitePly = pgn::Ply(UciManager::displayMove(_p, res.PV.getMove(0)));
 			pendingMove =true;

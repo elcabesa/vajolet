@@ -49,7 +49,7 @@ public :
 		return pInstance;
 	}
 
-	void startThinking( const Position& p, SearchLimits& l);
+	void startThinking(const Position& p, SearchLimits& l);
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();
@@ -57,6 +57,7 @@ public :
 	const SearchResult& getResult() const;
 	void setMute(bool mute);
 	SearchParameters& getSearchParameters();
+	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
 	
 };
 #endif /* THREAD_H_ */
