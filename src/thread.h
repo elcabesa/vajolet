@@ -18,16 +18,13 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
-#include <condition_variable>
 #include <memory>
-
 
 class Position;
 class timeManagement;
 class SearchLimits;
 class SearchParameters;
 class SearchResult;
-
 
 class my_thread
 {
@@ -53,8 +50,6 @@ public :
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();
-	std::condition_variable& finished();
-	const SearchResult& getResult() const;
 	void setMute(bool mute);
 	SearchParameters& getSearchParameters();
 	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);

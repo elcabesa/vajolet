@@ -89,7 +89,6 @@ public:
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();
-	std::condition_variable& finished();
 	const SearchResult& getResult() const;
 	void setMute(bool mute);
 	SearchParameters& getSearchParameters();
@@ -253,10 +252,6 @@ inline void my_thread::impl::ponderHit()
 
 inline void my_thread::impl::_stopPonder(){ _limits.setPonder(false);}
 
-std::condition_variable& my_thread::impl::finished() {
-	return _finishedSearch;
-}
-
 const SearchResult& my_thread::impl::getResult() const {
 	return _srcRes;
 }
@@ -276,8 +271,16 @@ SearchParameters& my_thread::impl::getSearchParameters() { return _src.getSearch
 
 const SearchResult& my_thread::impl::synchronousSearch(const Position& p, SearchLimits& l) {
 	startThinking(p, l);
+
 	std::unique_lock<std::mutex> lk(_gMutex);
 	_finishedSearch.wait(lk, [&]{return _startThink == false;});
+
+	std::lock(_tMutex, _sMutex);
+	std::unique_lock<std::mutex> lcks(_sMutex, std::adopt_lock);
+	_searchCond.wait( lcks, [&]{ return _searchStatus == threadStatus::ready; } );
+	std::unique_lock<std::mutex> lckt(_tMutex, std::adopt_lock);
+	_timerCond.wait( lckt, [&]{ return _timerStatus == threadStatus::ready; } );
+
 	return getResult();
 }
 
@@ -296,10 +299,6 @@ void my_thread::ponderHit() { pimpl->ponderHit();}
 timeManagement& my_thread::getTimeMan(){ return pimpl->getTimeMan(); }
 
 void my_thread::startThinking(const Position& p, SearchLimits& l){ pimpl->startThinking( p, l); }
-
-std::condition_variable& my_thread::finished() { return pimpl->finished(); }
-
-const SearchResult& my_thread::getResult() const { return pimpl->getResult(); }
 
 void my_thread::setMute(bool mute) { pimpl->setMute(mute); }
 
