@@ -22,7 +22,7 @@ class TunerParameters {
 public:
 	static constexpr int gameNumber = 25000;
 	
-	static constexpr float gameTime = 5;
+	static constexpr float gameTime = 1;
 	static constexpr float gameTimeIncrement = 0.05;
 };
 

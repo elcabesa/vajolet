@@ -98,7 +98,7 @@ void Tournament::play() {
 			blackPlayer->insertResult(-2);
 		}
 		std::cout<< _p1.print()<<" ";
-		std::cout<< _p2.print()<<" ";
+		//std::cout<< _p2.print()<<" ";
 		std::cout<<std::endl;
 		
 		_saveGamePgn(g);
