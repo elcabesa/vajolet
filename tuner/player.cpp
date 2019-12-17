@@ -36,6 +36,7 @@ void Player::insertResult(int res) {
 
 std::string Player::print() const {
 	std::string s;
+	Elo elo(_win, _lost, _draw);
 	s += std::to_string(_win);
 	s += "/";
 	s += std::to_string(_lost);
@@ -44,8 +45,12 @@ std::string Player::print() const {
 	s += " ";
 	s += std::to_string(_unknown);
 	s += " ";
-	s += std::to_string(Elo(_win, _lost, _draw).diff());
-	s += " elo";
+	s += std::to_string(elo.diff());
+	s += " elo +-";
+	s += std::to_string(elo.errorMargin());
+	s += " elo LOS(";
+	s += std::to_string(elo.LOS());
+	s += ")";
 	return s;
 }
 
