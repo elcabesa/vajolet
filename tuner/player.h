@@ -37,8 +37,6 @@ private:
 	int _draw = 0;
 	int _unknown = 0;
 	std::string _name;
-	double _getWinProbability() const;
-	double _getElo() const;
 };
 
 #endif /* PLAYER_H_ */

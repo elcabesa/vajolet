@@ -18,6 +18,7 @@
 #include <cmath>
 #include <string>
 
+#include "elo.h"
 #include "player.h"
 
 
@@ -43,20 +44,11 @@ std::string Player::print() const {
 	s += " ";
 	s += std::to_string(_unknown);
 	s += " ";
-	s += std::to_string(_getElo());
+	s += std::to_string(Elo(_win, _lost, _draw).diff());
 	s += " elo";
 	return s;
 }
 
 const std::string& Player::getName() const {
 	return _name;
-}
-
-double Player::_getWinProbability() const {
-	return (_draw * 0.5 + _win) / (_win + _lost + _draw);
-}
-
-double Player::_getElo() const {
-	double p = _getWinProbability();
-	return 400.0 * log10(p / (1.0 - p));
 }
