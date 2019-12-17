@@ -1020,15 +1020,15 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			//------------------------
 			if (log) ln->test("Razoring");
 			if (!_sd.skipNullMove(ply)
-				&&  depth < 4 * ONE_PLY
-				&&  eval + razorMargin(depth, type == nodeType::CUT_NODE) <= alpha
-				&&  alpha >= -SCORE_INFINITE+razorMargin(depth, type == nodeType::CUT_NODE)
-				&&  ( !ttMove || type == nodeType::ALL_NODE)
+				&& depth < _sp.razorDepth
+				&& eval + razorMargin(depth, type == nodeType::CUT_NODE) <= alpha
+				&& alpha >= -SCORE_INFINITE + razorMargin(depth, type == nodeType::CUT_NODE)
+				&& ( !ttMove || type == nodeType::ALL_NODE)
 			)
 			{
 				PVline childPV;
-				Score v = qsearch<nodeType::CUT_NODE, log>(ply,0 , alpha, alpha+1, childPV);
-				if (v <= alpha)
+				Score v = qsearch<nodeType::CUT_NODE, log>(ply,0 , alpha, alpha + 1, childPV);
+				if (v <= alpha || _sp.razorReturn)
 				{
 					if (log) ln->logReturnValue(v);
 					if (log) ln->endSection();
@@ -1554,7 +1554,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		}
 		else if(!inCheck)
 		{
-			bestScore = std::min( (int)0, (int)(-5000 + _pos.getPly()*250) );
+			bestScore = getDrawValue();
 		}
 		else
 		{

@@ -131,6 +131,8 @@ public:
 	int razorMargin = 20000;
 	int razorMarginDepth = 1248 / 16;
 	int razorMarginCut = 20000;
+	int razorDepth = 4 * 16;
+	bool razorReturn = false;
 };
 
 #endif /* EVAL_H_ */
