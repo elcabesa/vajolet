@@ -21,6 +21,7 @@
 #include "parameters.h"
 #include "position.h"
 #include "pawnTable.h"
+#include "uciOutput.h"
 #include "uciParameters.h"
 #include "vajolet.h"
 
@@ -456,7 +457,7 @@ void Position::display()const
 			std::cout << rank+1 <<  " |";
 			for (tFile file = FILEA; file <= FILEH; ++file)
 			{
-				std::cout << " " << UciManager::getPieceName(getPieceAt(getSquare(file,rank))) << " |";
+				std::cout << " " << UciOutput::getPieceName(getPieceAt(getSquare(file, rank))) << " |";
 			}
 			std::cout << std::endl;
 		}
@@ -507,7 +508,7 @@ std::string  Position::getFen() const {
 					s+=std::to_string(emptyFiles);
 				}
 				emptyFiles=0;
-				s += UciManager::getPieceName( getPieceAt(getSquare(file,rank)) );
+				s += UciOutput::getPieceName(getPieceAt(getSquare(file, rank)));
 			}
 			else
 			{

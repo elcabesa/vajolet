@@ -35,6 +35,7 @@
 #include "searchTimer.h"
 #include "timeManagement.h"
 #include "thread.h"
+#include "uciOutput.h"
 #include "uciParameters.h"
 #include "searchResult.h"
 #include "syzygy/syzygy.h"
@@ -220,7 +221,7 @@ public:
 		{
 			Move m(res.first);
 			// todo shall it know wheher the move is chess960?
-			std::cout<<"Move: "<<UciManager::displayUci(m, false)<<" votes: "<<res.second;
+			std::cout<<"Move: "<<UciOutput::displayUci(m, false)<<" votes: "<<res.second;
 			if( bm == m ) std::cout<<" *****";
 			std::cout<<std::endl;
 		}
@@ -230,11 +231,11 @@ public:
 		{
 			if( res == bm)
 			{
-				std::cout<<"bestMove: "<<UciManager::displayUci(res.firstMove, false)<<" *****"<<std::endl;
+				std::cout<<"bestMove: "<<UciOutput::displayUci(res.firstMove, false)<<" *****"<<std::endl;
 			}
 			else
 			{
-				std::cout<<"bestMove: "<<UciManager::displayUci(res.firstMove, false)<<std::endl;
+				std::cout<<"bestMove: "<<UciOutput::displayUci(res.firstMove, false)<<std::endl;
 			}
 			std::cout<<"score: "<<res.score<<std::endl;
 			std::cout<<"depth: "<<res.depth<<std::endl;

@@ -18,10 +18,10 @@
 
 #include <string>
 #include "bitBoardIndex.h"
-#include "command.h"
 #include "position.h"
 #include "tbfile.h"
 #include "tbtables.h"
+#include "uciOutput.h"
 
 TBTables::TBTables(): MaxCardinality(0){}
 
@@ -41,7 +41,7 @@ void TBTables::_add(const std::vector<bitboardIndex>& pieces) {
 	std::string code;
 
     for (auto p : pieces){
-		code += UciManager::getPieceName(p);
+		code += UciOutput::getPieceName(p);
 	}
 	code.insert(code.find('K', 1), "v");
 	

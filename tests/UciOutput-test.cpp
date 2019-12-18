@@ -2,7 +2,7 @@
 #include <sstream>
 
 #include "gtest/gtest.h"
-#include "command.h"
+#include "uciOutput.h"
 #include "move.h"
 #include "tSquare.h"
 

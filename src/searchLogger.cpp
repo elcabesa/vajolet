@@ -16,10 +16,10 @@
 */
 #include <algorithm>
 
-#include "command.h"
 #include "move.h"
 #include "searchLogger.h"
 #include "transposition.h"
+#include "uciOutput.h"
 
 logWriter::logWriter(std::string fen, const unsigned int depth, unsigned int iteration) {
 	std::string fileName("log_");
@@ -52,7 +52,7 @@ void logWriter::writeFloat(const float x) {
 }
 
 void logWriter::writeMove(const Move& m) {
-	_log << UciManager::displayUci(m, false);
+	_log << UciOutput::displayUci(m, false);
 }
 
 unsigned int logNode::_ply = 0;
