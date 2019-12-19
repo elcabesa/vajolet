@@ -19,6 +19,7 @@
 #include <iostream>
 
 #include "libchess.h"
+#include "player.h"
 #include "thread.h"
 #include "tournament.h"
 #include "transposition.h"
@@ -57,11 +58,22 @@ int main() {
 	libChessInit();
 	transpositionTable::getInstance().setSize(1);
 	
+	
+	Player p1("p1");
+	Player p2("p2");
+	p1.getSearchParameters().razorMargin = 20000;
+	p1.getSearchParameters().razorMarginDepth = 0;
+	p1.getSearchParameters().razorMarginCut = 0;
+	
+	
 	//----------------------------------
 	//	play tournament
 	//----------------------------------
-	Tournament t;
-	t.play();
+	for(int round  = 1; round <=TunerParameters::roundNumber; ++round) {
+		Tournament t("tournament.pgn", p1, p2);
+		auto res = t.play();
+		std::cout<<"Tournament Result: "<<static_cast<int>(res)<<std::endl;
+	}
 	
 	return 0;
 }

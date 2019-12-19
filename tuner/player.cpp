@@ -57,3 +57,7 @@ std::string Player::print() const {
 const std::string& Player::getName() const {
 	return _name;
 }
+
+double Player::pointRatio() const {
+	return 	Elo(_win, _lost, _draw).pointRatio();
+}

@@ -52,27 +52,20 @@ private:
 	int _unknown = 0;
 };
 
-
-const std::string Tournament::_pgnName = "tournament.pgn";
-
-Tournament::Tournament(): _p1("dev"), _p2("ref") {
-	_p1.getSearchParameters().razorMargin = 20000;
-	_p1.getSearchParameters().razorMarginDepth = 0;
-	_p1.getSearchParameters().razorMarginCut = 0;
+Tournament::Tournament(const std::string& pgnName, const Player& p1, const Player& p2): _pgnName(pgnName), _p1(p1), _p2(p2) {
 }
 
-void Tournament::play() {
+TournamentResult Tournament::play() {
 	std::cout<<"start tournament ("<< TunerParameters::gameNumber << " games)" << std::endl;
 	_createNewTournamentPgn();
 	Stats stats;
+	Player* whitePlayer = &_p1;
+	Player* blackPlayer = &_p2;
 	
 	for(int i = 0; i < TunerParameters::gameNumber; ++i) {
-		Player* whitePlayer;
-		Player* blackPlayer;
-		
 		unsigned int round = i + 1;
 		
-		if( round % 2) {
+		if(round % 2) {
 			whitePlayer = &_p1;
 			blackPlayer = &_p2;
 		} else {
@@ -83,27 +76,23 @@ void Tournament::play() {
 		auto g = SelfPlay(*whitePlayer, *blackPlayer).playGame(round);
 		
 		stats.insert(g);
+		_updateResults(g, *whitePlayer, *blackPlayer);
+		
 		std::cout<< stats.print()<<" ";
-		if(g.result().isWhiteWin()) {
-			whitePlayer->insertResult(1);
-			blackPlayer->insertResult(-1);
-		} else if(g.result().isBlackWin()) {
-			whitePlayer->insertResult(-1);
-			blackPlayer->insertResult(1);
-		} else if(g.result().isDrawn()) {
-			whitePlayer->insertResult(0);
-			blackPlayer->insertResult(0);
-		} else {
-			whitePlayer->insertResult(-2);
-			blackPlayer->insertResult(-2);
-		}
 		std::cout<< _p1.print()<<" ";
-		//std::cout<< _p2.print()<<" ";
 		std::cout<<std::endl;
 		
 		_saveGamePgn(g);
 	}
 	std::cout<< std::endl << "finished tournament!" <<std::endl;
+	double res = _p1.pointRatio();
+	if(res > 0.51) {
+		return TournamentResult::p1Won;
+	} else if (res < 0.49) {
+		return TournamentResult::p2Won;
+	} else {
+		return TournamentResult::draw;
+	}
 }
 
 void Tournament::_saveGamePgn(const pgn::Game& g) {
@@ -117,4 +106,20 @@ void Tournament::_createNewTournamentPgn() {
 	std::ofstream myfile;
 	myfile.open(_pgnName, std::fstream::out);
 	myfile.close();
+}
+
+void Tournament::_updateResults(const pgn::Game& g, Player& w, Player& b) {
+	if(g.result().isWhiteWin()) {
+		w.insertResult(1);
+		b.insertResult(-1);
+	} else if(g.result().isBlackWin()) {
+		w.insertResult(-1);
+		b.insertResult(1);
+	} else if(g.result().isDrawn()) {
+		w.insertResult(0);
+		b.insertResult(0);
+	} else {
+		w.insertResult(-2);
+		b.insertResult(-2);
+	}
 }

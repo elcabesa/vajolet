@@ -19,19 +19,27 @@
 
 #include <string>
 #include "player.h"
+#include "tunerPars.h"
 
 namespace pgn { class Game;};
 
+enum class TournamentResult {
+	p1Won,
+	p2Won,
+	draw
+};
+
 class Tournament {
 public:
-	Tournament();
-	void play();
+	Tournament(const std::string& pgnName, const Player& _p1, const Player& _p2);
+	TournamentResult play();
 
 private:
 	void _saveGamePgn(const pgn::Game& g);
 	void _createNewTournamentPgn();
+	void _updateResults(const pgn::Game& g, Player& _p1, Player& _p2);
 
-	static const std::string _pgnName;
+	const std::string _pgnName;
 	Player _p1, _p2;
 };
 

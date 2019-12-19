@@ -29,6 +29,7 @@ public:
 	void insertResult(int res);
 	std::string print() const;
 	const std::string& getName() const;
+	double pointRatio() const;
 	
 private:
 	SearchParameters _sp;
