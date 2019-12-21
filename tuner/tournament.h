@@ -24,9 +24,9 @@
 namespace pgn { class Game;};
 
 enum class TournamentResult {
-	p1Won,
-	p2Won,
-	draw
+	p1Won = 1,
+	p2Won = -1,
+	draw = 0
 };
 
 class Tournament {

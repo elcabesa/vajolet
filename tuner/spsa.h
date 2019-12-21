@@ -14,17 +14,19 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef PARAMETER_H_
-#define PARAMETER_H_
+#ifndef SPSA_H_
+#define SPSA_H_
 
-//todo read data from a json
-class TunerParameters {
+class SPSA {
 public:
-	static constexpr int gameNumber = 20;
-	static constexpr int roundNumber = 40;
-	
-	static constexpr float gameTime = 1;
-	static constexpr float gameTimeIncrement = 0.05;
+	SPSA();
+	void run();
+
+private:
+	static constexpr double alpha = 0.602;
+	static constexpr double gamma = 0.101;
+	static constexpr int N = 50000;
+	static constexpr double A = 5000;
 };
 
 #endif

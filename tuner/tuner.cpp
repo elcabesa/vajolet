@@ -19,9 +19,11 @@
 #include <iostream>
 
 #include "libchess.h"
-#include "player.h"
+//#include "player.h"
+
+//#include "tournament.h"
+#include "spsa.h"
 #include "thread.h"
-#include "tournament.h"
 #include "transposition.h"
 
 void signalHandler(int signum)
@@ -58,7 +60,9 @@ int main() {
 	libChessInit();
 	transpositionTable::getInstance().setSize(1);
 	
-	
+	SPSA spsa;
+	spsa.run();
+	/*
 	Player p1("p1");
 	Player p2("p2");
 	p1.getSearchParameters().razorMargin = 20000;
@@ -70,10 +74,10 @@ int main() {
 	//	play tournament
 	//----------------------------------
 	for(int round  = 1; round <=TunerParameters::roundNumber; ++round) {
-		Tournament t("tournament.pgn", p1, p2);
+		Tournament t("tournament" + std::to_string(round)+".pgn", p1, p2);
 		auto res = t.play();
 		std::cout<<"Tournament Result: "<<static_cast<int>(res)<<std::endl;
-	}
+	}*/
 	
 	return 0;
 }

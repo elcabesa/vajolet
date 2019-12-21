@@ -5,6 +5,7 @@ add_executable(Vajolet_tuner
 	elo.cpp
 	player.cpp
 	selfplay.cpp
+	spsa.cpp
 	tournament.cpp
 	tuner.cpp)
 
