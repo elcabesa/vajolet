@@ -84,7 +84,7 @@ class transpositionTable
 {
 private:
 	std::vector<ttCluster> _table;
-	unsigned long int _elements;
+	uint64_t _elements;
 	unsigned char _generation;
 
 	explicit transpositionTable()
@@ -112,7 +112,7 @@ public:
 	}
 	
 	void newSearch();
-	unsigned long int setSize(unsigned long int mbSize);
+	uint64_t setSize(unsigned long int mbSize);
 	void refresh(ttEntry& tte);
 	ttEntry* probe(const HashKey& k);
 	void store(const HashKey& k, Score value, unsigned char type, signed short int depth, const Move& move, Score statValue);
