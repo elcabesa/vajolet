@@ -15,7 +15,6 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <cmath>
 #include <iostream>
 
 #include "hashKey.h"
@@ -48,12 +47,7 @@ uint64_t transpositionTable::setSize(unsigned long int mbSize)
 {
 
 	uint64_t size = (uint64_t)( (((uint64_t)mbSize) << 20) / sizeof(ttCluster));
-	std::cout<<"mbSize: "<<mbSize<<std::endl;
-	std::cout<<"sizeof(ttCluster): "<<sizeof(ttCluster)<<std::endl;
-	
 	_elements = size;
-	std::cout<<"_elements: "<<_elements<<std::endl;
-	std::cout<<"elements bits:"<<std::log(_elements) / std::log(2)<<std::endl;
 
 	_table.clear();
 	_table.shrink_to_fit();
