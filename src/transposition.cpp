@@ -156,7 +156,7 @@ void transpositionTable::refresh(ttEntry& tte)
 unsigned int transpositionTable::getFullness() const
 {
 	unsigned int cnt = 0u;
-	unsigned int end = std::min( 250llu, _elements );
+	unsigned int end = std::min( 250llu,uint64_t(_elements) );
 
 	for (auto t = _table.begin(); t != _table.begin()+end; t++)
 	{
