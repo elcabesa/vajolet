@@ -139,6 +139,7 @@ void transpositionTable::clear()
 
 inline ttCluster& transpositionTable::findCluster(uint64_t key)
 {
+	assert((uint32_t(key) * uint64_t(_elements)) >> 32 < _elements);
 	return _table[(uint32_t(key) * uint64_t(_elements)) >> 32];
 }
 

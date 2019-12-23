@@ -40,7 +40,7 @@ static const std::vector<positions> _p =
 	{"8/1P6/k7/2K5/8/8/8/8 w - - 0 1", 4, Move(B7,B8, Move::fpromotion, Move::promQueen),Move::NOMOVE, equal, mateIn(3)},
 	{"8/5P1k/5K2/8/8/8/8/8 w - - 0 1", 4, Move(F7,F8, Move::fpromotion, Move::promRook),Move::NOMOVE, equal, mateIn(3)},
 	{"3kB3/8/1N1K4/8/8/8/8/8 w - - 0 50",4, Move::NOMOVE,Move::NOMOVE, equal, 0}, //stale mate
-	{"8/8/2K5/3QP3/P6P/1q6/8/k7 w - - 31 51", 11, Move::NOMOVE,Move(D5,B3), bigger, 40000 },
+	{"8/8/2K5/3QP3/P6P/1q6/8/k7 w - - 31 51", 12, Move::NOMOVE,Move(D5,B3), bigger, 40000 },
 
 	{"2r2rk1/6p1/p3pq1p/1p1b1p2/3P1n2/PP3N2/3N1PPP/1Q2RR1K b - - 0 1", 15, Move(F4,G2),Move::NOMOVE, bigger, 30000 },  //WAC 174
 	{"r1bq2rk/pp3pbp/2p1p1pQ/7P/3P4/2PB1N2/PP3PPR/2KR4 w - -", 10, Move(H6,H7),Move::NOMOVE, equal, mateIn(3) }, //WAC 004
