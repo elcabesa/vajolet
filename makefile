@@ -43,6 +43,7 @@ CPP_SRCS := \
 ./src/thread.cpp \
 ./src/timeManagement.cpp \
 ./src/transposition.cpp \
+./src/uciOutput.cpp \
 ./src/uciParameters.cpp \
 ./src/vajolet.cpp \
 ./src/syzygy/syzygy.cpp \
@@ -88,6 +89,7 @@ OBJS :=  \
 ./src/thread.o \
 ./src/timeManagement.o \
 ./src/transposition.o \
+./src/uciOutput.o \
 ./src/uciParameters.o \
 ./src/vajolet.o \
 ./src/syzygy/syzygy.o \
@@ -128,6 +130,7 @@ CPP_DEPS := \
 ./src/thread.d \
 ./src/timeManagement.d \
 ./src/transposition.d \
+./src/uciOutput.d \
 ./src/uciParameters.d \
 ./src/vajolet.d \
 ./src/syzygy/syzygy.d \
@@ -198,7 +201,7 @@ vajolet: $(OBJS) $(USER_OBJS)
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(CPP_DEPS)$(C_DEPS) vajolet2.exe
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(CPP_DEPS)$(C_DEPS) $(EXE)
 	-@echo ' '
 
 .PHONY: all clean dependents
