@@ -55,7 +55,7 @@ private:
 	
 	static void setTTSize(unsigned int size)
 	{
-		unsigned long elements = transpositionTable::getInstance().setSize(size);
+		uint64_t elements = transpositionTable::getInstance().setSize(size);
 		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
 	}
 	static void clearHash() {transpositionTable::getInstance().clear();}
@@ -266,8 +266,8 @@ UciManager::impl::impl(): _pos(Position::pawnHash::off)
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
 	
-	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, setTTSize, 1, 1, 65535));
-	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, nullptr, 1, 1, 128));
+	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, setTTSize, 1, 1, 262144));
+	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, nullptr, 1, 1, 256));
 	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, nullptr, 1, 1, 500));
 	_optionList.emplace_back( new CheckUciOption("Ponder", uciParameters::Ponder, true));
 	_optionList.emplace_back( new CheckUciOption("OwnBook", uciParameters::useOwnBook, true));

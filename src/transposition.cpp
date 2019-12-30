@@ -43,10 +43,10 @@ inline void ttEntry::setGeneration(unsigned char gen)
 }
 
 
-unsigned long int transpositionTable::setSize(unsigned long int mbSize)
+uint64_t transpositionTable::setSize(unsigned long int mbSize)
 {
 
-	long long unsigned int size = (long unsigned int)( ((unsigned long long int)mbSize << 20) / sizeof(ttCluster));
+	uint64_t size = (uint64_t)( (((uint64_t)mbSize) << 20) / sizeof(ttCluster));
 	_elements = size;
 
 	_table.clear();
@@ -72,7 +72,7 @@ ttEntry* transpositionTable::probe( const HashKey& k )
 	const auto key = k.getKey();
 
 	ttCluster& ttc = findCluster(key);
-	unsigned int keyH = (unsigned int)(key >> 32);
+	unsigned int keyH = (uint32_t)(key >> 32);
 
 	auto it = std::find_if (ttc.begin(), ttc.end(), [keyH](ttEntry p){return p.getKey()==keyH;});
 	if( it != ttc.end())
@@ -97,7 +97,7 @@ void transpositionTable::store(const HashKey& k, Score value, unsigned char type
 
 	const auto key = k.getKey();
 	ttEntry *candidate;
-	unsigned int keyH = (unsigned int)(key >> 32); // Use the high 32 bits as key inside the cluster
+	unsigned int keyH = (uint32_t)(key >> 32); // Use the high 32 bits as key inside the cluster
 
 	ttCluster& ttc = findCluster(key);
 
@@ -139,7 +139,8 @@ void transpositionTable::clear()
 
 inline ttCluster& transpositionTable::findCluster(uint64_t key)
 {
-	return _table[ static_cast<size_t>(((unsigned int)key) % _elements) ];
+	assert((uint32_t(key) * uint64_t(_elements)) >> 32 < _elements);
+	return _table[(uint32_t(key) * uint64_t(_elements)) >> 32];
 }
 
 void transpositionTable::refresh(ttEntry& tte)
@@ -150,13 +151,13 @@ void transpositionTable::refresh(ttEntry& tte)
 unsigned int transpositionTable::getFullness() const
 {
 	unsigned int cnt = 0u;
-	unsigned int end = std::min( 250lu, _elements );
+	unsigned int end = std::min(  uint64_t(250llu), uint64_t(_elements) );
 
 	for (auto t = _table.begin(); t != _table.begin()+end; t++)
 	{
 		cnt+= std::count_if (t->begin(), t->end(), [=](ttEntry d){return d.getGeneration() == this->_generation;});
 	}
-	return (unsigned int)(cnt*250lu/(end));
+	return (unsigned int)(cnt*250llu/(end));
 }
 
 
