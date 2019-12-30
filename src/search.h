@@ -20,9 +20,9 @@
 #include <memory>
 
 #include "command.h"
-
 #include "pvLine.h"
 #include "score.h"
+#include "uciOutput.h"
 
 class Position;
 class SearchTimer;

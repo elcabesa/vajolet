@@ -25,6 +25,7 @@ add_library(libChess
 	timeManagement.cpp
 	transposition.cpp
 	uciParameters.cpp
+	uciOutput.cpp
 	vajo_io.cpp)
 add_subdirectory(syzygy)
 

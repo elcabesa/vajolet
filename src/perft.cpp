@@ -16,12 +16,12 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "command.h"
 #include "vajo_io.h"
 #include "movepicker.h"
 #include "perft.h"
 #include "position.h"
 #include "transposition.h"
+#include "uciOutput.h"
 #include "vajolet.h"
 
 
@@ -104,7 +104,7 @@ unsigned long long Perft::divide(unsigned int depth)
 		}
 		tot += n;
 		_pos.undoMove();
-		sync_cout<<mn<<") "<<UciManager::displayMove(_pos, m)<<": "<<n<<sync_endl;
+		sync_cout<<mn<<") "<<UciOutput::displayMove(_pos, m)<<": "<<n<<sync_endl;
 	}
 	return tot;
 
