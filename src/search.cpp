@@ -47,7 +47,7 @@ void testSimmetry(const Position& pos)
 {
 	static Position ppp(Position::pawnHash::off);
 
-	ppp.setupFromFen(pos.getSymmetricFen(), pos.isChess960());
+	ppp.setupFromFen(pos.getSymmetricFen());
 
 	Score staticEval = pos.eval<false>();
 	Score test = ppp.eval<false>();
@@ -57,7 +57,7 @@ void testSimmetry(const Position& pos)
 		sync_cout << "eval symmetry problem " << test << ":" << staticEval << sync_endl;
 		pos.display();
 		ppp.display();
-		while(1);
+		exit(-1);
 	}
 }
 #endif
@@ -1997,7 +1997,7 @@ void Search::impl::setUOI( std::unique_ptr<UciOutput> UOI )
 
 inline Score Search::impl::getDrawValue() const
 {
-	int contemptSign = ( _pos.getNextTurn() == _initialTurn) ? 1 : -1;
+	int contemptSign = _pos.isTurn(_initialTurn) ? 1 : -1;
 	return contemptSign * std::min( (int)0, (int)(-5000 + _pos.getPly()*250) );
 }
 

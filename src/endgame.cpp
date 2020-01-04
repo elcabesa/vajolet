@@ -61,7 +61,7 @@ bool Position::evalKxvsK(Score& res) const
 
 	res = SCORE_KNOWN_WIN + 50000;
 	res -= 10 * distance(winKingSquare,losKingSquare);// devo tenere il re vicino
-	res += 20 * distance(losKingSquare,E4);// devo portare il re avversario vicino al bordo
+	res += 20 * centerDistance(losKingSquare);// devo portare il re avversario vicino al bordo
 	res += 50 * bitCnt(getBitmap(pieces));
 	assert( res < SCORE_MATE_IN_MAX_PLY);
 
@@ -125,7 +125,7 @@ bool Position::evalKBPsvsK(Score& res) const
 		// the square of promotion is not protected by bishop
 		&& ( getSquareColor( getSquare( pawnFile, getRelativeRankOf(  A8, Pcolor ) ) ) != getSquareColor(bishopSquare) )
 		// the defending king is near the promotion square
-		&& ( getRankOf(kingSquare) >= getRelativeRankOf(A7, Pcolor) && abs( pawnFile - getFileOf(kingSquare) ) <= 1 )
+		&& ( getRelativeRankOf(kingSquare, Pcolor) >= RANK7 && abs( pawnFile - getFileOf(kingSquare) ) <= 1 )
 	)
 	{
 		res = 0;
@@ -289,7 +289,7 @@ bool Position::evalKQvsK(Score& res) const
 
 	res = SCORE_KNOWN_WIN + 40000;
 	res -= 10 * distance(enemySquare,kingSquare);// devo tenere il re vicino
-	res += 20 * distance(enemySquare,E4);// devo portare il re avversario vicino al bordo
+	res += 20 * centerDistance(enemySquare);// devo portare il re avversario vicino al bordo
 
 	res *= sign;
 	return true;
@@ -324,7 +324,7 @@ bool Position::evalKRvsK(Score& res) const
 
 	res = SCORE_KNOWN_WIN + 30000;
 	res -= 10 * distance(enemySquare,kingSquare);// devo tenere il re vicino
-	res += 20 * distance(enemySquare,E4);// devo portare il re avversario vicino al bordo
+	res += 20 * centerDistance(enemySquare);// devo portare il re avversario vicino al bordo
 
 	res *= mul;
 	return true;
@@ -376,7 +376,7 @@ bool Position::evalKPvsK(Score& res) const
 	const tSquare promotionSquare = getPromotionSquareOf( pawnSquare, pColor );
 	const int relativeRank = getRelativeRankOf(pawnSquare, pColor);
 	// Rule of the square
-	if ( std::min( 5, 7- relativeRank) <  std::max((int)distance(enemySquare,promotionSquare) - ( getNextTurn() == turn ? 0 : 1) , 0) )
+	if ( std::min( 5, 7 - relativeRank) <  std::max((int)distance(enemySquare,promotionSquare) - ( isTurn(turn) ? 0 : 1) , 0) )
 	{
 		res = mul * (SCORE_KNOWN_WIN + relativeRank);
 		return true;
@@ -384,7 +384,7 @@ bool Position::evalKPvsK(Score& res) const
 	if( !isLateralFile( getFileOf(pawnSquare) ) )
 	{
 
-		if(distance(enemySquare,pawnSquare) >= 2 || getNextTurn() == turn )
+		if(distance(enemySquare,pawnSquare) >= 2 || isTurn(turn) )
 		{
 			//winning king on a key square
 			if(relativeRank < RANK5)
@@ -415,7 +415,7 @@ bool Position::evalKPvsK(Score& res) const
 			// 3 rules for winning, if  conditions are met -> it's won
 			unsigned int count = 0;
 			if(kingSquare == pawnSquare + pawnPush(pColor) ) count++;
-			if(isBlackTurn() && kingsDirectOpposition()) count++;
+			if(!isTurn(turn) && kingsDirectOpposition()) count++;
 			if(getRelativeRankOf(kingSquare, pColor) == RANK6) count++;
 
 			if(count > 1)
