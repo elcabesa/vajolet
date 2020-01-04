@@ -190,6 +190,11 @@ public:
 	{
 		return getActualState().isWhiteTurn();
 	}
+	
+	inline bool isTurn(const eNextMove t) const
+	{
+		return getActualState().getNextTurn() == t;
+	}
 
 	tSquare getEpSquare(void) const
 	{

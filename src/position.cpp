@@ -25,23 +25,17 @@
 #include "uciParameters.h"
 #include "vajolet.h"
 
-/* PST data */
-const int Center[8]	= { -3, -1, +0, +1, +1, +0, -1, -3};
-const int KFile[8]	= { +3, +4, +2, +0, +0, +2, +4, +3};
-const int KRank[8]	= { +1, +0, -2, -3, -4, -5, -6, -7};
-
 simdScore Position::pieceValue[lastBitboard];
 simdScore Position::_pstValue[lastBitboard][squareNumber];
 simdScore Position::_nonPawnValue[lastBitboard];
-/*eCastle Position::_castleRightsMask[squareNumber];
-std::array<bitMap, 9> Position::_castlePath;
-std::array<bitMap, 9> Position::_castleKingPath;
-std::array<tSquare ,9> Position::_castleRookInvolved;
-std::array<tSquare ,9> Position::_castleKingFinalSquare;
-std::array<tSquare ,9> Position::_castleRookFinalSquare;*/
+
 
 void Position::initPstValues(void)
 {
+	/* PST data */
+	const int Center[8]	= { -3, -1, +0, +1, +1, +0, -1, -3};
+	const int KFile[8]	= { +3, +4, +2, +0, +0, +2, +4, +3};
+	const int KRank[8]	= { +1, +0, -2, -3, -4, -5, -6, -7};
 	for(bitboardIndex piece = occupiedSquares; piece < lastBitboard; ++piece)
 	{
 		for(tSquare s = A1; s < squareNumber; ++s)
@@ -607,7 +601,7 @@ std::string Position::getSymmetricFen() const {
 				{
 					xx = (bitboardIndex)(xx + separationBitmap);
 				}
-				s += UciManager::getPieceName( xx );
+				s += UciOutput::getPieceName( xx );
 			}
 			else
 			{
@@ -834,7 +828,7 @@ void Position::doMove(const Move & m)
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	if( ! isMoveLegal(m) )
 	{
-		std::cerr<<"illegal move "<<UciManager::displayUci(m, isChess960())<<std::endl;
+		std::cerr<<"illegal move "<<UciOutput::displayUci(m, isChess960())<<std::endl;
 		exit(-1);
 	}
 #endif

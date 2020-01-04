@@ -94,6 +94,12 @@ inline unsigned int distance( const tSquare sq1, const tSquare sq2 )
 	return SQUARE_DISTANCE[sq1][sq2];
 }
 
+inline unsigned int centerDistance( const tSquare sq )
+{
+	extern const volatile unsigned int CENTER_DISTANCE[squareNumber];
+	return CENTER_DISTANCE[sq];
+}
+
 inline const bitMap& rankMask( const tSquare sq )
 {
 	extern bitMap RANKMASK[squareNumber];
