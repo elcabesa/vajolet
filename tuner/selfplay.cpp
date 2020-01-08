@@ -17,7 +17,6 @@
 
 #include <string>
 
-#include "command.h"
 #include "parameters.h"
 #include "player.h"
 #include "PGNGame.h"
@@ -31,6 +30,7 @@
 #include "searchResult.h"
 #include "thread.h"
 #include "tunerPars.h"
+#include "uciOutput.h"
 #include "vajo_io.h"
 
 SelfPlay::SelfPlay(const Player& white, const Player& black) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black) {
@@ -72,10 +72,10 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		
 		auto res = thr.synchronousSearch(_p, _sl);
 		if(_c.isWhiteTurn()) {
-			whitePly = pgn::Ply(UciManager::displayMove(_p, res.PV.getMove(0)));
+			whitePly = pgn::Ply(UciOutput::displayMove(_p, res.PV.getMove(0)));
 			pendingMove =true;
 		}	else {
-			blackPly = pgn::Ply(UciManager::displayMove(_p, res.PV.getMove(0)));
+			blackPly = pgn::Ply(UciOutput::displayMove(_p, res.PV.getMove(0)));
 			pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
 			
 			++moveCount;
