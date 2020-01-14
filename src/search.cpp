@@ -159,7 +159,7 @@ private:
 	void excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread);
 	void idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false );
 
-	static Score futility(int depth, bool improving );
+	Score futility(int depth, bool improving );
 	Score getDrawValue() const;
 
 	void _updateCounterMove( const Move& m );
@@ -278,7 +278,7 @@ private:
 
 Score Search::impl::futility(int depth, bool improving )
 {
-	return (6000/ONE_PLY) * depth - 2000 * improving;
+	return _sp.staticNullMovePruningValue * depth - _sp.staticNullMovePruningImprovingBonus * improving;
 }
 Score Search::impl::futilityMargin[7] = {0};
 unsigned int Search::impl::FutilityMoveCounts[2][16]= {{0},{0}};
@@ -1043,8 +1043,8 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			//---------------------------
 			if (log) ln->test("StaticNullMovePruning");
 			if (!_sd.skipNullMove(ply)
-				&& depth < 8 * ONE_PLY
-				&& eval - futility( depth, improving ) >= beta
+				&& depth < _sp.staticNullMovePruningDepth
+				&& eval - futility(depth, improving) >= beta
 				&& eval < SCORE_KNOWN_WIN
 				&& _pos.hasActivePlayerNonPawnMaterial()
 			)
@@ -1063,19 +1063,19 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			// this search let us know about threat move by the opponent.
 			//---------------------------
 			if (log) ln->test("NullMovePruning");
-			if( depth >= ONE_PLY
+			if( depth >= _sp.nullMovePruningDepth
 				&& eval >= beta
 				&& !_sd.skipNullMove(ply)
 				&& _pos.hasActivePlayerNonPawnMaterial()
 			){
 				int newPly = ply + 1;
 				// Null move dynamic reduction based on depth
-				int red = 3 * ONE_PLY + depth / 4;
+				int red = _sp.nullMovePruningReduction + depth * _sp.nullMovePruningBonusDepth;
 
 				// Null move dynamic reduction based on value
-				if (eval > -SCORE_INFINITE+10000 && eval - 10000 > beta)
+				if (eval - _sp.nullMovePruningBonusThreshold > -SCORE_INFINITE && eval - _sp.nullMovePruningBonusThreshold > beta)
 				{
-					red += ONE_PLY;
+					red += _sp.nullMovePruningBonusAdditionalRed;
 				}
 				
 				_pos.doNullMove();

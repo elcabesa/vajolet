@@ -133,6 +133,16 @@ public:
 	int razorMarginCut = 20000;
 	int razorDepth = 4 * 16;
 	bool razorReturn = false;
+	
+	int staticNullMovePruningDepth = 8 * 16;
+	int staticNullMovePruningValue = 6000 / 16;
+	int staticNullMovePruningImprovingBonus = 2000;
+	
+	int nullMovePruningDepth = 16;
+	int nullMovePruningReduction = 3 * 16;
+	float nullMovePruningBonusDepth = 0.25;
+	int nullMovePruningBonusThreshold = 10000;
+	int nullMovePruningBonusAdditionalRed = 16;
 };
 
 #endif /* EVAL_H_ */
