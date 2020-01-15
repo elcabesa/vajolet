@@ -21,7 +21,7 @@ protected:
 };
 
 void insertQuit(std::stringstream& str) {
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 	str<<std::string("stop\nquit\n");
 	
 }

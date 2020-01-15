@@ -67,6 +67,14 @@ TEST(MultiPVManager, functionalTest)
 	ASSERT_EQ( res[3], rm5 );
 	ASSERT_EQ( res[4], rm4 );
 	
+	ASSERT_TRUE(x.alreadySearched(rm1.firstMove));
+	ASSERT_TRUE(x.alreadySearched(rm2.firstMove));
+	ASSERT_TRUE(x.alreadySearched(rm3.firstMove));
+	ASSERT_TRUE(x.alreadySearched(rm4.firstMove));
+	ASSERT_TRUE(x.alreadySearched(rm5.firstMove));
+	
+	ASSERT_FALSE(x.alreadySearched(Move(C5,C7)));
+	
 	// start a new iteration
 	x.startNewIteration();
 	
@@ -102,14 +110,32 @@ TEST(MultiPVManager, functionalTest)
 	ASSERT_EQ( res[2], rm7 );
 	ASSERT_EQ( res[3], rm1 );
 	ASSERT_EQ( res[4], rm5 );
+	
+	ASSERT_FALSE(x.alreadySearched(rm1.firstMove));
+	ASSERT_TRUE(x.alreadySearched(rm2.firstMove)); // rm2 is equal to rm7
+	ASSERT_TRUE(x.alreadySearched(rm3.firstMove)); // rm is equal to rm8
+	ASSERT_FALSE(x.alreadySearched(rm4.firstMove));
+	ASSERT_FALSE(x.alreadySearched(rm5.firstMove));
+	
+	ASSERT_TRUE(x.alreadySearched(rm6.firstMove));
+	ASSERT_TRUE(x.alreadySearched(rm7.firstMove));
+	ASSERT_TRUE(x.alreadySearched(rm8.firstMove));
 
-	
-	
 	x.clean();
 	x.setLinesToBeSearched(0);
 	res = x.get();
 	
 	ASSERT_EQ( res.size(), 0 );	
+	
+	ASSERT_FALSE(x.alreadySearched(rm1.firstMove));
+	ASSERT_FALSE(x.alreadySearched(rm2.firstMove));
+	ASSERT_FALSE(x.alreadySearched(rm3.firstMove));
+	ASSERT_FALSE(x.alreadySearched(rm4.firstMove));
+	ASSERT_FALSE(x.alreadySearched(rm5.firstMove));
+	
+	ASSERT_FALSE(x.alreadySearched(rm6.firstMove));
+	ASSERT_FALSE(x.alreadySearched(rm7.firstMove));
+	ASSERT_FALSE(x.alreadySearched(rm8.firstMove));
 
 }
 
