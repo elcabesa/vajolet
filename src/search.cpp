@@ -554,12 +554,12 @@ void Search::impl::excludeRootMoves( std::vector<rootMove>& temporaryResults, un
 
 void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
 {
-	//_printRootMoveList(); // TODO refactor
+	//_rootMovesToBeSearched.print();
 	rootMove& bestMove = temporaryResults[index];
 	
 	my_thread &thr = my_thread::getInstance();
 	// manage multi PV moves
-	_multiPVmanager.setLinesToBeSearched( std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size()) );
+	_multiPVmanager.setLinesToBeSearched(std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size()));
 
 	// ramdomly initialize the bestmove
 	bestMove = rootMove(_rootMovesToBeSearched.getMove(0));
@@ -626,7 +626,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			thr.getTimeMan().notifyIterationHasBeenFinished();
 		}
 	}
-	while( ++depth <= (_sl.isDepthLimitedSearch() ? _sl.getDepth() : 100) && !_stop);
+	while(++depth <= (_sl.isDepthLimitedSearch() ? _sl.getDepth() : 100) && !_stop);
 
 }
 
