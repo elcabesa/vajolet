@@ -1982,9 +1982,13 @@ inline void  Position::removeState()
 
 unsigned int Position::getNumberOfLegalMoves() const
 {
+	return getLegalMoves().size();
+}
+
+MoveList<MAX_MOVE_PER_POSITION> Position::getLegalMoves() const {
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
-	_mg.generateMoves<Movegen::genType::allMg>( moveList );
-	return moveList.size();
+	_mg.generateMoves<Movegen::genType::allMg>(moveList);
+	return moveList;
 }
 
 bitMap Position::_CastlePathOccupancyBitmap( const eCastle c ) const

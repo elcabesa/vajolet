@@ -42,26 +42,66 @@
 #include "transposition.h"
 #include "vajolet.h"
 
-#ifdef DEBUG_EVAL_SIMMETRY
-void testSimmetry(const Position& pos)
+
+class rootMovesToBeSearched
 {
-	static Position ppp(Position::pawnHash::off);
+public:
+	void fill(const std::list<Move>& ml);
+	void fill(MoveList<MAX_MOVE_PER_POSITION> ml);
+	size_t size() const;
+	const Move& getMove(unsigned int pos) const;
+	void print() const;
+	bool contain(const Move& m) const;
+	const std::vector<Move>& getAll() const {return _rm;};
+	void remove(const Move& m);
+private:
+	std::vector<Move> _rm;
+	
+};
 
-	ppp.setupFromFen(pos.getSymmetricFen());
-
-	Score staticEval = pos.eval<false>();
-	Score test = ppp.eval<false>();
-
-	if(test != staticEval)
-	{
-		sync_cout << "eval symmetry problem " << test << ":" << staticEval << sync_endl;
-		pos.display();
-		ppp.display();
-		exit(-1);
+void rootMovesToBeSearched::remove(const Move& m) {
+	if (auto it = std::find(_rm.begin(), _rm.end(), m); it != _rm.end()) {
+		_rm.erase(it);
 	}
 }
-#endif
 
+bool rootMovesToBeSearched::contain(const Move& m) const {
+	return std::find(_rm.begin(), _rm.end(), m) != _rm.end();
+}
+
+void rootMovesToBeSearched::print() const {
+	unsigned int i = 0;
+	sync_cout;
+	std::cout<<"move list"<<std::endl;
+	for(auto m: _rm)
+	{
+		++i;
+		std::cout<<i<<": "<<UciOutput::displayUci(m, false)<<std::endl;
+		
+	}
+	std::cout<<sync_endl;
+}
+
+const Move& rootMovesToBeSearched::getMove(unsigned int pos) const {
+	if (pos < size()) {
+		return _rm[pos];
+	}
+	return Move::NOMOVE;
+}
+
+size_t rootMovesToBeSearched::size() const {
+	return _rm.size();
+}
+
+void rootMovesToBeSearched::fill(const std::list<Move>& ml) {
+	_rm.clear();
+	for_each(ml.begin(), ml.end(), [&](const Move &m){_rm.emplace_back(m);});
+}
+
+void rootMovesToBeSearched::fill(MoveList<MAX_MOVE_PER_POSITION> ml) {
+	_rm.clear();
+	std::for_each(ml.begin(), ml.end(), [&](const Move &m){_rm.emplace_back(m);});
+}
 
 
 class Search::impl
@@ -148,8 +188,7 @@ private:
 
 	SearchLimits& _sl; // todo limits belong to threads
 	SearchTimer& _st;
-	std::vector<Move> _rootMovesToBeSearched;
-	std::vector<Move> _rootMovesAlreadySearched;
+	rootMovesToBeSearched _rootMovesToBeSearched;
 	Game _game;
 
 
@@ -159,8 +198,8 @@ private:
 	// private methods
 	//--------------------------------------------------------
 	void cleanMemoryBeforeStartingNewSearch();
-	void generateRootMovesList(std::vector<Move>& rm, const std::list<Move>& ml);
-	void filterRootMovesByTablebase(std::vector<Move>& rm);
+	void generateRootMovesList(const std::list<Move>& ml);
+	void filterRootMovesByTablebase();
 	SearchResult manageQsearch();
 
 
@@ -180,7 +219,6 @@ private:
 
 	void _updateCounterMove( const Move& m );
 	void _updateNodeStatistics(const unsigned int ply);
-	//void _printRootMoveList() const;
 
 	bool _manageDraw(const bool PVnode, PVline& pvLine);
 	void _showCurrenLine( const unsigned int ply, const int depth );
@@ -195,7 +233,10 @@ private:
 	Move _getPonderMoveFromHash( const Move& bestMove );
 	Move _getPonderMoveFromBook( const Move& bookMove );
 	void _waitStopPondering() const;
-
+	
+#ifdef DEBUG_EVAL_SIMMETRY
+	void testSimmetry() const;
+#endif
 
 };
 
@@ -212,7 +253,7 @@ class voteSystem
 public:
 	explicit voteSystem( const std::vector<rootMove>& res): _results(res) {}
 
-	void print( const std::map<unsigned short, int>& votes, const Score minScore, const rootMove& bm ) const
+	void print(const std::map<unsigned short, int>& votes, const Score minScore, const rootMove& bm) const
 	{
 		std::cout<<"----------VOTE SYSTEM-------------"<<std::endl;
 		std::cout<<"minScore: "<<minScore<<std::endl;
@@ -229,7 +270,7 @@ public:
 
 		for (auto &res : _results)
 		{
-			if( res == bm)
+			if(res == bm)
 			{
 				std::cout<<"bestMove: "<<UciOutput::displayUci(res.firstMove, false)<<" *****"<<std::endl;
 			}
@@ -254,8 +295,8 @@ public:
 		Score minScore = _results[0].score;
 		for (auto &res : _results)
 		{
-			minScore = std::min( minScore, res.score );
-			votes[ res.firstMove.getPacked() ] = 0;
+			minScore = std::min(minScore, res.score);
+			votes[res.firstMove.getPacked()] = 0;
 		}
 
 		//////////////////////////////////////////
@@ -263,25 +304,25 @@ public:
 		//////////////////////////////////////////
 		for (auto &res : _results)
 		{
-			votes[ res.firstMove.getPacked() ] += (int)( res.score - minScore ) + 40 * res.depth;
+			votes[res.firstMove.getPacked()] += (int)(res.score - minScore) + 40 * res.depth;
 		}
 
 		//////////////////////////////////////////
 		// find the maximum
 		//////////////////////////////////////////
 		const rootMove* bestMove = &_results[0];
-		int bestResult = votes[ _results[0].firstMove.getPacked() ];
+		int bestResult = votes[_results[0].firstMove.getPacked()];
 
-		for ( auto &res : _results )
+		for (auto &res : _results)
 		{
-			if( votes[ res.firstMove.getPacked() ] > bestResult )
+			if (votes[ res.firstMove.getPacked() ] > bestResult)
 			{
-				bestResult = votes[ res.firstMove.getPacked() ];
+				bestResult = votes[res.firstMove.getPacked()];
 				bestMove = &res;
 			}
 		}
 
-		if( verbose ) print( votes, minScore, *bestMove);
+		if( verbose ) print(votes, minScore, *bestMove);
 
 		return *bestMove;
 	}
@@ -322,15 +363,14 @@ void Search::impl::cleanMemoryBeforeStartingNewSearch(void)
 	_visitedNodes = 0;
 	_tbHits = 0;
 	_multiPVmanager.clean();
-	_rootMovesAlreadySearched.clear();
 }
 
-void Search::impl::filterRootMovesByTablebase(std::vector<Move>& rm)
+void Search::impl::filterRootMovesByTablebase()
 {
-	if(rm.size() > 0) {
+	if(_rootMovesToBeSearched.size() > 0) {
 		
 		std::vector<extMove> rm2;
-		for (auto m: rm) {
+		for (auto m: _rootMovesToBeSearched.getAll()) {
 			extMove em(m);
 			rm2.push_back(em);
 		}
@@ -348,10 +388,7 @@ void Search::impl::filterRootMovesByTablebase(std::vector<Move>& rm)
 				
 				for (auto m: rm2) {
 					if (m.getScore() < Max) {
-						auto it = std::find(rm.begin(), rm.end(), m);
-						if (it != rm.end()) {
-							rm.erase(it);
-						}
+						_rootMovesToBeSearched.remove(m);
 					}
 				}
 			}	
@@ -359,23 +396,15 @@ void Search::impl::filterRootMovesByTablebase(std::vector<Move>& rm)
 	}
 }
 
-void Search::impl::generateRootMovesList( std::vector<Move>& rm, const std::list<Move>& ml)
+void Search::impl::generateRootMovesList(const std::list<Move>& ml)
 {
-	rm.clear();
-	
-	if( ml.size() == 0 )	// all the legal moves
+	if(ml.size() == 0)	// all the legal moves
 	{
-		Move m;
-		MovePicker mp( _pos );
-		while( ( m = mp.getNextMove() ) )
-		{
-			rm.emplace_back( m );
-		}
+		_rootMovesToBeSearched.fill(_pos.getLegalMoves());
 	}
-	else
+	else //only selected moves
 	{
-		//only selected moves
-		for_each( ml.begin(), ml.end(), [&]( const Move &m){rm.emplace_back(m);} );
+		_rootMovesToBeSearched.fill(ml);
 	}
 }
 
@@ -388,20 +417,6 @@ SearchResult Search::impl::manageQsearch(void)
 	
 	return SearchResult( -SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, res );
 }
-/*
-void Search::impl::_printRootMoveList() const
-{
-	unsigned int i = 0;
-	sync_cout;
-	std::cout<<"move list"<<std::endl;
-	for( auto m: _rootMovesToBeSearched)
-	{
-		++i;
-		std::cout<<i<<": "<<UciManager::displayUci(m)<<std::endl;
-		
-	}
-	std::cout<<sync_endl;
-}*/
 
 template<bool log>
 rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score beta, const bool masterThread)
@@ -539,7 +554,7 @@ void Search::impl::excludeRootMoves( std::vector<rootMove>& temporaryResults, un
 
 void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
 {
-	//_printRootMoveList();
+	//_printRootMoveList(); // TODO refactor
 	rootMove& bestMove = temporaryResults[index];
 	
 	my_thread &thr = my_thread::getInstance();
@@ -547,7 +562,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 	_multiPVmanager.setLinesToBeSearched( std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size()) );
 
 	// ramdomly initialize the bestmove
-	bestMove = rootMove(_rootMovesToBeSearched[0]);
+	bestMove = rootMove(_rootMovesToBeSearched.getMove(0));
 	
 	do
 	{
@@ -562,7 +577,6 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 		//----------------------------
 		// iterative loop
 		//----------------------------
-		_rootMovesAlreadySearched.clear();
 		
 		//----------------------------------
 		// multi PV loop
@@ -592,7 +606,6 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			{
 				bestMove = res;
 				_multiPVmanager.insertMove(bestMove);
-				_rootMovesAlreadySearched.push_back(bestMove.firstMove);
 			}
 
 			// at depth 1 only print the PV at the end of search
@@ -631,14 +644,14 @@ SearchResult Search::impl::go(int depth, Score alpha, Score beta, PVline pvToBeF
 	//--------------------------------
 	// generate the list of root moves to be searched
 	//--------------------------------
-	generateRootMovesList(_rootMovesToBeSearched, _sl.getMoveList());
+	generateRootMovesList(_sl.getMoveList());
 	
 	//--------------------------------
 	//	tablebase probing, filtering rootmoves to be searched
 	//--------------------------------
-	if(!_sl.isSearchMovesMode() && uciParameters::multiPVLines==1)
+	if(!_sl.isSearchMovesMode() && uciParameters::multiPVLines == 1)
 	{
-		filterRootMovesByTablebase(_rootMovesToBeSearched);
+		filterRootMovesByTablebase();
 	}
 	
 
@@ -1014,7 +1027,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		if (log) ln->calcStaticEval(staticEval);
 
 #ifdef DEBUG_EVAL_SIMMETRY
-		testSimmetry(_pos);
+		testSimmetry();
 #endif
 	}
 	else
@@ -1286,7 +1299,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		}
 
 		// Search only the moves in the Search list
-		if( type == nodeType::ROOT_NODE && ( std::count(_rootMovesAlreadySearched.begin(), _rootMovesAlreadySearched.end(), m ) || !std::count(_rootMovesToBeSearched.begin(), _rootMovesToBeSearched.end(), m) ) )
+		if(type == nodeType::ROOT_NODE && ( _multiPVmanager.alreadySearched(m) || !_rootMovesToBeSearched.contain(m)))
 		{
 			if (log) ln->skipMove(m, " not in the root nodes");
 			continue;
@@ -1759,7 +1772,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 	Score staticEval = (tte->getType() != typeVoid) ? tte->getStaticValue() : _pos.eval<false>();
 	if (log) ln->calcStaticEval(staticEval);
 #ifdef DEBUG_EVAL_SIMMETRY
-	testSimmetry(_pos);
+	testSimmetry();
 #endif
 
 	//----------------------------
@@ -2202,6 +2215,26 @@ SearchResult Search::impl::manageNewSearch()
 	return res;
 
 }
+
+#ifdef DEBUG_EVAL_SIMMETRY
+void Search::impl::testSimmetry() const
+{
+	Position ppp(Position::pawnHash::off);
+
+	ppp.setupFromFen(_pos.getSymmetricFen());
+
+	Score staticEval = _pos.eval<false>();
+	Score test = ppp.eval<false>();
+
+	if(test != staticEval)
+	{
+		sync_cout << "eval symmetry problem " << test << ":" << staticEval << sync_endl;
+		_pos.display();
+		ppp.display();
+		exit(-1);
+	}
+}
+#endif
 
 
 

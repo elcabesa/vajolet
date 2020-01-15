@@ -108,7 +108,7 @@ const Move& MoveList<N>::get( const unsigned int n ) const
 }
 
 template <std::size_t N>
-const typename std::array<extMove,N >::iterator MoveList<N>::begin() 
+const typename std::array<extMove,N >::iterator MoveList<N>::begin()
 {
 	return _ml.begin();
 }

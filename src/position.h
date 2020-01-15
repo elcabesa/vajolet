@@ -129,6 +129,7 @@ public:
 	}
 	
 	unsigned int getNumberOfLegalMoves() const;
+	MoveList<MAX_MOVE_PER_POSITION> getLegalMoves() const;
 	
 	void display(void) const;
 	std::string getFen(void) const;
