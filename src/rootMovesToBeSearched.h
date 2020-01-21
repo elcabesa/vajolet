@@ -29,7 +29,7 @@ public:
 	const Move& getMove(unsigned int pos) const;
 	void print() const;
 	bool contain(const Move& m) const;
-	const std::vector<Move>& getAll() const {return _rm;};
+	const std::vector<Move>& getAll() const {return _rm;}
 	void remove(const Move& m);
 private:
 	std::vector<Move> _rm;
