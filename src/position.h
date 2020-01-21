@@ -436,7 +436,15 @@ private:
 	simdScore calcMaterialValue(void) const;
 	simdScore calcNonPawnMaterialValue(void) const;
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	void checkPosConsistency(int nn) const;
+	enum class checkPhase{
+	setup,
+	doMove,
+	doNullMove,
+	undoMove,
+	undoNullMove
+};
+	void _checkPosConsistency(checkPhase nn) const;
+	void _block( const std::string& errorString, checkPhase type ) const;
 #endif
 	void clear();
 	inline void calcCheckingSquares(void);

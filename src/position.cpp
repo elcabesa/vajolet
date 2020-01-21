@@ -357,7 +357,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & _bitBoard[x.getPiecesOfOtherPlayer()] );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(1);
+	_checkPosConsistency(checkPhase::setup);
 #endif
 	return *this;
 }
@@ -813,7 +813,7 @@ void Position::doNullMove()
 	x.setPinnedPieces( getHiddenCheckers<false>() );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(1);
+	_checkPosConsistency(checkPhase::doNullMove);
 #endif
 
 
@@ -1021,7 +1021,7 @@ void Position::doMove(const Move & m)
 	x.setPinnedPieces( getHiddenCheckers<false>() );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(1);
+	_checkPosConsistency(checkPhase::doMove);
 #endif
 
 
@@ -1100,7 +1100,7 @@ void Position::undoMove()
 
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(0);
+	_checkPosConsistency(checkPhase::undoMove);
 #endif
 
 }
@@ -1117,7 +1117,7 @@ void Position::undoNullMove()
 	std::swap( Us, Them );
 
 #ifdef ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(0);
+	_checkPosConsistency(checkPhase::undoNullMove);
 #endif
 }
 
@@ -1165,10 +1165,28 @@ bitMap Position::initKingPath(const tSquare kSqFrom, const tSquare kSqTo)
 }
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-static void block( const std::string& errorString, unsigned int type )
+void Position::_block( const std::string& errorString, checkPhase type ) const
 {
 	std::cerr<< errorString <<std::endl;
-	std::cerr<<( type ? "DO error" : "undoError" ) <<std::endl;
+	switch(type) {
+		case checkPhase::setup:
+			std::cerr << "setup error" << std::endl;
+		break;
+		case checkPhase::doMove:
+			std::cerr << "do error" << std::endl;
+		break;
+		case checkPhase::doNullMove:
+			std::cerr << "doNull error" << std::endl;
+		break;
+		case checkPhase::undoMove:
+			std::cerr << "undo error" << std::endl;
+		break;
+		case checkPhase::undoNullMove:
+			std::cerr << "undoNull error" << std::endl;
+		break;
+		default:
+			std::cerr << "unknown error" << std::endl;
+	}
 	exit(-1);
 }
 
@@ -1177,18 +1195,18 @@ static void block( const std::string& errorString, unsigned int type )
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::checkPosConsistency(int nn) const
+void Position::_checkPosConsistency(checkPhase nn) const
 {
 	const state &x = getActualState();
 	if( x.getNextTurn() != whiteTurn && x.getNextTurn() != blackTurn)
 	{
-		block( "nextMove error", nn );
+		_block( "nextMove error", nn );
 	}
 
 	// check board
 	if(_bitBoard[whitePieces] & _bitBoard[blackPieces])
 	{
-		block( "white piece & black piece intersected", nn );
+		_block( "white piece & black piece intersected", nn );
 	}
 	if((_bitBoard[whitePieces] | _bitBoard[blackPieces]) !=_bitBoard[occupiedSquares])
 	{
@@ -1197,7 +1215,7 @@ void Position::checkPosConsistency(int nn) const
 		displayBitmap(_bitBoard[blackPieces]);
 		displayBitmap(_bitBoard[occupiedSquares]);
 
-		block( "all piece problem", nn );
+		_block( "all piece problem", nn );
 	}
 	for(tSquare sq = square0; sq < squareNumber; ++sq)
 	{
@@ -1205,7 +1223,7 @@ void Position::checkPosConsistency(int nn) const
 
 		if( id != empty && !isSquareSet( _bitBoard[id], sq ) )
 		{
-			block( "board inconsistency", nn );
+			_block( "board inconsistency", nn );
 		}
 	}
 
@@ -1215,7 +1233,7 @@ void Position::checkPosConsistency(int nn) const
 		{
 			if(i!=j && i!= whitePieces && i!= separationBitmap && j!= whitePieces && j!= separationBitmap && (_bitBoard[i] & _bitBoard[j]))
 			{
-				block( "_bitBoard intersection", nn );
+				_block( "_bitBoard intersection", nn );
 			}
 		}
 	}
@@ -1225,7 +1243,7 @@ void Position::checkPosConsistency(int nn) const
 		{
 			if(getPieceCount((bitboardIndex)i) != bitCnt(_bitBoard[i]))
 			{
-				block( "pieceCount Error", nn );
+				_block( "pieceCount Error", nn );
 			}
 		}
 	}
@@ -1238,7 +1256,7 @@ void Position::checkPosConsistency(int nn) const
 	}
 	if(test!= _bitBoard[whitePieces])
 	{
-		block( "white piece error", nn );
+		_block( "white piece error", nn );
 	}
 	test=0;
 	for (int i = blackKing; i < blackPieces; i++)
@@ -1247,21 +1265,21 @@ void Position::checkPosConsistency(int nn) const
 	}
 	if(test!= _bitBoard[blackPieces])
 	{
-		block( "black piece error", nn );
+		_block( "black piece error", nn );
 	}
 	if( x.getKey() != calcKey() )
 	{
 		display();
-		block( "hashKey error", nn );
+		_block( "hashKey error", nn );
 	}
 	if(x.getPawnKey() != calcPawnKey())
 	{
 		display();
-		block( "pawnKey error", nn );
+		_block( "pawnKey error", nn );
 	}
 	if(x.getMaterialKey() != calcMaterialKey())
 	{
-		block( "materialKey error", nn );
+		_block( "materialKey error", nn );
 	}
 
 	simdScore sc=calcMaterialValue();
@@ -1270,7 +1288,7 @@ void Position::checkPosConsistency(int nn) const
 		display();
 		sync_cout<<sc[0]<<":"<<x.getMaterialValue()[0]<<sync_endl;
 		sync_cout<<sc[1]<<":"<<x.getMaterialValue()[1]<<sync_endl;
-		block( "material error", nn );
+		_block( "material error", nn );
 	}
 	simdScore score = calcNonPawnMaterialValue();
 	if(score[0]!= x.getNonPawnValue()[0] ||
@@ -1283,7 +1301,7 @@ void Position::checkPosConsistency(int nn) const
 		sync_cout<<score[1]<<":"<<x.getNonPawnValue()[1]<<sync_endl;
 		sync_cout<<score[2]<<":"<<x.getNonPawnValue()[2]<<sync_endl;
 		sync_cout<<score[3]<<":"<<x.getNonPawnValue()[3]<<sync_endl;
-		block( "non pawn material error", nn );
+		_block( "non pawn material error", nn );
 	}
 }
 #endif
