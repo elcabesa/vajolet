@@ -17,6 +17,7 @@ add_library(libChess
 	perft.cpp
 	polyglotKey.cpp
 	position.cpp
+	rootMovesToBeSearched.cpp
 	search.cpp
 	searchData.cpp
 	searchLogger.cpp

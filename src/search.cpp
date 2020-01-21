@@ -29,6 +29,7 @@
 #include "position.h"
 #include "pvLineFollower.h"
 #include "rootMove.h"
+#include "rootMovesToBeSearched.h"
 #include "search.h"
 #include "searchData.h"
 #include "searchLogger.h"
@@ -42,66 +43,6 @@
 #include "transposition.h"
 #include "vajolet.h"
 
-
-class rootMovesToBeSearched
-{
-public:
-	void fill(const std::list<Move>& ml);
-	void fill(MoveList<MAX_MOVE_PER_POSITION> ml);
-	size_t size() const;
-	const Move& getMove(unsigned int pos) const;
-	void print() const;
-	bool contain(const Move& m) const;
-	const std::vector<Move>& getAll() const {return _rm;};
-	void remove(const Move& m);
-private:
-	std::vector<Move> _rm;
-	
-};
-
-void rootMovesToBeSearched::remove(const Move& m) {
-	if (auto it = std::find(_rm.begin(), _rm.end(), m); it != _rm.end()) {
-		_rm.erase(it);
-	}
-}
-
-bool rootMovesToBeSearched::contain(const Move& m) const {
-	return std::find(_rm.begin(), _rm.end(), m) != _rm.end();
-}
-
-void rootMovesToBeSearched::print() const {
-	unsigned int i = 0;
-	sync_cout;
-	std::cout<<"move list"<<std::endl;
-	for(auto m: _rm)
-	{
-		++i;
-		std::cout<<i<<": "<<UciOutput::displayUci(m, false)<<std::endl;
-		
-	}
-	std::cout<<sync_endl;
-}
-
-const Move& rootMovesToBeSearched::getMove(unsigned int pos) const {
-	if (pos < size()) {
-		return _rm[pos];
-	}
-	return Move::NOMOVE;
-}
-
-size_t rootMovesToBeSearched::size() const {
-	return _rm.size();
-}
-
-void rootMovesToBeSearched::fill(const std::list<Move>& ml) {
-	_rm.clear();
-	for_each(ml.begin(), ml.end(), [&](const Move &m){_rm.emplace_back(m);});
-}
-
-void rootMovesToBeSearched::fill(MoveList<MAX_MOVE_PER_POSITION> ml) {
-	_rm.clear();
-	std::for_each(ml.begin(), ml.end(), [&](const Move &m){_rm.emplace_back(m);});
-}
 
 
 class Search::impl
