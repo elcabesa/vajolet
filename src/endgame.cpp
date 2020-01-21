@@ -28,7 +28,7 @@ std::unordered_map<tKey, Position::materialStruct> Position::_materialKeyMap;
 /**********************************************
 eval king and pieces vs lone king
 **********************************************/
-bool Position::evalKxvsK(Score& res) const
+bool Position::_evalKxvsK(Score& res) const
 {
 	const Color StrongColor = bitCnt(getBitmap(whitePieces))>1  ? white : black;
 	tSquare winKingSquare;
@@ -74,7 +74,7 @@ bool Position::evalKxvsK(Score& res) const
 eval king Knight and pawn vs lone king, 
 it looks drawish if the pawn is on seventh and on the edge of the board
 **********************************************/
-bool Position::evalKNPvsK(Score& res) const
+bool Position::_evalKNPvsK(Score& res) const
 {
 	const Color Pcolor = getBitmap(whitePawns) ? white : black;
 	const tSquare pawnSquare = getSquareOfThePiece( Pcolor ? blackPawns: whitePawns);
@@ -94,7 +94,7 @@ bool Position::evalKNPvsK(Score& res) const
 eval king Bishop and pawns vs lone king, 
 it looks drawish if all the pawns are on the edge of the board and the bishop is of the wrong color
 **********************************************/
-bool Position::evalKBPsvsK(Score& res) const
+bool Position::_evalKBPsvsK(Score& res) const
 {
 	const Color Pcolor = getBitmap(whitePawns) ? white : black;
 	bitMap pawns;
@@ -139,7 +139,7 @@ bool Position::evalKBPsvsK(Score& res) const
 eval king and queen vs king and pawn, 
 it looks drawish if the promoting pawn is on column A or C
 **********************************************/
-bool Position::evalKQvsKP(Score& res) const
+bool Position::_evalKQvsKP(Score& res) const
 {
 	Color pColor = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
@@ -182,7 +182,7 @@ bool Position::evalKQvsKP(Score& res) const
 eval king, rook and pawn vs king and rook, 
 help handling lucena and philidor positions
 **********************************************/
-bool Position::evalKRPvsKr(Score& res) const
+bool Position::_evalKRPvsKr(Score& res) const
 {
 	Color Pcolor = getBitmap(whitePawns) ? white : black;
 	bitboardIndex pawnPiece;
@@ -216,7 +216,7 @@ bool Position::evalKRPvsKr(Score& res) const
 eval king, bishop and knight vs lone king, 
 the rook shall be pyushed toward thre right corner and the winning king shall help the pieces
 **********************************************/
-bool Position::evalKBNvsK( Score& res) const
+bool Position::_evalKBNvsK( Score& res) const
 {
 	Color color = getBitmap(whiteBishops) ? white : black;
 	tSquare bishopSquare;
@@ -261,7 +261,7 @@ bool Position::evalKBNvsK( Score& res) const
 
 }
 
-bool Position::evalKQvsK(Score& res) const
+bool Position::_evalKQvsK(Score& res) const
 {
 	Color color = getBitmap(whiteQueens) ? white : black;
 	tSquare kingSquare;
@@ -296,7 +296,7 @@ bool Position::evalKQvsK(Score& res) const
 
 }
 
-bool Position::evalKRvsK(Score& res) const
+bool Position::_evalKRvsK(Score& res) const
 {
 	Color color = getBitmap(whiteRooks) ? white : black;
 	tSquare kingSquare;
@@ -331,7 +331,7 @@ bool Position::evalKRvsK(Score& res) const
 
 }
 
-bool Position::kingsDirectOpposition() const
+bool Position::_kingsDirectOpposition() const
 {
 	if(
 			(getSquareOfThePiece(whiteKing) + 16 == getSquareOfThePiece(blackKing) )
@@ -345,7 +345,7 @@ bool Position::kingsDirectOpposition() const
 
 }
 
-bool Position::evalKPvsK(Score& res) const
+bool Position::_evalKPvsK(Score& res) const
 {
 	Color pColor = getBitmap(whitePawns) ? white : black;
 	tSquare pawnSquare;
@@ -415,7 +415,7 @@ bool Position::evalKPvsK(Score& res) const
 			// 3 rules for winning, if  conditions are met -> it's won
 			unsigned int count = 0;
 			if(kingSquare == pawnSquare + pawnPush(pColor) ) count++;
-			if(!isTurn(turn) && kingsDirectOpposition()) count++;
+			if(!isTurn(turn) && _kingsDirectOpposition()) count++;
 			if(getRelativeRankOf(kingSquare, pColor) == RANK6) count++;
 
 			if(count > 1)
@@ -444,7 +444,7 @@ bool Position::evalKPvsK(Score& res) const
 	return false;
 }
 
-bool Position::evalKPsvsK(Score& res) const
+bool Position::_evalKPsvsK(Score& res) const
 {
 	Color color = getBitmap(whitePawns) ? white : black;
 	
@@ -483,7 +483,7 @@ bool Position::evalKPsvsK(Score& res) const
 }
 
 
-bool Position::evalOppositeBishopEndgame(Score& res) const
+bool Position::_evalOppositeBishopEndgame(Score& res) const
 {
 	if(isOppositeBishops())
 	{
@@ -528,13 +528,13 @@ bool Position::evalOppositeBishopEndgame(Score& res) const
 
 }
 
-bool Position::evalKRvsKm(Score& res) const
+bool Position::_evalKRvsKm(Score& res) const
 {
 	res = 64;
 	return true;
 }
 
-bool Position::evalKNNvsK(Score& res) const
+bool Position::_evalKNNvsK(Score& res) const
 {
 	res = 10;
 	return true;
@@ -595,8 +595,8 @@ void Position::initMaterialKeys(void)
 			{"kbb5/8/8/8/8/8/8/6NK w - -",materialStruct::type::exact, nullptr, 0 },
 			{"kbb5/8/8/8/8/8/8/6BK w - -",materialStruct::type::exact, nullptr, 0 },
 
-			{"knp5/8/8/8/8/8/8/7K w - -",materialStruct::type::multiplicativeFunction, &Position::evalKNPvsK, 0 },
-			{"k7/8/8/8/8/8/8/5KNP w - -",materialStruct::type::multiplicativeFunction, &Position::evalKNPvsK, 0 },
+			{"knp5/8/8/8/8/8/8/7K w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKNPvsK, 0 },
+			{"k7/8/8/8/8/8/8/5KNP w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKNPvsK, 0 },
 
 			{"kn6/8/8/8/8/8/8/5NNK w - -",materialStruct::type::exact, nullptr, 0 },
 			{"kb6/8/8/8/8/8/8/5NNK w - -",materialStruct::type::exact, nullptr, 0 },
@@ -641,61 +641,61 @@ void Position::initMaterialKeys(void)
 			{"k7/1ppppppp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
 			{"k7/pppppppp/8/8/8/8/8/6NK w - -",materialStruct::type::saturationH, nullptr, 0 },
 
-			{"k7/8/8/8/8/8/8/5BPK w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/4BPPK w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/3BPPPK w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"kbp5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"kbpp4/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
-			{"kbppp3/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKBPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/5BPK w - -",materialStruct::type::exactFunction, &Position::_evalKBPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/4BPPK w - -",materialStruct::type::exactFunction, &Position::_evalKBPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/3BPPPK w - -",materialStruct::type::exactFunction, &Position::_evalKBPsvsK, 0 },
+			{"kbp5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKBPsvsK, 0 },
+			{"kbpp4/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKBPsvsK, 0 },
+			{"kbppp3/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKBPsvsK, 0 },
 			
-			{"k7/8/8/8/8/8/8/5BNK w - -",materialStruct::type::exactFunction, &Position::evalKBNvsK, 0 },
-			{"kbn5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKBNvsK, 0 },
+			{"k7/8/8/8/8/8/8/5BNK w - -",materialStruct::type::exactFunction, &Position::_evalKBNvsK, 0 },
+			{"kbn5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKBNvsK, 0 },
 
-			{"k7/8/8/8/8/8/8/6QK w - -",materialStruct::type::exactFunction, &Position::evalKQvsK, 0 },
-			{"kq6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKQvsK, 0 },
+			{"k7/8/8/8/8/8/8/6QK w - -",materialStruct::type::exactFunction, &Position::_evalKQvsK, 0 },
+			{"kq6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKQvsK, 0 },
 
-			{"k7/8/8/8/8/8/8/6RK w - -",materialStruct::type::exactFunction, &Position::evalKRvsK, 0 },
-			{"kr6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKRvsK, 0 },
+			{"k7/8/8/8/8/8/8/6RK w - -",materialStruct::type::exactFunction, &Position::_evalKRvsK, 0 },
+			{"kr6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKRvsK, 0 },
 
-			{"k7/8/8/8/8/8/8/6PK w - -",materialStruct::type::exactFunction, &Position::evalKPvsK, 0 },
-			{"kp6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPvsK, 0 },
+			{"k7/8/8/8/8/8/8/6PK w - -",materialStruct::type::exactFunction, &Position::_evalKPvsK, 0 },
+			{"kp6/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKPvsK, 0 },
 			
-			{"k7/8/8/8/8/8/8/5PPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/4PPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/3PPPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/2PPPPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/1PPPPPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"k7/8/8/8/8/8/8/PPPPPPPK w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kpp5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kppp4/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kpppp3/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kppppp2/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
-			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/5PPK w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/4PPPK w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/3PPPPK w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/2PPPPPK w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/1PPPPPPK w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"k7/8/8/8/8/8/8/PPPPPPPK w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"kpp5/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"kppp4/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"kpppp3/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"kppppp2/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
+			{"kpppppp1/8/8/8/8/8/8/7K w - -",materialStruct::type::exactFunction, &Position::_evalKPsvsK, 0 },
 			
 			
 			
 			
 
-			{"kr6/8/8/8/8/8/8/6NK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"kr6/8/8/8/8/8/8/6BK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"kb6/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"kn6/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"kr6/8/8/8/8/8/8/6NK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRvsKm, 0 },
+			{"kr6/8/8/8/8/8/8/6BK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRvsKm, 0 },
+			{"kb6/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRvsKm, 0 },
+			{"kn6/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRvsKm, 0 },
 
-			{"knn5/8/8/8/8/8/8/7K w - -",materialStruct::type::multiplicativeFunction, &Position::evalKNNvsK, 0 },
-			{"k7/8/8/8/8/8/8/5NNK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKNNvsK, 0 },
+			{"knn5/8/8/8/8/8/8/7K w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKNNvsK, 0 },
+			{"k7/8/8/8/8/8/8/5NNK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKNNvsK, 0 },
 
-			{"kr6/8/8/8/8/8/8/5PRK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
-			{"krp5/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRPvsKr, 0 },
+			{"kr6/8/8/8/8/8/8/5PRK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRPvsKr, 0 },
+			{"krp5/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRPvsKr, 0 },
 			
-			{"kr6/8/8/8/8/8/8/5NRK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"krn5/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"kr6/8/8/8/8/8/8/5NRK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRvsKm, 0 },
+			{"krn5/8/8/8/8/8/8/6RK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRvsKm, 0 },
 			
-			{"krn5/8/8/8/8/8/8/4NNRK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
-			{"krnn4/8/8/8/8/8/8/5NRK w - -",materialStruct::type::multiplicativeFunction, &Position::evalKRvsKm, 0 },
+			{"krn5/8/8/8/8/8/8/4NNRK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRvsKm, 0 },
+			{"krnn4/8/8/8/8/8/8/5NRK w - -",materialStruct::type::multiplicativeFunction, &Position::_evalKRvsKm, 0 },
 
-			{"kq6/8/8/8/8/8/8/6PK w - -",materialStruct::type::exactFunction, &Position::evalKQvsKP, 0 },
-			{"kp6/8/8/8/8/8/8/6QK w - -",materialStruct::type::exactFunction, &Position::evalKQvsKP, 0 }
+			{"kq6/8/8/8/8/8/8/6PK w - -",materialStruct::type::exactFunction, &Position::_evalKQvsKP, 0 },
+			{"kp6/8/8/8/8/8/8/6QK w - -",materialStruct::type::exactFunction, &Position::_evalKQvsKP, 0 }
 
 	};
 
@@ -729,7 +729,7 @@ void Position::initMaterialKeys(void)
 				s+="/6BK w - -";
 				tKey key = p.setupFromFen(s).getMaterialKey().getKey();
 				t.type=materialStruct::type::multiplicativeFunction;
-				t.pointer=&Position::evalOppositeBishopEndgame;
+				t.pointer=&Position::_evalOppositeBishopEndgame;
 				t.val=0;
 				_materialKeyMap.insert({key,t});
 			}

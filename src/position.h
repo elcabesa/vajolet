@@ -424,17 +424,17 @@ private:
 	// private methods
 	//--------------------------------------------------------
 
-	inline void insertState( state & s );
-	inline void removeState();
+	inline void _insertState( state & s );
+	inline void _removeState();
 
-	void updateUsThem();
+	void _updateUsThem();
 
 
-	HashKey calcKey(void) const;
-	HashKey calcPawnKey(void) const;
-	HashKey calcMaterialKey(void) const;
-	simdScore calcMaterialValue(void) const;
-	simdScore calcNonPawnMaterialValue(void) const;
+	HashKey _calcKey(void) const;
+	HashKey _calcPawnKey(void) const;
+	HashKey _calcMaterialKey(void) const;
+	simdScore _calcMaterialValue(void) const;
+	simdScore _calcNonPawnMaterialValue(void) const;
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	enum class checkPhase{
 	setup,
@@ -446,40 +446,40 @@ private:
 	void _checkPosConsistency(checkPhase nn) const;
 	void _block( const std::string& errorString, checkPhase type ) const;
 #endif
-	void clear();
-	inline void calcCheckingSquares(void);
+	void _clear();
+	inline void _calcCheckingSquares(void);
 	template<bool our>
-	bitMap getHiddenCheckers() const;
+	bitMap _getHiddenCheckers() const;
 
-	void putPiece(const bitboardIndex piece, const tSquare s);
-	void movePiece(const bitboardIndex piece, const tSquare from, const tSquare to);
-	void removePiece(const bitboardIndex piece, const tSquare s);
+	void _putPiece(const bitboardIndex piece, const tSquare s);
+	void _movePiece(const bitboardIndex piece, const tSquare from, const tSquare to);
+	void _removePiece(const bitboardIndex piece, const tSquare s);
 
 
-	template<Color c> simdScore evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const;
-	template<Color c> simdScore evalPassedPawn(bitMap pp, bitMap * attackedSquares) const;
-	template<bitboardIndex piece> simdScore evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
+	template<Color c> simdScore _evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const;
+	template<Color c> simdScore _evalPassedPawn(bitMap pp, bitMap * attackedSquares) const;
+	template<bitboardIndex piece> simdScore _evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes, bitMap const blockedPawns, bitMap * const kingRing, unsigned int * const kingAttackersCount, unsigned int * const kingAttackersWeight, unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const;
 
-	template<Color c> Score evalShieldStorm(tSquare ksq) const;
-	template<Color c> simdScore evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
+	template<Color c> Score _evalShieldStorm(tSquare ksq) const;
+	template<Color c> simdScore _evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
 	
-	simdScore calcPawnValues(bitMap& weakPawns, bitMap& passedPawns, bitMap * const attackedSquares , bitMap * const weakSquares, bitMap * const holes) const;
+	simdScore _calcPawnValues(bitMap& weakPawns, bitMap& passedPawns, bitMap * const attackedSquares , bitMap * const weakSquares, bitMap * const holes) const;
 
-	const materialStruct* getMaterialData() const;
-	bool evalKxvsK(Score& res) const;
-	bool evalKBPsvsK(Score& res) const;
-	bool evalKQvsKP(Score& res) const;
-	bool evalKRPvsKr(Score& res) const;
-	bool evalKBNvsK(Score& res) const;
-	bool evalKQvsK(Score& res) const;
-	bool evalKRvsK(Score& res) const;
-	bool kingsDirectOpposition() const;
-	bool evalKPvsK(Score& res) const;
-	bool evalKPsvsK(Score& res) const;
-	bool evalOppositeBishopEndgame(Score& res) const;
-	bool evalKRvsKm(Score& res) const;
-	bool evalKNNvsK(Score& res) const;
-	bool evalKNPvsK(Score& res) const;
+	const materialStruct* _getMaterialData() const;
+	bool _evalKxvsK(Score& res) const;
+	bool _evalKBPsvsK(Score& res) const;
+	bool _evalKQvsKP(Score& res) const;
+	bool _evalKRPvsKr(Score& res) const;
+	bool _evalKBNvsK(Score& res) const;
+	bool _evalKQvsK(Score& res) const;
+	bool _evalKRvsK(Score& res) const;
+	bool _kingsDirectOpposition() const;
+	bool _evalKPvsK(Score& res) const;
+	bool _evalKPsvsK(Score& res) const;
+	bool _evalOppositeBishopEndgame(Score& res) const;
+	bool _evalKRvsKm(Score& res) const;
+	bool _evalKNNvsK(Score& res) const;
+	bool _evalKNPvsK(Score& res) const;
 
 	static std::string _printEpSquare( const state& st );
 
