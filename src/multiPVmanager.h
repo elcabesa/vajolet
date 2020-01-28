@@ -27,12 +27,12 @@ class MultiPVManager
 {
 public:
 	MultiPVManager(): _linesToBeSearched(0), _multiPvCounter(0){};
-	void clean(){ _res.clear(); _previousRes.clear();}
-	void startNewIteration(){ _previousRes = _res; _res.clear(); _multiPvCounter = 0;}
-	void goToNextPV(){ ++_multiPvCounter; }
-	void insertMove( const rootMove& m ){ _res.push_back(m); std::stable_sort(_res.begin(), _res.end());}
-	void setLinesToBeSearched( const unsigned int l ){ _linesToBeSearched = l;}
-	bool thereArePvToBeSearched() const { return _multiPvCounter < _linesToBeSearched; }
+	void clean() {_res.clear(); _previousRes.clear();}
+	void startNewIteration() {_previousRes = _res; _res.clear(); _multiPvCounter = 0;}
+	void goToNextPV() {++_multiPvCounter;}
+	void insertMove(const rootMove& m) {_res.push_back(m); std::stable_sort(_res.begin(), _res.end());}
+	void setLinesToBeSearched(const unsigned int l) {_linesToBeSearched = l;}
+	bool thereArePvToBeSearched() const {return _multiPvCounter < _linesToBeSearched;}
 	
 	
 	bool getNextRootMove(rootMove& rm) const
@@ -49,6 +49,10 @@ public:
 	
 	unsigned int getLinesToBeSearched() const { return _linesToBeSearched; }
 	unsigned int getPVNumber() const { return _multiPvCounter;}
+	
+	bool alreadySearched(const Move& m) const {
+		return std::find_if(_res.begin(), _res.end(), [&](const auto& val) {return m == val.firstMove;}) != _res.end();
+	}
 	
 	std::vector<rootMove> get() const
 	{	

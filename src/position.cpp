@@ -136,7 +136,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	std::istringstream ss(fenStr);
 	_isChess960 = uciParameters::Chess960;
 
-	clear();
+	_clear();
 	ss >> std::noskipws;
 
 	while ((ss >> token) && !std::isspace(token))
@@ -150,40 +150,40 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 			switch (token)
 			{
 			case 'P':
-				putPiece(whitePawns,sq);
+				_putPiece(whitePawns,sq);
 				break;
 			case 'N':
-				putPiece(whiteKnights,sq);
+				_putPiece(whiteKnights,sq);
 				break;
 			case 'B':
-				putPiece(whiteBishops,sq);
+				_putPiece(whiteBishops,sq);
 				break;
 			case 'R':
-				putPiece(whiteRooks,sq);
+				_putPiece(whiteRooks,sq);
 				break;
 			case 'Q':
-				putPiece(whiteQueens,sq);
+				_putPiece(whiteQueens,sq);
 				break;
 			case 'K':
-				putPiece(whiteKing,sq);
+				_putPiece(whiteKing,sq);
 				break;
 			case 'p':
-				putPiece(blackPawns,sq);
+				_putPiece(blackPawns,sq);
 				break;
 			case 'n':
-				putPiece(blackKnights,sq);
+				_putPiece(blackKnights,sq);
 				break;
 			case 'b':
-				putPiece(blackBishops,sq);
+				_putPiece(blackBishops,sq);
 				break;
 			case 'r':
-				putPiece(blackRooks,sq);
+				_putPiece(blackRooks,sq);
 				break;
 			case 'q':
-				putPiece(blackQueens,sq);
+				_putPiece(blackQueens,sq);
 				break;
 			case 'k':
-				putPiece(blackKing,sq);
+				_putPiece(blackKing,sq);
 				break;
 			}
 			++sq;
@@ -196,7 +196,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	ss >> token;
 	x.setNextTurn( token == 'w' ? whiteTurn : blackTurn );
 
-	updateUsThem();
+	_updateUsThem();
 
 	ss >> token;
 
@@ -343,21 +343,21 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	x.setCurrentMove( Move::NOMOVE );
 	x.resetCapturedPiece();
 
-	x.setMaterialValue( calcMaterialValue() );
-	x.setNonPawnValue( calcNonPawnMaterialValue() );
+	x.setMaterialValue( _calcMaterialValue() );
+	x.setNonPawnValue( _calcNonPawnMaterialValue() );
 
-	x.setKey( calcKey() );
-	x.setPawnKey( calcPawnKey() );
-	x.setMaterialKey( calcMaterialKey() );
+	x.setKey( _calcKey() );
+	x.setPawnKey( _calcPawnKey() );
+	x.setMaterialKey( _calcMaterialKey() );
 
-	calcCheckingSquares();
+	_calcCheckingSquares();
 
-	x.setHiddenCheckers( getHiddenCheckers<true>() );
-	x.setPinnedPieces( getHiddenCheckers<false>() );
+	x.setHiddenCheckers( _getHiddenCheckers<true>() );
+	x.setPinnedPieces( _getHiddenCheckers<false>() );
 	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & _bitBoard[x.getPiecesOfOtherPlayer()] );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(1);
+	_checkPosConsistency(checkPhase::setup);
 #endif
 	return *this;
 }
@@ -412,12 +412,12 @@ void Position::initScoreValues(void)
 
 	initPstValues();
 }
-/*! \brief clear a position and his history
+/*! \brief _clear a position and his history
 	\author Marco Belli
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::clear()
+void Position::_clear()
 {
 	for (tSquare sq = square0; sq < squareNumber; ++sq)
 	{
@@ -662,7 +662,7 @@ std::string Position::getSymmetricFen() const {
 	\version 1.0
 	\date 27/10/2013
 */
-HashKey Position::calcKey(void) const
+HashKey Position::_calcKey(void) const
 {
 	HashKey hash(0);
 	const state& st =getActualState();
@@ -695,7 +695,7 @@ HashKey Position::calcKey(void) const
 	\version 1.0
 	\date 27/10/2013
 */
-HashKey Position::calcPawnKey(void) const
+HashKey Position::_calcPawnKey(void) const
 {
 	HashKey hash(1);
 	bitMap b= getBitmap(whitePawns);
@@ -719,7 +719,7 @@ HashKey Position::calcPawnKey(void) const
 	\version 1.0
 	\date 27/10/2013
 */
-HashKey Position::calcMaterialKey(void) const
+HashKey Position::_calcMaterialKey(void) const
 {
 	HashKey hash(0);
 	for ( bitboardIndex i = whiteKing; i < lastBitboard; ++i)
@@ -742,7 +742,7 @@ HashKey Position::calcMaterialKey(void) const
 	\version 1.0
 	\date 27/10/2013
 */
-simdScore Position::calcMaterialValue(void) const{
+simdScore Position::_calcMaterialValue(void) const{
 	simdScore score = {0,0,0,0};
 	bitMap b = getOccupationBitmap();
 	while(b)
@@ -759,7 +759,7 @@ simdScore Position::calcMaterialValue(void) const{
 	\version 1.0
 	\date 27/10/2013
 */
-simdScore Position::calcNonPawnMaterialValue() const
+simdScore Position::_calcNonPawnMaterialValue() const
 {
 
 	simdScore t[2] ={{0,0,0,0},{0,0,0,0}};
@@ -787,7 +787,7 @@ simdScore Position::calcNonPawnMaterialValue() const
 void Position::doNullMove()
 {
 
-	insertState(getActualState());
+	_insertState(getActualState());
 	state &x = getActualState();
 
 	x.setCurrentMove( Move::NOMOVE );
@@ -808,12 +808,12 @@ void Position::doNullMove()
 	std::swap(Us,Them);
 
 
-	calcCheckingSquares();
-	x.setHiddenCheckers( getHiddenCheckers<true>() );
-	x.setPinnedPieces( getHiddenCheckers<false>() );
+	_calcCheckingSquares();
+	x.setHiddenCheckers( _getHiddenCheckers<true>() );
+	x.setPinnedPieces( _getHiddenCheckers<false>() );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(1);
+	_checkPosConsistency(checkPhase::doNullMove);
 #endif
 
 
@@ -836,7 +836,7 @@ void Position::doMove(const Move & m)
 
 	const bool moveIsCheck = moveGivesCheck(m);
 
-	insertState(getActualState());
+	_insertState(getActualState());
 	state &x = getActualState();
 
 	x.setCurrentMove( m );
@@ -883,12 +883,12 @@ void Position::doMove(const Move & m)
 		assert(kFrom<squareNumber);
 		assert(kTo<squareNumber);
 		
-		removePiece(rook, rFrom);
+		_removePiece(rook, rFrom);
 		if( kFrom != kTo )
 		{
-			movePiece( piece, kFrom, kTo );
+			_movePiece( piece, kFrom, kTo );
 		}
-		putPiece(rook, rTo);
+		_putPiece(rook, rTo);
 		
 		x.getKey().updatePiece( rFrom, rook );
 		x.getKey().updatePiece( rTo, rook );
@@ -916,7 +916,7 @@ void Position::doMove(const Move & m)
 			}
 
 			// remove piece
-			removePiece(captured,captureSquare);
+			_removePiece(captured,captureSquare);
 			// update material
 			x.removeMaterial( _pstValue[captured][captureSquare] );
 			x.removeNonPawnMaterial( _nonPawnValue[captured] );
@@ -933,7 +933,7 @@ void Position::doMove(const Move & m)
 		// update hashKey
 		x.getKey().updatePiece( from, piece );
 		x.getKey().updatePiece( to, piece );
-		movePiece(piece, from, to);
+		_movePiece(piece, from, to);
 
 		x.addMaterial( _pstValue[piece][to] - _pstValue[piece][from] );
 	}
@@ -963,8 +963,8 @@ void Position::doMove(const Move & m)
 			bitboardIndex promotedPiece = getPieceOfPlayer( m.getPromotedPiece(), x.getNextTurn() );
 			assert( isValidPiece(promotedPiece) );
 
-			removePiece(piece,to);
-			putPiece(promotedPiece,to);
+			_removePiece(piece,to);
+			_putPiece(promotedPiece,to);
 
 			x.addMaterial( _pstValue[promotedPiece][to] - _pstValue[piece][to] );
 			x.addNonPawnMaterial( _nonPawnValue[promotedPiece] );
@@ -1016,12 +1016,12 @@ void Position::doMove(const Move & m)
 		}
 	}
 
-	calcCheckingSquares();
-	x.setHiddenCheckers( getHiddenCheckers<true>() );
-	x.setPinnedPieces( getHiddenCheckers<false>() );
+	_calcCheckingSquares();
+	x.setHiddenCheckers( _getHiddenCheckers<true>() );
+	x.setPinnedPieces( _getHiddenCheckers<false>() );
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(1);
+	_checkPosConsistency(checkPhase::doMove);
 #endif
 
 
@@ -1064,21 +1064,21 @@ void Position::undoMove()
 		assert(isRook(rook));
 		
 		auto kPiece = getPieceAt(kTo);
-		removePiece(rook, rTo);
+		_removePiece(rook, rTo);
 		if( kFrom != kTo )
 		{
-			movePiece( kPiece, kTo, kFrom );
+			_movePiece( kPiece, kTo, kFrom );
 		}
-		putPiece(rook, rFrom);
+		_putPiece(rook, rFrom);
 		
 	}
 	else {
 		if( m.isPromotionMove() ){
-			removePiece(piece,to);
+			_removePiece(piece,to);
 			piece = isBlackPiece( piece) ? blackPawns : whitePawns;
-			putPiece(piece,to);
+			_putPiece(piece,to);
 		}
-		movePiece(piece, to, from);
+		_movePiece(piece, to, from);
 		
 		assert( isValidPiece( x.getCapturedPiece() ) || x.getCapturedPiece() == empty );
 		if( bitboardIndex p = x.getCapturedPiece() )
@@ -1089,18 +1089,18 @@ void Position::undoMove()
 				capSq += pawnPush( x.isBlackTurn() );
 			}
 			assert( capSq < squareNumber );
-			putPiece( p, capSq );
+			_putPiece( p, capSq );
 		}
 	}
 
 	
-	removeState();
+	_removeState();
 
 	std::swap(Us,Them);
 
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(0);
+	_checkPosConsistency(checkPhase::undoMove);
 #endif
 
 }
@@ -1113,11 +1113,11 @@ void Position::undoMove()
 void Position::undoNullMove()
 {
 	--_ply;
-	removeState();
+	_removeState();
 	std::swap( Us, Them );
 
 #ifdef ENABLE_CHECK_CONSISTENCY
-	checkPosConsistency(0);
+	_checkPosConsistency(checkPhase::undoNullMove);
 #endif
 }
 
@@ -1165,10 +1165,28 @@ bitMap Position::initKingPath(const tSquare kSqFrom, const tSquare kSqTo)
 }
 
 #ifdef	ENABLE_CHECK_CONSISTENCY
-static void block( const std::string& errorString, unsigned int type )
+void Position::_block( const std::string& errorString, checkPhase type ) const
 {
 	std::cerr<< errorString <<std::endl;
-	std::cerr<<( type ? "DO error" : "undoError" ) <<std::endl;
+	switch(type) {
+		case checkPhase::setup:
+			std::cerr << "setup error" << std::endl;
+		break;
+		case checkPhase::doMove:
+			std::cerr << "do error" << std::endl;
+		break;
+		case checkPhase::doNullMove:
+			std::cerr << "doNull error" << std::endl;
+		break;
+		case checkPhase::undoMove:
+			std::cerr << "undo error" << std::endl;
+		break;
+		case checkPhase::undoNullMove:
+			std::cerr << "undoNull error" << std::endl;
+		break;
+		default:
+			std::cerr << "unknown error" << std::endl;
+	}
 	exit(-1);
 }
 
@@ -1177,18 +1195,18 @@ static void block( const std::string& errorString, unsigned int type )
 	\version 1.0
 	\date 27/10/2013
 */
-void Position::checkPosConsistency(int nn) const
+void Position::_checkPosConsistency(checkPhase nn) const
 {
 	const state &x = getActualState();
 	if( x.getNextTurn() != whiteTurn && x.getNextTurn() != blackTurn)
 	{
-		block( "nextMove error", nn );
+		_block( "nextMove error", nn );
 	}
 
 	// check board
 	if(_bitBoard[whitePieces] & _bitBoard[blackPieces])
 	{
-		block( "white piece & black piece intersected", nn );
+		_block( "white piece & black piece intersected", nn );
 	}
 	if((_bitBoard[whitePieces] | _bitBoard[blackPieces]) !=_bitBoard[occupiedSquares])
 	{
@@ -1197,7 +1215,7 @@ void Position::checkPosConsistency(int nn) const
 		displayBitmap(_bitBoard[blackPieces]);
 		displayBitmap(_bitBoard[occupiedSquares]);
 
-		block( "all piece problem", nn );
+		_block( "all piece problem", nn );
 	}
 	for(tSquare sq = square0; sq < squareNumber; ++sq)
 	{
@@ -1205,7 +1223,7 @@ void Position::checkPosConsistency(int nn) const
 
 		if( id != empty && !isSquareSet( _bitBoard[id], sq ) )
 		{
-			block( "board inconsistency", nn );
+			_block( "board inconsistency", nn );
 		}
 	}
 
@@ -1215,7 +1233,7 @@ void Position::checkPosConsistency(int nn) const
 		{
 			if(i!=j && i!= whitePieces && i!= separationBitmap && j!= whitePieces && j!= separationBitmap && (_bitBoard[i] & _bitBoard[j]))
 			{
-				block( "_bitBoard intersection", nn );
+				_block( "_bitBoard intersection", nn );
 			}
 		}
 	}
@@ -1225,7 +1243,7 @@ void Position::checkPosConsistency(int nn) const
 		{
 			if(getPieceCount((bitboardIndex)i) != bitCnt(_bitBoard[i]))
 			{
-				block( "pieceCount Error", nn );
+				_block( "pieceCount Error", nn );
 			}
 		}
 	}
@@ -1238,7 +1256,7 @@ void Position::checkPosConsistency(int nn) const
 	}
 	if(test!= _bitBoard[whitePieces])
 	{
-		block( "white piece error", nn );
+		_block( "white piece error", nn );
 	}
 	test=0;
 	for (int i = blackKing; i < blackPieces; i++)
@@ -1247,32 +1265,32 @@ void Position::checkPosConsistency(int nn) const
 	}
 	if(test!= _bitBoard[blackPieces])
 	{
-		block( "black piece error", nn );
+		_block( "black piece error", nn );
 	}
-	if( x.getKey() != calcKey() )
+	if( x.getKey() != _calcKey() )
 	{
 		display();
-		block( "hashKey error", nn );
+		_block( "hashKey error", nn );
 	}
-	if(x.getPawnKey() != calcPawnKey())
+	if(x.getPawnKey() != _calcPawnKey())
 	{
 		display();
-		block( "pawnKey error", nn );
+		_block( "pawnKey error", nn );
 	}
-	if(x.getMaterialKey() != calcMaterialKey())
+	if(x.getMaterialKey() != _calcMaterialKey())
 	{
-		block( "materialKey error", nn );
+		_block( "materialKey error", nn );
 	}
 
-	simdScore sc=calcMaterialValue();
+	simdScore sc=_calcMaterialValue();
 	if((sc[0]!=x.getMaterialValue()[0]) || (sc[1]!=x.getMaterialValue()[1]))
 	{
 		display();
 		sync_cout<<sc[0]<<":"<<x.getMaterialValue()[0]<<sync_endl;
 		sync_cout<<sc[1]<<":"<<x.getMaterialValue()[1]<<sync_endl;
-		block( "material error", nn );
+		_block( "material error", nn );
 	}
-	simdScore score = calcNonPawnMaterialValue();
+	simdScore score = _calcNonPawnMaterialValue();
 	if(score[0]!= x.getNonPawnValue()[0] ||
 		score[1]!= x.getNonPawnValue()[1] ||
 		score[2]!= x.getNonPawnValue()[2] ||
@@ -1283,7 +1301,7 @@ void Position::checkPosConsistency(int nn) const
 		sync_cout<<score[1]<<":"<<x.getNonPawnValue()[1]<<sync_endl;
 		sync_cout<<score[2]<<":"<<x.getNonPawnValue()[2]<<sync_endl;
 		sync_cout<<score[3]<<":"<<x.getNonPawnValue()[3]<<sync_endl;
-		block( "non pawn material error", nn );
+		_block( "non pawn material error", nn );
 	}
 }
 #endif
@@ -1293,7 +1311,7 @@ void Position::checkPosConsistency(int nn) const
 	\version 1.0
 	\date 08/11/2013
 */
-inline void Position::calcCheckingSquares(void)
+inline void Position::_calcCheckingSquares(void)
 {
 	state &s = getActualState();
 	const eNextMove& attackingPieces = s.getNextTurn();
@@ -1329,7 +1347,7 @@ inline void Position::calcCheckingSquares(void)
 	\date 08/11/2013
 */
 template<bool our>
-bitMap Position::getHiddenCheckers() const
+bitMap Position::_getHiddenCheckers() const
 {
 	const state &x  = getActualState();
 	const tSquare kingSquare = our? getSquareOfTheirKing(): getSquareOfOurKing();
@@ -1805,7 +1823,7 @@ Position::Position(const pawnHash usePawnHash):_ply(0), _mg(*this), _isChess960(
 	_stateInfo.emplace_back(state());
 	_stateInfo[0].setNextTurn( whiteTurn );
 
-	updateUsThem();
+	_updateUsThem();
 	
 	// todo create value NOCASTLE = 0
 	for (auto& cr : _castleRightsMask) {cr = (eCastle)0;}
@@ -1824,7 +1842,7 @@ Position::Position(const pawnHash usePawnHash):_ply(0), _mg(*this), _isChess960(
 Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960)
 {
 	
-	updateUsThem();
+	_updateUsThem();
 	_castleRightsMask = other._castleRightsMask;
 	_castlePath = other._castlePath;
 	_castleKingPath = other._castleKingPath;
@@ -1852,7 +1870,7 @@ Position& Position::operator=(const Position& other)
 	_bitBoard = other._bitBoard;
 	_isChess960 = other._isChess960;
 
-	updateUsThem();
+	_updateUsThem();
 	
 	_castleRightsMask = other._castleRightsMask;
 	_castlePath = other._castlePath;
@@ -1864,7 +1882,7 @@ Position& Position::operator=(const Position& other)
 	return *this;
 }
 
-inline void Position::updateUsThem()
+inline void Position::_updateUsThem()
 {
 	auto turn = getNextTurn();
 	Us = &_bitBoard[ turn ];
@@ -1876,7 +1894,7 @@ inline void Position::updateUsThem()
 	\version 1.0
 	\date 27/10/2013
 */
-inline void Position::putPiece(const bitboardIndex piece,const tSquare s)
+inline void Position::_putPiece(const bitboardIndex piece,const tSquare s)
 {
 	assert(s<squareNumber);
 	assert( isValidPiece( piece ) );
@@ -1896,7 +1914,7 @@ inline void Position::putPiece(const bitboardIndex piece,const tSquare s)
 	\version 1.0
 	\date 27/10/2013
 */
-inline void Position::movePiece(const bitboardIndex piece,const tSquare from,const tSquare to)
+inline void Position::_movePiece(const bitboardIndex piece,const tSquare from,const tSquare to)
 {
 	assert(from<squareNumber);
 	assert(to<squareNumber);
@@ -1920,7 +1938,7 @@ inline void Position::movePiece(const bitboardIndex piece,const tSquare from,con
 	\version 1.0
 	\date 27/10/2013
 */
-inline void Position::removePiece(const bitboardIndex piece,const tSquare s)
+inline void Position::_removePiece(const bitboardIndex piece,const tSquare s)
 {
 
 	assert(!isKing(piece));
@@ -1964,7 +1982,7 @@ std::string Position::_printEpSquare( const state& st)
 	\version 1.1 get rid of continuos malloc/free
 	\date 21/11/2013
 */
-inline void Position::insertState( state & s )
+inline void Position::_insertState( state & s )
 {
 	_stateInfo.emplace_back(s);
 }
@@ -1975,16 +1993,20 @@ inline void Position::insertState( state & s )
 	\version 1.1 get rid of continuos malloc/free
 	\date 21/11/2013
 */
-inline void  Position::removeState()
+inline void  Position::_removeState()
 {
 	_stateInfo.pop_back();
 }
 
 unsigned int Position::getNumberOfLegalMoves() const
 {
+	return getLegalMoves().size();
+}
+
+MoveList<MAX_MOVE_PER_POSITION> Position::getLegalMoves() const {
 	MoveList<MAX_MOVE_PER_POSITION> moveList;
-	_mg.generateMoves<Movegen::genType::allMg>( moveList );
-	return moveList.size();
+	_mg.generateMoves<Movegen::genType::allMg>(moveList);
+	return moveList;
 }
 
 bitMap Position::_CastlePathOccupancyBitmap( const eCastle c ) const

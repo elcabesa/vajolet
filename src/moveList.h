@@ -71,6 +71,30 @@ public:
 	const Move& findNextBestMove(void);
 	const Move& getNextMove(void);
 	void ignoreMove( const Move& m );
+	
+	MoveList() : _moveListEnd(_ml.begin()), _moveListPosition(_moveListEnd){}
+	~MoveList() {}
+
+	MoveList(const MoveList& other) // copy constructor
+	: _ml(other._ml), _moveListEnd(_ml.begin() + (other._moveListEnd - other._ml.begin())), _moveListPosition(_ml.begin() + (other._moveListPosition - other._ml.begin()))
+	{}
+
+	MoveList(MoveList&& other) noexcept // move constructor
+	: _ml(std::move(other._ml)), _moveListEnd(_ml.begin() + (other._moveListEnd - other._ml.begin())), _moveListPosition(_ml.begin() + (other._moveListPosition - other._ml.begin()))
+	{}
+
+	MoveList& operator=(const MoveList& other) // copy assignment
+	{
+		return *this = MoveList(other);
+	}
+
+	MoveList& operator=(MoveList&& other) noexcept // move assignment
+	{
+		std::swap(_ml, other._ml);
+		_moveListEnd = _ml.begin() + (other._moveListEnd - other._ml.begin());
+		_moveListPosition = _ml.begin() + (other._moveListPosition - other._ml.begin());
+		return *this;
+	}
 
 /*****************************************************************
 *	members
@@ -108,7 +132,7 @@ const Move& MoveList<N>::get( const unsigned int n ) const
 }
 
 template <std::size_t N>
-const typename std::array<extMove,N >::iterator MoveList<N>::begin() 
+const typename std::array<extMove,N >::iterator MoveList<N>::begin()
 {
 	return _ml.begin();
 }

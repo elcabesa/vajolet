@@ -40,7 +40,7 @@ simdScore traceRes={0,0,0,0};
 
 
 //---------------------------------------------
-const Position::materialStruct * Position::getMaterialData() const
+const Position::materialStruct * Position::_getMaterialData() const
 {
 	tKey key = getMaterialKey().getKey();
 
@@ -61,7 +61,7 @@ const Position::materialStruct * Position::getMaterialData() const
 
 
 template<Color c>
-simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const
+simdScore Position::_evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns) const
 {
 	simdScore res = {0,0,0,0};
 
@@ -164,7 +164,7 @@ simdScore Position::evalPawn(tSquare sq, bitMap& weakPawns, bitMap& passedPawns)
 }
 
 template<bitboardIndex piece>
-simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes,bitMap const blockedPawns, bitMap * const kingRing,unsigned int * const kingAttackersCount,unsigned int * const kingAttackersWeight,unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const
+simdScore Position::_evalPieces(const bitMap * const weakSquares,  bitMap * const attackedSquares ,const bitMap * const holes,bitMap const blockedPawns, bitMap * const kingRing,unsigned int * const kingAttackersCount,unsigned int * const kingAttackersWeight,unsigned int * const kingAdjacentZoneAttacksCount, bitMap & weakPawns) const
 {
 	simdScore res = {0,0,0,0};
 	bitMap tempPieces = getBitmap(piece);
@@ -411,7 +411,7 @@ simdScore Position::evalPieces(const bitMap * const weakSquares,  bitMap * const
 }
 
 template<Color kingColor>
-Score Position::evalShieldStorm(tSquare ksq) const
+Score Position::_evalShieldStorm(tSquare ksq) const
 {
 	if( getFileOf(ksq) == FILEA )
 	{
@@ -454,7 +454,7 @@ Score Position::evalShieldStorm(tSquare ksq) const
 }
 
 template<Color c>
-simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
+simdScore Position::_evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 {
 	tSquare kingSquare = c ? getSquareOfThePiece( blackKing ) : getSquareOfThePiece( whiteKing );
 	tSquare enemyKingSquare = c ?getSquareOfThePiece( whiteKing ) : getSquareOfThePiece( blackKing );
@@ -562,7 +562,7 @@ simdScore Position::evalPassedPawn(bitMap pp, bitMap* attackedSquares) const
 }
 
 
-template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const
+template<Color c> simdScore Position::_evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const
 {
 	simdScore res = {0,0,0,0};
 	bitMap AttackingPieces = c ? getBitmap(whitePieces) : getBitmap(blackPieces);
@@ -622,14 +622,14 @@ template<Color c> simdScore Position::evalKingSafety(Score kingSafety, unsigned 
 }
 
 
-simdScore Position::calcPawnValues(bitMap& weakPawns, bitMap& passedPawns, bitMap * const attackedSquares , bitMap * const weakSquares, bitMap * const holes) const {
+simdScore Position::_calcPawnValues(bitMap& weakPawns, bitMap& passedPawns, bitMap * const attackedSquares , bitMap * const weakSquares, bitMap * const holes) const {
 	simdScore pawnResult = simdScore{0,0,0,0};
 	bitMap pawns = getBitmap(whitePawns);
 
 	while(pawns)
 	{
 		tSquare sq = iterateBit(pawns);
-		pawnResult += evalPawn<white>(sq, weakPawns, passedPawns);
+		pawnResult += _evalPawn<white>(sq, weakPawns, passedPawns);
 	}
 
 	pawns = getBitmap(blackPawns);
@@ -637,7 +637,7 @@ simdScore Position::calcPawnValues(bitMap& weakPawns, bitMap& passedPawns, bitMa
 	while(pawns)
 	{
 		tSquare sq = iterateBit(pawns);
-		pawnResult -= evalPawn<black>(sq, weakPawns, passedPawns);
+		pawnResult -= _evalPawn<black>(sq, weakPawns, passedPawns);
 	}
 
 
@@ -768,7 +768,7 @@ Score Position::eval(void) const
 	//-----------------------------------------------------
 
 
-	const materialStruct* const materialData = getMaterialData();
+	const materialStruct* const materialData = _getMaterialData();
 	if( materialData )
 	{
 		bool (Position::*pointer)(Score &) const = materialData->pointer;
@@ -809,7 +809,7 @@ Score Position::eval(void) const
 		if( (bitCnt(getBitmap(whitePieces) )== 1 && bitCnt(getBitmap(blackPieces) )> 1) || (bitCnt(getBitmap(whitePieces) )> 1 && bitCnt(getBitmap(blackPieces) )== 1) )
 		{
 			Score r;
-			evalKxvsK(r);
+			_evalKxvsK(r);
 			return isBlackTurn() ? -r : r;
 		}
 	}
@@ -892,14 +892,14 @@ Score Position::eval(void) const
 		if (simdScore tableScore; _pawnHashTable->getValues(pawnKey, tableScore, weakPawns, passedPawns, attackedSquares, weakSquares, holes)) {
 			res += tableScore;
 		} else {
-			simdScore pawnResult = calcPawnValues(weakPawns, passedPawns, attackedSquares, weakSquares, holes);
+			simdScore pawnResult = _calcPawnValues(weakPawns, passedPawns, attackedSquares, weakSquares, holes);
 			
 			_pawnHashTable->insert(pawnKey, pawnResult, weakPawns, passedPawns, attackedSquares, weakSquares, holes);			
 			res += pawnResult;
 
 		}
 	} else {
-		res += calcPawnValues(weakPawns, passedPawns, attackedSquares, weakSquares, holes);
+		res += _calcPawnValues(weakPawns, passedPawns, attackedSquares, weakSquares, holes);
 	}
 	
 	//---------------------------------------------
@@ -952,8 +952,8 @@ Score Position::eval(void) const
 
 	simdScore wScore;
 	simdScore bScore;
-	wScore = evalPieces<whiteKnights>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
-	bScore = evalPieces<blackKnights>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
+	wScore = _evalPieces<whiteKnights>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
+	bScore = _evalPieces<blackKnights>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
 	res += wScore - bScore;
 	if(trace)
 	{
@@ -967,8 +967,8 @@ Score Position::eval(void) const
 		traceRes = res;
 	}
 
-	wScore = evalPieces<whiteBishops>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
-	bScore = evalPieces<blackBishops>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
+	wScore = _evalPieces<whiteBishops>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
+	bScore = _evalPieces<blackBishops>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
 	res += wScore - bScore;
 	if(trace)
 	{
@@ -982,8 +982,8 @@ Score Position::eval(void) const
 		traceRes = res;
 	}
 
-	wScore = evalPieces<whiteRooks>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
-	bScore = evalPieces<blackRooks>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
+	wScore = _evalPieces<whiteRooks>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
+	bScore = _evalPieces<blackRooks>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
 	res += wScore - bScore;
 	if(trace)
 	{
@@ -997,8 +997,8 @@ Score Position::eval(void) const
 		traceRes=res;
 	}
 
-	wScore = evalPieces<whiteQueens>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
-	bScore = evalPieces<blackQueens>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
+	wScore = _evalPieces<whiteQueens>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
+	bScore = _evalPieces<blackQueens>(weakSquares, attackedSquares, holes, blockedPawns, kingRing, kingAttackersCount, kingAttackersWeight, kingAdjacentZoneAttacksCount, weakPawns );
 	res += wScore - bScore;
 
 	if(trace)
@@ -1037,8 +1037,8 @@ Score Position::eval(void) const
 	//-----------------------------------------
 
 
-	wScore = evalPassedPawn<white>(passedPawns & getBitmap( whitePawns ), attackedSquares);
-	bScore = evalPassedPawn<black>(passedPawns & getBitmap( blackPawns ), attackedSquares);
+	wScore = _evalPassedPawn<white>(passedPawns & getBitmap( whitePawns ), attackedSquares);
+	bScore = _evalPassedPawn<black>(passedPawns & getBitmap( blackPawns ), attackedSquares);
 	res += wScore - bScore;
 
 	if(trace)
@@ -1202,14 +1202,14 @@ Score Position::eval(void) const
 	//--------------------------------------
 	Score kingSafety[2] = {0, 0};
 
-	kingSafety[white] = evalShieldStorm<white>(getSquareOfThePiece(whiteKing));
+	kingSafety[white] = _evalShieldStorm<white>(getSquareOfThePiece(whiteKing));
 
 	if( st.hasCastleRight( wCastleOO )
 		&& !(attackedSquares[blackPieces] & getCastleKingPath(wCastleOO))
 		&& !moreThanOneBit(_CastlePathOccupancyBitmap(wCastleOO))
 		)
 	{
-		kingSafety[white] = std::max( evalShieldStorm<white>(G1), kingSafety[white]);
+		kingSafety[white] = std::max( _evalShieldStorm<white>(G1), kingSafety[white]);
 	}
 
 	if( st.hasCastleRight( wCastleOOO )
@@ -1217,21 +1217,21 @@ Score Position::eval(void) const
 		&& !moreThanOneBit(_CastlePathOccupancyBitmap(wCastleOOO))
 		)
 	{
-		kingSafety[white] = std::max( evalShieldStorm<white>(C1), kingSafety[white]);
+		kingSafety[white] = std::max( _evalShieldStorm<white>(C1), kingSafety[white]);
 	}
 	if(trace)
 	{
 		wScore = simdScore{ kingSafety[white], 0, 0, 0};
 	}
 
-	kingSafety[black] = evalShieldStorm<black>(getSquareOfThePiece(blackKing));
+	kingSafety[black] = _evalShieldStorm<black>(getSquareOfThePiece(blackKing));
 
 	if( st.hasCastleRight( bCastleOO )
 		&& !(attackedSquares[whitePieces] & getCastleKingPath(bCastleOO))
 		&& !moreThanOneBit(_CastlePathOccupancyBitmap(bCastleOO))
 		)
 	{
-		kingSafety[black] = std::max( evalShieldStorm<black>(G8), kingSafety[black]);
+		kingSafety[black] = std::max( _evalShieldStorm<black>(G8), kingSafety[black]);
 	}
 
 	if( st.hasCastleRight( bCastleOOO )
@@ -1239,7 +1239,7 @@ Score Position::eval(void) const
 		&& !moreThanOneBit(_CastlePathOccupancyBitmap(bCastleOOO))
 		)
 	{
-		kingSafety[black] = std::max(evalShieldStorm<black>(C8), kingSafety[black]);
+		kingSafety[black] = std::max(_evalShieldStorm<black>(C8), kingSafety[black]);
 	}
 	if(trace)
 	{
@@ -1251,7 +1251,7 @@ Score Position::eval(void) const
 
 
 
-	simdScore kingSaf = evalKingSafety<white>(kingSafety[white], kingAttackersCount[black], kingAdjacentZoneAttacksCount[black], kingAttackersWeight[black], attackedSquares);
+	simdScore kingSaf = _evalKingSafety<white>(kingSafety[white], kingAttackersCount[black], kingAdjacentZoneAttacksCount[black], kingAttackersWeight[black], attackedSquares);
 
 	res += kingSaf;
 	if(trace)
@@ -1259,7 +1259,7 @@ Score Position::eval(void) const
 		wScore += kingSaf;
 	}
 
-	kingSaf = evalKingSafety<black>(kingSafety[black], kingAttackersCount[white], kingAdjacentZoneAttacksCount[white], kingAttackersWeight[white], attackedSquares);
+	kingSaf = _evalKingSafety<black>(kingSafety[black], kingAttackersCount[white], kingAdjacentZoneAttacksCount[white], kingAttackersWeight[white], attackedSquares);
 
 	res-= kingSaf;
 	if(trace)

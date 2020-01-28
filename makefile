@@ -36,6 +36,7 @@ CPP_SRCS := \
 ./src/perft.cpp \
 ./src/polyglotKey.cpp \
 ./src/position.cpp \
+./src/rootMovesToBeSearched.cpp \
 ./src/search.cpp \
 ./src/searchData.cpp \
 ./src/searchLogger.cpp \
@@ -82,6 +83,7 @@ OBJS :=  \
 ./src/perft.o \
 ./src/polyglotKey.o \
 ./src/position.o \
+./src/rootMovesToBeSearched.o \
 ./src/search.o \
 ./src/searchData.o \
 ./src/searchLogger.o \
@@ -123,6 +125,7 @@ CPP_DEPS := \
 ./src/perft.d \
 ./src/polyglotKey.d \
 ./src/position.d \
+./src/rootMovesToBeSearched.d \
 ./src/search.d \
 ./src/searchData.d \
 ./src/searchLogger.d \
