@@ -93,6 +93,7 @@ public:
 	void setMute(bool mute);
 	SearchParameters& getSearchParameters();
 	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
+	bool isSearchRunning() const;
 };
 
 volatile bool my_thread::impl::_quit = false;
@@ -284,6 +285,10 @@ const SearchResult& my_thread::impl::synchronousSearch(const Position& p, Search
 	return getResult();
 }
 
+bool my_thread::impl::isSearchRunning() const {
+	return _searchStatus == threadStatus::running;
+}
+
 /*********************************************
 * my_thread class
 **********************************************/
@@ -305,3 +310,5 @@ void my_thread::setMute(bool mute) { pimpl->setMute(mute); }
 SearchParameters& my_thread::getSearchParameters() { return pimpl->getSearchParameters(); };
 
 const SearchResult& my_thread::synchronousSearch(const Position& p, SearchLimits& l) { return pimpl->synchronousSearch(p, l); }
+
+bool my_thread::isSearchRunning() const { return pimpl->isSearchRunning(); };

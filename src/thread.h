@@ -53,6 +53,7 @@ public :
 	void setMute(bool mute);
 	SearchParameters& getSearchParameters();
 	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
+	bool isSearchRunning() const;
 	
 };
 #endif /* THREAD_H_ */

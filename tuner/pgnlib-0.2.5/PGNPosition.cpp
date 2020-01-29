@@ -314,7 +314,7 @@ namespace pgn
 		class KingMovementRule : public PieceMovementRule
 		{
 			public:
-				bool checkLegalMovement(const PositionData &position, const Square &from, const Square &to)
+				bool checkLegalMovement(const PositionData &, const Square &, const Square &)
 				{
 				      // no need to check the movement because there is always one king (per side) on the board.
 				      return true;

@@ -441,7 +441,7 @@ bool pgn::Parser::getVariation(std::string::const_iterator &itr1, const std::str
 	return true;
 }
 
-int pgn::Parser::getGlyph(std::string::const_iterator &itr1, const std::string::const_iterator &itr2)
+int pgn::Parser::getGlyph(std::string::const_iterator &itr1, const std::string::const_iterator &)
 {
 	if (*itr1 == '$')
 	{

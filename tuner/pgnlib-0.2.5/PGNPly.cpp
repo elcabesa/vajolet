@@ -120,9 +120,9 @@ namespace pgn
 		
 		bool supportingComments() const { return false; }
 		bool supportingVariations() const { return false; }
-		void bindComment(const CommentText &comment) {} // nop
+		void bindComment(const CommentText &) {} // nop
 		void unbindComment() {} // nop
-		void bindVariation(const MoveList &variation) {} // nop
+		void bindVariation(const MoveList &) {} // nop
 		void unbindVariations() {} // nop
 		pgn::CommentText const* comment() const { return 0; }
 		std::vector<pgn::MoveList *> const* variations() const { return 0; }
@@ -166,7 +166,7 @@ namespace pgn
 		{
 			delete comment_; comment_ = 0;
 		}
-		void bindVariation(const MoveList &variation) {} // nop
+		void bindVariation(const MoveList &) {} // nop
 		void unbindVariations() {} // nop
 		pgn::CommentText const* comment() const { return comment_; }
 		std::vector<pgn::MoveList *> const* variations() const { return 0; }
@@ -199,7 +199,7 @@ namespace pgn
 
 		bool supportingComments() const { return false; }
 		bool supportingVariations() const { return true; }
-		void bindComment(const CommentText &comment) {} // nop
+		void bindComment(const CommentText &) {} // nop
 		void unbindComment() {} // nop
 		void bindVariation(const MoveList &variation) 
 		{
