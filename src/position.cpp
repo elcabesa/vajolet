@@ -786,6 +786,9 @@ simdScore Position::_calcNonPawnMaterialValue() const
 */
 void Position::doNullMove()
 {
+#ifdef	ENABLE_CHECK_CONSISTENCY
+	_checkPosConsistency(checkPhase::doNullMove);
+#endif
 
 	_insertState(getActualState());
 	state &x = getActualState();
@@ -812,10 +815,6 @@ void Position::doNullMove()
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
 
-#ifdef	ENABLE_CHECK_CONSISTENCY
-	_checkPosConsistency(checkPhase::doNullMove);
-#endif
-
 
 }
 /*! \brief do a move
@@ -826,6 +825,8 @@ void Position::doNullMove()
 void Position::doMove(const Move & m)
 {
 #ifdef	ENABLE_CHECK_CONSISTENCY
+	_checkPosConsistency(checkPhase::doMove);
+
 	if( ! isMoveLegal(m) )
 	{
 		std::cerr<<"illegal move "<<UciOutput::displayUci(m, isChess960())<<std::endl;
@@ -1020,11 +1021,6 @@ void Position::doMove(const Move & m)
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
 
-#ifdef	ENABLE_CHECK_CONSISTENCY
-	_checkPosConsistency(checkPhase::doMove);
-#endif
-
-
 }
 
 /*! \brief undo a move
@@ -1034,6 +1030,9 @@ void Position::doMove(const Move & m)
 */
 void Position::undoMove()
 {
+#ifdef	ENABLE_CHECK_CONSISTENCY
+	_checkPosConsistency(checkPhase::undoMove);
+#endif
 	--_ply;
 
 	const state& x = getActualState();
@@ -1097,12 +1096,6 @@ void Position::undoMove()
 	_removeState();
 
 	std::swap(Us,Them);
-
-
-#ifdef	ENABLE_CHECK_CONSISTENCY
-	_checkPosConsistency(checkPhase::undoMove);
-#endif
-
 }
 
 /*! \brief undo a null move
@@ -1303,6 +1296,10 @@ void Position::_checkPosConsistency(checkPhase nn) const
 		sync_cout<<score[3]<<":"<<x.getNonPawnValue()[3]<<sync_endl;
 		_block( "non pawn material error", nn );
 	}
+	
+	if(getPieceCount(whiteKing)==0) {_block( "missing whiteKing", nn );}
+	if(getPieceCount(blackKing)==0) {_block( "missing blackKing", nn );}
+	
 }
 #endif
 
