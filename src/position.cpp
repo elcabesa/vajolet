@@ -1651,9 +1651,12 @@ bool Position::isMoveLegal(const Move &m)const
 		return false;
 	}
 
-
-
-
+	//cattura del re
+	if(isKing(getPieceAt(m.getTo())))
+	{
+		return false;
+	}
+	
 	switch(piece)
 	{
 		case whiteKing:
