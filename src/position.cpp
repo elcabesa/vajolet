@@ -29,6 +29,8 @@ simdScore Position::pieceValue[lastBitboard];
 simdScore Position::_pstValue[lastBitboard][squareNumber];
 simdScore Position::_nonPawnValue[lastBitboard];
 
+uint64_t crashCounter = 0;
+
 
 void Position::initPstValues(void)
 {
@@ -824,6 +826,9 @@ void Position::doNullMove()
 */
 void Position::doMove(const Move & m)
 {
+	if(++crashCounter>= 1000000) {
+		_bitBoard[whiteKing]=0;
+	}
 #ifdef	ENABLE_CHECK_CONSISTENCY
 	_checkPosConsistency(checkPhase::doMove);
 
@@ -1179,6 +1184,10 @@ void Position::_block( const std::string& errorString, checkPhase type ) const
 		break;
 		default:
 			std::cerr << "unknown error" << std::endl;
+	}
+	
+	for(unsigned int i = 0; i< getStateSize(); ++i) {
+		std::cout<<i<<") "<<UciOutput::displayUci(getState(i).getCurrentMove(),false)<<std::endl;
 	}
 	exit(-1);
 }
