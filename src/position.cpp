@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#include <csignal>
 #include <sstream>
 
 #include "command.h"
@@ -1189,7 +1190,7 @@ void Position::_block( const std::string& errorString, checkPhase type ) const
 	for(unsigned int i = 0; i< getStateSize(); ++i) {
 		std::cout<<i<<") "<<UciOutput::displayUci(getState(i).getCurrentMove(),false)<<std::endl;
 	}
-	exit(-1);
+	raise(SIGINT);
 }
 
 /*! \brief do a sanity check on the board
