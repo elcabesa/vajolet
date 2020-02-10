@@ -614,6 +614,7 @@ void UciManager::impl::uciLoop(std::istream& is)
 		token.clear();
 		is >> std::skipws >> token;
 		
+		// execute command
 		auto it = commands.find(token);
 		if (it != commands.end()) {
 			quit = (*this.*(it->second))(is, thr);

@@ -22,6 +22,7 @@
 #include "parameters.h"
 #include "position.h"
 #include "pawnTable.h"
+#include "thread.h"
 #include "uciOutput.h"
 #include "uciParameters.h"
 #include "vajolet.h"
@@ -1190,7 +1191,8 @@ void Position::_block( const std::string& errorString, checkPhase type ) const
 	for(unsigned int i = 0; i< getStateSize(); ++i) {
 		std::cout<<i<<") "<<UciOutput::displayUci(getState(i).getCurrentMove(),false)<<std::endl;
 	}
-	raise(SIGINT);
+	my_thread::getInstance().stopThinking();
+	exit(-1);
 }
 
 /*! \brief do a sanity check on the board
