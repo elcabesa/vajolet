@@ -56,7 +56,7 @@ public:
 	
 	std::vector<rootMove> get() const
 	{	
-		// Sort the PV lines searched so far and update the GUI	
+		// Sort the PV lines searched so far and update the GUI
 		std::vector<rootMove> _multiPVprint = _res;
 
 		// always send all the moves toghether in multiPV

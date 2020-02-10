@@ -26,6 +26,7 @@
 #include "vajo_io.h"
 #include "movepicker.h"
 #include "multiPVmanager.h"
+#include "parameters.h"
 #include "position.h"
 #include "pvLineFollower.h"
 #include "rootMove.h"
@@ -80,6 +81,8 @@ public:
 	void showLine(){ _showLine= true;}
 	SearchResult manageNewSearch();
 	Position& getPosition();
+	void setUOI( std::unique_ptr<UciOutput> UOI );
+	SearchParameters& getSearchParameters() {return _sp;};
 
 private:
 	std::unique_ptr<logWriter> _lw;
@@ -134,6 +137,8 @@ private:
 
 
 	volatile bool _stop = false;
+	
+	SearchParameters _sp;
 
 	//--------------------------------------------------------
 	// private methods
@@ -145,7 +150,7 @@ private:
 
 
 
-	signed int razorMargin(unsigned int depth,bool cut) const { return 20000+depth*(1248/ONE_PLY)+cut*20000; }
+	signed int razorMargin(unsigned int depth,bool cut) const {return _sp.razorMargin + depth * _sp.razorMarginDepth + cut * _sp.razorMarginCut; }
 
 	template<nodeType type, bool log>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
 	template<nodeType type, bool log>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
@@ -154,8 +159,7 @@ private:
 	void excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread);
 	void idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false );
 
-	void setUOI( std::unique_ptr<UciOutput> UOI );
-	static Score futility(int depth, bool improving );
+	Score futility(int depth, bool improving );
 	Score getDrawValue() const;
 
 	void _updateCounterMove( const Move& m );
@@ -274,7 +278,7 @@ private:
 
 Score Search::impl::futility(int depth, bool improving )
 {
-	return (6000/ONE_PLY) * depth - 2000 * improving;
+	return _sp.staticNullMovePruningValue * depth - _sp.staticNullMovePruningImprovingBonus * improving;
 }
 Score Search::impl::futilityMargin[7] = {0};
 unsigned int Search::impl::FutilityMoveCounts[2][16]= {{0},{0}};
@@ -1016,15 +1020,15 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			//------------------------
 			if (log) ln->test("Razoring");
 			if (!_sd.skipNullMove(ply)
-				&&  depth < 4 * ONE_PLY
-				&&  eval + razorMargin(depth, type == nodeType::CUT_NODE) <= alpha
-				&&  alpha >= -SCORE_INFINITE+razorMargin(depth, type == nodeType::CUT_NODE)
-				&&  ( !ttMove || type == nodeType::ALL_NODE)
+				&& depth < _sp.razorDepth
+				&& eval + razorMargin(depth, type == nodeType::CUT_NODE) <= alpha
+				&& alpha >= -SCORE_INFINITE + razorMargin(depth, type == nodeType::CUT_NODE)
+				&& ( !ttMove || type == nodeType::ALL_NODE)
 			)
 			{
 				PVline childPV;
-				Score v = qsearch<nodeType::CUT_NODE, log>(ply,0 , alpha, alpha+1, childPV);
-				if (v <= alpha)
+				Score v = qsearch<nodeType::CUT_NODE, log>(ply,0 , alpha, alpha + 1, childPV);
+				if (v <= alpha || _sp.razorReturn)
 				{
 					if (log) ln->logReturnValue(v);
 					if (log) ln->endSection();
@@ -1039,8 +1043,8 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			//---------------------------
 			if (log) ln->test("StaticNullMovePruning");
 			if (!_sd.skipNullMove(ply)
-				&& depth < 8 * ONE_PLY
-				&& eval - futility( depth, improving ) >= beta
+				&& depth < _sp.staticNullMovePruningDepth
+				&& eval - futility(depth, improving) >= beta
 				&& eval < SCORE_KNOWN_WIN
 				&& _pos.hasActivePlayerNonPawnMaterial()
 			)
@@ -1059,19 +1063,19 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			// this search let us know about threat move by the opponent.
 			//---------------------------
 			if (log) ln->test("NullMovePruning");
-			if( depth >= ONE_PLY
+			if( depth >= _sp.nullMovePruningDepth
 				&& eval >= beta
 				&& !_sd.skipNullMove(ply)
 				&& _pos.hasActivePlayerNonPawnMaterial()
 			){
 				int newPly = ply + 1;
 				// Null move dynamic reduction based on depth
-				int red = 3 * ONE_PLY + depth / 4;
+				int red = _sp.nullMovePruningReduction + depth * _sp.nullMovePruningBonusDepth;
 
 				// Null move dynamic reduction based on value
-				if (eval > -SCORE_INFINITE+10000 && eval - 10000 > beta)
+				if (eval - _sp.nullMovePruningBonusThreshold > -SCORE_INFINITE && eval - _sp.nullMovePruningBonusThreshold > beta)
 				{
-					red += ONE_PLY;
+					red += _sp.nullMovePruningBonusAdditionalRed;
 				}
 				
 				_pos.doNullMove();
@@ -1550,7 +1554,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		}
 		else if(!inCheck)
 		{
-			bestScore = std::min( (int)0, (int)(-5000 + _pos.getPly()*250) );
+			bestScore = getDrawValue();
 		}
 		else
 		{
@@ -2190,3 +2194,5 @@ unsigned long long Search::getTbHits() const{ return pimpl->getTbHits(); }
 void Search::showLine(){ pimpl->showLine(); }
 SearchResult Search::manageNewSearch(){ return pimpl->manageNewSearch(); }
 Position& Search::getPosition(){ return pimpl->getPosition(); }
+void Search::setUOI( std::unique_ptr<UciOutput> UOI ) { pimpl->setUOI(std::move(UOI)); };
+SearchParameters& Search::getSearchParameters() { return pimpl->getSearchParameters(); };

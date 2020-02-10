@@ -28,6 +28,7 @@ class Position;
 class SearchTimer;
 class SearchLimits;
 class SearchResult;
+class SearchParameters;
 
 
 class Search
@@ -57,6 +58,8 @@ public:
 	void showLine();
 	SearchResult manageNewSearch();
 	Position& getPosition();
+	void setUOI( std::unique_ptr<UciOutput> UOI );
+	SearchParameters& getSearchParameters();
 
 private:
 	class impl;

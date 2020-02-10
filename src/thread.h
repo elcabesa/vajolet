@@ -18,9 +18,13 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
+#include <memory>
+
 class Position;
 class timeManagement;
 class SearchLimits;
+class SearchParameters;
+class SearchResult;
 
 class my_thread
 {
@@ -42,9 +46,14 @@ public :
 		return pInstance;
 	}
 
-	void startThinking( const Position& p, SearchLimits& l);
+	void startThinking(const Position& p, SearchLimits& l);
 	void stopThinking();
 	void ponderHit();
 	timeManagement& getTimeMan();
+	void setMute(bool mute);
+	SearchParameters& getSearchParameters();
+	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
+	bool isSearchRunning() const;
+	
 };
 #endif /* THREAD_H_ */
