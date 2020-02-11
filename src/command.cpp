@@ -437,8 +437,12 @@ bool UciManager::impl::_go(std::istringstream& is, my_thread &)
 	return false;
 }
 
-bool UciManager::impl::_setoption(std::istringstream& is, my_thread &)
+bool UciManager::impl::_setoption(std::istringstream& is, my_thread &th)
 {
+	if(th.isSearchRunning()) {
+		sync_cout << "info string warning option not applied bacause search is in progress"<< sync_endl;
+		return false;
+	}
 	std::string token, name, value;
 
 	///////////////////////////////////////////////
