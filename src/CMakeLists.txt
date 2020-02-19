@@ -10,7 +10,6 @@ add_library(libChess
 	movegen.cpp
 	movepicker.cpp
 	parameters.cpp
-	polyglotKey.cpp
 	rootMovesToBeSearched.cpp
 	search.cpp
 	searchData.cpp
