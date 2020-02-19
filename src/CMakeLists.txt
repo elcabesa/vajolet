@@ -1,5 +1,4 @@
 add_library(libChess 
-	benchmark.cpp
 	bitops.cpp 
 	book.cpp
 	data.cpp
@@ -13,7 +12,6 @@ add_library(libChess
 	movegen.cpp
 	movepicker.cpp
 	parameters.cpp
-	perft.cpp
 	polyglotKey.cpp
 	position.cpp
 	rootMovesToBeSearched.cpp
@@ -26,6 +24,7 @@ add_library(libChess
 	transposition.cpp
 	vajo_io.cpp)
 add_subdirectory(uci)
+add_subdirectory(utility)
 add_subdirectory(syzygy)
 
 
