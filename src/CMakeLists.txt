@@ -2,7 +2,6 @@ add_library(libChess
 	benchmark.cpp
 	bitops.cpp 
 	book.cpp
-	command.cpp
 	data.cpp
 	endgame.cpp
 	eval.cpp
@@ -28,6 +27,7 @@ add_library(libChess
 	uciParameters.cpp
 	uciOutput.cpp
 	vajo_io.cpp)
+add_subdirectory(uci)
 add_subdirectory(syzygy)
 
 
