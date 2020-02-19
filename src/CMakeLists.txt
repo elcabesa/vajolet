@@ -2,8 +2,6 @@ add_library(libChess
 	bitops.cpp 
 	book.cpp
 	data.cpp
-	endgame.cpp
-	eval.cpp
 	game.cpp
 	hashKey.cpp
 	libchess.cpp
@@ -13,7 +11,6 @@ add_library(libChess
 	movepicker.cpp
 	parameters.cpp
 	polyglotKey.cpp
-	position.cpp
 	rootMovesToBeSearched.cpp
 	search.cpp
 	searchData.cpp
@@ -23,6 +20,7 @@ add_library(libChess
 	timeManagement.cpp
 	transposition.cpp
 	vajo_io.cpp)
+add_subdirectory(position)
 add_subdirectory(uci)
 add_subdirectory(utility)
 add_subdirectory(syzygy)
