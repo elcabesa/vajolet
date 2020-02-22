@@ -1107,7 +1107,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 						nullVal = beta;
 					}
 
-					if (depth < 12 * ONE_PLY)
+					if (depth < _sp.nullMovePruningVerificationDepth)
 					{
 						if (log) ln->logReturnValue(nullVal);
 						if (log) ln->endSection();
@@ -1138,15 +1138,15 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			//	at high depth we try the capture moves. if a reduced search of this moves gives us a result above beta we bet we can found with a regular search a move exceeding beta
 			//------------------------
 			if (log) ln->test("ProbCut");
-			if( depth >= 5 * ONE_PLY
+			if( depth >= _sp.probCutDepth
 				&&  !_sd.skipNullMove(ply)
 				// && abs(beta)<SCORE_KNOWN_WIN
 				// && eval> beta-40000
 				&& abs(beta) < SCORE_MATE_IN_MAX_PLY
 			){
 				Score s;
-				Score rBeta = std::min(beta + 8000, SCORE_INFINITE);
-				int rDepth = depth - ONE_PLY - 3 * ONE_PLY;
+				Score rBeta = std::min(beta + _sp.probCutDelta, SCORE_INFINITE);
+				int rDepth = depth - ONE_PLY - _sp.probCutDepthRed;
 
 				MovePicker mp(_pos, _sd, ply, ttMove);
 				mp.setupProbCutSearch( _pos.getCapturedPiece() );
@@ -1188,12 +1188,12 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	//------------------------
 	//	IID
 	//------------------------
-	if(depth >= (PVnode ? 5 * ONE_PLY : 8 * ONE_PLY)
+	if(depth >= (PVnode ? _sp.iidDepthPv : _sp.iidDepthNonPv)
 		&& !ttMove
-		&& (PVnode || staticEval + 10000 >= beta))
+		&& (PVnode || staticEval + _sp.iidStaticEvalBonus >= beta))
 	{
 		if (log) ln->test("IID");
-		int d = depth - 2 * ONE_PLY - (PVnode ? 0 : depth / 4);
+		int d = depth - _sp.iidDepthRed - (PVnode ? 0 : depth / _sp.iidDepthRedFactor);
 
 		bool skipBackup = _sd.skipNullMove(ply);
 		_sd.setSkipNullMove(ply, true);

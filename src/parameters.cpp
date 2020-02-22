@@ -196,19 +196,29 @@ simdScore mobilityBonus[separationBitmap][32] = {
 
 SearchParameters::SearchParameters():
 razorMargin(20000),
-razorMarginDepth(1248/16),
+razorMarginDepth(1248 / 16),
 razorMarginCut(20000),
-razorDepth(4*16),
+razorDepth(4 * 16),
 razorReturn(false),
 
-staticNullMovePruningDepth(8*16),
-staticNullMovePruningValue(6000/16),
+staticNullMovePruningDepth(8 * 16),
+staticNullMovePruningValue(6000 / 16),
 staticNullMovePruningImprovingBonus(2000),
 
 nullMovePruningDepth(16),
-nullMovePruningReduction(3*16),
+nullMovePruningReduction(3 * 16),
 nullMovePruningBonusDepth(0.25),
 nullMovePruningBonusThreshold(10000),
-nullMovePruningBonusAdditionalRed(16)
+nullMovePruningBonusAdditionalRed(16),
+nullMovePruningVerificationDepth(12*16),
+
+probCutDepth(5 * 16),
+probCutDelta(8000),
+probCutDepthRed(3 * 16),
+iidDepthPv(5 * 16),
+iidDepthNonPv(8 * 16),
+iidStaticEvalBonus(10000),
+iidDepthRed(2 * 16),
+iidDepthRedFactor(4)
 
 {}
