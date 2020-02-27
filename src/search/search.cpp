@@ -100,14 +100,15 @@ private:
 	//--------------------------------------------------------
 	// private static members
 	//--------------------------------------------------------
-	static const int ONE_PLY = 16;
-	static const int ONE_PLY_SHIFT = 4;
-	static const unsigned int LmrLimit = 32;
+	static constexpr int ONE_PLY = 16;
+	static constexpr int ONE_PLY_SHIFT = 4;
+	static constexpr unsigned int LmrLimit = 32;
+	static constexpr unsigned int LmrLimitMove = 64;
 	static Score futilityMargin[7];
 	static constexpr int FutilityMoveCountsDepth = 16;
 	static unsigned int FutilityMoveCounts[2][FutilityMoveCountsDepth];
-	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
-	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
+	static Score PVreduction[2][LmrLimit*ONE_PLY][LmrLimitMove];
+	static Score nonPVreduction[2][LmrLimit*ONE_PLY][LmrLimitMove];
 	static std::mutex _mutex;
 
 	//--------------------------------------------------------
@@ -1397,7 +1398,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				{
 					assert(moveNumber != 0);
 
-					int reduction = PVreduction[improving][ std::min(depth, int((LmrLimit * ONE_PLY) - 1)) ][ std::min(moveNumber, (unsigned int)63) ];
+					int reduction = PVreduction[improving][ std::min(depth, int((LmrLimit * ONE_PLY) - 1)) ][ std::min(moveNumber, LmrLimitMove - 1) ];
 					int d = std::max(newDepth - reduction, ONE_PLY);
 
 					if(reduction != 0)
@@ -1454,7 +1455,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				&& !mp.isKillerMove(m)
 			)
 			{
-				int reduction = nonPVreduction[improving][std::min(depth, int((LmrLimit * ONE_PLY) - 1))][std::min(moveNumber, (unsigned int)63)];
+				int reduction = nonPVreduction[improving][std::min(depth, int((LmrLimit * ONE_PLY) - 1))][std::min(moveNumber, LmrLimitMove - 1)];
 				int d = std::max(newDepth - reduction, ONE_PLY);
 
 				if(reduction != 0)
@@ -1969,19 +1970,19 @@ void Search::impl::initSearchParameters(void)
 	 * LRM
 	 ***************************************************/
 
-	for (int mc = 1; mc < 64; ++mc)
+	for (unsigned int mc = 1; mc < LmrLimitMove; ++mc)
 	{
 		PVreduction[0][0][mc] = 0;
 		nonPVreduction[1][0][mc] = 0;
 	}
-	for (unsigned int d = 1; d < LmrLimit*ONE_PLY; ++d)
+	for (unsigned int d = 1; d < LmrLimit * ONE_PLY; ++d)
 	{
-		for (int mc = 1; mc < 64; ++mc)
+		for (unsigned int mc = 1; mc < LmrLimitMove; ++mc)
 		{
 			double dd = (16.0 * d) / ONE_PLY;
 			
-			double    PVRed = -1.5 + 0.33 * log(double(dd)) * log(double(mc));
-			double nonPVRed = -1.2 + 0.37 * log(double(dd)) * log(double(mc));
+			double    PVRed = -1.5 + 0.33 * log(dd) * log(double(mc));
+			double nonPVRed = -1.2 + 0.37 * log(dd) * log(double(mc));
 
 			PVreduction[1][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(ONE_PLY)) : 0);
 			nonPVreduction[1][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(ONE_PLY)) : 0);
