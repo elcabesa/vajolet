@@ -144,6 +144,21 @@ public:
 	float nullMovePruningBonusDepth;
 	int nullMovePruningBonusThreshold;
 	int nullMovePruningBonusAdditionalRed;
+	int nullMovePruningVerificationDepth;
+	
+	int probCutDepth;
+	int probCutDelta;
+	int probCutDepthRed;
+	
+	int iidDepthPv;
+	int iidDepthNonPv;
+	int iidStaticEvalBonus;
+	int iidDepthRed;
+	int iidDepthRedFactor;
+	
+	int singularExpressionPVDepth;
+	int singularExpressionNonPVDepth;
+	int singularExpressionTtDepth;
 };
 
 #endif /* EVAL_H_ */
