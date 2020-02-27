@@ -196,8 +196,8 @@ simdScore mobilityBonus[separationBitmap][32] = {
 
 SearchParameters::SearchParameters():
 razorMargin(20000),
-razorMarginDepth(1248/16),
-razorMarginCut(20000),
+razorMarginDepth(0),
+razorMarginCut(0),
 razorDepth(4*16),
 razorReturn(false),
 
