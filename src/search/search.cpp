@@ -2198,5 +2198,5 @@ unsigned long long Search::getTbHits() const{ return pimpl->getTbHits(); }
 void Search::showLine(){ pimpl->showLine(); }
 SearchResult Search::manageNewSearch(){ return pimpl->manageNewSearch(); }
 Position& Search::getPosition(){ return pimpl->getPosition(); }
-void Search::setUOI( std::unique_ptr<UciOutput> UOI ) { pimpl->setUOI(std::move(UOI)); };
-SearchParameters& Search::getSearchParameters() { return pimpl->getSearchParameters(); };
+void Search::setUOI( std::unique_ptr<UciOutput> UOI ) { pimpl->setUOI(std::move(UOI)); }
+SearchParameters& Search::getSearchParameters() { return pimpl->getSearchParameters(); }

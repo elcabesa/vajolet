@@ -267,7 +267,7 @@ void my_thread::impl::setMute(bool mute) {
 	}
 }
 
-SearchParameters& my_thread::impl::getSearchParameters() { return _src.getSearchParameters(); };
+SearchParameters& my_thread::impl::getSearchParameters() { return _src.getSearchParameters(); }
 
 
 const SearchResult& my_thread::impl::synchronousSearch(const Position& p, SearchLimits& l) {
@@ -307,8 +307,8 @@ void my_thread::startThinking(const Position& p, SearchLimits& l){ pimpl->startT
 
 void my_thread::setMute(bool mute) { pimpl->setMute(mute); }
 
-SearchParameters& my_thread::getSearchParameters() { return pimpl->getSearchParameters(); };
+SearchParameters& my_thread::getSearchParameters() { return pimpl->getSearchParameters(); }
 
 const SearchResult& my_thread::synchronousSearch(const Position& p, SearchLimits& l) { return pimpl->synchronousSearch(p, l); }
 
-bool my_thread::isSearchRunning() const { return pimpl->isSearchRunning(); };
+bool my_thread::isSearchRunning() const { return pimpl->isSearchRunning(); }
