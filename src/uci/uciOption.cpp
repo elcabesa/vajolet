@@ -44,7 +44,8 @@ std::string StringUciOption::print() const
 	s += " type string default ";
 	s += _defaultValue;
 	return s;
-};	
+}
+
 bool StringUciOption::setValue( const std::string& s, bool verbose)
 {
 	_value = s;
@@ -83,7 +84,7 @@ std::string SpinUciOption::print() const {
 	s += " max ";
 	s += std::to_string(_maxValue);
 	return s;
-};
+}
 
 bool SpinUciOption::setValue( const std::string& s, bool verbose)
 {
@@ -126,7 +127,8 @@ std::string CheckUciOption::print() const {
 	s += " type check default ";
 	s += ( _defaultValue ? "true" : "false" );
 	return s;
-};	
+}
+
 bool CheckUciOption::setValue( const std::string& s, bool verbose)
 {
 	if( s == "true" )
@@ -165,7 +167,7 @@ std::string ButtonUciOption::print() const {
 	s += _name;
 	s += " type button";
 	return s;
-};
+}
 
 bool ButtonUciOption::setValue( const std::string&, bool)
 {
