@@ -1,6 +1,7 @@
 target_sources(libChess PRIVATE 
 	${CMAKE_CURRENT_SOURCE_DIR}/command.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/uciParameters.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/uciOption.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/uciOutput.cpp)
 
 # Make sure the compiler can find include files for our libChess library
