@@ -219,6 +219,10 @@ iidDepthPv(5 * 16),
 iidDepthNonPv(8 * 16),
 iidStaticEvalBonus(10000),
 iidDepthRed(2 * 16),
-iidDepthRedFactor(4)
+iidDepthRedFactor(4),
+
+singularExpressionPVDepth(6 * 16),
+singularExpressionNonPVDepth(8 * 16),
+singularExpressionTtDepth(3 * 16)
 
 {}

@@ -155,6 +155,10 @@ public:
 	int iidStaticEvalBonus;
 	int iidDepthRed;
 	int iidDepthRedFactor;
+	
+	int singularExpressionPVDepth;
+	int singularExpressionNonPVDepth;
+	int singularExpressionTtDepth;
 };
 
 #endif /* EVAL_H_ */

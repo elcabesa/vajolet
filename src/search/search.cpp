@@ -104,7 +104,8 @@ private:
 	static const int ONE_PLY_SHIFT = 4;
 	static const unsigned int LmrLimit = 32;
 	static Score futilityMargin[7];
-	static unsigned int FutilityMoveCounts[2][16];
+	static constexpr int FutilityMoveCountsDepth = 16;
+	static unsigned int FutilityMoveCounts[2][FutilityMoveCountsDepth];
 	static Score PVreduction[2][LmrLimit*ONE_PLY][64];
 	static Score nonPVreduction[2][LmrLimit*ONE_PLY][64];
 	static std::mutex _mutex;
@@ -839,7 +840,8 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	//--------------------------------------
 	// initialize node constants
 	//--------------------------------------
-	const bool PVnode = ( type == nodeType::PV_NODE || type == nodeType::ROOT_NODE );
+	const bool rootNode = (type == nodeType::ROOT_NODE);
+	const bool PVnode = (type == nodeType::PV_NODE || type == nodeType::ROOT_NODE);
 	const bool inCheck = _pos.isInCheck();
 	_sd.setInCheck(ply, inCheck);
 
@@ -863,7 +865,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	(void)childNodesType;	// to suppress warning in root node and PV nodes
 
 	if (log) ln->startSection("early returns");
-	if(type != nodeType::ROOT_NODE )
+	if(!rootNode)
 	{
 		//---------------------------------------
 		//	Manage Draw
@@ -896,7 +898,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
 	if (log) ln->test("CanUseTT");
-	if (	type != nodeType::ROOT_NODE
+	if (	!rootNode
 			&& _canUseTTeValue( PVnode, beta, ttValue, tte, depth )
 		)
 	{
@@ -1221,18 +1223,20 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	MovePicker mp(_pos, _sd, ply, ttMove);
 	unsigned int moveNumber = 0;
 	unsigned int quietMoveCount = 0;
-	Move quietMoveList[64];
+	constexpr int quietMoveListSize = 64;
+	constexpr int captureMoveListSize = 32;
+	Move quietMoveList[quietMoveListSize];
 	unsigned int captureMoveCount = 0;
-	Move captureMoveList[32];
+	Move captureMoveList[captureMoveListSize];
 
 	bool singularExtensionNode =
-		type != nodeType::ROOT_NODE
-		&& depth >= (PVnode ? 6 * ONE_PLY : 8 * ONE_PLY)
+		!rootNode
+		&& depth >= (PVnode ? _sp.singularExpressionPVDepth : _sp.singularExpressionNonPVDepth)
 		&& ttMove
 		&& !excludedMove // Recursive singular Search is not allowed
 		&& tte != nullptr
 		&& tte->isTypeGoodForBetaCutoff()
-		&& tte->getDepth() >= depth - 3 * ONE_PLY;
+		&& tte->getDepth() >= depth - _sp.singularExpressionTtDepth;
 
 	while (bestScore <beta  && ( m = mp.getNextMove() ) )
 	{
@@ -1244,7 +1248,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		}
 
 		// Search only the moves in the Search list
-		if(type == nodeType::ROOT_NODE && ( _multiPVmanager.alreadySearched(m) || !_rootMovesToBeSearched.contain(m)))
+		if(rootNode && ( _multiPVmanager.alreadySearched(m) || !_rootMovesToBeSearched.contain(m)))
 		{
 			if (log) ln->skipMove(m, " not in the root nodes");
 			continue;
@@ -1257,7 +1261,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 		bool moveGivesCheck = _pos.moveGivesCheck(m);
 		bool isDangerous = moveGivesCheck || m.isCastleMove() || _pos.isPassedPawnMove(m);
-		bool FutilityMoveCountFlag = (depth < 16 * ONE_PLY ) && (moveNumber >= FutilityMoveCounts[improving][depth >> ONE_PLY_SHIFT]);
+		bool FutilityMoveCountFlag = (depth < FutilityMoveCountsDepth * ONE_PLY ) && (moveNumber >= FutilityMoveCounts[improving][depth >> ONE_PLY_SHIFT]);
 
 		int ext = 0;
 		if(PVnode && isDangerous )
@@ -1305,7 +1309,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		//---------------------------------------
 		//	FUTILITY PRUNING
 		//---------------------------------------
-		if( type != nodeType::ROOT_NODE
+		if( !rootNode
 			&& !captureOrPromotion
 			&& !inCheck
 			&& m != ttMove
@@ -1344,7 +1348,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			}
 		}
 
-		if(type == nodeType::ROOT_NODE)
+		if(rootNode)
 		{
 			long long int elapsed = _st.getElapsedTime();
 			if(
@@ -1508,7 +1512,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				{
 					alpha = bestScore;
 					pvLine.appendNewPvLine( bestMove, childPV);
-					if(type == nodeType::ROOT_NODE && uciParameters::multiPVLines == 1 )
+					if(rootNode && uciParameters::multiPVLines == 1)
 					{
 						if(val < beta && depth > 1 * ONE_PLY)
 						{
@@ -1527,14 +1531,14 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		{
 			if(!captureOrPromotion)
 			{
-				if(quietMoveCount < 64)
+				if(quietMoveCount < quietMoveListSize)
 				{
 					quietMoveList[quietMoveCount++] = m;
 				}
 			}
 			else
 			{
-				if(captureMoveCount < 32)
+				if(captureMoveCount < captureMoveListSize)
 				{
 					captureMoveList[captureMoveCount++] = m;
 				}
@@ -2000,7 +2004,7 @@ void Search::impl::initSearchParameters(void)
 	/***************************************************
 	 * FUTILITY MOVE COUNT
 	 ***************************************************/
-	for (unsigned int d = 0; d < 16; ++d)
+	for (unsigned int d = 0; d < FutilityMoveCountsDepth; ++d)
 	{
 		FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
 		FutilityMoveCounts[1][d] = int(4.5 + 0.704 * std::pow( d, 2.0));
