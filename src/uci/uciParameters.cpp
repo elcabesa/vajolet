@@ -27,5 +27,7 @@ bool uciParameters::Syzygy50MoveRule =  true;
 bool uciParameters::Ponder;
 bool uciParameters::Chess960 = false;
 bool uciParameters::perftUseHash = false;
+bool uciParameters::limitStrength = false;
+unsigned int uciParameters::engineLevel = 20;
 
 

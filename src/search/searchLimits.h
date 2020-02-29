@@ -20,6 +20,7 @@
 
 #include <list>
 
+#include "uciParameters.h"
 #include "move.h"
 
 
@@ -33,6 +34,19 @@ public:
 		if(_btime == -1 && _wtime == -1 && _moveTime == -1)
 		{
 			setInfiniteSearch();
+		}
+	}
+	
+	void manageSkillLevel()
+	{
+		if(uciParameters::limitStrength)
+		{
+			if (_depth == -1) {
+				_depth = uciParameters::engineLevel;
+			}
+			else {
+				_depth = std::min(static_cast<unsigned  int>(_depth), uciParameters::engineLevel);
+			}
 		}
 	}
 	
