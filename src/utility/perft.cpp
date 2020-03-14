@@ -24,9 +24,6 @@
 #include "uciOutput.h"
 #include "vajolet.h"
 
-
-bool Perft::perftUseHash = false;
-
 /*! \brief calculate the perft result
 	\author Marco Belli
 	\version 1.0
@@ -41,10 +38,9 @@ unsigned long long Perft::perft(unsigned int depth)
 		return 1;
 	}
 #endif
-	PerftTranspositionTable tt;
-	
+
 	unsigned long long tot;
-	if( perftUseHash && tt.retrieve(_pos.getKey(), depth, tot) )
+	if( perftUseHash && _tt.retrieve(_pos.getKey(), depth, tot) )
 	{
 		return tot;
 	}
@@ -69,7 +65,7 @@ unsigned long long Perft::perft(unsigned int depth)
 	
 	if( perftUseHash )
 	{
-		tt.store(_pos.getKey(), depth, tot);
+		_tt.store(_pos.getKey(), depth, tot);
 	}
 	
 	return tot;

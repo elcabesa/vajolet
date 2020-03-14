@@ -56,10 +56,10 @@ private:
 	
 	static void setTTSize(unsigned int size)
 	{
-		uint64_t elements = transpositionTable::getInstance().setSize(size);
+		uint64_t elements = my_thread::getInstance().getTT().setSize(size);
 		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
 	}
-	static void clearHash() {transpositionTable::getInstance().clear();}
+	static void clearHash() {my_thread::getInstance().getTT().clear();}
 	static void setTTPath( std::string s ) {
 		auto&  szg = Syzygy::getInstance();
 		szg.setPath(s);
@@ -116,7 +116,7 @@ UciManager::impl::impl(): _pos(Position::pawnHash::off)
 	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, nullptr, 1, 1, 100));
 	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, true));
 	_optionList.emplace_back( new ButtonUciOption("ClearHash", clearHash));
-	_optionList.emplace_back( new CheckUciOption("PerftUseHash", Perft::perftUseHash, false));
+	_optionList.emplace_back( new CheckUciOption("PerftUseHash", uciParameters::perftUseHash, false));
 	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciOutput::reduceVerbosity, false));
 	_optionList.emplace_back( new CheckUciOption("UCI_Chess960", uciParameters::Chess960, false));
 	
@@ -234,7 +234,10 @@ void UciManager::impl::_doPerft(const unsigned int n)
 {
 	SearchTimer st;
 	
-	unsigned long long res = Perft(_pos).perft(n);
+	PerftTranspositionTable tt(my_thread::getInstance().getTT());
+	Perft pft(_pos,tt);
+	pft.perftUseHash = uciParameters::perftUseHash;
+	unsigned long long res = pft.perft(n);
 
 	long long int totalTime = std::max( st.getElapsedTime(), static_cast<int64_t>(1)) ;
 
@@ -355,7 +358,10 @@ bool UciManager::impl::_divide(std::istringstream& is, my_thread &) {
 		{
 			n = 1;
 		}
-		unsigned long long res = Perft(_pos).divide(n);
+		PerftTranspositionTable tt(my_thread::getInstance().getTT());
+		Perft pft(_pos,tt);
+		pft.perftUseHash = uciParameters::perftUseHash;
+		unsigned long long res = pft.divide(n);
 		sync_cout << "divide Res= " << res << sync_endl;
 	}
 	else {

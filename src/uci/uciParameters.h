@@ -32,6 +32,7 @@ public:
 	static bool Syzygy50MoveRule;
 	static bool Ponder;
 	static bool Chess960;
+	static bool perftUseHash;
 };
 
 #endif

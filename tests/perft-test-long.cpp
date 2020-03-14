@@ -29,12 +29,14 @@ static const std::vector<positions> perftPos = {
 
 TEST(PerftTest, perft) {
 	Position pos;
+	transpositionTable tt;
+	PerftTranspositionTable ptt(tt);
 	for (auto & p : perftPos)
 	{
 		pos.setupFromFen(p.Fen); 
 		for( unsigned int i = 0; i < p.PerftValue.size(); i++)
 		{
-			EXPECT_EQ(Perft(pos).perft(i+1), p.PerftValue[i]);
+			EXPECT_EQ(Perft(pos,ptt).perft(i+1), p.PerftValue[i]);
 		}
 	}
 }

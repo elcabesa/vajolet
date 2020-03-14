@@ -58,7 +58,7 @@ int main() {
 	//	init global data
 	//----------------------------------
 	libChessInit();
-	transpositionTable::getInstance().setSize(1);
+	my_thread::getInstance().getTT().setSize(1);
 	
 	SPSA spsa;
 	spsa.run();

@@ -25,6 +25,7 @@ class timeManagement;
 class SearchLimits;
 class SearchParameters;
 class SearchResult;
+class transpositionTable;
 
 class my_thread
 {
@@ -54,6 +55,7 @@ public :
 	SearchParameters& getSearchParameters();
 	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
 	bool isSearchRunning() const;
+	transpositionTable& getTT();
 	
 };
 #endif /* THREAD_H_ */

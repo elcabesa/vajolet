@@ -58,12 +58,13 @@ static std::string getNodesPerSecond(const uint64_t nodeCount, const int64_t tim
 void benchmark() {
 	// initialize search parameters
 	uciParameters::useOwnBook = false;
-	transpositionTable::getInstance().setSize(32);
+	transpositionTable tt;
+	tt.setSize(32);
 	
 	SearchTimer st;
 	SearchLimits sl;
 	sl.setDepth(15);
-	Search src(st, sl, UciOutput::create(UciOutput::type::mute));
+	Search src(st, sl, tt, UciOutput::create(UciOutput::type::mute));
 	
 	
 	// iterate positions

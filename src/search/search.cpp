@@ -59,14 +59,15 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	impl( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st){}
+	impl( SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st), _tt(tt){}
 
-	impl( const impl& other ) :_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMovesToBeSearched(other._rootMovesToBeSearched){}
+	impl( const impl& other ) :_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMovesToBeSearched(other._rootMovesToBeSearched), _tt(other._tt){}
 	impl& operator=(const impl& other)
 	{
 		// todo fare una copia fatta bene
 		_sl = other._sl;
 		_st = other._st;
+		_tt = other._tt;
 		_UOI = UciOutput::create();
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return *this;
@@ -135,6 +136,7 @@ private:
 	SearchLimits& _sl; // todo limits belong to threads
 	SearchTimer& _st;
 	rootMovesToBeSearched _rootMovesToBeSearched;
+	transpositionTable& _tt;
 	Game _game;
 
 
@@ -584,7 +586,7 @@ SearchResult Search::impl::go(int depth, Score alpha, Score beta, PVline pvToBeF
 	//------------------------------------
 	
 	//clean transposition table
-	transpositionTable::getInstance().newSearch();
+	_tt.newSearch();
 	
 	_pvLineFollower.setPVline(pvToBeFollowed);
 	
@@ -894,7 +896,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	//--------------------------------------
 	// test the transposition table
 	//--------------------------------------
-	ttEntry* tte = transpositionTable::getInstance().probe( posKey );
+	ttEntry* tte = _tt.probe( posKey );
 	Move ttMove( tte->getPackedMove() );
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
@@ -903,7 +905,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			&& _canUseTTeValue( PVnode, beta, ttValue, tte, depth )
 		)
 	{
-		transpositionTable::getInstance().refresh(*tte);
+		_tt.refresh(*tte);
 		
 		if constexpr (PVnode)
 		{
@@ -947,7 +949,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		{
 			if(	res.TTtype == typeExact || (res.TTtype == typeScoreHigherThanBeta  && res.value >=beta) || (res.TTtype == typeScoreLowerThanAlpha && res.value <=alpha)	)
 			{
-				transpositionTable::getInstance().store(posKey,
+				_tt.store(posKey,
 					transpositionTable::scoreToTT(res.value, ply),
 					res.TTtype,
 					std::min( 100 * ONE_PLY , depth + 6 * ONE_PLY),
@@ -1208,7 +1210,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 		_sd.setSkipNullMove(ply, skipBackup);
 
-		tte = transpositionTable::getInstance().probe(posKey);
+		tte = _tt.probe(posKey);
 		ttMove = tte->getPackedMove();
 	}
 
@@ -1572,7 +1574,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 	if(!_stop)
 	{
-		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+		_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta  ? typeScoreHigherThanBeta :
 					(PVnode && bestMove ) ? typeExact : typeScoreLowerThanAlpha,
 							(short int)depth, bestMove, staticEval);
@@ -1678,7 +1680,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 
 	const HashKey& posKey = _getSearchKey();
-	ttEntry* const tte = transpositionTable::getInstance().probe( _pos.getKey() );
+	ttEntry* const tte = _tt.probe( _pos.getKey() );
 	if (log) ln->logTTprobe(*tte);
 	Move ttMove( tte->getPackedMove() );
 	if(!_pos.isMoveLegal(ttMove)) {
@@ -1703,7 +1705,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 	if (log) ln->test("CanUseTT");
 	if( _canUseTTeValue( PVnode, beta, ttValue, tte, TTdepth ) )
 	{
-		transpositionTable::getInstance().refresh(*tte);
+		_tt.refresh(*tte);
 		if constexpr (PVnode)
 		{
 			_appendTTmoveIfLegal( ttMove, pvLine);
@@ -1766,7 +1768,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 				}
 				if(!_stop)
 				{
-					transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove, staticEval);
+					_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove, staticEval);
 				}
 				if (log) ln->logReturnValue(bestScore);
 				if (log) ln->endSection();
@@ -1916,7 +1918,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 					}
 					if(!_stop)
 					{
-						transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
+						_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
 					}
 					if (log) ln->logReturnValue(bestScore);
 					if (log) ln->endSection();
@@ -1943,7 +1945,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 	if( !_stop )
 	{
-		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove, staticEval);
+		_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove, staticEval);
 	}
 	if (log) ln->logReturnValue(bestScore);
 	return bestScore;
@@ -2017,7 +2019,7 @@ Move Search::impl::_getPonderMoveFromHash(const Move& bestMove )
 	Move ponderMove(0);
 	_pos.doMove( bestMove );
 	
-	const ttEntry* const tte = transpositionTable::getInstance().probe(_pos.getKey());
+	const ttEntry* const tte = _tt.probe(_pos.getKey());
 	
 	Move m( tte->getPackedMove() );
 	if( _pos.isMoveLegal(m) )
@@ -2149,7 +2151,7 @@ SearchResult Search::impl::manageNewSearch()
 	// print out the choosen line
 	//-----------------------------
 
-	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime());
+	_UOI->printGeneralInfo( _tt.getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime());
 	
 	Move bestMove = PV.getMove(0);
 	Move ponderMove = PV.getMove(1);
@@ -2189,7 +2191,7 @@ void Search::impl::testSimmetry() const
 
 
 void Search::initSearchParameters(){ Search::impl::initSearchParameters(); }
-Search::Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, std::move(UOI))}{}
+Search::Search( SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, tt, std::move(UOI))}{}
 Search::~Search() = default;
 void Search::stopSearch(){ pimpl->stopSearch(); }
 

@@ -197,7 +197,7 @@ int main()
 	
 	libChessInit();
 
-	transpositionTable::getInstance().setSize(1);
+	//transpositionTable::getInstance().setSize(1);
 	auto&  szg = Syzygy::getInstance();
 	szg.setPath(uciParameters::SyzygyPath);
 	sync_cout<<"info string syzygy path set to "<<uciParameters::SyzygyPath<<sync_endl;

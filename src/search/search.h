@@ -29,6 +29,7 @@ class SearchTimer;
 class SearchLimits;
 class SearchResult;
 class SearchParameters;
+class transpositionTable;
 
 
 class Search
@@ -42,10 +43,10 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	explicit Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) );
+	explicit Search(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create( ));
 	~Search();
 
-	Search( const Search& other ) = delete;
+	Search(const Search& other) = delete;
 	Search& operator=(const Search& other) = delete;
 	Search(Search&&) =delete;
 	Search& operator=(Search&&) = delete;

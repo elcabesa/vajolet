@@ -117,6 +117,12 @@ private:
 	uint64_t _elements;
 	unsigned char _generation;
 
+	transpositionTable(transpositionTable const&) = delete;
+	//void operator=(transpositionTable const&) = delete;
+	ttCluster& findCluster(uint64_t key);
+	
+public:
+
 	explicit transpositionTable()
 	{
 		_table.clear();
@@ -125,21 +131,14 @@ private:
 		_generation = 0;
 		_elements = 1;
 	}
-	
-	transpositionTable(transpositionTable const&) = delete;
-	void operator=(transpositionTable const&) = delete;
-	ttCluster& findCluster(uint64_t key);
-	
-
-public:
 
 	void clear();
-	static transpositionTable& getInstance()
+	/*static transpositionTable& getInstance()
 	{
 		static transpositionTable instance; // Guaranteed to be destroyed.
 		// Instantiated on first use.
 		return instance;
-	}
+	}*/
 	
 	void newSearch();
 	uint64_t setSize(unsigned long int mbSize);
@@ -183,14 +182,13 @@ public:
 
 class PerftTranspositionTable
 {
+private:
+	transpositionTable& _tt;
 public:
-	explicit PerftTranspositionTable(){}
+	explicit PerftTranspositionTable(transpositionTable& tt): _tt(tt){}
 	
 	void store(const HashKey& key, signed short int depth, unsigned long long v);
 	bool retrieve(const HashKey& key, unsigned int depth, unsigned long long& res);
 };
-
-
-
 
 #endif /* TRANSPOSITION_H_ */

@@ -163,12 +163,12 @@ unsigned int transpositionTable::getFullness() const
 
 void PerftTranspositionTable::store(const HashKey& key, signed short int depth, unsigned long long v)
 {
-	transpositionTable::getInstance().store(key, Score(v&0x7FFFFF), typeExact, depth, Move::NOMOVE, (v>>23)&0x7FFFFF);
+	_tt.store(key, Score(v&0x7FFFFF), typeExact, depth, Move::NOMOVE, (v>>23)&0x7FFFFF);
 }
 
 bool PerftTranspositionTable::retrieve(const HashKey& key, unsigned int depth, unsigned long long& res)
 {
-	ttEntry* tte = transpositionTable::getInstance().probe( key );
+	ttEntry* tte = _tt.probe( key );
 	
 	if( tte->getKey() == (key.getKey()>>32) && (unsigned int)tte->getDepth() == depth )
 	{
