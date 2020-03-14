@@ -57,8 +57,32 @@ void SPSA::run() {
 	
 	std::vector<variable> pars = {
 		{"razorMargin", &SearchParameters::razorMargin, 20000, 0, 40000, 5000, 0.0020, {}},
-		{"razorMarginDepth", &SearchParameters::razorMarginDepth, 78, 0, 160, 30, 0.0020, {}},
-		{"razorMarginCut", &SearchParameters::razorMarginCut, 20000, 0, 40000, 5000, 0.0020, {}}
+		{"razorDepth", &SearchParameters::razorMarginDepth, 64, 0, 128, 30, 0.0020, {}},
+		//{"razorMarginCut", &SearchParameters::razorMarginCut, 20000, 0, 40000, 5000, 0.0020, {}}
+		
+		{"staticNullMovePruningDepth", &SearchParameters::staticNullMovePruningDepth, 128, 0, 256, 40, 0.0020, {}},
+		{"staticNullMovePruningValue", &SearchParameters::staticNullMovePruningValue, 375, 0, 500, 50, 0.0020, {}},
+		{"staticNullMovePruningImprovingBonus", &SearchParameters::staticNullMovePruningImprovingBonus, 2000, 0, 4000, 500, 0.0020, {}},
+
+		{"nullMovePruningDepth", &SearchParameters::nullMovePruningDepth, 16, 0, 32, 4, 0.0020, {}},
+		{"nullMovePruningReduction", &SearchParameters::nullMovePruningReduction, 48, 0, 96, 12, 0.0020, {}},
+		{"nullMovePruningBonusThreshold", &SearchParameters::nullMovePruningBonusThreshold, 10000, 0, 20000, 2000, 0.0020, {}},
+		{"nullMovePruningBonusAdditionalRed", &SearchParameters::nullMovePruningBonusAdditionalRed, 16, 0, 32, 4, 0.0020, {}},
+		{"nullMovePruningVerificationDepth", &SearchParameters::nullMovePruningVerificationDepth, 192, 0, 400, 50, 0.0020, {}},
+		
+		{"probCutDepth", &SearchParameters::probCutDepth, 80, 0, 160, 20, 0.0020, {}},
+		{"probCutDelta", &SearchParameters::probCutDelta, 8000, 0, 16000, 2000, 0.0020, {}},
+		{"probCutDepthRed", &SearchParameters::probCutDepthRed, 48, 0, 100, 10, 0.0020, {}},
+		
+		{"iidDepthPv", &SearchParameters::iidDepthPv, 80, 0, 160, 20, 0.0020, {}},
+		{"iidDepthNonPv", &SearchParameters::iidDepthNonPv, 128, 0, 256, 32, 0.0020, {}},
+		{"iidStaticEvalBonus", &SearchParameters::iidStaticEvalBonus, 10000, 0, 20000, 2000, 0.0020, {}},
+		{"iidDepthRed", &SearchParameters::iidDepthRed, 32, 0, 64, 8, 0.0020, {}},
+		{"iidDepthRedFactor", &SearchParameters::iidDepthRedFactor, 4, 0, 8, 1, 0.0020, {}},
+		
+		{"singularExpressionPVDepth", &SearchParameters::singularExpressionPVDepth, 96, 0, 200, 20, 0.0020, {}},
+		{"singularExpressionNonPVDepth", &SearchParameters::singularExpressionNonPVDepth, 128, 0, 256, 25, 0.0020, {}},
+		{"singularExpressionTtDepth", &SearchParameters::singularExpressionTtDepth, 48, 0, 96, 10, 0.0020, {}}
 	};
 	
 	for( auto& par: pars) {
