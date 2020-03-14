@@ -28,7 +28,7 @@
 
 void signalHandler(int signum)
 {
-	my_thread::getInstance().stopThinking();
+	//my_thread::getInstance().stopThinking();
 	exit(signum);
 }
 
@@ -58,7 +58,6 @@ int main() {
 	//	init global data
 	//----------------------------------
 	libChessInit();
-	my_thread::getInstance().getTT().setSize(1);
 	
 	SPSA spsa;
 	spsa.run();

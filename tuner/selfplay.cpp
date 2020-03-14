@@ -29,6 +29,7 @@
 #include "selfplay.h"
 #include "searchResult.h"
 #include "thread.h"
+#include "transposition.h"
 #include "tunerPars.h"
 #include "uciOutput.h"
 #include "vajo_io.h"
@@ -46,8 +47,9 @@ SelfPlay::SelfPlay(const Player& white, const Player& black) : _p(Position::pawn
 pgn::Game SelfPlay::playGame(unsigned int round) {
 	
 	// init search & time management
-	my_thread &thr = my_thread::getInstance();
+	my_thread thr;
 	thr.setMute(true);
+	thr.getTT().setSize(1);
 	
 	pgn::Game pgnGame;
 	_addGameTags(pgnGame, round);
