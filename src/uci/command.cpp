@@ -24,13 +24,12 @@
 #include "command.h"
 #include "movepicker.h"
 #include "perft.h"
-#include "position.h"
 #include "searchTimer.h"
 #include "searchLimits.h"
 #include "syzygy/syzygy.h"
 #include "tSquare.h"
-#include "thread.h"
 #include "transposition.h"
+#include "uciManagerImpl.h"
 #include "uciOption.h"
 #include "uciOutput.h"
 #include "uciParameters.h"
@@ -38,64 +37,6 @@
 #include "vajo_io.h"
 #include "version.h"
 
-class UciManager::impl
-{
-public:
-	explicit impl();
-	~impl();
-	
-	void uciLoop(std::istream& is);
-
-	
-private:
-	/*! \brief array of char to create the fen string
-		\author Marco Belli
-		\version 1.0
-		\date 27/10/2013
-	*/
-	
-	static void setTTSize(unsigned int size)
-	{
-		uint64_t elements = my_thread::getInstance().getTT().setSize(size);
-		sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
-	}
-	static void clearHash() {my_thread::getInstance().getTT().clear();}
-	static void setTTPath( std::string s ) {
-		auto&  szg = Syzygy::getInstance();
-		szg.setPath(s);
-		sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;
-	}
-	std::string unusedVersion;
-	unsigned int unusedSize;
-	
-	static const std::string _StartFEN;
-	
-	std::list<std::unique_ptr<UciOption>> _optionList;
-	
-	std::string _getProgramNameAndVersion();
-	void _printNameAndVersionMessage();
-	
-	Move _moveFromUci(const Position& pos,const  std::string& str);
-	void _doPerft(const unsigned int n);
-	
-	
-	bool _printUciInfo(std::istringstream& is, my_thread &thr);
-	bool _stop(std::istringstream& is, my_thread &thr);
-	bool _uciNewGame(std::istringstream& is, my_thread &thr);
-	bool _eval(std::istringstream& is, my_thread &thr);
-	bool _display(std::istringstream& is, my_thread &thr);
-	bool _position(std::istringstream& is, my_thread &thr);
-	
-	bool _go(std::istringstream& is, my_thread &thr);
-	bool _setoption(std::istringstream& is, my_thread &thr);
-	bool _readyOk(std::istringstream& is, my_thread &thr);
-	bool _benchmark(std::istringstream& is, my_thread &thr);
-	bool _ponderHit(std::istringstream& is, my_thread &thr);
-	bool _perft(std::istringstream& is, my_thread &thr);
-	bool _divide(std::istringstream& is, my_thread &thr);
-	bool _quit(std::istringstream& is, my_thread &thr);
-	Position _pos;
-};
 
 const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
@@ -104,18 +45,18 @@ UciManager::impl::impl(): _pos(Position::pawnHash::off)
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
 	
-	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, setTTSize, 1, 1, 262144));
-	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, nullptr, 1, 1, 256));
-	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, nullptr, 1, 1, 500));
+	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, this, &UciManager::impl::setTTSize, 1, 1, 262144));
+	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, this, nullptr, 1, 1, 256));
+	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, this, nullptr, 1, 1, 500));
 	_optionList.emplace_back( new CheckUciOption("Ponder", uciParameters::Ponder, true));
 	_optionList.emplace_back( new CheckUciOption("OwnBook", uciParameters::useOwnBook, true));
 	_optionList.emplace_back( new CheckUciOption("BestMoveBook", uciParameters::bestMoveBook, false));
-	_optionList.emplace_back( new StringUciOption("UCI_EngineAbout", unusedVersion, nullptr, _getProgramNameAndVersion() + " by Marco Belli (build date: " + __DATE__ + " " + __TIME__ + ")"));
+	_optionList.emplace_back( new StringUciOption("UCI_EngineAbout", unusedVersion, this, nullptr, _getProgramNameAndVersion() + " by Marco Belli (build date: " + __DATE__ + " " + __TIME__ + ")"));
 	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", uciParameters::showCurrentLine, false));
-	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath, setTTPath, "<empty>"));
-	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, nullptr, 1, 1, 100));
+	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath, this, &UciManager::impl::setTTPath, "<empty>"));
+	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, this, nullptr, 1, 1, 100));
 	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, true));
-	_optionList.emplace_back( new ButtonUciOption("ClearHash", clearHash));
+	_optionList.emplace_back( new ButtonUciOption("ClearHash", this, &UciManager::impl::clearHash));
 	_optionList.emplace_back( new CheckUciOption("PerftUseHash", uciParameters::perftUseHash, false));
 	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciOutput::reduceVerbosity, false));
 	_optionList.emplace_back( new CheckUciOption("UCI_Chess960", uciParameters::Chess960, false));
@@ -129,7 +70,17 @@ UciManager::impl::~impl()
 //---------------------------------------------
 //	function implementation
 //---------------------------------------------
-
+void UciManager::impl::setTTSize(unsigned int size)
+{
+	uint64_t elements = thr.getTT().setSize(size);
+	sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
+}
+void UciManager::impl::clearHash() {thr.getTT().clear();}
+void UciManager::impl::setTTPath( std::string s ) {
+	auto&  szg = Syzygy::getInstance();
+	szg.setPath(s);
+	sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;
+}
 
 std::string UciManager::impl::_getProgramNameAndVersion()
 {
@@ -234,7 +185,7 @@ void UciManager::impl::_doPerft(const unsigned int n)
 {
 	SearchTimer st;
 	
-	PerftTranspositionTable tt(my_thread::getInstance().getTT());
+	PerftTranspositionTable tt(thr.getTT());
 	Perft pft(_pos,tt);
 	pft.perftUseHash = uciParameters::perftUseHash;
 	unsigned long long res = pft.perft(n);
@@ -274,7 +225,7 @@ bool UciManager::impl::_go(std::istringstream& is, my_thread &)
 			}
 		}
 	}
-	my_thread::getInstance().startThinking( _pos, limits );
+	thr.startThinking( _pos, limits );
 	return false;
 }
 
@@ -358,7 +309,7 @@ bool UciManager::impl::_divide(std::istringstream& is, my_thread &) {
 		{
 			n = 1;
 		}
-		PerftTranspositionTable tt(my_thread::getInstance().getTT());
+		PerftTranspositionTable tt(thr.getTT());
 		Perft pft(_pos,tt);
 		pft.perftUseHash = uciParameters::perftUseHash;
 		unsigned long long res = pft.divide(n);
@@ -430,7 +381,6 @@ void UciManager::impl::uciLoop(std::istream& is)
 {
 	_printNameAndVersionMessage();
 	
-	my_thread &thr = my_thread::getInstance();
 	std::string cmd;
 	
 	bool quit = false;

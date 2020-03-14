@@ -19,12 +19,14 @@
 #include <string>
 #include <vector>
 
+#include "bitBoardIndex.h"
 #include "vajo_io.h"
 #include "position.h"
 #include "search.h"
 #include "searchResult.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
+#include "timeManagement.h"
 #include "transposition.h"
 #include "uciParameters.h"
 
@@ -64,6 +66,7 @@ void benchmark() {
 	SearchTimer st;
 	SearchLimits sl;
 	sl.setDepth(15);
+	auto tm = timeManagement::create(sl, eNextMove::whiteTurn);
 	Search src(st, sl, tt, UciOutput::create(UciOutput::type::mute));
 	
 	
@@ -73,7 +76,7 @@ void benchmark() {
 	for (auto pos: positions) {	
 		src.getPosition().setupFromFen(pos);
 		sync_cout << "Position: " << (++i) << '/' << positions.size() << sync_endl;
-		src.manageNewSearch();
+		src.manageNewSearch(*tm);
 		nodeCount += src.getVisitedNodes();
 	}
 	

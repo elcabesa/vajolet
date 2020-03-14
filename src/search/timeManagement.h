@@ -25,7 +25,7 @@
 class timeManagement
 {
 public:
-	explicit timeManagement( SearchLimits& limits ):_firstIterationFinished(false), _idLoopIterationFinished(false), _idLoopFailLow(false), _idLoopFailOver(false), _resolution(0), _stop(false), _limits(limits){}
+	explicit timeManagement(const SearchLimits& limits):_firstIterationFinished(false), _idLoopIterationFinished(false), _idLoopFailLow(false), _idLoopFailOver(false), _resolution(0), _stop(false), _limits(limits){}
 	virtual ~timeManagement(){}
 
 	void notifyIterationHasBeenFinished();

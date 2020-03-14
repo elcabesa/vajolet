@@ -67,12 +67,12 @@ private:
 		
 	SearchLimits _limits; // todo limits belong to threads
 	SearchTimer _st;
-	Search _src;
 	transpositionTable _tt;
 	std::unique_ptr<timeManagement> _timeMan;
 	std::unique_ptr<UciOutput> _UOI;
 	long long _lastHasfullMessageTime;
 	SearchResult _srcRes;
+	Search _src;
 
 
 	bool _initThreads();
@@ -102,7 +102,7 @@ volatile bool my_thread::impl::_quit = false;
 volatile bool my_thread::impl::_startThink = false;
 
 
-my_thread::impl::impl(): _src(_st, _limits, _tt), _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create()), _srcRes(0, 0, 0, PVline(), 0) 
+my_thread::impl::impl(): _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create()), _srcRes(0, 0, 0, PVline(), 0), _src(_st, _limits, _tt) 
 {
 	if( !_initThreads() )
 	{
@@ -187,7 +187,7 @@ void my_thread::impl::_searchThread()
 			_src.resetStopCondition();
 			_st.resetTimers();
 			_timerCond.notify_all();
-			_srcRes = _src.manageNewSearch();
+			_srcRes = _src.manageNewSearch(getTimeMan());
 			_startThink = false;
 		}
 		_finishedSearch.notify_all();

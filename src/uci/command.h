@@ -42,8 +42,9 @@ private:
 	UciManager& operator=(const UciManager&) = delete;
 	UciManager(const UciManager&&) = delete;
 	UciManager& operator=(const UciManager&&) = delete;
-	
-	class impl;
+public:
+	class impl;	
+private:
 	std::unique_ptr<impl> pimpl;
 public:
 

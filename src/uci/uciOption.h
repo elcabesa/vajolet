@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include "uciManagerImpl.h"
+
 class UciOption
 {
 public:
@@ -35,19 +37,20 @@ protected:
 class StringUciOption final: public UciOption
 {
 public:
-	StringUciOption(const std::string& name, std::string& value, void (*callbackFunc)(std::string), const std::string& defVal);
+	StringUciOption(const std::string& name, std::string& value, UciManager::impl* uci, void (UciManager::impl::*callbackFunc)(std::string), const std::string& defVal);
 	std::string print() const override;
 	bool setValue( const std::string& s, bool verbose = true) override;
 private:
 	const std::string _defaultValue;
 	std::string& _value;
-	void (*_callbackFunc)(std::string);
+	void (UciManager::impl::*_callbackFunc)(std::string);
+	UciManager::impl* _uci;
 };
 
 class SpinUciOption final: public UciOption
 {
 public:
-	SpinUciOption( const std::string& name, unsigned int& value, void (*callbackFunc)(unsigned int), const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal);
+	SpinUciOption( const std::string& name, unsigned int& value, UciManager::impl* uci, void (UciManager::impl::*callbackFunc)(unsigned int), const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal);
 	std::string print() const override;
 	bool setValue( const std::string& s, bool verbose = true) override;		
 private:
@@ -55,7 +58,8 @@ private:
 	const unsigned int _minValue;
 	const unsigned int _maxValue;
 	unsigned int & _value;
-	void (*_callbackFunc)(unsigned int);
+	void (UciManager::impl::*_callbackFunc)(unsigned int);
+	UciManager::impl* _uci;
 };
 
 class CheckUciOption final: public UciOption
@@ -72,11 +76,12 @@ private:
 class ButtonUciOption final: public UciOption
 {
 public:
-	ButtonUciOption( const std::string& name, void (*callbackFunc)());
+	ButtonUciOption( const std::string& name, UciManager::impl* uci, void (UciManager::impl::*callbackFunc)());
 	std::string print() const override;
 	bool setValue( const std::string&, bool verbose = true ) override;
 private:
-	void (*_callbackFunc)();
+	void (UciManager::impl::*_callbackFunc)();
+	UciManager::impl* _uci;
 };
 
 #endif /* UCI_OPTION_H_ */
