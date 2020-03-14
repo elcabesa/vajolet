@@ -57,7 +57,7 @@ void SPSA::run() {
 	
 	std::vector<variable> pars = {
 		{"razorMargin", &SearchParameters::razorMargin, 20000, 0, 40000, 5000, 0.0020, {}},
-		{"razorDepth", &SearchParameters::razorMarginDepth, 64, 0, 128, 30, 0.0020, {}},
+		{"razorDepth", &SearchParameters::razorMarginDepth, 64, 0, 128, 15, 0.0020, {}},
 		//{"razorMarginCut", &SearchParameters::razorMarginCut, 20000, 0, 40000, 5000, 0.0020, {}}
 		
 		{"staticNullMovePruningDepth", &SearchParameters::staticNullMovePruningDepth, 128, 0, 256, 40, 0.0020, {}},
