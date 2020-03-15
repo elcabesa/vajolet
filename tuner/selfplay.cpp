@@ -28,13 +28,10 @@
 #include "PGNTagList.h"
 #include "selfplay.h"
 #include "searchResult.h"
-#include "thread.h"
-#include "transposition.h"
 #include "tunerPars.h"
 #include "uciOutput.h"
-#include "vajo_io.h"
 
-SelfPlay::SelfPlay(const Player& white, const Player& black) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black) {
+SelfPlay::SelfPlay(Player& white, Player& black) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black) {
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());
@@ -45,11 +42,6 @@ SelfPlay::SelfPlay(const Player& white, const Player& black) : _p(Position::pawn
 }
 
 pgn::Game SelfPlay::playGame(unsigned int round) {
-	
-	// init search & time management
-	my_thread thr;
-	thr.setMute(true);
-	thr.getTT().setSize(1);
 	
 	pgn::Game pgnGame;
 	_addGameTags(pgnGame, round);
@@ -66,13 +58,8 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		_sl.setWTime(_c.getWhiteTime());
 		_sl.setBTime(_c.getBlackTime());
 		
-		if(_c.isWhiteTurn()) {
-			thr.getSearchParameters() = _white.getSearchParametersConst();
-		} else {
-			thr.getSearchParameters() = _black.getSearchParametersConst();
-		}
+		auto res = _c.isWhiteTurn()? _white.doSearch(_p, _sl): _black.doSearch(_p, _sl);
 		
-		auto res = thr.synchronousSearch(_p, _sl);
 		if(_c.isWhiteTurn()) {
 			whitePly = pgn::Ply(UciOutput::displayMove(_p, res.PV.getMove(0)));
 			pendingMove =true;
@@ -159,9 +146,9 @@ void SelfPlay::_addGameTags(pgn::Game& g, int round) {
 	g.tags().insert(pgn::Tag("Round",std::to_string(round)));
 	g.tags().insert(pgn::Tag("White",_white.getName()));
 	g.tags().insert(pgn::Tag("Black",_black.getName()));
-	g.tags().insert(pgn::Tag("Result","*"));
-	
+	g.tags().insert(pgn::Tag("Result","*"));	
 }
+
 void SelfPlay::_addGameResult(pgn::Game& g, const std::string & s) {
 	g.tags().insert(pgn::Tag("Result",s));
 	g.result() = s;

@@ -28,7 +28,7 @@ class Player;
 class SelfPlay {
 	
 public:
-	SelfPlay(const Player& white, const Player& black);
+	SelfPlay(Player& white, Player& black);
 	pgn::Game playGame(unsigned int round);
 private:	
 	bool _isGameFinished();
@@ -38,8 +38,8 @@ private:
 	Position _p;
 	Clock _c;
 	SearchLimits _sl;
-	const Player& _white;
-	const Player& _black;
+	Player& _white;
+	Player& _black;
 };
 
 #endif /* SELFPLAY_H_ */

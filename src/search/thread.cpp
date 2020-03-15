@@ -61,9 +61,8 @@ private:
 	std::condition_variable _timerCond;
 	std::condition_variable _finishedSearch;
 	
-	volatile static bool _quit;
-	volatile static bool _startThink;
-	
+	volatile bool _quit = false;
+	volatile bool _startThink = false;
 		
 	SearchLimits _limits; // todo limits belong to threads
 	SearchTimer _st;
@@ -97,10 +96,6 @@ public:
 	bool isSearchRunning() const;
 	transpositionTable& getTT();
 };
-
-volatile bool my_thread::impl::_quit = false;
-volatile bool my_thread::impl::_startThink = false;
-
 
 my_thread::impl::impl(): _src(_st, _limits, _tt), _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create()), _srcRes(0, 0, 0, PVline(), 0) 
 {

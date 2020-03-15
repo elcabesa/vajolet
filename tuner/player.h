@@ -19,6 +19,10 @@
 
 #include <string>
 #include "parameters.h"
+#include "searchResult.h"
+#include "thread.h"
+
+class Position;
 
 class Player {
 public:
@@ -30,6 +34,7 @@ public:
 	std::string print() const;
 	const std::string& getName() const;
 	double pointRatio() const;
+	SearchResult doSearch(const Position& p, SearchLimits& sl);
 	
 private:
 	SearchParameters _sp;
@@ -38,6 +43,7 @@ private:
 	int _draw = 0;
 	int _unknown = 0;
 	std::string _name;
+	my_thread _thr;
 };
 
 #endif /* PLAYER_H_ */
