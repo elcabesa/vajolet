@@ -133,12 +133,6 @@ public:
 	}
 
 	void clear();
-	/*static transpositionTable& getInstance()
-	{
-		static transpositionTable instance; // Guaranteed to be destroyed.
-		// Instantiated on first use.
-		return instance;
-	}*/
 	
 	void newSearch();
 	uint64_t setSize(unsigned long int mbSize);

@@ -41,12 +41,6 @@ public :
 	explicit my_thread();
 	~my_thread();
 
-	/*static my_thread& getInstance()
-	{
-		static my_thread pInstance;
-		return pInstance;
-	}*/
-
 	void startThinking(const Position& p, SearchLimits& l);
 	void stopThinking();
 	void ponderHit();
