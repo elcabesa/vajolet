@@ -52,7 +52,7 @@ private:
 	int _unknown = 0;
 };
 
-Tournament::Tournament(const std::string& pgnName, const Player& p1, const Player& p2): _pgnName(pgnName), _p1(p1), _p2(p2) {
+Tournament::Tournament(const std::string& pgnName, Player& p1, Player& p2): _pgnName(pgnName), _p1(p1), _p2(p2) {
 }
 
 TournamentResult Tournament::play() {

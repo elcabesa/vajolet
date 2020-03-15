@@ -5,6 +5,7 @@
 #include "searchResult.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
+#include "timeManagement.h"
 #include "transposition.h"
 #include "syzygy/syzygy.h"
 
@@ -60,20 +61,20 @@ static const std::vector<positions> _p =
 TEST(search, search) {
 	
 	Syzygy::getInstance().setPath("");
-	transpositionTable::getInstance().setSize(1);
+	
 	
 	SearchTimer st;
 	SearchLimits sl;
-
-
-	Search src( st, sl, UciOutput::create(UciOutput::type::mute));
-
+	transpositionTable tt;
+	tt.setSize(1);
+	auto tm = timeManagement::create(sl, eNextMove::whiteTurn);
+	Search src( st, sl, tt, UciOutput::create(UciOutput::type::mute));
 
 	for (auto & p : _p)
 	{
 		src.getPosition().setupFromFen(p.Fen);
 		sl.setDepth(p.depth);
-		auto res = src.manageNewSearch();
+		auto res = src.manageNewSearch(*tm);
 		if( p.bm != Move::NOMOVE)
 		{
 			EXPECT_EQ( res.PV.getMove(0), p.bm);
@@ -106,18 +107,20 @@ TEST(search, search) {
 TEST(search, searchExludeMove) {
 	
 	Syzygy::getInstance().setPath("");
-	transpositionTable::getInstance().setSize(1);
 	
 	SearchTimer st;
 	SearchLimits sl;
 	sl.moveListInsert(Move(F1,C4));
 	sl.moveListInsert(Move(C3,A4));
+	transpositionTable tt;
+	tt.setSize(1);
+	auto tm = timeManagement::create(sl, eNextMove::whiteTurn);
 	
-	Search src( st, sl, UciOutput::create( UciOutput::type::mute ) );
+	Search src( st, sl, tt,UciOutput::create( UciOutput::type::mute ) );
 
 	src.getPosition().setupFromFen("rn1qkbnr/pbpp1ppp/1p6/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 2 4");
 	sl.setDepth(10);
-	auto res = src.manageNewSearch();
+	auto res = src.manageNewSearch(*tm);
 
 	EXPECT_EQ( res.PV.getMove(0), Move(F1,C4));
 }
@@ -126,21 +129,22 @@ TEST(search, syzygy) {
 	
 	auto& szg = Syzygy::getInstance();
 	szg.setPath("data/syzygy");
-
-	transpositionTable::getInstance().setSize(1);
 	
 	ASSERT_EQ(szg.getMaxCardinality(), 4);
 	ASSERT_EQ(szg.getSize(), 35);
 	
 	SearchTimer st;
 	SearchLimits sl;
+	transpositionTable tt;
+	tt.setSize(1);
+	auto tm = timeManagement::create(sl, eNextMove::whiteTurn);
 	
-	Search src( st, sl, UciOutput::create( UciOutput::type::mute ) );
+	Search src( st, sl, tt,UciOutput::create( UciOutput::type::mute ) );
 	
 	src.getPosition().setupFromFen("8/8/8/6P1/8/5K2/1r6/k7 b - - 0 1");
 	
 	sl.setDepth(1);
-	auto res = src.manageNewSearch();
+	auto res = src.manageNewSearch(*tm);
 	
 	EXPECT_EQ( res.PV.getMove(0), Move(B2, B4));
 
@@ -150,21 +154,22 @@ TEST(search, syzygy2) {
 	
 	auto& szg = Syzygy::getInstance();
 	szg.setPath("data/syzygy");
-
-	transpositionTable::getInstance().setSize(1);
 	
 	ASSERT_EQ(szg.getMaxCardinality(), 4);
 	ASSERT_EQ(szg.getSize(), 35);
 	
 	SearchTimer st;
 	SearchLimits sl;
+	transpositionTable tt;
+	tt.setSize(1);
+	auto tm = timeManagement::create(sl, eNextMove::whiteTurn);
 	
-	Search src( st, sl, UciOutput::create( UciOutput::type::mute ) );
+	Search src( st, sl, tt,UciOutput::create( UciOutput::type::mute ) );
 	
 	src.getPosition().setupFromFen("8/8/8/1k4p1/1P4Pp/K6P/8/8 w - - 0 1");
 	
 	sl.setDepth(15);
-	auto res = src.manageNewSearch();
+	auto res = src.manageNewSearch(*tm);
 	
 	EXPECT_EQ( res.PV.getMove(0), Move(A3, B3));
 

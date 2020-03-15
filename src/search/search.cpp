@@ -59,19 +59,20 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	impl( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) ):_UOI(std::move(UOI)), _sl(sl), _st(st){}
+	impl(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create()):_UOI(std::move(UOI)), _sl(sl), _st(st), _tt(tt) {}
 
-	impl( const impl& other ) :_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMovesToBeSearched(other._rootMovesToBeSearched){}
+	impl(const impl& other) :_UOI(UciOutput::create()), _sl(other._sl), _st(other._st), _rootMovesToBeSearched(other._rootMovesToBeSearched), _tt(other._tt) {}
 	impl& operator=(const impl& other)
 	{
 		// todo fare una copia fatta bene
 		_sl = other._sl;
 		_st = other._st;
+		_tt = other._tt;
 		_UOI = UciOutput::create();
 		_rootMovesToBeSearched = other._rootMovesToBeSearched;
 		return *this;
 	}
-	SearchResult go(int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
+	SearchResult go(timeManagement & tm, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline() );
 
 	void stopSearch(){ _stop = true;}
 	void resetStopCondition(){ _stop = false;}
@@ -79,7 +80,7 @@ public:
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 	void showLine(){ _showLine= true;}
-	SearchResult manageNewSearch();
+	SearchResult manageNewSearch(timeManagement & tm);
 	Position& getPosition();
 	void setUOI( std::unique_ptr<UciOutput> UOI );
 	SearchParameters& getSearchParameters() {return _sp;};
@@ -135,6 +136,7 @@ private:
 	SearchLimits& _sl; // todo limits belong to threads
 	SearchTimer& _st;
 	rootMovesToBeSearched _rootMovesToBeSearched;
+	transpositionTable& _tt;
 	Game _game;
 
 
@@ -157,9 +159,9 @@ private:
 	template<nodeType type, bool log>Score qsearch(unsigned int ply,int depth,Score alpha,Score beta, PVline& pvLine);
 	template<nodeType type, bool log>Score alphaBeta(unsigned int ply,int depth,Score alpha,Score beta,PVline& pvLine);
 
-	template<bool log>rootMove aspirationWindow(const int depth, Score alpha, Score beta, const bool masterThread);
+	template<bool log>rootMove aspirationWindow(timeManagement& tm, const int depth, Score alpha, Score beta, const bool masterThread);
 	void excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread);
-	void idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false );
+	void idLoop(timeManagement& tm,std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, bool masterThread = false );
 
 	Score futility(int depth, bool improving );
 	Score getDrawValue() const;
@@ -366,10 +368,8 @@ SearchResult Search::impl::manageQsearch(void)
 }
 
 template<bool log>
-rootMove Search::impl::aspirationWindow( const int depth, Score alpha, Score beta, const bool masterThread)
+rootMove Search::impl::aspirationWindow(timeManagement& tm, const int depth, Score alpha, Score beta, const bool masterThread)
 {
-	timeManagement &tm = my_thread::getInstance().getTimeMan();
-
 	rootMove bestMove(Move::NOMOVE);
 	Score delta = 800;
 	//----------------------------------
@@ -499,12 +499,11 @@ void Search::impl::excludeRootMoves( std::vector<rootMove>& temporaryResults, un
 	}
 }
 
-void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
+void Search::impl::idLoop(timeManagement& tm, std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
 {
 	//_rootMovesToBeSearched.print();
 	rootMove& bestMove = temporaryResults[index];
-	
-	my_thread &thr = my_thread::getInstance();
+
 	// manage multi PV moves
 	_multiPVmanager.setLinesToBeSearched(std::min( uciParameters::multiPVLines, (unsigned int)_rootMovesToBeSearched.size()));
 
@@ -548,7 +547,7 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 			//----------------------------------
 			// aspiration window
 			//----------------------------------
-			rootMove res = aspirationWindow<false>( depth, alpha, beta, masterThread);
+			rootMove res = aspirationWindow<false>(tm, depth, alpha, beta, masterThread);
 			if( res.firstMove != Move::NOMOVE )
 			{
 				bestMove = res;
@@ -570,21 +569,21 @@ void Search::impl::idLoop(std::vector<rootMove>& temporaryResults, unsigned int 
 
 		if( masterThread )
 		{
-			thr.getTimeMan().notifyIterationHasBeenFinished();
+			tm.notifyIterationHasBeenFinished();
 		}
 	}
 	while(++depth <= (_sl.isDepthLimitedSearch() ? _sl.getDepth() : 100) && !_stop);
 
 }
 
-SearchResult Search::impl::go(int depth, Score alpha, Score beta, PVline pvToBeFollowed)
+SearchResult Search::impl::go(timeManagement& tm,int depth, Score alpha, Score beta, PVline pvToBeFollowed)
 {
 	//------------------------------------
 	//init the new search
 	//------------------------------------
 	
 	//clean transposition table
-	transpositionTable::getInstance().newSearch();
+	_tt.newSearch();
 	
 	_pvLineFollower.setPVline(pvToBeFollowed);
 	
@@ -649,14 +648,14 @@ SearchResult Search::impl::go(int depth, Score alpha, Score beta, PVline pvToBeF
 		helperSearch[i-1]._pos = _pos;
 		helperSearch[i-1]._pvLineFollower.setPVline(pvToBeFollowed);
 		helperSearch[i-1]._initialTurn = _initialTurn;
-		helperThread.emplace_back( std::thread(&Search::impl::idLoop, &helperSearch[i-1], std::ref(helperResults), i, std::ref(toBeExcludedMove), depth, alpha, beta, false));
+		helperThread.emplace_back( std::thread(&Search::impl::idLoop, &helperSearch[i-1], std::ref(tm), std::ref(helperResults), i, std::ref(toBeExcludedMove), depth, alpha, beta, false));
 	}
 
 	//----------------------------------
 	// iterative deepening loop
 	//----------------------------------
 	helperResults[0].firstMove = m;
-	idLoop(helperResults, 0, toBeExcludedMove, depth, alpha, beta, true);
+	idLoop(tm, helperResults, 0, toBeExcludedMove, depth, alpha, beta, true);
 	
 	// _stop helper threads
 	for(unsigned int i = 0; i< ( uciParameters::threads - 1); i++)
@@ -894,7 +893,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	//--------------------------------------
 	// test the transposition table
 	//--------------------------------------
-	ttEntry* tte = transpositionTable::getInstance().probe( posKey );
+	ttEntry* tte = _tt.probe( posKey );
 	Move ttMove( tte->getPackedMove() );
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
@@ -903,7 +902,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 			&& _canUseTTeValue( PVnode, beta, ttValue, tte, depth )
 		)
 	{
-		transpositionTable::getInstance().refresh(*tte);
+		_tt.refresh(*tte);
 		
 		if constexpr (PVnode)
 		{
@@ -947,7 +946,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		{
 			if(	res.TTtype == typeExact || (res.TTtype == typeScoreHigherThanBeta  && res.value >=beta) || (res.TTtype == typeScoreLowerThanAlpha && res.value <=alpha)	)
 			{
-				transpositionTable::getInstance().store(posKey,
+				_tt.store(posKey,
 					transpositionTable::scoreToTT(res.value, ply),
 					res.TTtype,
 					std::min( 100 * ONE_PLY , depth + 6 * ONE_PLY),
@@ -1208,7 +1207,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 		_sd.setSkipNullMove(ply, skipBackup);
 
-		tte = transpositionTable::getInstance().probe(posKey);
+		tte = _tt.probe(posKey);
 		ttMove = tte->getPackedMove();
 	}
 
@@ -1572,7 +1571,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 	if(!_stop)
 	{
-		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply),
+		_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply),
 			bestScore >= beta  ? typeScoreHigherThanBeta :
 					(PVnode && bestMove ) ? typeExact : typeScoreLowerThanAlpha,
 							(short int)depth, bestMove, staticEval);
@@ -1678,7 +1677,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 
 	const HashKey& posKey = _getSearchKey();
-	ttEntry* const tte = transpositionTable::getInstance().probe( _pos.getKey() );
+	ttEntry* const tte = _tt.probe( _pos.getKey() );
 	if (log) ln->logTTprobe(*tte);
 	Move ttMove( tte->getPackedMove() );
 	if(!_pos.isMoveLegal(ttMove)) {
@@ -1703,7 +1702,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 	if (log) ln->test("CanUseTT");
 	if( _canUseTTeValue( PVnode, beta, ttValue, tte, TTdepth ) )
 	{
-		transpositionTable::getInstance().refresh(*tte);
+		_tt.refresh(*tte);
 		if constexpr (PVnode)
 		{
 			_appendTTmoveIfLegal( ttMove, pvLine);
@@ -1766,7 +1765,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 				}
 				if(!_stop)
 				{
-					transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove, staticEval);
+					_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, ttMove, staticEval);
 				}
 				if (log) ln->logReturnValue(bestScore);
 				if (log) ln->endSection();
@@ -1916,7 +1915,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 					}
 					if(!_stop)
 					{
-						transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
+						_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
 					}
 					if (log) ln->logReturnValue(bestScore);
 					if (log) ln->endSection();
@@ -1943,7 +1942,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 
 	if( !_stop )
 	{
-		transpositionTable::getInstance().store(posKey, transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove, staticEval);
+		_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove, staticEval);
 	}
 	if (log) ln->logReturnValue(bestScore);
 	return bestScore;
@@ -2017,7 +2016,7 @@ Move Search::impl::_getPonderMoveFromHash(const Move& bestMove )
 	Move ponderMove(0);
 	_pos.doMove( bestMove );
 	
-	const ttEntry* const tte = transpositionTable::getInstance().probe(_pos.getKey());
+	const ttEntry* const tte = _tt.probe(_pos.getKey());
 	
 	Move m( tte->getPackedMove() );
 	if( _pos.isMoveLegal(m) )
@@ -2055,7 +2054,7 @@ Position& Search::impl::getPosition()
 	return _pos;
 }
 
-SearchResult Search::impl::manageNewSearch()
+SearchResult Search::impl::manageNewSearch(timeManagement & tm)
 {
 	/*************************************************
 	 *	first of all check the number of legal moves
@@ -2139,7 +2138,7 @@ SearchResult Search::impl::manageNewSearch()
 	//}
 	//else
 	
-	SearchResult res = go();
+	SearchResult res = go(tm);
 	
 	PVline PV = res.PV;
 
@@ -2149,7 +2148,7 @@ SearchResult Search::impl::manageNewSearch()
 	// print out the choosen line
 	//-----------------------------
 
-	_UOI->printGeneralInfo( transpositionTable::getInstance().getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime());
+	_UOI->printGeneralInfo( _tt.getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime());
 	
 	Move bestMove = PV.getMove(0);
 	Move ponderMove = PV.getMove(1);
@@ -2189,7 +2188,7 @@ void Search::impl::testSimmetry() const
 
 
 void Search::initSearchParameters(){ Search::impl::initSearchParameters(); }
-Search::Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, std::move(UOI))}{}
+Search::Search( SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, tt, std::move(UOI))}{}
 Search::~Search() = default;
 void Search::stopSearch(){ pimpl->stopSearch(); }
 
@@ -2197,7 +2196,7 @@ void Search::resetStopCondition(){ pimpl->resetStopCondition(); }
 unsigned long long Search::getVisitedNodes() const{ return pimpl->getVisitedNodes(); }
 unsigned long long Search::getTbHits() const{ return pimpl->getTbHits(); }
 void Search::showLine(){ pimpl->showLine(); }
-SearchResult Search::manageNewSearch(){ return pimpl->manageNewSearch(); }
+SearchResult Search::manageNewSearch(timeManagement & tm){ return pimpl->manageNewSearch(tm); }
 Position& Search::getPosition(){ return pimpl->getPosition(); }
 void Search::setUOI( std::unique_ptr<UciOutput> UOI ) { pimpl->setUOI(std::move(UOI)); }
 SearchParameters& Search::getSearchParameters() { return pimpl->getSearchParameters(); }

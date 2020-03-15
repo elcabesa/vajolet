@@ -19,12 +19,14 @@
 #include <string>
 #include <vector>
 
+#include "bitBoardIndex.h"
 #include "vajo_io.h"
 #include "position.h"
 #include "search.h"
 #include "searchResult.h"
 #include "searchLimits.h"
 #include "searchTimer.h"
+#include "timeManagement.h"
 #include "transposition.h"
 #include "uciParameters.h"
 
@@ -58,12 +60,14 @@ static std::string getNodesPerSecond(const uint64_t nodeCount, const int64_t tim
 void benchmark() {
 	// initialize search parameters
 	uciParameters::useOwnBook = false;
-	transpositionTable::getInstance().setSize(32);
+	transpositionTable tt;
+	tt.setSize(32);
 	
 	SearchTimer st;
 	SearchLimits sl;
 	sl.setDepth(15);
-	Search src(st, sl, UciOutput::create(UciOutput::type::mute));
+	auto tm = timeManagement::create(sl, eNextMove::whiteTurn);
+	Search src(st, sl, tt, UciOutput::create(UciOutput::type::mute));
 	
 	
 	// iterate positions
@@ -72,7 +76,7 @@ void benchmark() {
 	for (auto pos: positions) {	
 		src.getPosition().setupFromFen(pos);
 		sync_cout << "Position: " << (++i) << '/' << positions.size() << sync_endl;
-		src.manageNewSearch();
+		src.manageNewSearch(*tm);
 		nodeCount += src.getVisitedNodes();
 	}
 	

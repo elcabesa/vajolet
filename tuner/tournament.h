@@ -31,7 +31,7 @@ enum class TournamentResult {
 
 class Tournament {
 public:
-	Tournament(const std::string& pgnName, const Player& _p1, const Player& _p2);
+	Tournament(const std::string& pgnName, Player& _p1, Player& _p2);
 	TournamentResult play();
 
 private:
@@ -40,7 +40,7 @@ private:
 	void _updateResults(const pgn::Game& g, Player& _p1, Player& _p2);
 
 	const std::string _pgnName;
-	Player _p1, _p2;
+	Player &_p1, &_p2;
 };
 
 #endif /* TOURNAMENT_H_ */

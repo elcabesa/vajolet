@@ -36,7 +36,7 @@ UciOption::UciOption(const std::string& name):_name(name){}
 StringUciOption
 **********************************************************/
 
-StringUciOption::StringUciOption( const std::string& name, std::string& value, void (*callbackFunc)(std::string), const std::string& defVal):UciOption(name),_defaultValue(defVal),_value(value), _callbackFunc(callbackFunc){ setValue(_defaultValue, false); }
+StringUciOption::StringUciOption( const std::string& name, std::string& value, UciManager::impl* uci, void (UciManager::impl::*callbackFunc)(std::string), const std::string& defVal):UciOption(name),_defaultValue(defVal),_value(value), _callbackFunc(callbackFunc), _uci(uci){ setValue(_defaultValue, false); }
 std::string StringUciOption::print() const
 {
 	std::string s = "option name ";
@@ -51,7 +51,7 @@ bool StringUciOption::setValue( const std::string& s, bool verbose)
 	_value = s;
 	if(_callbackFunc)
 	{
-		_callbackFunc(_value);
+		(_uci->*_callbackFunc)(_value);
 	}
 	if(verbose)
 	{
@@ -63,13 +63,14 @@ bool StringUciOption::setValue( const std::string& s, bool verbose)
 /**********************************************************
 SpinUciOption
 **********************************************************/
-SpinUciOption::SpinUciOption( const std::string& name, unsigned int& value, void (*callbackFunc)(unsigned int), const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal):
+SpinUciOption::SpinUciOption( const std::string& name, unsigned int& value, UciManager::impl* uci, void (UciManager::impl::*callbackFunc)(unsigned int), const unsigned int defVal, const unsigned int minVal, const int unsigned maxVal):
 	UciOption(name),
 	_defValue(defVal),
 	_minValue(minVal),
 	_maxValue(maxVal),
 	_value(value),
-	_callbackFunc(callbackFunc)
+	_callbackFunc(callbackFunc),
+	_uci(uci)
 { 
 	setValue( std::to_string(_defValue), false );
 }
@@ -104,7 +105,7 @@ bool SpinUciOption::setValue( const std::string& s, bool verbose)
 	
 	if( _callbackFunc )
 	{
-		_callbackFunc(_value);
+		(_uci->*_callbackFunc)(_value);
 	}
 	if(verbose)
 	{
@@ -160,7 +161,7 @@ bool CheckUciOption::setValue( const std::string& s, bool verbose)
 /**********************************************************
 ButtonUciOption
 **********************************************************/
-ButtonUciOption::ButtonUciOption( const std::string& name, void (*callbackFunc)()):UciOption(name), _callbackFunc(callbackFunc){}
+ButtonUciOption::ButtonUciOption( const std::string& name, UciManager::impl* uci, void (UciManager::impl::*callbackFunc)()):UciOption(name), _callbackFunc(callbackFunc), _uci(uci){}
 
 std::string ButtonUciOption::print() const {
 	std::string s = "option name ";
@@ -173,7 +174,7 @@ bool ButtonUciOption::setValue( const std::string&, bool)
 {
 	if(_callbackFunc)
 	{
-		_callbackFunc();
+		(_uci->*_callbackFunc)();
 	}
 	return true;
 }

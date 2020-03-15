@@ -20,9 +20,13 @@
 
 #include "elo.h"
 #include "player.h"
+#include "transposition.h"
 
 
-Player::Player(std::string name): _name(name){}
+Player::Player(std::string name): _name(name){
+	_thr.setMute(true);
+	_thr.getTT().setSize(1);
+}
 
 const SearchParameters& Player::getSearchParametersConst() const { return _sp; }
 SearchParameters& Player::getSearchParameters() { return _sp; }
@@ -60,4 +64,10 @@ const std::string& Player::getName() const {
 
 double Player::pointRatio() const {
 	return 	Elo(_win, _lost, _draw).pointRatio();
+}
+
+SearchResult Player::doSearch(const Position& p, SearchLimits& sl)
+{
+	_thr.getSearchParameters() = getSearchParametersConst();
+	return _thr.synchronousSearch(p, sl);
 }

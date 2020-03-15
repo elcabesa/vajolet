@@ -28,7 +28,7 @@
 
 void signalHandler(int signum)
 {
-	my_thread::getInstance().stopThinking();
+	//my_thread::getInstance().stopThinking();
 	exit(signum);
 }
 
@@ -51,33 +51,15 @@ int main() {
 #ifdef SIGHUP		
 	signal(SIGHUP, signalHandler);  
 #endif
-	
-	//pgn::GameCollection gc;
+
 	printStartInfo();
 	//----------------------------------
 	//	init global data
 	//----------------------------------
 	libChessInit();
-	transpositionTable::getInstance().setSize(1);
 	
 	SPSA spsa;
 	spsa.run();
-	/*
-	Player p1("p1");
-	Player p2("p2");
-	p1.getSearchParameters().razorMargin = 20000;
-	p1.getSearchParameters().razorMarginDepth = 0;
-	p1.getSearchParameters().razorMarginCut = 0;
-	
-	
-	//----------------------------------
-	//	play tournament
-	//----------------------------------
-	for(int round  = 1; round <=TunerParameters::roundNumber; ++round) {
-		Tournament t("tournament" + std::to_string(round)+".pgn", p1, p2);
-		auto res = t.play();
-		std::cout<<"Tournament Result: "<<static_cast<int>(res)<<std::endl;
-	}*/
-	
+
 	return 0;
 }

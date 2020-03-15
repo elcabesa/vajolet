@@ -29,6 +29,8 @@ class SearchTimer;
 class SearchLimits;
 class SearchResult;
 class SearchParameters;
+class timeManagement;
+class transpositionTable;
 
 
 class Search
@@ -42,10 +44,10 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	explicit Search( SearchTimer& st, SearchLimits& sl, std::unique_ptr<UciOutput> UOI = UciOutput::create( ) );
+	explicit Search(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create());
 	~Search();
 
-	Search( const Search& other ) = delete;
+	Search(const Search& other) = delete;
 	Search& operator=(const Search& other) = delete;
 	Search(Search&&) =delete;
 	Search& operator=(Search&&) = delete;
@@ -56,7 +58,7 @@ public:
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;
 	void showLine();
-	SearchResult manageNewSearch();
+	SearchResult manageNewSearch(timeManagement & tm);
 	Position& getPosition();
 	void setUOI( std::unique_ptr<UciOutput> UOI );
 	SearchParameters& getSearchParameters();

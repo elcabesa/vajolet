@@ -61,13 +61,13 @@ private:
 	std::condition_variable _timerCond;
 	std::condition_variable _finishedSearch;
 	
-	volatile static bool _quit;
-	volatile static bool _startThink;
-	
+	volatile bool _quit = false;
+	volatile bool _startThink = false;
 		
 	SearchLimits _limits; // todo limits belong to threads
 	SearchTimer _st;
 	Search _src;
+	transpositionTable _tt;
 	std::unique_ptr<timeManagement> _timeMan;
 	std::unique_ptr<UciOutput> _UOI;
 	long long _lastHasfullMessageTime;
@@ -94,13 +94,10 @@ public:
 	SearchParameters& getSearchParameters();
 	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
 	bool isSearchRunning() const;
+	transpositionTable& getTT();
 };
 
-volatile bool my_thread::impl::_quit = false;
-volatile bool my_thread::impl::_startThink = false;
-
-
-my_thread::impl::impl(): _src(_st, _limits), _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create()), _srcRes(0, 0, 0, PVline(), 0) 
+my_thread::impl::impl(): _src(_st, _limits, _tt), _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create()), _srcRes(0, 0, 0, PVline(), 0) 
 {
 	if( !_initThreads() )
 	{
@@ -122,7 +119,7 @@ void my_thread::impl::_printTimeDependentOutput(long long int time) {
 	{
 		_lastHasfullMessageTime = time;
 
-		_UOI->printGeneralInfo(transpositionTable::getInstance().getFullness(),	_src.getTbHits(), _src.getVisitedNodes(), time);
+		_UOI->printGeneralInfo(_tt.getFullness(),	_src.getTbHits(), _src.getVisitedNodes(), time);
 
 		if(uciParameters::showCurrentLine)
 		{
@@ -185,7 +182,7 @@ void my_thread::impl::_searchThread()
 			_src.resetStopCondition();
 			_st.resetTimers();
 			_timerCond.notify_all();
-			_srcRes = _src.manageNewSearch();
+			_srcRes = _src.manageNewSearch(getTimeMan());
 			_startThink = false;
 		}
 		_finishedSearch.notify_all();
@@ -289,6 +286,8 @@ bool my_thread::impl::isSearchRunning() const {
 	return _searchStatus == threadStatus::running;
 }
 
+transpositionTable& my_thread::impl::getTT() {return _tt;}
+
 /*********************************************
 * my_thread class
 **********************************************/
@@ -312,3 +311,5 @@ SearchParameters& my_thread::getSearchParameters() { return pimpl->getSearchPara
 const SearchResult& my_thread::synchronousSearch(const Position& p, SearchLimits& l) { return pimpl->synchronousSearch(p, l); }
 
 bool my_thread::isSearchRunning() const { return pimpl->isSearchRunning(); }
+
+transpositionTable& my_thread::getTT() { return pimpl->getTT();}

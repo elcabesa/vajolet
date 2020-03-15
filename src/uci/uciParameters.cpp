@@ -26,5 +26,6 @@ unsigned int uciParameters::SyzygyProbeDepth = 1;
 bool uciParameters::Syzygy50MoveRule =  true;
 bool uciParameters::Ponder;
 bool uciParameters::Chess960 = false;
+bool uciParameters::perftUseHash = false;
 
 

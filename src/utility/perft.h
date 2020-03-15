@@ -18,19 +18,23 @@
 #ifndef PERFT_H_
 #define PERFT_H_
 
+#include "transposition.h"
+
 class Position;
 
 class Perft
 {
 public:
-	static bool perftUseHash;
+	bool perftUseHash = false;
 	
-	explicit Perft( Position & pos ): _pos(pos){}
+	explicit Perft( Position & pos, PerftTranspositionTable& tt): _pos(pos), _tt(tt){}
 	unsigned long long perft(unsigned int depth);
 	unsigned long long divide(unsigned int depth);
 
 private:
 	Position & _pos;
+	PerftTranspositionTable& _tt;
+	
 };
 
 #endif /* PERFT_H_ */

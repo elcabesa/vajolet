@@ -25,12 +25,11 @@ class timeManagement;
 class SearchLimits;
 class SearchParameters;
 class SearchResult;
+class transpositionTable;
 
 class my_thread
 {
 private:
-	explicit my_thread();
-	~my_thread();
 	my_thread(const my_thread&) = delete;
 	my_thread& operator=(const my_thread&) = delete;
 	my_thread(const my_thread&&) = delete;
@@ -39,12 +38,8 @@ private:
 	class impl;
 	std::unique_ptr<impl> pimpl;
 public :
-
-	static my_thread& getInstance()
-	{
-		static my_thread pInstance;
-		return pInstance;
-	}
+	explicit my_thread();
+	~my_thread();
 
 	void startThinking(const Position& p, SearchLimits& l);
 	void stopThinking();
@@ -54,6 +49,7 @@ public :
 	SearchParameters& getSearchParameters();
 	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
 	bool isSearchRunning() const;
+	transpositionTable& getTT();
 	
 };
 #endif /* THREAD_H_ */
