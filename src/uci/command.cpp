@@ -61,7 +61,7 @@ UciManager::impl::impl(): _pos(Position::pawnHash::off)
 	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciOutput::reduceVerbosity, false));
 	_optionList.emplace_back( new CheckUciOption("UCI_Chess960", uciParameters::Chess960, false));
 	_optionList.emplace_back( new CheckUciOption("UCI_LimitStrength", uciParameters::limitStrength, false));
-	_optionList.emplace_back( new SpinUciOption("Skill Level", uciParameters::engineLevel, nullptr, 20, 1, 20));
+	_optionList.emplace_back( new SpinUciOption("Skill Level", uciParameters::engineLevel, this, nullptr, 20, 1, 20));
 	
 	_pos.setupFromFen(_StartFEN);
 }
