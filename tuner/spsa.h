@@ -74,6 +74,8 @@ private:
 	void _printParameters(Player& p1, Player& p2);
 	TournamentResult _runTournament(Player& p1, Player& p2, int k);
 	void _updateParamters(TournamentResult& r);
+	
+	std::mt19937 _gen;
 };
 
 #endif

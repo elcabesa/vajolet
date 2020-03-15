@@ -25,7 +25,7 @@
 #include "spsa.h"
 #include "tournament.h"
 
-SPSA::SPSA() {
+SPSA::SPSA():_gen((std::random_device())()) {
 	std::cout<<"SPSA"<<std::endl;
 }
 
@@ -66,8 +66,6 @@ void SPSA::_populateParameters()
 
 void SPSA::_generateParamters(Player& p1, Player& p2, int k)
 {
-	std::random_device rd;
-    std::mt19937 gen(rd());
 	std::bernoulli_distribution d(0.5);
 	
 	for( auto& par: _pars) {
@@ -80,7 +78,7 @@ void SPSA::_generateParamters(Player& p1, Player& p2, int k)
 		par.run.a = _a / std::pow(A + k, alpha);
 		par.run.c = _c / std::pow(k, gamma);
 		par.run.r = par.run.a / std::pow(par.run.c, 2.0);
-		par.run.delta = d(gen) ? 1 : -1;
+		par.run.delta = d(_gen) ? 1 : -1;
 		std::cout<<"\t\ta:"<<par.run.a<<" c:"<<par.run.c<<" r:"<<par.run.r<<" delta:"<<par.run.delta<<std::endl;
 		p1.getSearchParameters().*(par.par) = std::max(std::min(par.run.value + par.run.c * par.run.delta, par.maxValue), par.minValue);
 		p2.getSearchParameters().*(par.par) = std::max(std::min(par.run.value - par.run.c * par.run.delta, par.maxValue), par.minValue);
