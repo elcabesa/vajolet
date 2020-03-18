@@ -20,11 +20,11 @@
 //todo read data from a json
 class TunerParameters {
 public:
+	static constexpr int parallelGames = 10;
 	static constexpr int gameNumber = 20;
-	//static constexpr int roundNumber = 40;
 	
-	static constexpr float gameTime = 1;
-	static constexpr float gameTimeIncrement = 0.05;
+	static constexpr float gameTime = 10;
+	static constexpr float gameTimeIncrement = 0.1;
 };
 
 #endif

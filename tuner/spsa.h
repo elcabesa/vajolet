@@ -17,6 +17,7 @@
 #ifndef SPSA_H_
 #define SPSA_H_
 
+#include <mutex>
 #include <random>
 #include <vector>
 #include "parameters.h"
@@ -70,12 +71,16 @@ private:
 	std::vector<variable> _pars;
 	
 	void _populateParameters();
-	void _generateParamters(Player& p1, Player& p2, int k);
-	void _printParameters(Player& p1, Player& p2);
-	TournamentResult _runTournament(Player& p1, Player& p2, int k);
-	void _updateParamters(TournamentResult& r);
+	void _generateParamters(Player& p1, Player& p2, int k, int th);
+	void _printParameters(Player& p1, Player& p2, int k, int th);
+	TournamentResult _runTournament(Player& p1, Player& p2, int k, int th);
+	void _updateParamters(TournamentResult& r, int k, int th);
+	void _worker(int n);
+	int _getTurn();
 	
 	std::mt19937 _gen;
+	std::mutex _mtx;
+	unsigned int _turn = 0;
 };
 
 #endif

@@ -52,11 +52,13 @@ private:
 	int _unknown = 0;
 };
 
-Tournament::Tournament(const std::string& pgnName, Player& p1, Player& p2): _pgnName(pgnName), _p1(p1), _p2(p2) {
+Tournament::Tournament(const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2) {
 }
 
 TournamentResult Tournament::play() {
-	std::cout<<"start tournament ("<< TunerParameters::gameNumber << " games)" << std::endl;
+	std::ofstream myfile;
+	myfile.open (_debugName);
+	myfile<<"start tournament ("<< TunerParameters::gameNumber << " games)" << std::endl;
 	_createNewTournamentPgn();
 	Stats stats;
 	Player* whitePlayer = &_p1;
@@ -72,19 +74,19 @@ TournamentResult Tournament::play() {
 			whitePlayer = &_p2;
 			blackPlayer = &_p1;
 		}
-		std::cout<< "starting game " <<round  <<" of "<< TunerParameters::gameNumber << "(" << round * 100.0 / TunerParameters::gameNumber << "%) ";
+		myfile<< "starting game " <<round  <<" of "<< TunerParameters::gameNumber << "(" << round * 100.0 / TunerParameters::gameNumber << "%) ";
 		auto g = SelfPlay(*whitePlayer, *blackPlayer).playGame(round);
 		
 		stats.insert(g);
 		_updateResults(g, *whitePlayer, *blackPlayer);
 		
-		std::cout<< stats.print()<<" ";
-		std::cout<< _p1.print()<<" ";
-		std::cout<<std::endl;
+		myfile<< stats.print()<<" ";
+		myfile<< _p1.print()<<" ";
+		myfile<<std::endl;
 		
 		_saveGamePgn(g);
 	}
-	std::cout<< std::endl << "finished tournament!" <<std::endl;
+	myfile<< std::endl << "finished tournament!" <<std::endl;
 	double res = _p1.pointRatio();
 	if(res > 0.51) {
 		return TournamentResult::p1Won;
@@ -93,6 +95,7 @@ TournamentResult Tournament::play() {
 	} else {
 		return TournamentResult::draw;
 	}
+	myfile.close();
 }
 
 void Tournament::_saveGamePgn(const pgn::Game& g) {

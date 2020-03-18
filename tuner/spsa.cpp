@@ -17,16 +17,22 @@
 
 #include <cmath>
 #include <iostream>
+#include <thread>
 
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 
 #include "player.h"
 #include "spsa.h"
 #include "tournament.h"
+#include "vajo_io.h"
+
+
 
 SPSA::SPSA():_gen((std::random_device())()) {
-	std::cout<<"SPSA"<<std::endl;
+	sync_cout<<"SPSA"<<sync_endl;
 }
 
 void SPSA::_populateParameters()
@@ -64,64 +70,106 @@ void SPSA::_populateParameters()
 	}
 }
 
-void SPSA::_generateParamters(Player& p1, Player& p2, int k)
+void SPSA::_generateParamters(Player& p1, Player& p2, int k, int th)
 {
 	std::bernoulli_distribution d(0.5);
 	
+	std::lock_guard<std::mutex> lck(_mtx);
+	
+	std::ofstream myfile;
+	myfile.open ("generation"+ std::to_string(k) +"-"+ std::to_string(th) + ".txt");
+	
+	sync_cout<<"\tThread "<<th<<" GENERATE PARAMETERS"<<sync_endl;
 	for( auto& par: _pars) {
-		std::cout<<"\tCalculating "<<par.name<<std::endl;
+		myfile<<"Calculating "<<par.name<<std::endl;
 		double _c = par.cEnd * std::pow(N, gamma);
 		double _aEnd = par.rEnd * std::pow(par.cEnd, 2.0);
 		double _a = _aEnd * std::pow(A + N, alpha);
-		std::cout<<"\t\tc:"<<_c<<" aEnd:"<<_aEnd<<" a:"<<_a<<std::endl;
+		myfile<<"\tc:"<<_c<<" aEnd:"<<_aEnd<<" a:"<<_a<<std::endl;
 		
 		par.run.a = _a / std::pow(A + k, alpha);
 		par.run.c = _c / std::pow(k, gamma);
 		par.run.r = par.run.a / std::pow(par.run.c, 2.0);
 		par.run.delta = d(_gen) ? 1 : -1;
-		std::cout<<"\t\ta:"<<par.run.a<<" c:"<<par.run.c<<" r:"<<par.run.r<<" delta:"<<par.run.delta<<std::endl;
+		myfile<<"\ta:"<<par.run.a<<" c:"<<par.run.c<<" r:"<<par.run.r<<" delta:"<<par.run.delta<<std::endl;
 		p1.getSearchParameters().*(par.par) = std::max(std::min(par.run.value + par.run.c * par.run.delta, par.maxValue), par.minValue);
 		p2.getSearchParameters().*(par.par) = std::max(std::min(par.run.value - par.run.c * par.run.delta, par.maxValue), par.minValue);
 	}
+	myfile.close();
+	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;
 }
 
-TournamentResult SPSA::_runTournament(Player& p1, Player& p2, int k)
+TournamentResult SPSA::_runTournament(Player& p1, Player& p2, int k, int th)
 {
-	Tournament t("tournament" + std::to_string(k)+".pgn", p1, p2);
+	sync_cout<<"\tThread "<<th<<" RUN TOURNAMENT"<<sync_endl;
+	Tournament t("tournament" + std::to_string(k) + "-" + std::to_string(th) + ".pgn", "tournament" + std::to_string(k) + "-" + std::to_string(th) + ".txt",p1, p2);
 	auto res = t.play();
-	std::cout<<"Tournament Result: "<<static_cast<int>(res)<<std::endl;
+	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;
+	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;
 	return res;
 }
 
-void SPSA::_printParameters(Player& p1, Player& p2)
+void SPSA::_printParameters(Player& p1, Player& p2, int k, int th)
 {
-	std::cout<<"----------PARAMETERS--------"<<std::endl;	
+	std::lock_guard<std::mutex> lck(_mtx);
+	std::ofstream myfile;
+	myfile.open ("parameters"+ std::to_string(k) +"-"+ std::to_string(th) + ".txt");
+	sync_cout<<"\tThread "<<th<<" PRINT PARAMETERS"<<sync_endl;
 	for(auto& par: _pars) {
-		std::cout<<par.name<<" "<<p1.getSearchParameters().*(par.par)<<" "<<p2.getSearchParameters().*(par.par)<<std::endl;
+		myfile<<par.name<<" "<<p1.getSearchParameters().*(par.par)<<" "<<p2.getSearchParameters().*(par.par)<<std::endl;
 	}
+	myfile.close();
+	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;
 }
 
-void SPSA::_updateParamters(TournamentResult& res)
+void SPSA::_updateParamters(TournamentResult& res, int k, int th)
 {
+	std::lock_guard<std::mutex> lck(_mtx);
+	std::ofstream myfile;
+	myfile.open ("update parameters"+ std::to_string(k) +"-"+ std::to_string(th) + ".txt");
+	sync_cout<<"\tThread "<<th<<" UPDATE PARAMETERS"<<sync_endl;
 	for( auto& par: _pars) {
 		par.run.value = std::max(std::min(par.run.value + par.run.r * par.run.c * static_cast<int>(res) * par.run.delta, par.maxValue), par.minValue);
-		std::cout<<par.name<<":"<<par.run.value<<std::endl;
+		myfile<<par.name<<":"<<par.run.value<<std::endl;
 	}
+	myfile.close();
+	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;
 }
 
-void SPSA::run() {	
-	_populateParameters();
-
-	for(int k = 1; k <= N; ++k) {
-		std::cout<<"iteration "<<k<<std::endl;
-		
+void SPSA::_worker(int thrNum)
+{
+	int iteration = _getTurn();
+	while( iteration < N) {
+		sync_cout<<"\tThread "<<thrNum<<" iteration "<<iteration<<sync_endl;
 		Player p1("p1");
 		Player p2("p2");
 		
-		_generateParamters(p1, p2, k);
-		_printParameters(p1, p2);
-		auto res = _runTournament(p1, p2, k);
-		_updateParamters(res);
+		_generateParamters(p1, p2, iteration, thrNum);
+		_printParameters(p1, p2, iteration, thrNum);
+		auto res = _runTournament(p1, p2, iteration, thrNum);
+		_updateParamters(res, iteration, thrNum);
+		iteration = _getTurn();
 	}
+}
 
+int SPSA::_getTurn() {
+	std::lock_guard<std::mutex> lck(_mtx);
+	return ++_turn;
+}
+
+void SPSA::run()
+{	
+	_populateParameters();
+	
+	std::vector<std::thread> helperThread;
+	for(int i = 0; i < TunerParameters::parallelGames -1; ++i){
+		helperThread.emplace_back( std::thread(&SPSA::_worker, this, i + 2));
+	}
+	
+	_worker(1);
+	
+	for(auto &t : helperThread)
+	{
+		t.join();
+	}
 }
