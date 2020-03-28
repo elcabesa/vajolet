@@ -33,6 +33,8 @@ public:
 	static bool Ponder;
 	static bool Chess960;
 	static bool perftUseHash;
+	static bool limitStrength;
+	static unsigned int engineLevel;
 };
 
 #endif

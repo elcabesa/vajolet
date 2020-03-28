@@ -178,6 +178,7 @@ void my_thread::impl::_searchThread()
 		if(!_quit)
 		{
 			_limits.checkInfiniteSearch();
+			_limits.manageSkillLevel();
 			_timeMan = timeManagement::create(_limits, _src.getPosition().getNextTurn());
 			_src.resetStopCondition();
 			_st.resetTimers();
