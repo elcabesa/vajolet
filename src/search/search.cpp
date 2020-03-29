@@ -184,7 +184,7 @@ private:
 	void _waitStopPondering() const;
 	
 #ifdef DEBUG_EVAL_SIMMETRY
-	void testSimmetry() const;
+	void _testSimmetry() const;
 #endif
 
 };
@@ -974,7 +974,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		if (log) ln->calcStaticEval(staticEval);
 
 #ifdef DEBUG_EVAL_SIMMETRY
-		testSimmetry();
+		_testSimmetry();
 #endif
 	}
 	else
@@ -1051,7 +1051,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				&& _pos.hasActivePlayerNonPawnMaterial()
 			)
 			{
-				assert((depth>>ONE_PLY_SHIFT)<8);
+				assert((depth>>ONE_PLY_SHIFT)<9);
 				if (log) ln->logReturnValue(eval);
 				if (log) ln->endSection();
 				return eval;
@@ -1721,7 +1721,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 	Score staticEval = (tte->getType() != typeVoid) ? tte->getStaticValue() : _pos.eval<false>();
 	if (log) ln->calcStaticEval(staticEval);
 #ifdef DEBUG_EVAL_SIMMETRY
-	testSimmetry();
+	_testSimmetry();
 #endif
 
 	//----------------------------
@@ -2166,7 +2166,7 @@ SearchResult Search::impl::manageNewSearch(timeManagement & tm)
 }
 
 #ifdef DEBUG_EVAL_SIMMETRY
-void Search::impl::testSimmetry() const
+void Search::impl::_testSimmetry() const
 {
 	Position ppp(Position::pawnHash::off);
 
