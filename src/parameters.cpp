@@ -212,7 +212,7 @@ nullMovePruningBonusThreshold(10143),
 nullMovePruningBonusAdditionalRed(16),
 nullMovePruningVerificationDepth(184),
 
-probCutDepth(78),
+probCutDepth(81),
 probCutDelta(8241),
 probCutDepthRed(49),
 iidDepthPv(81),
