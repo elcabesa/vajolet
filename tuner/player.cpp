@@ -25,7 +25,7 @@
 
 Player::Player(std::string name): _name(name){
 	_thr.setMute(true);
-	_thr.getTT().setSize(1);
+	_thr.getTT().setSize(64);
 }
 
 const SearchParameters& Player::getSearchParametersConst() const { return _sp; }
