@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+#include "book.h"
 #include "player.h"
 #include "spsa.h"
 #include "tournament.h"
@@ -31,7 +32,7 @@
 
 
 
-SPSA::SPSA():_gen((std::random_device())()) {
+SPSA::SPSA(Book& b):_gen((std::random_device())()),_book(b) {
 	sync_cout<<"SPSA"<<sync_endl;
 }
 
@@ -102,7 +103,7 @@ void SPSA::_generateParamters(Player& p1, Player& p2, int k, int th)
 TournamentResult SPSA::_runTournament(Player& p1, Player& p2, int k, int th)
 {
 	sync_cout<<"\tThread "<<th<<" RUN TOURNAMENT"<<sync_endl;
-	Tournament t("tournament" + std::to_string(k) + "-" + std::to_string(th) + ".pgn", "tournament" + std::to_string(k) + "-" + std::to_string(th) + ".txt",p1, p2);
+	Tournament t("tournament" + std::to_string(k) + "-" + std::to_string(th) + ".pgn", "tournament" + std::to_string(k) + "-" + std::to_string(th) + ".txt",p1, p2, _book);
 	auto res = t.play();
 	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;
 	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;

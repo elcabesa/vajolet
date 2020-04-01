@@ -23,12 +23,13 @@
 #include "searchLimits.h"
 
 namespace pgn { class Game;};
+class Book;
 class Player;
 
 class SelfPlay {
 	
 public:
-	SelfPlay(Player& white, Player& black);
+	SelfPlay(Player& white, Player& black, Book& b);
 	pgn::Game playGame(unsigned int round);
 private:	
 	bool _isGameFinished();
@@ -40,6 +41,7 @@ private:
 	SearchLimits _sl;
 	Player& _white;
 	Player& _black;
+	Book& _book;
 };
 
 #endif /* SELFPLAY_H_ */

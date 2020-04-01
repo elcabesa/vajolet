@@ -18,6 +18,7 @@
 #include <fstream>
 #include <string>
 
+#include "book.h"
 #include "PGNGame.h"
 #include "selfplay.h"
 #include "tournament.h"
@@ -52,7 +53,7 @@ private:
 	int _unknown = 0;
 };
 
-Tournament::Tournament(const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2) {
+Tournament::Tournament(const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2, Book& b): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2), _book(b) {
 }
 
 TournamentResult Tournament::play() {
@@ -75,7 +76,7 @@ TournamentResult Tournament::play() {
 			blackPlayer = &_p1;
 		}
 		myfile<< "starting game " <<round  <<" of "<< TunerParameters::gameNumber << "(" << round * 100.0 / TunerParameters::gameNumber << "%) ";
-		auto g = SelfPlay(*whitePlayer, *blackPlayer).playGame(round);
+		auto g = SelfPlay(*whitePlayer, *blackPlayer, _book).playGame(round);
 		
 		stats.insert(g);
 		_updateResults(g, *whitePlayer, *blackPlayer);

@@ -24,11 +24,12 @@
 #include "tournament.h"
 
 class Player;
+class Book;
 
 
 class SPSA {
 public:
-	SPSA();
+	SPSA(Book& b);
 	void run();
 
 private:
@@ -81,6 +82,7 @@ private:
 	std::mt19937 _gen;
 	std::mutex _mtx;
 	unsigned int _turn = 0;
+	Book& _book;
 };
 
 #endif

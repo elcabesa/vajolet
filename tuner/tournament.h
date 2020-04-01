@@ -21,6 +21,8 @@
 #include "player.h"
 #include "tunerPars.h"
 
+class Book;
+
 namespace pgn { class Game;};
 
 enum class TournamentResult {
@@ -31,7 +33,7 @@ enum class TournamentResult {
 
 class Tournament {
 public:
-	Tournament(const std::string& pgnName, const std::string& debugName, Player& _p1, Player& _p2);
+	Tournament(const std::string& pgnName, const std::string& debugName, Player& _p1, Player& _p2, Book &b);
 	TournamentResult play();
 
 private:
@@ -42,6 +44,7 @@ private:
 	const std::string _pgnName;
 	const std::string _debugName;
 	Player &_p1, &_p2;
+	Book& _book;
 };
 
 #endif /* TOURNAMENT_H_ */
