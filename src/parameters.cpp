@@ -195,34 +195,34 @@ simdScore mobilityBonus[separationBitmap][32] = {
 };
 
 SearchParameters::SearchParameters():
-razorMargin(20346),
+razorMargin(20039),
 razorMarginDepth(0),
 razorMarginCut(0),
-razorDepth(64),
+razorDepth(63),
 razorReturn(false),
 
-staticNullMovePruningDepth(127),
-staticNullMovePruningValue(374),
-staticNullMovePruningImprovingBonus(2020),
+staticNullMovePruningDepth(128),
+staticNullMovePruningValue(371),
+staticNullMovePruningImprovingBonus(1999),
 
 nullMovePruningDepth(16),
-nullMovePruningReduction(47),
+nullMovePruningReduction(48),
 nullMovePruningBonusDepth(0.25),
-nullMovePruningBonusThreshold(10143),
+nullMovePruningBonusThreshold(9798),
 nullMovePruningBonusAdditionalRed(16),
-nullMovePruningVerificationDepth(184),
+nullMovePruningVerificationDepth(190),
 
-probCutDepth(81),
-probCutDelta(8241),
-probCutDepthRed(49),
+probCutDepth(79),
+probCutDelta(7958),
+probCutDepthRed(48),
 iidDepthPv(81),
-iidDepthNonPv(130),
-iidStaticEvalBonus(9893),
-iidDepthRed(31),
+iidDepthNonPv(128),
+iidStaticEvalBonus(9987),
+iidDepthRed(32),
 iidDepthRedFactor(4),
 
-singularExpressionPVDepth(93),
-singularExpressionNonPVDepth(127),
+singularExpressionPVDepth(97),
+singularExpressionNonPVDepth(128),
 singularExpressionTtDepth(49)
 
 {}
