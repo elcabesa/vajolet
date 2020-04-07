@@ -1228,7 +1228,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 	Move quietMoveList[quietMoveListSize];
 	unsigned int captureMoveCount = 0;
 	Move captureMoveList[captureMoveListSize];
-	
+
 	bool singularExtensionNode =
 		!rootNode
 		&& depth >= (PVnode ? _sp.singularExpressionPVDepth : _sp.singularExpressionNonPVDepth)
@@ -1237,10 +1237,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 		&& tte != nullptr
 		&& tte->isTypeGoodForBetaCutoff()
 		&& tte->getDepth() >= depth - _sp.singularExpressionTtDepth;
-	if( ply == 1) {
-		std::cout<<"-------------------------------"<<std::endl;
-		std::cout<<singularExtensionNode<<" "<<!rootNode<<" "<<depth<<" "<<(PVnode ? _sp.singularExpressionPVDepth : _sp.singularExpressionNonPVDepth)<<" "<<bool(ttMove)<<" "<<bool(excludedMove)<<" "<<tte<<" "<<tte->isTypeGoodForBetaCutoff()<<" "<<tte->getDepth()<<" "<<depth - _sp.singularExpressionTtDepth<<std::endl;
-	}
+
 	while (bestScore <beta  && ( m = mp.getNextMove() ) )
 	{
 		assert( m );
