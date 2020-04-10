@@ -25,12 +25,9 @@
 #include "uciParameters.h"
 #include "vajolet.h"
 
-simdScore Position::pieceValue[lastBitboard];
-simdScore Position::_pstValue[lastBitboard][squareNumber];
-simdScore Position::_nonPawnValue[lastBitboard];
 
 
-void Position::initPstValues(void)
+void Position::initPstValues()
 {
 	/* PST data */
 	const int Center[8]	= { -3, -1, +0, +1, +1, +0, -1, -3};
@@ -1818,6 +1815,7 @@ Position::~Position() = default;
 
 Position::Position(const pawnHash usePawnHash):_ply(0), _mg(*this), _isChess960(false)
 {
+	initScoreValues();
 	
 	_stateInfo.clear();
 	_stateInfo.emplace_back(state());
@@ -1841,7 +1839,7 @@ Position::Position(const pawnHash usePawnHash):_ply(0), _mg(*this), _isChess960(
 
 Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960)
 {
-	
+	initScoreValues();
 	_updateUsThem();
 	_castleRightsMask = other._castleRightsMask;
 	_castlePath = other._castlePath;

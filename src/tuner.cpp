@@ -452,9 +452,6 @@ int main()
 
 			}
 		}
-		Position::initScoreValues();
-		
-
 
 		error = calcError2();
 

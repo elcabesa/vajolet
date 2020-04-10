@@ -1842,12 +1842,12 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 					)
 					{
 						Score futilityValue = futilityBase
-								+ Position::pieceValue[_pos.getPieceAt(m.getTo())][1]
-								+ ( m.isEnPassantMove() ? Position::pieceValue[whitePawns][1] : 0);
+								+ _pos.pieceValue[_pos.getPieceAt(m.getTo())][1]
+								+ ( m.isEnPassantMove() ? _pos.pieceValue[whitePawns][1] : 0);
 
 						if( m.isPromotionMove() )
 						{
-							futilityValue += Position::pieceValue[m.getPromotionType() + whiteQueens][1] - Position::pieceValue[whitePawns][1];
+							futilityValue += _pos.pieceValue[m.getPromotionType() + whiteQueens][1] - _pos.pieceValue[whitePawns][1];
 						}
 
 						if (futilityValue <= alpha)

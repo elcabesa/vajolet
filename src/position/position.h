@@ -57,8 +57,8 @@ public:
 	// public static methods
 	//--------------------------------------------------------
 	static void initMaterialKeys(void);
-	static void initScoreValues(void);
-	static void initPstValues(void);
+	void initScoreValues(void);
+	void initPstValues(void);
 	
 	//--------------------------------------------------------
 	// public methods
@@ -352,7 +352,7 @@ public:
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
-	static simdScore pieceValue[lastBitboard];
+	simdScore pieceValue[lastBitboard];
 private:
 
 
@@ -360,7 +360,7 @@ private:
 	Position(Position&& ) noexcept = delete;
 
 	//--------------------------------------------------------
-	// private struct
+	// private structPosition
 	//--------------------------------------------------------
 	struct materialStruct
 	{
@@ -388,8 +388,8 @@ private:
 		\date 27/10/2013
 	*/
 	
-	static simdScore _pstValue[lastBitboard][squareNumber];
-	static simdScore _nonPawnValue[lastBitboard];
+	simdScore _pstValue[lastBitboard][squareNumber];
+	simdScore _nonPawnValue[lastBitboard];
 	std::unordered_map<tKey, materialStruct> static _materialKeyMap;
 	
 	
