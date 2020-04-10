@@ -302,7 +302,7 @@ void MovePicker::setupProbCutSearch( const bitboardIndex capturePiece )
 		_stagedGeneratorState = eStagedGeneratorState::getProbCutTT;
 	//}
 
-	_captureThreshold = _pos.pieceValue[capturePiece][0];
+	_captureThreshold = _pos.getPieceValue(capturePiece)[0];
 	if( _pos.isMoveLegal( _ttMove) && ( ( !_pos.isCaptureMove( _ttMove ) ) || ( _pos.see( _ttMove ) < _captureThreshold ) ) )
 	{
 		_ttMove = Move::NOMOVE;

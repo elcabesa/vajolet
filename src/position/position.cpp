@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#include <cstring>
 #include <sstream>
 
 #include "command.h"
@@ -24,102 +25,6 @@
 #include "uciOutput.h"
 #include "uciParameters.h"
 #include "vajolet.h"
-
-
-
-void Position::initPstValues()
-{
-	/* PST data */
-	const int Center[8]	= { -3, -1, +0, +1, +1, +0, -1, -3};
-	const int KFile[8]	= { +3, +4, +2, +0, +0, +2, +4, +3};
-	const int KRank[8]	= { +1, +0, -2, -3, -4, -5, -6, -7};
-	for(bitboardIndex piece = occupiedSquares; piece < lastBitboard; ++piece)
-	{
-		for(tSquare s = A1; s < squareNumber; ++s)
-		{
-			assert(s<squareNumber);
-			_nonPawnValue[piece] = simdScore{0,0,0,0};
-			_pstValue[piece][s] = simdScore{0,0,0,0};
-			tRank rank = getRankOf(s);
-			tFile file = getFileOf(s);
-
-			if (isValidPiece(piece)) {
-				if (!isBlackPiece(piece)) {
-					if (isPawn(piece)) {
-						_pstValue[piece][s] = simdScore{0,0,0,0};
-						if (s == D3) {
-							_pstValue[piece][s] = PawnD3;
-						} else if (s == D4) {
-							_pstValue[piece][s] = PawnD4;
-						} else if (s == D5) {
-							_pstValue[piece][s] = PawnD5;
-						} else if (s == E3) {
-							_pstValue[piece][s] = PawnE3;
-						} else if (s == E4)	{
-							_pstValue[piece][s] = PawnE4;
-						} else if (s == E5)	{
-							_pstValue[piece][s] = PawnE5;
-						}
-						_pstValue[piece][s] += PawnRankBonus * static_cast<int>(rank - 2);
-						_pstValue[piece][s] += Center[file] * PawnCentering;
-					} else if (isKnight(piece)) {
-						_pstValue[piece][s] = KnightPST * (Center[file] + Center[rank]);
-						if (rank == RANK1) {
-							_pstValue[piece][s] -= KnightBackRankOpening;
-						}
-					} else if (isBishop(piece))	{
-						_pstValue[piece][s] = BishopPST * (Center[file] + Center[rank]);
-						if (rank == RANK1) {
-							_pstValue[piece][s] -= BishopBackRankOpening;
-						}
-						if (((int)file == (int)rank) || (file + rank == 7)) {
-							_pstValue[piece][s] += BishopOnBigDiagonals;
-						}
-					} else if (isRook(piece)) {
-						_pstValue[piece][s] = RookPST * Center[file];
-						if (rank == RANK1) {
-							_pstValue[piece][s] -= RookBackRankOpening;
-						}
-					} else if (isQueen(piece)) {
-						_pstValue[piece][s] = QueenPST * (Center[file] + Center[rank]);
-						if (rank == RANK1) {
-							_pstValue[piece][s] -= QueenBackRankOpening;
-						}
-					} else if (isKing(piece)) {
-						_pstValue[piece][s] = simdScore{
-								(KFile[file]+KRank[rank]) * KingPST[0],
-								(Center[file]+Center[rank]) * KingPST[1],
-								0,0};
-					}
-					// add piece value to pst
-					if(!isKing( piece ) )
-					{
-						_pstValue[piece][s] += pieceValue[piece];
-					}
-
-					if (!isPawn(piece) && !isKing(piece)) {
-						_nonPawnValue[piece][0] = pieceValue[piece][0];
-						_nonPawnValue[piece][1] = pieceValue[piece][1];
-					}
-
-				} else {
-					tRank r = getRelativeRankOf(s, black);
-					tFile f = file;
-					_pstValue[piece][s] = -_pstValue[piece - separationBitmap][getSquare(f, r)];
-
-					if(!isPawn(piece) && !isKing(piece)) {
-						_nonPawnValue[piece][2] = pieceValue[piece][0];
-						_nonPawnValue[piece][3] = pieceValue[piece][1];
-					}
-				}
-			} else {
-				_pstValue[piece][s] = simdScore{0,0,0,0};
-			}
-		}
-	}
-
-}
-
 
 /*! \brief setup a position from a fen string
 	\author Marco Belli
@@ -380,35 +285,6 @@ const Position& Position::setup(const std::string& code, const Color c)
 }
 
 
-
-
-/*! \brief init the score value in the static const
-	\author Marco Belli
-	\version 1.0
-	\date 27/10/2013
-*/
-void Position::initScoreValues(void)
-{
-	for(auto &val: pieceValue)
-	{
-		val = simdScore{0,0,0,0};
-	}
-	pieceValue[whitePawns] = initialPieceValue[whitePawns];
-	pieceValue[whiteKnights] = initialPieceValue[whiteKnights];
-	pieceValue[whiteBishops] = initialPieceValue[whiteBishops];
-	pieceValue[whiteRooks] = initialPieceValue[whiteRooks];
-	pieceValue[whiteQueens] = initialPieceValue[whiteQueens];
-	pieceValue[whiteKing] = initialPieceValue[whiteKing];
-
-	pieceValue[blackPawns] = pieceValue[whitePawns];
-	pieceValue[blackKnights] = pieceValue[whiteKnights];
-	pieceValue[blackBishops] = pieceValue[whiteBishops];
-	pieceValue[blackRooks] = pieceValue[whiteRooks];
-	pieceValue[blackQueens] = pieceValue[whiteQueens];
-	pieceValue[blackKing] = pieceValue[whiteKing];
-
-	initPstValues();
-}
 /*! \brief _clear a position and his history
 	\author Marco Belli
 	\version 1.0
@@ -746,7 +622,7 @@ simdScore Position::_calcMaterialValue(void) const{
 	{
 		tSquare s = iterateBit(b);
 		bitboardIndex val = getPieceAt(s);
-		score += _pstValue[val][s];
+		score += _eParm._pstValue[val][s];
 	}
 	return score;
 
@@ -769,7 +645,7 @@ simdScore Position::_calcNonPawnMaterialValue() const
 		bitboardIndex val = getPieceAt(n);
 		if(!isPawn(val) && !isKing(val) )
 		{
-			t[ isBlackPiece( val ) ] += pieceValue[val];
+			t[ isBlackPiece( val ) ] += _eParm._pieceValue[val];
 		}
 	}
 	res = simdScore{t[0][0],t[0][1],t[1][0],t[1][1]};
@@ -893,8 +769,8 @@ void Position::doMove(const Move & m)
 		x.getKey().updatePiece( kFrom, piece );
 		x.getKey().updatePiece( kTo, piece );
 		
-		x.addMaterial( _pstValue[rook][rTo] - _pstValue[rook][rFrom] );
-		x.addMaterial( _pstValue[piece][kTo] - _pstValue[piece][kFrom] );
+		x.addMaterial( _eParm._pstValue[rook][rTo] - _eParm._pstValue[rook][rFrom] );
+		x.addMaterial( _eParm._pstValue[piece][kTo] - _eParm._pstValue[piece][kFrom] );
 
 	}
 	else 
@@ -916,8 +792,8 @@ void Position::doMove(const Move & m)
 			// remove piece
 			_removePiece(captured,captureSquare);
 			// update material
-			x.removeMaterial( _pstValue[captured][captureSquare] );
-			x.removeNonPawnMaterial( _nonPawnValue[captured] );
+			x.removeMaterial( _eParm._pstValue[captured][captureSquare] );
+			x.removeNonPawnMaterial( _eParm._nonPawnValue[captured] );
 
 			// update keys
 			x.getKey().updatePiece( captureSquare, captured);
@@ -933,7 +809,7 @@ void Position::doMove(const Move & m)
 		x.getKey().updatePiece( to, piece );
 		_movePiece(piece, from, to);
 
-		x.addMaterial( _pstValue[piece][to] - _pstValue[piece][from] );
+		x.addMaterial( _eParm._pstValue[piece][to] - _eParm._pstValue[piece][from] );
 	}
 
 	// Update castle rights if needed
@@ -964,8 +840,8 @@ void Position::doMove(const Move & m)
 			_removePiece(piece,to);
 			_putPiece(promotedPiece,to);
 
-			x.addMaterial( _pstValue[promotedPiece][to] - _pstValue[piece][to] );
-			x.addNonPawnMaterial( _nonPawnValue[promotedPiece] );
+			x.addMaterial( _eParm._pstValue[promotedPiece][to] - _eParm._pstValue[piece][to] );
+			x.addNonPawnMaterial( _eParm._nonPawnValue[promotedPiece] );
 
 
 			x.getKey().updatePiece( to, piece );
@@ -1528,8 +1404,8 @@ bool Position::isDraw(bool isPVline) const
 
 	const state & s = getActualState();
 	if (  !_bitBoard[whitePawns] && !_bitBoard[blackPawns]
-		&&( ( (s.getNonPawnValue()[0]<= pieceValue[whiteBishops][0]) && s.getNonPawnValue()[2] == 0)
-		|| ( (s.getNonPawnValue()[2]<= pieceValue[whiteBishops][0]) && s.getNonPawnValue()[0] == 0)
+		&&( ( (s.getNonPawnValue()[0]<= _eParm._pieceValue[whiteBishops][0]) && s.getNonPawnValue()[2] == 0)
+		|| ( (s.getNonPawnValue()[2]<= _eParm._pieceValue[whiteBishops][0]) && s.getNonPawnValue()[0] == 0)
 		)
 	)
 	{
@@ -1813,10 +1689,8 @@ bool Position::isMoveLegal(const Move &m)const
 
 Position::~Position() = default;
 
-Position::Position(const pawnHash usePawnHash):_ply(0), _mg(*this), _isChess960(false)
-{
-	initScoreValues();
-	
+Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm)
+{	
 	_stateInfo.clear();
 	_stateInfo.emplace_back(state());
 	_stateInfo[0].setNextTurn( whiteTurn );
@@ -1837,9 +1711,8 @@ Position::Position(const pawnHash usePawnHash):_ply(0), _mg(*this), _isChess960(
 }
 
 
-Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960)
+Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm)
 {
-	initScoreValues();
 	_updateUsThem();
 	_castleRightsMask = other._castleRightsMask;
 	_castlePath = other._castlePath;
@@ -1876,6 +1749,8 @@ Position& Position::operator=(const Position& other)
 	_castleRookInvolved = other._castleRookInvolved;
 	_castleKingFinalSquare = other._castleKingFinalSquare;
 	_castleRookFinalSquare = other._castleRookFinalSquare;
+	
+	_eParm = other._eParm;
 
 	return *this;
 }
