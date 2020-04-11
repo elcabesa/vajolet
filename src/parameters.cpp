@@ -25,6 +25,11 @@ EvalParameters::EvalParameters()
 	_initValues();
 }
 
+void EvalParameters::updateValues()
+{
+	_initValues();
+}
+
 void EvalParameters::_initValues() {
 	for(auto &val: _pieceValue)
 	{

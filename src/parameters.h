@@ -209,6 +209,8 @@ public:
 	simdScore _pstValue[lastBitboard][squareNumber];
 	simdScore _nonPawnValue[lastBitboard];
 	simdScore _pieceValue[lastBitboard];
+	
+	void updateValues();
 
 private:
 	void _initValues();

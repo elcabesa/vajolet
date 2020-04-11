@@ -72,10 +72,10 @@ private:
 	std::vector<variable> _pars;
 	
 	void _populateParameters();
-	void _generateParamters(Player& p1, Player& p2, int k, int th);
-	void _printParameters(Player& p1, Player& p2, int k, int th);
+	void _generateParamters(std::vector<variable>& localPars, Player& p1, Player& p2, int k, int th);
+	void _printParameters(std::vector<variable>& localPars, Player& p1, Player& p2, int k, int th);
 	TournamentResult _runTournament(Player& p1, Player& p2, int k, int th);
-	void _updateParamters(TournamentResult& r, int k, int th);
+	void _updateParamters(std::vector<variable>& localPars, TournamentResult& r, int k, int th);
 	void _worker(int n);
 	int _getTurn();
 	

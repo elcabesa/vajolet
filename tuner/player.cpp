@@ -19,17 +19,22 @@
 #include <string>
 
 #include "elo.h"
+#include "position.h"
 #include "player.h"
 #include "transposition.h"
 
 
-Player::Player(std::string name): _name(name){
+Player::Player(std::string name): _name(name)
+{
 	_thr.setMute(true);
 	_thr.getTT().setSize(64);
 }
 
 const SearchParameters& Player::getSearchParametersConst() const { return _sp; }
 SearchParameters& Player::getSearchParameters() { return _sp; }
+
+const EvalParameters& Player::getEvalParametersConst() const { return _ep; }
+EvalParameters& Player::getEvalParameters() { return _ep; }
 
 void Player::insertResult(int res) {
 	_win += (res == 1);
@@ -69,5 +74,7 @@ double Player::pointRatio() const {
 SearchResult Player::doSearch(const Position& p, SearchLimits& sl)
 {
 	_thr.getSearchParameters() = getSearchParametersConst();
-	return _thr.synchronousSearch(p, sl);
+	Position pos(Position::pawnHash::off, _ep);
+	pos.setupFromFen(p.getFen());
+	return _thr.synchronousSearch(pos, sl);
 }

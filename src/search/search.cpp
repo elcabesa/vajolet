@@ -557,7 +557,7 @@ void Search::impl::idLoop(timeManagement& tm, std::vector<rootMove>& temporaryRe
 			// at depth 1 only print the PV at the end of search
 			if(!_stop && depth == 1)
 			{
-				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), _pos.isChess960(), UciOutput::PVbound::upperbound);
+				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), _pos.isChess960());
 			}
 			if(!_stop && uciParameters::multiPVLines > 1)
 			{

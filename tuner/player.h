@@ -30,6 +30,8 @@ public:
 	Player(std::string name);
 	const SearchParameters& getSearchParametersConst() const;
 	SearchParameters& getSearchParameters();
+	const EvalParameters& getEvalParametersConst() const;
+	EvalParameters& getEvalParameters();
 	void insertResult(int res);
 	std::string print() const;
 	const std::string& getName() const;
@@ -38,6 +40,7 @@ public:
 	
 private:
 	SearchParameters _sp;
+	EvalParameters _ep;
 	int _win = 0;
 	int _lost = 0;
 	int _draw = 0;

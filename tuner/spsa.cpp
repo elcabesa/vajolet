@@ -18,6 +18,8 @@
 #include <cmath>
 #include <iostream>
 #include <thread>
+#include<algorithm>
+#include<iterator>
 
 #include <iostream>
 #include <fstream>
@@ -66,12 +68,14 @@ void SPSA::_populateParameters()
 	_pars.emplace_back("singularExpressionNonPVDepth", &SearchParameters::singularExpressionNonPVDepth, 128, 0, 256, 25, 0.0020);
 	_pars.emplace_back("singularExpressionTtDepth", &SearchParameters::singularExpressionTtDepth, 48, 0, 96, 10, 0.0020);
 	
+/*	_pars.emplace_back("queenValue", &EvalParameters::initialPieceValue, 118976, 0, 300000, 500, 0.0020);*/
+	
 	for( auto& par: _pars) {
 		par.run.value = par.startValue;
 	}
 }
 
-void SPSA::_generateParamters(Player& p1, Player& p2, int k, int th)
+void SPSA::_generateParamters(std::vector<variable>& localPars, Player& p1, Player& p2, int k, int th)
 {
 	std::bernoulli_distribution d(0.5);
 	
@@ -80,8 +84,11 @@ void SPSA::_generateParamters(Player& p1, Player& p2, int k, int th)
 	std::ofstream myfile;
 	myfile.open ("generation"+ std::to_string(k) +"-"+ std::to_string(th) + ".txt");
 	
+	localPars.clear();
+	std::copy(_pars.begin(), _pars.end(), std::back_inserter(localPars));
+	
 	sync_cout<<"\tThread "<<th<<" GENERATE PARAMETERS"<<sync_endl;
-	for( auto& par: _pars) {
+	for( auto& par: localPars) {
 		myfile<<"Calculating "<<par.name<<std::endl;
 		double _c = par.cEnd * std::pow(N, gamma);
 		double _aEnd = par.rEnd * std::pow(par.cEnd, 2.0);
@@ -95,7 +102,11 @@ void SPSA::_generateParamters(Player& p1, Player& p2, int k, int th)
 		myfile<<"\ta:"<<par.run.a<<" c:"<<par.run.c<<" r:"<<par.run.r<<" delta:"<<par.run.delta<<std::endl;
 		p1.getSearchParameters().*(par.par) = std::max(std::min(par.run.value + par.run.c * par.run.delta, par.maxValue), par.minValue);
 		p2.getSearchParameters().*(par.par) = std::max(std::min(par.run.value - par.run.c * par.run.delta, par.maxValue), par.minValue);
+		/*(p1.getEvalParameters().*(par.par))[2][0] = std::max(std::min(par.run.value + par.run.c * par.run.delta, par.maxValue), par.minValue);
+		(p2.getEvalParameters().*(par.par))[2][0] = std::max(std::min(par.run.value - par.run.c * par.run.delta, par.maxValue), par.minValue);*/
 	}
+	p1.getEvalParameters().updateValues();
+	p2.getEvalParameters().updateValues();
 	myfile.close();
 	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;
 }
@@ -110,28 +121,31 @@ TournamentResult SPSA::_runTournament(Player& p1, Player& p2, int k, int th)
 	return res;
 }
 
-void SPSA::_printParameters(Player& p1, Player& p2, int k, int th)
+void SPSA::_printParameters(std::vector<variable>& localPars, Player& p1, Player& p2, int k, int th)
 {
 	std::lock_guard<std::mutex> lck(_mtx);
 	std::ofstream myfile;
 	myfile.open ("parameters"+ std::to_string(k) +"-"+ std::to_string(th) + ".txt");
 	sync_cout<<"\tThread "<<th<<" PRINT PARAMETERS"<<sync_endl;
-	for(auto& par: _pars) {
+	for(auto& par: localPars) {
 		myfile<<par.name<<" "<<p1.getSearchParameters().*(par.par)<<" "<<p2.getSearchParameters().*(par.par)<<std::endl;
+		//myfile<<par.name<<" "<<(p1.getEvalParameters().*(par.par))[2][0]<<" "<<(p2.getEvalParameters().*(par.par))[2][0]<<std::endl;
 	}
 	myfile.close();
 	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;
 }
 
-void SPSA::_updateParamters(TournamentResult& res, int k, int th)
+void SPSA::_updateParamters(std::vector<variable>& localPars, TournamentResult& res, int k, int th)
 {
 	std::lock_guard<std::mutex> lck(_mtx);
 	std::ofstream myfile;
 	myfile.open ("update parameters"+ std::to_string(k) +"-"+ std::to_string(th) + ".txt");
 	sync_cout<<"\tThread "<<th<<" UPDATE PARAMETERS"<<sync_endl;
-	for( auto& par: _pars) {
-		par.run.value = std::max(std::min(par.run.value + par.run.r * par.run.c * static_cast<int>(res) * par.run.delta, par.maxValue), par.minValue);
-		myfile<<par.name<<":"<<par.run.value<<std::endl;
+	for(std::vector<variable>::iterator loc = localPars.begin(), dst = _pars.begin() ; loc != localPars.end(); ++loc, ++dst)
+	{
+		double val = dst->run.value;
+		dst->run.value = std::max(std::min(dst->run.value + loc->run.r * loc->run.c * static_cast<int>(res) * loc->run.delta, dst->maxValue), dst->minValue);
+		myfile<<dst->name<<":"<<dst->run.value<<" ("<< dst->run.value-val<<")"<<std::endl;
 	}
 	myfile.close();
 	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;
@@ -144,11 +158,13 @@ void SPSA::_worker(int thrNum)
 		sync_cout<<"\tThread "<<thrNum<<" iteration "<<iteration<<sync_endl;
 		Player p1("p1");
 		Player p2("p2");
+
+		std::vector<variable> localPars;
 		
-		_generateParamters(p1, p2, iteration, thrNum);
-		_printParameters(p1, p2, iteration, thrNum);
+		_generateParamters(localPars, p1, p2, iteration, thrNum);
+		_printParameters(localPars, p1, p2, iteration, thrNum);
 		auto res = _runTournament(p1, p2, iteration, thrNum);
-		_updateParamters(res, iteration, thrNum);
+		_updateParamters(localPars, res, iteration, thrNum);
 		iteration = _getTurn();
 	}
 }

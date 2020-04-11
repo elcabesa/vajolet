@@ -81,8 +81,8 @@ TournamentResult Tournament::play() {
 		stats.insert(g);
 		_updateResults(g, *whitePlayer, *blackPlayer);
 		
-		myfile<< stats.print()<<" ";
 		myfile<< _p1.print()<<" ";
+		myfile<< stats.print()<<" ";
 		myfile<<std::endl;
 		
 		_saveGamePgn(g);
