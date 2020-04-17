@@ -77,14 +77,25 @@
 
 #include <cstdint>
 
-extern const uint64_t magicmoves_r_magics[64];
-extern const uint64_t magicmoves_r_mask[64];
-extern const uint64_t magicmoves_b_magics[64];
-extern const uint64_t magicmoves_b_mask[64];
-extern const unsigned int magicmoves_b_shift[64];
-extern const unsigned int magicmoves_r_shift[64];
-extern const uint64_t* magicmoves_b_indices[64];
-extern const uint64_t* magicmoves_r_indices[64];
+#include "bitops.h"
+
+struct Magic
+{
+	uint64_t magic;
+	uint64_t mask;
+	uint64_t* indices;
+	unsigned int shift;
+	inline uint64_t move(bitMap occupancy) const{
+		return *(move_pointer(occupancy));
+	}
+
+	inline uint64_t* move_pointer(bitMap occupancy) const{
+		return (indices+(((occupancy & mask) * magic) >> shift));
+	}
+};
+
+extern const Magic rookMagic[64];
+extern const Magic bishopMagic[64];
 
 void initmagicmoves(void);
 
