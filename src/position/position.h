@@ -435,9 +435,9 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::array<bitboardIndex,squareNumber> _squares;		// board square rapresentation to speed up, it contain pieces indexed by square
+	std::array<bitboardIndex,squareNumber> _squares;	// board square rapresentation to speed up, it contain pieces indexed by square
 	std::array<bitMap,lastBitboard> _bitBoard;			// bitboards indexed by bitboardIndex enum
-	bitMap *Us,*Them;	/*!< pointer to our & their pieces _bitBoard*/
+	bitMap *Us, *Them;	/*!< pointer to our & their pieces _bitBoard*/
 	bool _isChess960;
 
 	//--------------------------------------------------------
