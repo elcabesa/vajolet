@@ -33,9 +33,10 @@
 
 #define C64(c) c##ULL
 
-uint64_t magicmovesrdb[102400];
+bitMap magicmovesrdb[102400];
+bitMap magicmovesbdb[5248];
 
-const Magic rookMagic[64] {
+const Magic rookMagic[tSquare::squareNumber] {
 	{C64(0x0080001020400080), C64(0x000101010101017E), magicmovesrdb+86016, 52},
 	{C64(0x0040001000200040), C64(0x000202020202027C), magicmovesrdb+73728, 53},
 	{C64(0x0080081000200080), C64(0x000404040404047A), magicmovesrdb+36864, 53},
@@ -102,8 +103,7 @@ const Magic rookMagic[64] {
 	{C64(0x0001FFFAABFAD1A2), C64(0x7E80808080808000), magicmovesrdb+98304, 53}
 };
 
-uint64_t magicmovesbdb[5248];
-const Magic bishopMagic[64] {
+const Magic bishopMagic[tSquare::squareNumber] {
 	{C64(0x0002020202020200), C64(0x0040201008040200), magicmovesbdb+4992, 58},
 	{C64(0x0002020202020000), C64(0x0000402010080400), magicmovesbdb+2624, 59},
 	{C64(0x0004010202000000), C64(0x0000004020100A00), magicmovesbdb+256,  59},
@@ -171,16 +171,20 @@ const Magic bishopMagic[64] {
 };
 
 
-uint64_t initmagicmoves_occ(const int* squares, const int numSquares, const uint64_t linocc)
+uint64_t initmagicmoves_occ(const tSquare* const squares, const int numSquares, const uint64_t linocc)
 {
 	int i;
 	uint64_t ret=0;
-	for(i=0;i<numSquares;i++)
-		if(linocc&(((uint64_t)(1))<<i)) ret|=(((uint64_t)(1))<<squares[i]);
+	for(i=0;i<numSquares;i++) {
+		if(linocc & (((uint64_t)(1))<<i))
+		{
+			ret|=(((uint64_t)(1))<<squares[i]);
+		}
+	}
 	return ret;
 }
 
-uint64_t initmagicmoves_Rmoves(const int square, const uint64_t occ)
+uint64_t initMagicMoves_Rmoves(const int square, const uint64_t occ)
 {
 	uint64_t ret=0;
 	uint64_t bit;
@@ -215,7 +219,7 @@ uint64_t initmagicmoves_Rmoves(const int square, const uint64_t occ)
 	return ret;
 }
 
-uint64_t initmagicmoves_Bmoves(const int square, const uint64_t occ)
+uint64_t initMagicMoves_Bmoves(const int square, const uint64_t occ)
 {
 	uint64_t ret=0;
 	uint64_t bit;
@@ -261,62 +265,37 @@ uint64_t initmagicmoves_Bmoves(const int square, const uint64_t occ)
 	return ret;
 }
 
+void convertMaskToSquareList(bitMap mask, tSquare * const squares, int& numsquares) {
+	numsquares = 0;
+	while(mask)
+	{
+		squares[numsquares++] = iterateBit(mask);
+	}
+}
 
 void initmagicmoves(void)
 {
-	int i;
+	tSquare squares[tSquare::squareNumber];
+	int numsquares;
 
-	//for bitscans :
-	//initmagicmoves_bitpos64_database[(x*C64(0x07EDD5E59A4E28C2))>>58]
-	int initmagicmoves_bitpos64_database[64] =
-	{
-	63,  0, 58,  1, 59, 47, 53,  2,
-	60, 39, 48, 27, 54, 33, 42,  3,
-	61, 51, 37, 40, 49, 18, 28, 20,
-	55, 30, 34, 11, 43, 14, 22,  4,
-	62, 57, 46, 52, 38, 26, 32, 41,
-	50, 36, 17, 19, 29, 10, 13, 21,
-	56, 45, 25, 31, 35, 16,  9, 12,
-	44, 24, 15,  8, 23,  7,  6,  5
-	};
-
-
-	// todo do it with bitmap & t_squares & functions
-
-	for(i=0;i<64;i++)
-	{
-		int squares[64];
-		int numsquares=0;
-		uint64_t temp=bishopMagic[i].mask;
-		while(temp)
+	for(tSquare sq = A1; sq < tSquare::squareNumber; ++sq)
+	{		
+		convertMaskToSquareList(bishopMagic[sq].mask, squares, numsquares);
+		
+		for(bitMap occ = 0;occ < (((uint64_t)(1))<<numsquares); ++occ)
 		{
-			// cppcheck-suppress oppositeExpression
-			uint64_t bit=temp&-temp;
-			squares[numsquares++]=initmagicmoves_bitpos64_database[(bit*C64(0x07EDD5E59A4E28C2))>>58];
-			temp^=bit;
-		}
-		for(temp=0;temp<(((uint64_t)(1))<<numsquares);temp++)
-		{
-			uint64_t tempocc=initmagicmoves_occ(squares,numsquares,temp);
-			*(bishopMagic[i].move_pointer(tempocc)) = initmagicmoves_Bmoves(i,tempocc);
+			uint64_t tempocc = initmagicmoves_occ(squares, numsquares, occ);
+			*(bishopMagic[sq].move_pointer(tempocc)) = initMagicMoves_Bmoves(sq, tempocc);
 		}
 	}
-	for(i=0;i<64;i++)
-	{
-		int squares[64];
-		int numsquares=0;
-		uint64_t temp=rookMagic[i].mask;
-		while(temp)
+	for(tSquare sq = A1; sq < tSquare::squareNumber; ++sq)
+	{		
+		convertMaskToSquareList(rookMagic[sq].mask, squares, numsquares);
+
+		for(bitMap occ = 0;occ < (((uint64_t)(1))<<numsquares); ++occ)
 		{
-			// cppcheck-suppress oppositeExpression
-			uint64_t bit=temp&-temp;
-			squares[numsquares++]=initmagicmoves_bitpos64_database[(bit*C64(0x07EDD5E59A4E28C2))>>58];
-			temp^=bit;
-		}
-		for(temp=0;temp<(((uint64_t)(1))<<numsquares);temp++)
-		{
-			uint64_t tempocc=initmagicmoves_occ(squares,numsquares,temp);
-			*(rookMagic[i].move_pointer(tempocc)) = initmagicmoves_Rmoves(i,tempocc);
+			uint64_t tempocc = initmagicmoves_occ(squares, numsquares, occ);
+			*(rookMagic[sq].move_pointer(tempocc)) = initMagicMoves_Rmoves(sq, tempocc);
 		}
 	}
 }

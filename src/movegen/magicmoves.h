@@ -78,6 +78,7 @@
 #include <cstdint>
 
 #include "bitops.h"
+#include "tSquare.h"
 
 struct Magic
 {
@@ -85,17 +86,20 @@ struct Magic
 	uint64_t mask;
 	uint64_t* indices;
 	unsigned int shift;
-	inline uint64_t move(bitMap occupancy) const{
+
+	inline const bitMap& move(const bitMap& occupancy) const
+	{
 		return *(move_pointer(occupancy));
 	}
 
-	inline uint64_t* move_pointer(bitMap occupancy) const{
+	inline bitMap* move_pointer(const bitMap&  occupancy) const
+	{
 		return (indices+(((occupancy & mask) * magic) >> shift));
 	}
 };
 
-extern const Magic rookMagic[64];
-extern const Magic bishopMagic[64];
+extern const Magic rookMagic[tSquare::squareNumber];
+extern const Magic bishopMagic[tSquare::squareNumber];
 
 void initmagicmoves(void);
 

@@ -1302,6 +1302,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 				ext = ONE_PLY;
 		    }
 		}
+		//__builtin_prefetch(_tt.findCluster(_pos.getKeyAfterMove(m).getKey()));
 
 		int newDepth = depth - ONE_PLY + ext;
 
@@ -1364,6 +1365,7 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::alphaBeta(un
 
 
 		_pos.doMove(m);
+		__builtin_prefetch(_tt.findCluster(_pos.getKey().getKey()));
 		if (log) ln->doMove(m);
 		Score val;
 		PVline childPV;
@@ -1884,8 +1886,10 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 			//}
 
 		}
+		//__builtin_prefetch(_tt.findCluster(_pos.getKeyAfterMove(m).getKey()));
 		
 		_pos.doMove(m);
+		__builtin_prefetch(_tt.findCluster(_pos.getKey().getKey()));
 		if (log) ln->doMove(m);
 		Score val = -qsearch<childNodesType, log>(ply+1, depth - ONE_PLY, -beta, -alpha, childPV);
 		_pos.undoMove();
