@@ -38,6 +38,7 @@ CPP_SRCS := \
 ./src/position/position.cpp \
 ./src/search/rootMovesToBeSearched.cpp \
 ./src/search/search.cpp \
+./src/search/searcher.cpp \
 ./src/search/searchData.cpp \
 ./src/search/searchLogger.cpp \
 ./src/search/see.cpp \
@@ -86,6 +87,7 @@ OBJS :=  \
 ./src/position/position.o \
 ./src/search/rootMovesToBeSearched.o \
 ./src/search/search.o \
+./src/search/searcher.o \
 ./src/search/searchData.o \
 ./src/search/searchLogger.o \
 ./src/search/see.o \
@@ -129,6 +131,7 @@ CPP_DEPS := \
 ./src/position/position.d \
 ./src/search/rootMovesToBeSearched.d \
 ./src/search/search.d \
+./src/search/searcher.d \
 ./src/search/searchData.d \
 ./src/search/searchLogger.d \
 ./src/search/see.d \
