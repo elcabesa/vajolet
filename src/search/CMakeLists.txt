@@ -3,6 +3,7 @@ target_sources(libChess PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/rootMovesToBeSearched.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/search.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/searchData.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/searcher.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/searchLogger.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/see.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/thread.cpp

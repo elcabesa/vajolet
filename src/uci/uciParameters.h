@@ -35,6 +35,8 @@ public:
 	static bool perftUseHash;
 	static bool limitStrength;
 	static unsigned int engineLevel;
+
+	static bool isMultiPvSearch() {return multiPVLines > 1;}
 };
 
 #endif

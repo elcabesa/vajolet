@@ -258,10 +258,10 @@ const SearchResult& my_thread::impl::getResult() const {
 void my_thread::impl::setMute(bool mute) {
 	if (mute) {
 		_UOI = UciOutput::create(UciOutput::type::mute);
-		_src.setUOI(UciOutput::create(UciOutput::type::mute));
+		_src.setUOI(UciOutput::type::mute);
 	} else {
-		_UOI = UciOutput::create();
-		_src.setUOI(UciOutput::create());
+		_UOI = UciOutput::create(UciOutput::type::standard);
+		_src.setUOI(UciOutput::type::standard);
 	}
 }
 

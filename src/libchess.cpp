@@ -26,7 +26,6 @@ void libChessInit()
 	initData();
 	HashKey::init();
 	Movegen::initMovegenConstant();
-	Search::initSearchParameters();
 	Position::initMaterialKeys();
 	Syzygy::getInstance();
 }

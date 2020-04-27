@@ -249,9 +249,31 @@ public:
 	int iidDepthRed;
 	int iidDepthRedFactor;
 	
-	int singularExpressionPVDepth;
-	int singularExpressionNonPVDepth;
-	int singularExpressionTtDepth;
+	int singularExtensionPVDepth;
+	int singularExtensionNonPVDepth;
+	int singularExtensionTtDepth;
+	int singularExtensionScoreDepthBonus;
+	int singularExtensionExt;
+
+	int dangerousMoveExtension;
+	int checkMoveExtension;
+
+	int FutilityMoveCountsDepth;
+	unsigned int FutilityMoveCounts[2][32];
+
+	int futilityDepth;
+	Score futilityMargin[12];// todo change with a not scaled depth formula
+
+	int negativeSeeSkipDepth;
+
+	int lmrDepthLimitInf;
+
+	static constexpr unsigned int LmrLimit = 32;
+	static constexpr unsigned int LmrLimitMove = 64;
+	Score PVreduction[2][LmrLimit * 16][LmrLimitMove];
+	Score nonPVreduction[2][LmrLimit * 16][LmrLimitMove];
+private:
+	void _updatePars();
 };
 
 #endif /* EVAL_H_ */
