@@ -52,7 +52,7 @@ namespace pgn
 	};
 
 	std::ostream& operator << ( std::ostream& os, const pgn::GameResult& src );
-};
+}
 
 #endif 
 

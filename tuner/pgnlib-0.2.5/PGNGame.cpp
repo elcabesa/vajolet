@@ -40,7 +40,7 @@ namespace pgn
 		pgn::CommentText bgComment;
 		pgn::CommentText agComment;
 	};
-};
+}
 
 pgn::Game::Game()
 {

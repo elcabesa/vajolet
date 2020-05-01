@@ -33,6 +33,7 @@ public:
 	void insertMove(const rootMove& m) {_res.push_back(m); std::stable_sort(_res.begin(), _res.end());}
 	void setLinesToBeSearched(const unsigned int l) {_linesToBeSearched = l;}
 	bool thereArePvToBeSearched() const {return _multiPvCounter < _linesToBeSearched;}
+	bool isLastLine() const {return _multiPvCounter == _linesToBeSearched - 1;}
 	
 	
 	bool getNextRootMove(rootMove& rm) const

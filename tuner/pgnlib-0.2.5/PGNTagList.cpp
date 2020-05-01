@@ -30,7 +30,7 @@ namespace pgn
 	{
 		std::vector<pgn::Tag> tags;
 	};
-};
+}
 
 pgn::TagList::TagList() 
 {
@@ -178,7 +178,7 @@ namespace pgn
 	{
 		std::vector<pgn::Tag>::iterator it;
 	};
-};
+}
 
 
 pgn::TagList::iterator::iterator()

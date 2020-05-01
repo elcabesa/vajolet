@@ -230,7 +230,7 @@ void Search::impl::searchManager(Search::impl& base, timeManagement& tm,std::vec
 }*/
 
 
-SearchResult Search::impl::_go(timeManagement& tm, int depth, Score alpha, Score beta, PVline pvToBeFollowed)
+SearchResult Search::impl::_go(timeManagement& tm, /*int depth,*/ Score alpha, Score beta, PVline pvToBeFollowed)
 {
 	// manage depth 0 search ( return qsearch )
 	if(_sl.getDepth() == 0)

@@ -49,7 +49,7 @@ namespace pgn
 
 	};
 	std::ostream& operator << ( std::ostream& os, const pgn::CommentText& src );
-};
+}
 
 #endif 
 

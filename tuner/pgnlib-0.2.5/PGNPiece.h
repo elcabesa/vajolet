@@ -69,7 +69,7 @@ namespace pgn
 			
 	};
 	std::ostream& operator << ( std::ostream& os, const pgn::Piece& src );
-};
+}
 
 #endif 
 

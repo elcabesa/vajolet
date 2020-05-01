@@ -56,7 +56,7 @@ namespace pgn
 	std::istream& operator >> ( std::istream& is, Move& src);
 	std::ostream& operator << ( std::ostream& os, const Move& src);
 
-};
+}
 
 #endif 
 

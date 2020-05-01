@@ -60,7 +60,7 @@ namespace pgn
 			struct GameData *hdata;
 	};
 	
-};
+}
 
 #endif 
 

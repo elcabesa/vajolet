@@ -52,7 +52,6 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	
 	pgn::Ply whitePly;
 	pgn::Ply blackPly;
-	bool pendingMove = false;
 	
 	// read book moves
 	auto bookMoves = _book.getLine();
@@ -78,17 +77,13 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		
 		if(_c.isWhiteTurn()) {
 			whitePly = pgn::Ply(UciOutput::displayMove(_p, bestMove));
-			pendingMove =true;
-		}
-		else
-		{
+		} else {
 			blackPly = pgn::Ply(UciOutput::displayMove(_p, bestMove));
 			pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
 			
 			++moveCount;
 			whitePly = pgn::Ply();
 			blackPly = pgn::Ply();
-			pendingMove = false;
 		}
 		
 		_p.doMove(bestMove);

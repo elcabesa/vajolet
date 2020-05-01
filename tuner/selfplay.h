@@ -22,7 +22,7 @@
 #include "position.h"
 #include "searchLimits.h"
 
-namespace pgn { class Game;};
+namespace pgn { class Game;}
 class Book;
 class Player;
 

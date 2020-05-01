@@ -82,7 +82,7 @@ namespace pgn
 	
 	std::istream& operator >> ( std::istream& is, Ply& src);
 	std::ostream& operator << ( std::ostream& os, const Ply& src);
-};
+}
 
 #endif 
 

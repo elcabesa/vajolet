@@ -38,7 +38,7 @@ namespace pgn
 	{
 		std::vector<pgn::Move>::iterator it;
 	};
-};
+}
 		
 pgn::MoveList::MoveList() 
 {

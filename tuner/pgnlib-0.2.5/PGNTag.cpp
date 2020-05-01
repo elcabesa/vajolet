@@ -32,7 +32,7 @@ namespace pgn
 		std::string tagName;
 		std::string tagValue;
 	};
-};
+}
 
 pgn::Tag::Tag() 
 {

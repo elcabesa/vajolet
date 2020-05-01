@@ -870,7 +870,7 @@ namespace pgn
 				return castling;
 			}
  	};
-};
+}
 
 // By default we get the position at the start of the game
 pgn::Position::Position() 
@@ -1200,7 +1200,7 @@ namespace pgn
 	{
 		std::vector<pgn::Square>::iterator it;
 	};
-};
+}
 
 
 pgn::Position::iterator::iterator()

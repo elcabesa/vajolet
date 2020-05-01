@@ -113,7 +113,7 @@ namespace pgn
 		
 			struct iteratorData *hdata;
 	};
-};
+}
 
 #endif 
 

@@ -346,7 +346,7 @@ namespace pgn
 			return fromPiece();
 	}
 
-};
+}
 
 pgn::Ply::Ply(const pgn::Ply& src) 
 {

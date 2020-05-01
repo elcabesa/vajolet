@@ -97,7 +97,7 @@ private:
 	//--------------------------------------------------------
 	// private methods
 	//--------------------------------------------------------
-    SearchResult _go(timeManagement & tm, int depth = 1, Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline());
+    SearchResult _go(timeManagement & tm, /*int depth = 1,*/ Score alpha = -SCORE_INFINITE, Score beta = SCORE_INFINITE, PVline pvToBeFollowed = PVline());
 	SearchResult _manageQsearch(timeManagement & tm);
     void _generateRootMovesList(const std::list<Move>& ml);
     void _filterRootMovesByTablebase();
