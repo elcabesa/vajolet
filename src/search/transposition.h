@@ -119,7 +119,8 @@ private:
 
 	transpositionTable(transpositionTable const&) = delete;
 	//void operator=(transpositionTable const&) = delete;
-	ttCluster& findCluster(uint64_t key);
+public:
+	ttCluster* findCluster(uint64_t key);
 	
 public:
 

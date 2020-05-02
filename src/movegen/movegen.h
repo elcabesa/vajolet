@@ -113,13 +113,13 @@ private:
 	inline static bitMap _attackFromRook(const tSquare from, const bitMap& occupancy)
 	{
 		assert(from <squareNumber);
-		return *(magicmoves_r_indices[from]+(((occupancy&magicmoves_r_mask[from])*magicmoves_r_magics[from])>>magicmoves_r_shift[from]));
+		return rookMagic[from].move(occupancy);
 	}
 
 	inline static bitMap _attackFromBishop(const tSquare from, const bitMap& occupancy)
 	{
 		assert(from <squareNumber);
-		return *(magicmoves_b_indices[from]+(((occupancy&magicmoves_b_mask[from])*magicmoves_b_magics[from])>>magicmoves_b_shift[from]));
+		return bishopMagic[from].move(occupancy);
 	}
 	
 	inline static bitMap _attackFromQueen(const tSquare from, const bitMap& occupancy)

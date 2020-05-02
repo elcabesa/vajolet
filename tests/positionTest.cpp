@@ -165,3 +165,58 @@ TEST(PositionTest, getFen) {
 
 	}
 }
+
+/*TEST(PositionTest, getKeyAfterMove) {
+	Position pos;
+	pos.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); 
+	{
+		Move m(E2,E4);
+		auto k = pos.getKeyAfterMove(m);
+		pos.doMove(m);
+		EXPECT_EQ(pos.getKey(), k);
+	}
+	{
+		Move m(E7,E5);
+		auto k = pos.getKeyAfterMove(m);
+		pos.doMove(m);
+		EXPECT_EQ(pos.getKey(), k);
+	}
+	{
+		Move m(D2,D4);
+		auto k = pos.getKeyAfterMove(m);
+		pos.doMove(m);
+		EXPECT_EQ(pos.getKey(), k);
+	}
+	{
+		Move m(E5,D4);
+		auto k = pos.getKeyAfterMove(m);
+		pos.doMove(m);
+		EXPECT_EQ(pos.getKey(), k);
+	}
+	{
+		Move m(D1,D4);
+		auto k = pos.getKeyAfterMove(m);
+		pos.doMove(m);
+		EXPECT_EQ(pos.getKey(), k);
+	}
+	{
+		Move m(D7,D5);
+		auto k = pos.getKeyAfterMove(m);
+		pos.doMove(m);
+		EXPECT_EQ(pos.getKey(), k);
+	}
+	{
+		Move m(D4,D5);
+		auto k = pos.getKeyAfterMove(m);
+		pos.doMove(m);
+		EXPECT_EQ(pos.getKey(), k);
+	}
+	{
+		Move m(D8,D5);
+		auto k = pos.getKeyAfterMove(m);
+		pos.doMove(m);
+		EXPECT_EQ(pos.getKey(), k);
+	}
+	
+
+}*/

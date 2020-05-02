@@ -891,10 +891,8 @@ void Position::doMove(const Move & m)
 		}
 		_putPiece(rook, rTo);
 		
-		x.getKey().updatePiece( rFrom, rook );
-		x.getKey().updatePiece( rTo, rook );
-		x.getKey().updatePiece( kFrom, piece );
-		x.getKey().updatePiece( kTo, piece );
+		x.getKey().updatePiece( rFrom, rTo, rook );
+		x.getKey().updatePiece( kFrom, kTo, piece );
 		
 		x.addMaterial( _pstValue[rook][rTo] - _pstValue[rook][rFrom] );
 		x.addMaterial( _pstValue[piece][kTo] - _pstValue[piece][kFrom] );
@@ -932,8 +930,7 @@ void Position::doMove(const Move & m)
 		}
 
 		// update hashKey
-		x.getKey().updatePiece( from, piece );
-		x.getKey().updatePiece( to, piece );
+		x.getKey().updatePiece( from, to, piece );
 		_movePiece(piece, from, to);
 
 		x.addMaterial( _pstValue[piece][to] - _pstValue[piece][from] );
@@ -971,14 +968,12 @@ void Position::doMove(const Move & m)
 			x.addNonPawnMaterial( _nonPawnValue[promotedPiece] );
 
 
-			x.getKey().updatePiece( to, piece );
-			x.getKey().updatePiece( to, promotedPiece );
+			x.getKey().updatePiece( to, piece, promotedPiece );
 			x.getPawnKey().updatePiece( to,piece );
 			x.getMaterialKey().updatePiece( (tSquare)promotedPiece, (bitboardIndex)( getPieceCount(promotedPiece) - 1 ) );
 			x.getMaterialKey().updatePiece( (tSquare)piece, (bitboardIndex)getPieceCount(piece) );
 		}
-		x.getPawnKey().updatePiece( from, piece );
-		x.getPawnKey().updatePiece( to, piece );
+		x.getPawnKey().updatePiece( from, to, piece );
 		x.resetIrreversibleMoveCount();
 	}
 

@@ -165,6 +165,23 @@ public:
 		return getActualState().getKey();
 	}
 
+	/*const HashKey getKeyAfterMove(const Move& m) const
+	{
+		auto k = getActualState().getKey();
+		const tSquare from = m.getFrom();
+		const tSquare to = m.getTo();
+		const bitboardIndex piece = getPieceAt(from);
+		const bitboardIndex captured = getPieceAt(to);
+
+		k.changeSide();
+
+		if(captured){
+			k.updatePiece(to,captured);
+		}
+		k.updatePiece( from, to, piece );
+		return k;	
+	}*/
+
 	const HashKey getExclusionKey(void) const
 	{
 		return getActualState().getKey().getExclusionKey();
@@ -418,9 +435,9 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	std::array<bitboardIndex,squareNumber> _squares;		// board square rapresentation to speed up, it contain pieces indexed by square
+	std::array<bitboardIndex,squareNumber> _squares;	// board square rapresentation to speed up, it contain pieces indexed by square
 	std::array<bitMap,lastBitboard> _bitBoard;			// bitboards indexed by bitboardIndex enum
-	bitMap *Us,*Them;	/*!< pointer to our & their pieces _bitBoard*/
+	bitMap *Us, *Them;	/*!< pointer to our & their pieces _bitBoard*/
 	bool _isChess960;
 
 	//--------------------------------------------------------

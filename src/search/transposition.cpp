@@ -71,11 +71,11 @@ ttEntry* transpositionTable::probe( const HashKey& k )
 
 	const auto key = k.getKey();
 
-	ttCluster& ttc = findCluster(key);
+	ttCluster* ttc = findCluster(key);
 	unsigned int keyH = (uint32_t)(key >> 32);
 
-	auto it = std::find_if (ttc.begin(), ttc.end(), [keyH](ttEntry p){return p.getKey()==keyH;});
-	if( it != ttc.end())
+	auto it = std::find_if (ttc->begin(), ttc->end(), [keyH](ttEntry p){return p.getKey()==keyH;});
+	if( it != ttc->end())
 	{
 		return it;
 	}
@@ -99,17 +99,17 @@ void transpositionTable::store(const HashKey& k, Score value, unsigned char type
 	ttEntry *candidate;
 	unsigned int keyH = (uint32_t)(key >> 32); // Use the high 32 bits as key inside the cluster
 
-	ttCluster& ttc = findCluster(key);
+	ttCluster* ttc = findCluster(key);
 
-	auto it = std::find_if (ttc.begin(), ttc.end(), [keyH](ttEntry p){return (!p.getKey()) || (p.getKey()==keyH);});
-	if( it != ttc.end())
+	auto it = std::find_if (ttc->begin(), ttc->end(), [keyH](ttEntry p){return (!p.getKey()) || (p.getKey()==keyH);});
+	if( it != ttc->end())
 	{
 		candidate = it;
 	}
 	else
 	{
-		candidate = &ttc[0];
-		for(auto& d: ttc)
+		candidate = reinterpret_cast < ttEntry * > (ttc);
+		for(auto& d: *ttc)
 		{
 			bool cc1,cc2,cc3,cc4;
 
@@ -137,10 +137,10 @@ void transpositionTable::clear()
 	std::fill(_table.begin(), _table.end(), ttc);
 }
 
-inline ttCluster& transpositionTable::findCluster(uint64_t key)
+ttCluster* transpositionTable::findCluster(uint64_t key)
 {
 	assert((uint32_t(key) * uint64_t(_elements)) >> 32 < _elements);
-	return _table[(uint32_t(key) * uint64_t(_elements)) >> 32];
+	return &_table[(uint32_t(key) * uint64_t(_elements)) >> 32];
 }
 
 void transpositionTable::refresh(ttEntry& tte)

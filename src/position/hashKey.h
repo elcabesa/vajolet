@@ -64,6 +64,16 @@ public:
 		_key ^= _keys[ t ][ piece ];
 	}
 
+	inline void updatePiece( const tSquare from, const tSquare to, const bitboardIndex piece )
+	{
+		_key ^= _keys[ from ][ piece ] ^ _keys[ to ][ piece ];
+	}
+
+	inline void updatePiece( const tSquare t, const bitboardIndex piece1, const bitboardIndex piece2 )
+	{
+		_key ^= _keys[ t ][ piece1 ] ^ _keys[ t ][ piece2 ];
+	}
+
 	inline void changeSide()
 	{
 		_key ^= _side;
