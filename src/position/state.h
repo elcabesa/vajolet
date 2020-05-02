@@ -295,32 +295,32 @@ public:
 
 	inline bitboardIndex getPiecesOfActivePlayer() const
 	{
-		return (bitboardIndex)(whitePieces + _nextMove);
+		return static_cast<bitboardIndex>(static_cast<int>(whitePieces) + static_cast<int>(_nextMove));
 	}
 
 	inline bitboardIndex getPiecesOfOtherPlayer() const
 	{
-		return (bitboardIndex)(blackPieces - _nextMove);
+		return static_cast<bitboardIndex>(static_cast<int>(blackPieces) - static_cast<int>(_nextMove));
 	}
 
 	inline bitboardIndex getKingOfActivePlayer() const
 	{
-		return (bitboardIndex)(whiteKing + _nextMove);
+		return static_cast<bitboardIndex>(static_cast<int>(whiteKing) + static_cast<int>(_nextMove));
 	}
 
 	inline bitboardIndex getKingOfOtherPlayer() const
 	{
-		return (bitboardIndex)(blackKing - _nextMove);
+		return static_cast<bitboardIndex>(static_cast<int>(blackKing) - static_cast<int>(_nextMove));
 	}
 
 	inline bitboardIndex getPawnsOfActivePlayer() const
 	{
-		return (bitboardIndex)(whitePawns + _nextMove);
+		return static_cast<bitboardIndex>(static_cast<int>(whitePawns) + static_cast<int>(_nextMove));
 	}
 
 	inline bitboardIndex getPawnsOfOtherPlayer() const
 	{
-		return (bitboardIndex)(blackPawns - _nextMove);
+		return static_cast<bitboardIndex>(static_cast<int>(blackPawns) - static_cast<int>(_nextMove));
 	}
 
 	inline bool isBlackTurn() const

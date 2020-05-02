@@ -28,7 +28,7 @@ namespace pgn
 	{
 		std::string comment;		
 	};
-};
+}
 
 pgn::CommentText::CommentText() 
 {

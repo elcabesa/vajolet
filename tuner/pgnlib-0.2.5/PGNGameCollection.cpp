@@ -38,7 +38,7 @@ namespace pgn
 	{
 		std::vector<pgn::Game>::iterator it;
 	};
-};
+}
 
 pgn::GameCollection::GameCollection() 
 {

@@ -64,9 +64,9 @@ void SPSA::_populateParameters()
 	_pars.emplace_back("iidDepthRed", &SearchParameters::iidDepthRed, 32, 0, 64, 8, 0.0020);
 	_pars.emplace_back("iidDepthRedFactor", &SearchParameters::iidDepthRedFactor, 4, 0, 8, 1, 0.0020);
 	
-	_pars.emplace_back("singularExpressionPVDepth", &SearchParameters::singularExpressionPVDepth, 96, 0, 200, 20, 0.0020);
-	_pars.emplace_back("singularExpressionNonPVDepth", &SearchParameters::singularExpressionNonPVDepth, 128, 0, 256, 25, 0.0020);
-	_pars.emplace_back("singularExpressionTtDepth", &SearchParameters::singularExpressionTtDepth, 48, 0, 96, 10, 0.0020);
+	_pars.emplace_back("singularExtensionPVDepth", &SearchParameters::singularExtensionPVDepth, 96, 0, 200, 20, 0.0020);
+	_pars.emplace_back("singularExtensionNonPVDepth", &SearchParameters::singularExtensionNonPVDepth, 128, 0, 256, 25, 0.0020);
+	_pars.emplace_back("singularExtensionTtDepth", &SearchParameters::singularExtensionTtDepth, 48, 0, 96, 10, 0.0020);
 	
 /*	_pars.emplace_back("queenValue", &EvalParameters::initialPieceValue, 118976, 0, 300000, 500, 0.0020);*/
 	

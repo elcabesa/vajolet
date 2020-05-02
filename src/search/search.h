@@ -32,14 +32,12 @@ class SearchParameters;
 class timeManagement;
 class transpositionTable;
 
-
 class Search
 {
 public:
 	//--------------------------------------------------------
 	// public static methods
 	//--------------------------------------------------------
-	static void initSearchParameters();
 
 	//--------------------------------------------------------
 	// public methods
@@ -60,11 +58,11 @@ public:
 	void showLine();
 	SearchResult manageNewSearch(timeManagement & tm);
 	Position& getPosition();
-	void setUOI( std::unique_ptr<UciOutput> UOI );
+	void setUOI( UciOutput::type UOI);
 	SearchParameters& getSearchParameters();
-
-private:
 	class impl;
+private:
+	
 	std::unique_ptr<impl> pimpl;
 };
 

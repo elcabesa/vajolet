@@ -177,7 +177,7 @@ inline bool Move::isQueenSideCastle() const
 
 inline bitboardIndex Move::getPromotedPiece() const
 {
-	return bitboardIndex( whiteQueens + getPromotionType() );
+	return static_cast<bitboardIndex>(static_cast<int>(whiteQueens) + static_cast<int>(getPromotionType()));
 }
 
 

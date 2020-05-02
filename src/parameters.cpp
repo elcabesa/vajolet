@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#include <cmath>
 
 #include <cassert>
 
@@ -173,8 +174,70 @@ iidStaticEvalBonus(9576),
 iidDepthRed(32),
 iidDepthRedFactor(4),
 
-singularExpressionPVDepth(96),
-singularExpressionNonPVDepth(125),
-singularExpressionTtDepth(48)
+singularExtensionPVDepth(96),
+singularExtensionNonPVDepth(125),
+singularExtensionTtDepth(48),
+singularExtensionScoreDepthBonus(20),
+singularExtensionExt(16),
 
-{}
+dangerousMoveExtension(16),
+checkMoveExtension(8),
+
+FutilityMoveCountsDepth(16),
+
+futilityDepth(112),
+
+negativeSeeSkipDepth(64),
+
+lmrDepthLimitInf(48)
+{
+	_updatePars();
+}
+
+void SearchParameters::_updatePars() 
+{
+	/***************************************************
+	 * FUTILITY MOVE COUNT
+	 ***************************************************/
+	for (unsigned int d = 0; d < 32; ++d)
+	{
+		FutilityMoveCounts[0][d] = int(2.52 + 0.704 * std::pow( d, 1.8));
+		FutilityMoveCounts[1][d] = int(4.5 + 0.704 * std::pow( d, 2.0));
+	}
+
+	/***************************************************
+	 * FUTILITY
+	 ***************************************************/
+	for (unsigned int d = 0; d < 12; ++d)
+	{
+		futilityMargin[d] = 10000 + d * 10000;
+	}
+	/***************************************************
+	 * LRM
+	 ***************************************************/
+
+	for (unsigned int mc = 1; mc < LmrLimitMove; ++mc)
+	{
+		PVreduction[0][0][mc] = 0;
+		nonPVreduction[1][0][mc] = 0;
+	}
+	for (unsigned int d = 1; d < LmrLimit * 16; ++d)
+	{
+		for (unsigned int mc = 1; mc < LmrLimitMove; ++mc)
+		{
+			double dd = (16.0 * d) / 16;
+			
+			double    PVRed = -1.5 + 0.33 * log(dd) * log(double(mc));
+			double nonPVRed = -1.2 + 0.37 * log(dd) * log(double(mc));
+
+			PVreduction[1][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(16)) : 0);
+			nonPVreduction[1][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(16)) : 0);
+
+			PVreduction[0][d][mc] = PVreduction[1][d][mc];
+			nonPVreduction[0][d][mc] = nonPVreduction[1][d][mc];
+
+			if(    PVreduction[0][d][mc] > int(16) ){    PVreduction[0][d][mc] += int(16); }
+			if( nonPVreduction[0][d][mc] > int(16) ){ nonPVreduction[0][d][mc] += int(16); }
+		}
+	}
+}

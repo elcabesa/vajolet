@@ -34,7 +34,7 @@ namespace pgn
 		pgn::Ply white;
 		pgn::Ply black;
 	};
-};
+}
 
 pgn::Move::Move() 
 {

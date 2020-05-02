@@ -23,7 +23,7 @@
 
 class Book;
 
-namespace pgn { class Game;};
+namespace pgn { class Game;}
 
 enum class TournamentResult {
 	p1Won = 1,

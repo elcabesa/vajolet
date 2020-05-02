@@ -70,10 +70,12 @@ public:
 	static std::string displayUci(const Move& m, const bool chess960);
 	static std::string displayMove(const Position& pos, const Move& m);
 	static char getPieceName(const bitboardIndex idx);
+	type getType() const { return _type;}
 	
 protected:
 	unsigned int _depth;
 	unsigned int _PVlineIndex;
+	type _type;
 	
 	static char _printFileOf( const tSquare& sq ) { return char( 'a' + getFileOf( sq ) ); }
 	static char _printRankOf( const tSquare& sq ) { return char( '1' + getRankOf( sq ) ); }

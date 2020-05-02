@@ -60,8 +60,8 @@ Score Position::see(const Move& m) const
 	}
 	if( m.isPromotionMove() )
 	{
-		captured = bitboardIndex(whiteQueens + m.getPromotionType());
-		swapList[0] += getPieceValue(static_cast<bitboardIndex>(whiteQueens + m.getPromotionType()))[0] - getPieceValue(whitePawns)[0];
+		captured = static_cast<bitboardIndex>(static_cast<int>(whiteQueens) + static_cast<int>(m.getPromotionType()));
+		swapList[0] += getPieceValue(static_cast<bitboardIndex>(static_cast<int>(whiteQueens) + static_cast<int>(m.getPromotionType())))[0] - getPieceValue(whitePawns)[0];
 	}
 
 	// Find all attackers to the destination square, with the moving piece
@@ -71,7 +71,7 @@ Score Position::see(const Move& m) const
 	// If the opponent has no attackers we are finished
 	color = (eNextMove)(blackTurn - color);
 	assert( (bitboardIndex)( Pieces + color ) == blackPieces || (bitboardIndex)( Pieces + color ) == whitePieces );
-	colorAttackers = attackers & getBitmap((bitboardIndex)(Pieces + color));
+	colorAttackers = attackers & getBitmap(static_cast<bitboardIndex>(static_cast<int>(Pieces) + static_cast<int>(color)));
 
 
 	if (!colorAttackers)
@@ -107,7 +107,7 @@ Score Position::see(const Move& m) const
 
 		while(nextAttacker >= King)
 		{
-			bitMap att = getBitmap(bitboardIndex(nextAttacker + color)) & colorAttackers;
+			bitMap att = getBitmap(static_cast<bitboardIndex>(static_cast<int>(nextAttacker) + static_cast<int>(color))) & colorAttackers;
 
 			if(att)
 			{
@@ -142,7 +142,7 @@ Score Position::see(const Move& m) const
 
 
 		color = (eNextMove)(blackTurn-color);
-		colorAttackers = attackers & getBitmap((bitboardIndex)(Pieces + color));
+		colorAttackers = attackers & getBitmap(static_cast<bitboardIndex>(static_cast<int>(Pieces) + static_cast<int>(color)));
 
 		// Stop before processing a king capture
 		if (captured == King && colorAttackers)

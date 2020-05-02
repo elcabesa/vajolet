@@ -57,7 +57,7 @@ namespace pgn
 	std::ostream& operator << ( std::ostream& os, const pgn::Tag& src );
 	std::istream& operator >> (std::istream& is, Tag& src);
 
-};
+}
 
 #endif 
 

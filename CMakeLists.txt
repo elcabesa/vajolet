@@ -14,7 +14,7 @@ ELSEIF( VAJOLET_CPU_TYPE STREQUAL "64BMI2")
 ELSE()
 ENDIF()
 
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -pedantic -Wall -Wextra" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -pedantic -Wall -Wextra" )
 if (WIN32)
 	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -femulated-tls" )

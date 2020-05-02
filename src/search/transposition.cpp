@@ -155,7 +155,7 @@ unsigned int transpositionTable::getFullness() const
 
 	for (auto t = _table.begin(); t != _table.begin()+end; t++)
 	{
-		cnt+= std::count_if (t->begin(), t->end(), [=](ttEntry d){return d.getGeneration() == this->_generation;});
+		cnt+= std::count_if (t->begin(), t->end(), [=, this](ttEntry d){return d.getGeneration() == this->_generation;});
 	}
 	return (unsigned int)(cnt*250llu/(end));
 }

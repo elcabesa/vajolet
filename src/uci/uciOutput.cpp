@@ -37,6 +37,9 @@ public:
 	void printScore(const signed int cp) const override;
 	void printBestMove( const Move& m, const Move& ponder, bool isChess960) const override;
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const override;
+	UciMuteOutput() {
+		_type = type::mute;
+	}
 };
 
 
@@ -51,6 +54,9 @@ public:
 	void printScore(const signed int cp) const override;
 	void printBestMove( const Move& m, const Move& ponder, bool isChess960) const override;
 	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const override;
+	UciStandardOutput() {
+		_type = type::standard;
+	}
 };
 
 
