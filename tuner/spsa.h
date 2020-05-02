@@ -17,9 +17,19 @@
 #ifndef SPSA_H_
 #define SPSA_H_
 
+#include <mutex>
+#include <random>
+#include <vector>
+#include "parameters.h"
+#include "tournament.h"
+
+class Player;
+class Book;
+
+
 class SPSA {
 public:
-	SPSA();
+	SPSA(Book& b);
 	void run();
 
 private:
@@ -27,6 +37,52 @@ private:
 	static constexpr double gamma = 0.101;
 	static constexpr int N = 50000;
 	static constexpr double A = 5000;
+	
+	struct runtimeVars
+	{
+		double value;
+		double a;
+		double c;
+		double r;
+		int delta;
+	};
+
+	struct variable
+	{
+		variable(std::string n, int SearchParameters::*p, const double sv, const double minv, const double maxv, const double cE, const double rE):
+		name(n),
+		par(p),
+		startValue(sv),
+		minValue(minv),
+		maxValue(maxv),
+		cEnd(cE),
+		rEnd(rE),
+		run({})
+		{}
+		const std::string name;
+		int SearchParameters::*par;
+		const double startValue;
+		const double minValue;
+		const double maxValue;
+		const double cEnd;
+		const double rEnd;
+		runtimeVars run;
+	};
+	
+	std::vector<variable> _pars;
+	
+	void _populateParameters();
+	void _generateParamters(std::vector<variable>& localPars, Player& p1, Player& p2, int k, int th);
+	void _printParameters(std::vector<variable>& localPars, Player& p1, Player& p2, int k, int th);
+	TournamentResult _runTournament(Player& p1, Player& p2, int k, int th);
+	void _updateParamters(std::vector<variable>& localPars, TournamentResult& r, int k, int th);
+	void _worker(int n);
+	int _getTurn();
+	
+	std::mt19937 _gen;
+	std::mutex _mtx;
+	unsigned int _turn = 0;
+	Book& _book;
 };
 
 #endif

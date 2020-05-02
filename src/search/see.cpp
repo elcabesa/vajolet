@@ -22,7 +22,7 @@
 Score Position::seeSign(const Move& m) const
 {
 	assert( m );
-	if ( (pieceValue[getPieceAt(m.getFrom())][0] <= pieceValue[getPieceAt(m.getTo())][0])/* ||  m.isEnPassantMove() */)
+	if ( (getPieceValue(getPieceAt(m.getFrom()))[0] <= getPieceValue(getPieceAt(m.getTo()))[0])/* ||  m.isEnPassantMove() */)
 	{
 		return 1;
 	}
@@ -45,14 +45,14 @@ Score Position::see(const Move& m) const
 	bitMap colorAttackers;
 	bitboardIndex captured;
 
-	swapList[0] = pieceValue[getPieceAt(to)][0];
+	swapList[0] = getPieceValue(getPieceAt(to))[0];
 	//std::cout<<"DEBUG inital capture: "<<swapList[0]<<std::endl;
 	captured = getPieceTypeAt(from);
 
 	if( m.isEnPassantMove() )
 	{
 		occupied ^= bitSet(to - pawnPush(color));
-		swapList[0] = pieceValue[whitePawns][0];
+		swapList[0] = getPieceValue(whitePawns)[0];
 	}
 	if( m.isCastleMove() )
 	{
@@ -61,7 +61,7 @@ Score Position::see(const Move& m) const
 	if( m.isPromotionMove() )
 	{
 		captured = bitboardIndex(whiteQueens + m.getPromotionType());
-		swapList[0] += pieceValue[whiteQueens + m.getPromotionType()][0] - pieceValue[whitePawns][0];
+		swapList[0] += getPieceValue(static_cast<bitboardIndex>(whiteQueens + m.getPromotionType()))[0] - getPieceValue(whitePawns)[0];
 	}
 
 	// Find all attackers to the destination square, with the moving piece
@@ -96,9 +96,9 @@ Score Position::see(const Move& m) const
 		//std::cout<<"DEBUG iteration "<<slIndex<<std::endl;
 
 		// Add the new entry to the swap list
-		swapList[slIndex] = -swapList[slIndex - 1] + pieceValue[captured][0];
+		swapList[slIndex] = -swapList[slIndex - 1] + getPieceValue(captured)[0];
 		//std::cout<<"DEBUG capture piece "<<captured<<std::endl;
-		//std::cout<<"DEBUG capture value "<<pieceValue[captured][0]<<std::endl;
+		//std::cout<<"DEBUG capture value "<<getPieceValue(captured)[0]<<std::endl;
 		//std::cout<<"DEBUG new swaplist "<<swapList[slIndex]<<std::endl;
 
 
@@ -130,7 +130,7 @@ Score Position::see(const Move& m) const
 				if( nextAttacker == Pawns && canBePromotion)
 				{
 					//nextAttacker = Queens;
-					swapList[slIndex] += pieceValue[whiteQueens][0] - pieceValue[whitePawns][0];
+					swapList[slIndex] += getPieceValue(whiteQueens)[0] - getPieceValue(whitePawns)[0];
 					//std::cout<<"DEBUG changed swaplist "<<swapList[slIndex]<<std::endl;
 					captured = whiteQueens;
 				}
@@ -147,7 +147,7 @@ Score Position::see(const Move& m) const
 		// Stop before processing a king capture
 		if (captured == King && colorAttackers)
 		{
-			swapList[slIndex++] = pieceValue[whiteKing][0];
+			swapList[slIndex++] = getPieceValue(whiteKing)[0];
 			//std::cout<<"DEBUG king capture, insert block "<<swapList[slIndex-1]<<std::endl;
 			break;
 		}

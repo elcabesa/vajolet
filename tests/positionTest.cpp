@@ -220,3 +220,41 @@ TEST(PositionTest, getFen) {
 	
 
 }*/
+
+TEST(PositionTest, copyConstructor) {
+	Position pos;
+	pos.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	
+	Position pos2(pos);
+	
+	pos.doMove(Move(E2,E4));
+	pos.doMove(Move(E7,E5));
+	pos.doMove(Move(D2,D4));
+
+	pos2.doMove(Move(E2,E4));
+	pos2.doMove(Move(E7,E5));
+	pos2.doMove(Move(D2,D4));
+	
+	EXPECT_EQ(pos.getFen(), pos2.getFen());
+	EXPECT_EQ(pos.eval<false>(), pos2.eval<false>());
+}
+
+TEST(PositionTest, copy) {
+	Position pos;
+	pos.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); 
+	
+	Position pos2;
+	pos2 = pos;
+
+	pos.doMove(Move(E2,E4));
+	pos.doMove(Move(E7,E5));
+	pos.doMove(Move(D2,D4));
+
+	pos2.doMove(Move(E2,E4));
+	pos2.doMove(Move(E7,E5));
+	pos2.doMove(Move(D2,D4));
+	
+	EXPECT_EQ(pos.getFen(), pos2.getFen());
+	EXPECT_EQ(pos.eval<false>(), pos2.eval<false>());
+}
+

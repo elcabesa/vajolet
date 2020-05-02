@@ -18,17 +18,17 @@
 #include <csignal>
 #include <iostream>
 
-#include "libchess.h"
-//#include "player.h"
+#include "book.h"
 
-//#include "tournament.h"
+#include "libchess.h"
+
 #include "spsa.h"
 #include "thread.h"
 #include "transposition.h"
+#include "uciOutput.h"
 
 void signalHandler(int signum)
 {
-	//my_thread::getInstance().stopThinking();
 	exit(signum);
 }
 
@@ -58,7 +58,15 @@ int main() {
 	//----------------------------------
 	libChessInit();
 	
-	SPSA spsa;
+	Book book("book.pgn");
+	/*while(true) {
+		auto moves = b.getLine();
+		for(const auto& m: moves) {
+			std::cout<<UciOutput::displayUci(m, false)<<" ";
+		}
+		std::cout<<std::endl;
+	}*/
+	SPSA spsa(book);
 	spsa.run();
 
 	return 0;

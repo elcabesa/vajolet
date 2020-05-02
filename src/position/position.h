@@ -30,6 +30,7 @@
 #include "hashKey.h"
 #include "movegen.h"
 #include "move.h"
+#include "parameters.h"
 #include "score.h"
 #include "state.h"
 #include "vajolet.h"
@@ -57,8 +58,6 @@ public:
 	// public static methods
 	//--------------------------------------------------------
 	static void initMaterialKeys(void);
-	static void initScoreValues(void);
-	static void initPstValues(void);
 	
 	//--------------------------------------------------------
 	// public methods
@@ -69,7 +68,7 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	explicit Position(const pawnHash usePawnHash = pawnHash::on);
+	explicit Position(const pawnHash usePawnHash = pawnHash::on, const EvalParameters& eParm = EvalParameters());
 	explicit Position(const Position& other, const pawnHash usePawnHash = pawnHash::on);
 	~Position();
 	Position& operator=(const Position& other);
@@ -290,10 +289,10 @@ public:
 	*/
 	inline Score getMvvLvaScore(const Move & m) const
 	{
-		Score s = pieceValue[ getPieceAt( m.getTo() ) ][0] + getPieceAt( m.getFrom() );
+		Score s = _eParm._pieceValue[ getPieceAt( m.getTo() ) ][0] + getPieceAt( m.getFrom() );
 		if( m.isEnPassantMove() )
 		{
-			s += pieceValue[ whitePawns ][0];
+			s += _eParm._pieceValue[ whitePawns ][0];
 		}
 		return s;
 	}
@@ -343,7 +342,7 @@ public:
 	
 	inline bool hasActivePlayerNonPawnMaterial() const
 	{
-		return getActualState().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= Position::pieceValue[whiteKnights][0];
+		return getActualState().getNonPawnValue()[ isBlackTurn()? 2 : 0 ] >= _eParm._pieceValue[whiteKnights][0];
 	}
 	
 	bitMap _CastlePathOccupancyBitmap( const eCastle c ) const;
@@ -357,7 +356,8 @@ public:
 		return _mg;
 	}
 	
-	bool isOppositeBishops() const{
+	bool isOppositeBishops() const
+	{
 		return 
 			(getPieceCount(whiteBishops) == 1)
 			&& (getPieceCount(blackBishops) == 1)
@@ -366,10 +366,11 @@ public:
 
 	bool isChess960() const {return _isChess960;}
 
+	simdScore getPieceValue(const bitboardIndex b) const { return _eParm._pieceValue[b];}
+
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
-	static simdScore pieceValue[lastBitboard];
 private:
 
 
@@ -377,7 +378,7 @@ private:
 	Position(Position&& ) noexcept = delete;
 
 	//--------------------------------------------------------
-	// private struct
+	// private structPosition
 	//--------------------------------------------------------
 	struct materialStruct
 	{
@@ -404,9 +405,6 @@ private:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	
-	static simdScore _pstValue[lastBitboard][squareNumber];
-	static simdScore _nonPawnValue[lastBitboard];
 	std::unordered_map<tKey, materialStruct> static _materialKeyMap;
 	
 	
@@ -439,10 +437,11 @@ private:
 	std::array<bitMap,lastBitboard> _bitBoard;			// bitboards indexed by bitboardIndex enum
 	bitMap *Us, *Them;	/*!< pointer to our & their pieces _bitBoard*/
 	bool _isChess960;
+	EvalParameters _eParm;
 
 	//--------------------------------------------------------
 	// private methods
-	//--------------------------------------------------------
+	//--------------------------------------------------------	
 
 	inline void _insertState( state & s );
 	inline void _removeState();

@@ -18,12 +18,13 @@ struct positions
 
 TEST(seeTest, see)
 {
+	EvalParameters ep;
 
-	const Score P = initialPieceValue[Pawns][0];
-	const Score N = initialPieceValue[Knights][0];
-	const Score B = initialPieceValue[Bishops][0];
-	const Score R= initialPieceValue[Rooks][0];
-	const Score Q = initialPieceValue[Queens][0];
+	const Score P = ep.initialPieceValue[Pawns][0];
+	const Score N = ep.initialPieceValue[Knights][0];
+	const Score B = ep.initialPieceValue[Bishops][0];
+	const Score R = ep.initialPieceValue[Rooks][0];
+	const Score Q = ep.initialPieceValue[Queens][0];
 	//const Score K = initialPieceValue[King][0];
 	/* manythanks to Fabio Gobbato for this list of fen Tests*/
 	std::list<positions> posList;

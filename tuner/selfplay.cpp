@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "book.h"
 #include "parameters.h"
 #include "player.h"
 #include "PGNGame.h"
@@ -31,7 +32,7 @@
 #include "tunerPars.h"
 #include "uciOutput.h"
 
-SelfPlay::SelfPlay(Player& white, Player& black) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black) {
+SelfPlay::SelfPlay(Player& white, Player& black, Book& b) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b) {
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());
@@ -53,18 +54,35 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	pgn::Ply blackPly;
 	bool pendingMove = false;
 	
+	// read book moves
+	auto bookMoves = _book.getLine();
+	auto it = bookMoves.begin();
+	
 	while (!_isGameFinished()) {
 		// set time limit
 		_sl.setWTime(_c.getWhiteTime());
 		_sl.setBTime(_c.getBlackTime());
 		
-		auto res = _c.isWhiteTurn()? _white.doSearch(_p, _sl): _black.doSearch(_p, _sl);
+		Move bestMove;
+		if(it != bookMoves.end())
+		{
+			// make book moves
+			bestMove = *it;
+			++it;
+		}
+		else 
+		{	// out of book search
+			auto res = _c.isWhiteTurn()? _white.doSearch(_p, _sl): _black.doSearch(_p, _sl);
+			bestMove = res.PV.getMove(0);
+		}
 		
 		if(_c.isWhiteTurn()) {
-			whitePly = pgn::Ply(UciOutput::displayMove(_p, res.PV.getMove(0)));
+			whitePly = pgn::Ply(UciOutput::displayMove(_p, bestMove));
 			pendingMove =true;
-		}	else {
-			blackPly = pgn::Ply(UciOutput::displayMove(_p, res.PV.getMove(0)));
+		}
+		else
+		{
+			blackPly = pgn::Ply(UciOutput::displayMove(_p, bestMove));
 			pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
 			
 			++moveCount;
@@ -73,7 +91,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			pendingMove = false;
 		}
 		
-		_p.doMove(res.PV.getMove(0));
+		_p.doMove(bestMove);
 		
 		_c.switchTurn();
 	}

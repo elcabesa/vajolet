@@ -245,12 +245,12 @@ int main()
 ++	parameters.push_back(parameter("isolatedPawnPenalty",&isolatedPawnPenalty,2));
 ++	parameters.push_back(parameter("isolatedPawnPenaltyOpp",&isolatedPawnPenaltyOpp,2));
 ++	parameters.push_back(parameter("doubledPawnPenalty",&doubledPawnPenalty,2));
-++	parameters.push_back(parameter("backwardPawnPenalty",&backwardPawnPenalty,2));*/
+++	parameters.push_back(parameter("backwardPawnPenalty",&backwardPawnPenalty,2));
 	parameters.push_back(parameter("chainedPawnBonus",&chainedPawnBonus,2));
 	parameters.push_back(parameter("chainedPawnBonusOffset",&chainedPawnBonusOffset,2));
 	parameters.push_back(parameter("chainedPawnBonusOpp",&chainedPawnBonusOpp,2));
 	parameters.push_back(parameter("chainedPawnBonusOffsetOpp",&chainedPawnBonusOffsetOpp,2));
-/*	parameters.push_back(parameter("passedPawnFileAHPenalty",&passedPawnFileAHPenalty,2));
+	parameters.push_back(parameter("passedPawnFileAHPenalty",&passedPawnFileAHPenalty,2));
 	parameters.push_back(parameter("passedPawnSupportedBonus",&passedPawnSupportedBonus,2));
 ++	parameters.push_back(parameter("candidateBonus",&candidateBonus,2));
 	parameters.push_back(parameter("passedPawnBonus",&passedPawnBonus,2));
@@ -452,9 +452,6 @@ int main()
 
 			}
 		}
-		Position::initScoreValues();
-		
-
 
 		error = calcError2();
 

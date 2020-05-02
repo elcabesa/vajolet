@@ -557,7 +557,7 @@ void Search::impl::idLoop(timeManagement& tm, std::vector<rootMove>& temporaryRe
 			// at depth 1 only print the PV at the end of search
 			if(!_stop && depth == 1)
 			{
-				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), _pos.isChess960(), UciOutput::PVbound::upperbound);
+				_UOI->printPV(res.score, _maxPlyReached, _st.getElapsedTime(), res.PV, getVisitedNodes(), _pos.isChess960());
 			}
 			if(!_stop && uciParameters::multiPVLines > 1)
 			{
@@ -1844,12 +1844,12 @@ template<Search::impl::nodeType type, bool log> Score Search::impl::qsearch(unsi
 					)
 					{
 						Score futilityValue = futilityBase
-								+ Position::pieceValue[_pos.getPieceAt(m.getTo())][1]
-								+ ( m.isEnPassantMove() ? Position::pieceValue[whitePawns][1] : 0);
+								+ _pos.getPieceValue(_pos.getPieceAt(m.getTo()))[1]
+								+ ( m.isEnPassantMove() ? _pos.getPieceValue(whitePawns)[1] : 0);
 
 						if( m.isPromotionMove() )
 						{
-							futilityValue += Position::pieceValue[m.getPromotionType() + whiteQueens][1] - Position::pieceValue[whitePawns][1];
+							futilityValue += _pos.getPieceValue(static_cast<bitboardIndex>(m.getPromotionType() + whiteQueens))[1] - _pos.getPieceValue(whitePawns)[1];
 						}
 
 						if (futilityValue <= alpha)
