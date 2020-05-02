@@ -1321,7 +1321,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 
 						if( m.isPromotionMove() )
 						{
-							futilityValue += _pos.getPieceValue(static_cast<bitboardIndex>(m.getPromotionType() + whiteQueens))[1] - _pos.getPieceValue(whitePawns)[1];
+							futilityValue += _pos.getPieceValue(static_cast<bitboardIndex>(static_cast<int>(m.getPromotionType()) + static_cast<int>(whiteQueens)))[1] - _pos.getPieceValue(whitePawns)[1];
 						}
 
 						if (futilityValue <= alpha)

@@ -147,7 +147,7 @@ inline static bool isValidPiece(const bitboardIndex piece)
 
 inline bitboardIndex getPieceOfPlayer( const bitboardIndex piece, const eNextMove nM)
 {
-	return (bitboardIndex)( piece + nM );
+	return static_cast<bitboardIndex>(static_cast<int>(piece) + static_cast<int>(nM));
 }
 
 inline bitboardIndex getPieceOfOpponent( const bitboardIndex piece, const eNextMove nM)
