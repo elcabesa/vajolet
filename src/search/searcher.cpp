@@ -151,9 +151,9 @@ void Searcher::_idLoop(std::vector<rootMove>& temporaryResults, unsigned int ind
 				long long int elapsed = _st.getElapsedTime();
 				if(
 #ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-					elapsed - lastPvPrint > 1000
+					elapsed - lastPvPrint > 1000 ||
 #endif				
-					|| _multiPVmanager.isLastLine()
+					_multiPVmanager.isLastLine()
 				)
 				{
 					_UOI->printPVs(mpRes, _pos.isChess960());

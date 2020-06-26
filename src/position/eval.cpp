@@ -1104,8 +1104,8 @@ Score Position::eval(void) const
 		wScore -= _eParm.attackedByPawnPenalty[ getPieceTypeAt(attacked) ];
 	}
 
-	// todo fare un weak piece migliore:qualsiasi pezzo attaccato riceve un malus dipendente dal suo più debole attaccante e dal suo valore.
-	// volendo anche da quale pezzo è difeso
+	// todo fare un weak piece migliore:qualsiasi pezzo attaccato riceve un malus dipendente dal suo piï¿½ debole attaccante e dal suo valore.
+	// volendo anche da quale pezzo ï¿½ difeso
 	bitMap undefendedMinors =  (getBitmap(whiteKnights) | getBitmap(whiteBishops))  & ~attackedSquares[whitePieces];
 	if (undefendedMinors)
 	{
