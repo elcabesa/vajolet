@@ -62,7 +62,6 @@ TEST(search, search) {
 	
 	Syzygy::getInstance().setPath("");
 	
-	
 	SearchTimer st;
 	SearchLimits sl;
 	transpositionTable tt;

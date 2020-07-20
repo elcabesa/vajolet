@@ -264,7 +264,7 @@ std::string UciOutput::displayMove(const Position& pos, const Move& m)
 
 	const bool capture = pos.isCaptureMove(m);
 	const bool check = pos.moveGivesCheck(m);
-	const bool doubleCheck = pos.moveGivesDoubleCheck(m);
+	//const bool doubleCheck = pos.moveGivesDoubleCheck(m);
 	unsigned int checkMate;
 	const bitboardIndex piece = pos.getPieceAt( m.getFrom() );
 	const bool pawnMove = isPawn(piece);
@@ -378,11 +378,11 @@ std::string UciOutput::displayMove(const Position& pos, const Move& m)
 		}
 		else 
 		{
-			if( doubleCheck )
+			/*if( doubleCheck )
 			{
 				s+="++";
 			}
-			else
+			else*/
 			{
 				s+="+";
 			}

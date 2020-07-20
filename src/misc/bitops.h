@@ -18,7 +18,7 @@
 #ifndef BITOPS_H_
 #define BITOPS_H_
 
-#include <bit>
+#include <bitset>
 #include <cstdint>
 
 #include "tSquare.h"
@@ -36,7 +36,7 @@ using bitMap = uint64_t; /*!< 64 bit bitMap*/
 */
 static inline unsigned int bitCnt(const bitMap b)
 {
-	return std::popcount(b);
+	return std::bitset<64>(b).count();
 }
 
 

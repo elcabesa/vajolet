@@ -38,6 +38,10 @@ add_executable(Vajolet_perft_validation main.cpp perft-test-very-long.cpp )
 target_link_libraries(Vajolet_perft_validation gtest libChess)
 target_include_directories (Vajolet_perft_validation PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+add_executable(Vajolet_wac wac.cpp )
+target_link_libraries(Vajolet_wac libChess)
+target_include_directories (Vajolet_wac PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
 add_subdirectory(syzygyTests)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Perfect2017.bin
@@ -50,6 +54,12 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/fischer.txt
 	
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/perft.txt
     ${CMAKE_CURRENT_BINARY_DIR}/perft.txt COPYONLY)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/wacnew.epd
+    ${CMAKE_CURRENT_BINARY_DIR}/wacnew.epd COPYONLY)
+    
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/STS1-STS15_LAN_v3.epd
+    ${CMAKE_CURRENT_BINARY_DIR}/STS1-STS15_LAN_v3.epd COPYONLY)
 
 add_test(NAME unit_test COMMAND Vajolet_unit_test)
 add_test(NAME syzygy_test COMMAND Vajolet_syzygy_test)
