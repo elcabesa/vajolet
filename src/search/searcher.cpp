@@ -83,8 +83,6 @@ void Searcher::_cleanMemoryBeforeStartingNewSearch()
 
 void Searcher::_idLoop(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, int depth, Score alpha, Score beta, bool masterThread)
 {
-	long long int lastPvPrint = _st.getElapsedTime();
-
 	//_rootMovesToBeSearched.print();
 	rootMove& bestMove = temporaryResults[index];
 
@@ -145,20 +143,9 @@ void Searcher::_idLoop(std::vector<rootMove>& temporaryResults, unsigned int ind
 			}
 			if(!_stop && uciParameters::isMultiPvSearch())
 			{
-				
 				auto mpRes = _multiPVmanager.get();
 				bestMove = mpRes[0];
-				long long int elapsed = _st.getElapsedTime();
-				if(
-#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-					elapsed - lastPvPrint > 1000
-#endif				
-					|| _multiPVmanager.isLastLine()
-				)
-				{
-					_UOI->printPVs(mpRes, _pos.isChess960());
-					lastPvPrint = elapsed;
-				}
+				_UOI->printPVs(mpRes, _pos.isChess960(), _st.getElapsedTime());
 			}
 		}
 
@@ -668,7 +655,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 	//------------------------
 	//	IID
 	//------------------------
-	if(depth >= (PVnode ? _sp.iidDepthPv : _sp.iidDepthNonPv)
+	if(depth >= ((PVnode && !rootNode) ? _sp.iidDepthPv : _sp.iidDepthNonPv)
 		&& !ttMove
 		&& (PVnode || staticEval + _sp.iidStaticEvalBonus >= beta))
 	{
@@ -716,7 +703,6 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 		&& tte->isTypeGoodForBetaCutoff()
 		&& tte->getDepth() >= depth - _sp.singularExtensionTtDepth;
 	
-	long long int lastCurrMovePrint = _st.getElapsedTime();
 	while (bestScore <beta  && ( m = mp.getNextMove() ) )
 	{
 		assert( m );
@@ -827,19 +813,8 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 			}
 		}
 
-		if(rootNode && depth >= 10 * ONE_PLY)
-		{
-			long long int elapsed = _st.getElapsedTime();
-			if(
-#ifndef DISABLE_TIME_DIPENDENT_OUTPUT
-				(elapsed - lastCurrMovePrint > 1000  || moveNumber == 1) &&
-#endif
-				!_stop
-				)
-			{
-				_UOI->printCurrMoveNumber(moveNumber, m, _father.getVisitedNodes(), elapsed, _pos.isChess960());
-				lastCurrMovePrint = elapsed;
-			}
+		if(rootNode && !_stop) {
+			_UOI->printCurrMoveNumber(moveNumber, m, _father.getVisitedNodes(), _st.getElapsedTime(), _pos.isChess960());
 		}
 
 

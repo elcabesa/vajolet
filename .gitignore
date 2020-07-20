@@ -9,3 +9,5 @@
 /build/
 /Release64/
 /build-rel/
+.vscode/c_cpp_properties.json
+.vscode/settings.json
