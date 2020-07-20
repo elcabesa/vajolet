@@ -26,7 +26,7 @@ class SearchTimer
 	std::chrono::time_point<std::chrono::steady_clock> _startTime;
 	std::chrono::time_point<std::chrono::steady_clock> _ponderTime;
 
-	static auto _getTime(){return std::chrono::steady_clock::now();}
+	static std::chrono::time_point<std::chrono::steady_clock> _getTime(){return std::chrono::steady_clock::now();}
 public:
 	explicit SearchTimer():_startTime(_getTime()), _ponderTime(_startTime) {};
 	explicit SearchTimer(const SearchTimer &other) = delete;
