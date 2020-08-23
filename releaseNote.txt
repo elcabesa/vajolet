@@ -1,4 +1,27 @@
 -------------------------------------------------------------------------
+Release note 2.9
+
+New feature:
+  Increase limits
+    256 threads
+    256GB of ram
+  UCI skill level
+  SPSA autotuner
+
+Improvements:
+  simplyfy razor code
+  search parameters tuning
+  speedup TT initialization
+  prefetch
+
+bug Fixes:
+  disable setting option while searching
+  king pawn vs king endgame
+  
+testing
+  automatic test suites (WAC & STS)
+  
+-------------------------------------------------------------------------
 Release note 2.8
 
 New feature:
