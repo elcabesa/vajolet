@@ -17,10 +17,13 @@
 
 #include <csignal>
 #include <iostream>
+#include <fstream>
+#include <string>
 
 #include "book.h"
 #include "fenSaver.h"
 #include "player.h"
+#include "position.h"
 #include "tournament.h"
 
 #include "libchess.h"
@@ -60,9 +63,9 @@ int main() {
 	//----------------------------------
 	//	setup hyperparameters
 	//----------------------------------
-	TunerParameters::gameNumber = 200;
-	TunerParameters::gameTime = 2;
-	TunerParameters::gameTimeIncrement = 0.05;
+	/*TunerParameters::gameNumber = 9e6;
+	TunerParameters::gameTime = 10;
+	TunerParameters::gameTimeIncrement = 0.1;
 
 	FenSaver fs(5);
 	Book book("book.pgn");
@@ -70,7 +73,23 @@ int main() {
 	Player p2("p2");
 	Tournament t("tournament.pgn", "tournament.txt",p1, p2, book, &fs, true);
 	auto res = t.play();
-	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;
+	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;*/
+    
+    FenSaver fs(1);
+    Position pos;
+    std::string line;
+    std::ifstream myfile ("quiet.epd");
+    if (myfile.is_open())
+    {
+        unsigned int x = 0;
+        while ( getline (myfile,line) )
+        {
+            std::cout << (++x) << std::endl;
+            fs.save(pos.setupFromFen(line));
+        }
+        myfile.close();
+    }
+    else std::cout << "Unable to open file"<<std::endl;
 
 	return 0;
 }

@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <set>
 
 #include "player.h"
 #include "searchLimits.h"
@@ -38,6 +39,11 @@ private:
 	Player _player;
 	SearchLimits _sl;
 	uint_fast64_t _saved = 0;
+    
+	void writeFeatures(const Position& pos);
+	void writeRes(Score res);
+    
+    std::set<unsigned int> featuresIndex;
 };
 
 #endif /* SELFPLAY_H_ */
