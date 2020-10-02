@@ -34,6 +34,7 @@ NNUE::NNUE(): _loaded{false} {}
 bool NNUE::init(std::string path) {
     
     std::cout<<"creating NNUE model"<<std::endl;
+	_model.clear();
     _model.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, ActivationFactory::create(ActivationFactory::type::linear)));
     _model.addLayer(std::make_unique<DenseLayer>(512,32, ActivationFactory::create(ActivationFactory::type::relu)));
     _model.addLayer(std::make_unique<DenseLayer>(32,32, ActivationFactory::create(ActivationFactory::type::relu)));
