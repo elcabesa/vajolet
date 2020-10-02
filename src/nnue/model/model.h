@@ -20,6 +20,7 @@ public:
     unsigned int getLayerCount();
     
     const Input& forwardPass(const Input& input, bool verbose = false);
+    const Input& incrementalPass(const Input& input, bool verbose = false);
     
     bool deserialize(std::ifstream& ss);
     

@@ -15,18 +15,21 @@ DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSi
 {
     //_bias->resize(outputSize, 0.0);
     //_weight->resize(outputSize * inputSize, 1.0);
+    _netOutput.resize(outputSize, 0.0);
 }
 
 DenseLayer::~DenseLayer() {}
 
 void DenseLayer::_calcNetOut(const Input& input, bool incremental) {
     assert(input.size() == _inputSize);
-    if  (!incremental) {
+    if (!incremental) {
         _netOutput = *_bias;
     }
     unsigned int num = input.getElementNumber();
+    //if (incremental)std::cout<<"element number "<< num<<std::endl;
     for (unsigned int idx = 0; idx < num; ++idx) {
         auto& el = input.getElementFromIndex(idx);
+        //if (incremental)std::cout<<"element idx "<< idx<<" index "<<el.first<< " value "<<el.second<<std::endl;
         for (unsigned int o = 0; o < _outputSize; ++o) {
             _netOutput[o] += el.second * (*_weight)[_calcWeightIndex(el.first,o)];
         }

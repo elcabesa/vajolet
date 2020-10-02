@@ -32,6 +32,28 @@ const Input& Model::forwardPass(const Input& input, bool verbose /* = false */) 
     return *in;
 }
 
+const Input& Model::incrementalPass(const Input& input, bool verbose/* = false */) {
+    const Input* in = &input;
+    unsigned int i= 0;
+    for(auto& p: _layers) {
+        if(i == 0) {
+            p->incrementalPropagate(*in);
+        }
+        else { 
+            p->propagate(*in);
+        }
+        if(verbose) {
+            p->printOutput();
+        }
+        in = &p->output();
+        ++i;
+    }
+    if(verbose) {
+        in->print();
+    }
+    return *in;
+}
+
 bool Model::deserialize(std::ifstream& ss) {
     ss.clear();
     ss.seekg(0);

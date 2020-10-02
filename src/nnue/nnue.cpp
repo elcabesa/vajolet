@@ -22,12 +22,9 @@
 #include "position.h"
 #include "sparse.h"
 
-//TODO search multi thread... preallocate worker and use them, otherwise we call NNUE ctor for every search
-//TODO movegen  calc & update feature only if nn is used
-//TODO split init and load.... all position shall contain a NNUE? or one NNUE for each search.... command will call static load?
+//TODO remove std::set, std::map and aòò the very slow code
+//TODO hardcode the nn 
 //TODO move all the math in fixed point?
-//TODO incrememental update of NN
-//TODO have 2 neural network one for white end one for black. it souhld be faster updating them
 
 std::vector<double> NNUE::bias00;
 std::vector<double> NNUE::bias01;
@@ -45,7 +42,8 @@ bool NNUE::_loaded = false;
 
 NNUE::NNUE() {
 	//std::cout<<"creating NNUE model"<<std::endl;
-	_model.clear();
+	_modelW.clear();
+	_modelB.clear();
 
 	bias00.resize(256, 0.0);
 	bias01.resize(256, 0.0);
@@ -65,10 +63,16 @@ NNUE::NNUE() {
 	std::vector<std::vector<double>*> weights0;
 	weights0.push_back(&weight00);
 	weights0.push_back(&weight01);
-    _model.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
-    _model.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
-    _model.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
-    _model.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
+    _modelW.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
+    _modelW.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
+    _modelW.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+
+	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
+    _modelB.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
+    _modelB.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
+    _modelB.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
 	_m.clear();
@@ -83,10 +87,14 @@ NNUE::NNUE() {
 	whiteNoIncrementalEval = true;
     blackNoIncrementalEval = true;
 
-	_whiteAdd.clear();
-    _whiteRemove.clear();
-    _blackAdd.clear();
-    _blackRemove.clear();
+	_whiteAddW.clear();
+    _whiteRemoveW.clear();
+    _blackAddW.clear();
+    _blackRemoveW.clear();
+	_whiteAddB.clear();
+    _whiteRemoveB.clear();
+    _blackAddB.clear();
+    _blackRemoveB.clear();
 }
 
 bool NNUE::load(std::string path) {
@@ -98,7 +106,8 @@ bool NNUE::load(std::string path) {
 	nnFile.open(path);
 	if(nnFile.is_open()) {
 		//todo, it's possibile to clone model?
-		if(_model.deserialize(nnFile)
+		if(_modelW.deserialize(nnFile) 
+			&& _modelB.deserialize(nnFile)
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
 			&& _m.deserialize(nnFile)
 #endif
@@ -127,26 +136,88 @@ Score NNUE::eval(const Position& pos) {
     Score highSat = SCORE_INFINITE;
 	
 	if (whiteNoIncrementalEval || blackNoIncrementalEval) {
+		//std::cout<<"no incremental eval"<<std::endl;
 		// TODO if we move one king calculate everything from scratch
 		// can we do it faster??
 		_wFeatures = createWhiteFeatures(pos);
 		_bFeatures = createBlackFeatures(pos);
 		whiteNoIncrementalEval = false;
 		blackNoIncrementalEval = false;
-		_whiteAdd.clear();
-		_whiteRemove.clear();
-		_blackAdd.clear();
-		_blackRemove.clear();
+		_whiteAddW.clear();
+		_whiteRemoveW.clear();
+		_blackAddW.clear();
+		_blackRemoveW.clear();
+		_whiteAddB.clear();
+		_whiteRemoveB.clear();
+		_blackAddB.clear();
+		_blackRemoveB.clear();
+
+		
+		Score score;
+		//Score scoreW = _modelW.forwardPass(sp).get(0)* 10000.0;
+		//Score ScoreB = _modelB.forwardPass(sp).get(0)* 10000.0;
+		if(pos.isWhiteTurn()) {
+			auto fw = concatenateFeature(true, _wFeatures, _bFeatures);
+			SparseInput spw(81920, std::vector<unsigned int>(fw.begin(), fw.end()));
+			score = _modelW.forwardPass(spw).get(0) * 10000.0;
+			auto fb = concatenateFeature(false, _wFeatures, _bFeatures);
+			SparseInput spb(81920, std::vector<unsigned int>(fb.begin(), fb.end()));
+			_modelB.forwardPass(spb).get(0);
+
+		} else {
+			auto fb = concatenateFeature(false, _wFeatures, _bFeatures);
+			SparseInput spb(81920, std::vector<unsigned int>(fb.begin(), fb.end()));
+			score = _modelB.forwardPass(spb).get(0) * 10000.0;
+			auto fw = concatenateFeature(true, _wFeatures, _bFeatures);
+			SparseInput spw(81920, std::vector<unsigned int>(fw.begin(), fw.end()));
+			_modelW.forwardPass(spw).get(0);
+		}
+
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+		Score score2;
+		auto f1 = createFeatures(pos);
+		SparseInput sp2(81920, std::vector<unsigned int>(f1.begin(), f1.end()));
+		score2 = _m.forwardPass(sp2).get(0)* 10000.0;
+		if(score2 != score) {
+			std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
+		}
+#endif
+
+		score = std::min(highSat,score);
+		score = std::max(lowSat,score);
+    	return score;
 	}
 
-	auto f2 = concatenateFeature(pos.isWhiteTurn(), _wFeatures, _bFeatures);
-	SparseInput sp(81920, std::vector<unsigned int>(f2.begin(), f2.end()));
+
+	//auto f2 = concatenateFeature(pos.isWhiteTurn(), _wFeatures, _bFeatures);
+	//SparseInput sp(81920, std::vector<unsigned int>(f2.begin(), f2.end()));
 	Score score;
 	if(pos.isWhiteTurn()) {
-		// todo help
-		score = _model.forwardPass(sp).get(0)* 10000.0;
+		//std::cout<<"white"<<std::endl;
+		SparseInput sp(81920);
+		for(auto x: _whiteAddW) { /*std::cout<<"waddw"<<std::endl;*/sp.set(x, 1.0);}
+		for(auto x: _whiteRemoveW) { /*std::cout<<"wremw"<<std::endl;*/sp.set(x, -1.0);}
+		for(auto x: _blackAddW) { /*std::cout<<"baddw"<<std::endl;*/sp.set(x + 40960, 1.0);}
+		for(auto x: _blackRemoveW) { /*std::cout<<"bremw"<<std::endl;*/sp.set(x + 40960, -1.0);}
+		//sp.print();
+		score = _modelW.incrementalPass(sp).get(0)* 10000.0;
+		_whiteAddW.clear();
+		_whiteRemoveW.clear();
+		_blackAddW.clear();
+		_blackRemoveW.clear();
 	} else {
-		score = _model.forwardPass(sp).get(0)* 10000.0;
+		//std::cout<<"black"<<std::endl;
+		SparseInput sp(81920);
+		for(auto x: _whiteAddB) { /*std::cout<<"waddb"<<std::endl;*/sp.set(x + 40960, 1.0);}
+		for(auto x: _whiteRemoveB) { /*std::cout<<"wremb"<<std::endl;*/sp.set(x + 40960, -1.0);}
+		for(auto x: _blackAddB) { /*std::cout<<"baddb"<<std::endl;*/sp.set(x, 1.0);}
+		for(auto x: _blackRemoveB) { /*std::cout<<"bremb"<<std::endl;*/sp.set(x, -1.0);}
+		//sp.print();
+		score = _modelB.incrementalPass(sp).get(0)* 10000.0;
+		_whiteAddB.clear();
+		_whiteRemoveB.clear();
+		_blackAddB.clear();
+		_blackRemoveB.clear();
 	}
 	
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
@@ -370,36 +441,64 @@ unsigned int NNUE::mapBlackPiece(const bitboardIndex piece) {
 }
 
 void NNUE::removePiece(const Position& pos, bitboardIndex piece, tSquare sq) {
+	//std::cout<<"remove piece "<<piece<<" square "<<sq<<std::endl;
 	auto wf = whiteFeature(mapWhitePiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::whiteKing));
 	auto bf = blackFeature(mapBlackPiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::blackKing));
-	_wFeatures.erase(wf);
-	_bFeatures.erase(bf);
+	//std::cout<<"wf "<<wf<<std::endl;
+	//std::cout<<"bf "<<bf<<std::endl;
+	//_wFeatures.erase(wf);
+	//_bFeatures.erase(bf);
 
-	if(auto it = _whiteAdd.find(wf); it != _whiteAdd.end()) {
-		_whiteAdd.erase(it);
+	if(auto it = _whiteAddW.find(wf); it != _whiteAddW.end()) {
+		_whiteAddW.erase(it);
 	} else {
-    	_whiteRemove.insert(wf);
+    	_whiteRemoveW.insert(wf);
 	}
-	if(auto it = _blackAdd.find(bf); it != _blackAdd.end()) {
-		_blackAdd.erase(it);
+	if(auto it = _blackAddW.find(bf); it != _blackAddW.end()) {
+		_blackAddW.erase(it);
 	} else {
-    	_blackRemove.insert(bf);
+    	_blackRemoveW.insert(bf);
+	}
+
+	if(auto it = _whiteAddB.find(wf); it != _whiteAddB.end()) {
+		_whiteAddB.erase(it);
+	} else {
+    	_whiteRemoveB.insert(wf);
+	}
+	if(auto it = _blackAddB.find(bf); it != _blackAddB.end()) {
+		_blackAddB.erase(it);
+	} else {
+    	_blackRemoveB.insert(bf);
 	}
 }
 void NNUE::addPiece(const Position& pos, bitboardIndex piece, tSquare sq) {
+	//std::co_bFeaturesut<<"add piece "<<piece<<" square "<<sq<<std::endl;
 	auto wf = whiteFeature(mapWhitePiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::whiteKing));
 	auto bf = blackFeature(mapBlackPiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::blackKing));
-	_wFeatures.insert(wf);
-	_bFeatures.insert(bf);
+	//std::cout<<"wf "<<wf<<std::endl;
+	//std::cout<<"bf "<<bf<<std::endl;
+	//_wFeatures.insert(wf);
+	//_bFeatures.insert(bf);
 
-	if(auto it = _whiteRemove.find(wf); it != _whiteRemove.end()) {
-		_whiteRemove.erase(it);
+	if(auto it = _whiteRemoveW.find(wf); it != _whiteRemoveW.end()) {
+		_whiteRemoveW.erase(it);
 	} else {
-    	_whiteAdd.insert(wf);
+    	_whiteAddW.insert(wf);
 	}
-	if(auto it = _blackRemove.find(bf); it != _blackRemove.end()) {
-		_blackRemove.erase(it);
+	if(auto it = _blackRemoveW.find(bf); it != _blackRemoveW.end()) {
+		_blackRemoveW.erase(it);
 	} else {
-    	_blackAdd.insert(bf);
+    	_blackAddW.insert(bf);
+	}
+
+	if(auto it = _whiteRemoveB.find(wf); it != _whiteRemoveB.end()) {
+		_whiteRemoveB.erase(it);
+	} else {
+    	_whiteAddB.insert(wf);
+	}
+	if(auto it = _blackRemoveB.find(bf); it != _blackRemoveB.end()) {
+		_blackRemoveB.erase(it);
+	} else {
+    	_blackAddB.insert(bf);
 	}
 }

@@ -36,7 +36,7 @@ void SparseInput::print() const {
 
 void SparseInput::set(unsigned int index, double v) {
     assert(index < _size);
-    assert(_in.find(index) != _in.end());
+    //assert(_in.find(index) != _in.end());
     _in[index] = v;
 }
 

@@ -54,7 +54,8 @@ public:
     void removePiece(const Position& pos, bitboardIndex piece, tSquare sq);
     void addPiece(const Position& pos, bitboardIndex piece, tSquare sq);
 private:
-    Model _model;
+    Model _modelW;
+    Model _modelB;
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
     Model _m;
 #endif
@@ -73,14 +74,19 @@ private:
 
     linearActivation _linear;
 	reluActivation _relu;
-    std::set<unsigned int> _features;
+    //std::set<unsigned int> _features;
     std::set<unsigned int> _wFeatures;
 	std::set<unsigned int> _bFeatures;
 
-    std::set<unsigned int> _whiteAdd;
-    std::set<unsigned int> _whiteRemove;
-    std::set<unsigned int> _blackAdd;
-    std::set<unsigned int> _blackRemove;
+    std::set<unsigned int> _whiteAddW;
+    std::set<unsigned int> _whiteRemoveW;
+    std::set<unsigned int> _blackAddW;
+    std::set<unsigned int> _blackRemoveW;
+
+    std::set<unsigned int> _whiteAddB;
+    std::set<unsigned int> _whiteRemoveB;
+    std::set<unsigned int> _blackAddB;
+    std::set<unsigned int> _blackRemoveB;
 
 };
 
