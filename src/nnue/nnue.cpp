@@ -380,7 +380,7 @@ Score NNUE::_completeEval(const Position& pos) {
 	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 		spb.set(_completeFeatureList.get(i), 1.0);
 	}
-	Score scoreB = _modelB.forwardPass(spb).get(0);
+	Score scoreB = _modelB.forwardPass(spb).get(0) * 10000.0;
 
 	if(pos.isWhiteTurn()) {
 		score = scoreW;
