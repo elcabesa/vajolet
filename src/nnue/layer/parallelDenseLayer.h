@@ -11,14 +11,10 @@ class Activation;
 
 class ParallelDenseLayer: public Layer {
 public:
-    ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, std::shared_ptr<Activation> act, const double stdDev = 0.0);
+    ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, std::shared_ptr<Activation> act, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights, const double stdDev = 0.0);
     ~ParallelDenseLayer();
     
     void propagate(const Input& input);
-
-    
-    std::vector<double>& bias();
-    std::vector<double>& weight();
     
     DenseLayer& getLayer(unsigned int);
 

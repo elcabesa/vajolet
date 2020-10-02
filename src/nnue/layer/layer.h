@@ -17,10 +17,7 @@ public:
     void printOutput() const;
     
     virtual void propagate(const Input& input) = 0;
-
-    virtual std::vector<double>& bias() = 0;
-    virtual std::vector<double>& weight() = 0;
-
+    
     virtual bool deserialize(std::ifstream& ss) = 0;
 
 protected:

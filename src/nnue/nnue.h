@@ -47,6 +47,18 @@ public:
 private:
     Model _model;
     bool _loaded;
+    static std::vector<double> bias00;
+    static std::vector<double> bias01;
+    static std::vector<double> bias1;
+    static std::vector<double> bias2;
+    static std::vector<double> bias3;
+
+    static std::vector<double> weight00;
+    static std::vector<double> weight01;
+    static std::vector<double> weight1;
+    static std::vector<double> weight2;
+    static std::vector<double> weight3;
+
 
 };
 

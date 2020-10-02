@@ -25,9 +25,22 @@
 #include "sparse.h"
 
 //TODO multithreaded code, a single set of weights and bias shall stored outside the model
+//TODO set weight & biases size outside layers 
 //TODO move all the math in fixed point?
 //TODO incrememental update of NN
 //TODO have 2 neural network one for white end one for black. it souhld be faster updating them
+
+std::vector<double> NNUE::bias00;
+std::vector<double> NNUE::bias01;
+std::vector<double> NNUE::bias1;
+std::vector<double> NNUE::bias2;
+std::vector<double> NNUE::bias3;
+
+std::vector<double> NNUE::weight00;
+std::vector<double> NNUE::weight01;
+std::vector<double> NNUE::weight1;
+std::vector<double> NNUE::weight2;
+std::vector<double> NNUE::weight3;
 
 NNUE::NNUE(): _loaded{false} {}
 
@@ -35,10 +48,16 @@ bool NNUE::init(std::string path) {
     
     std::cout<<"creating NNUE model"<<std::endl;
 	_model.clear();
-    _model.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, ActivationFactory::create(ActivationFactory::type::linear)));
-    _model.addLayer(std::make_unique<DenseLayer>(512,32, ActivationFactory::create(ActivationFactory::type::relu)));
-    _model.addLayer(std::make_unique<DenseLayer>(32,32, ActivationFactory::create(ActivationFactory::type::relu)));
-    _model.addLayer(std::make_unique<DenseLayer>(32, 1, ActivationFactory::create(ActivationFactory::type::linear)));
+	std::vector<std::vector<double>*> biases0;
+	biases0.push_back(&bias00);
+	biases0.push_back(&bias01);
+	std::vector<std::vector<double>*> weights0;
+	biases0.push_back(&weight00);
+	biases0.push_back(&weight01);
+    _model.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, ActivationFactory::create(ActivationFactory::type::linear), biases0, weights0));
+    _model.addLayer(std::make_unique<DenseLayer>(512,32, ActivationFactory::create(ActivationFactory::type::relu), &bias1, &weight1));
+    _model.addLayer(std::make_unique<DenseLayer>(32,32, ActivationFactory::create(ActivationFactory::type::relu), &bias2, &weight2));
+    _model.addLayer(std::make_unique<DenseLayer>(32, 1, ActivationFactory::create(ActivationFactory::type::linear), &bias3, &weight3));
     std::cout<<"done"<<std::endl;
     
     std::cout<<"reload NNUE parameters"<<std::endl;
