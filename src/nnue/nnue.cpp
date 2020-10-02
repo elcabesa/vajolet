@@ -56,7 +56,7 @@ bool NNUE::init(std::string path) {
 		}
 		nnFile.close();
 	} else {
-		std::cout<<"error deserializing NNUE file";
+		std::cout<<"error deserializing NNUE file"<<std::endl;
 		return false;
 	}
 }
@@ -69,8 +69,12 @@ void NNUE::clear() {
 Score NNUE::eval(const Position& pos) {
     Score lowSat = -SCORE_INFINITE;
     Score highSat = SCORE_INFINITE;
-    auto f = createFeatures(pos);
-    SparseInput sp(81920, f);
+    //auto f1 = createFeatures(pos);
+	auto f2 = pos.getFeatures();
+	/*if(f1 != f2) {
+		std::cout<<"AHHHHHHHHHHHHHHHHHHh"<<std::endl;
+	}*/
+    SparseInput sp(81920, std::vector<unsigned int>(f2.begin(), f2.end()));
     Score score = _model.forwardPass(sp).get(0)* 10000.0;
     score = std::min(highSat,score);
 	score = std::max(lowSat,score);
@@ -78,8 +82,8 @@ Score NNUE::eval(const Position& pos) {
     
 }
 
-std::vector<unsigned int> NNUE::createFeatures(const Position& pos){
-    std::vector<unsigned int> features;
+std::set<unsigned int> NNUE::createFeatures(const Position& pos){
+    std::set<unsigned int> features;
 	bitboardIndex whitePow[10] = {
 		whiteQueens,
 		whiteRooks,
@@ -107,31 +111,89 @@ std::vector<unsigned int> NNUE::createFeatures(const Position& pos){
 	};
 	
 	bool whiteTurn = pos.isWhiteTurn();
+	bool blackTurn = pos.isBlackTurn();
 	
-
-	tSquare wksq = pos.getSquareOfThePiece(bitboardIndex::whiteKing);
-	tSquare pieceSq;
-	unsigned int piece;
-	for(piece = 0; piece < 10; ++piece) {
+	tSquare wkSq = pos.getSquareOfThePiece(bitboardIndex::whiteKing);
+	for(unsigned int piece = 0; piece < 10; ++piece) {
     
 		bitMap b = pos.getBitmap(whitePow[piece]);
 		while(b)
 		{
-			pieceSq = iterateBit(b);
-			features.push_back(calcWhiteFeature(whiteTurn, piece, pieceSq, wksq));
+			tSquare pieceSq = iterateBit(b);
+			features.insert(calcWhiteFeature(whiteTurn, piece, pieceSq, wkSq));
 		}
 	}
 	
-	tSquare bksq = pos.getSquareOfThePiece(bitboardIndex::blackKing);
-	for(piece = 0; piece < 10; ++piece) {
+	tSquare bkSq = pos.getSquareOfThePiece(bitboardIndex::blackKing);
+	for(unsigned int piece = 0; piece < 10; ++piece) {
 		
 		bitMap b = pos.getBitmap(blackPow[piece]);
 		while(b)
 		{
-			pieceSq = iterateBit(b);
-            features.push_back(calcWhiteFeature(whiteTurn, piece, pieceSq, bksq));
+			tSquare pieceSq = iterateBit(b);
+            features.insert(calcBlackFeature(blackTurn, piece, pieceSq, bkSq));
 		}
 	}
+	 
+	return features;
+}
+
+std::set<unsigned int> NNUE::createBlackFeatures(const Position& pos){
+    std::set<unsigned int> features;
+
+	bitboardIndex blackPow[10] = {
+		blackQueens,
+		blackRooks,
+		blackBishops,
+		blackKnights,
+		blackPawns,
+		whiteQueens,
+		whiteRooks,
+		whiteBishops,
+		whiteKnights,
+		whitePawns
+	};
+	
+	tSquare bkSq = pos.getSquareOfThePiece(bitboardIndex::blackKing);
+	for(unsigned int piece = 0; piece < 10; ++piece) {
+		
+		bitMap b = pos.getBitmap(blackPow[piece]);
+		while(b)
+		{
+			tSquare pieceSq = iterateBit(b);
+            features.insert(blackFeature(piece, pieceSq, bkSq));
+		}
+	}
+	 
+	return features;
+}
+
+std::set<unsigned int> NNUE::createWhiteFeatures(const Position& pos){
+    std::set<unsigned int> features;
+	bitboardIndex whitePow[10] = {
+		whiteQueens,
+		whiteRooks,
+		whiteBishops,
+		whiteKnights,
+		whitePawns,
+		blackQueens,
+		blackRooks,
+		blackBishops,
+		blackKnights,
+		blackPawns
+	};
+	
+	tSquare wkSq = pos.getSquareOfThePiece(bitboardIndex::whiteKing);
+	for(unsigned int piece = 0; piece < 10; ++piece) {
+    
+		bitMap b = pos.getBitmap(whitePow[piece]);
+		while(b)
+		{
+			tSquare pieceSq = iterateBit(b);
+			features.insert(whiteFeature(piece, pieceSq, wkSq));
+		}
+	}
+	 
 	return features;
 }
 
@@ -139,9 +201,88 @@ bool NNUE::loaded() const {
     return _loaded;
 }
 
-unsigned int NNUE::calcWhiteFeature(bool whiteTurn, unsigned int  piece, tSquare pSquare, tSquare ksq) {
-    return (whiteTurn? 0 : 40960 ) + piece + (10 * pSquare) + (640 * ksq);
+unsigned int NNUE::calcWhiteFeature(bool myTurn, unsigned int  piece, tSquare pSquare, tSquare ksq) {
+    return turnOffset(myTurn) + whiteFeature(piece, pSquare, ksq);
 }
-unsigned int NNUE::calcBlackFeature(bool whiteTurn, unsigned int  piece, tSquare pSquare, tSquare ksq) {
-    return (whiteTurn? 40960 : 0 ) + piece + (10 * (pSquare^56)) + (640 * (ksq^56));
+
+unsigned int NNUE::calcBlackFeature(bool myTurn, unsigned int  piece, tSquare pSquare, tSquare ksq) {
+    return turnOffset(myTurn) + blackFeature(piece, pSquare, ksq);
+}
+
+unsigned int NNUE::whiteFeature(unsigned int  piece, tSquare pSquare, tSquare ksq) {
+	unsigned int f = piece + (10 * pSquare) + (640 * ksq);
+	//std::cout<<f<<std::endl;
+    return f;
+}
+
+unsigned int NNUE::blackFeature(unsigned int  piece, tSquare pSquare, tSquare ksq) {
+    unsigned int f = piece + (10 * (pSquare^56)) + (640 * (ksq^56));
+	//std::cout<<f<<std::endl;
+    return f;
+}
+
+unsigned int NNUE::turnOffset(bool myTurn) {
+	return myTurn ? 0 : 40960;
+}
+
+std::set<unsigned int> NNUE::concatenateFeature(bool whiteTurn, std::set<unsigned int> w, std::set<unsigned int> b) {
+	std::set<unsigned int> features;
+	if (whiteTurn) {
+		features = w;
+		for(auto & f: b) {
+			features.insert(f + 40960);
+		}
+	} else {
+		features = b;
+		for(auto & f: w) {
+			features.insert(f + 40960);
+		}
+	}
+
+	return features;
+}
+
+unsigned int NNUE::mapWhitePiece(const bitboardIndex piece) {
+	unsigned int n[] = {
+		0, //occupiedSquares,			//0		00000000
+		0, //whiteKing,					//1		00000001
+		0, //whiteQueens,				//2		00000010
+		1, //whiteRooks,				//3		00000011
+		2, //whiteBishops,				//4		00000100
+		3, //whiteKnights,				//5		00000101
+		4, //whitePawns,				//6		00000110
+		0, //whitePieces,				//7		00000111
+
+		0, //separationBitmap,			//8
+		0, //blackKing,					//9		00001001
+		5, //blackQueens,				//10	00001010
+		6, //blackRooks,				//11	00001011
+		7, //blackBishops,				//12	00001100
+		8, //blackKnights,				//13	00001101
+		9, //blackPawns,				//14	00001110
+		0  //blackPieces,				//15	00001111
+	};
+	return n[piece];
+}
+unsigned int NNUE::mapBlackPiece(const bitboardIndex piece) {
+	unsigned int n[] = {
+		0, //occupiedSquares,			//0		00000000
+		0, //whiteKing,					//1		00000001
+		5, //whiteQueens,				//2		00000010
+		6, //whiteRooks,				//3		00000011
+		7, //whiteBishops,				//4		00000100
+		8, //whiteKnights,				//5		00000101
+		9, //whitePawns,				//6		00000110
+		0, //whitePieces,				//7		00000111
+
+		0, //separationBitmap,			//8
+		0, //blackKing,					//9		00001001
+		0, //blackQueens,				//10	00001010
+		1, //blackRooks,				//11	00001011
+		2, //blackBishops,				//12	00001100
+		3, //blackKnights,				//13	00001101
+		4, //blackPawns,				//14	00001110
+		0  //blackPieces,				//15	00001111
+	};
+	return n[piece];
 }

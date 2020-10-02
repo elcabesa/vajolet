@@ -23,6 +23,7 @@
 #include "benchmark.h"
 #include "command.h"
 #include "movepicker.h"
+#include "nnue.h"
 #include "perft.h"
 #include "searchTimer.h"
 #include "searchLimits.h"
@@ -362,6 +363,11 @@ bool UciManager::impl::_stop(std::istringstream&, my_thread &thr) {
 
 bool UciManager::impl::_display(std::istringstream&, my_thread &) {
 	_pos.display();
+	std::cout<<"FEATURES ";
+	for(auto f: NNUE::createFeatures(_pos)) {
+		std::cout<<f<<" ";
+	}
+	std::cout<<std::endl;
 	return false;
 }
 

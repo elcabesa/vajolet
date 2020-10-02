@@ -16,6 +16,7 @@
 */
 #include <cmath>
 #include "fenSaver.h"
+#include "nnue.h"
 #include "position.h"
 #include "searchResult.h"
 #include "timeManagement.h"
@@ -57,79 +58,21 @@ void FenSaver::save(const Position& pos) {
 }
 
 void FenSaver::writeFeatures(const Position& pos) {
-	std::set<unsigned int> features;
-	bitboardIndex whitePow[10] = {
-		whiteQueens, // 0
-		whiteRooks,  // 1
-		whiteBishops,// 2
-		whiteKnights,// 3
-		whitePawns,  // 4
-		blackQueens, // 5
-		blackRooks,  // 6
-		blackBishops,// 7
-		blackKnights,// 8
-		blackPawns   // 9
-	};
-	
-	bitboardIndex blackPow[10] = {
-		blackQueens, // 0
-		blackRooks,  // 1
-		blackBishops,// 2
-		blackKnights,// 3
-		blackPawns,  // 4
-		whiteQueens, // 5
-		whiteRooks,  // 6
-		whiteBishops,// 7
-		whiteKnights,// 8
-		whitePawns   // 9
-	};
-	
+	auto features = NNUE::createFeatures(pos);
 	_stream <<'{';
-	
-	bool whiteTurn = pos.isWhiteTurn();
-	
-	//std::cout<<pos.getFen()<<std::endl;
-	tSquare wksq = pos.getSquareOfThePiece(bitboardIndex::whiteKing);
-	tSquare pieceSq;
-	unsigned int piece;
-	for(piece = 0; piece < 10; ++piece) {
-    
-		bitMap b = pos.getBitmap(whitePow[piece]);
-		while(b)
-		{
-			pieceSq = iterateBit(b);
-			unsigned int feature = (whiteTurn? 0 : 40960 ) + piece + (10 * pieceSq) + (640 * wksq);
-			features.insert(feature);
-            featuresIndex.insert(feature);
-			//std::cout<<"FEATURE "<<feature<<std::endl;
-		}
-	}
-	
-	tSquare bksq = pos.getSquareOfThePiece(bitboardIndex::blackKing);
-	for(piece = 0; piece < 10; ++piece) {
-		
-		bitMap b = pos.getBitmap(blackPow[piece]);
-		while(b)
-		{
-			pieceSq = iterateBit(b);
-			unsigned int feature = (whiteTurn? 40960 : 0 ) + piece + (10 * (pieceSq^56)) + (640 * (bksq^56));
-			features.insert(feature);
-            featuresIndex.insert(feature);
-			//std::cout<<"FEATURE "<<feature<<std::endl;
-		}
-	}
+
 	unsigned int i = 0;
 	for(auto& f: features) {
 		_stream<<f;
 		if(i++ < features.size() -1) {_stream <<',';}
+		featuresIndex.insert(f);
 	}
     _stream <<'}';
-    if(_logDecimationCnt>=1000) {
+
+	if(_logDecimationCnt>=1000) {
 		_logDecimationCnt = 0;
 		std::cout<<"thread "<<_n<<"features "<<featuresIndex.size() <<"/81920 ("<< featuresIndex.size() *100.0/81920<<"%)"<<std::endl; 
 	}
-
-	//exit(0);
 }
 
 void FenSaver::writeRes(Score res) {

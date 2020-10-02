@@ -17,7 +17,7 @@
 #ifndef NNUE_H_
 #define NNUE_H_ 
 
-#include <vector>
+#include <set>
 
 #include "bitBoardIndex.h"
 #include "score.h"
@@ -33,9 +33,17 @@ public:
     void clear();
     Score eval(const Position& pos);
     bool loaded() const;
-    static std::vector<unsigned int> createFeatures(const Position& pos);
+    static std::set<unsigned int> createFeatures(const Position& pos);
+    static std::set<unsigned int> createWhiteFeatures(const Position& pos);
+    static std::set<unsigned int> createBlackFeatures(const Position& pos);
     static unsigned int calcWhiteFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int calcBlackFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
+    static unsigned int whiteFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
+    static unsigned int blackFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
+    static unsigned int turnOffset(bool myturn);
+    static std::set<unsigned int> concatenateFeature(bool whiteTurn, std::set<unsigned int> w, std::set<unsigned int> b);
+    static unsigned int mapWhitePiece(const bitboardIndex piece);
+    static unsigned int mapBlackPiece(const bitboardIndex piece);
 private:
     Model _model;
     bool _loaded;

@@ -23,6 +23,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <set>
 
 #include "bitBoardIndex.h"
 #include "data.h"
@@ -368,6 +369,7 @@ public:
 	bool isChess960() const {return _isChess960;}
 
 	simdScore getPieceValue(const bitboardIndex b) const { return _eParm._pieceValue[b];}
+	std::set<unsigned int> getFeatures() const;
 
 	//--------------------------------------------------------
 	// public members
@@ -504,6 +506,9 @@ private:
 	static std::string _printEpSquare( const state& st );
     
     NNUE * const _nnue;
+	std::set<unsigned int> _features;
+	std::set<unsigned int> _wFeatures;
+	std::set<unsigned int> _bFeatures;
 
 };
 
