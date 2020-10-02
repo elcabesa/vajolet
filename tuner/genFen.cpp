@@ -81,10 +81,10 @@ int main() {
     std::ifstream myfile ("quiet.epd");
     if (myfile.is_open())
     {
-        unsigned int x = 0;
+        //unsigned int x = 0;
         while ( getline (myfile,line) )
         {
-            std::cout << (++x) << std::endl;
+            //std::cout << (++x) << std::endl;
             fs.save(pos.setupFromFen(line));
         }
         myfile.close();

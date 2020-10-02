@@ -17,20 +17,31 @@
 
 #include "fenSaver.h"
 #include "position.h"
+#include "searchResult.h"
+#include "timeManagement.h"
+#include "transposition.h"
 
-FenSaver::FenSaver(unsigned int decimation): _decimation(decimation), _player("p"){
+
+FenSaver::FenSaver(unsigned int decimation): _decimation(decimation), _src(_st, _sl, _tt, UciOutput::create(UciOutput::type::mute)){
 	_stream.open("fen.csv");
-	_sl.setDepth(4);
+	_sl.setDepth(8);
+	_tt.setSize(64);
 }
 
 
 void FenSaver::save(const Position& pos) {
 	if (++_counter >= _decimation) {
-        auto res = _player.doSearch(pos, _sl).Res;
+        _src.getPosition() = pos;
+		auto res = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn())).Res;
         auto eval = pos.eval<false>();
         if (std::abs(res)< SCORE_KNOWN_WIN && std::abs(eval)< SCORE_KNOWN_WIN) {
 		    _counter = 0;
-		    std::cout << "saved " << ++_saved << " FENs" <<std::endl;
+			++_logDecimationCnt;
+			++_saved;
+			if(_logDecimationCnt>=1000) {
+					std::cout << "saved " << _saved << " FENs" <<std::endl;
+			}
+		    
             writeFeatures(pos);
 			writeRes(res);
 			_stream << std::endl;
@@ -109,7 +120,10 @@ void FenSaver::writeFeatures(const Position& pos) {
         if(i < features.size() -1) {_stream <<',';}
     }
     _stream <<'}';
-    std::cout<<"features "<<featuresIndex.size() <<"/81920 ("<< featuresIndex.size() *100.0/81920<<"%)"<<std::endl; 
+    if(_logDecimationCnt>=1000) {
+		_logDecimationCnt = 0;
+		std::cout<<"features "<<featuresIndex.size() <<"/81920 ("<< featuresIndex.size() *100.0/81920<<"%)"<<std::endl; 
+	}
 
 	//exit(0);
 }

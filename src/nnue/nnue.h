@@ -19,8 +19,10 @@
 
 #include <vector>
 
+#include "bitBoardIndex.h"
 #include "score.h"
 #include "model.h"
+#include "tSquare.h"
 
 class Position;
 
@@ -30,9 +32,10 @@ public:
     void init();
     Score eval(const Position& pos);
     bool loaded() const;
-    
+    static std::vector<unsigned int> createFeatures(const Position& pos);
+    static unsigned int calcWhiteFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
+    static unsigned int calcBlackFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
 private:
-    std::vector<unsigned int> createFeatures(const Position& pos) const;
     Model _model;
     bool _loaded;
 

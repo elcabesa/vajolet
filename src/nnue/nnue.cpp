@@ -65,7 +65,7 @@ Score NNUE::eval(const Position& pos) {
     
 }
 
-std::vector<unsigned int> NNUE::createFeatures(const Position& pos) const {
+std::vector<unsigned int> NNUE::createFeatures(const Position& pos){
     std::vector<unsigned int> features;
 	bitboardIndex whitePow[10] = {
 		whiteQueens,
@@ -105,8 +105,7 @@ std::vector<unsigned int> NNUE::createFeatures(const Position& pos) const {
 		while(b)
 		{
 			pieceSq = iterateBit(b);
-			unsigned int feature = (whiteTurn? 0 : 40960 ) + piece + (10 * pieceSq) + (640 * wksq);
-			features.push_back(feature);
+			features.push_back(calcWhiteFeature(whiteTurn, piece, pieceSq, wksq));
 		}
 	}
 	
@@ -117,8 +116,7 @@ std::vector<unsigned int> NNUE::createFeatures(const Position& pos) const {
 		while(b)
 		{
 			pieceSq = iterateBit(b);
-			unsigned int feature = (whiteTurn? 40960 : 0 ) + piece + (10 * (pieceSq^56)) + (640 * (bksq^56));
-			features.push_back(feature);
+            features.push_back(calcWhiteFeature(whiteTurn, piece, pieceSq, bksq));
 		}
 	}
 	return features;
@@ -126,4 +124,11 @@ std::vector<unsigned int> NNUE::createFeatures(const Position& pos) const {
 
 bool NNUE::loaded() const {
     return _loaded;
+}
+
+unsigned int NNUE::calcWhiteFeature(bool whiteTurn, unsigned int  piece, tSquare pSquare, tSquare ksq) {
+    return (whiteTurn? 0 : 40960 ) + piece + (10 * pSquare) + (640 * ksq);
+}
+unsigned int NNUE::calcBlackFeature(bool whiteTurn, unsigned int  piece, tSquare pSquare, tSquare ksq) {
+    return (whiteTurn? 40960 : 0 ) + piece + (10 * (pSquare^56)) + (640 * (ksq^56));
 }

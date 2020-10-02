@@ -21,8 +21,10 @@
 #include <fstream>
 #include <set>
 
-#include "player.h"
 #include "searchLimits.h"
+#include "searchTimer.h"
+#include "search.h"
+#include "transposition.h"
 
 class Position;
 
@@ -36,9 +38,12 @@ private:
 	const unsigned int _decimation;
 	unsigned int _counter = 0;
 	std::ofstream _stream;
-	Player _player;
 	SearchLimits _sl;
+	SearchTimer _st;
+	transpositionTable _tt;
+	Search _src;
 	uint_fast64_t _saved = 0;
+	unsigned int _logDecimationCnt = 0;
     
 	void writeFeatures(const Position& pos);
 	void writeRes(Score res);
