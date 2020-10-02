@@ -7,7 +7,7 @@ SparseInput::SparseInput(const unsigned int size):Input(size) {
 
 SparseInput::SparseInput(unsigned int size, const std::map<unsigned int, double>& v):Input(size), _in(v) {
     using pair_type = decltype(_in)::value_type;
-    assert( std::max_element(std::begin(_in), std::end(_in),[] (const pair_type & p1, const pair_type & p2) { return p1.first < p2.first;})->first < size);
+    //assert( std::max_element(std::begin(_in), std::end(_in),[] (const pair_type & p1, const pair_type & p2) { return p1.first < p2.first;})->first < size);
 }
 
 SparseInput::SparseInput(const std::vector<double>& v):Input(v.size()) {
