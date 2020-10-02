@@ -74,7 +74,7 @@ double Player::pointRatio() const {
 SearchResult Player::doSearch(const Position& p, SearchLimits& sl)
 {
 	_thr.getSearchParameters() = getSearchParametersConst();
-	Position pos(Position::pawnHash::off, _ep);
+	Position pos(nullptr, Position::pawnHash::off, _ep);
 	pos.setupFromFen(p.getFen());
 	return _thr.synchronousSearch(pos, sl);
 }

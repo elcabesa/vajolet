@@ -124,7 +124,7 @@ long double calcSigleError2(Position &p, long double res)
 
 long double calcError2()
 {
-	Position p(Position::pawnHash::off);
+	Position p(nullptr, Position::pawnHash::off);
 	long double totalError = 0.0;
 
 	for(const auto& v : positions)

@@ -26,13 +26,13 @@ std::mutex  Searcher::_mutex;
 Searcher::Searcher(Search::impl& father, SearchTimer& st, SearchLimits& sl, transpositionTable& tt, SearchParameters& sp, timeManagement& tm, rootMovesToBeSearched(rm), PVline pvToBeFollowed, UciOutput::type UOI):
     _UOI(UciOutput::create(UOI)),
     _rootMovesToBeSearched(rm),
+    _pos{father.getPosition()},
     _sp(sp),
     _sl(sl),
     _st(st),
     _tt(tt),
     _tm(tm),
     _father(father) {
-    _pos = father.getPosition();
     _pvLineFollower.setPVline(pvToBeFollowed);
     _initialTurn = _pos.getNextTurn();
 }

@@ -24,6 +24,7 @@
 #include "game.h"
 #include "searchLogger.h"
 #include "multiPVmanager.h"
+#include "nnue.h"
 #include "parameters.h"
 #include "position.h"
 #include "pvLineFollower.h"
@@ -45,7 +46,7 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	impl(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create()):_UOI(std::move(UOI)), _sl(sl), _st(st), _tt(tt) {}
+	impl(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create()):_UOI(std::move(UOI)), _pos(&_nnue), _sl(sl), _st(st), _tt(tt) { _nnue.init();}
 
 	impl(const impl& other) = delete;
 	impl& operator=(const impl& other) = delete;
@@ -82,6 +83,7 @@ private:
 	// private members
 	//--------------------------------------------------------
 	std::unique_ptr<UciOutput> _UOI;
+    NNUE _nnue;
 	Position _pos;
 
 	SearchLimits& _sl; // todo limits belong to threads

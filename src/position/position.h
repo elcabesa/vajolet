@@ -39,6 +39,7 @@
 //---------------------------------------------------
 class pawnEntry;
 class pawnTable;
+class NNUE;
 
 //---------------------------------------------------
 //	class
@@ -68,7 +69,7 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	explicit Position(const pawnHash usePawnHash = pawnHash::on, const EvalParameters& eParm = EvalParameters());
+	explicit Position(NNUE * const nnue = nullptr, const pawnHash usePawnHash = pawnHash::on, const EvalParameters& eParm = EvalParameters());
 	explicit Position(const Position& other, const pawnHash usePawnHash = pawnHash::on);
 	~Position();
 	Position& operator=(const Position& other);
@@ -501,6 +502,8 @@ private:
 	bool _evalKNPvsK(Score& res) const;
 
 	static std::string _printEpSquare( const state& st );
+    
+    NNUE * const _nnue;
 
 };
 

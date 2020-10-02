@@ -288,7 +288,7 @@ Result test(const std::string& testName, my_thread& thr, Position& pos, SearchLi
         }
         else if (Movelist(pos, record.getOperations().get("bm")).contains(r.PV.getMove(0))) {
             results.addResult(1);
-        } 
+        }
     }
     return results; 
 }
@@ -309,7 +309,7 @@ int main(int , char **) {
     thr.setMute(true);
 	thr.getTT().setSize(64);
 
-    Position pos(Position::pawnHash::off);
+    Position pos(nullptr, Position::pawnHash::off);
 
     SearchLimits sl;
     sl.setMoveTime(time);

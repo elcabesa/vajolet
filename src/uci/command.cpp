@@ -40,7 +40,7 @@
 
 const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-UciManager::impl::impl(): _pos(Position::pawnHash::off)
+UciManager::impl::impl(): _pos(nullptr, Position::pawnHash::off)
 {
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
