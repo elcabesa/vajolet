@@ -150,7 +150,7 @@ Score NNUE::eval(const Position& pos) {
 		Score score;
 		if(pos.isWhiteTurn()) {
 			_completeFeatureList.clear();
-			concatenateFeature(true, _completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+			concatenateFeature(_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
 			SparseInput spw(81920);
 			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 				spw.set(_completeFeatureList.get(i), 1.0);
@@ -158,7 +158,7 @@ Score NNUE::eval(const Position& pos) {
 			score = _modelW.forwardPass(spw).get(0) * 10000.0;
 
 			_completeFeatureList.clear();
-			concatenateFeature(false, _completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+			concatenateFeature(_completeBlackFeatureList, _completeWhiteFeatureList, _completeFeatureList);
 			SparseInput spb(81920);
 			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 				spb.set(_completeFeatureList.get(i), 1.0);
@@ -167,7 +167,7 @@ Score NNUE::eval(const Position& pos) {
 
 		} else {
 			_completeFeatureList.clear();
-			concatenateFeature(false,_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+			concatenateFeature(_completeBlackFeatureList, _completeWhiteFeatureList, _completeFeatureList);
 			SparseInput spb(81920);
 			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 				spb.set(_completeFeatureList.get(i), 1.0);
@@ -175,7 +175,7 @@ Score NNUE::eval(const Position& pos) {
 			score = _modelB.forwardPass(spb).get(0) * 10000.0;
 
 			_completeFeatureList.clear();
-			concatenateFeature(true, _completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+			concatenateFeature(_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
 			SparseInput spw(81920);
 			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 				spw.set(_completeFeatureList.get(i), 1.0);
@@ -374,21 +374,12 @@ unsigned int NNUE::turnOffset(bool myTurn) {
 	return myTurn ? 0 : 40960;
 }
 
-void NNUE::concatenateFeature(bool whiteTurn, FeatureList w, FeatureList b, FeatureList& complete) {
-	if (whiteTurn) {
-		for(unsigned int i = 0; i < w.size(); ++i) {
-			complete.add(w.get(i));
-		}
-		for(unsigned int i = 0; i < b.size(); ++i) {
-			complete.add(b.get(i) + 40960);
-		}
-	} else {
-		for(unsigned int i = 0; i < b.size(); ++i) {
-			complete.add(b.get(i));
-		}
-		for(unsigned int i = 0; i < w.size(); ++i) {
-			complete.add(w.get(i) + 40960);
-		}
+void NNUE::concatenateFeature(FeatureList f1, FeatureList f2, FeatureList& complete) {
+	for(unsigned int i = 0; i < f1.size(); ++i) {
+		complete.add(f1.get(i));
+	}
+	for(unsigned int i = 0; i < f2.size(); ++i) {
+		complete.add(f2.get(i) + 40960);
 	}
 }
 

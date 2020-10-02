@@ -77,7 +77,7 @@ public:
     static unsigned int whiteFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int blackFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int turnOffset(bool myturn);
-    static void concatenateFeature(bool whiteTurn, FeatureList w, FeatureList b, FeatureList& complete);
+    void concatenateFeature(FeatureList f1, FeatureList f2, FeatureList& complete);
     static unsigned int mapWhitePiece(const bitboardIndex piece);
     static unsigned int mapBlackPiece(const bitboardIndex piece);
 
