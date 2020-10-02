@@ -44,7 +44,7 @@ void FenSaver::save(const Position& pos) {
 			++_saved;
 			if(_logDecimationCnt>=1000) {
 					std::cout << "thread "<<_n<<" saved " << _saved << " FENs" <<std::endl;
-					std::cout << "avg cost "<< _totalError/_n<<std::endl;
+					std::cout << "avg cost "<< _totalError/_saved<<std::endl;
 			}
 		    
             writeFeatures(pos);
@@ -57,7 +57,7 @@ void FenSaver::save(const Position& pos) {
 }
 
 void FenSaver::writeFeatures(const Position& pos) {
-	std::vector<unsigned int> features;
+	std::set<unsigned int> features;
 	bitboardIndex whitePow[10] = {
 		whiteQueens, // 0
 		whiteRooks,  // 1
@@ -99,7 +99,7 @@ void FenSaver::writeFeatures(const Position& pos) {
 		{
 			pieceSq = iterateBit(b);
 			unsigned int feature = (whiteTurn? 0 : 40960 ) + piece + (10 * pieceSq) + (640 * wksq);
-			features.push_back(feature);
+			features.insert(feature);
             featuresIndex.insert(feature);
 			//std::cout<<"FEATURE "<<feature<<std::endl;
 		}
@@ -113,7 +113,7 @@ void FenSaver::writeFeatures(const Position& pos) {
 		{
 			pieceSq = iterateBit(b);
 			unsigned int feature = (whiteTurn? 40960 : 0 ) + piece + (10 * (pieceSq^56)) + (640 * (bksq^56));
-			features.push_back(feature);
+			features.insert(feature);
             featuresIndex.insert(feature);
 			//std::cout<<"FEATURE "<<feature<<std::endl;
 		}
