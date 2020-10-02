@@ -28,6 +28,7 @@ void Clock::reset() {
 
 int Clock::getWhiteTime() const { return _whiteTime; }
 int Clock::getBlackTime() const { return _blackTime; }
+int Clock::getTimeIncrement() const { return _increment; }
 
 void Clock::switchTurn() {
 	_updateClock();

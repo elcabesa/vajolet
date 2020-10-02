@@ -14,36 +14,24 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef SELFPLAY_H_
-#define SELFPLAY_H_
-
-#include <string>
-#include "clock.h"
+#include "fenSaver.h"
 #include "position.h"
-#include "searchLimits.h"
 
-namespace pgn { class Game;}
-class Book;
-class Player;
-class FenSaver;
+FenSaver::FenSaver(unsigned int decimation): _decimation(decimation), _player("p"){
+	_stream.open("fen.csv");
+	_sl.setDepth(4);
+}
 
-class SelfPlay {
-	
-public:
-	SelfPlay(Player& white, Player& black, Book& b, FenSaver * const fs = nullptr);
-	pgn::Game playGame(unsigned int round);
-private:	
-	bool _isGameFinished();
-	std::string _getGameResult();
-	void _addGameTags(pgn::Game& g, int round);
-	void _addGameResult(pgn::Game& g, const std::string & s);
-	Position _p;
-	Clock _c;
-	SearchLimits _sl;
-	Player& _white;
-	Player& _black;
-	Book& _book;
-	FenSaver * const _fs;
-};
 
-#endif /* SELFPLAY_H_ */
+void FenSaver::save(const Position& pos) {
+	if (++_counter >= _decimation) {
+        auto res = _player.doSearch(pos, _sl).Res;
+        auto eval = pos.eval<false>();
+        if (std::abs(res)< SCORE_KNOWN_WIN && std::abs(eval)< SCORE_KNOWN_WIN) {
+		    _counter = 0;
+		    std::cout << "saved " << ++_saved << " FENs" <<std::endl;
+		    _stream << pos.getFen() << "," << eval << "," << res << std::endl;
+        }
+		
+	}
+}

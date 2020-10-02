@@ -14,36 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef SELFPLAY_H_
-#define SELFPLAY_H_
 
-#include <string>
-#include "clock.h"
-#include "position.h"
-#include "searchLimits.h"
+#include "tunerPars.h"
 
-namespace pgn { class Game;}
-class Book;
-class Player;
-class FenSaver;
-
-class SelfPlay {
+int TunerParameters::parallelGames = 22;
+int TunerParameters::gameNumber = 20;
 	
-public:
-	SelfPlay(Player& white, Player& black, Book& b, FenSaver * const fs = nullptr);
-	pgn::Game playGame(unsigned int round);
-private:	
-	bool _isGameFinished();
-	std::string _getGameResult();
-	void _addGameTags(pgn::Game& g, int round);
-	void _addGameResult(pgn::Game& g, const std::string & s);
-	Position _p;
-	Clock _c;
-	SearchLimits _sl;
-	Player& _white;
-	Player& _black;
-	Book& _book;
-	FenSaver * const _fs;
-};
+float TunerParameters::gameTime = 10;
+float TunerParameters::gameTimeIncrement = 0.1;
 
-#endif /* SELFPLAY_H_ */

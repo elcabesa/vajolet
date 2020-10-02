@@ -19,10 +19,12 @@
 #include <iostream>
 
 #include "book.h"
+#include "fenSaver.h"
+#include "player.h"
+#include "tournament.h"
 
 #include "libchess.h"
-
-#include "spsa.h"
+#include "vajo_io.h"
 
 void signalHandler(int signum)
 {
@@ -36,7 +38,7 @@ void signalHandler(int signum)
 */
 static void printStartInfo(void)
 {
-	std::cout <<"Vajolet tuner"<< std::endl;
+	std::cout <<"Vajolet fen generator"<< std::endl;
 }
 
 int main() {
@@ -54,17 +56,21 @@ int main() {
 	//	init global data
 	//----------------------------------
 	libChessInit();
-	
+
+	//----------------------------------
+	//	setup hyperparameters
+	//----------------------------------
+	TunerParameters::gameNumber = 200;
+	TunerParameters::gameTime = 2;
+	TunerParameters::gameTimeIncrement = 0.05;
+
+	FenSaver fs(5);
 	Book book("book.pgn");
-	/*while(true) {
-		auto moves = b.getLine();
-		for(const auto& m: moves) {
-			std::cout<<UciOutput::displayUci(m, false)<<" ";
-		}
-		std::cout<<std::endl;
-	}*/
-	SPSA spsa(book);
-	spsa.run();
+	Player p1("p1");
+	Player p2("p2");
+	Tournament t("tournament.pgn", "tournament.txt",p1, p2, book, &fs, true);
+	auto res = t.play();
+	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;
 
 	return 0;
 }

@@ -14,36 +14,30 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef SELFPLAY_H_
-#define SELFPLAY_H_
+#ifndef FENSAVER_H_
+#define FENSAVER_H_
 
-#include <string>
-#include "clock.h"
-#include "position.h"
+#include <iostream>
+#include <fstream>
+
+#include "player.h"
 #include "searchLimits.h"
 
-namespace pgn { class Game;}
-class Book;
-class Player;
-class FenSaver;
+class Position;
 
-class SelfPlay {
+class FenSaver {
 	
 public:
-	SelfPlay(Player& white, Player& black, Book& b, FenSaver * const fs = nullptr);
-	pgn::Game playGame(unsigned int round);
+	FenSaver(unsigned int decimation);
+	void save(const Position& pos);
+
 private:	
-	bool _isGameFinished();
-	std::string _getGameResult();
-	void _addGameTags(pgn::Game& g, int round);
-	void _addGameResult(pgn::Game& g, const std::string & s);
-	Position _p;
-	Clock _c;
+	const unsigned int _decimation;
+	unsigned int _counter = 0;
+	std::ofstream _stream;
+	Player _player;
 	SearchLimits _sl;
-	Player& _white;
-	Player& _black;
-	Book& _book;
-	FenSaver * const _fs;
+	uint_fast64_t _saved = 0;
 };
 
 #endif /* SELFPLAY_H_ */
