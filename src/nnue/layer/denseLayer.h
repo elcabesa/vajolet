@@ -12,7 +12,7 @@ class Activation;
 
 class DenseLayer: public Layer {
 public:
-    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::shared_ptr<Activation> act, std::vector<double>* bias, std::vector<double>* weight,const double stdDev = 0.0);
+    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<double>* bias, std::vector<double>* weight,const double stdDev = 0.0);
     ~DenseLayer();
     
     void propagate(const Input& input);
@@ -27,7 +27,7 @@ private:
    
     std::vector<double> _netOutput;
     
-    std::shared_ptr<Activation> _act;
+    Activation& _act;
     
     //std::set<unsigned int> _activeFeature;
     

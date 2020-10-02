@@ -31,6 +31,7 @@
 #include "hashKey.h"
 #include "movegen.h"
 #include "move.h"
+#include "nnue.h"
 #include "parameters.h"
 #include "score.h"
 #include "state.h"
@@ -40,7 +41,6 @@
 //---------------------------------------------------
 class pawnEntry;
 class pawnTable;
-class NNUE;
 
 //---------------------------------------------------
 //	class
@@ -70,7 +70,7 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	explicit Position(NNUE * const nnue = nullptr, const pawnHash usePawnHash = pawnHash::on, const EvalParameters& eParm = EvalParameters());
+	explicit Position(const pawnHash usePawnHash = pawnHash::on, const EvalParameters& eParm = EvalParameters());
 	explicit Position(const Position& other, const pawnHash usePawnHash = pawnHash::on);
 	~Position();
 	Position& operator=(const Position& other);
@@ -370,6 +370,7 @@ public:
 
 	simdScore getPieceValue(const bitboardIndex b) const { return _eParm._pieceValue[b];}
 	std::set<unsigned int> getFeatures() const;
+	NNUE& nnue() { return _nnue; };
 
 	//--------------------------------------------------------
 	// public members
@@ -505,7 +506,7 @@ private:
 
 	static std::string _printEpSquare( const state& st );
     
-    NNUE * const _nnue;
+    mutable NNUE _nnue;
 	std::set<unsigned int> _features;
 	std::set<unsigned int> _wFeatures;
 	std::set<unsigned int> _bFeatures;

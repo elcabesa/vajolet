@@ -34,11 +34,12 @@ void FenSaver::save(const Position& pos) {
 	if (++_counter >= _decimation) {
         _src.getPosition() = pos;
 		//std::cout<<"THREAD "<<_n<<" start search"<<std::endl;
-		auto res = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn())).Res;
+		//auto res = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn())).Res;
+		Score res = 0;
 		//std::cout<<"THREAD "<<_n<<" start Eval"<<std::endl;
         auto eval = pos.eval<false>();
 		//std::cout<<"THREAD "<<_n<<" done search"<<std::endl;
-        if (std::abs(res)< 200000) {
+        if (std::abs(eval)< 200000) {
 			_totalError += std::pow((res - eval), 2.0) / 2.0;
 		    _counter = 0;
 			++_logDecimationCnt;

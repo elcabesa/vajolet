@@ -35,7 +35,7 @@
 #include "tunerPars.h"
 #include "uciOutput.h"
 
-SelfPlay::SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs) : _p(nullptr, Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) {
+SelfPlay::SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) {
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());

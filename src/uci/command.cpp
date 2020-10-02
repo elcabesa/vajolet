@@ -41,7 +41,7 @@
 
 const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-UciManager::impl::impl(): _pos(nullptr, Position::pawnHash::off)
+UciManager::impl::impl(): _pos(Position::pawnHash::off)
 {
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
@@ -76,11 +76,24 @@ UciManager::impl::~impl()
 //	function implementation
 //---------------------------------------------
 void UciManager::impl::_useNnue(bool) {
-	thr.setNnue(uciParameters::useNnue, uciParameters::nnueFile);
+	if(uciParameters::useNnue) {
+		_pos.nnue().load(uciParameters::nnueFile);
+	}
+	else {
+		_pos.nnue().clear();
+		
+	}
+
 }
 
 void UciManager::impl::_setNnueFile(std::string) {
-	thr.setNnue(uciParameters::useNnue, uciParameters::nnueFile);
+	if(uciParameters::useNnue) {
+		_pos.nnue().load(uciParameters::nnueFile);
+	}
+	else {
+		_pos.nnue().clear();
+	}
+	
 }
 
 void UciManager::impl::_setTTSize(unsigned int size)
@@ -304,6 +317,17 @@ bool UciManager::impl::_eval(std::istringstream&, my_thread &) {
 	return false;
 }
 
+bool UciManager::impl::_evalNN(std::istringstream&, my_thread &) {
+	if(_pos.nnue().loaded()) {
+		Score s = _pos.nnue().eval(_pos);
+		sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
+		sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0 * 100 << "%" << sync_endl;
+	} else {
+		sync_cout << "NN not loaded" << sync_endl;
+	}
+	return false;
+}
+
 bool UciManager::impl::_readyOk(std::istringstream& , my_thread &) {
 	sync_cout << "readyok" << sync_endl;
 	return false;
@@ -411,6 +435,7 @@ void UciManager::impl::uciLoop(std::istream& is)
 	commands["position"] = &UciManager::impl::_position;
 	commands["setoption"] = &UciManager::impl::_setoption;
 	commands["eval"] = &UciManager::impl::_eval;
+	commands["evalNN"] = &UciManager::impl::_evalNN;
 	commands["isready"] = &UciManager::impl::_readyOk;
 	commands["perft"] = &UciManager::impl::_perft;
 	commands["divide"] = &UciManager::impl::_divide;

@@ -59,7 +59,6 @@ public:
 	Position& getPosition();
 	void setUOI( UciOutput::type UOI);
 	SearchParameters& getSearchParameters();
-	bool setNnue(bool use, std::string path);
 	class impl;
 private:
 	

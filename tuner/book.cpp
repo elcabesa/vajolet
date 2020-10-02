@@ -67,7 +67,7 @@ std::list<Move> Book::getLine()
 	}
 	pgn::MoveList movelist = game.moves();
 
-	Position p(nullptr, Position::pawnHash::off);
+	Position p(Position::pawnHash::off);
 	p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	// now let's iterate trough the list of moves and print each one to stdout

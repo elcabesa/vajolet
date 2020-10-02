@@ -215,6 +215,7 @@ SearchResult Search::impl::_go(timeManagement& tm, /*int depth,*/ Score alpha, S
 
 	// setup other threads
 	_searchers.clear();
+	_searchers.reserve(uciParameters::threads);
 	for(unsigned int i = 0; i < uciParameters::threads; ++i) {
 		_searchers.emplace_back(
 			*this,
@@ -436,18 +437,6 @@ SearchResult Search::impl::manageNewSearch(timeManagement & tm)
 
 }
 
-bool Search::impl::setNnue(bool use, std::string path) {
-	if(use) {
-		return _nnue.init(path);
-	}
-	else {
-		_nnue.clear();
-		return true;
-	}
-	
-}
-
-
 Search::Search( SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, tt, std::move(UOI))}{}
 Search::~Search() = default;
 void Search::stopSearch(){ pimpl->stopSearch(); }
@@ -458,4 +447,3 @@ SearchResult Search::manageNewSearch(timeManagement & tm){ return pimpl->manageN
 Position& Search::getPosition(){ return pimpl->getPosition(); }
 void Search::setUOI( UciOutput::type UOI ) { pimpl->setUOI(UOI); }
 SearchParameters& Search::getSearchParameters() { return pimpl->getSearchParameters(); }
-bool Search::setNnue(bool use, std::string path) { return pimpl->setNnue(use, path); }

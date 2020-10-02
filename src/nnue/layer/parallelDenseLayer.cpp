@@ -8,7 +8,7 @@
 #include "input.h"
 #include "parallelSparse.h"
 
-ParallelDenseLayer::ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, std::shared_ptr<Activation> act, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights, const double stdDev):
+ParallelDenseLayer::ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights, const double stdDev):
     Layer{number * inputSize, number * outputSize, stdDev}, _layerInputSize(inputSize), _layerOutputSize(outputSize)
     
 {
@@ -20,13 +20,11 @@ ParallelDenseLayer::ParallelDenseLayer(const unsigned int number, const unsigned
 ParallelDenseLayer::~ParallelDenseLayer() {}
 
 DenseLayer& ParallelDenseLayer::getLayer(unsigned int i) {
-    assert(i<_number);
     return _parallelLayers[i];
 }
 
 unsigned int ParallelDenseLayer::_calcBiasIndex(const unsigned int layer, const unsigned int offset) const {
     assert(offset < _layerOutputSize);
-    assert(layer < _number);
     unsigned int x = layer * _layerOutputSize + offset;
     assert(x < _outputSize);
     return x;
@@ -48,12 +46,8 @@ void ParallelDenseLayer::propagate(const Input& input) {
             _output.set(_calcBiasIndex(n, el.first), el.second); 
         }
         ++n;
-    }
-    
+    }    
 }
-
-
-
 
 bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
     //std::cout<<"DESERIALIZE PARALLEL DENSE LAYER"<<std::endl;

@@ -6,15 +6,15 @@
 #include "denseLayer.h"
 #include "input.h"
 
-DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::shared_ptr<Activation> act, std::vector<double>* bias, std::vector<double>* weight,const double stdDev):
+DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<double>* bias, std::vector<double>* weight,const double stdDev):
     Layer{inputSize, outputSize, stdDev},
     _bias(bias),
     _weight(weight),
-    _act(std::move(act))
+    _act(act)
     
 {
-    _bias->resize(outputSize, 0.0);
-    _weight->resize(outputSize * inputSize, 1.0);
+    //_bias->resize(outputSize, 0.0);
+    //_weight->resize(outputSize * inputSize, 1.0);
 }
 
 DenseLayer::~DenseLayer() {}
@@ -33,7 +33,7 @@ void DenseLayer::calcNetOut(const Input& input) {
 
 void DenseLayer::calcOut() {
     for(unsigned int o=0; o < _outputSize; ++o) {
-        _output.set(o, _act->propagate(_netOutput[o]));
+        _output.set(o, _act.propagate(_netOutput[o]));
     }
 }
 

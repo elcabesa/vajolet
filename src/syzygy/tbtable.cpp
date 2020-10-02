@@ -29,7 +29,7 @@
 #include "tbvalidater.h"
 
 TBTable::TBTable(const std::string& code, const std::string& ext, unsigned int sides): _endgame(code), _sides(sides), _map(nullptr), _extension(ext)  {
-	Position pos(nullptr, Position::pawnHash::off);
+	Position pos(Position::pawnHash::off);
 	
 	_key = pos.setup(getEndGame(), white).getMaterialKey();
 	_pieceCount = pos.getPieceCount(occupiedSquares);

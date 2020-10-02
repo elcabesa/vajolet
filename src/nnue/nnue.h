@@ -20,6 +20,8 @@
 #include <set>
 
 #include "bitBoardIndex.h"
+#include "linear.h"
+#include "relu.h"
 #include "score.h"
 #include "model.h"
 #include "tSquare.h"
@@ -29,7 +31,7 @@ class Position;
 class NNUE {
 public:
     NNUE();
-    bool init(std::string path);
+    bool load(std::string path);
     void clear();
     Score eval(const Position& pos);
     bool loaded() const;
@@ -46,7 +48,7 @@ public:
     static unsigned int mapBlackPiece(const bitboardIndex piece);
 private:
     Model _model;
-    bool _loaded;
+    static bool _loaded;
     static std::vector<double> bias00;
     static std::vector<double> bias01;
     static std::vector<double> bias1;
@@ -58,6 +60,9 @@ private:
     static std::vector<double> weight1;
     static std::vector<double> weight2;
     static std::vector<double> weight3;
+
+    linearActivation _linear;
+	reluActivation _relu;
 
 
 };

@@ -42,7 +42,7 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	impl(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create()):_UOI(std::move(UOI)), _pos(&_nnue), _sl(sl), _st(st), _tt(tt) {}
+	impl(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create()):_UOI(std::move(UOI)), _pos(), _sl(sl), _st(st), _tt(tt) {}
 
 	impl(const impl& other) = delete;
 	impl& operator=(const impl& other) = delete;
@@ -61,7 +61,6 @@ public:
 	Position& getPosition();
 	void setUOI( UciOutput::type UOI ); // todo remove??
 	SearchParameters& getSearchParameters() {return _sp;};
-	bool setNnue(bool use, std::string path);
 
 private:
 	std::vector<Searcher> _searchers;
@@ -71,7 +70,6 @@ private:
 	// private members
 	//--------------------------------------------------------
 	std::unique_ptr<UciOutput> _UOI;
-    NNUE _nnue;
 	Position _pos;
 
 	SearchLimits& _sl; // todo limits belong to threads

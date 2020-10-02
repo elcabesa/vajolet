@@ -15,14 +15,5 @@ public:
     virtual const std::string getType() const = 0;
 };
 
-class ActivationFactory {
-public:
-    enum class type
-    {
-        linear,
-        relu
-    };
-    static std::unique_ptr<Activation> create(const ActivationFactory::type t  = ActivationFactory::type::linear);
-};
 
 #endif 

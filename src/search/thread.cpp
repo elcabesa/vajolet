@@ -95,7 +95,6 @@ public:
 	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
 	bool isSearchRunning() const;
 	transpositionTable& getTT();
-	bool setNnue(bool use, std::string path);
 };
 
 my_thread::impl::impl(): _src(_st, _limits, _tt), _timeMan(timeManagement::create(_limits, _src.getPosition().getNextTurn())), _UOI(UciOutput::create()), _srcRes(0, 0, 0, PVline(), 0) 
@@ -289,8 +288,6 @@ bool my_thread::impl::isSearchRunning() const {
 
 transpositionTable& my_thread::impl::getTT() {return _tt;}
 
-bool my_thread::impl::setNnue(bool use, std::string path) { return _src.setNnue(use, path); }
-
 /*********************************************
 * my_thread class
 **********************************************/
@@ -316,5 +313,3 @@ const SearchResult& my_thread::synchronousSearch(const Position& p, SearchLimits
 bool my_thread::isSearchRunning() const { return pimpl->isSearchRunning(); }
 
 transpositionTable& my_thread::getTT() { return pimpl->getTT(); }
-
-bool my_thread::setNnue(bool use, std::string path) { return pimpl->setNnue(use, path); }

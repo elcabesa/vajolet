@@ -24,6 +24,7 @@
 #include <sstream>
 
 #include "command.h"
+#include "nnue.h"
 #include "position.h"
 #include "thread.h"
 
@@ -68,6 +69,7 @@ private:
 	bool _stop(std::istringstream& is, my_thread &thr);
 	bool _uciNewGame(std::istringstream& is, my_thread &thr);
 	bool _eval(std::istringstream& is, my_thread &thr);
+	bool _evalNN(std::istringstream& is, my_thread &thr);
 	bool _display(std::istringstream& is, my_thread &thr);
 	bool _position(std::istringstream& is, my_thread &thr);
 	
@@ -81,6 +83,7 @@ private:
 	bool _quit(std::istringstream& is, my_thread &thr);
 	Position _pos;
 	my_thread thr;
+
 };
 
 #endif

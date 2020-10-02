@@ -1768,7 +1768,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 Position::~Position() = default;
 
-Position::Position(NNUE * const nnue, const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm), _nnue{nnue}
+Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm)
 {
 	_stateInfo.clear();
 	_stateInfo.emplace_back(state());
@@ -1793,7 +1793,7 @@ Position::Position(NNUE * const nnue, const pawnHash usePawnHash, const EvalPara
 }
 
 
-Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm), _nnue {other._nnue}
+Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm)
 {
 	_updateUsThem();
 	_castleRightsMask = other._castleRightsMask;

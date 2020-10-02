@@ -17,15 +17,12 @@
 
 #include <iostream>
 
-#include "linear.h"
 #include "nnue.h"
 #include "parallelDenseLayer.h"
 #include "position.h"
-#include "relu.h"
 #include "sparse.h"
 
-//TODO multithreaded code, a single set of weights and bias shall stored outside the model
-//TODO set weight & biases size outside layers 
+//TODO split init and load.... all position shall contain a NNUE? or one NNUE for each search.... command will call static load?
 //TODO move all the math in fixed point?
 //TODO incrememental update of NN
 //TODO have 2 neural network one for white end one for black. it souhld be faster updating them
@@ -42,27 +39,42 @@ std::vector<double> NNUE::weight1;
 std::vector<double> NNUE::weight2;
 std::vector<double> NNUE::weight3;
 
-NNUE::NNUE(): _loaded{false} {}
+bool NNUE::_loaded = false;
 
-bool NNUE::init(std::string path) {
-    
-    std::cout<<"creating NNUE model"<<std::endl;
+NNUE::NNUE() {
+	std::cout<<"creating NNUE model"<<std::endl;
 	_model.clear();
+	
+	bias00.resize(256, 0.0);
+	bias01.resize(256, 0.0);
+	bias1.resize(32, 0.0);
+	bias2.resize(32, 0.0);
+	bias3.resize(1, 0.0);
+	
+	weight00.resize(40960 * 256, 1.0);
+	weight01.resize(40960 * 256, 1.0);
+	weight1.resize(512 * 32, 1.0);
+	weight2.resize(32 * 32, 1.0);
+	weight3.resize(32 * 1, 1.0);
+
 	std::vector<std::vector<double>*> biases0;
 	biases0.push_back(&bias00);
 	biases0.push_back(&bias01);
 	std::vector<std::vector<double>*> weights0;
-	biases0.push_back(&weight00);
-	biases0.push_back(&weight01);
-    _model.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, ActivationFactory::create(ActivationFactory::type::linear), biases0, weights0));
-    _model.addLayer(std::make_unique<DenseLayer>(512,32, ActivationFactory::create(ActivationFactory::type::relu), &bias1, &weight1));
-    _model.addLayer(std::make_unique<DenseLayer>(32,32, ActivationFactory::create(ActivationFactory::type::relu), &bias2, &weight2));
-    _model.addLayer(std::make_unique<DenseLayer>(32, 1, ActivationFactory::create(ActivationFactory::type::linear), &bias3, &weight3));
+	weights0.push_back(&weight00);
+	weights0.push_back(&weight01);
+    _model.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
+    _model.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
+    _model.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
+    _model.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
     std::cout<<"done"<<std::endl;
-    
-    std::cout<<"reload NNUE parameters"<<std::endl;
-    
+}
+
+bool NNUE::load(std::string path) {
+
+    std::cout<<"reload NNUE parameters"<<std::endl;    
 	std::cout<<"deserialize"<<std::endl;
+
 	std::ifstream nnFile;
 	nnFile.open(path);
 	if(nnFile.is_open()) {
@@ -83,7 +95,7 @@ bool NNUE::init(std::string path) {
 
 void NNUE::clear() {
 	_loaded = false;
-	_model.clear();
+	//_model.clear();
 }
 
 Score NNUE::eval(const Position& pos) {
