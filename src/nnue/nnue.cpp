@@ -135,10 +135,10 @@ Score NNUE::eval(const Position& pos) {
 		//std::cout<<"no incremental eval"<<std::endl;
 		// TODO if we move one king calculate everything from scratch
 		// can we do it faster??
-		std::set<unsigned int> _wFeatures;
-		std::set<unsigned int> _bFeatures;
-		_wFeatures = createWhiteFeatures(pos);
-		_bFeatures = createBlackFeatures(pos);
+		_completeWhiteFeatureList.clear();
+		_completeBlackFeatureList.clear();
+		createWhiteFeatures(pos, _completeWhiteFeatureList);
+		createBlackFeatures(pos, _completeBlackFeatureList);
 		whiteNoIncrementalEval = false;
 		blackNoIncrementalEval = false;
 
@@ -148,22 +148,38 @@ Score NNUE::eval(const Position& pos) {
     	_blackB.clear();
 
 		Score score;
-		//Score scoreW = _modelW.forwardPass(sp).get(0)* 10000.0;
-		//Score ScoreB = _modelB.forwardPass(sp).get(0)* 10000.0;
 		if(pos.isWhiteTurn()) {
-			auto fw = concatenateFeature(true, _wFeatures, _bFeatures);
-			SparseInput spw(81920, std::vector<unsigned int>(fw.begin(), fw.end()));
+			_completeFeatureList.clear();
+			concatenateFeature(true, _completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+			SparseInput spw(81920);
+			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
+				spw.set(_completeFeatureList.get(i), 1.0);
+			}
 			score = _modelW.forwardPass(spw).get(0) * 10000.0;
-			auto fb = concatenateFeature(false, _wFeatures, _bFeatures);
-			SparseInput spb(81920, std::vector<unsigned int>(fb.begin(), fb.end()));
+
+			_completeFeatureList.clear();
+			concatenateFeature(false, _completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+			SparseInput spb(81920);
+			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
+				spb.set(_completeFeatureList.get(i), 1.0);
+			}
 			_modelB.forwardPass(spb).get(0);
 
 		} else {
-			auto fb = concatenateFeature(false, _wFeatures, _bFeatures);
-			SparseInput spb(81920, std::vector<unsigned int>(fb.begin(), fb.end()));
+			_completeFeatureList.clear();
+			concatenateFeature(false,_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+			SparseInput spb(81920);
+			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
+				spb.set(_completeFeatureList.get(i), 1.0);
+			}
 			score = _modelB.forwardPass(spb).get(0) * 10000.0;
-			auto fw = concatenateFeature(true, _wFeatures, _bFeatures);
-			SparseInput spw(81920, std::vector<unsigned int>(fw.begin(), fw.end()));
+
+			_completeFeatureList.clear();
+			concatenateFeature(true, _completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+			SparseInput spw(81920);
+			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
+				spw.set(_completeFeatureList.get(i), 1.0);
+			}
 			_modelW.forwardPass(spw).get(0);
 		}
 
@@ -280,9 +296,7 @@ std::set<unsigned int> NNUE::createFeatures(const Position& pos){
 	return features;
 }
 
-std::set<unsigned int> NNUE::createBlackFeatures(const Position& pos){
-    std::set<unsigned int> features;
-
+void NNUE::createBlackFeatures(const Position& pos, FeatureList& fl){
 	bitboardIndex blackPow[10] = {
 		blackQueens,
 		blackRooks,
@@ -303,15 +317,12 @@ std::set<unsigned int> NNUE::createBlackFeatures(const Position& pos){
 		while(b)
 		{
 			tSquare pieceSq = iterateBit(b);
-            features.insert(blackFeature(piece, pieceSq, bkSq));
+            fl.add(blackFeature(piece, pieceSq, bkSq));
 		}
 	}
-	 
-	return features;
 }
 
-std::set<unsigned int> NNUE::createWhiteFeatures(const Position& pos){
-    std::set<unsigned int> features;
+void NNUE::createWhiteFeatures(const Position& pos, FeatureList& fl){
 	bitboardIndex whitePow[10] = {
 		whiteQueens,
 		whiteRooks,
@@ -332,11 +343,9 @@ std::set<unsigned int> NNUE::createWhiteFeatures(const Position& pos){
 		while(b)
 		{
 			tSquare pieceSq = iterateBit(b);
-			features.insert(whiteFeature(piece, pieceSq, wkSq));
+			fl.add(whiteFeature(piece, pieceSq, wkSq));
 		}
 	}
-	 
-	return features;
 }
 
 bool NNUE::loaded() {
@@ -365,21 +374,22 @@ unsigned int NNUE::turnOffset(bool myTurn) {
 	return myTurn ? 0 : 40960;
 }
 
-std::set<unsigned int> NNUE::concatenateFeature(bool whiteTurn, std::set<unsigned int> w, std::set<unsigned int> b) {
-	std::set<unsigned int> features;
+void NNUE::concatenateFeature(bool whiteTurn, FeatureList w, FeatureList b, FeatureList& complete) {
 	if (whiteTurn) {
-		features = w;
-		for(auto & f: b) {
-			features.insert(f + 40960);
+		for(unsigned int i = 0; i < w.size(); ++i) {
+			complete.add(w.get(i));
+		}
+		for(unsigned int i = 0; i < b.size(); ++i) {
+			complete.add(b.get(i) + 40960);
 		}
 	} else {
-		features = b;
-		for(auto & f: w) {
-			features.insert(f + 40960);
+		for(unsigned int i = 0; i < b.size(); ++i) {
+			complete.add(b.get(i));
+		}
+		for(unsigned int i = 0; i < w.size(); ++i) {
+			complete.add(w.get(i) + 40960);
 		}
 	}
-
-	return features;
 }
 
 unsigned int NNUE::mapWhitePiece(const bitboardIndex piece) {
@@ -450,17 +460,11 @@ void NNUE::addPiece(const Position& pos, bitboardIndex piece, tSquare sq) {
 
 
 void DifferentialList::clear() {
-	//_add.clear();
-	//_remove.clear();
-
 	_addPos = 0;
 	_removePos = 0;
 }
 
 void DifferentialList::serialize(SparseInput& s, unsigned int offset) {
-	//for(auto x: _add) { s.set(x + offset, 1.0); }
-	//for(auto x: _remove) { s.set(x + offset, -1.0); }
-
 	for(unsigned int i = 0; i < _addPos; ++i) {
 		s.set(_addList[i] + offset, 1.0);
 	}
@@ -470,12 +474,6 @@ void DifferentialList::serialize(SparseInput& s, unsigned int offset) {
 }
 
 void DifferentialList::add(unsigned int f) {
-	/*if(auto it = _remove.find(f); it != _remove.end()) {
-		_remove.erase(it);
-	} else {
-    	_add.insert(f);
-	}*/
-
 	// search in remove
 	for(unsigned int i = 0; i < _removePos; ++i) {
 		if(_removeList[i] == f) {
@@ -491,12 +489,6 @@ void DifferentialList::add(unsigned int f) {
 
 }
 void DifferentialList::remove(unsigned int f) {
-	/*if(auto it = _add.find(f); it != _add.end()) {
-		_add.erase(it);
-	} else {
-    	_remove.insert(f);
-	}*/
-
 	// search in remove
 	for(unsigned int i = 0; i < _addPos; ++i) {
 		if(_addList[i] == f) {
@@ -509,4 +501,22 @@ void DifferentialList::remove(unsigned int f) {
 		}
 	}
 	_removeList[_removePos++] = f;
+}
+
+void FeatureList::clear() {
+	_pos = 0;
+}
+
+void FeatureList::add(unsigned int f) {
+	// search in remove
+	_list[_pos++] = f;
+
+}
+
+unsigned int FeatureList::get(unsigned int index) {
+	return _list[index];
+}
+
+unsigned int FeatureList::size() {
+	return _pos;
 }

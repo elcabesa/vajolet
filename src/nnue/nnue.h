@@ -38,8 +38,6 @@ public:
     void add(unsigned int f);
     void remove(unsigned int f);
 private:
-    //std::set<unsigned int> _add;
-    //std::set<unsigned int> _remove;
     // TODO minimize size
     // TODO save max element stored
     std::array<unsigned int, 50> _addList;
@@ -47,6 +45,21 @@ private:
     unsigned int _addPos = 0;
     unsigned int _removePos = 0;
 
+};
+
+class FeatureList {
+public:
+    void clear();
+    //void serialize(SparseInput& s, unsigned int offset);
+    void add(unsigned int f);
+    unsigned int get(unsigned int index);
+    unsigned int size();
+private:
+
+    // TODO minimize size
+    // TODO save max element stored
+    std::array<unsigned int, 100> _list;
+    unsigned int _pos = 0;
 };
 
 class NNUE {
@@ -57,14 +70,14 @@ public:
     Score eval(const Position& pos);
     static bool loaded();
     static std::set<unsigned int> createFeatures(const Position& pos);
-    static std::set<unsigned int> createWhiteFeatures(const Position& pos);
-    static std::set<unsigned int> createBlackFeatures(const Position& pos);
+    void createWhiteFeatures(const Position& pos, FeatureList& fl);
+    void createBlackFeatures(const Position& pos, FeatureList& fl);
     static unsigned int calcWhiteFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int calcBlackFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int whiteFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int blackFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int turnOffset(bool myturn);
-    static std::set<unsigned int> concatenateFeature(bool whiteTurn, std::set<unsigned int> w, std::set<unsigned int> b);
+    static void concatenateFeature(bool whiteTurn, FeatureList w, FeatureList b, FeatureList& complete);
     static unsigned int mapWhitePiece(const bitboardIndex piece);
     static unsigned int mapBlackPiece(const bitboardIndex piece);
 
@@ -99,6 +112,10 @@ private:
     DifferentialList _blackW;
     DifferentialList _whiteB;
     DifferentialList _blackB;
+
+    FeatureList _completeWhiteFeatureList;
+    FeatureList _completeBlackFeatureList;
+    FeatureList _completeFeatureList;
 };
 
 
