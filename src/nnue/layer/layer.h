@@ -17,6 +17,7 @@ public:
     void printOutput() const;
     
     virtual void propagate(const Input& input) = 0;
+    virtual void incrementalPropagate(const Input& input) = 0;
     
     virtual bool deserialize(std::ifstream& ss) = 0;
 

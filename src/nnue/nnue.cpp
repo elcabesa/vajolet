@@ -45,7 +45,9 @@ bool NNUE::_loaded = false;
 
 NNUE::NNUE() {
 	//std::cout<<"creating NNUE model"<<std::endl;
-	_model.clear();
+	_modelW.clear();
+	_modelB.clear();
+
 	
 	bias00.resize(256, 0.0);
 	bias01.resize(256, 0.0);
@@ -65,11 +67,28 @@ NNUE::NNUE() {
 	std::vector<std::vector<double>*> weights0;
 	weights0.push_back(&weight00);
 	weights0.push_back(&weight01);
-    _model.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
-    _model.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
-    _model.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
-    _model.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
+    _modelW.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
+    _modelW.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
+    _modelW.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+
+	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
+    _modelB.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
+    _modelB.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
+    _modelB.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+	_m.clear();
+	_m.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
+    _m.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
+    _m.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
+    _m.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+
+#endif
     //std::cout<<"done"<<std::endl;
+
+	whiteNoIncrementalEval = true;
+    blackNoIncrementalEval = true;
 }
 
 bool NNUE::load(std::string path) {
@@ -80,7 +99,13 @@ bool NNUE::load(std::string path) {
 	std::ifstream nnFile;
 	nnFile.open(path);
 	if(nnFile.is_open()) {
-		if(_model.deserialize(nnFile)){
+		//todo, it's possibile to clone model?
+		if(_modelW.deserialize(nnFile) 
+			&& _modelB.deserialize(nnFile)
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+			&& _m.deserialize(nnFile)
+#endif
+		){
 			_loaded = true;
 			std::cout<<"done"<<std::endl;
 			return true;
@@ -103,13 +128,34 @@ void NNUE::clear() {
 Score NNUE::eval(const Position& pos) {
     Score lowSat = -SCORE_INFINITE;
     Score highSat = SCORE_INFINITE;
-    //auto f1 = createFeatures(pos);
-	auto f2 = pos.getFeatures();
-	/*if(f1 != f2) {
-		std::cout<<"AHHHHHHHHHHHHHHHHHHh"<<std::endl;
-	}*/
-    SparseInput sp(81920, std::vector<unsigned int>(f2.begin(), f2.end()));
-    Score score = _model.forwardPass(sp).get(0)* 10000.0;
+	
+	if (whiteNoIncrementalEval) {
+		_wFeatures = createWhiteFeatures(pos);
+		whiteNoIncrementalEval = false;
+	}
+	if (blackNoIncrementalEval) {
+		_bFeatures = createWhiteFeatures(pos);
+		blackNoIncrementalEval = false;
+	}
+	auto f2 = concatenateFeature(pos.isWhiteTurn(), _wFeatures, _bFeatures);
+	SparseInput sp(81920, std::vector<unsigned int>(f2.begin(), f2.end()));
+	Score score;
+	if(pos.isWhiteTurn()) {
+		score = _modelW.forwardPass(sp).get(0)* 10000.0;
+	} else {
+		score = _modelB.forwardPass(sp).get(0)* 10000.0;
+	}
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+	Score score2;
+	auto f1 = createFeatures(pos);
+	SparseInput sp2(81920, std::vector<unsigned int>(f2.begin(), f2.end()));
+	score2 = _m.forwardPass(sp2).get(0)* 10000.0;
+	if(score2 != score) {
+		std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
+	}
+#endif
+
+
     score = std::min(highSat,score);
 	score = std::max(lowSat,score);
     return score;

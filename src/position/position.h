@@ -369,7 +369,6 @@ public:
 	bool isChess960() const {return _isChess960;}
 
 	simdScore getPieceValue(const bitboardIndex b) const { return _eParm._pieceValue[b];}
-	std::set<unsigned int> getFeatures() const;
 	NNUE& nnue() { return _nnue; };
 
 	//--------------------------------------------------------
@@ -507,10 +506,6 @@ private:
 	static std::string _printEpSquare( const state& st );
     
     mutable NNUE _nnue;
-	std::set<unsigned int> _features;
-	std::set<unsigned int> _wFeatures;
-	std::set<unsigned int> _bFeatures;
-
 };
 
 

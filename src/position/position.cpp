@@ -260,21 +260,12 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & _bitBoard[x.getPiecesOfOtherPlayer()] );
 	
 	if (NNUE::loaded()) {
-		_wFeatures = NNUE::createWhiteFeatures(*this);
-		_bFeatures = NNUE::createBlackFeatures(*this);
+		_nnue.whiteNoIncrementalEval = true;
+		_nnue.blackNoIncrementalEval = true;
 	}
 
 #ifdef ENABLE_CHECK_CONSISTENCY
 	_checkPosConsistency(checkPhase::setup);
-#endif
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-	if (NNUE::loaded()) {
-		_features = NNUE::createFeatures(*this);	
-		auto f = NNUE::concatenateFeature(isWhiteTurn(), _wFeatures, _bFeatures);
-		if(_features != f) {
-			_block("NNUE FEATURE", checkPhase::setup);
-		}
-	}
 #endif
 	return *this;
 }
@@ -702,16 +693,6 @@ void Position::doNullMove()
 	_calcCheckingSquares();
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
-
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-	if (NNUE::loaded()) {
-		_features = NNUE::createFeatures(*this);	
-		auto f = NNUE::concatenateFeature(isWhiteTurn(), _wFeatures, _bFeatures);
-		if(_features != f) {
-			_block("NNUE FEATURE", checkPhase::doNullMove);
-		}
-	}
-#endif
 }
 /*! \brief do a move
 	\author STOCKFISH
@@ -789,10 +770,10 @@ void Position::doMove(const Move & m)
 		_putPiece(rook, rTo);
 
 		if (NNUE::loaded()) {
-			_wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(rook), rFrom, getSquareOfThePiece(bitboardIndex::whiteKing)));
-			_bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(rook), rFrom, getSquareOfThePiece(bitboardIndex::blackKing)));
-			_wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(rook), rTo, getSquareOfThePiece(bitboardIndex::whiteKing)));
-			_bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(rook), rTo, getSquareOfThePiece(bitboardIndex::blackKing)));
+			_nnue._wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(rook), rFrom, getSquareOfThePiece(bitboardIndex::whiteKing)));
+			_nnue._bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(rook), rFrom, getSquareOfThePiece(bitboardIndex::blackKing)));
+			_nnue._wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(rook), rTo, getSquareOfThePiece(bitboardIndex::whiteKing)));
+			_nnue._bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(rook), rTo, getSquareOfThePiece(bitboardIndex::blackKing)));
 		}
 		
 		x.getKey().updatePiece( rFrom, rTo, rook );
@@ -821,8 +802,8 @@ void Position::doMove(const Move & m)
 			// remove piece
 			_removePiece(captured,captureSquare);
 			if (NNUE::loaded()) {
-				_wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(captured), captureSquare, getSquareOfThePiece(bitboardIndex::whiteKing)));
-				_bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(captured), captureSquare, getSquareOfThePiece(bitboardIndex::blackKing)));
+				_nnue._wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(captured), captureSquare, getSquareOfThePiece(bitboardIndex::whiteKing)));
+				_nnue._bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(captured), captureSquare, getSquareOfThePiece(bitboardIndex::blackKing)));
 			}
 			// update material
 			x.removeMaterial( _eParm._pstValue[captured][captureSquare] );
@@ -841,10 +822,10 @@ void Position::doMove(const Move & m)
 		x.getKey().updatePiece( from, to, piece );
 		_movePiece(piece, from, to);
 		if(!kingMove && NNUE::loaded()) {
-			_wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), from, getSquareOfThePiece(bitboardIndex::whiteKing)));
-			_bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(piece), from, getSquareOfThePiece(bitboardIndex::blackKing)));
-			_wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
-			_bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(piece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
+			_nnue._wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), from, getSquareOfThePiece(bitboardIndex::whiteKing)));
+			_nnue._bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(piece), from, getSquareOfThePiece(bitboardIndex::blackKing)));
+			_nnue._wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
+			_nnue._bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(piece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
 		}
 
 		x.addMaterial( _eParm._pstValue[piece][to] - _eParm._pstValue[piece][from] );
@@ -879,10 +860,10 @@ void Position::doMove(const Move & m)
 			_putPiece(promotedPiece,to);
 
 			if (NNUE::loaded()) {
-				_wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
-				_bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(piece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
-				_wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(promotedPiece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
-				_bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(promotedPiece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
+				_nnue._wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
+				_nnue._bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(piece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
+				_nnue._wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(promotedPiece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
+				_nnue._bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(promotedPiece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
 			}
 
 			x.addMaterial( _eParm._pstValue[promotedPiece][to] - _eParm._pstValue[piece][to] );
@@ -937,18 +918,10 @@ void Position::doMove(const Move & m)
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
 	if (NNUE::loaded()) {
-		_features = NNUE::createFeatures(*this);
 		if(kingMove) {
-			if(isBlackTurn()) _wFeatures = NNUE::createWhiteFeatures(*this); // turn has alreaby been switched
-			else _bFeatures = NNUE::createBlackFeatures(*this);
+			if(isBlackTurn()) _nnue.whiteNoIncrementalEval = true;
+			else _nnue.blackNoIncrementalEval = true;
 		}
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-		_features = NNUE::createFeatures(*this);	
-		auto f = NNUE::concatenateFeature(isWhiteTurn(), _wFeatures, _bFeatures);
-		if(_features != f) {
-			_block("NNUE FEATURE", checkPhase::doMove);
-		}
-#endif
 	}
 }
 
@@ -1000,10 +973,10 @@ void Position::undoMove()
 		}
 		_putPiece(rook, rFrom);
 		if (NNUE::loaded()) {
-			_wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(rook), rTo, getSquareOfThePiece(bitboardIndex::whiteKing)));
-			_bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(rook), rTo, getSquareOfThePiece(bitboardIndex::blackKing)));
-			_wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(rook), rFrom, getSquareOfThePiece(bitboardIndex::whiteKing)));
-			_bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(rook), rFrom, getSquareOfThePiece(bitboardIndex::blackKing)));
+			_nnue._wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(rook), rTo, getSquareOfThePiece(bitboardIndex::whiteKing)));
+			_nnue._bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(rook), rTo, getSquareOfThePiece(bitboardIndex::blackKing)));
+			_nnue._wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(rook), rFrom, getSquareOfThePiece(bitboardIndex::whiteKing)));
+			_nnue._bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(rook), rFrom, getSquareOfThePiece(bitboardIndex::blackKing)));
 		}
 		
 	} else {
@@ -1013,18 +986,18 @@ void Position::undoMove()
 			piece = isBlackPiece(piece) ? blackPawns : whitePawns;
 			_putPiece(piece,to);
 			if (NNUE::loaded()) {
-				_wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(promotedPiece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
-				_bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(promotedPiece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
-				_wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
-				_bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(piece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
+				_nnue._wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(promotedPiece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
+				_nnue._bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(promotedPiece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
+				_nnue._wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
+				_nnue._bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(piece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
 			}
 		}
 		_movePiece(piece, to, from);
 		if(!kingMove && NNUE::loaded()) {
-			_wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
-			_bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(piece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
-			_wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), from, getSquareOfThePiece(bitboardIndex::whiteKing)));
-			_bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(piece), from, getSquareOfThePiece(bitboardIndex::blackKing)));
+			_nnue._wFeatures.erase(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), to, getSquareOfThePiece(bitboardIndex::whiteKing)));
+			_nnue._bFeatures.erase(NNUE::blackFeature(NNUE::mapBlackPiece(piece), to, getSquareOfThePiece(bitboardIndex::blackKing)));
+			_nnue._wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(piece), from, getSquareOfThePiece(bitboardIndex::whiteKing)));
+			_nnue._bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(piece), from, getSquareOfThePiece(bitboardIndex::blackKing)));
 		}
 
 		
@@ -1039,8 +1012,8 @@ void Position::undoMove()
 			assert( capSq < squareNumber );
 			_putPiece( p, capSq );
 			if (NNUE::loaded()) {
-				_wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(p), capSq, getSquareOfThePiece(bitboardIndex::whiteKing)));
-				_bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(p), capSq, getSquareOfThePiece(bitboardIndex::blackKing)));
+				_nnue._wFeatures.insert(NNUE::whiteFeature(NNUE::mapWhitePiece(p), capSq, getSquareOfThePiece(bitboardIndex::whiteKing)));
+				_nnue._bFeatures.insert(NNUE::blackFeature(NNUE::mapBlackPiece(p), capSq, getSquareOfThePiece(bitboardIndex::blackKing)));
 			}
 		}
 	}
@@ -1051,16 +1024,9 @@ void Position::undoMove()
 
 	if (NNUE::loaded()) {
 		if(kingMove || m.isCastleMove()) {
-			if(isWhiteTurn()) _wFeatures = NNUE::createWhiteFeatures(*this); // turn has alread been switched back
-			else _bFeatures = NNUE::createBlackFeatures(*this);
+			if(isWhiteTurn()) _nnue.whiteNoIncrementalEval = true;
+			else _nnue.blackNoIncrementalEval = true;
 		}
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-		_features = NNUE::createFeatures(*this);	
-		auto f = NNUE::concatenateFeature(isWhiteTurn(), _wFeatures, _bFeatures);
-		if(_features != f) {
-			_block("NNUE FEATURE", checkPhase::undoMove);
-		}
-#endif
 	}
 	
 }
@@ -1075,17 +1041,6 @@ void Position::undoNullMove()
 	--_ply;
 	_removeState();
 	std::swap( Us, Them );
-
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-	if (NNUE::loaded()) {
-		_features = NNUE::createFeatures(*this);	
-		auto f = NNUE::concatenateFeature(isWhiteTurn(), _wFeatures, _bFeatures);
-		if(_features != f) {
-			_block("NNUE FEATURE", checkPhase::undoNullMove);
-		}
-	}
-#endif
-
 #ifdef ENABLE_CHECK_CONSISTENCY
 	_checkPosConsistency(checkPhase::undoNullMove);
 #endif
@@ -1812,9 +1767,8 @@ Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply
 	if (usePawnHash == pawnHash::on) {
 		_pawnHashTable = std::make_unique<pawnTable>();
 	}
-	_features.clear();
-	_wFeatures.clear();
-	_bFeatures.clear();
+	_nnue._wFeatures.clear();
+	_nnue._bFeatures.clear();
 }
 
 
@@ -1831,9 +1785,8 @@ Position::Position(const Position& other, const pawnHash usePawnHash): _ply(othe
 	if (usePawnHash == pawnHash::on) {
 		_pawnHashTable = std::make_unique<pawnTable>();
 	}
-	_features = other._features;
-	_wFeatures = other._wFeatures;
-	_bFeatures = other._bFeatures;
+	_nnue._wFeatures = other._nnue._wFeatures;
+	_nnue._bFeatures = other._nnue._bFeatures;
 	
 }
 
@@ -1862,9 +1815,8 @@ Position& Position::operator=(const Position& other)
 	_castleRookFinalSquare = other._castleRookFinalSquare;
 	
 	_eParm = other._eParm;
-	_features = other._features;
-	_wFeatures = other._wFeatures;
-	_bFeatures = other._bFeatures;
+	_nnue._wFeatures = other._nnue._wFeatures;
+	_nnue._bFeatures = other._nnue._bFeatures;
 
 	return *this;
 }
@@ -2032,8 +1984,4 @@ bool Position::isStaleMate() const {
 	
 	return !inCheck && !legalReplies;
 	
-}
-
-std::set<unsigned int> Position::getFeatures() const {
-	return NNUE::concatenateFeature(isWhiteTurn(), _wFeatures, _bFeatures);
 }

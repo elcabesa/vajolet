@@ -16,6 +16,7 @@ public:
     ~DenseLayer();
     
     void propagate(const Input& input);
+    void incrementalPropagate(const Input& input);
 
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
@@ -32,8 +33,8 @@ private:
     //std::set<unsigned int> _activeFeature;
     
     
-    void calcNetOut(const Input& input);
-    void calcOut();
+    void _calcNetOut(const Input& input, bool incremental = false);
+    void _calcOut();
 };
 
 #endif  

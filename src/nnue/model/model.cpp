@@ -33,6 +33,8 @@ const Input& Model::forwardPass(const Input& input, bool verbose /* = false */) 
 }
 
 bool Model::deserialize(std::ifstream& ss) {
+    ss.clear();
+    ss.seekg(0);
     //std::cout<<"DESERIALIZE MODEL"<<std::endl;
     if(ss.get() != '{') {std::cout<<"MODEL missing {"<<std::endl;return false;}
     for(auto& l :_layers) {

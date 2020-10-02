@@ -25,6 +25,7 @@
 #include "score.h"
 #include "model.h"
 #include "tSquare.h"
+#include "vajolet.h"
 
 class Position;
 
@@ -46,8 +47,20 @@ public:
     static std::set<unsigned int> concatenateFeature(bool whiteTurn, std::set<unsigned int> w, std::set<unsigned int> b);
     static unsigned int mapWhitePiece(const bitboardIndex piece);
     static unsigned int mapBlackPiece(const bitboardIndex piece);
+
+    bool whiteNoIncrementalEval;
+    bool blackNoIncrementalEval;
+
+   
+	std::set<unsigned int> _wFeatures;
+	std::set<unsigned int> _bFeatures;
+
 private:
-    Model _model;
+    Model _modelW;
+    Model _modelB;
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+    Model _m;
+#endif
     static bool _loaded;
     static std::vector<double> bias00;
     static std::vector<double> bias01;
@@ -63,7 +76,7 @@ private:
 
     linearActivation _linear;
 	reluActivation _relu;
-
+     std::set<unsigned int> _features;
 
 };
 

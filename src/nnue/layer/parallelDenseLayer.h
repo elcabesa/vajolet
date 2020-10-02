@@ -15,6 +15,7 @@ public:
     ~ParallelDenseLayer();
     
     void propagate(const Input& input);
+    void incrementalPropagate(const Input& input);
     
     DenseLayer& getLayer(unsigned int);
 

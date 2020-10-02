@@ -19,27 +19,34 @@ DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSi
 
 DenseLayer::~DenseLayer() {}
 
-void DenseLayer::calcNetOut(const Input& input) {
+void DenseLayer::_calcNetOut(const Input& input, bool incremental) {
     assert(input.size() == _inputSize);
-    _netOutput = *_bias;
+    if  (!incremental) {
+        _netOutput = *_bias;
+    }
     unsigned int num = input.getElementNumber();
-    for(unsigned int idx = 0; idx < num; ++idx) {
+    for (unsigned int idx = 0; idx < num; ++idx) {
         auto& el = input.getElementFromIndex(idx);
-        for(unsigned int o = 0; o < _outputSize; ++o) {
+        for (unsigned int o = 0; o < _outputSize; ++o) {
             _netOutput[o] += el.second * (*_weight)[_calcWeightIndex(el.first,o)];
         }
     }  
 }
 
-void DenseLayer::calcOut() {
+void DenseLayer::_calcOut() {
     for(unsigned int o=0; o < _outputSize; ++o) {
         _output.set(o, _act.propagate(_netOutput[o]));
     }
 }
 
 void DenseLayer::propagate(const Input& input) {
-    calcNetOut(input);
-    calcOut();
+    _calcNetOut(input);
+    _calcOut();
+}
+
+void DenseLayer::incrementalPropagate(const Input& input) {
+    _calcNetOut(input, true);
+    _calcOut();
 }
 
 unsigned int DenseLayer::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
