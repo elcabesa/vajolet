@@ -128,7 +128,11 @@ void Searcher::_idLoop(std::vector<rootMove>& temporaryResults, unsigned int ind
 			//----------------------------------
 			// aspiration window
 			//----------------------------------
+#ifdef LOG_SEARCH
+			rootMove res = _aspirationWindow<true>(depth, alpha, beta, masterThread);
+#else 
 			rootMove res = _aspirationWindow<false>(depth, alpha, beta, masterThread);
+#endif
 			if( res.firstMove != Move::NOMOVE )
 			{
 				bestMove = res;

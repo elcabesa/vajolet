@@ -51,13 +51,10 @@ public:
     bool whiteNoIncrementalEval;
     bool blackNoIncrementalEval;
 
-   
-	std::set<unsigned int> _wFeatures;
-	std::set<unsigned int> _bFeatures;
-
+    void removePiece(const Position& pos, bitboardIndex piece, tSquare sq);
+    void addPiece(const Position& pos, bitboardIndex piece, tSquare sq);
 private:
-    Model _modelW;
-    Model _modelB;
+    Model _model;
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
     Model _m;
 #endif
@@ -76,7 +73,14 @@ private:
 
     linearActivation _linear;
 	reluActivation _relu;
-     std::set<unsigned int> _features;
+    std::set<unsigned int> _features;
+    std::set<unsigned int> _wFeatures;
+	std::set<unsigned int> _bFeatures;
+
+    std::set<unsigned int> _whiteAdd;
+    std::set<unsigned int> _whiteRemove;
+    std::set<unsigned int> _blackAdd;
+    std::set<unsigned int> _blackRemove;
 
 };
 
