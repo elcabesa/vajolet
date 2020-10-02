@@ -18,6 +18,7 @@
 #define NNUE_H_ 
 
 #include <set>
+#include <array>
 
 #include "bitBoardIndex.h"
 #include "linear.h"
@@ -28,6 +29,25 @@
 #include "vajolet.h"
 
 class Position;
+class SparseInput;
+
+class DifferentialList {
+public:
+    void clear();
+    void serialize(SparseInput& s, unsigned int offset);
+    void add(unsigned int f);
+    void remove(unsigned int f);
+private:
+    //std::set<unsigned int> _add;
+    //std::set<unsigned int> _remove;
+    // TODO minimize size
+    // TODO save max element stored
+    std::array<unsigned int, 50> _addList;
+    std::array<unsigned int, 50> _removeList;
+    unsigned int _addPos = 0;
+    unsigned int _removePos = 0;
+
+};
 
 class NNUE {
 public:
@@ -74,20 +94,13 @@ private:
 
     linearActivation _linear;
 	reluActivation _relu;
-    //std::set<unsigned int> _features;
-    std::set<unsigned int> _wFeatures;
-	std::set<unsigned int> _bFeatures;
 
-    std::set<unsigned int> _whiteAddW;
-    std::set<unsigned int> _whiteRemoveW;
-    std::set<unsigned int> _blackAddW;
-    std::set<unsigned int> _blackRemoveW;
-
-    std::set<unsigned int> _whiteAddB;
-    std::set<unsigned int> _whiteRemoveB;
-    std::set<unsigned int> _blackAddB;
-    std::set<unsigned int> _blackRemoveB;
-
+    DifferentialList _whiteW;
+    DifferentialList _blackW;
+    DifferentialList _whiteB;
+    DifferentialList _blackB;
 };
+
+
 
 #endif

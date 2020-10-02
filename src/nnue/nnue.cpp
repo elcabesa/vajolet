@@ -87,14 +87,10 @@ NNUE::NNUE() {
 	whiteNoIncrementalEval = true;
     blackNoIncrementalEval = true;
 
-	_whiteAddW.clear();
-    _whiteRemoveW.clear();
-    _blackAddW.clear();
-    _blackRemoveW.clear();
-	_whiteAddB.clear();
-    _whiteRemoveB.clear();
-    _blackAddB.clear();
-    _blackRemoveB.clear();
+	_whiteW.clear();
+    _blackW.clear();
+    _whiteB.clear();
+    _blackB.clear();
 }
 
 bool NNUE::load(std::string path) {
@@ -139,20 +135,18 @@ Score NNUE::eval(const Position& pos) {
 		//std::cout<<"no incremental eval"<<std::endl;
 		// TODO if we move one king calculate everything from scratch
 		// can we do it faster??
+		std::set<unsigned int> _wFeatures;
+		std::set<unsigned int> _bFeatures;
 		_wFeatures = createWhiteFeatures(pos);
 		_bFeatures = createBlackFeatures(pos);
 		whiteNoIncrementalEval = false;
 		blackNoIncrementalEval = false;
-		_whiteAddW.clear();
-		_whiteRemoveW.clear();
-		_blackAddW.clear();
-		_blackRemoveW.clear();
-		_whiteAddB.clear();
-		_whiteRemoveB.clear();
-		_blackAddB.clear();
-		_blackRemoveB.clear();
 
-		
+		_whiteW.clear();
+    	_blackW.clear();
+    	_whiteB.clear();
+    	_blackB.clear();
+
 		Score score;
 		//Score scoreW = _modelW.forwardPass(sp).get(0)* 10000.0;
 		//Score ScoreB = _modelB.forwardPass(sp).get(0)* 10000.0;
@@ -195,29 +189,22 @@ Score NNUE::eval(const Position& pos) {
 	if(pos.isWhiteTurn()) {
 		//std::cout<<"white"<<std::endl;
 		SparseInput sp(81920);
-		for(auto x: _whiteAddW) { /*std::cout<<"waddw"<<std::endl;*/sp.set(x, 1.0);}
-		for(auto x: _whiteRemoveW) { /*std::cout<<"wremw"<<std::endl;*/sp.set(x, -1.0);}
-		for(auto x: _blackAddW) { /*std::cout<<"baddw"<<std::endl;*/sp.set(x + 40960, 1.0);}
-		for(auto x: _blackRemoveW) { /*std::cout<<"bremw"<<std::endl;*/sp.set(x + 40960, -1.0);}
+		_whiteW.serialize(sp, 0);
+    	_blackW.serialize(sp, 40960);
 		//sp.print();
 		score = _modelW.incrementalPass(sp).get(0)* 10000.0;
-		_whiteAddW.clear();
-		_whiteRemoveW.clear();
-		_blackAddW.clear();
-		_blackRemoveW.clear();
+		_whiteW.clear();
+    	_blackW.clear();
 	} else {
 		//std::cout<<"black"<<std::endl;
 		SparseInput sp(81920);
-		for(auto x: _whiteAddB) { /*std::cout<<"waddb"<<std::endl;*/sp.set(x + 40960, 1.0);}
-		for(auto x: _whiteRemoveB) { /*std::cout<<"wremb"<<std::endl;*/sp.set(x + 40960, -1.0);}
-		for(auto x: _blackAddB) { /*std::cout<<"baddb"<<std::endl;*/sp.set(x, 1.0);}
-		for(auto x: _blackRemoveB) { /*std::cout<<"bremb"<<std::endl;*/sp.set(x, -1.0);}
+		_whiteB.serialize(sp, 40960);
+    	_blackB.serialize(sp, 0);
 		//sp.print();
 		score = _modelB.incrementalPass(sp).get(0)* 10000.0;
-		_whiteAddB.clear();
-		_whiteRemoveB.clear();
-		_blackAddB.clear();
-		_blackRemoveB.clear();
+		_whiteB.clear();
+    	_blackB.clear();
+
 	}
 	
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
@@ -444,61 +431,82 @@ void NNUE::removePiece(const Position& pos, bitboardIndex piece, tSquare sq) {
 	//std::cout<<"remove piece "<<piece<<" square "<<sq<<std::endl;
 	auto wf = whiteFeature(mapWhitePiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::whiteKing));
 	auto bf = blackFeature(mapBlackPiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::blackKing));
-	//std::cout<<"wf "<<wf<<std::endl;
-	//std::cout<<"bf "<<bf<<std::endl;
-	//_wFeatures.erase(wf);
-	//_bFeatures.erase(bf);
 
-	if(auto it = _whiteAddW.find(wf); it != _whiteAddW.end()) {
-		_whiteAddW.erase(it);
-	} else {
-    	_whiteRemoveW.insert(wf);
-	}
-	if(auto it = _blackAddW.find(bf); it != _blackAddW.end()) {
-		_blackAddW.erase(it);
-	} else {
-    	_blackRemoveW.insert(bf);
-	}
-
-	if(auto it = _whiteAddB.find(wf); it != _whiteAddB.end()) {
-		_whiteAddB.erase(it);
-	} else {
-    	_whiteRemoveB.insert(wf);
-	}
-	if(auto it = _blackAddB.find(bf); it != _blackAddB.end()) {
-		_blackAddB.erase(it);
-	} else {
-    	_blackRemoveB.insert(bf);
-	}
+	_whiteW.remove(wf);
+	_blackW.remove(bf);
+	_whiteB.remove(wf);
+	_blackB.remove(bf);
 }
 void NNUE::addPiece(const Position& pos, bitboardIndex piece, tSquare sq) {
 	//std::co_bFeaturesut<<"add piece "<<piece<<" square "<<sq<<std::endl;
 	auto wf = whiteFeature(mapWhitePiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::whiteKing));
 	auto bf = blackFeature(mapBlackPiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::blackKing));
-	//std::cout<<"wf "<<wf<<std::endl;
-	//std::cout<<"bf "<<bf<<std::endl;
-	//_wFeatures.insert(wf);
-	//_bFeatures.insert(bf);
+	
+	_whiteW.add(wf);
+	_blackW.add(bf);
+	_whiteB.add(wf);
+	_blackB.add(bf);
+}
 
-	if(auto it = _whiteRemoveW.find(wf); it != _whiteRemoveW.end()) {
-		_whiteRemoveW.erase(it);
-	} else {
-    	_whiteAddW.insert(wf);
-	}
-	if(auto it = _blackRemoveW.find(bf); it != _blackRemoveW.end()) {
-		_blackRemoveW.erase(it);
-	} else {
-    	_blackAddW.insert(bf);
-	}
 
-	if(auto it = _whiteRemoveB.find(wf); it != _whiteRemoveB.end()) {
-		_whiteRemoveB.erase(it);
-	} else {
-    	_whiteAddB.insert(wf);
+void DifferentialList::clear() {
+	//_add.clear();
+	//_remove.clear();
+
+	_addPos = 0;
+	_removePos = 0;
+}
+
+void DifferentialList::serialize(SparseInput& s, unsigned int offset) {
+	//for(auto x: _add) { s.set(x + offset, 1.0); }
+	//for(auto x: _remove) { s.set(x + offset, -1.0); }
+
+	for(unsigned int i = 0; i < _addPos; ++i) {
+		s.set(_addList[i] + offset, 1.0);
 	}
-	if(auto it = _blackRemoveB.find(bf); it != _blackRemoveB.end()) {
-		_blackRemoveB.erase(it);
-	} else {
-    	_blackAddB.insert(bf);
+	for(unsigned int i = 0; i < _removePos; ++i) {
+		s.set(_removeList[i] + offset, -1.0);
 	}
+}
+
+void DifferentialList::add(unsigned int f) {
+	/*if(auto it = _remove.find(f); it != _remove.end()) {
+		_remove.erase(it);
+	} else {
+    	_add.insert(f);
+	}*/
+
+	// search in remove
+	for(unsigned int i = 0; i < _removePos; ++i) {
+		if(_removeList[i] == f) {
+			// found remove it
+			for(unsigned int x = i; x < _removePos; ++x) {
+				_removeList[x] = _removeList[x+1];
+			}
+			--_removePos;
+			return;
+		}
+	}
+	_addList[_addPos++] = f;
+
+}
+void DifferentialList::remove(unsigned int f) {
+	/*if(auto it = _add.find(f); it != _add.end()) {
+		_add.erase(it);
+	} else {
+    	_remove.insert(f);
+	}*/
+
+	// search in remove
+	for(unsigned int i = 0; i < _addPos; ++i) {
+		if(_addList[i] == f) {
+			// found remove it
+			for(unsigned int x = i; x < _addPos; ++x) {
+				_addList[x] = _addList[x+1];
+			}
+			--_addPos;
+			return;
+		}
+	}
+	_removeList[_removePos++] = f;
 }
