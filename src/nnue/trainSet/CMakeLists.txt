@@ -1,10 +1,5 @@
 target_sources(libChess PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/diskInputSet.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/diskInputSet2.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/inputSet.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/labeledExample.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/memoryInputSet.cpp
-    
 )
 
 # Make sure the compiler can find include files for our libChess library

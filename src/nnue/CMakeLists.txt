@@ -7,7 +7,6 @@ target_sources(libChess PRIVATE
 target_include_directories (libChess PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(activation)
-add_subdirectory(cost)
 add_subdirectory(input)
 add_subdirectory(layer)
 add_subdirectory(model)

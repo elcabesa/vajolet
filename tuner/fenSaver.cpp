@@ -118,12 +118,11 @@ void FenSaver::writeFeatures(const Position& pos) {
 			//std::cout<<"FEATURE "<<feature<<std::endl;
 		}
 	}
-	
-	
-    for(unsigned int i =0; i < features.size(); ++i) {
-        _stream<<features[i];
-        if(i < features.size() -1) {_stream <<',';}
-    }
+	unsigned int i = 0;
+	for(auto& f: features) {
+		_stream<<f;
+		if(i++ < features.size() -1) {_stream <<',';}
+	}
     _stream <<'}';
     if(_logDecimationCnt>=1000) {
 		_logDecimationCnt = 0;

@@ -11,7 +11,6 @@ public:
     void print() const;
     
     const double& get(unsigned int index) const;
-    /*double& get(unsigned int index);*/
     void set(unsigned int index, double v); // not allowed
     
     unsigned int getElementNumber() const;

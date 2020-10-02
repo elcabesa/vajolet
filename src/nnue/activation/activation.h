@@ -12,7 +12,6 @@ public:
     virtual ~Activation();
     
     virtual double propagate(double input) const = 0;
-    virtual double derivate(double input) const = 0;
     virtual const std::string getType() const = 0;
 };
 

@@ -5,12 +5,12 @@
 SparseInput::SparseInput(const unsigned int size):Input(size) {
 }
 
-SparseInput::SparseInput(unsigned int size, const std::map<unsigned int, double> v):Input(size), _in(v) {
+SparseInput::SparseInput(unsigned int size, const std::map<unsigned int, double>& v):Input(size), _in(v) {
     using pair_type = decltype(_in)::value_type;
     assert( std::max_element(std::begin(_in), std::end(_in),[] (const pair_type & p1, const pair_type & p2) { return p1.first < p2.first;})->first < size);
 }
 
-SparseInput::SparseInput(const std::vector<double> v):Input(v.size()) {
+SparseInput::SparseInput(const std::vector<double>& v):Input(v.size()) {
     unsigned int index = 0;
     for(auto& val: v) {
         assert(index < _size);
@@ -18,7 +18,7 @@ SparseInput::SparseInput(const std::vector<double> v):Input(v.size()) {
     }
 }
 
-SparseInput::SparseInput(unsigned int size, const std::vector<unsigned int> v):Input(size) {
+SparseInput::SparseInput(unsigned int size, const std::vector<unsigned int>& v):Input(size) {
     for(auto& val: v) {
         assert(val < _size);
         _in.insert(std::pair<unsigned int, double>(val, 1.0));
@@ -33,14 +33,6 @@ void SparseInput::print() const {
     }
     std::cout<<std::endl;
 }
-
-/*double& SparseInput::get(unsigned int index) {
-    auto it = _in.find(index);
-    if (it != _in.end()) {
-        return it->second;
-    }
-    return _zeroInput;
-}*/
 
 void SparseInput::set(unsigned int index, double v) {
     assert(index < _size);

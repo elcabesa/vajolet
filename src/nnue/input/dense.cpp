@@ -18,10 +18,6 @@ void DenseInput::print() const {
     std::cout<<std::endl;
 }
 
-/*double& DenseInput::get(unsigned int index) {
-    assert(index <_size);
-    return _in[index];
-}*/
 void DenseInput::set(unsigned int index, double v) {
     assert(index < _size);
     _in[index] = v;

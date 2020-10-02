@@ -15,7 +15,6 @@ public:
     virtual void print() const = 0;
     
     virtual const double& get(unsigned int index) const = 0;
-    /*virtual double& get(unsigned int index) = 0;*/
     virtual void set(unsigned int index, double v) = 0;
     
     virtual unsigned int getElementNumber() const = 0;

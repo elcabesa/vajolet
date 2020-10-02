@@ -311,6 +311,7 @@ int main(int argc, char ** argv) {
     my_thread thr;
     thr.setMute(true);
 	thr.getTT().setSize(64);
+    thr.setNnue(true, "nnue.par");
 
     Position pos(nullptr, Position::pawnHash::off);
 

@@ -22,11 +22,6 @@ void ParalledSparseInput::print() const {
     std::cout<<std::endl;
 }
 
-/*double& ParalledSparseInput::get(unsigned int index) {
-    unsigned int newIndex = index + _number * _size;
-    return _si.get(newIndex);
-}*/
-
 const double& ParalledSparseInput::get(unsigned int index) const {
     assert(index < _size);
     unsigned int newIndex = index + _number * _size;
@@ -35,7 +30,6 @@ const double& ParalledSparseInput::get(unsigned int index) const {
 
 void ParalledSparseInput::set(unsigned int, double) {
     assert(false);
-    //_si.set(index + _number * _size, v);
 }
 
 unsigned int ParalledSparseInput::getElementNumber() const {
@@ -55,7 +49,7 @@ unsigned int ParalledSparseInput::getElementNumber() const {
 }
 
 const std::pair<unsigned int, double> ParalledSparseInput::getElementFromIndex(unsigned int index) const {
-    assert(index < getElementNumber());
+    assert(index < getElementNumber());    
     return _elements[index];
 }
 

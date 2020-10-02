@@ -9,7 +9,6 @@ public:
     ~linearActivation();
     
     double propagate(double input) const;
-    double derivate(double input) const;
     const std::string getType() const;
 }; 
 

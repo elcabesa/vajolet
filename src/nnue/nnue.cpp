@@ -24,6 +24,10 @@
 #include "relu.h"
 #include "sparse.h"
 
+//TODO multithreaded code, a single set of weights and bias shall stored outside the model
+//TODO move all the math in fixed point?
+//TODO incrememental update of NN
+//TODO have 2 neural network one for white end one for black. it souhld be faster updating them
 
 NNUE::NNUE(): _loaded{false} {}
 
