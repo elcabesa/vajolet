@@ -116,6 +116,9 @@ private:
     FeatureList _completeWhiteFeatureList;
     FeatureList _completeBlackFeatureList;
     FeatureList _completeFeatureList;
+
+    //unsigned int incrementalCount = 0;
+    //unsigned int completeCount = 0;
 };
 
 

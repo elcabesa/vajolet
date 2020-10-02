@@ -128,10 +128,12 @@ void NNUE::clear() {
 }
 
 Score NNUE::eval(const Position& pos) {
+	//std::cout<<"inc: "<<incrementalCount<< " complete: "<<completeCount<<std::endl;
     Score lowSat = -SCORE_INFINITE;
     Score highSat = SCORE_INFINITE;
 	
 	if (whiteNoIncrementalEval || blackNoIncrementalEval) {
+		++completeCount;
 		//std::cout<<"no incremental eval"<<std::endl;
 		// TODO if we move one king calculate everything from scratch
 		// can we do it faster??
@@ -198,6 +200,8 @@ Score NNUE::eval(const Position& pos) {
     	return score;
 	}
 
+	
+	++incrementalCount;
 
 	//auto f2 = concatenateFeature(pos.isWhiteTurn(), _wFeatures, _bFeatures);
 	//SparseInput sp(81920, std::vector<unsigned int>(f2.begin(), f2.end()));
