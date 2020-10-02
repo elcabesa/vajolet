@@ -45,23 +45,25 @@ UciManager::impl::impl(): _pos(nullptr, Position::pawnHash::off)
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
 	
-	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, this, &UciManager::impl::setTTSize, 1, 1, 262144));
+	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, this, &UciManager::impl::_setTTSize, 1, 1, 262144));
 	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, this, nullptr, 1, 1, 256));
 	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, this, nullptr, 1, 1, 500));
-	_optionList.emplace_back( new CheckUciOption("Ponder", uciParameters::Ponder, true));
-	_optionList.emplace_back( new CheckUciOption("OwnBook", uciParameters::useOwnBook, true));
-	_optionList.emplace_back( new CheckUciOption("BestMoveBook", uciParameters::bestMoveBook, false));
+	_optionList.emplace_back( new CheckUciOption("Ponder", uciParameters::Ponder, this, nullptr, true));
+	_optionList.emplace_back( new CheckUciOption("OwnBook", uciParameters::useOwnBook, this, nullptr, true));
+	_optionList.emplace_back( new CheckUciOption("BestMoveBook", uciParameters::bestMoveBook, this, nullptr, false));
 	_optionList.emplace_back( new StringUciOption("UCI_EngineAbout", unusedVersion, this, nullptr, _getProgramNameAndVersion() + " by Marco Belli (build date: " + __DATE__ + " " + __TIME__ + ")"));
-	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", uciParameters::showCurrentLine, false));
-	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath, this, &UciManager::impl::setTTPath, "<empty>"));
+	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", uciParameters::showCurrentLine, this, nullptr, false));
+	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath, this, &UciManager::impl::_setSyzygyPath, "<empty>"));
 	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, this, nullptr, 1, 1, 100));
-	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, true));
-	_optionList.emplace_back( new ButtonUciOption("ClearHash", this, &UciManager::impl::clearHash));
-	_optionList.emplace_back( new CheckUciOption("PerftUseHash", uciParameters::perftUseHash, false));
-	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciOutput::reduceVerbosity, false));
-	_optionList.emplace_back( new CheckUciOption("UCI_Chess960", uciParameters::Chess960, false));
-	_optionList.emplace_back( new CheckUciOption("UCI_LimitStrength", uciParameters::limitStrength, false));
+	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, this, nullptr, true));
+	_optionList.emplace_back( new ButtonUciOption("ClearHash", this, &UciManager::impl::_clearHash));
+	_optionList.emplace_back( new CheckUciOption("PerftUseHash", uciParameters::perftUseHash, this, nullptr, false));
+	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciOutput::reduceVerbosity, this, nullptr, false));
+	_optionList.emplace_back( new CheckUciOption("UCI_Chess960", uciParameters::Chess960, this, nullptr, false));
+	_optionList.emplace_back( new CheckUciOption("UCI_LimitStrength", uciParameters::limitStrength, this, nullptr, false));
 	_optionList.emplace_back( new SpinUciOption("Skill Level", uciParameters::engineLevel, this, nullptr, 20, 1, 20));
+	_optionList.emplace_back( new CheckUciOption("Use NNUE", uciParameters::useNnue, this, &UciManager::impl::_useNnue, false)); // TODO ADD callback
+	_optionList.emplace_back( new StringUciOption("EvalFile", uciParameters::nnueFile, this, &UciManager::impl::_setNnueFile, "<empty>")); // TODO add callback
 	
 	_pos.setupFromFen(_StartFEN);
 }
@@ -72,13 +74,21 @@ UciManager::impl::~impl()
 //---------------------------------------------
 //	function implementation
 //---------------------------------------------
-void UciManager::impl::setTTSize(unsigned int size)
+void UciManager::impl::_useNnue(bool) {
+	thr.setNnue(uciParameters::useNnue, uciParameters::nnueFile);
+}
+
+void UciManager::impl::_setNnueFile(std::string) {
+	thr.setNnue(uciParameters::useNnue, uciParameters::nnueFile);
+}
+
+void UciManager::impl::_setTTSize(unsigned int size)
 {
 	uint64_t elements = thr.getTT().setSize(size);
 	sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
 }
-void UciManager::impl::clearHash() {thr.getTT().clear();}
-void UciManager::impl::setTTPath( std::string s ) {
+void UciManager::impl::_clearHash() {thr.getTT().clear();}
+void UciManager::impl::_setSyzygyPath( std::string s ) {
 	auto&  szg = Syzygy::getInstance();
 	szg.setPath(s);
 	sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;

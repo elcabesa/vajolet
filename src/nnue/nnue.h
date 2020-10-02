@@ -29,7 +29,8 @@ class Position;
 class NNUE {
 public:
     NNUE();
-    void init();
+    bool init(std::string path);
+    void clear();
     Score eval(const Position& pos);
     bool loaded() const;
     static std::vector<unsigned int> createFeatures(const Position& pos);

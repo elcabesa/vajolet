@@ -46,6 +46,7 @@ public :
 	void ponderHit();
 	timeManagement& getTimeMan();
 	void setMute(bool mute);
+	bool setNnue(bool use, std::string path);
 	SearchParameters& getSearchParameters();
 	const SearchResult& synchronousSearch(const Position& p, SearchLimits& l);
 	bool isSearchRunning() const;

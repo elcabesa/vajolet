@@ -27,7 +27,7 @@
 
 NNUE::NNUE(): _loaded{false} {}
 
-void NNUE::init() {
+bool NNUE::init(std::string path) {
     
     std::cout<<"creating NNUE model"<<std::endl;
     _model.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, ActivationFactory::create(ActivationFactory::type::linear)));
@@ -37,20 +37,29 @@ void NNUE::init() {
     std::cout<<"done"<<std::endl;
     
     std::cout<<"reload NNUE parameters"<<std::endl;
-    {
-        std::cout<<"deserialize"<<std::endl;
-        std::ifstream nnFile;
-        nnFile.open ("nnue.par");
-        if(_model.deserialize(nnFile)){
-            _loaded = true;
-             std::cout<<"done"<<std::endl;
-        }else {
-             std::cout<<"FAIL"<<std::endl;
-        }
-        nnFile.close();
-    }
-    std::cout<<"done"<<std::endl;
     
+	std::cout<<"deserialize"<<std::endl;
+	std::ifstream nnFile;
+	nnFile.open(path);
+	if(nnFile.is_open()) {
+		if(_model.deserialize(nnFile)){
+			_loaded = true;
+			std::cout<<"done"<<std::endl;
+			return true;
+		}else {
+			std::cout<<"FAIL"<<std::endl;
+			return false;
+		}
+		nnFile.close();
+	} else {
+		std::cout<<"error deserializing NNUE file";
+		return false;
+	}
+}
+
+void NNUE::clear() {
+	_loaded = false;
+	_model.clear();
 }
 
 Score NNUE::eval(const Position& pos) {

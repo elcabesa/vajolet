@@ -45,9 +45,11 @@ private:
 		\date 27/10/2013
 	*/
 	
-	void setTTSize(unsigned int size);
-	void clearHash();
-	void setTTPath( std::string s );
+	void _setTTSize(unsigned int size);
+	void _clearHash();
+	void _setSyzygyPath(std::string s);
+	void _useNnue(bool use);
+	void _setNnueFile(std::string s);
 	std::string unusedVersion;
 	unsigned int unusedSize;
 	

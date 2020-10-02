@@ -174,9 +174,24 @@ void ParallelDenseLayer::serialize(std::ofstream& ss) const{
 bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
     //std::cout<<"DESERIALIZE PARALLEL DENSE LAYER"<<std::endl;
     if(ss.get() != '{') {std::cout<<"ParallelDenseLayer missing {"<<std::endl;return false;}
+    
+    unsigned int n = 0;
     for(auto& l :_parallelLayers) {
         if(!l.deserialize(ss)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
+        
+        // todo this code is duplicated with the code of randomize params
+        auto & b = l.bias();
+        for(unsigned int o = 0; o < _layerOutputSize; ++o) {
+            _bias[_calcBiasIndex(n, o)] = b[o];
+        }
+        
+        auto & w = l.weight();
+        for(unsigned int wi = 0; wi < _layerWeightNumber; ++wi) {
+            _weight[_calcWeightIndex(n, wi)] = w[wi];
+        }
+        ++n;
     }
+    
     if(ss.get() != '}') {std::cout<<"ParallelDenseLayer missing }"<<std::endl;return false;}
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     return true;

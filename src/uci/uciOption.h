@@ -65,12 +65,14 @@ private:
 class CheckUciOption final: public UciOption
 {
 public:
-	CheckUciOption( const std::string& name, bool& value, const bool defVal);
+	CheckUciOption( const std::string& name, bool& value, UciManager::impl* uci, void (UciManager::impl::*callbackFunc)(bool), const bool defVal);
 	std::string print() const override;
 	bool setValue( const std::string& s, bool verbose = true) override;
 private:
 	const bool _defaultValue;
 	bool& _value;
+	void (UciManager::impl::*_callbackFunc)(bool);
+	UciManager::impl* _uci;
 };
 
 class ButtonUciOption final: public UciOption

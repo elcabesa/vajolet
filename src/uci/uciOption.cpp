@@ -118,7 +118,12 @@ bool SpinUciOption::setValue( const std::string& s, bool verbose)
 CheckUciOption
 **********************************************************/
 
-CheckUciOption::CheckUciOption( const std::string& name, bool& value, const bool defVal):UciOption(name),_defaultValue(defVal), _value(value)
+CheckUciOption::CheckUciOption( const std::string& name, bool& value, UciManager::impl* uci, void (UciManager::impl::*callbackFunc)(bool), const bool defVal):
+	UciOption(name),
+	_defaultValue(defVal),
+	_value(value),
+	_callbackFunc(callbackFunc),
+	_uci(uci)
 {
 	setValue( _defaultValue ? "true" : "false", false );
 }
@@ -153,6 +158,10 @@ bool CheckUciOption::setValue( const std::string& s, bool verbose)
 	{
 		sync_cout<<"info string error setting "<<_name<<sync_endl;
 		return false;
+	}
+	if( _callbackFunc )
+	{
+		(_uci->*_callbackFunc)(_value);
 	}
 	return true;
 }

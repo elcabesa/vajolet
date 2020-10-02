@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <numeric>
 
 #include "activation.h"
 #include "labeledExample.h"
@@ -40,14 +41,16 @@ const Input& Model::forwardPass(const Input& input, bool verbose /* = false */) 
     return *in;
 }
 
-double Model::calcLoss(const LabeledExample& le) {
+double Model::calcLoss(const LabeledExample& le, bool verbose) {
     auto& out = forwardPass(le.features());
-    return cost.calc(out.get(0), le.label());
+    auto c = cost.calc(out.get(0), le.label());
+    if (verbose) { std::cerr<< out.get(0) <<","<<le.label()<<","<<c<<std::endl;}
+    return c;
 }
 
-double Model::calcAvgLoss(const std::vector<std::shared_ptr<LabeledExample>>& input) {
+double Model::calcAvgLoss(const std::vector<std::shared_ptr<LabeledExample>>& input, bool verbose) {
     double error = 0.0;
-    for(auto& le: input) {error += calcLoss(*le);}
+    for(auto& le: input) {error += calcLoss(*le, verbose);}
     return error / input.size();
 }
 
@@ -123,4 +126,38 @@ Layer& Model::getLayer(unsigned int index) {
 }
 unsigned int Model::getLayerCount() {
     return _layers.size();
+}
+
+void Model::printParamsStats() {
+    std::cout<<"layer count = " << _layers.size()<<std::endl;
+    std::cout<<"---------------------------------"<<std::endl;
+    for(auto &l: _layers) {
+        std::cout<<(*l).getInputSize() <<" x "<<(*l).getOutputSize()<<std::endl;
+    }
+    std::cout<<"---------------------------------"<<std::endl;
+    for(auto &l: _layers) {
+        std::cout<<"biases: "<<(*l).bias().size() <<" weight: "<<(*l).weight().size() <<std::endl;
+    }
+    std::cout<<"---------------------------------"<<std::endl;
+    unsigned int count = 0;
+    for(auto &l: _layers) {
+        std::cout<<"LAYER "<<(++count)<<std::endl;
+        double biasAvg = std::accumulate( (*l).bias().begin(), (*l).bias().end(), 0.0) / (*l).bias().size(); 
+        std::cout<<"bias avg "<< biasAvg<<std::endl;
+        double biasMin = *std::min_element( (*l).bias().begin(), (*l).bias().end()); 
+        std::cout<<"bias min "<< biasMin<<std::endl;
+        double biasMax = *std::max_element( (*l).bias().begin(), (*l).bias().end()); 
+        std::cout<<"bias max "<< biasMax<<std::endl;
+        
+        double weightAvg = std::accumulate( (*l).weight().begin(), (*l).weight().end(), 0.0) / (*l).weight().size(); 
+        std::cout<<"weight avg "<< weightAvg<<std::endl;
+        double weightMin = *std::min_element( (*l).weight().begin(), (*l).weight().end()); 
+        std::cout<<"weight min "<< weightMin<<std::endl;
+        double weightMax = *std::max_element( (*l).weight().begin(), (*l).weight().end()); 
+        std::cout<<"weight max "<< weightMax<<std::endl;
+    }
+}
+
+void Model::clear() {
+    _layers.clear();
 }
