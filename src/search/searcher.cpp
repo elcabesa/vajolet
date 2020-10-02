@@ -70,7 +70,6 @@ void Searcher::searchManager(std::vector<rootMove>& temporaryResults, unsigned i
     _cleanMemoryBeforeStartingNewSearch();
 	_idLoop(temporaryResults, index, toBeExcludedMove, 1, -SCORE_INFINITE, SCORE_INFINITE,  index == 0);
 	_finished = true;
-	_father._waitStopCV.notify_one();	
 }
 
 void Searcher::_cleanMemoryBeforeStartingNewSearch()

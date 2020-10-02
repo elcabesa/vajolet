@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#include <thread>
 
 #include "book.h"
 #include "vajo_io.h"
@@ -184,51 +185,6 @@ void Search::impl::_filterRootMovesByTablebase()
 	}
 }
 
-/*
-void Search::impl::searchManager(Search::impl& base, timeManagement& tm,std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread)
-{
-	if(masterThread)
-	{
-		sync_cout<<"MASTER START"<<sync_endl;
-		while(!_stop)
-		{
-			std::this_thread::sleep_for(std::chrono::seconds(10));
-			std::cout<<"------------------------------------"<<std::endl;
-			int i = 0;
-			for(auto & res: temporaryResults)
-			{
-				std::cout<<UciOutput::displayUci(res.firstMove, false)<<" depth:"<<res.depth<<" score:"<<res.score<<" "<<UciOutput::displayUci(toBeExcludedMove[i], false)<<std::endl;
-				++i;
-			}
-			std::cout<<"------------------------------------"<<std::endl;
-			struct d{ int count; int sum;};
-			std::map<unsigned short, d> data;
-			for(auto & res: temporaryResults)
-			{
-				data[res.firstMove.getPacked()] = {0,0};
-			}
-			for(auto & res: temporaryResults)
-			{
-				++(data[res.firstMove.getPacked()].count);
-				data[res.firstMove.getPacked()].sum += res.score;
-			}
-			for(auto & res: data)
-			{
-				std::cout<<UciOutput::displayUci(Move(res.first), false)<<" "<<static_cast<double>(res.second.sum)/res.second.count<<std::endl;	
-			}
-			
-		}
-		sync_cout<<"MASTER STOP"<<sync_endl;
-	}
-	else
-	{	
-		idLoop(tm, temporaryResults, index, toBeExcludedMove, 1, -SCORE_INFINITE, SCORE_INFINITE,  index == 0);
-		finished = true;
-		base._waitStopCV.notify_one();
-	}
-	
-}*/
-
 
 SearchResult Search::impl::_go(timeManagement& tm, /*int depth,*/ Score alpha, Score beta, PVline pvToBeFollowed)
 {
@@ -288,27 +244,24 @@ SearchResult Search::impl::_go(timeManagement& tm, /*int depth,*/ Score alpha, S
 	std::vector<Move> toBeExcludedMove( uciParameters::threads, Move::NOMOVE);
 
 	// launch helper threads
+	//----------------------------------
+	// iterative deepening loop
+	//----------------------------------
 	for( unsigned int i = 0; i < ( uciParameters::threads); ++i)
 	{
 		helperResults[i].firstMove = m;
 		helperThread.emplace_back( std::thread(&Searcher::searchManager, &_searchers[i], std::ref(helperResults), i, std::ref(toBeExcludedMove)));
 	}
-
-	//----------------------------------
-	// iterative deepening loop
-	//----------------------------------
-	//searchManager(this, tm, helperResults, 0, toBeExcludedMove, true);
-	std::unique_lock<std::mutex> lck(_waitStopMutex);
-	_waitStopCV.wait(lck, [&]{ return _stop || _searchers[0].isFinished();});
-  	
+  	helperThread[0].join();
 	// _stop helper threads
 	for(auto &s : _searchers)
 	{
 		s.stopSearch();
 	}
-	for(auto &t : helperThread)
+
+	for( unsigned int i = 1; i < ( uciParameters::threads); ++i)
 	{
-		t.join();
+		helperThread[i].join();
 	}
 	//----------------------------------
 	// gather results
@@ -487,8 +440,6 @@ SearchResult Search::impl::manageNewSearch(timeManagement & tm)
 Search::Search( SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI):pimpl{std::make_unique<impl>(st, sl, tt, std::move(UOI))}{}
 Search::~Search() = default;
 void Search::stopSearch(){ pimpl->stopSearch(); }
-
-void Search::resetStopCondition(){ pimpl->resetStopCondition(); }
 unsigned long long Search::getVisitedNodes() const{ return pimpl->getVisitedNodes(); }
 unsigned long long Search::getTbHits() const{ return pimpl->getTbHits(); }
 void Search::showLine(){ pimpl->showLine(); }

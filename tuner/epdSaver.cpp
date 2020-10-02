@@ -14,36 +14,28 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef SELFPLAY_H_
-#define SELFPLAY_H_
 
-#include <string>
-#include "clock.h"
+#include "epdSaver.h"
 #include "position.h"
-#include "searchLimits.h"
+#include "searchResult.h"
+#include "timeManagement.h"
+#include "transposition.h"
 
-namespace pgn { class Game;}
-class Book;
-class Player;
-class EpdSaver;
 
-class SelfPlay {
-	
-public:
-	SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs = nullptr);
-	pgn::Game playGame(unsigned int round);
-private:	
-	bool _isGameFinished(Score res);
-	std::string _getGameResult(Score res);
-	void _addGameTags(pgn::Game& g, int round);
-	void _addGameResult(pgn::Game& g, const std::string & s);
-	Position _p;
-	Clock _c;
-	SearchLimits _sl;
-	Player& _white;
-	Player& _black;
-	Book& _book;
-	EpdSaver * const _fs;
-};
+EpdSaver::EpdSaver(unsigned int decimation, unsigned int n): _decimation(decimation){
+	_stream.open("fen"+ std::to_string(n) + ".epd");
+}
 
-#endif /* SELFPLAY_H_ */
+
+void EpdSaver::save(const Position& pos) {
+	if (++_counter >= _decimation) {
+		_counter = 0;
+		++_logDecimationCnt;
+		++_saved;
+		if(_logDecimationCnt>=10000) {
+				std::cout << "saved " << _saved << " FENs" <<std::endl;
+				_logDecimationCnt = 0;
+		}
+		_stream << pos.getFen()<< std::endl;		
+	}
+}

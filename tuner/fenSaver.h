@@ -31,7 +31,7 @@ class Position;
 class FenSaver {
 	
 public:
-	FenSaver(unsigned int decimation);
+	FenSaver(unsigned int decimation, unsigned int n);
 	void save(const Position& pos);
 
 private:	
@@ -49,6 +49,8 @@ private:
 	void writeRes(Score res);
     
     std::set<unsigned int> featuresIndex;
+	unsigned int _n;
+	double _totalError = 0.0;
 };
 
 #endif /* SELFPLAY_H_ */

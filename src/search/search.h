@@ -51,7 +51,6 @@ public:
 	Search& operator=(Search&&) = delete;
 
 	void stopSearch();
-	void resetStopCondition();
 
 	unsigned long long getVisitedNodes() const;
 	unsigned long long getTbHits() const;

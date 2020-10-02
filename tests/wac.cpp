@@ -298,9 +298,12 @@ void doTest(const std::string& testName, my_thread& thr, Position& pos, SearchLi
     std::cout<<testName<<": "<<res.getPercentual()<<"% ("<<res.getPartial()<<"/"<<res.getTotal()<<")"<<std::endl;
 }
 
-int main(int , char **) {
-
-    const unsigned int time = 100;
+int main(int argc, char ** argv) {
+    unsigned int time = 100;
+    if( argc == 2) {
+        time = atoi(argv[1]);
+    }
+    
     std::cout<<"time for each position: "<<time<<" ms"<<std::endl;
 	
     libChessInit();

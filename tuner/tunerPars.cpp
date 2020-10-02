@@ -19,7 +19,11 @@
 
 int TunerParameters::parallelGames = 22;
 int TunerParameters::gameNumber = 20;
+unsigned int TunerParameters::randomMoveEveryXPly = 10;
 	
 float TunerParameters::gameTime = 10;
 float TunerParameters::gameTimeIncrement = 0.1;
+
+unsigned int TunerParameters::minDepth = 4;
+unsigned int TunerParameters::MaxDepth = 6;
 

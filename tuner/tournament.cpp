@@ -53,10 +53,11 @@ private:
 	int _unknown = 0;
 };
 
-Tournament::Tournament(const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2, Book& b, FenSaver * const fs,  bool verbose): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2), _book(b), _fs(fs),_verbose(verbose) {
+Tournament::Tournament(const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2, Book& b, EpdSaver * const fs,  bool verbose): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2), _book(b), _fs(fs),_verbose(verbose) {
 }
 
 TournamentResult Tournament::play() {
+	unsigned int logDecimation = 0;
 	std::ofstream myfile;
 	myfile.open (_debugName);
 	myfile<<"start tournament ("<< TunerParameters::gameNumber << " games)" << std::endl;
@@ -84,7 +85,11 @@ TournamentResult Tournament::play() {
 		myfile<< _p1.print()<<" ";
 		myfile<< stats.print()<<" ";
 		myfile<<std::endl;
-		if (_verbose) { std::cout << "game " << round << std::endl;}
+		if (_verbose) { 
+			if( ++logDecimation >= 100) {
+				logDecimation = 0;
+				std::cout << "game " << round << std::endl;}
+			}
 		
 		_saveGamePgn(g);
 	}

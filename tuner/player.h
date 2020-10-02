@@ -20,7 +20,11 @@
 #include <string>
 #include "parameters.h"
 #include "searchResult.h"
-#include "thread.h"
+//#include "thread.h"
+#include "searchLimits.h"
+#include "searchTimer.h"
+#include "search.h"
+#include "transposition.h"
 
 class Position;
 
@@ -46,7 +50,11 @@ private:
 	int _draw = 0;
 	int _unknown = 0;
 	std::string _name;
-	my_thread _thr;
+	SearchLimits _sl;
+	SearchTimer _st;
+	transpositionTable _tt;
+	Search _src;
+	//my_thread _thr;
 };
 
 #endif /* PLAYER_H_ */

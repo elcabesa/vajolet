@@ -4,6 +4,7 @@ add_executable(Vajolet_tuner
 	book.cpp
 	clock.cpp
 	elo.cpp
+	epdSaver.cpp
 	fenSaver.cpp
 	player.cpp
 	selfplay.cpp
@@ -18,6 +19,7 @@ add_executable(Vajolet_genFen
 	book.cpp
 	clock.cpp
 	elo.cpp
+	epdSaver.cpp
 	fenSaver.cpp
 	genFen.cpp
 	player.cpp

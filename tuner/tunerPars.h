@@ -22,9 +22,13 @@ class TunerParameters {
 public:
 	static int parallelGames;
 	static int gameNumber;
+    static unsigned int randomMoveEveryXPly;
 	
 	static float gameTime;
 	static float gameTimeIncrement;
+
+    static unsigned int minDepth;
+    static unsigned int MaxDepth;
 };
 
 #endif

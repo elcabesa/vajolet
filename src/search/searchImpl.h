@@ -17,10 +17,6 @@
 #ifndef SEARCH_IMPL_H_
 #define SEARCH_IMPL_H_
 
-#include <condition_variable>
-#include <mutex>
-#include <thread>
-
 #include "game.h"
 #include "searchLogger.h"
 #include "multiPVmanager.h"
@@ -52,14 +48,10 @@ public:
 	impl& operator=(const impl& other) = delete;
 
 	void stopSearch() {
-		std::unique_lock<std::mutex> lck(_waitStopMutex);
-		_stop = true;
-		_waitStopCV.notify_one();
-	}
-	void resetStopCondition() {
-		std::unique_lock<std::mutex> lck(_waitStopMutex);
-		_stop = false;
-		_waitStopCV.notify_one();
+		for(auto &s : _searchers)
+		{
+			s.stopSearch();
+		}
 	}
 
 	unsigned long long getVisitedNodes() const;
@@ -69,11 +61,6 @@ public:
 	Position& getPosition();
 	void setUOI( UciOutput::type UOI ); // todo remove??
 	SearchParameters& getSearchParameters() {return _sp;};
-
-    //--------------------------------------------------------
-	// public members
-	//--------------------------------------------------------
-    std::condition_variable _waitStopCV;
 
 private:
 	std::vector<Searcher> _searchers;
@@ -90,12 +77,8 @@ private:
 	SearchTimer& _st;
 	transpositionTable& _tt;
 	Game _game;
-	volatile bool _stop = false;
 	SearchParameters _sp;
     rootMovesToBeSearched _rootMovesToBeSearched;
-
-	std::mutex _waitStopMutex;
-
 	//--------------------------------------------------------
 	// private methods
 	//--------------------------------------------------------

@@ -16,18 +16,26 @@
 */
 
 #include <cmath>
+#include <iostream>
+#include <random>
 #include <string>
 
 #include "elo.h"
 #include "position.h"
 #include "player.h"
+#include <search.h>
 #include "transposition.h"
+#include "searchResult.h"
+#include "timeManagement.h"
+#include "tunerPars.h"
 
 
-Player::Player(std::string name): _name(name)
+Player::Player(std::string name): _name(name),_src(_st, _sl, _tt, UciOutput::create(UciOutput::type::mute))
 {
-	_thr.setMute(true);
-	_thr.getTT().setSize(64);
+	//_thr.setMute(true);
+	//_thr.getTT().setSize(64);
+	_sl.setDepth(4);
+	_tt.setSize(64);
 }
 
 const SearchParameters& Player::getSearchParametersConst() const { return _sp; }
@@ -71,10 +79,18 @@ double Player::pointRatio() const {
 	return 	Elo(_win, _lost, _draw).pointRatio();
 }
 
-SearchResult Player::doSearch(const Position& p, SearchLimits& sl)
+SearchResult Player::doSearch(const Position& p, SearchLimits&)
 {
+	/*
 	_thr.getSearchParameters() = getSearchParametersConst();
 	Position pos(nullptr, Position::pawnHash::off, _ep);
 	pos.setupFromFen(p.getFen());
-	return _thr.synchronousSearch(pos, sl);
+	return _thr.synchronousSearch(pos, sl);*/
+	std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+	std::uniform_int_distribution<> distrib(TunerParameters::minDepth, TunerParameters::MaxDepth);
+	_src.getPosition() = p;
+	int depth = distrib(gen);
+	_sl.setDepth(depth);
+	return _src.manageNewSearch(*timeManagement::create(_sl, p.getNextTurn()));
 }
