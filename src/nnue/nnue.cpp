@@ -22,6 +22,8 @@
 #include "position.h"
 #include "sparse.h"
 
+//TODO search multi thread... preallocate worker and use them, otherwise we call NNUE ctor for every search
+//TODO movegen  calc & update feature only if nn is used
 //TODO split init and load.... all position shall contain a NNUE? or one NNUE for each search.... command will call static load?
 //TODO move all the math in fixed point?
 //TODO incrememental update of NN
@@ -42,7 +44,7 @@ std::vector<double> NNUE::weight3;
 bool NNUE::_loaded = false;
 
 NNUE::NNUE() {
-	std::cout<<"creating NNUE model"<<std::endl;
+	//std::cout<<"creating NNUE model"<<std::endl;
 	_model.clear();
 	
 	bias00.resize(256, 0.0);
@@ -67,7 +69,7 @@ NNUE::NNUE() {
     _model.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
     _model.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
     _model.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
-    std::cout<<"done"<<std::endl;
+    //std::cout<<"done"<<std::endl;
 }
 
 bool NNUE::load(std::string path) {
@@ -229,7 +231,7 @@ std::set<unsigned int> NNUE::createWhiteFeatures(const Position& pos){
 	return features;
 }
 
-bool NNUE::loaded() const {
+bool NNUE::loaded() {
     return _loaded;
 }
 

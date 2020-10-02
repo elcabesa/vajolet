@@ -34,7 +34,7 @@ public:
     bool load(std::string path);
     void clear();
     Score eval(const Position& pos);
-    bool loaded() const;
+    static bool loaded();
     static std::set<unsigned int> createFeatures(const Position& pos);
     static std::set<unsigned int> createWhiteFeatures(const Position& pos);
     static std::set<unsigned int> createBlackFeatures(const Position& pos);
