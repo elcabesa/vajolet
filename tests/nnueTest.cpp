@@ -47,8 +47,13 @@ TEST(NNUE, calcBlackFeature)
 }
 
 TEST(NNUE, EquivalentFeature) {
-     ASSERT_EQ(
+    ASSERT_EQ(
          NNUE::calcWhiteFeature(true, 1, tSquare::A7, tSquare::E4),
+         NNUE::calcBlackFeature(true, 1, tSquare::A2, tSquare::E5)
+    );
+
+    ASSERT_EQ(
+         NNUE::calcWhiteFeature(false, 1, tSquare::A7, tSquare::E4),
          NNUE::calcBlackFeature(false, 1, tSquare::A2, tSquare::E5)
     );
 }
