@@ -1,16 +1,14 @@
 #ifndef _SPARSE_H
 #define _SPARSE_H
 
-#include <map>
+#include <utility>
+#include <vector>
 
 #include "input.h"
 
 class SparseInput: public Input {
 public:
-    
-    SparseInput(unsigned int size, const std::map<unsigned int, double>& v);
-    SparseInput(const std::vector<double>& v);
-    SparseInput(unsigned int size, const std::vector<unsigned int>& v);
+
     SparseInput(const unsigned int size);
     ~SparseInput();
 
@@ -23,7 +21,7 @@ public:
 private:
     //TODO manage 
     double _zeroInput = 0.0;
-    std::map<unsigned int, double> _in;
+    std::vector<std::pair<unsigned int, double>> _in;
 };
 
 #endif   
