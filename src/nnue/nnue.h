@@ -40,8 +40,8 @@ public:
 private:
     // TODO minimize size
     // TODO save max element stored
-    std::array<unsigned int, 50> _addList;
-    std::array<unsigned int, 50> _removeList;
+    std::array<unsigned int, 500> _addList;
+    std::array<unsigned int, 500> _removeList;
     unsigned int _addPos = 0;
     unsigned int _removePos = 0;
 
@@ -50,7 +50,6 @@ private:
 class FeatureList {
 public:
     void clear();
-    //void serialize(SparseInput& s, unsigned int offset);
     void add(unsigned int f);
     unsigned int get(unsigned int index);
     unsigned int size();
@@ -119,6 +118,10 @@ private:
 
     //unsigned int incrementalCount = 0;
     //unsigned int completeCount = 0;
+    //unsigned int incrementalMaxSize = 0;
+
+    Score _completeEval(const Position& pos);
+    Score _incrementalEval(const Position& pos);
 };
 
 

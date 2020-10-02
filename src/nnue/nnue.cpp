@@ -129,119 +129,14 @@ void NNUE::clear() {
 
 Score NNUE::eval(const Position& pos) {
 	//std::cout<<"inc: "<<incrementalCount<< " complete: "<<completeCount<<std::endl;
-    Score lowSat = -SCORE_INFINITE;
-    Score highSat = SCORE_INFINITE;
 	
 	if (whiteNoIncrementalEval || blackNoIncrementalEval) {
-		++completeCount;
-		//std::cout<<"no incremental eval"<<std::endl;
-		// TODO if we move one king calculate everything from scratch
-		// can we do it faster??
-		_completeWhiteFeatureList.clear();
-		_completeBlackFeatureList.clear();
-		createWhiteFeatures(pos, _completeWhiteFeatureList);
-		createBlackFeatures(pos, _completeBlackFeatureList);
 		whiteNoIncrementalEval = false;
 		blackNoIncrementalEval = false;
-
-		_whiteW.clear();
-    	_blackW.clear();
-    	_whiteB.clear();
-    	_blackB.clear();
-
-		Score score;
-		if(pos.isWhiteTurn()) {
-			_completeFeatureList.clear();
-			concatenateFeature(_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
-			SparseInput spw(81920);
-			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
-				spw.set(_completeFeatureList.get(i), 1.0);
-			}
-			score = _modelW.forwardPass(spw).get(0) * 10000.0;
-
-			_completeFeatureList.clear();
-			concatenateFeature(_completeBlackFeatureList, _completeWhiteFeatureList, _completeFeatureList);
-			SparseInput spb(81920);
-			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
-				spb.set(_completeFeatureList.get(i), 1.0);
-			}
-			_modelB.forwardPass(spb).get(0);
-
-		} else {
-			_completeFeatureList.clear();
-			concatenateFeature(_completeBlackFeatureList, _completeWhiteFeatureList, _completeFeatureList);
-			SparseInput spb(81920);
-			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
-				spb.set(_completeFeatureList.get(i), 1.0);
-			}
-			score = _modelB.forwardPass(spb).get(0) * 10000.0;
-
-			_completeFeatureList.clear();
-			concatenateFeature(_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
-			SparseInput spw(81920);
-			for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
-				spw.set(_completeFeatureList.get(i), 1.0);
-			}
-			_modelW.forwardPass(spw).get(0);
-		}
-
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-		Score score2;
-		auto f1 = createFeatures(pos);
-		SparseInput sp2(81920, std::vector<unsigned int>(f1.begin(), f1.end()));
-		score2 = _m.forwardPass(sp2).get(0)* 10000.0;
-		if(score2 != score) {
-			std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
-		}
-#endif
-
-		score = std::min(highSat,score);
-		score = std::max(lowSat,score);
-    	return score;
+		return _completeEval(pos);
 	}
-
-	
-	++incrementalCount;
-
-	//auto f2 = concatenateFeature(pos.isWhiteTurn(), _wFeatures, _bFeatures);
-	//SparseInput sp(81920, std::vector<unsigned int>(f2.begin(), f2.end()));
-	Score score;
-	if(pos.isWhiteTurn()) {
-		//std::cout<<"white"<<std::endl;
-		SparseInput sp(81920);
-		_whiteW.serialize(sp, 0);
-    	_blackW.serialize(sp, 40960);
-		//sp.print();
-		score = _modelW.incrementalPass(sp).get(0)* 10000.0;
-		_whiteW.clear();
-    	_blackW.clear();
-	} else {
-		//std::cout<<"black"<<std::endl;
-		SparseInput sp(81920);
-		_whiteB.serialize(sp, 40960);
-    	_blackB.serialize(sp, 0);
-		//sp.print();
-		score = _modelB.incrementalPass(sp).get(0)* 10000.0;
-		_whiteB.clear();
-    	_blackB.clear();
-
-	}
-	
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-	Score score2;
-	auto f1 = createFeatures(pos);
-	SparseInput sp2(81920, std::vector<unsigned int>(f1.begin(), f1.end()));
-	score2 = _m.forwardPass(sp2).get(0)* 10000.0;
-	if(score2 != score) {
-		std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
-	}
-#endif
-
-
-    score = std::min(highSat,score);
-	score = std::max(lowSat,score);
-    return score;
-    
+	//++incrementalCount;
+	return _incrementalEval(pos);
 }
 
 std::set<unsigned int> NNUE::createFeatures(const Position& pos){
@@ -451,6 +346,106 @@ void NNUE::addPiece(const Position& pos, bitboardIndex piece, tSquare sq) {
 	_blackW.add(bf);
 	_whiteB.add(wf);
 	_blackB.add(bf);
+}
+
+Score NNUE::_completeEval(const Position& pos) {
+	Score lowSat = -SCORE_INFINITE;
+    Score highSat = SCORE_INFINITE;
+	//++completeCount;
+	//std::cout<<"no incremental eval"<<std::endl;
+	// TODO if we move one king calculate everything from scratch
+	// can we do it faster??
+	_completeWhiteFeatureList.clear();
+	_completeBlackFeatureList.clear();
+	createWhiteFeatures(pos, _completeWhiteFeatureList);
+	createBlackFeatures(pos, _completeBlackFeatureList);
+
+	_whiteW.clear();
+	_blackW.clear();
+	_whiteB.clear();
+	_blackB.clear();
+
+	Score score;
+	_completeFeatureList.clear();
+	concatenateFeature(_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
+	SparseInput spw(81920);
+	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
+		spw.set(_completeFeatureList.get(i), 1.0);
+	}
+	Score scoreW = _modelW.forwardPass(spw).get(0) * 10000.0;
+
+	_completeFeatureList.clear();
+	concatenateFeature(_completeBlackFeatureList, _completeWhiteFeatureList, _completeFeatureList);
+	SparseInput spb(81920);
+	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
+		spb.set(_completeFeatureList.get(i), 1.0);
+	}
+	Score scoreB = _modelB.forwardPass(spb).get(0);
+
+	if(pos.isWhiteTurn()) {
+		score = scoreW;
+	} else {
+		score = scoreB;
+	}
+
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+	Score score2;
+	auto f1 = createFeatures(pos);
+	SparseInput sp2(81920, std::vector<unsigned int>(f1.begin(), f1.end()));
+	score2 = _m.forwardPass(sp2).get(0)* 10000.0;
+	if(score2 != score) {
+		std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
+	}
+#endif
+
+	score = std::min(highSat,score);
+	score = std::max(lowSat,score);
+	return score;
+}
+
+Score NNUE::_incrementalEval(const Position& pos) {
+	Score lowSat = -SCORE_INFINITE;
+    Score highSat = SCORE_INFINITE;
+	Score score;
+	if(pos.isWhiteTurn()) {
+		//std::cout<<"white"<<std::endl;
+		SparseInput sp(81920);
+		_whiteW.serialize(sp, 0);
+    	_blackW.serialize(sp, 40960);
+		//incrementalMaxSize = std::max(sp.getElementNumber(), incrementalMaxSize);
+		//sp.print();
+		score = _modelW.incrementalPass(sp).get(0)* 10000.0;
+		_whiteW.clear();
+    	_blackW.clear();
+	} else {
+		//std::cout<<"black"<<std::endl;
+		SparseInput sp(81920);
+		_whiteB.serialize(sp, 40960);
+    	_blackB.serialize(sp, 0);
+		//incrementalMaxSize = std::max(sp.getElementNumber(), incrementalMaxSize);
+		//sp.print();
+		score = _modelB.incrementalPass(sp).get(0)* 10000.0;
+		_whiteB.clear();
+    	_blackB.clear();
+
+	}
+
+	//std::cout<<"incrementalMaxSize " << incrementalMaxSize << std::endl;
+	
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+	Score score2;
+	auto f1 = createFeatures(pos);
+	SparseInput sp2(81920, std::vector<unsigned int>(f1.begin(), f1.end()));
+	score2 = _m.forwardPass(sp2).get(0)* 10000.0;
+	if(score2 != score) {
+		std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
+	}
+#endif
+
+
+    score = std::min(highSat,score);
+	score = std::max(lowSat,score);
+    return score;
 }
 
 
