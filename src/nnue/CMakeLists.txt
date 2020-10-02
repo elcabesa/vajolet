@@ -10,7 +10,6 @@ add_subdirectory(activation)
 add_subdirectory(input)
 add_subdirectory(layer)
 add_subdirectory(model)
-add_subdirectory(trainSet)
 
 
 
