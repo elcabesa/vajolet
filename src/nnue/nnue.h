@@ -37,6 +37,7 @@ public:
     void serialize(SparseInput& s, unsigned int offset);
     void add(unsigned int f);
     void remove(unsigned int f);
+    unsigned int size();
 private:
     // TODO minimize size
     // TODO save max element stored

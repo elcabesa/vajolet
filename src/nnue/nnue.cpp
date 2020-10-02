@@ -135,7 +135,6 @@ Score NNUE::eval(const Position& pos) {
 		blackNoIncrementalEval = false;
 		return _completeEval(pos);
 	}
-	//++incrementalCount;
 	return _incrementalEval(pos);
 }
 
@@ -404,10 +403,13 @@ Score NNUE::_completeEval(const Position& pos) {
 }
 
 Score NNUE::_incrementalEval(const Position& pos) {
+	const unsigned int CompleteEvalThreshold = 50;
+	//++incrementalCount;
 	Score lowSat = -SCORE_INFINITE;
     Score highSat = SCORE_INFINITE;
 	Score score;
 	if(pos.isWhiteTurn()) {
+		if(_whiteW.size() + _blackW.size() > CompleteEvalThreshold) {return _completeEval(pos);}
 		//std::cout<<"white"<<std::endl;
 		SparseInput sp(81920);
 		_whiteW.serialize(sp, 0);
@@ -418,6 +420,7 @@ Score NNUE::_incrementalEval(const Position& pos) {
 		_whiteW.clear();
     	_blackW.clear();
 	} else {
+		if(_whiteB.size() + _blackB.size() > CompleteEvalThreshold) {return _completeEval(pos);}
 		//std::cout<<"black"<<std::endl;
 		SparseInput sp(81920);
 		_whiteB.serialize(sp, 40960);
@@ -491,6 +494,10 @@ void DifferentialList::remove(unsigned int f) {
 		}
 	}
 	_removeList[_removePos++] = f;
+}
+
+unsigned int DifferentialList::size() {
+	return _addPos + _removePos;
 }
 
 void FeatureList::clear() {
