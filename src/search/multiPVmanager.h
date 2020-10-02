@@ -52,7 +52,7 @@ public:
 	unsigned int getPVNumber() const { return _multiPvCounter;}
 	
 	bool alreadySearched(const Move& m) const {
-		return std::find_if(_res.begin(), _res.end(), [&](const auto& val) {return m == val.firstMove;}) != _res.end();
+		return std::find_if(_res.begin(), _res.end(), [&](const rootMove& val) {return m == val.firstMove;}) != _res.end();
 	}
 	
 	std::vector<rootMove> get() const
