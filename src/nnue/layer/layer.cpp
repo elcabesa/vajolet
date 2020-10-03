@@ -35,12 +35,9 @@ unsigned int Layer::getOutputSize() const {
 }
 
 double Layer::getOutput(unsigned int i) const {
-    return _output.get(i);
+    return _output[i];
 }
 
-const Input& Layer::output() const {return _output;}
+const std::vector<double>& Layer::output() const {return _output;}
 
-void Layer::printOutput() const {
-    _output.print();
-}
 

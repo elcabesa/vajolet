@@ -33,6 +33,9 @@ public:
     void propagate(const Input& input);
     void incrementalPropagate(const Input& input);
 
+    void propagate(const std::vector<double>& input);
+    void incrementalPropagate(const std::vector<double>& input);
+
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
     bool deserialize(std::ifstream& ss);
@@ -45,7 +48,8 @@ private:
     
     activationType _act;
     
-    void _calcNetOut(const Input& input, bool incremental = false);
+    void _calcNetOut1(const Input& input, bool incremental = false);
+    void _calcNetOut2(const std::vector<double>& input, bool incremental = false);
     void _calcOut();
 };
 

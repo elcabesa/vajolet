@@ -34,7 +34,7 @@ DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSi
 
 DenseLayer::~DenseLayer() {}
 
-void DenseLayer::_calcNetOut(const Input& input, bool incremental) {
+void DenseLayer::_calcNetOut1(const Input& input, bool incremental) {
     assert(input.size() == _inputSize);
     if (!incremental) {
         _netOutput = *_bias;
@@ -50,26 +50,49 @@ void DenseLayer::_calcNetOut(const Input& input, bool incremental) {
     }  
 }
 
+void DenseLayer::_calcNetOut2(const std::vector<double>& input, bool incremental) {
+    assert(input.size() == _inputSize);
+    if (!incremental) {
+        _netOutput = *_bias;
+    }
+    unsigned int index = 0;
+    for(double value: input) {
+        for (unsigned int o = 0; o < _outputSize; ++o) {
+            _netOutput[o] += value * (*_weight)[_calcWeightIndex(index, o)];
+        }
+        ++index;
+    }
+}
+
 void DenseLayer::_calcOut() {
     if(_act == activationType::relu) {
         for(unsigned int o=0; o < _outputSize; ++o) {
-            _output.set(o, std::max(_netOutput[o], 0.0));
+            _output[o] = std::max(_netOutput[o], 0.0); 
         }
     }
     else {
-        for(unsigned int o=0; o < _outputSize; ++o) {
-            _output.set(o, _netOutput[o]);
-        }
+        //todo write directly to _output
+        _output = _netOutput;
     }
 }
 
 void DenseLayer::propagate(const Input& input) {
-    _calcNetOut(input);
+    _calcNetOut1(input);
     _calcOut();
 }
 
 void DenseLayer::incrementalPropagate(const Input& input) {
-    _calcNetOut(input, true);
+    _calcNetOut1(input, true);
+    _calcOut();
+}
+
+void DenseLayer::propagate(const std::vector<double>& input) {
+    _calcNetOut2(input);
+    _calcOut();
+}
+
+void DenseLayer::incrementalPropagate(const std::vector<double>& input) {
+    _calcNetOut2(input, true);
     _calcOut();
 }
 

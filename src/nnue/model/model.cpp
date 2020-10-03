@@ -32,41 +32,34 @@ void Model::addLayer(std::unique_ptr<Layer> l) {
     _layers.push_back(std::move(l));
 }
 
-const Input& Model::forwardPass(const Input& input, bool verbose /* = false */) {
-    const Input* in = &input;
-    for(auto& p: _layers) {
-        p->propagate(*in);
-        if(verbose) {
-            p->printOutput();
-        }
-        in = &p->output();
-    }
-    if(verbose) {
-        in->print();
-    }
-    return *in;
-}
-
-const Input& Model::incrementalPass(const Input& input, bool verbose/* = false */) {
-    const Input* in = &input;
+double Model::forwardPass(const Input& input) {
+    const std::vector<double>* in;
     unsigned int i= 0;
     for(auto& p: _layers) {
         if(i == 0) {
-            p->incrementalPropagate(*in);
-        }
-        else { 
+            p->propagate(input);
+        } else {
             p->propagate(*in);
-        }
-        if(verbose) {
-            p->printOutput();
         }
         in = &p->output();
         ++i;
     }
-    if(verbose) {
-        in->print();
+    return (*in)[0] * 10000;
+}
+
+double Model::incrementalPass(const Input& input) {
+    const std::vector<double>* in;
+    unsigned int i= 0;
+    for(auto& p: _layers) {
+        if(i == 0) {
+            p->incrementalPropagate(input);
+        } else { 
+            p->propagate(*in);
+        }
+        in = &p->output();
+        ++i;
     }
-    return *in;
+    return (*in)[0] * 10000;
 }
 
 bool Model::deserialize(std::ifstream& ss) {

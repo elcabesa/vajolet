@@ -33,6 +33,9 @@ public:
     
     void propagate(const Input& input);
     void incrementalPropagate(const Input& input);
+
+    void propagate(const std::vector<double>& input);
+    void incrementalPropagate(const std::vector<double>& input);
     
     DenseLayer& getLayer(unsigned int);
 

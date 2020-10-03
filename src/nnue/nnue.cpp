@@ -372,7 +372,7 @@ Score NNUE::_completeEval(const Position& pos) {
 	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 		spw.set(_completeFeatureList.get(i), 1.0);
 	}
-	Score scoreW = _modelW.forwardPass(spw).get(0) * 10000.0;
+	Score scoreW = _modelW.forwardPass(spw);
 
 	_completeFeatureList.clear();
 	concatenateFeature(_completeBlackFeatureList, _completeWhiteFeatureList, _completeFeatureList);
@@ -380,7 +380,7 @@ Score NNUE::_completeEval(const Position& pos) {
 	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 		spb.set(_completeFeatureList.get(i), 1.0);
 	}
-	Score scoreB = _modelB.forwardPass(spb).get(0) * 10000.0;
+	Score scoreB = _modelB.forwardPass(spb);
 
 	if(pos.isWhiteTurn()) {
 		score = scoreW;
@@ -417,7 +417,7 @@ Score NNUE::_incrementalEval(const Position& pos) {
     	_blackW.serialize(sp, 40960);
 		//incrementalMaxSize = std::max(sp.getElementNumber(), incrementalMaxSize);
 		//sp.print();
-		score = _modelW.incrementalPass(sp).get(0)* 10000.0;
+		score = _modelW.incrementalPass(sp);
 		_whiteW.clear();
     	_blackW.clear();
 	} else {
@@ -428,7 +428,7 @@ Score NNUE::_incrementalEval(const Position& pos) {
     	_blackB.serialize(sp, 0);
 		//incrementalMaxSize = std::max(sp.getElementNumber(), incrementalMaxSize);
 		//sp.print();
-		score = _modelB.incrementalPass(sp).get(0)* 10000.0;
+		score = _modelB.incrementalPass(sp);
 		_whiteB.clear();
     	_blackB.clear();
 

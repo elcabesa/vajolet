@@ -44,41 +44,51 @@ unsigned int ParallelDenseLayer::_calcBiasIndex(const unsigned int layer, const 
 }
 
 void ParallelDenseLayer::propagate(const Input& input) {
-    unsigned int n= 0;
-    _output.clear();
+    unsigned int LayerNum = 0;
+    //_output.clear();
     for(auto& l: _parallelLayers) {
         
-        const ParalledSparseInput psi(input, n, _layerInputSize);
+        const ParalledSparseInput psi(input, LayerNum, _layerInputSize);
         l.propagate(psi);
         
         // copy back output
+        // TODO remove, write directly to output
         auto& out = l.output();
-        unsigned int num = out.getElementNumber();
-        for(unsigned int o = 0; o < num; ++o){
-            auto el = out.getElementFromIndex(o);
-            _output.set(_calcBiasIndex(n, el.first), el.second); 
+        unsigned int outIndex = 0;
+        for(auto el: out) {
+            _output[_calcBiasIndex(LayerNum, outIndex)] = el; 
+            ++outIndex;
         }
-        ++n;
+        ++LayerNum;
     }    
 }
 
 void ParallelDenseLayer::incrementalPropagate(const Input& input) {
-    unsigned int n= 0;
-    _output.clear();
+    unsigned int LayerNum = 0;
+    //_output.clear();
     for(auto& l: _parallelLayers) {
         
-        const ParalledSparseInput psi(input, n, _layerInputSize);
+        const ParalledSparseInput psi(input, LayerNum, _layerInputSize);
         l.incrementalPropagate(psi);
         
         // copy back output
+        // TODO remove, write directly to output
         auto& out = l.output();
-        unsigned int num = out.getElementNumber();
-        for(unsigned int o = 0; o < num; ++o){
-            auto el = out.getElementFromIndex(o);
-            _output.set(_calcBiasIndex(n, el.first), el.second); 
+        unsigned int outIndex = 0;
+        for(auto el: out) {
+            _output[_calcBiasIndex(LayerNum, outIndex)] = el; 
+            ++outIndex;
         }
-        ++n;
+        ++LayerNum;
     }
+}
+
+void ParallelDenseLayer::propagate(const std::vector<double>& ) {
+    std::cout<<"ARGHHHHH"<<std::endl;
+}
+
+void ParallelDenseLayer::incrementalPropagate(const std::vector<double>& ) {
+    std::cout<<"ARGHHHHH2"<<std::endl;
 }
 
 bool ParallelDenseLayer::deserialize(std::ifstream& ss) {

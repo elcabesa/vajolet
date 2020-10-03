@@ -36,8 +36,8 @@ public:
     Layer& getLayer(unsigned int index);
     unsigned int getLayerCount();
     
-    const Input& forwardPass(const Input& input, bool verbose = false);
-    const Input& incrementalPass(const Input& input, bool verbose = false);
+    double forwardPass(const Input& input);
+    double incrementalPass(const Input& input);
     
     bool deserialize(std::ifstream& ss);
     
