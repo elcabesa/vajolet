@@ -51,16 +51,21 @@ void DenseLayer::_calcNetOut(const Input& input, bool incremental) {
 }
 
 void DenseLayer::_calcOut() {
-    for(unsigned int o=0; o < _outputSize; ++o) {
-        _output.set(o, std::max(_netOutput[o], 0.0));
+    if(_act == activationType::relu) {
+        for(unsigned int o=0; o < _outputSize; ++o) {
+            _output.set(o, std::max(_netOutput[o], 0.0));
+        }
+    }
+    else {
+        for(unsigned int o=0; o < _outputSize; ++o) {
+            _output.set(o, _netOutput[o]);
+        }
     }
 }
 
 void DenseLayer::propagate(const Input& input) {
     _calcNetOut(input);
-    if(_act == activationType::relu) {
-        _calcOut();
-    }
+    _calcOut();
 }
 
 void DenseLayer::incrementalPropagate(const Input& input) {
