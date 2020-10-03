@@ -64,12 +64,12 @@ NNUE::NNUE() {
 	std::vector<std::vector<double>*> weights0;
 	weights0.push_back(&weight00);
 	weights0.push_back(&weight01);
-    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, biases0, weights0));
+    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, biases0, weights0));
     _modelW.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
     _modelW.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
     _modelW.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
 
-	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, biases0, weights0));
+	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, biases0, weights0));
     _modelB.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
     _modelB.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
     _modelB.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
@@ -77,7 +77,7 @@ NNUE::NNUE() {
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
 	_m.clear();
-	_m.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, biases0, weights0));
+	_m.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, biases0, weights0));
     _m.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
     _m.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
     _m.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
@@ -319,7 +319,6 @@ unsigned int NNUE::mapBlackPiece(const bitboardIndex piece) {
 }
 
 void NNUE::removePiece(const Position& pos, bitboardIndex piece, tSquare sq) {
-	//std::cout<<"remove piece "<<piece<<" square "<<sq<<std::endl;
 	auto wf = whiteFeature(mapWhitePiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::whiteKing));
 	auto bf = blackFeature(mapBlackPiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::blackKing));
 
@@ -329,7 +328,6 @@ void NNUE::removePiece(const Position& pos, bitboardIndex piece, tSquare sq) {
 	_blackB.remove(bf);
 }
 void NNUE::addPiece(const Position& pos, bitboardIndex piece, tSquare sq) {
-	//std::co_bFeaturesut<<"add piece "<<piece<<" square "<<sq<<std::endl;
 	auto wf = whiteFeature(mapWhitePiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::whiteKing));
 	auto bf = blackFeature(mapBlackPiece(piece), sq, pos.getSquareOfThePiece(bitboardIndex::blackKing));
 	
@@ -365,17 +363,6 @@ Score NNUE::_completeEval(const Position& pos) {
 	} else {
 		score = scoreB;
 	}
-
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-	Score score2;
-	auto f1 = createFeatures(pos);
-	SparseInput sp2(81920, std::vector<unsigned int>(f1.begin(), f1.end()));
-	score2 = _m.forwardPass(sp2).get(0)* 10000.0;
-	if(score2 != score) {
-		std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
-	}
-#endif
-
 	score = std::min(highSat,score);
 	score = std::max(lowSat,score);
 	return score;
@@ -389,23 +376,13 @@ Score NNUE::_incrementalEval(const Position& pos) {
 	Score score;
 	if(pos.isWhiteTurn()) {
 		if(_whiteW.size() + _blackW.size() > CompleteEvalThreshold) {return _completeEval(pos);}
-		//std::cout<<"white"<<std::endl;
-		//SparseInput sp(81920);
-		//_whiteW.serialize(sp, 0);
-    	//_blackW.serialize(sp, 40960);
-		//incrementalMaxSize = std::max(sp.getElementNumber(), incrementalMaxSize);
-		//sp.print();
+
 		score = _modelW.incrementalPass(_whiteW, _blackW);
 		_whiteW.clear();
     	_blackW.clear();
 	} else {
 		if(_whiteB.size() + _blackB.size() > CompleteEvalThreshold) {return _completeEval(pos);}
-		//std::cout<<"black"<<std::endl;
-		/*SparseInput sp(81920);
-		_whiteB.serialize(sp, 40960);
-    	_blackB.serialize(sp, 0);*/
-		//incrementalMaxSize = std::max(sp.getElementNumber(), incrementalMaxSize);
-		//sp.print();
+
 		score = _modelB.incrementalPass(_blackB, _whiteB);
 		_whiteB.clear();
     	_blackB.clear();
@@ -415,10 +392,16 @@ Score NNUE::_incrementalEval(const Position& pos) {
 	//std::cout<<"incrementalMaxSize " << incrementalMaxSize << std::endl;
 	
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
+	_completeWhiteFeatureList.clear();
+	_completeBlackFeatureList.clear();
+	createWhiteFeatures(pos, _completeWhiteFeatureList);
+	createBlackFeatures(pos, _completeBlackFeatureList);
 	Score score2;
-	auto f1 = createFeatures(pos);
-	SparseInput sp2(81920, std::vector<unsigned int>(f1.begin(), f1.end()));
-	score2 = _m.forwardPass(sp2).get(0)* 10000.0;
+	if(pos.isWhiteTurn()) {
+		score2 = _m.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
+	} else {
+		score2 = _m.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);;
+	}
 	if(score2 != score) {
 		std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
 	}

@@ -25,7 +25,6 @@
 
 class DifferentialList;
 class FeatureList;
-class Input;
 
 class Layer {
 public:

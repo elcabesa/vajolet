@@ -22,10 +22,10 @@
 #include "parallelDenseLayer.h"
 #include "parallelSparse.h"
 
-ParallelDenseLayer::ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights):
-    Layer{number * inputSize, number * outputSize}, _layerInputSize(inputSize), _layerOutputSize(outputSize)
+ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights):
+    Layer{2 * inputSize, 2 * outputSize}, _layerInputSize(inputSize), _layerOutputSize(outputSize)
 {
-    for(unsigned int n = 0 ; n < number; ++n){
+    for(unsigned int n = 0 ; n < 2; ++n){
         _parallelLayers.emplace_back(DenseLayer(_layerInputSize, _layerOutputSize, Layer::activationType::linear, biases[n], weights[n]));
     }    
 }
@@ -115,9 +115,8 @@ bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
     //std::cout<<"DESERIALIZE PARALLEL DENSE LAYER"<<std::endl;
     if(ss.get() != '{') {std::cout<<"ParallelDenseLayer missing {"<<std::endl;return false;}
     
-    for(auto& l :_parallelLayers) {
-        if(!l.deserialize(ss)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
-    }
+    if(!_parallelLayers[0].deserialize(ss)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
+    if(!_parallelLayers[1].deserialize(ss)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
     
     if(ss.get() != '}') {std::cout<<"ParallelDenseLayer missing }"<<std::endl;return false;}
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
