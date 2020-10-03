@@ -19,11 +19,10 @@
 #include <cassert>
 #include <iostream>
 
-#include "activation.h"
 #include "denseLayer.h"
 #include "input.h"
 
-DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<double>* bias, std::vector<double>* weight):
+DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<double>* bias, std::vector<double>* weight):
     Layer{inputSize, outputSize},
     _bias(bias),
     _weight(weight),
@@ -53,13 +52,15 @@ void DenseLayer::_calcNetOut(const Input& input, bool incremental) {
 
 void DenseLayer::_calcOut() {
     for(unsigned int o=0; o < _outputSize; ++o) {
-        _output.set(o, _act.propagate(_netOutput[o]));
+        _output.set(o, std::max(_netOutput[o], 0.0));
     }
 }
 
 void DenseLayer::propagate(const Input& input) {
     _calcNetOut(input);
-    _calcOut();
+    if(_act == activationType::relu) {
+        _calcOut();
+    }
 }
 
 void DenseLayer::incrementalPropagate(const Input& input) {

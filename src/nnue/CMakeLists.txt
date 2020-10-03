@@ -6,7 +6,6 @@ target_sources(libChess PRIVATE
 # when other libraries or executables link to libChess
 target_include_directories (libChess PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory(activation)
 add_subdirectory(input)
 add_subdirectory(layer)
 add_subdirectory(model)

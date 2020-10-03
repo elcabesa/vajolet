@@ -25,6 +25,7 @@
 //TODO remove std::set, std::map and aòò the very slow code
 //TODO hardcode the nn 
 //TODO move all the math in fixed point?
+// todo remove derived classes? 
 
 std::vector<double> NNUE::bias00;
 std::vector<double> NNUE::bias01;
@@ -63,23 +64,23 @@ NNUE::NNUE() {
 	std::vector<std::vector<double>*> weights0;
 	weights0.push_back(&weight00);
 	weights0.push_back(&weight01);
-    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
-    _modelW.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
-    _modelW.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
-    _modelW.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, biases0, weights0));
+    _modelW.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
+    _modelW.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
+    _modelW.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
 
-	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
-    _modelB.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
-    _modelB.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
-    _modelB.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, biases0, weights0));
+    _modelB.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
+    _modelB.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
+    _modelB.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
 
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
 	_m.clear();
-	_m.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, _linear, biases0, weights0));
-    _m.addLayer(std::make_unique<DenseLayer>(512,32, _relu, &bias1, &weight1));
-    _m.addLayer(std::make_unique<DenseLayer>(32,32, _relu, &bias2, &weight2));
-    _m.addLayer(std::make_unique<DenseLayer>(32, 1, _linear, &bias3, &weight3));
+	_m.addLayer(std::make_unique<ParallelDenseLayer>(2, 40960, 256, biases0, weights0));
+    _m.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
+    _m.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
+    _m.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
 
 #endif
     //std::cout<<"done"<<std::endl;

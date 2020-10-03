@@ -22,8 +22,6 @@
 #include <array>
 
 #include "bitBoardIndex.h"
-#include "linear.h"
-#include "relu.h"
 #include "score.h"
 #include "model.h"
 #include "tSquare.h"
@@ -105,9 +103,6 @@ private:
     static std::vector<double> weight1;
     static std::vector<double> weight2;
     static std::vector<double> weight3;
-
-    linearActivation _linear;
-	reluActivation _relu;
 
     DifferentialList _whiteW;
     DifferentialList _blackW;

@@ -18,9 +18,7 @@
 
 #include <cassert>
 #include <iostream>
-#include <numeric>
 
-#include "activation.h"
 #include "model.h"
 
 Model::Model(){}

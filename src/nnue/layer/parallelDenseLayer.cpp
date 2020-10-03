@@ -19,16 +19,14 @@
 #include <cassert>
 #include <iostream>
 
-#include "activation.h"
 #include "parallelDenseLayer.h"
 #include "parallelSparse.h"
 
-ParallelDenseLayer::ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights):
+ParallelDenseLayer::ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights):
     Layer{number * inputSize, number * outputSize}, _layerInputSize(inputSize), _layerOutputSize(outputSize)
-    
 {
     for(unsigned int n = 0 ; n < number; ++n){
-        _parallelLayers.emplace_back(DenseLayer(_layerInputSize, _layerOutputSize, act, biases[n], weights[n]));
+        _parallelLayers.emplace_back(DenseLayer(_layerInputSize, _layerOutputSize, Layer::activationType::linear, biases[n], weights[n]));
     }    
 }
 

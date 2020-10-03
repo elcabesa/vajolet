@@ -25,6 +25,11 @@
 
 class Layer {
 public:
+
+    enum class activationType{
+        linear,
+        relu
+    };
     Layer(const unsigned int inputSize, const unsigned int outputSize);
     virtual ~Layer();
     
