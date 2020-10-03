@@ -27,7 +27,7 @@ class Activation;
 
 class DenseLayer: public Layer {
 public:
-    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<double>* bias, std::vector<double>* weight,const double stdDev = 0.0);
+    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<double>* bias, std::vector<double>* weight);
     ~DenseLayer();
     
     void propagate(const Input& input);

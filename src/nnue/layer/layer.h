@@ -25,7 +25,7 @@
 
 class Layer {
 public:
-    Layer(const unsigned int inputSize, const unsigned int outputSize, const double stdDev);
+    Layer(const unsigned int inputSize, const unsigned int outputSize);
     virtual ~Layer();
     
     unsigned int getInputSize() const;
@@ -43,7 +43,6 @@ protected:
     unsigned int _inputSize;
     unsigned int _outputSize;
     DenseInput _output;
-    const double _stdDev;
     
 };
 

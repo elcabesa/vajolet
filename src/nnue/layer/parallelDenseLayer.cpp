@@ -23,12 +23,12 @@
 #include "parallelDenseLayer.h"
 #include "parallelSparse.h"
 
-ParallelDenseLayer::ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights, const double stdDev):
-    Layer{number * inputSize, number * outputSize, stdDev}, _layerInputSize(inputSize), _layerOutputSize(outputSize)
+ParallelDenseLayer::ParallelDenseLayer(const unsigned int number, const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights):
+    Layer{number * inputSize, number * outputSize}, _layerInputSize(inputSize), _layerOutputSize(outputSize)
     
 {
     for(unsigned int n = 0 ; n < number; ++n){
-        _parallelLayers.emplace_back(DenseLayer(_layerInputSize, _layerOutputSize, act, biases[n], weights[n], _stdDev));
+        _parallelLayers.emplace_back(DenseLayer(_layerInputSize, _layerOutputSize, act, biases[n], weights[n]));
     }    
 }
 

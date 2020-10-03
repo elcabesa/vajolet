@@ -23,8 +23,8 @@
 #include "denseLayer.h"
 #include "input.h"
 
-DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<double>* bias, std::vector<double>* weight,const double stdDev):
-    Layer{inputSize, outputSize, stdDev},
+DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, Activation& act, std::vector<double>* bias, std::vector<double>* weight):
+    Layer{inputSize, outputSize},
     _bias(bias),
     _weight(weight),
     _act(act)
