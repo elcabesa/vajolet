@@ -26,18 +26,15 @@ DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSi
     Layer{inputSize, outputSize},
     _bias(bias),
     _weight(weight),
-    _act(act)
-    
-{
-    _netOutput.resize(outputSize, 0.0);
-}
+    _act(act)  
+{}
 
 DenseLayer::~DenseLayer() {}
 
 void DenseLayer::_calcNetOut1(const Input& input, bool incremental) {
     assert(input.size() == _inputSize);
     if (!incremental) {
-        _netOutput = *_bias;
+        _output = *_bias;
     }
     unsigned int num = input.getElementNumber();
     //if (incremental)std::cout<<"element number "<< num<<std::endl;
@@ -45,7 +42,7 @@ void DenseLayer::_calcNetOut1(const Input& input, bool incremental) {
         auto& el = input.getElementFromIndex(idx);
         //if (incremental)std::cout<<"element idx "<< idx<<" index "<<el.first<< " value "<<el.second<<std::endl;
         for (unsigned int o = 0; o < _outputSize; ++o) {
-            _netOutput[o] += el.second * (*_weight)[_calcWeightIndex(el.first,o)];
+            _output[o] += el.second * (*_weight)[_calcWeightIndex(el.first,o)];
         }
     }  
 }
@@ -53,12 +50,12 @@ void DenseLayer::_calcNetOut1(const Input& input, bool incremental) {
 void DenseLayer::_calcNetOut2(const std::vector<double>& input, bool incremental) {
     assert(input.size() == _inputSize);
     if (!incremental) {
-        _netOutput = *_bias;
+        _output = *_bias;
     }
     unsigned int index = 0;
     for(double value: input) {
         for (unsigned int o = 0; o < _outputSize; ++o) {
-            _netOutput[o] += value * (*_weight)[_calcWeightIndex(index, o)];
+            _output[o] += value * (*_weight)[_calcWeightIndex(index, o)];
         }
         ++index;
     }
@@ -67,12 +64,8 @@ void DenseLayer::_calcNetOut2(const std::vector<double>& input, bool incremental
 void DenseLayer::_calcOut() {
     if(_act == activationType::relu) {
         for(unsigned int o=0; o < _outputSize; ++o) {
-            _output[o] = std::max(_netOutput[o], 0.0); 
+            _output[o] = std::max(_output[o], 0.0); 
         }
-    }
-    else {
-        //todo write directly to _output
-        _output = _netOutput;
     }
 }
 

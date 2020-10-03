@@ -43,8 +43,6 @@ public:
 private:
     std::vector<double>* _bias;
     std::vector<double>* _weight;
-   
-    std::vector<double> _netOutput;
     
     activationType _act;
     
