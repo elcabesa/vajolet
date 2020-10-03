@@ -16,36 +16,22 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _MODEL_H
-#define _MODEL_H
+#include "featureList.h"
 
-#include <memory>
-#include <vector>
+void FeatureList::clear() {
+	_pos = 0;
+}
 
-#include "layer.h"
+void FeatureList::add(unsigned int f) {
+	// search in remove
+	_list[_pos++] = f;
 
-class Input;
-class FeatureList;
+}
 
+unsigned int FeatureList::get(unsigned int index) const {
+	return _list[index];
+}
 
-
-class Model {
-public:
-    Model();
-    
-    void addLayer(std::unique_ptr<Layer> l);
-    Layer& getLayer(unsigned int index);
-    unsigned int getLayerCount();
-    
-    double forwardPass(const FeatureList& l, const FeatureList& h);
-    double incrementalPass(const Input& input);
-    
-    bool deserialize(std::ifstream& ss);
-    
-    void clear();
-
-private:
-    std::vector<std::unique_ptr<Layer>> _layers;
-};
-
-#endif
+unsigned int FeatureList::size() const {
+	return _pos;
+}

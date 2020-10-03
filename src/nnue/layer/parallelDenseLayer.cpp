@@ -43,24 +43,35 @@ unsigned int ParallelDenseLayer::_calcBiasIndex(const unsigned int layer, const 
     return x;
 }
 
-void ParallelDenseLayer::propagate(const Input& input) {
-    unsigned int LayerNum = 0;
-    //_output.clear();
-    for(auto& l: _parallelLayers) {
-        
-        const ParalledSparseInput psi(input, LayerNum, _layerInputSize);
-        l.propagate(psi);
-        
-        // copy back output
-        // TODO remove, write directly to output
-        auto& out = l.output();
+void ParallelDenseLayer::propagate(const FeatureList&) {
+    std::cout<<"AHHHHHHHHHHHHHHHHHHH"<<std::endl;
+}
+
+void ParallelDenseLayer::propagate(const FeatureList& l, const FeatureList& h) {
+
+    _parallelLayers[0].propagate(l);
+    // copy back output
+    // TODO remove, write directly to output
+    {
+        auto& out = _parallelLayers[0].output();
         unsigned int outIndex = 0;
         for(auto el: out) {
-            _output[_calcBiasIndex(LayerNum, outIndex)] = el; 
+            _output[_calcBiasIndex(0, outIndex)] = el; 
             ++outIndex;
         }
-        ++LayerNum;
-    }    
+    }
+
+    _parallelLayers[1].propagate(h);
+    // copy back output
+    // TODO remove, write directly to output
+    {
+        auto& out = _parallelLayers[1].output();
+        unsigned int outIndex = 0;
+        for(auto el: out) {
+            _output[_calcBiasIndex(1, outIndex)] = el; 
+            ++outIndex;
+        }  
+    }
 }
 
 void ParallelDenseLayer::incrementalPropagate(const Input& input) {

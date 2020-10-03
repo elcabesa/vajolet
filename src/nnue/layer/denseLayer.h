@@ -20,7 +20,6 @@
 #define _DENSE_LAYER_H
 
 #include <vector>
-
 #include "layer.h"
 
 class Activation;
@@ -30,7 +29,8 @@ public:
     DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<double>* bias, std::vector<double>* weight);
     ~DenseLayer();
     
-    void propagate(const Input& input);
+    void propagate(const FeatureList& input);
+    void propagate(const FeatureList& l, const FeatureList& h);
     void incrementalPropagate(const Input& input);
 
     void propagate(const std::vector<double>& input);
@@ -46,7 +46,8 @@ private:
     
     activationType _act;
     
-    void _calcNetOut1(const Input& input, bool incremental = false);
+    void _calcNetOut(const FeatureList& input);
+    void _calcNetOutIncremental(const Input& input);
     void _calcNetOut2(const std::vector<double>& input, bool incremental = false);
     void _calcOut();
 };

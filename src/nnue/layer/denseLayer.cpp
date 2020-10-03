@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "denseLayer.h"
+#include "featureList.h"
 #include "input.h"
 
 DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<double>* bias, std::vector<double>* weight):
@@ -31,11 +32,22 @@ DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSi
 
 DenseLayer::~DenseLayer() {}
 
-void DenseLayer::_calcNetOut1(const Input& input, bool incremental) {
+void DenseLayer::_calcNetOut(const FeatureList& input) {
     assert(input.size() == _inputSize);
-    if (!incremental) {
-        _output = *_bias;
-    }
+    
+    _output = *_bias;
+
+    for (unsigned int idx = 0; idx < input.size(); ++idx) {
+        unsigned int in = input.get(idx);
+        for (unsigned int o = 0; o < _outputSize; ++o) {
+            _output[o] += (*_weight)[_calcWeightIndex(in, o)];
+        }
+    }  
+}
+
+void DenseLayer::_calcNetOutIncremental(const Input& input) {
+    assert(input.size() == _inputSize);
+
     unsigned int num = input.getElementNumber();
     //if (incremental)std::cout<<"element number "<< num<<std::endl;
     for (unsigned int idx = 0; idx < num; ++idx) {
@@ -46,6 +58,7 @@ void DenseLayer::_calcNetOut1(const Input& input, bool incremental) {
         }
     }  
 }
+
 
 void DenseLayer::_calcNetOut2(const std::vector<double>& input, bool incremental) {
     assert(input.size() == _inputSize);
@@ -69,13 +82,15 @@ void DenseLayer::_calcOut() {
     }
 }
 
-void DenseLayer::propagate(const Input& input) {
-    _calcNetOut1(input);
-    _calcOut();
+void DenseLayer::propagate(const FeatureList& input) {
+    _calcNetOut(input);
+}
+void DenseLayer::propagate(const FeatureList&, const FeatureList&) {
+    std::cout<<"AHHHHHHHHHHHHHHHHHHHH"<<std::endl;
 }
 
 void DenseLayer::incrementalPropagate(const Input& input) {
-    _calcNetOut1(input, true);
+    _calcNetOutIncremental(input);
     _calcOut();
 }
 
@@ -84,9 +99,8 @@ void DenseLayer::propagate(const std::vector<double>& input) {
     _calcOut();
 }
 
-void DenseLayer::incrementalPropagate(const std::vector<double>& input) {
-    _calcNetOut2(input, true);
-    _calcOut();
+void DenseLayer::incrementalPropagate(const std::vector<double>&) {
+    std::cout<<"AHHHHHHHHHHHHH"<<std::endl;
 }
 
 unsigned int DenseLayer::_calcWeightIndex(const unsigned int i, const unsigned int o) const {

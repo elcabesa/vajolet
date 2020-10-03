@@ -273,14 +273,14 @@ unsigned int NNUE::turnOffset(bool myTurn) {
 	return myTurn ? 0 : 40960;
 }
 
-void NNUE::concatenateFeature(FeatureList f1, FeatureList f2, FeatureList& complete) {
+/*void NNUE::concatenateFeature(FeatureList f1, FeatureList f2, FeatureList& complete) {
 	for(unsigned int i = 0; i < f1.size(); ++i) {
 		complete.add(f1.get(i));
 	}
 	for(unsigned int i = 0; i < f2.size(); ++i) {
 		complete.add(f2.get(i) + 40960);
 	}
-}
+}*/
 
 unsigned int NNUE::mapWhitePiece(const bitboardIndex piece) {
 	unsigned int n[] = {
@@ -365,23 +365,24 @@ Score NNUE::_completeEval(const Position& pos) {
 	_whiteB.clear();
 	_blackB.clear();
 
-	Score score;
-	_completeFeatureList.clear();
+	
+	/*_completeFeatureList.clear();
 	concatenateFeature(_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
 	SparseInput spw(81920);
 	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 		spw.set(_completeFeatureList.get(i), 1.0);
-	}
-	Score scoreW = _modelW.forwardPass(spw);
+	}*/
+	Score scoreW = _modelW.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
 
-	_completeFeatureList.clear();
+	/*_completeFeatureList.clear();
 	concatenateFeature(_completeBlackFeatureList, _completeWhiteFeatureList, _completeFeatureList);
 	SparseInput spb(81920);
 	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
 		spb.set(_completeFeatureList.get(i), 1.0);
-	}
-	Score scoreB = _modelB.forwardPass(spb);
+	}*/
+	Score scoreB = _modelB.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);
 
+	Score score;
 	if(pos.isWhiteTurn()) {
 		score = scoreW;
 	} else {
@@ -450,71 +451,4 @@ Score NNUE::_incrementalEval(const Position& pos) {
     score = std::min(highSat,score);
 	score = std::max(lowSat,score);
     return score;
-}
-
-
-void DifferentialList::clear() {
-	_addPos = 0;
-	_removePos = 0;
-}
-
-void DifferentialList::serialize(SparseInput& s, unsigned int offset) {
-	for(unsigned int i = 0; i < _addPos; ++i) {
-		s.set(_addList[i] + offset, 1.0);
-	}
-	for(unsigned int i = 0; i < _removePos; ++i) {
-		s.set(_removeList[i] + offset, -1.0);
-	}
-}
-
-void DifferentialList::add(unsigned int f) {
-	// search in remove
-	for(unsigned int i = 0; i < _removePos; ++i) {
-		if(_removeList[i] == f) {
-			// found remove it
-			for(unsigned int x = i; x < _removePos; ++x) {
-				_removeList[x] = _removeList[x+1];
-			}
-			--_removePos;
-			return;
-		}
-	}
-	_addList[_addPos++] = f;
-
-}
-void DifferentialList::remove(unsigned int f) {
-	// search in remove
-	for(unsigned int i = 0; i < _addPos; ++i) {
-		if(_addList[i] == f) {
-			// found remove it
-			for(unsigned int x = i; x < _addPos; ++x) {
-				_addList[x] = _addList[x+1];
-			}
-			--_addPos;
-			return;
-		}
-	}
-	_removeList[_removePos++] = f;
-}
-
-unsigned int DifferentialList::size() {
-	return _addPos + _removePos;
-}
-
-void FeatureList::clear() {
-	_pos = 0;
-}
-
-void FeatureList::add(unsigned int f) {
-	// search in remove
-	_list[_pos++] = f;
-
-}
-
-unsigned int FeatureList::get(unsigned int index) {
-	return _list[index];
-}
-
-unsigned int FeatureList::size() {
-	return _pos;
 }

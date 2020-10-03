@@ -16,27 +16,33 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _DENSE_H
-#define _DENSE_H
 
-#include <vector>
+#ifndef _DIFFERENTIAL_LIST_H
+#define _DIFFERENTIAL_LIST_H
 
-#include "input.h"
+#include <array>
 
-class DenseInput: public Input {
+class SparseInput;
+
+class DifferentialList {
 public:
-    DenseInput(const std::vector<double> v);
-    DenseInput(const unsigned int size);
-    ~DenseInput();
-    void print() const;
-    const double& get(unsigned int index) const;
-    void set(unsigned int index, double v);
-    unsigned int getElementNumber() const;
-    const std::pair<unsigned int, double> getElementFromIndex(unsigned int index) const;
     void clear();
+    void serialize(SparseInput& s, unsigned int offset) const;
+    void add(unsigned int f);
+    void remove(unsigned int f);
+    unsigned int size() const;
+    unsigned int addList(unsigned int) const;
+    unsigned int removeList(unsigned int) const;
+    unsigned int addSize() const;
+    unsigned int removeSize() const;
 private:
-    mutable std::pair<unsigned int, double> tempReply;
-    std::vector<double> _in;
+    // TODO minimize size
+    // TODO save max element stored
+    std::array<unsigned int, 500> _addList;
+    std::array<unsigned int, 500> _removeList;
+    unsigned int _addPos = 0;
+    unsigned int _removePos = 0;
+
 };
 
-#endif   
+#endif

@@ -32,12 +32,12 @@ void Model::addLayer(std::unique_ptr<Layer> l) {
     _layers.push_back(std::move(l));
 }
 
-double Model::forwardPass(const Input& input) {
+double Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     const std::vector<double>* in;
     unsigned int i= 0;
     for(auto& p: _layers) {
         if(i == 0) {
-            p->propagate(input);
+            p->propagate(l, h);
         } else {
             p->propagate(*in);
         }

@@ -22,7 +22,9 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "dense.h"
+
+class FeatureList;
+class Input;
 
 class Layer {
 public:
@@ -39,7 +41,8 @@ public:
     double getOutput(unsigned int i) const;
     const std::vector<double>& output() const;
     
-    virtual void propagate(const Input& input) = 0;
+    virtual void propagate(const FeatureList& input) = 0;
+    virtual void propagate(const FeatureList& l, const FeatureList& h) = 0;
     virtual void incrementalPropagate(const Input& input) = 0;
 
     virtual void propagate(const std::vector<double>& input) = 0;
