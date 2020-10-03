@@ -23,6 +23,7 @@
 #include <fstream>
 #include <vector>
 
+class DifferentialList;
 class FeatureList;
 class Input;
 
@@ -43,7 +44,8 @@ public:
     
     virtual void propagate(const FeatureList& input) = 0;
     virtual void propagate(const FeatureList& l, const FeatureList& h) = 0;
-    virtual void incrementalPropagate(const Input& input) = 0;
+    virtual void incrementalPropagate(const DifferentialList& input) = 0;
+    virtual void incrementalPropagate(const DifferentialList& l, const DifferentialList& h) = 0;
 
     virtual void propagate(const std::vector<double>& input) = 0;
     virtual void incrementalPropagate(const std::vector<double>& input) = 0;

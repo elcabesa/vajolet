@@ -273,15 +273,6 @@ unsigned int NNUE::turnOffset(bool myTurn) {
 	return myTurn ? 0 : 40960;
 }
 
-/*void NNUE::concatenateFeature(FeatureList f1, FeatureList f2, FeatureList& complete) {
-	for(unsigned int i = 0; i < f1.size(); ++i) {
-		complete.add(f1.get(i));
-	}
-	for(unsigned int i = 0; i < f2.size(); ++i) {
-		complete.add(f2.get(i) + 40960);
-	}
-}*/
-
 unsigned int NNUE::mapWhitePiece(const bitboardIndex piece) {
 	unsigned int n[] = {
 		0, //occupiedSquares,			//0		00000000
@@ -365,21 +356,7 @@ Score NNUE::_completeEval(const Position& pos) {
 	_whiteB.clear();
 	_blackB.clear();
 
-	
-	/*_completeFeatureList.clear();
-	concatenateFeature(_completeWhiteFeatureList, _completeBlackFeatureList, _completeFeatureList);
-	SparseInput spw(81920);
-	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
-		spw.set(_completeFeatureList.get(i), 1.0);
-	}*/
 	Score scoreW = _modelW.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
-
-	/*_completeFeatureList.clear();
-	concatenateFeature(_completeBlackFeatureList, _completeWhiteFeatureList, _completeFeatureList);
-	SparseInput spb(81920);
-	for(unsigned int i = 0; i < _completeFeatureList.size(); ++i) {
-		spb.set(_completeFeatureList.get(i), 1.0);
-	}*/
 	Score scoreB = _modelB.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);
 
 	Score score;
@@ -413,23 +390,23 @@ Score NNUE::_incrementalEval(const Position& pos) {
 	if(pos.isWhiteTurn()) {
 		if(_whiteW.size() + _blackW.size() > CompleteEvalThreshold) {return _completeEval(pos);}
 		//std::cout<<"white"<<std::endl;
-		SparseInput sp(81920);
-		_whiteW.serialize(sp, 0);
-    	_blackW.serialize(sp, 40960);
+		//SparseInput sp(81920);
+		//_whiteW.serialize(sp, 0);
+    	//_blackW.serialize(sp, 40960);
 		//incrementalMaxSize = std::max(sp.getElementNumber(), incrementalMaxSize);
 		//sp.print();
-		score = _modelW.incrementalPass(sp);
+		score = _modelW.incrementalPass(_whiteW, _blackW);
 		_whiteW.clear();
     	_blackW.clear();
 	} else {
 		if(_whiteB.size() + _blackB.size() > CompleteEvalThreshold) {return _completeEval(pos);}
 		//std::cout<<"black"<<std::endl;
-		SparseInput sp(81920);
+		/*SparseInput sp(81920);
 		_whiteB.serialize(sp, 40960);
-    	_blackB.serialize(sp, 0);
+    	_blackB.serialize(sp, 0);*/
 		//incrementalMaxSize = std::max(sp.getElementNumber(), incrementalMaxSize);
 		//sp.print();
-		score = _modelB.incrementalPass(sp);
+		score = _modelB.incrementalPass(_blackB, _whiteB);
 		_whiteB.clear();
     	_blackB.clear();
 

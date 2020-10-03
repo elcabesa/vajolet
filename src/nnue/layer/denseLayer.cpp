@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "denseLayer.h"
+#include "differentialList.h"
 #include "featureList.h"
 #include "input.h"
 
@@ -45,18 +46,22 @@ void DenseLayer::_calcNetOut(const FeatureList& input) {
     }  
 }
 
-void DenseLayer::_calcNetOutIncremental(const Input& input) {
+void DenseLayer::_calcNetOutIncremental(const DifferentialList& input) {
     assert(input.size() == _inputSize);
 
-    unsigned int num = input.getElementNumber();
-    //if (incremental)std::cout<<"element number "<< num<<std::endl;
-    for (unsigned int idx = 0; idx < num; ++idx) {
-        auto& el = input.getElementFromIndex(idx);
-        //if (incremental)std::cout<<"element idx "<< idx<<" index "<<el.first<< " value "<<el.second<<std::endl;
+    for(unsigned int idx = 0; idx < input.addSize(); ++idx) {
+        unsigned int in = input.addList(idx);
         for (unsigned int o = 0; o < _outputSize; ++o) {
-            _output[o] += el.second * (*_weight)[_calcWeightIndex(el.first,o)];
+            _output[o] += (*_weight)[_calcWeightIndex(in, o)];
         }
-    }  
+    }
+
+    for(unsigned int idx = 0; idx < input.removeSize(); ++idx) {
+        unsigned int in = input.removeList(idx);
+        for (unsigned int o = 0; o < _outputSize; ++o) {
+            _output[o] -= (*_weight)[_calcWeightIndex(in, o)];
+        }
+    }
 }
 
 
@@ -89,9 +94,13 @@ void DenseLayer::propagate(const FeatureList&, const FeatureList&) {
     std::cout<<"AHHHHHHHHHHHHHHHHHHHH"<<std::endl;
 }
 
-void DenseLayer::incrementalPropagate(const Input& input) {
+void DenseLayer::incrementalPropagate(const DifferentialList& input) {
     _calcNetOutIncremental(input);
     _calcOut();
+}
+
+void DenseLayer::incrementalPropagate(const DifferentialList&, const DifferentialList&) {
+    std::cout<<"AAAAAAAAAAAAAAHHH"<<std::endl;
 }
 
 void DenseLayer::propagate(const std::vector<double>& input) {

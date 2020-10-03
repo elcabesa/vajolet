@@ -47,12 +47,12 @@ double Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     return (*in)[0] * 10000;
 }
 
-double Model::incrementalPass(const Input& input) {
+double Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
     const std::vector<double>* in;
     unsigned int i= 0;
     for(auto& p: _layers) {
         if(i == 0) {
-            p->incrementalPropagate(input);
+            p->incrementalPropagate(l, h);
         } else { 
             p->propagate(*in);
         }

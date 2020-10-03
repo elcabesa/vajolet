@@ -24,10 +24,8 @@
 
 #include "layer.h"
 
-class Input;
+class DifferentialList;
 class FeatureList;
-
-
 
 class Model {
 public:
@@ -38,7 +36,7 @@ public:
     unsigned int getLayerCount();
     
     double forwardPass(const FeatureList& l, const FeatureList& h);
-    double incrementalPass(const Input& input);
+    double incrementalPass(const DifferentialList& l, const DifferentialList& h);
     
     bool deserialize(std::ifstream& ss);
     

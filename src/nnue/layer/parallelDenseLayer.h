@@ -33,7 +33,8 @@ public:
     
     void propagate(const FeatureList& input);
     void propagate(const FeatureList& l, const FeatureList& h);
-    void incrementalPropagate(const Input& input);
+    void incrementalPropagate(const DifferentialList& input);
+    void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
     void propagate(const std::vector<double>& input);
     void incrementalPropagate(const std::vector<double>& input);
