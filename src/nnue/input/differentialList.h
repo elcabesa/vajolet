@@ -27,7 +27,6 @@ class SparseInput;
 class DifferentialList {
 public:
     void clear();
-    void serialize(SparseInput& s, unsigned int offset) const;
     void add(unsigned int f);
     void remove(unsigned int f);
     unsigned int size() const;
@@ -36,10 +35,11 @@ public:
     unsigned int addSize() const;
     unsigned int removeSize() const;
 private:
+    static constexpr unsigned int _size = 500;
     // TODO minimize size
     // TODO save max element stored
-    std::array<unsigned int, 500> _addList;
-    std::array<unsigned int, 500> _removeList;
+    std::array<unsigned int, _size> _addList;
+    std::array<unsigned int, _size> _removeList;
     unsigned int _addPos = 0;
     unsigned int _removePos = 0;
 

@@ -34,7 +34,7 @@ DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSi
 DenseLayer::~DenseLayer() {}
 
 void DenseLayer::_calcNetOut(const FeatureList& input) {
-    assert(input.size() == _inputSize);
+    //assert(input.size() == _inputSize);
     
     _output = *_bias;
 
@@ -47,7 +47,7 @@ void DenseLayer::_calcNetOut(const FeatureList& input) {
 }
 
 void DenseLayer::_calcNetOutIncremental(const DifferentialList& input) {
-    assert(input.size() == _inputSize);
+    //assert(input.size() == _inputSize);
 
     for(unsigned int idx = 0; idx < input.addSize(); ++idx) {
         unsigned int in = input.addList(idx);

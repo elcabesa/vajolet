@@ -260,8 +260,7 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & _bitBoard[x.getPiecesOfOtherPlayer()] );
 	
 	if (NNUE::loaded()) {
-		_nnue.whiteNoIncrementalEval = true;
-		_nnue.blackNoIncrementalEval = true;
+		_nnue.clean();
 	}
 
 #ifdef ENABLE_CHECK_CONSISTENCY
@@ -770,8 +769,8 @@ void Position::doMove(const Move & m)
 		_putPiece(rook, rTo);
 
 		if (NNUE::loaded()) {
-			_nnue.removePiece(*this, rook, rFrom);
-			_nnue.addPiece(*this, rook, rTo);
+			_nnue.removePiece(rook, rFrom);
+			_nnue.addPiece(rook, rTo);
 		}
 		
 		x.getKey().updatePiece( rFrom, rTo, rook );
@@ -800,7 +799,7 @@ void Position::doMove(const Move & m)
 			// remove piece
 			_removePiece(captured,captureSquare);
 			if (NNUE::loaded()) {
-				_nnue.removePiece(*this, captured, captureSquare);
+				_nnue.removePiece(captured, captureSquare);
 			}
 			// update material
 			x.removeMaterial( _eParm._pstValue[captured][captureSquare] );
@@ -819,8 +818,8 @@ void Position::doMove(const Move & m)
 		x.getKey().updatePiece( from, to, piece );
 		_movePiece(piece, from, to);
 		if(!kingMove && NNUE::loaded()) {
-			_nnue.removePiece(*this, piece, from);
-			_nnue.addPiece(*this, piece, to);
+			_nnue.removePiece(piece, from);
+			_nnue.addPiece(piece, to);
 		}
 
 		x.addMaterial( _eParm._pstValue[piece][to] - _eParm._pstValue[piece][from] );
@@ -855,8 +854,8 @@ void Position::doMove(const Move & m)
 			_putPiece(promotedPiece,to);
 
 			if (NNUE::loaded()) {
-				_nnue.removePiece(*this, piece, to);
-				_nnue.addPiece(*this, promotedPiece, to);
+				_nnue.removePiece(piece, to);
+				_nnue.addPiece(promotedPiece, to);
 			}
 
 			x.addMaterial( _eParm._pstValue[promotedPiece][to] - _eParm._pstValue[piece][to] );
@@ -966,8 +965,8 @@ void Position::undoMove()
 		}
 		_putPiece(rook, rFrom);
 		if (NNUE::loaded()) {
-			_nnue.removePiece(*this, rook, rTo);
-			_nnue.addPiece(*this, rook, rFrom);
+			_nnue.removePiece(rook, rTo);
+			_nnue.addPiece(rook, rFrom);
 		}
 		
 	} else {
@@ -977,14 +976,14 @@ void Position::undoMove()
 			piece = isBlackPiece(piece) ? blackPawns : whitePawns;
 			_putPiece(piece,to);
 			if (NNUE::loaded()) {
-				_nnue.removePiece(*this, promotedPiece, to);
-				_nnue.addPiece(*this, piece, to);
+				_nnue.removePiece(promotedPiece, to);
+				_nnue.addPiece(piece, to);
 			}
 		}
 		_movePiece(piece, to, from);
 		if(!kingMove && NNUE::loaded()) {
-			_nnue.removePiece(*this, piece, to);
-			_nnue.addPiece(*this, piece, from);
+			_nnue.removePiece(piece, to);
+			_nnue.addPiece(piece, from);
 		}
 
 		
@@ -999,7 +998,7 @@ void Position::undoMove()
 			assert( capSq < squareNumber );
 			_putPiece( p, capSq );
 			if (NNUE::loaded()) {
-				_nnue.addPiece(*this, p, capSq);
+				_nnue.addPiece(p, capSq);
 			}
 		}
 	}
@@ -1734,7 +1733,7 @@ bool Position::isMoveLegal(const Move &m)const
 
 Position::~Position() = default;
 
-Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm)
+Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm), _nnue(*this)
 {
 	_stateInfo.clear();
 	_stateInfo.emplace_back(state());
@@ -1753,12 +1752,11 @@ Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply
 	if (usePawnHash == pawnHash::on) {
 		_pawnHashTable = std::make_unique<pawnTable>();
 	}
-	_nnue.whiteNoIncrementalEval = true;
-	_nnue.blackNoIncrementalEval = true;
+	_nnue.clean();
 }
 
 
-Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm)
+Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm), _nnue(*this)
 {
 	_updateUsThem();
 	_castleRightsMask = other._castleRightsMask;
@@ -1771,8 +1769,7 @@ Position::Position(const Position& other, const pawnHash usePawnHash): _ply(othe
 	if (usePawnHash == pawnHash::on) {
 		_pawnHashTable = std::make_unique<pawnTable>();
 	}
-	_nnue.whiteNoIncrementalEval = true;
-	_nnue.blackNoIncrementalEval = true;
+	_nnue.clean();
 	
 }
 
@@ -1801,8 +1798,7 @@ Position& Position::operator=(const Position& other)
 	_castleRookFinalSquare = other._castleRookFinalSquare;
 	
 	_eParm = other._eParm;
-	_nnue.whiteNoIncrementalEval = true;
-	_nnue.blackNoIncrementalEval = true;
+	_nnue.clean();
 
 	return *this;
 }

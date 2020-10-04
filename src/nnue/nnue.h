@@ -34,14 +34,14 @@ class Position;
 
 class NNUE {
 public:
-    NNUE();
+    NNUE(const Position& pos);
     bool load(std::string path);
     void clear();
-    Score eval(const Position& pos);
+    Score eval();
     static bool loaded();
-    static std::set<unsigned int> createFeatures(const Position& pos);
-    void createWhiteFeatures(const Position& pos, FeatureList& fl);
-    void createBlackFeatures(const Position& pos, FeatureList& fl);
+    std::set<unsigned int> createFeatures();
+    void createWhiteFeatures(FeatureList& fl);
+    void createBlackFeatures(FeatureList& fl);
     static unsigned int calcWhiteFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int calcBlackFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
     static unsigned int whiteFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
@@ -54,8 +54,10 @@ public:
     bool whiteNoIncrementalEval;
     bool blackNoIncrementalEval;
 
-    void removePiece(const Position& pos, bitboardIndex piece, tSquare sq);
-    void addPiece(const Position& pos, bitboardIndex piece, tSquare sq);
+    void removePiece(bitboardIndex piece, tSquare sq);
+    void addPiece(bitboardIndex piece, tSquare sq);
+
+    void clean();
 private:
     Model _modelW;
     Model _modelB;
@@ -88,8 +90,10 @@ private:
     //unsigned int completeCount = 0;
     //unsigned int incrementalMaxSize = 0;
 
-    Score _completeEval(const Position& pos);
-    Score _incrementalEval(const Position& pos);
+    Score _completeEval();
+    Score _incrementalEval();
+
+    const Position& _pos;
 };
 
 

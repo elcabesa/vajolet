@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-
+#include <cassert>
 #include "featureList.h"
 
 void FeatureList::clear() {
@@ -23,12 +23,15 @@ void FeatureList::clear() {
 }
 
 void FeatureList::add(unsigned int f) {
+    assert(_pos<_size);
 	// search in remove
 	_list[_pos++] = f;
 
 }
 
 unsigned int FeatureList::get(unsigned int index) const {
+    assert(index<_size);
+    assert(index<_pos);
 	return _list[index];
 }
 

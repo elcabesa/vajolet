@@ -198,6 +198,7 @@ bool UciManager::impl::_position(std::istringstream& is, my_thread &)
 	while( is >> token && (m = _moveFromUci(_pos, token) ) )
 	{
 		_pos.doMove(m);
+		_pos.nnue().clean();
 	}
 	return false;
 }
@@ -319,7 +320,7 @@ bool UciManager::impl::_eval(std::istringstream&, my_thread &) {
 
 bool UciManager::impl::_evalNN(std::istringstream&, my_thread &) {
 	if(_pos.nnue().loaded()) {
-		Score s = _pos.nnue().eval(_pos);
+		Score s = _pos.nnue().eval();
 		sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
 		sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0 * 100 << "%" << sync_endl;
 	} else {
@@ -388,7 +389,7 @@ bool UciManager::impl::_stop(std::istringstream&, my_thread &thr) {
 bool UciManager::impl::_display(std::istringstream&, my_thread &) {
 	_pos.display();
 	std::cout<<"FEATURES ";
-	for(auto f: NNUE::createFeatures(_pos)) {
+	for(auto f: _pos.nnue().createFeatures()) {
 		std::cout<<f<<" ";
 	}
 	std::cout<<std::endl;

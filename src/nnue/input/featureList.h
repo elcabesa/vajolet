@@ -29,10 +29,10 @@ public:
     unsigned int get(unsigned int index) const;
     unsigned int size() const;
 private:
-
+    static constexpr unsigned int _size = 100;
     // TODO minimize size
     // TODO save max element stored
-    std::array<unsigned int, 100> _list;
+    std::array<unsigned int, _size> _list;
     unsigned int _pos = 0;
 };
 

@@ -16,6 +16,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <cassert>
+
 #include "differentialList.h"
 #include "sparse.h"
 
@@ -25,23 +27,21 @@ void DifferentialList::clear() {
 	_removePos = 0;
 }
 
-void DifferentialList::serialize(SparseInput& s, unsigned int offset) const{
-	for(unsigned int i = 0; i < _addPos; ++i) {
-		s.set(_addList[i] + offset, 1.0);
-	}
-	for(unsigned int i = 0; i < _removePos; ++i) {
-		s.set(_removeList[i] + offset, -1.0);
-	}
-}
 
 void DifferentialList::add(unsigned int f) {
 	// search in remove
+	assert(_removePos<_size);
+	assert(_addPos<_size);
+
 	for(unsigned int i = 0; i < _removePos; ++i) {
 		if(_removeList[i] == f) {
 			// found remove it
-			for(unsigned int x = i; x < _removePos; ++x) {
+			for(unsigned int x = i; x < _removePos - 1; ++x) {
+				assert(x + 1 < _size);
+				assert(x + 1 < _removePos);
 				_removeList[x] = _removeList[x+1];
 			}
+			assert(_removePos>0);
 			--_removePos;
 			return;
 		}
@@ -50,13 +50,18 @@ void DifferentialList::add(unsigned int f) {
 
 }
 void DifferentialList::remove(unsigned int f) {
+	assert(_removePos<_size);
+	assert(_addPos<_size);
 	// search in remove
 	for(unsigned int i = 0; i < _addPos; ++i) {
 		if(_addList[i] == f) {
 			// found remove it
-			for(unsigned int x = i; x < _addPos; ++x) {
+			for(unsigned int x = i; x < _addPos - 1; ++x) {
+				assert(x + 1 < _size);
+				assert(x + 1 < _addPos);
 				_addList[x] = _addList[x+1];
 			}
+			assert(_addPos>0);
 			--_addPos;
 			return;
 		}
@@ -69,10 +74,14 @@ unsigned int DifferentialList::size() const {
 }
 
 unsigned int DifferentialList::addList(unsigned int i) const {
+	assert(i<_size);
+	assert(i<_addPos);
 	return _addList[i];
 }
 
 unsigned int DifferentialList::removeList(unsigned int i) const {
+	assert(i<_size);
+	assert(i<_removePos);
 	return _removeList[i];
 }
 
