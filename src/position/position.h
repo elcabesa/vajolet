@@ -138,7 +138,7 @@ public:
 	std::string getSymmetricFen() const;
 #endif
 
-	const Position& setupFromFen(const std::string& fenStr);
+	Position& setupFromFen(const std::string& fenStr);
 	const Position& setup(const std::string& code, const Color c);
 
 	void doNullMove();

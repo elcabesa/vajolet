@@ -32,7 +32,7 @@ class FenSaver {
 	
 public:
 	FenSaver(unsigned int decimation, unsigned int n);
-	void save(const Position& pos);
+	void save(Position& pos);
 
 private:	
 	const unsigned int _decimation;
@@ -45,7 +45,7 @@ private:
 	uint_fast64_t _saved = 0;
 	unsigned int _logDecimationCnt = 0;
     
-	void writeFeatures(const Position& pos);
+	void writeFeatures(Position& pos);
 	void writeRes(Score res);
     
     std::set<unsigned int> featuresIndex;

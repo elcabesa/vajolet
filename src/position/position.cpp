@@ -32,7 +32,7 @@
 	\version 1.0
 	\date 27/10/2013
 */
-const Position& Position::setupFromFen(const std::string& fenStr)
+Position& Position::setupFromFen(const std::string& fenStr)
 {
 	char col,row,token;
 	tSquare sq = A8;
