@@ -19,63 +19,119 @@
 #include <cassert>
 #include <iostream>
 
+#include "featureList.h"
+#include "differentialList.h"
 #include "parallelDenseLayer.h"
 
 ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights):
-    Layer{2 * inputSize, 2 * outputSize}, _layerInputSize(inputSize), _layerOutputSize(outputSize)
-{
-    for(unsigned int n = 0 ; n < 2; ++n){
-        _parallelLayers.emplace_back(DenseLayer(_layerInputSize, _layerOutputSize, Layer::activationType::linear, biases[n], weights[n]));
-    }    
-}
+    Layer{2 * inputSize, 2 * outputSize}, 
+    _layerOutputSize(outputSize),
+    _bias0(biases[0]),
+    _bias1(biases[1]),
+    _weight0(weights[0]),
+    _weight1(weights[1])
+{}
 
 ParallelDenseLayer::~ParallelDenseLayer() {}
 
-DenseLayer& ParallelDenseLayer::getLayer(unsigned int i) {
-    return _parallelLayers[i];
-}
+unsigned int ParallelDenseLayer::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
+    assert(o + i * _layerOutputSize < _weight0->size());
+    return o + i * _layerOutputSize;
 
-unsigned int ParallelDenseLayer::_calcBiasIndex(const unsigned int layer, const unsigned int offset) const {
-    assert(offset < _layerOutputSize);
-    unsigned int x = layer * _layerOutputSize + offset;
-    assert(x < _outputSize);
-    return x;
-}
-
-void ParallelDenseLayer::propagate(const FeatureList&, std::vector<double>&, const unsigned int) {
-    std::cout<<"AHHHHHHHHHHHHHHHHHHH"<<std::endl;
 }
 
 void ParallelDenseLayer::propagate(const FeatureList& l, const FeatureList& h) {
-    _parallelLayers[0].propagate(l, _output, 0);
-    _parallelLayers[1].propagate(h, _output, _layerOutputSize);
+    for (unsigned int o = 0; o < _layerOutputSize; ++o) {
+        _output[o] = (*_bias0)[o];
+    }
+
+    for (unsigned int o = 0; o < _layerOutputSize; ++o) {
+        _output[_layerOutputSize + o ] = (*_bias1)[o];
+    }
+
+    for (unsigned int idx = 0; idx < l.size(); ++idx) {
+        unsigned int in = l.get(idx);
+        for (unsigned int o = 0; o < _layerOutputSize; ++o) {
+            _output[o] += (*_weight0)[_calcWeightIndex(in, o)];
+        }
+    } 
+
+    for (unsigned int idx = 0; idx < h.size(); ++idx) {
+        unsigned int in = h.get(idx);
+        for (unsigned int o = 0; o < _layerOutputSize; ++o) {
+            _output[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
+        }
+    } 
     
 }
 
-void ParallelDenseLayer::incrementalPropagate(const DifferentialList&, std::vector<double>&, const unsigned int) {
-    std::cout<<"AHHHHHHHHHHHHHHHHHHHh"<<std::endl;
-}
 void ParallelDenseLayer::incrementalPropagate(const DifferentialList& l, const DifferentialList& h) {
-    _parallelLayers[0].incrementalPropagate(l, _output, 0);
-    _parallelLayers[1].incrementalPropagate(h, _output, _layerOutputSize);
+    for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
+        unsigned int in = l.addList(idx);
+        for (unsigned int o = 0; o < _layerOutputSize; ++o) {
+            _output[o] += (*_weight0)[_calcWeightIndex(in, o)];
+        }
+    }
+
+    for(unsigned int idx = 0; idx < l.removeSize(); ++idx) {
+        unsigned int in = l.removeList(idx);
+        for (unsigned int o = 0; o < _layerOutputSize; ++o) {
+            _output[o] -= (*_weight0)[_calcWeightIndex(in, o)];
+        }
+    }
+
+    for(unsigned int idx = 0; idx < h.addSize(); ++idx) {
+        unsigned int in = h.addList(idx);
+        for (unsigned int o = 0; o < _layerOutputSize; ++o) {
+            _output[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
+        }
+    }
+
+    for(unsigned int idx = 0; idx < h.removeSize(); ++idx) {
+        unsigned int in = h.removeList(idx);
+        for (unsigned int o = 0; o < _layerOutputSize; ++o) {
+            _output[_layerOutputSize + o] -= (*_weight1)[_calcWeightIndex(in, o)];
+        }
+    }
 }
 
 void ParallelDenseLayer::propagate(const std::vector<double>& ) {
     std::cout<<"ARGHHHHH"<<std::endl;
 }
 
-void ParallelDenseLayer::incrementalPropagate(const std::vector<double>& ) {
-    std::cout<<"ARGHHHHH2"<<std::endl;
-}
-
 bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
     //std::cout<<"DESERIALIZE PARALLEL DENSE LAYER"<<std::endl;
     if(ss.get() != '{') {std::cout<<"ParallelDenseLayer missing {"<<std::endl;return false;}
     
-    if(!_parallelLayers[0].deserialize(ss)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
-    if(!_parallelLayers[1].deserialize(ss)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
+    if(!_deserialize(ss, _bias0, _weight0)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
+    if(!_deserialize(ss, _bias1, _weight1)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
     
     if(ss.get() != '}') {std::cout<<"ParallelDenseLayer missing }"<<std::endl;return false;}
+    if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
+    return true;
+}
+
+bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<double>* bias, std::vector<double>* weight) {
+    //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
+    union un{
+        double d;
+        char c[8];
+    }u;
+    if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
+    for( auto & b: *bias) {
+        ss.read(u.c, 8);
+        b = u.d;
+        if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
+        if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
+    }
+    if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
+    for( auto & w: *weight) {
+        ss.read(u.c, 8);
+        w = u.d;
+        if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
+        if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
+    }
+    if(ss.get() != '}') {std::cout<<"DenseLayer missing }"<<std::endl;return false;} 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     return true;
 }

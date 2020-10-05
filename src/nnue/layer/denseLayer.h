@@ -28,14 +28,11 @@ class DenseLayer: public Layer {
 public:
     DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<double>* bias, std::vector<double>* weight);
     ~DenseLayer();
-    
-    void propagate(const FeatureList& input, std::vector<double>& out, const unsigned int offset);
+
     void propagate(const FeatureList& l, const FeatureList& h);
-    void incrementalPropagate(const DifferentialList& input, std::vector<double>& out, const unsigned int offset);
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
     void propagate(const std::vector<double>& input);
-    void incrementalPropagate(const std::vector<double>& input);
 
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 

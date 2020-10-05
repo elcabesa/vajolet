@@ -32,38 +32,8 @@ DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSi
 
 DenseLayer::~DenseLayer() {}
 
-
-void DenseLayer::propagate(const FeatureList& input, std::vector<double>& out, const unsigned int offset) {
-    
-    for (unsigned int o = 0; o < _outputSize; ++o) {
-        out[offset + o ] = (*_bias)[o];
-    }
-
-    for (unsigned int idx = 0; idx < input.size(); ++idx) {
-        unsigned int in = input.get(idx);
-        for (unsigned int o = 0; o < _outputSize; ++o) {
-            out[offset + o] += (*_weight)[_calcWeightIndex(in, o)];
-        }
-    }  
-}
 void DenseLayer::propagate(const FeatureList&, const FeatureList&) {
     std::cout<<"AHHHHHHHHHHHHHHHHHHHH"<<std::endl;
-}
-
-void DenseLayer::incrementalPropagate(const DifferentialList& input, std::vector<double>& out, const unsigned int offset) {
-    for(unsigned int idx = 0; idx < input.addSize(); ++idx) {
-        unsigned int in = input.addList(idx);
-        for (unsigned int o = 0; o < _outputSize; ++o) {
-            out[offset + o] += (*_weight)[_calcWeightIndex(in, o)];
-        }
-    }
-
-    for(unsigned int idx = 0; idx < input.removeSize(); ++idx) {
-        unsigned int in = input.removeList(idx);
-        for (unsigned int o = 0; o < _outputSize; ++o) {
-            out[offset + o] -= (*_weight)[_calcWeightIndex(in, o)];
-        }
-    }
 }
 
 void DenseLayer::incrementalPropagate(const DifferentialList&, const DifferentialList&) {
@@ -85,10 +55,6 @@ void DenseLayer::propagate(const std::vector<double>& input) {
             _output[o] = std::max(_output[o], 0.0); 
         }
     }
-}
-
-void DenseLayer::incrementalPropagate(const std::vector<double>&) {
-    std::cout<<"AHHHHHHHHHHHHH"<<std::endl;
 }
 
 unsigned int DenseLayer::_calcWeightIndex(const unsigned int i, const unsigned int o) const {

@@ -30,25 +30,27 @@ class ParallelDenseLayer: public Layer {
 public:
     ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights);
     ~ParallelDenseLayer();
-    
-    void propagate(const FeatureList& input, std::vector<double>& out, const unsigned int offset);
+
     void propagate(const FeatureList& l, const FeatureList& h);
-    void incrementalPropagate(const DifferentialList& input, std::vector<double>& out, const unsigned int offset);
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
     void propagate(const std::vector<double>& input);
-    void incrementalPropagate(const std::vector<double>& input);
-    
-    DenseLayer& getLayer(unsigned int);
 
-    unsigned int _calcBiasIndex(const unsigned int layer, const unsigned int offset) const;
+
     
     bool deserialize(std::ifstream& ss);
     
+    
 private:
-    std::vector<DenseLayer> _parallelLayers;
-    const unsigned int _layerInputSize;
+    unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
+    bool _deserialize(std::ifstream& ss, std::vector<double>* bias, std::vector<double>* weight);
+
     const unsigned int _layerOutputSize;
+
+    std::vector<double>* _bias0;
+    std::vector<double>* _bias1;
+    std::vector<double>* _weight0;
+    std::vector<double>* _weight1;
 
 };
 
