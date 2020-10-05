@@ -57,18 +57,12 @@ NNUE::NNUE(const Position& pos):_pos(pos) {
 	weight2.resize(32 * 32, 1.0);
 	weight3.resize(32 * 1, 1.0);
 
-	std::vector<std::vector<double>*> biases0;
-	biases0.push_back(&bias00);
-	biases0.push_back(&bias01);
-	std::vector<std::vector<double>*> weights0;
-	weights0.push_back(&weight00);
-	weights0.push_back(&weight01);
-    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, biases0, weights0));
+    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01));
     _modelW.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
     _modelW.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
     _modelW.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
 
-	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, biases0, weights0));
+	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01));
     _modelB.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
     _modelB.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
     _modelB.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
@@ -76,7 +70,7 @@ NNUE::NNUE(const Position& pos):_pos(pos) {
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
 	_m.clear();
-	_m.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, biases0, weights0));
+	_m.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01));
     _m.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
     _m.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
     _m.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));

@@ -28,7 +28,7 @@ class Activation;
 
 class ParallelDenseLayer: public Layer {
 public:
-    ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights);
+    ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<double>* bias0, std::vector<double>* bias1, std::vector<double>* weight0, std::vector<double>* weight1);
     ~ParallelDenseLayer();
 
     void propagate(const FeatureList& l, const FeatureList& h);

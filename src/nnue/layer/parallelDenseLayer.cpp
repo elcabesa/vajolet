@@ -23,13 +23,13 @@
 #include "differentialList.h"
 #include "parallelDenseLayer.h"
 
-ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights):
+ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<double>* bias0, std::vector<double>* bias1, std::vector<double>* weight0, std::vector<double>* weight1):
     Layer{2 * inputSize, 2 * outputSize}, 
     _layerOutputSize(outputSize),
-    _bias0(biases[0]),
-    _bias1(biases[1]),
-    _weight0(weights[0]),
-    _weight1(weights[1])
+    _bias0(bias0),
+    _bias1(bias1),
+    _weight0(weight0),
+    _weight1(weight1)
 {}
 
 ParallelDenseLayer::~ParallelDenseLayer() {}
