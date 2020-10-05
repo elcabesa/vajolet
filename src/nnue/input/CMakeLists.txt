@@ -1,9 +1,6 @@
 target_sources(libChess PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/differentialList.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/featureList.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/input.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sparse.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/parallelSparse.cpp
 )
 
 # Make sure the compiler can find include files for our libChess library

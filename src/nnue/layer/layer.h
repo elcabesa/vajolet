@@ -38,7 +38,6 @@ public:
     
     unsigned int getInputSize() const;
     unsigned int getOutputSize() const;
-    double getOutput(unsigned int i) const;
     const std::vector<double>& output() const;
     
     virtual void propagate(const FeatureList& input) = 0;

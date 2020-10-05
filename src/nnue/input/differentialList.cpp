@@ -19,8 +19,6 @@
 #include <cassert>
 
 #include "differentialList.h"
-#include "sparse.h"
-
 
 void DifferentialList::clear() {
 	_addPos = 0;

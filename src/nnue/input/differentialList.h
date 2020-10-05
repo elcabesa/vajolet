@@ -22,8 +22,6 @@
 
 #include <array>
 
-class SparseInput;
-
 class DifferentialList {
 public:
     void clear();

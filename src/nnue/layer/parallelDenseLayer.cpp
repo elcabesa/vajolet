@@ -20,7 +20,6 @@
 #include <iostream>
 
 #include "parallelDenseLayer.h"
-#include "parallelSparse.h"
 
 ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights):
     Layer{2 * inputSize, 2 * outputSize}, _layerInputSize(inputSize), _layerOutputSize(outputSize)

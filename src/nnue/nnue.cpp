@@ -20,7 +20,6 @@
 #include "nnue.h"
 #include "parallelDenseLayer.h"
 #include "position.h"
-#include "sparse.h"
 
 //TODO remove std::set, std::map and aòò the very slow code
 //TODO hardcode the nn 

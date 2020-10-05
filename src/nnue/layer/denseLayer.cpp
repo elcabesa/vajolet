@@ -22,7 +22,6 @@
 #include "denseLayer.h"
 #include "differentialList.h"
 #include "featureList.h"
-#include "input.h"
 
 DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<double>* bias, std::vector<double>* weight):
     Layer{inputSize, outputSize},
@@ -96,7 +95,6 @@ void DenseLayer::propagate(const FeatureList&, const FeatureList&) {
 
 void DenseLayer::incrementalPropagate(const DifferentialList& input) {
     _calcNetOutIncremental(input);
-    _calcOut();
 }
 
 void DenseLayer::incrementalPropagate(const DifferentialList&, const DifferentialList&) {
