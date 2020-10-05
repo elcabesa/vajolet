@@ -31,9 +31,9 @@ public:
     ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<std::vector<double>*> biases, std::vector<std::vector<double>*> weights);
     ~ParallelDenseLayer();
     
-    void propagate(const FeatureList& input);
+    void propagate(const FeatureList& input, std::vector<double>& out, const unsigned int offset);
     void propagate(const FeatureList& l, const FeatureList& h);
-    void incrementalPropagate(const DifferentialList& input);
+    void incrementalPropagate(const DifferentialList& input, std::vector<double>& out, const unsigned int offset);
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
     void propagate(const std::vector<double>& input);

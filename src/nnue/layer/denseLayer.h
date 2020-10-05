@@ -29,9 +29,9 @@ public:
     DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<double>* bias, std::vector<double>* weight);
     ~DenseLayer();
     
-    void propagate(const FeatureList& input);
+    void propagate(const FeatureList& input, std::vector<double>& out, const unsigned int offset);
     void propagate(const FeatureList& l, const FeatureList& h);
-    void incrementalPropagate(const DifferentialList& input);
+    void incrementalPropagate(const DifferentialList& input, std::vector<double>& out, const unsigned int offset);
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
     void propagate(const std::vector<double>& input);
@@ -46,11 +46,6 @@ private:
     std::vector<double>* _weight;
     
     activationType _act;
-    
-    void _calcNetOut(const FeatureList& input);
-    void _calcNetOutIncremental(const DifferentialList& input);
-    void _calcNetOut2(const std::vector<double>& input, bool incremental = false);
-    void _calcOut();
 };
 
 #endif  

@@ -42,64 +42,22 @@ unsigned int ParallelDenseLayer::_calcBiasIndex(const unsigned int layer, const 
     return x;
 }
 
-void ParallelDenseLayer::propagate(const FeatureList&) {
+void ParallelDenseLayer::propagate(const FeatureList&, std::vector<double>&, const unsigned int) {
     std::cout<<"AHHHHHHHHHHHHHHHHHHH"<<std::endl;
 }
 
 void ParallelDenseLayer::propagate(const FeatureList& l, const FeatureList& h) {
-
-    _parallelLayers[0].propagate(l);
-    // copy back output
-    // TODO remove, write directly to output
-    {
-        auto& out = _parallelLayers[0].output();
-        unsigned int outIndex = 0;
-        for(auto el: out) {
-            _output[_calcBiasIndex(0, outIndex)] = el; 
-            ++outIndex;
-        }
-    }
-
-    _parallelLayers[1].propagate(h);
-    // copy back output
-    // TODO remove, write directly to output
-    {
-        auto& out = _parallelLayers[1].output();
-        unsigned int outIndex = 0;
-        for(auto el: out) {
-            _output[_calcBiasIndex(1, outIndex)] = el; 
-            ++outIndex;
-        }  
-    }
+    _parallelLayers[0].propagate(l, _output, 0);
+    _parallelLayers[1].propagate(h, _output, _layerOutputSize);
+    
 }
 
-void ParallelDenseLayer::incrementalPropagate(const DifferentialList&) {
+void ParallelDenseLayer::incrementalPropagate(const DifferentialList&, std::vector<double>&, const unsigned int) {
     std::cout<<"AHHHHHHHHHHHHHHHHHHHh"<<std::endl;
 }
 void ParallelDenseLayer::incrementalPropagate(const DifferentialList& l, const DifferentialList& h) {
-    _parallelLayers[0].incrementalPropagate(l);
-    // copy back output
-    // TODO remove, write directly to output
-    {
-        auto& out = _parallelLayers[0].output();
-        unsigned int outIndex = 0;
-        for(auto el: out) {
-            _output[_calcBiasIndex(0, outIndex)] = el; 
-            ++outIndex;
-        }
-    }
-
-    _parallelLayers[1].incrementalPropagate(h);
-    // copy back output
-    // TODO remove, write directly to output
-    {
-        auto& out = _parallelLayers[1].output();
-        unsigned int outIndex = 0;
-        for(auto el: out) {
-            _output[_calcBiasIndex(1, outIndex)] = el; 
-            ++outIndex;
-        }  
-    }
+    _parallelLayers[0].incrementalPropagate(l, _output, 0);
+    _parallelLayers[1].incrementalPropagate(h, _output, _layerOutputSize);
 }
 
 void ParallelDenseLayer::propagate(const std::vector<double>& ) {

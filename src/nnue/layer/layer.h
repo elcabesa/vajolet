@@ -40,9 +40,9 @@ public:
     unsigned int getOutputSize() const;
     const std::vector<double>& output() const;
     
-    virtual void propagate(const FeatureList& input) = 0;
+    virtual void propagate(const FeatureList& input, std::vector<double>& out, const unsigned int offset) = 0;
     virtual void propagate(const FeatureList& l, const FeatureList& h) = 0;
-    virtual void incrementalPropagate(const DifferentialList& input) = 0;
+    virtual void incrementalPropagate(const DifferentialList& input, std::vector<double>& out, const unsigned int offset) = 0;
     virtual void incrementalPropagate(const DifferentialList& l, const DifferentialList& h) = 0;
 
     virtual void propagate(const std::vector<double>& input) = 0;
