@@ -26,17 +26,17 @@
 //TODO move all the math in fixed point?
 // todo remove derived classes? 
 
-std::vector<double> NNUE::bias00;
-std::vector<double> NNUE::bias01;
-std::vector<double> NNUE::bias1;
-std::vector<double> NNUE::bias2;
-std::vector<double> NNUE::bias3;
+std::vector<nnueType> NNUE::bias00;
+std::vector<nnueType> NNUE::bias01;
+std::vector<nnueType> NNUE::bias1;
+std::vector<nnueType> NNUE::bias2;
+std::vector<nnueType> NNUE::bias3;
 
-std::vector<double> NNUE::weight00;
-std::vector<double> NNUE::weight01;
-std::vector<double> NNUE::weight1;
-std::vector<double> NNUE::weight2;
-std::vector<double> NNUE::weight3;
+std::vector<nnueType> NNUE::weight00;
+std::vector<nnueType> NNUE::weight01;
+std::vector<nnueType> NNUE::weight1;
+std::vector<nnueType> NNUE::weight2;
+std::vector<nnueType> NNUE::weight3;
 
 bool NNUE::_loaded = false;
 

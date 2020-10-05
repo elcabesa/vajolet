@@ -23,6 +23,8 @@
 #include <fstream>
 #include <vector>
 
+#include "nnue_type.h"
+
 class DifferentialList;
 class FeatureList;
 
@@ -38,19 +40,19 @@ public:
     
     unsigned int getInputSize() const;
     unsigned int getOutputSize() const;
-    const std::vector<double>& output() const;
+    const std::vector<nnueType>& output() const;
 
     virtual void propagate(const FeatureList& l, const FeatureList& h) = 0;
     virtual void incrementalPropagate(const DifferentialList& l, const DifferentialList& h) = 0;
 
-    virtual void propagate(const std::vector<double>& input) = 0;
+    virtual void propagate(const std::vector<nnueType>& input) = 0;
     
     virtual bool deserialize(std::ifstream& ss) = 0;
 
 protected:
     unsigned int _inputSize;
     unsigned int _outputSize;
-    std::vector<double> _output;
+    std::vector<nnueType> _output;
     
 };
 

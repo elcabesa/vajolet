@@ -20,27 +20,28 @@
 #define _DENSE_LAYER_H
 
 #include <vector>
+#include "nnue_type.h"
 #include "layer.h"
 
 class Activation;
 
 class DenseLayer: public Layer {
 public:
-    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<double>* bias, std::vector<double>* weight);
+    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<nnueType>* bias, std::vector<nnueType>* weight);
     ~DenseLayer();
 
     void propagate(const FeatureList& l, const FeatureList& h);
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
-    void propagate(const std::vector<double>& input);
+    void propagate(const std::vector<nnueType>& input);
 
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
     bool deserialize(std::ifstream& ss);
     
 private:
-    std::vector<double>* _bias;
-    std::vector<double>* _weight;
+    std::vector<nnueType>* _bias;
+    std::vector<nnueType>* _weight;
     
     activationType _act;
 };

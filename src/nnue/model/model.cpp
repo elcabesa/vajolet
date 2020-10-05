@@ -32,8 +32,8 @@ void Model::addLayer(std::unique_ptr<Layer> l) {
     _layers.push_back(std::move(l));
 }
 
-double Model::forwardPass(const FeatureList& l, const FeatureList& h) {
-    const std::vector<double>* in;
+nnueType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
+    const std::vector<nnueType>* in;
     unsigned int i= 0;
     for(auto& p: _layers) {
         if(i == 0) {
@@ -47,8 +47,8 @@ double Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     return (*in)[0] * 10000;
 }
 
-double Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
-    const std::vector<double>* in;
+nnueType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
+    const std::vector<nnueType>* in;
     unsigned int i= 0;
     for(auto& p: _layers) {
         if(i == 0) {

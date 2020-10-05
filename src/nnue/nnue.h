@@ -28,6 +28,7 @@
 #include "model.h"
 #include "tSquare.h"
 #include "vajolet.h"
+#include "nnue_type.h"
 
 class Position;
 
@@ -65,17 +66,17 @@ private:
     Model _m;
 #endif
     static bool _loaded;
-    static std::vector<double> bias00;
-    static std::vector<double> bias01;
-    static std::vector<double> bias1;
-    static std::vector<double> bias2;
-    static std::vector<double> bias3;
+    static std::vector<nnueType> bias00;
+    static std::vector<nnueType> bias01;
+    static std::vector<nnueType> bias1;
+    static std::vector<nnueType> bias2;
+    static std::vector<nnueType> bias3;
 
-    static std::vector<double> weight00;
-    static std::vector<double> weight01;
-    static std::vector<double> weight1;
-    static std::vector<double> weight2;
-    static std::vector<double> weight3;
+    static std::vector<nnueType> weight00;
+    static std::vector<nnueType> weight01;
+    static std::vector<nnueType> weight1;
+    static std::vector<nnueType> weight2;
+    static std::vector<nnueType> weight3;
 
     DifferentialList _whiteW;
     DifferentialList _blackW;

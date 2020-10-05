@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "layer.h"
+#include "nnue_type.h"
 
 class DifferentialList;
 class FeatureList;
@@ -35,8 +36,8 @@ public:
     Layer& getLayer(unsigned int index);
     unsigned int getLayerCount();
     
-    double forwardPass(const FeatureList& l, const FeatureList& h);
-    double incrementalPass(const DifferentialList& l, const DifferentialList& h);
+    nnueType forwardPass(const FeatureList& l, const FeatureList& h);
+    nnueType incrementalPass(const DifferentialList& l, const DifferentialList& h);
     
     bool deserialize(std::ifstream& ss);
     

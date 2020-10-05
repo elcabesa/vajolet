@@ -23,7 +23,7 @@
 #include "differentialList.h"
 #include "parallelDenseLayer.h"
 
-ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<double>* bias0, std::vector<double>* bias1, std::vector<double>* weight0, std::vector<double>* weight1):
+ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<nnueType>* bias0, std::vector<nnueType>* bias1, std::vector<nnueType>* weight0, std::vector<nnueType>* weight1):
     Layer{2 * inputSize, 2 * outputSize}, 
     _layerOutputSize(outputSize),
     _bias0(bias0),
@@ -95,7 +95,7 @@ void ParallelDenseLayer::incrementalPropagate(const DifferentialList& l, const D
     }
 }
 
-void ParallelDenseLayer::propagate(const std::vector<double>& ) {
+void ParallelDenseLayer::propagate(const std::vector<nnueType>& ) {
     std::cout<<"ARGHHHHH"<<std::endl;
 }
 
@@ -111,7 +111,7 @@ bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
     return true;
 }
 
-bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<double>* bias, std::vector<double>* weight) {
+bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* bias, std::vector<nnueType>* weight) {
     //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
     union un{
         double d;
@@ -120,14 +120,14 @@ bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<double>* bi
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
         ss.read(u.c, 8);
-        b = u.d;
+        b = (nnueType)(u.d);
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     for( auto & w: *weight) {
         ss.read(u.c, 8);
-        w = u.d;
+        w = (nnueType)(u.d);
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
