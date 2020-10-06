@@ -66,10 +66,10 @@ void ParallelDenseLayer::propagate(const FeatureList& l, const FeatureList& h) {
             _output[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
         }
     } 
-    std::cout<<"----------------"<<std::endl;
+    /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
         std::cout<<_output[o] /4096.0 <<std::endl;
-    }
+    }*/
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
         _max = std::max(_max, nnueType(_output[o]));
         _min = std::min(_min, nnueType(_output[o]));

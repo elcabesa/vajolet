@@ -67,10 +67,10 @@ void DenseLayer::propagate(const std::vector<nnueType>& input) {
         index += _inputSize;
     }
 
-    std::cout<<"----------------"<<std::endl;
+    /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
         std::cout<<_output[o] /4096.0 <<std::endl;
-    }
+    }*/
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
         _max = std::max(_max, nnueType(_output[o]));
