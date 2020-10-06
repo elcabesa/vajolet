@@ -20,8 +20,7 @@
 
 Layer::Layer(const unsigned int inputSize, const unsigned int outputSize):
     _inputSize(inputSize),
-    _outputSize(outputSize),
-    _output(outputSize)
+    _outputSize(outputSize)
 {}
 
 Layer::~Layer() {}
@@ -34,6 +33,5 @@ unsigned int Layer::getOutputSize() const {
     return _outputSize;
 }
 
-const std::vector<nnueType>& Layer::output() const {return _output;}
 
 

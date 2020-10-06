@@ -95,12 +95,7 @@ bool NNUE::load(std::string path) {
 	std::ifstream nnFile;
 	nnFile.open(path);
 	if(nnFile.is_open()) {
-		//todo, it's possibile to clone model?
 		if(_modelW.deserialize(nnFile) 
-			&& _modelB.deserialize(nnFile)
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-			&& _m.deserialize(nnFile)
-#endif
 		){
 			_loaded = true;
 			std::cout<<"done"<<std::endl;

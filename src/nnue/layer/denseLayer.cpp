@@ -27,10 +27,14 @@ DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSi
     Layer{inputSize, outputSize},
     _bias(bias),
     _weight(weight),
-    _act(act)  
+    _act(act),
+    _output(outputSize)
 {}
 
-DenseLayer::~DenseLayer() {}
+DenseLayer::~DenseLayer() {
+    //std::cout<<"min "<<_min <<std::endl;
+    //std::cout<<"MAX "<<_max <<std::endl;
+}
 
 void DenseLayer::propagate(const FeatureList&, const FeatureList&) {
     std::cout<<"AHHHHHHHHHHHHHHHHHHHH"<<std::endl;
@@ -55,6 +59,11 @@ void DenseLayer::propagate(const std::vector<nnueType>& input) {
             _output[o] = std::max(_output[o], (nnueType)(0.0)); 
         }
     }
+
+    /*for (unsigned int o = 0; o < _outputSize; ++o) {
+        _max = std::max(_max, nnueType(_output[o]));
+        _min = std::min(_min, nnueType(_output[o]));
+    }*/
 }
 
 unsigned int DenseLayer::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
@@ -64,26 +73,43 @@ unsigned int DenseLayer::_calcWeightIndex(const unsigned int i, const unsigned i
 }
 
 bool DenseLayer::deserialize(std::ifstream& ss) {
+    /*nnueType min = 1e8;
+    nnueType max = -1e8;*/
     //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
     union un{
         double d;
         char c[8];
     }u;
+    //std::cout<<"-----------------------------"<<std::endl;
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *_bias) {
         ss.read(u.c, 8);
         b = (nnueType)(u.d);
+        //std::cout<<b<<std::endl;
+        //min = std::min(min, nnueType(b));
+        //max = std::max(max, nnueType(b));
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
+    /*std::cout<<"b min "<<min<<std::endl;
+    std::cout<<"b MAX "<<max<<std::endl;
+    min = 1e8;
+    max = -1e8;*/
     for( auto & w: *_weight) {
         ss.read(u.c, 8);
         w = (nnueType)(u.d);
+        //std::cout<<w<<std::endl;
+        //min = std::min(min, nnueType(w));
+        //max = std::max(max, nnueType(w));
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
+    //std::cout<<"w min "<<min<<std::endl;
+    //std::cout<<"w MAX "<<max<<std::endl;
     if(ss.get() != '}') {std::cout<<"DenseLayer missing }"<<std::endl;return false;} 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     return true;
 }
+
+const std::vector<nnueType>& DenseLayer::output() const {return _output;}

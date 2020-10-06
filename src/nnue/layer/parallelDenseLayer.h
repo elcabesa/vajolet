@@ -40,6 +40,7 @@ public:
 
     
     bool deserialize(std::ifstream& ss);
+    const std::vector<nnueType>& output() const;
     
     
 private:
@@ -52,6 +53,11 @@ private:
     std::vector<nnueType>* _bias1;
     std::vector<nnueType>* _weight0;
     std::vector<nnueType>* _weight1;
+
+    /*nnueType _max = -127;
+    nnueType _min = 127;*/
+
+    std::vector<nnueType> _output;
 
 };
 

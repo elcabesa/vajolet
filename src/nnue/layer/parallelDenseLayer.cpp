@@ -29,10 +29,14 @@ ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsig
     _bias0(bias0),
     _bias1(bias1),
     _weight0(weight0),
-    _weight1(weight1)
+    _weight1(weight1),
+    _output(2 * outputSize)
 {}
 
-ParallelDenseLayer::~ParallelDenseLayer() {}
+ParallelDenseLayer::~ParallelDenseLayer() {
+    /*std::cout<<"Pmin "<<_min <<std::endl;
+    std::cout<<"PMAX "<<_max <<std::endl;*/
+}
 
 unsigned int ParallelDenseLayer::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
     assert(o + i * _layerOutputSize < _weight0->size());
@@ -63,6 +67,10 @@ void ParallelDenseLayer::propagate(const FeatureList& l, const FeatureList& h) {
         }
     } 
     
+    /*for (unsigned int o = 0; o < _outputSize; ++o) {
+        _max = std::max(_max, nnueType(_output[o]));
+        _min = std::min(_min, nnueType(_output[o]));
+    }*/
 }
 
 void ParallelDenseLayer::incrementalPropagate(const DifferentialList& l, const DifferentialList& h) {
@@ -93,6 +101,11 @@ void ParallelDenseLayer::incrementalPropagate(const DifferentialList& l, const D
             _output[_layerOutputSize + o] -= (*_weight1)[_calcWeightIndex(in, o)];
         }
     }
+
+    /*for (unsigned int o = 0; o < _outputSize; ++o) {
+        _max = std::max(_max, nnueType(_output[o]));
+        _min = std::min(_min, nnueType(_output[o]));
+    }*/
 }
 
 void ParallelDenseLayer::propagate(const std::vector<nnueType>& ) {
@@ -112,26 +125,43 @@ bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
 }
 
 bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* bias, std::vector<nnueType>* weight) {
+    /*nnueType min = 1e8;
+    nnueType max = -1e8;*/
     //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
     union un{
         double d;
         char c[8];
     }u;
+    //std::cout<<"-----------------------------"<<std::endl;
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
         ss.read(u.c, 8);
         b = (nnueType)(u.d);
+        //std::cout<<b<<std::endl;
+        /*min = std::min(min, nnueType(b));
+        max = std::max(max, nnueType(b));*/
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
+    /*std::cout<<"b min "<<min<<std::endl;
+    std::cout<<"b MAX "<<max<<std::endl;
+    min = 1e8;
+    max = -1e8;*/
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     for( auto & w: *weight) {
         ss.read(u.c, 8);
         w = (nnueType)(u.d);
+        //std::cout<<w<<std::endl;
+        /*min = std::min(min, nnueType(w));
+        max = std::max(max, nnueType(w));*/
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
+    /*std::cout<<"w min "<<min<<std::endl;
+    std::cout<<"wMAX "<<max<<std::endl;*/
     if(ss.get() != '}') {std::cout<<"DenseLayer missing }"<<std::endl;return false;} 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     return true;
 }
+
+const std::vector<nnueType>& ParallelDenseLayer::output() const {return _output;}

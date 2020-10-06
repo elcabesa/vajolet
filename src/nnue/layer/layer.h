@@ -40,7 +40,7 @@ public:
     
     unsigned int getInputSize() const;
     unsigned int getOutputSize() const;
-    const std::vector<nnueType>& output() const;
+    virtual const std::vector<nnueType>& output() const = 0;
 
     virtual void propagate(const FeatureList& l, const FeatureList& h) = 0;
     virtual void incrementalPropagate(const DifferentialList& l, const DifferentialList& h) = 0;
@@ -52,7 +52,6 @@ public:
 protected:
     unsigned int _inputSize;
     unsigned int _outputSize;
-    std::vector<nnueType> _output;
     
 };
 

@@ -18,6 +18,6 @@
 #ifndef NNUE_TYPE_H_
 #define NNUE_TYPE_H_ 
 
-using nnueType = double;
+using nnueType = float;
 
 #endif

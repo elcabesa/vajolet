@@ -38,12 +38,19 @@ public:
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
     bool deserialize(std::ifstream& ss);
+
+    const std::vector<nnueType>& output() const;
     
 private:
     std::vector<nnueType>* _bias;
     std::vector<nnueType>* _weight;
     
     activationType _act;
+
+    std::vector<nnueType> _output;
+
+    /*nnueType _max = -1e9;
+    nnueType _min = 1e9;*/
 };
 
 #endif  
