@@ -33,33 +33,19 @@ void Model::addLayer(std::unique_ptr<Layer> l) {
 }
 
 nnueType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
-    const std::vector<nnueType>* in;
-    unsigned int i= 0;
-    for(auto& p: _layers) {
-        if(i == 0) {
-            p->propagate(l, h);
-        } else {
-            p->propagate(*in);
-        }
-        in = &p->output();
-        ++i;
-    }
-    return (*in)[0] * 10000;
+    _layers[0]->propagate(l, h);
+    _layers[1]->propagate(_layers[0]->output());
+    _layers[2]->propagate(_layers[1]->output());
+    _layers[3]->propagate(_layers[2]->output());
+    return _layers[3]->output()[0] * 10000;
 }
 
 nnueType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
-    const std::vector<nnueType>* in;
-    unsigned int i= 0;
-    for(auto& p: _layers) {
-        if(i == 0) {
-            p->incrementalPropagate(l, h);
-        } else { 
-            p->propagate(*in);
-        }
-        in = &p->output();
-        ++i;
-    }
-    return (*in)[0] * 10000;
+    _layers[0]->incrementalPropagate(l, h);
+    _layers[1]->propagate(_layers[0]->output());
+    _layers[2]->propagate(_layers[1]->output());
+    _layers[3]->propagate(_layers[2]->output());
+    return _layers[3]->output()[0] * 10000;
 }
 
 bool Model::deserialize(std::ifstream& ss) {
