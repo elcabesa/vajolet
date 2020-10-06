@@ -44,20 +44,32 @@ void DenseLayer::incrementalPropagate(const DifferentialList&, const Differentia
     std::cout<<"AAAAAAAAAAAAAAHHH"<<std::endl;
 }
 
+nnueType DenseLayer::_propagate(const std::vector<nnueType>& input, const unsigned int index) {   
+    int32_t out = 0;
+    for(unsigned int i = 0; i< _inputSize; ++i) {
+        out += input[i] * (*_weight)[index + i]; // Q12 * Q15
+    }
+    return out >>15;
+}
+
 void DenseLayer::propagate(const std::vector<nnueType>& input) {
-    _output = *_bias;
 
     unsigned int index = 0;
-    for(nnueType value: input) {
-        for (unsigned int o = 0; o < _outputSize; ++o) {
-            _output[o] += value * (*_weight)[_calcWeightIndex(index, o)];
-        }
-        ++index;
-    }
-    if(_act == activationType::relu) {
-        for(unsigned int o = 0; o < _outputSize; ++o) {
+    for (unsigned int o = 0; o < _outputSize; ++o) {
+        
+        _output[o] = (*_bias)[o]; // Q12
+        
+        _output[o] += _propagate(input, index); //Q12
+
+        if(_act == activationType::relu) {
             _output[o] = std::max(_output[o], (nnueType)(0.0)); 
         }
+        index += _inputSize;
+    }
+
+    std::cout<<"----------------"<<std::endl;
+    for (unsigned int o = 0; o < _outputSize; ++o) {
+        std::cout<<_output[o] /4096.0 <<std::endl;
     }
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
@@ -68,7 +80,7 @@ void DenseLayer::propagate(const std::vector<nnueType>& input) {
 
 unsigned int DenseLayer::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
     assert(o + i * _outputSize < _weight->size());
-    return o + i * _outputSize;
+    return o * _inputSize + i;
 
 }
 
@@ -84,7 +96,7 @@ bool DenseLayer::deserialize(std::ifstream& ss) {
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *_bias) {
         ss.read(u.c, 8);
-        b = (nnueType)(u.d);
+        b = (nnueType)(u.d * 4096);
         //std::cout<<b<<std::endl;
         //min = std::min(min, nnueType(b));
         //max = std::max(max, nnueType(b));
@@ -96,9 +108,13 @@ bool DenseLayer::deserialize(std::ifstream& ss) {
     std::cout<<"b MAX "<<max<<std::endl;
     min = 1e8;
     max = -1e8;*/
-    for( auto & w: *_weight) {
+    for( size_t idx = 0; idx < (*_weight).size(); ++idx) 
+    //for( auto & w: *_weight)
+    {
+        unsigned int i = idx / _outputSize;
+        unsigned int o = idx % _outputSize;
         ss.read(u.c, 8);
-        w = (nnueType)(u.d);
+        (*_weight)[_calcWeightIndex(i, o)] = (nnueType)(u.d * 32768);
         //std::cout<<w<<std::endl;
         //min = std::min(min, nnueType(w));
         //max = std::max(max, nnueType(w));

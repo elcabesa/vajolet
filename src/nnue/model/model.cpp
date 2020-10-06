@@ -37,7 +37,7 @@ nnueType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     _layers[1]->propagate(_layers[0]->output());
     _layers[2]->propagate(_layers[1]->output());
     _layers[3]->propagate(_layers[2]->output());
-    return _layers[3]->output()[0] * 10000;
+    return _layers[3]->output()[0] * (10000.0 / 4096.0);
 }
 
 nnueType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
@@ -45,7 +45,7 @@ nnueType Model::incrementalPass(const DifferentialList& l, const DifferentialLis
     _layers[1]->propagate(_layers[0]->output());
     _layers[2]->propagate(_layers[1]->output());
     _layers[3]->propagate(_layers[2]->output());
-    return _layers[3]->output()[0] * 10000;
+    return _layers[3]->output()[0] * (10000.0 / 4096.0);
 }
 
 bool Model::deserialize(std::ifstream& ss) {

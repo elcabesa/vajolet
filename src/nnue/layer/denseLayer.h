@@ -51,6 +51,8 @@ private:
 
     /*nnueType _max = -1e9;
     nnueType _min = 1e9;*/
+
+    nnueType _propagate(const std::vector<nnueType>& input, const unsigned int index);
 };
 
 #endif  

@@ -66,7 +66,10 @@ void ParallelDenseLayer::propagate(const FeatureList& l, const FeatureList& h) {
             _output[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
         }
     } 
-    
+    std::cout<<"----------------"<<std::endl;
+    for (unsigned int o = 0; o < _outputSize; ++o) {
+        std::cout<<_output[o] /4096.0 <<std::endl;
+    }
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
         _max = std::max(_max, nnueType(_output[o]));
         _min = std::min(_min, nnueType(_output[o]));
@@ -136,7 +139,7 @@ bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* 
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
         ss.read(u.c, 8);
-        b = (nnueType)(u.d);
+        b = (nnueType)(u.d * 4096);
         //std::cout<<b<<std::endl;
         /*min = std::min(min, nnueType(b));
         max = std::max(max, nnueType(b));*/
@@ -150,7 +153,7 @@ bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     for( auto & w: *weight) {
         ss.read(u.c, 8);
-        w = (nnueType)(u.d);
+        w = (nnueType)(u.d * 4096);
         //std::cout<<w<<std::endl;
         /*min = std::min(min, nnueType(w));
         max = std::max(max, nnueType(w));*/

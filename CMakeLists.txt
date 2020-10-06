@@ -10,7 +10,7 @@ IF( VAJOLET_CPU_TYPE STREQUAL "64OLD")
 ELSEIF( VAJOLET_CPU_TYPE STREQUAL "64NEW")
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -m64 -mpopcnt" )
 ELSEIF( VAJOLET_CPU_TYPE STREQUAL "64BMI2")
-	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -m64 -mbmi -mbmi2 -mpopcnt -mavx -mavx2" )
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -m64 -mbmi -mbmi2 -mpopcnt -mavx -mavx2 -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize" )
 ELSE()
 ENDIF()
 
