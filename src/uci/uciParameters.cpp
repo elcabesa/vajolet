@@ -29,7 +29,7 @@ bool uciParameters::Chess960 = false;
 bool uciParameters::perftUseHash = false;
 bool uciParameters::limitStrength = false;
 unsigned int uciParameters::engineLevel = 20;
-bool uciParameters::useNnue = false; 
-std::string uciParameters::nnueFile = "<empty>";
+bool uciParameters::useNnue = true; 
+std::string uciParameters::nnueFile = "nnue.par";
 
 

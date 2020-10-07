@@ -17,6 +17,7 @@
 */
 
 #include <cassert>
+#include <cmath>
 #include <iostream>
 
 #include "featureList.h"
@@ -115,6 +116,12 @@ void ParallelDenseLayer::propagate(const std::vector<nnueType>& ) {
     std::cout<<"ARGHHHHH"<<std::endl;
 }
 
+int32_t ParallelDenseLayer::propagate(const std::vector<nnueType>&, const unsigned int, unsigned int) {
+    std::cout<<"ARGHHHHH"<<std::endl;
+    return 0;
+}
+
+
 bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
     //std::cout<<"DESERIALIZE PARALLEL DENSE LAYER"<<std::endl;
     if(ss.get() != '{') {std::cout<<"ParallelDenseLayer missing {"<<std::endl;return false;}
@@ -127,41 +134,60 @@ bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
     return true;
 }
 
+//#define PRINTSTAT
 bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* bias, std::vector<nnueType>* weight) {
-    /*nnueType min = 1e8;
-    nnueType max = -1e8;*/
+#ifdef PRINTSTAT
+    unsigned int count = 0;
+    double min = 1e8;
+    double max = -1e8;
+#endif
     //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
     union un{
         double d;
         char c[8];
     }u;
-    //std::cout<<"-----------------------------"<<std::endl;
+#ifdef PRINTSTAT
+    std::cout<<"-----------------------------"<<std::endl;
+#endif
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
         ss.read(u.c, 8);
-        b = (nnueType)(u.d * 4096);
+        b = (nnueType)(round(u.d * 1024)); //Q10
+#ifdef PRINTSTAT
+        if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
-        /*min = std::min(min, nnueType(b));
-        max = std::max(max, nnueType(b));*/
+        min = std::min(min, u.d);
+        max = std::max(max, u.d);
+#endif
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
-    /*std::cout<<"b min "<<min<<std::endl;
+#ifdef PRINTSTAT
+    std::cout<<"b min "<<min<<std::endl;
     std::cout<<"b MAX "<<max<<std::endl;
+    std::cout<<"B=0 :#"<<count<<std::endl;
     min = 1e8;
-    max = -1e8;*/
+    max = -1e8;
+    count = 0;
+#endif
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     for( auto & w: *weight) {
         ss.read(u.c, 8);
-        w = (nnueType)(u.d * 4096);
+        w = (nnueType)(round(u.d * 1024)); //Q10
+#ifdef PRINTSTAT
+        if(w == 0) { ++count;}
         //std::cout<<w<<std::endl;
-        /*min = std::min(min, nnueType(w));
-        max = std::max(max, nnueType(w));*/
+        min = std::min(min, u.d);
+        max = std::max(max, u.d);
+#endif
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
-    /*std::cout<<"w min "<<min<<std::endl;
-    std::cout<<"wMAX "<<max<<std::endl;*/
+#ifdef PRINTSTAT
+    std::cout<<"w min "<<min<<std::endl;
+    std::cout<<"w MAX "<<max<<std::endl;
+    std::cout<<"w=0 :#"<<count<<std::endl;
+#endif
     if(ss.get() != '}') {std::cout<<"DenseLayer missing }"<<std::endl;return false;} 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     return true;

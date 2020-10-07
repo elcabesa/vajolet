@@ -46,6 +46,8 @@ public:
     virtual void incrementalPropagate(const DifferentialList& l, const DifferentialList& h) = 0;
 
     virtual void propagate(const std::vector<nnueType>& input) = 0;
+    virtual int32_t propagate(const std::vector<nnueType>& input, const unsigned int index, unsigned int o) = 0;
+
     
     virtual bool deserialize(std::ifstream& ss) = 0;
 

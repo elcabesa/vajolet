@@ -36,6 +36,8 @@ public:
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
     void propagate(const std::vector<nnueType>& input);
+    int32_t propagate(const std::vector<nnueType>& input, const unsigned int index, unsigned int o);
+
 
 
     

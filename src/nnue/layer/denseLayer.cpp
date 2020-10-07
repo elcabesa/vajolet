@@ -17,6 +17,7 @@
 */
 
 #include <cassert>
+#include <cmath>
 #include <iostream>
 
 #include "denseLayer.h"
@@ -44,26 +45,25 @@ void DenseLayer::incrementalPropagate(const DifferentialList&, const Differentia
     std::cout<<"AAAAAAAAAAAAAAHHH"<<std::endl;
 }
 
-nnueType DenseLayer::_propagate(const std::vector<nnueType>& input, const unsigned int index) {   
-    int32_t out = 0;
+int32_t DenseLayer::propagate(const std::vector<nnueType>& input, const unsigned int index, unsigned int o) {   
+    int32_t out = (*_bias)[o]; // Q24;
     for(unsigned int i = 0; i< _inputSize; ++i) {
-        out += input[i] * (*_weight)[index + i]; // Q12 * Q15
+        out += input[i] * (*_weight)[index + i]; // Q10 * Q14
     }
-    return out >>15;
+    //if( std::abs(out >>14)>32767 ) {std::cout<<"WARNING: "<<std::abs(out >>14)/1024.0<<std::endl;}
+    return out; //Q24
 }
 
 void DenseLayer::propagate(const std::vector<nnueType>& input) {
 
     unsigned int index = 0;
-    for (unsigned int o = 0; o < _outputSize; ++o) {
-        
-        _output[o] = (*_bias)[o]; // Q12
-        
-        _output[o] += _propagate(input, index); //Q12
+    for (unsigned int o = 0; o < _outputSize; ++o) {        
+       int32_t out = propagate(input, index, o); //Q24
 
         if(_act == activationType::relu) {
-            _output[o] = std::max(_output[o], (nnueType)(0.0)); 
+            out = std::max(out, 0); // Q24
         }
+        _output[o] = out >>14; // Q10
         index += _inputSize;
     }
 
@@ -84,45 +84,64 @@ unsigned int DenseLayer::_calcWeightIndex(const unsigned int i, const unsigned i
 
 }
 
+//#define PRINTSTAT
 bool DenseLayer::deserialize(std::ifstream& ss) {
-    /*nnueType min = 1e8;
-    nnueType max = -1e8;*/
+#ifdef PRINTSTAT
+    unsigned int count = 0;
+    double min = 1e8;
+    double max = -1e8;
+#endif
     //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
     union un{
         double d;
         char c[8];
     }u;
-    //std::cout<<"-----------------------------"<<std::endl;
+#ifdef PRINTSTAT
+    std::cout<<"-----------------------------"<<std::endl;
+#endif
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *_bias) {
         ss.read(u.c, 8);
-        b = (nnueType)(u.d * 4096);
+        b = (nnueType)(round(u.d * 16777216)); //Q24
+#ifdef PRINTSTAT
+        if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
-        //min = std::min(min, nnueType(b));
-        //max = std::max(max, nnueType(b));
+        min = std::min(min, u.d);
+        max = std::max(max, u.d);
+#endif
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
-    /*std::cout<<"b min "<<min<<std::endl;
+#ifdef PRINTSTAT
+    std::cout<<"b min "<<min<<std::endl;
     std::cout<<"b MAX "<<max<<std::endl;
+    std::cout<<"B=0 :#"<<count<<std::endl;
     min = 1e8;
-    max = -1e8;*/
+    max = -1e8;
+    count = 0;
+#endif
     for( size_t idx = 0; idx < (*_weight).size(); ++idx) 
     //for( auto & w: *_weight)
     {
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
         ss.read(u.c, 8);
-        (*_weight)[_calcWeightIndex(i, o)] = (nnueType)(u.d * 32768);
+        (*_weight)[_calcWeightIndex(i, o)] = (nnueType)(round(u.d * 16384)); //Q14
+#ifdef PRINTSTAT
+        if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
         //std::cout<<w<<std::endl;
-        //min = std::min(min, nnueType(w));
-        //max = std::max(max, nnueType(w));
+        min = std::min(min, u.d);
+        max = std::max(max, u.d);
+#endif
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
-    //std::cout<<"w min "<<min<<std::endl;
-    //std::cout<<"w MAX "<<max<<std::endl;
+#ifdef PRINTSTAT
+    std::cout<<"w min "<<min<<std::endl;
+    std::cout<<"w MAX "<<max<<std::endl;
+    std::cout<<"w=0 :#"<<count<<std::endl;
+#endif
     if(ss.get() != '}') {std::cout<<"DenseLayer missing }"<<std::endl;return false;} 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     return true;
