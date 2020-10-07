@@ -69,7 +69,7 @@ void DenseLayer::propagate(const std::vector<nnueType>& input) {
 
     /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        std::cout<<_output[o] /4096.0 <<std::endl;
+        std::cout<<_output[o] /1024.0 <<std::endl;
     }*/
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
