@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <fstream>
 #include <iostream>
 
 #include "featureList.h"
@@ -25,12 +26,17 @@
 #include "parallelDenseLayer.h"
 
 ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<biasType>* bias0, std::vector<biasType>* bias1, std::vector<weightType>* weight0, std::vector<weightType>* weight1, unsigned int biasScale, unsigned int weightScale, unsigned int outShift):
-    Layer{2 * inputSize, 2 * outputSize, biasScale, weightScale, outShift}, 
+    _inputSize(2 * inputSize),
+    _outputSize(2 * outputSize),
+    _biasScale(biasScale),
+    _weightScale(weightScale),
+    _outShift(outShift),
     _layerOutputSize(outputSize),
     _bias0(bias0),
     _bias1(bias1),
     _weight0(weight0),
     _weight1(weight1),
+    _accumulator(2 * outputSize),
     _output(2 * outputSize)
 {}
 
@@ -47,33 +53,37 @@ unsigned int ParallelDenseLayer::_calcWeightIndex(const unsigned int i, const un
 
 void ParallelDenseLayer::propagate(const FeatureList& l, const FeatureList& h) {
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-        _output[o] = (*_bias0)[o];
+        _accumulator[o] = (*_bias0)[o];
     }
 
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-        _output[_layerOutputSize + o ] = (*_bias1)[o];
+        _accumulator[_layerOutputSize + o ] = (*_bias1)[o];
     }
 
     for (unsigned int idx = 0; idx < l.size(); ++idx) {
         unsigned int in = l.get(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[o] += (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] += (*_weight0)[_calcWeightIndex(in, o)];
         }
     } 
 
     for (unsigned int idx = 0; idx < h.size(); ++idx) {
         unsigned int in = h.get(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
         }
     } 
+
+    for (unsigned int o = 0; o < _outputSize; ++o) {
+        _output[o] = _accumulator[o];
+    }
     /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        std::cout<<_output[o] /1024.0 <<std::endl;
+        std::cout<<_accumulator[o] /1024.0 <<std::endl;
     }*/
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
-        _max = std::max(_max, double(_output[o]));
-        _min = std::min(_min, double(_output[o]));
+        _max = std::max(_max, double(_accumulator[o]));
+        _min = std::min(_min, double(_accumulator[o]));
     }*/
 }
 
@@ -81,29 +91,33 @@ void ParallelDenseLayer::incrementalPropagate(const DifferentialList& l, const D
     for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
         unsigned int in = l.addList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[o] += (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] += (*_weight0)[_calcWeightIndex(in, o)];
         }
     }
 
     for(unsigned int idx = 0; idx < l.removeSize(); ++idx) {
         unsigned int in = l.removeList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[o] -= (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] -= (*_weight0)[_calcWeightIndex(in, o)];
         }
     }
 
     for(unsigned int idx = 0; idx < h.addSize(); ++idx) {
         unsigned int in = h.addList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
         }
     }
 
     for(unsigned int idx = 0; idx < h.removeSize(); ++idx) {
         unsigned int in = h.removeList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[_layerOutputSize + o] -= (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] -= (*_weight1)[_calcWeightIndex(in, o)];
         }
+    }
+
+    for (unsigned int o = 0; o < _outputSize; ++o) {
+        _output[o] = _accumulator[o];
     }
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
@@ -111,16 +125,6 @@ void ParallelDenseLayer::incrementalPropagate(const DifferentialList& l, const D
         _min = std::min(_min, double(_output[o]));
     }*/
 }
-
-void ParallelDenseLayer::propagate(const std::vector<outType>& ) {
-    std::cout<<"ARGHHHHH"<<std::endl;
-}
-
-int32_t ParallelDenseLayer::propagate(const std::vector<outType>&, const unsigned int, unsigned int) {
-    std::cout<<"ARGHHHHH"<<std::endl;
-    return 0;
-}
-
 
 bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
     //std::cout<<"DESERIALIZE PARALLEL DENSE LAYER"<<std::endl;
@@ -193,4 +197,4 @@ bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<biasType>* 
     return true;
 }
 
-const std::vector<outType>& ParallelDenseLayer::output() const {return _output;}
+const std::vector<flOutType>& ParallelDenseLayer::output() const {return _output;}

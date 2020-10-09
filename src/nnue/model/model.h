@@ -54,9 +54,9 @@ private:
 
     //std::vector<std::unique_ptr<Layer>> _layers;
     ParallelDenseLayer _layer0;
-    DenseLayer _layer1;
-    DenseLayer _layer2;
-    DenseLayer _layer3;
+    DenseLayer<flOutType> _layer1;
+    DenseLayer<outType> _layer2;
+    DenseLayer<outType> _layer3;
 };
 
 #endif

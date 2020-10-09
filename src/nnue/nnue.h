@@ -28,7 +28,6 @@
 #include "model.h"
 #include "tSquare.h"
 #include "vajolet.h"
-#include "nnue_type.h"
 
 class Position;
 

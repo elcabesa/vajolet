@@ -15,16 +15,13 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <fstream>
 #include <iostream>
 
 #include "nnue.h"
 #include "parallelDenseLayer.h"
 #include "position.h"
 
-//TODO remove std::set, std::map and aòò the very slow code
-//TODO hardcode the nn 
-//TODO move all the math in fixed point?
-// todo remove derived classes? 
 
 bool NNUE::_loaded = false;
 

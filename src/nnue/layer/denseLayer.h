@@ -21,25 +21,19 @@
 
 #include <vector>
 #include "nnue_type.h"
-#include "layer.h"
 
-class Activation;
+class FeatureList;
+class DifferentialList;
 
-class DenseLayer: public Layer {
+template <typename inputType> 
+class DenseLayer{
 public:
-    enum class activationType{
-        linear,
-        relu
-    };
-    
-    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
+
+    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     ~DenseLayer();
 
-    void propagate(const FeatureList& l, const FeatureList& h);
-    void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
-
-    void propagate(const std::vector<outType>& input);
-    int32_t propagate(const std::vector<outType>& input, const unsigned int index, unsigned int o);
+    void propagate(const std::vector<inputType>& input);
+    int32_t propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
 
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
@@ -48,15 +42,21 @@ public:
     const std::vector<outType>& output() const;
     
 private:
+    unsigned int _inputSize;
+    unsigned int _outputSize;
+
+    unsigned int _biasScale;
+    unsigned int _weightScale;
+    unsigned int _outShift;
     std::vector<biasType>* _bias;
     std::vector<weightType>* _weight;
-    
-    activationType _act;
 
     std::vector<outType> _output;
 
     /*double _max = -1e9;
     double _min = 1e9;*/
+
+    
 };
 
 #endif  

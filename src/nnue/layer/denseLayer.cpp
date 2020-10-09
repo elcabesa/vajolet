@@ -18,34 +18,32 @@
 
 #include <cassert>
 #include <cmath>
+#include <fstream>
 #include <iostream>
 
 #include "denseLayer.h"
 #include "differentialList.h"
 #include "featureList.h"
-
-DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift):
-    Layer{inputSize, outputSize, biasScale, weightScale, outShift},
+template <typename inputType> 
+DenseLayer<inputType>::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift):
+    _inputSize(inputSize),
+    _outputSize(outputSize),
+    _biasScale(biasScale),
+    _weightScale(weightScale),
+    _outShift(outShift),
     _bias(bias),
     _weight(weight),
-    _act(act),
     _output(outputSize)
 {}
 
-DenseLayer::~DenseLayer() {
+template <typename inputType> 
+DenseLayer<inputType>::~DenseLayer() {
     //std::cout<<"min "<<_min <<std::endl;
     //std::cout<<"MAX "<<_max <<std::endl;
 }
 
-void DenseLayer::propagate(const FeatureList&, const FeatureList&) {
-    std::cout<<"AHHHHHHHHHHHHHHHHHHHH"<<std::endl;
-}
-
-void DenseLayer::incrementalPropagate(const DifferentialList&, const DifferentialList&) {
-    std::cout<<"AAAAAAAAAAAAAAHHH"<<std::endl;
-}
-
-int32_t DenseLayer::propagate(const std::vector<outType>& input, const unsigned int index, unsigned int o) {   
+template <typename inputType> 
+int32_t DenseLayer<inputType>::propagateOut(const std::vector<inputType>& input, const unsigned int index, unsigned int o) {   
     int32_t out = (*_bias)[o];
     for(unsigned int i = 0; i< _inputSize; ++i) {
         out += input[i] * (*_weight)[index + i];
@@ -53,15 +51,12 @@ int32_t DenseLayer::propagate(const std::vector<outType>& input, const unsigned 
     return out;
 }
 
-void DenseLayer::propagate(const std::vector<outType>& input) {
-
+template <typename inputType> 
+void DenseLayer<inputType>::propagate(const std::vector<inputType>& input) {
     unsigned int index = 0;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-       int32_t out = propagate(input, index, o);
-        if(_act == activationType::relu) {
-            out = std::min(std::max(out >> _outShift, 0), 127);
-        }
-        _output[o] = out;
+        int32_t out = propagateOut(input, index, o);
+        _output[o] = std::min(std::max(out >> _outShift, 0), 127);
         index += _inputSize;
     }
 
@@ -76,14 +71,16 @@ void DenseLayer::propagate(const std::vector<outType>& input) {
     }*/
 }
 
-unsigned int DenseLayer::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
+template <typename inputType> 
+unsigned int DenseLayer<inputType>::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
     assert(o + i * _outputSize < _weight->size());
     return o * _inputSize + i;
 
 }
 
 //#define PRINTSTAT
-bool DenseLayer::deserialize(std::ifstream& ss) {
+template <typename inputType> 
+bool DenseLayer<inputType>::deserialize(std::ifstream& ss) {
 #ifdef PRINTSTAT
     unsigned int count = 0;
     double min = 1e8;
@@ -145,4 +142,9 @@ bool DenseLayer::deserialize(std::ifstream& ss) {
     return true;
 }
 
-const std::vector<outType>& DenseLayer::output() const {return _output;}
+template <typename inputType> 
+const std::vector<outType>& DenseLayer<inputType>::output() const {return _output;}
+
+
+template class DenseLayer<flOutType>;
+template class DenseLayer<outType>;

@@ -21,33 +21,33 @@
 
 #include <vector>
 
-#include "layer.h"
 #include "denseLayer.h"
 #include "nnue_type.h"
 
 class Activation;
 
-class ParallelDenseLayer: public Layer {
+class ParallelDenseLayer {
 public:
     ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<biasType>* bias0, std::vector<biasType>* bias1, std::vector<weightType>* weight0, std::vector<weightType>* weight1, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     ~ParallelDenseLayer();
 
     void propagate(const FeatureList& l, const FeatureList& h);
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
-
-    void propagate(const std::vector<outType>& input);
-    int32_t propagate(const std::vector<outType>& input, const unsigned int index, unsigned int o);
-
-
-
     
     bool deserialize(std::ifstream& ss);
-    const std::vector<outType>& output() const;
+    const std::vector<flOutType>& output() const;
     
     
 private:
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
     bool _deserialize(std::ifstream& ss, std::vector<biasType>* bias, std::vector<weightType>* weight);
+
+    const unsigned int _inputSize;
+    const unsigned int _outputSize;
+
+    const unsigned int _biasScale;
+    const unsigned int _weightScale;
+    const unsigned int _outShift;
 
     const unsigned int _layerOutputSize;
 
@@ -58,8 +58,10 @@ private:
 
     /*double _max = -127;
     double _min = 127;*/
+    std::vector<accumulatorType> _accumulator;
+    std::vector<flOutType> _output;
 
-    std::vector<outType> _output;
+    
 
 };
 
