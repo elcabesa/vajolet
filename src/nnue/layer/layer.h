@@ -35,18 +35,18 @@ public:
         linear,
         relu
     };
-    Layer(const unsigned int inputSize, const unsigned int outputSize);
+    Layer(const unsigned int inputSize, const unsigned int outputSize, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     virtual ~Layer();
     
     unsigned int getInputSize() const;
     unsigned int getOutputSize() const;
-    virtual const std::vector<nnueType>& output() const = 0;
+    virtual const std::vector<outType>& output() const = 0;
 
     virtual void propagate(const FeatureList& l, const FeatureList& h) = 0;
     virtual void incrementalPropagate(const DifferentialList& l, const DifferentialList& h) = 0;
 
-    virtual void propagate(const std::vector<nnueType>& input) = 0;
-    virtual int32_t propagate(const std::vector<nnueType>& input, const unsigned int index, unsigned int o) = 0;
+    virtual void propagate(const std::vector<outType>& input) = 0;
+    virtual accumulatorType propagate(const std::vector<outType>& input, const unsigned int index, unsigned int o) = 0;
 
     
     virtual bool deserialize(std::ifstream& ss) = 0;
@@ -54,6 +54,11 @@ public:
 protected:
     unsigned int _inputSize;
     unsigned int _outputSize;
+
+    unsigned int _biasScale;
+    unsigned int _weightScale;
+    unsigned int _outShift;
+
     
 };
 

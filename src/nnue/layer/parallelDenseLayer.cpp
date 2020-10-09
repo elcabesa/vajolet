@@ -24,8 +24,8 @@
 #include "differentialList.h"
 #include "parallelDenseLayer.h"
 
-ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<nnueType>* bias0, std::vector<nnueType>* bias1, std::vector<nnueType>* weight0, std::vector<nnueType>* weight1):
-    Layer{2 * inputSize, 2 * outputSize}, 
+ParallelDenseLayer::ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<biasType>* bias0, std::vector<biasType>* bias1, std::vector<weightType>* weight0, std::vector<weightType>* weight1, unsigned int biasScale, unsigned int weightScale, unsigned int outShift):
+    Layer{2 * inputSize, 2 * outputSize, biasScale, weightScale, outShift}, 
     _layerOutputSize(outputSize),
     _bias0(bias0),
     _bias1(bias1),
@@ -72,8 +72,8 @@ void ParallelDenseLayer::propagate(const FeatureList& l, const FeatureList& h) {
         std::cout<<_output[o] /1024.0 <<std::endl;
     }*/
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
-        _max = std::max(_max, nnueType(_output[o]));
-        _min = std::min(_min, nnueType(_output[o]));
+        _max = std::max(_max, double(_output[o]));
+        _min = std::min(_min, double(_output[o]));
     }*/
 }
 
@@ -107,16 +107,16 @@ void ParallelDenseLayer::incrementalPropagate(const DifferentialList& l, const D
     }
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
-        _max = std::max(_max, nnueType(_output[o]));
-        _min = std::min(_min, nnueType(_output[o]));
+        _max = std::max(_max, double(_output[o]));
+        _min = std::min(_min, double(_output[o]));
     }*/
 }
 
-void ParallelDenseLayer::propagate(const std::vector<nnueType>& ) {
+void ParallelDenseLayer::propagate(const std::vector<outType>& ) {
     std::cout<<"ARGHHHHH"<<std::endl;
 }
 
-int32_t ParallelDenseLayer::propagate(const std::vector<nnueType>&, const unsigned int, unsigned int) {
+int32_t ParallelDenseLayer::propagate(const std::vector<outType>&, const unsigned int, unsigned int) {
     std::cout<<"ARGHHHHH"<<std::endl;
     return 0;
 }
@@ -135,7 +135,7 @@ bool ParallelDenseLayer::deserialize(std::ifstream& ss) {
 }
 
 //#define PRINTSTAT
-bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* bias, std::vector<nnueType>* weight) {
+bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<biasType>* bias, std::vector<weightType>* weight) {
 #ifdef PRINTSTAT
     unsigned int count = 0;
     double min = 1e8;
@@ -152,7 +152,7 @@ bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* 
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
         ss.read(u.c, 8);
-        b = (nnueType)(round(u.d * 1024)); //Q10
+        b = (biasType)(round(u.d * _biasScale));
 #ifdef PRINTSTAT
         if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
@@ -173,7 +173,7 @@ bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     for( auto & w: *weight) {
         ss.read(u.c, 8);
-        w = (nnueType)(round(u.d * 1024)); //Q10
+        w = (weightType)(round(u.d * _weightScale));
 #ifdef PRINTSTAT
         if(w == 0) { ++count;}
         //std::cout<<w<<std::endl;
@@ -193,4 +193,4 @@ bool ParallelDenseLayer::_deserialize(std::ifstream& ss, std::vector<nnueType>* 
     return true;
 }
 
-const std::vector<nnueType>& ParallelDenseLayer::output() const {return _output;}
+const std::vector<outType>& ParallelDenseLayer::output() const {return _output;}

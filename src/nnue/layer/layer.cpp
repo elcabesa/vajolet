@@ -18,9 +18,12 @@
 
 #include "layer.h"
 
-Layer::Layer(const unsigned int inputSize, const unsigned int outputSize):
+Layer::Layer(const unsigned int inputSize, const unsigned int outputSize, unsigned int biasScale, unsigned int weightScale, unsigned int outShift):
     _inputSize(inputSize),
-    _outputSize(outputSize)
+    _outputSize(outputSize),
+    _biasScale(biasScale),
+    _weightScale(weightScale),
+    _outShift(outShift)
 {}
 
 Layer::~Layer() {}

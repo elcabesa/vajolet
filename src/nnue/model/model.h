@@ -36,8 +36,8 @@ public:
     Layer& getLayer(unsigned int index);
     unsigned int getLayerCount();
     
-    nnueType forwardPass(const FeatureList& l, const FeatureList& h);
-    nnueType incrementalPass(const DifferentialList& l, const DifferentialList& h);
+    accumulatorType forwardPass(const FeatureList& l, const FeatureList& h);
+    accumulatorType incrementalPass(const DifferentialList& l, const DifferentialList& h);
     
     bool deserialize(std::ifstream& ss);
     

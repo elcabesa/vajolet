@@ -29,37 +29,37 @@ class Activation;
 
 class ParallelDenseLayer: public Layer {
 public:
-    ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<nnueType>* bias0, std::vector<nnueType>* bias1, std::vector<nnueType>* weight0, std::vector<nnueType>* weight1);
+    ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<biasType>* bias0, std::vector<biasType>* bias1, std::vector<weightType>* weight0, std::vector<weightType>* weight1, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     ~ParallelDenseLayer();
 
     void propagate(const FeatureList& l, const FeatureList& h);
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
-    void propagate(const std::vector<nnueType>& input);
-    int32_t propagate(const std::vector<nnueType>& input, const unsigned int index, unsigned int o);
+    void propagate(const std::vector<outType>& input);
+    int32_t propagate(const std::vector<outType>& input, const unsigned int index, unsigned int o);
 
 
 
     
     bool deserialize(std::ifstream& ss);
-    const std::vector<nnueType>& output() const;
+    const std::vector<outType>& output() const;
     
     
 private:
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
-    bool _deserialize(std::ifstream& ss, std::vector<nnueType>* bias, std::vector<nnueType>* weight);
+    bool _deserialize(std::ifstream& ss, std::vector<biasType>* bias, std::vector<weightType>* weight);
 
     const unsigned int _layerOutputSize;
 
-    std::vector<nnueType>* _bias0;
-    std::vector<nnueType>* _bias1;
-    std::vector<nnueType>* _weight0;
-    std::vector<nnueType>* _weight1;
+    std::vector<biasType>* _bias0;
+    std::vector<biasType>* _bias1;
+    std::vector<weightType>* _weight0;
+    std::vector<weightType>* _weight1;
 
-    /*nnueType _max = -127;
-    nnueType _min = 127;*/
+    /*double _max = -127;
+    double _min = 127;*/
 
-    std::vector<nnueType> _output;
+    std::vector<outType> _output;
 
 };
 

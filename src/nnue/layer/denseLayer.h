@@ -27,33 +27,31 @@ class Activation;
 
 class DenseLayer: public Layer {
 public:
-    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<nnueType>* bias, std::vector<nnueType>* weight);
+    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     ~DenseLayer();
 
     void propagate(const FeatureList& l, const FeatureList& h);
     void incrementalPropagate(const DifferentialList& l, const DifferentialList& h);
 
-    void propagate(const std::vector<nnueType>& input);
-    int32_t propagate(const std::vector<nnueType>& input, const unsigned int index, unsigned int o);
+    void propagate(const std::vector<outType>& input);
+    int32_t propagate(const std::vector<outType>& input, const unsigned int index, unsigned int o);
 
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
     bool deserialize(std::ifstream& ss);
 
-    const std::vector<nnueType>& output() const;
+    const std::vector<outType>& output() const;
     
 private:
-    std::vector<nnueType>* _bias;
-    std::vector<nnueType>* _weight;
+    std::vector<biasType>* _bias;
+    std::vector<weightType>* _weight;
     
     activationType _act;
 
-    std::vector<nnueType> _output;
+    std::vector<outType> _output;
 
-    /*nnueType _max = -1e9;
-    nnueType _min = 1e9;*/
-
-    nnueType _propagate(const std::vector<nnueType>& input, const unsigned int index);
+    /*double _max = -1e9;
+    double _min = 1e9;*/
 };
 
 #endif  

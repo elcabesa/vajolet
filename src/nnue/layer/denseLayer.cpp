@@ -24,8 +24,8 @@
 #include "differentialList.h"
 #include "featureList.h"
 
-DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<nnueType>* bias, std::vector<nnueType>* weight):
-    Layer{inputSize, outputSize},
+DenseLayer::DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift):
+    Layer{inputSize, outputSize, biasScale, weightScale, outShift},
     _bias(bias),
     _weight(weight),
     _act(act),
@@ -45,25 +45,23 @@ void DenseLayer::incrementalPropagate(const DifferentialList&, const Differentia
     std::cout<<"AAAAAAAAAAAAAAHHH"<<std::endl;
 }
 
-int32_t DenseLayer::propagate(const std::vector<nnueType>& input, const unsigned int index, unsigned int o) {   
-    int32_t out = (*_bias)[o]; // Q24;
+int32_t DenseLayer::propagate(const std::vector<outType>& input, const unsigned int index, unsigned int o) {   
+    int32_t out = (*_bias)[o];
     for(unsigned int i = 0; i< _inputSize; ++i) {
-        out += input[i] * (*_weight)[index + i]; // Q10 * Q14
+        out += input[i] * (*_weight)[index + i];
     }
-    //if( std::abs(out >>14)>32767 ) {std::cout<<"WARNING: "<<std::abs(out >>14)/1024.0<<std::endl;}
-    return out; //Q24
+    return out;
 }
 
-void DenseLayer::propagate(const std::vector<nnueType>& input) {
+void DenseLayer::propagate(const std::vector<outType>& input) {
 
     unsigned int index = 0;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-       int32_t out = propagate(input, index, o); //Q24
-
+       int32_t out = propagate(input, index, o);
         if(_act == activationType::relu) {
-            out = std::max(out, 0); // Q24
+            out = std::min(std::max(out >> _outShift, 0), 127);
         }
-        _output[o] = out >>14; // Q10
+        _output[o] = out;
         index += _inputSize;
     }
 
@@ -73,8 +71,8 @@ void DenseLayer::propagate(const std::vector<nnueType>& input) {
     }*/
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
-        _max = std::max(_max, nnueType(_output[o]));
-        _min = std::min(_min, nnueType(_output[o]));
+        _max = std::max(_max, double(_output[o]));
+        _min = std::min(_min, double(_output[o]));
     }*/
 }
 
@@ -102,7 +100,7 @@ bool DenseLayer::deserialize(std::ifstream& ss) {
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *_bias) {
         ss.read(u.c, 8);
-        b = (nnueType)(round(u.d * 16777216)); //Q24
+        b = (biasType)(round(u.d * _biasScale)); 
 #ifdef PRINTSTAT
         if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
@@ -127,7 +125,7 @@ bool DenseLayer::deserialize(std::ifstream& ss) {
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
         ss.read(u.c, 8);
-        (*_weight)[_calcWeightIndex(i, o)] = (nnueType)(round(u.d * 16384)); //Q14
+        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(round(u.d * _weightScale)); 
 #ifdef PRINTSTAT
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
         //std::cout<<w<<std::endl;
@@ -147,4 +145,4 @@ bool DenseLayer::deserialize(std::ifstream& ss) {
     return true;
 }
 
-const std::vector<nnueType>& DenseLayer::output() const {return _output;}
+const std::vector<outType>& DenseLayer::output() const {return _output;}

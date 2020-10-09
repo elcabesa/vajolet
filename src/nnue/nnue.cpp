@@ -26,17 +26,17 @@
 //TODO move all the math in fixed point?
 // todo remove derived classes? 
 
-std::vector<nnueType> NNUE::bias00;
-std::vector<nnueType> NNUE::bias01;
-std::vector<nnueType> NNUE::bias1;
-std::vector<nnueType> NNUE::bias2;
-std::vector<nnueType> NNUE::bias3;
+std::vector<biasType> NNUE::bias00;
+std::vector<biasType> NNUE::bias01;
+std::vector<biasType> NNUE::bias1;
+std::vector<biasType> NNUE::bias2;
+std::vector<biasType> NNUE::bias3;
 
-std::vector<nnueType> NNUE::weight00;
-std::vector<nnueType> NNUE::weight01;
-std::vector<nnueType> NNUE::weight1;
-std::vector<nnueType> NNUE::weight2;
-std::vector<nnueType> NNUE::weight3;
+std::vector<weightType> NNUE::weight00;
+std::vector<weightType> NNUE::weight01;
+std::vector<weightType> NNUE::weight1;
+std::vector<weightType> NNUE::weight2;
+std::vector<weightType> NNUE::weight3;
 
 bool NNUE::_loaded = false;
 
@@ -57,23 +57,23 @@ NNUE::NNUE(const Position& pos):_pos(pos) {
 	weight2.resize(32 * 32, 1.0);
 	weight3.resize(32 * 1, 1.0);
 
-    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01));
-    _modelW.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
-    _modelW.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
-    _modelW.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
+    _modelW.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01, 128, 128, 0));
+    _modelW.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1, 16384, 128, 9));
+    _modelW.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2, 2048, 64, 6));
+    _modelW.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3, 2048, 64, 0));
 
-	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01));
-    _modelB.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
-    _modelB.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
-    _modelB.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
+	_modelB.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01, 128, 128, 0));
+    _modelB.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1, 16384, 128, 9));
+    _modelB.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2, 2048, 64, 6));
+    _modelB.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3, 2048, 64, 0));
 
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
 	_m.clear();
-	_m.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01));
-    _m.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1));
-    _m.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2));
-    _m.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3));
+	_m.addLayer(std::make_unique<ParallelDenseLayer>(40960, 256, &bias00, &bias01, &weight00, &weight01, 128, 128, 0));
+    _m.addLayer(std::make_unique<DenseLayer>(512,32, Layer::activationType::relu, &bias1, &weight1, 16384, 128, 9));
+    _m.addLayer(std::make_unique<DenseLayer>(32,32, Layer::activationType::relu, &bias2, &weight2, 2048, 64, 6));
+    _m.addLayer(std::make_unique<DenseLayer>(32, 1, Layer::activationType::linear, &bias3, &weight3, 2048, 64, 0));
 
 #endif
     //std::cout<<"done"<<std::endl;

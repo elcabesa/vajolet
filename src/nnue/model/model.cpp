@@ -32,18 +32,18 @@ void Model::addLayer(std::unique_ptr<Layer> l) {
     _layers.push_back(std::move(l));
 }
 
-nnueType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
+accumulatorType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     _layers[0]->propagate(l, h);
     _layers[1]->propagate(_layers[0]->output());
     _layers[2]->propagate(_layers[1]->output());
-    return _layers[3]->propagate(_layers[2]->output(), 0, 0) * (10000.0 / 16777216.0); //Q24;
+    return _layers[3]->propagate(_layers[2]->output(), 0, 0) * 4.8828;
 }
 
-nnueType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
+accumulatorType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
     _layers[0]->incrementalPropagate(l, h);
     _layers[1]->propagate(_layers[0]->output());
     _layers[2]->propagate(_layers[1]->output());
-    return _layers[3]->propagate(_layers[2]->output(), 0, 0) * (10000.0 / 16777216.0); //Q24;
+    return _layers[3]->propagate(_layers[2]->output(), 0, 0) * 4.8828;
 }
 
 bool Model::deserialize(std::ifstream& ss) {

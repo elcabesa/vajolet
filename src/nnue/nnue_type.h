@@ -18,6 +18,14 @@
 #ifndef NNUE_TYPE_H_
 #define NNUE_TYPE_H_ 
 
-using nnueType = int16_t;
+//using flOutType = int8_t;
+using outType = uint8_t;
+using accumulatorType = int32_t;
+
+using biasType = int32_t;
+using weightType = int8_t;
+
+// TODO parallel layer should exit with int8_t!!!
+// todo eliminare completamente classe virtuale layer
 
 #endif
