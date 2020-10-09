@@ -25,11 +25,11 @@
 class FeatureList;
 class DifferentialList;
 
-template <typename inputType> 
+template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
 class DenseLayer{
 public:
 
-    DenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
+    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     ~DenseLayer();
 
     void propagate(const std::vector<inputType>& input);

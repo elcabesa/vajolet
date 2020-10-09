@@ -58,6 +58,7 @@ private:
 
     /*double _max = -127;
     double _min = 127;*/
+    std::vector<flOutType> _accumulator;
     std::vector<flOutType> _output;
 
     

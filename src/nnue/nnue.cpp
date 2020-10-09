@@ -333,10 +333,10 @@ Score NNUE::_incrementalEval() {
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
 	_completeWhiteFeatureList.clear();
 	_completeBlackFeatureList.clear();
-	createWhiteFeatures(pos, _completeWhiteFeatureList);
-	createBlackFeatures(pos, _completeBlackFeatureList);
+	createWhiteFeatures(_completeWhiteFeatureList);
+	createBlackFeatures(_completeBlackFeatureList);
 	Score score2;
-	if(pos.isWhiteTurn()) {
+	if(_pos.isWhiteTurn()) {
 		score2 = _m.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
 	} else {
 		score2 = _m.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);;

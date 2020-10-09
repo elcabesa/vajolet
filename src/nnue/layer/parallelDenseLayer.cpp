@@ -37,6 +37,7 @@ ParallelDenseLayer<inputSize, outputSize>::ParallelDenseLayer(std::vector<flBias
     _bias1(bias1),
     _weight0(weight0),
     _weight1(weight1),
+    _accumulator(2 * outputSize),
     _output(2 * outputSize)
 {}
 
@@ -57,19 +58,19 @@ unsigned int ParallelDenseLayer<inputSize, outputSize>::_calcWeightIndex(const u
 template <unsigned int inputSize, unsigned int outputSize> 
 void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, const FeatureList& h) {
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-        _output[o] = (*_bias0)[o];
+        _accumulator[o] = (*_bias0)[o];
         //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
     }
 
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-        _output[_layerOutputSize + o ] = (*_bias1)[o];
+        _accumulator[_layerOutputSize + o ] = (*_bias1)[o];
         //if(std::abs(_output[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
     }
 
     for (unsigned int idx = 0; idx < l.size(); ++idx) {
         unsigned int in = l.get(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[o] += (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] += (*_weight0)[_calcWeightIndex(in, o)];
             //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     } 
@@ -77,13 +78,13 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
     for (unsigned int idx = 0; idx < h.size(); ++idx) {
         unsigned int in = h.get(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
             //if(std::abs(_output[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        _output[o] = std::min(std::max(_output[o], flOutType(0)), flOutType(127));
+        _output[o] = std::min(std::max(_accumulator[o], flOutType(0)), flOutType(127));
     }
     /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
@@ -100,7 +101,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
         unsigned int in = l.addList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[o] += (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] += (*_weight0)[_calcWeightIndex(in, o)];
             //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
@@ -108,7 +109,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     for(unsigned int idx = 0; idx < l.removeSize(); ++idx) {
         unsigned int in = l.removeList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[o] -= (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] -= (*_weight0)[_calcWeightIndex(in, o)];
             //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
@@ -116,7 +117,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     for(unsigned int idx = 0; idx < h.addSize(); ++idx) {
         unsigned int in = h.addList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
             //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
@@ -124,9 +125,13 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     for(unsigned int idx = 0; idx < h.removeSize(); ++idx) {
         unsigned int in = h.removeList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _output[_layerOutputSize + o] -= (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] -= (*_weight1)[_calcWeightIndex(in, o)];
             //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
+    }
+
+    for (unsigned int o = 0; o < _outputSize; ++o) {        
+        _output[o] = std::min(std::max(_accumulator[o], flOutType(0)), flOutType(127));
     }
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
