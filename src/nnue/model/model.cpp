@@ -22,20 +22,20 @@
 
 #include "model.h"
 
-std::vector<biasType> Model::bias00;
-std::vector<biasType> Model::bias01;
+std::vector<flBiasType> Model::bias00;
+std::vector<flBiasType> Model::bias01;
 std::vector<biasType> Model::bias1;
 std::vector<biasType> Model::bias2;
 std::vector<biasType> Model::bias3;
 
-std::vector<weightType> Model::weight00;
-std::vector<weightType> Model::weight01;
+std::vector<flWeightType> Model::weight00;
+std::vector<flWeightType> Model::weight01;
 std::vector<weightType> Model::weight1;
 std::vector<weightType> Model::weight2;
 std::vector<weightType> Model::weight3;
 
 Model::Model():
-    _layer0(40960, 256, &bias00, &bias01, &weight00, &weight01, 128, 128, 0),
+    _layer0(&bias00, &bias01, &weight00, &weight01, 128, 128, 0),
     _layer1(512,32,&bias1, &weight1, 16384, 128, 9),
     _layer2(32,32, &bias2, &weight2, 2048, 64, 6),
     _layer3(32, 1, &bias3, &weight3, 2048, 64, 0)

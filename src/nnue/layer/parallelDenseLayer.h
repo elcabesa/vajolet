@@ -24,11 +24,11 @@
 #include "denseLayer.h"
 #include "nnue_type.h"
 
-class Activation;
 
+template <unsigned int inputSize, unsigned int outputSize> 
 class ParallelDenseLayer {
 public:
-    ParallelDenseLayer(const unsigned int inputSize, const unsigned int outputSize, std::vector<biasType>* bias0, std::vector<biasType>* bias1, std::vector<weightType>* weight0, std::vector<weightType>* weight1, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
+    ParallelDenseLayer(std::vector<flBiasType>* bias0, std::vector<flBiasType>* bias1, std::vector<flWeightType>* weight0, std::vector<flWeightType>* weight1, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     ~ParallelDenseLayer();
 
     void propagate(const FeatureList& l, const FeatureList& h);
@@ -40,7 +40,7 @@ public:
     
 private:
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
-    bool _deserialize(std::ifstream& ss, std::vector<biasType>* bias, std::vector<weightType>* weight);
+    bool _deserialize(std::ifstream& ss, std::vector<flBiasType>* bias, std::vector<flWeightType>* weight);
 
     const unsigned int _inputSize;
     const unsigned int _outputSize;
@@ -51,14 +51,13 @@ private:
 
     const unsigned int _layerOutputSize;
 
-    std::vector<biasType>* _bias0;
-    std::vector<biasType>* _bias1;
-    std::vector<weightType>* _weight0;
-    std::vector<weightType>* _weight1;
+    std::vector<flBiasType>* _bias0;
+    std::vector<flBiasType>* _bias1;
+    std::vector<flWeightType>* _weight0;
+    std::vector<flWeightType>* _weight1;
 
     /*double _max = -127;
     double _min = 127;*/
-    std::vector<accumulatorType> _accumulator;
     std::vector<flOutType> _output;
 
     

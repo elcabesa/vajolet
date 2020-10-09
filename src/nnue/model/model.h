@@ -40,20 +40,20 @@ public:
     
 private:
 
-    static std::vector<biasType> bias00;
-    static std::vector<biasType> bias01;
+    static std::vector<flBiasType> bias00;
+    static std::vector<flBiasType> bias01;
     static std::vector<biasType> bias1;
     static std::vector<biasType> bias2;
     static std::vector<biasType> bias3;
 
-    static std::vector<weightType> weight00;
-    static std::vector<weightType> weight01;
+    static std::vector<flWeightType> weight00;
+    static std::vector<flWeightType> weight01;
     static std::vector<weightType> weight1;
     static std::vector<weightType> weight2;
     static std::vector<weightType> weight3;
 
     //std::vector<std::unique_ptr<Layer>> _layers;
-    ParallelDenseLayer _layer0;
+    ParallelDenseLayer<40960, 256> _layer0;
     DenseLayer<flOutType> _layer1;
     DenseLayer<outType> _layer2;
     DenseLayer<outType> _layer3;
