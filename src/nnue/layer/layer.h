@@ -31,15 +31,9 @@ class FeatureList;
 class Layer {
 public:
 
-    enum class activationType{
-        linear,
-        relu
-    };
     Layer(const unsigned int inputSize, const unsigned int outputSize, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     virtual ~Layer();
     
-    unsigned int getInputSize() const;
-    unsigned int getOutputSize() const;
     virtual const std::vector<outType>& output() const = 0;
 
     virtual void propagate(const FeatureList& l, const FeatureList& h) = 0;

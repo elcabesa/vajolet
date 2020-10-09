@@ -28,13 +28,4 @@ Layer::Layer(const unsigned int inputSize, const unsigned int outputSize, unsign
 
 Layer::~Layer() {}
 
-unsigned int Layer::getInputSize() const {
-    return _inputSize;
-}
-
-unsigned int Layer::getOutputSize() const {
-    return _outputSize;
-}
-
-
 

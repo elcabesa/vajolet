@@ -22,7 +22,8 @@
 #include <memory>
 #include <vector>
 
-#include "layer.h"
+#include "parallelDenseLayer.h"
+#include "denseLayer.h"
 #include "nnue_type.h"
 
 class DifferentialList;
@@ -32,19 +33,30 @@ class Model {
 public:
     Model();
     
-    void addLayer(std::unique_ptr<Layer> l);
-    Layer& getLayer(unsigned int index);
-    unsigned int getLayerCount();
-    
     accumulatorType forwardPass(const FeatureList& l, const FeatureList& h);
     accumulatorType incrementalPass(const DifferentialList& l, const DifferentialList& h);
     
     bool deserialize(std::ifstream& ss);
     
-    void clear();
-
 private:
-    std::vector<std::unique_ptr<Layer>> _layers;
+
+    static std::vector<biasType> bias00;
+    static std::vector<biasType> bias01;
+    static std::vector<biasType> bias1;
+    static std::vector<biasType> bias2;
+    static std::vector<biasType> bias3;
+
+    static std::vector<weightType> weight00;
+    static std::vector<weightType> weight01;
+    static std::vector<weightType> weight1;
+    static std::vector<weightType> weight2;
+    static std::vector<weightType> weight3;
+
+    //std::vector<std::unique_ptr<Layer>> _layers;
+    ParallelDenseLayer _layer0;
+    DenseLayer _layer1;
+    DenseLayer _layer2;
+    DenseLayer _layer3;
 };
 
 #endif

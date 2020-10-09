@@ -66,17 +66,6 @@ private:
     Model _m;
 #endif
     static bool _loaded;
-    static std::vector<biasType> bias00;
-    static std::vector<biasType> bias01;
-    static std::vector<biasType> bias1;
-    static std::vector<biasType> bias2;
-    static std::vector<biasType> bias3;
-
-    static std::vector<weightType> weight00;
-    static std::vector<weightType> weight01;
-    static std::vector<weightType> weight1;
-    static std::vector<weightType> weight2;
-    static std::vector<weightType> weight3;
 
     DifferentialList _whiteW;
     DifferentialList _blackW;

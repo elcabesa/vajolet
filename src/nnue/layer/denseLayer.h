@@ -27,6 +27,11 @@ class Activation;
 
 class DenseLayer: public Layer {
 public:
+    enum class activationType{
+        linear,
+        relu
+    };
+    
     DenseLayer(const unsigned int inputSize, const unsigned int outputSize, activationType act, std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
     ~DenseLayer();
 
