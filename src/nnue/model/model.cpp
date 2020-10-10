@@ -37,8 +37,8 @@ std::vector<weightType> Model::weight3;
 Model::Model():
     _layer0(&bias00, &bias01, &weight00, &weight01, 65536, 65536, 9),
     _layer1(&bias1, &weight1, 32768, 256, 8),
-    _layer2(&bias2, &weight2, 2048, 64, 6),
-    _layer3(&bias3, &weight3, 2048, 64, 0)
+    _layer2(&bias2, &weight2, 8192, 64, 6),
+    _layer3(&bias3, &weight3, 8192, 64, 0)
 {
     bias00.resize(256, 0.0);
 	bias01.resize(256, 0.0);
@@ -57,14 +57,14 @@ accumulatorType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     _layer0.propagate(l, h);
     _layer1.propagate(_layer0.output());
     _layer2.propagate(_layer1.output());
-    return _layer3.propagateOut(_layer2.output(), 0, 0) * 4.8828;
+    return _layer3.propagateOut(_layer2.output(), 0, 0) * 1.22;
 }
 
 accumulatorType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
     _layer0.incrementalPropagate(l, h);
     _layer1.propagate(_layer0.output());
     _layer2.propagate(_layer1.output());
-    return _layer3.propagateOut(_layer2.output(), 0, 0) * 4.8828;
+    return _layer3.propagateOut(_layer2.output(), 0, 0) * 1.22;
 }
 
 bool Model::deserialize(std::ifstream& ss) {
