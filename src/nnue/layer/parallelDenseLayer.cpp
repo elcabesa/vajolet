@@ -84,7 +84,12 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        _output[o] = std::min(std::max(_accumulator[o], flOutType(0)), flOutType(127));
+        _output[o] = std::min(std::max(flOutType(_accumulator[o] >> _outShift), flOutType(0)), flOutType(127));
+    }
+
+    std::cout<<"-----------------------"<<std::endl;
+    for (unsigned int o = 0; o < _outputSize; ++o) {        
+        std::cout<< std::pow(2.0, _outShift) * _output[o] / double(_biasScale) <<std::endl;
     }
     /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
@@ -131,7 +136,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        _output[o] = std::min(std::max(_accumulator[o], flOutType(0)), flOutType(127));
+        _output[o] = std::min(std::max(flOutType(_accumulator[o] >> _outShift), flOutType(0)), flOutType(127));
     }
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
@@ -153,7 +158,7 @@ bool ParallelDenseLayer<inputSize, outputSize>::deserialize(std::ifstream& ss) {
     return true;
 }
 
-//#define PRINTSTAT
+#define PRINTSTAT
 template <unsigned int inputSize, unsigned int outputSize> 
 bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, std::vector<flBiasType>* bias, std::vector<flWeightType>* weight) {
 #ifdef PRINTSTAT
