@@ -35,8 +35,8 @@ std::vector<weightType> Model::weight2;
 std::vector<weightType> Model::weight3;
 
 Model::Model():
-    _layer0(&bias00, &bias01, &weight00, &weight01, 65280, 65793, 8),
-    _layer1(&bias1, &weight1, 65280, 257, 8),
+    _layer0(&bias00, &bias01, &weight00, &weight01, 65280, 65280, 8),
+    _layer1(&bias1, &weight1, 65280, 256, 8),
     _layer2(&bias2, &weight2, 16320, 64, 6),
     _layer3(&bias3, &weight3, 16320, 64, 0)
 {
