@@ -94,7 +94,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
 
     std::cout<<"-----------------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        std::cout<< std::pow(2.0, _outShift) * _output[o] / double(_biasScale) <<std::endl;
+        std::cout<< _output[o] / double(255) <<std::endl;
     }
     /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
