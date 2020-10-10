@@ -60,10 +60,10 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<i
         index += _inputSize;
     }
 
-    std::cout<<"-----------------------"<<std::endl;
+    /*std::cout<<"-----------------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
         std::cout<< std::pow(2.0, _outShift) * _output[o] / double(_biasScale) <<std::endl;
-    }
+    }*/
 
     /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
