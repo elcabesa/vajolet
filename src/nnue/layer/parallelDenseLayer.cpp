@@ -84,7 +84,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        _output[o] = std::min(std::max(flOutType(_accumulator[o] >> _outShift), flOutType(0)), flOutType(127));
+        _output[o] = std::min(std::max(flOutType(_accumulator[o] >> _outShift), flOutType(0)), flOutType(255));
     }
 
     std::cout<<"-----------------------"<<std::endl;
@@ -136,7 +136,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        _output[o] = std::min(std::max(flOutType(_accumulator[o] >> _outShift), flOutType(0)), flOutType(127));
+        _output[o] = std::min(std::max(flOutType(_accumulator[o] >> _outShift), flOutType(0)), flOutType(255));
     }
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {

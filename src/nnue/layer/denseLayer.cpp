@@ -56,7 +56,7 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<i
     unsigned int index = 0;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
         int32_t out = propagateOut(input, index, o);
-        _output[o] = std::min(std::max(out >> _outShift, 0), 127);
+        _output[o] = std::min(std::max(out >> _outShift, 0), 255);
         index += _inputSize;
     }
 
