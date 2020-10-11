@@ -17,10 +17,11 @@
 
 #include <iomanip>
 
-#include "vajo_io.h"
+#include "nnue.h"
 #include "parameters.h"
 #include "pawnTable.h"
 #include "position.h"
+#include "vajo_io.h"
 
 
 static const int KingExposed[] = {
@@ -715,53 +716,6 @@ Score Position::eval(void) const
 	unsigned int kingAttackersWeight[2] = {0};
 	unsigned int kingAdjacentZoneAttacksCount[2] = {0};
 
-	
-	
-	kingRing[white] = 0;
-	if( st.getNonPawnValue()[ 2 ] >= getPieceValue(Knights)[0] + getPieceValue(Rooks)[0] )
-	{
-		tSquare k = getSquareOfThePiece(whiteKing);
-		if( getRankOf(k) == RANK1 )
-		{
-			k += north;
-		}
-		if( getFileOf(k) == FILEA )
-		{
-			k += est;
-		}
-		if( getFileOf(k) == FILEH )
-		{
-			k += ovest;
-		}
-		kingRing[white] = Movegen::attackFrom<whiteKing>(k) | bitSet( k );
-	}
-
-	kingRing[black] = 0;
-	if( st.getNonPawnValue()[ 0 ] >= getPieceValue(Knights)[0] + getPieceValue(Rooks)[0] )
-	{
-		tSquare k = getSquareOfThePiece(blackKing);
-		if( getRankOf(k) == RANK8 )
-		{
-			k += sud;
-		}
-		if( getFileOf(k) == FILEA )
-		{
-			k += est;
-		}
-		if( getFileOf(k) == FILEH )
-		{
-			k += ovest;
-		}
-		kingRing[black] = Movegen::attackFrom<blackKing>(k) | bitSet( k );
-	}
-
-
-	// todo modificare valori material value & pst
-	// material + pst
-
-	simdScore res = st.getMaterialValue();
-
-
 	//-----------------------------------------------------
 	//	material evalutation
 	//-----------------------------------------------------
@@ -811,6 +765,55 @@ Score Position::eval(void) const
 			_evalKxvsK(r);
 			return isBlackTurn() ? -r : r;
 		}
+	}
+	
+	simdScore res = st.getMaterialValue();
+    
+	// removing std::abs(res[1]) < 20000 speed 38kn/s
+	// with std::abs(res[1]) < 20000 speed 56kn/s
+    if(!trace && std::abs(res[1]) < 20000 && _nnue.loaded()) {
+        return _nnue.eval();
+    }
+        
+    /*****************
+    // populate king ring variables
+    ******************/
+	kingRing[white] = 0;
+	if( st.getNonPawnValue()[ 2 ] >= getPieceValue(Knights)[0] + getPieceValue(Rooks)[0] )
+	{
+		tSquare k = getSquareOfThePiece(whiteKing);
+		if( getRankOf(k) == RANK1 )
+		{
+			k += north;
+		}
+		if( getFileOf(k) == FILEA )
+		{
+			k += est;
+		}
+		if( getFileOf(k) == FILEH )
+		{
+			k += ovest;
+		}
+		kingRing[white] = Movegen::attackFrom<whiteKing>(k) | bitSet( k );
+	}
+
+	kingRing[black] = 0;
+	if( st.getNonPawnValue()[ 0 ] >= getPieceValue(Knights)[0] + getPieceValue(Rooks)[0] )
+	{
+		tSquare k = getSquareOfThePiece(blackKing);
+		if( getRankOf(k) == RANK8 )
+		{
+			k += sud;
+		}
+		if( getFileOf(k) == FILEA )
+		{
+			k += est;
+		}
+		if( getFileOf(k) == FILEH )
+		{
+			k += ovest;
+		}
+		kingRing[black] = Movegen::attackFrom<blackKing>(k) | bitSet( k );
 	}
 
 

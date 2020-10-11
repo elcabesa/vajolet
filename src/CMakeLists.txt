@@ -4,6 +4,7 @@ add_library(libChess
 add_subdirectory(book)
 add_subdirectory(misc)
 add_subdirectory(movegen)
+add_subdirectory(nnue)
 add_subdirectory(position)
 add_subdirectory(search)
 add_subdirectory(uci)

@@ -9,6 +9,7 @@
 #include "libchess.h"
 #include "move.h"
 #include "movepicker.h"
+#include "nnue.h"
 #include "position.h"
 #include "searchLimits.h"
 #include "searchResult.h"
@@ -288,7 +289,7 @@ Result test(const std::string& testName, my_thread& thr, Position& pos, SearchLi
         }
         else if (Movelist(pos, record.getOperations().get("bm")).contains(r.PV.getMove(0))) {
             results.addResult(1);
-        } 
+        }
     }
     return results; 
 }
@@ -298,9 +299,12 @@ void doTest(const std::string& testName, my_thread& thr, Position& pos, SearchLi
     std::cout<<testName<<": "<<res.getPercentual()<<"% ("<<res.getPartial()<<"/"<<res.getTotal()<<")"<<std::endl;
 }
 
-int main(int , char **) {
-
-    const unsigned int time = 100;
+int main(int argc, char ** argv) {
+    unsigned int time = 100;
+    if( argc == 2) {
+        time = atoi(argv[1]);
+    }
+    
     std::cout<<"time for each position: "<<time<<" ms"<<std::endl;
 	
     libChessInit();
@@ -310,6 +314,7 @@ int main(int , char **) {
 	thr.getTT().setSize(64);
 
     Position pos(Position::pawnHash::off);
+    pos.nnue().load("nnue.par");
 
     SearchLimits sl;
     sl.setMoveTime(time);

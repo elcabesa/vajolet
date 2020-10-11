@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "command.h"
+#include "nnue.h"
 #include "vajo_io.h"
 #include "parameters.h"
 #include "position.h"
@@ -31,7 +32,7 @@
 	\version 1.0
 	\date 27/10/2013
 */
-const Position& Position::setupFromFen(const std::string& fenStr)
+Position& Position::setupFromFen(const std::string& fenStr)
 {
 	char col,row,token;
 	tSquare sq = A8;
@@ -257,8 +258,12 @@ const Position& Position::setupFromFen(const std::string& fenStr)
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
 	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & _bitBoard[x.getPiecesOfOtherPlayer()] );
+	
+	if (NNUE::loaded()) {
+		_nnue.clean();
+	}
 
-#ifdef	ENABLE_CHECK_CONSISTENCY
+#ifdef ENABLE_CHECK_CONSISTENCY
 	_checkPosConsistency(checkPhase::setup);
 #endif
 	return *this;
@@ -687,8 +692,6 @@ void Position::doNullMove()
 	_calcCheckingSquares();
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
-
-
 }
 /*! \brief do a move
 	\author STOCKFISH
@@ -719,6 +722,7 @@ void Position::doMove(const Move & m)
 	tSquare to = m.getTo();
 	const bitboardIndex piece = getPieceAt(from);
 	assert( isValidPiece( piece ));
+	bool kingMove = isKing(piece);
 
 	bitboardIndex captured = ( m.isEnPassantMove() ? (x.isBlackTurn() ? whitePawns : blackPawns ) : getPieceAt(to) );
 	assert( isValidPiece( captured ) || captured == empty );
@@ -763,6 +767,11 @@ void Position::doMove(const Move & m)
 			_movePiece( piece, kFrom, kTo );
 		}
 		_putPiece(rook, rTo);
+
+		if (NNUE::loaded()) {
+			_nnue.removePiece(rook, rFrom);
+			_nnue.addPiece(rook, rTo);
+		}
 		
 		x.getKey().updatePiece( rFrom, rTo, rook );
 		x.getKey().updatePiece( kFrom, kTo, piece );
@@ -789,6 +798,9 @@ void Position::doMove(const Move & m)
 
 			// remove piece
 			_removePiece(captured,captureSquare);
+			if (NNUE::loaded()) {
+				_nnue.removePiece(captured, captureSquare);
+			}
 			// update material
 			x.removeMaterial( _eParm._pstValue[captured][captureSquare] );
 			x.removeNonPawnMaterial( _eParm._nonPawnValue[captured] );
@@ -805,6 +817,10 @@ void Position::doMove(const Move & m)
 		// update hashKey
 		x.getKey().updatePiece( from, to, piece );
 		_movePiece(piece, from, to);
+		if(!kingMove && NNUE::loaded()) {
+			_nnue.removePiece(piece, from);
+			_nnue.addPiece(piece, to);
+		}
 
 		x.addMaterial( _eParm._pstValue[piece][to] - _eParm._pstValue[piece][from] );
 	}
@@ -836,6 +852,11 @@ void Position::doMove(const Move & m)
 
 			_removePiece(piece,to);
 			_putPiece(promotedPiece,to);
+
+			if (NNUE::loaded()) {
+				_nnue.removePiece(piece, to);
+				_nnue.addPiece(promotedPiece, to);
+			}
 
 			x.addMaterial( _eParm._pstValue[promotedPiece][to] - _eParm._pstValue[piece][to] );
 			x.addNonPawnMaterial( _eParm._nonPawnValue[promotedPiece] );
@@ -888,7 +909,12 @@ void Position::doMove(const Move & m)
 	_calcCheckingSquares();
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
-
+	if (NNUE::loaded()) {
+		if(kingMove) {
+			if(isBlackTurn()) _nnue.whiteNoIncrementalEval = true;
+			else _nnue.blackNoIncrementalEval = true;
+		}
+	}
 }
 
 /*! \brief undo a move
@@ -909,6 +935,7 @@ void Position::undoMove()
 	tSquare to = m.getTo();
 	const tSquare from = m.getFrom();
 	bitboardIndex piece = getPieceAt(to);
+	bool kingMove = isKing(piece); // pay attenction this code don't take in account castle
 	assert( isValidPiece( piece ) || m.isCastleMove() );
 
 	
@@ -937,15 +964,28 @@ void Position::undoMove()
 			_movePiece( kPiece, kTo, kFrom );
 		}
 		_putPiece(rook, rFrom);
+		if (NNUE::loaded()) {
+			_nnue.removePiece(rook, rTo);
+			_nnue.addPiece(rook, rFrom);
+		}
 		
-	}
-	else {
+	} else {
 		if( m.isPromotionMove() ){
 			_removePiece(piece,to);
-			piece = isBlackPiece( piece) ? blackPawns : whitePawns;
+			bitboardIndex promotedPiece = piece;
+			piece = isBlackPiece(piece) ? blackPawns : whitePawns;
 			_putPiece(piece,to);
+			if (NNUE::loaded()) {
+				_nnue.removePiece(promotedPiece, to);
+				_nnue.addPiece(piece, to);
+			}
 		}
 		_movePiece(piece, to, from);
+		if(!kingMove && NNUE::loaded()) {
+			_nnue.removePiece(piece, to);
+			_nnue.addPiece(piece, from);
+		}
+
 		
 		assert( isValidPiece( x.getCapturedPiece() ) || x.getCapturedPiece() == empty );
 		if( bitboardIndex p = x.getCapturedPiece() )
@@ -957,13 +997,23 @@ void Position::undoMove()
 			}
 			assert( capSq < squareNumber );
 			_putPiece( p, capSq );
+			if (NNUE::loaded()) {
+				_nnue.addPiece(p, capSq);
+			}
 		}
 	}
 
-	
 	_removeState();
 
 	std::swap(Us,Them);
+
+	if (NNUE::loaded()) {
+		if(kingMove || m.isCastleMove()) {
+			if(isWhiteTurn()) _nnue.whiteNoIncrementalEval = true;
+			else _nnue.blackNoIncrementalEval = true;
+		}
+	}
+	
 }
 
 /*! \brief undo a null move
@@ -976,7 +1026,6 @@ void Position::undoNullMove()
 	--_ply;
 	_removeState();
 	std::swap( Us, Them );
-
 #ifdef ENABLE_CHECK_CONSISTENCY
 	_checkPosConsistency(checkPhase::undoNullMove);
 #endif
@@ -1684,8 +1733,8 @@ bool Position::isMoveLegal(const Move &m)const
 
 Position::~Position() = default;
 
-Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm)
-{	
+Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm), _nnue(*this)
+{
 	_stateInfo.clear();
 	_stateInfo.emplace_back(state());
 	_stateInfo[0].setNextTurn( whiteTurn );
@@ -1703,10 +1752,11 @@ Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply
 	if (usePawnHash == pawnHash::on) {
 		_pawnHashTable = std::make_unique<pawnTable>();
 	}
+	_nnue.clean();
 }
 
 
-Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm)
+Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm), _nnue(*this)
 {
 	_updateUsThem();
 	_castleRightsMask = other._castleRightsMask;
@@ -1719,6 +1769,8 @@ Position::Position(const Position& other, const pawnHash usePawnHash): _ply(othe
 	if (usePawnHash == pawnHash::on) {
 		_pawnHashTable = std::make_unique<pawnTable>();
 	}
+	_nnue.clean();
+	
 }
 
 
@@ -1746,6 +1798,7 @@ Position& Position::operator=(const Position& other)
 	_castleRookFinalSquare = other._castleRookFinalSquare;
 	
 	_eParm = other._eParm;
+	_nnue.clean();
 
 	return *this;
 }

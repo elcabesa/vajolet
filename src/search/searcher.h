@@ -38,6 +38,7 @@ class UciOutput;
 class Searcher
 {
 public:
+	// TODO NNUE MODEL belong here, eache searcher shall have his own MODEL, but a single weight set shall be shared among all the searchers
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------

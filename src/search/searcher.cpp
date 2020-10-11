@@ -26,13 +26,13 @@ std::mutex  Searcher::_mutex;
 Searcher::Searcher(Search::impl& father, SearchTimer& st, SearchLimits& sl, transpositionTable& tt, SearchParameters& sp, timeManagement& tm, rootMovesToBeSearched(rm), PVline pvToBeFollowed, UciOutput::type UOI):
     _UOI(UciOutput::create(UOI)),
     _rootMovesToBeSearched(rm),
+    _pos{father.getPosition()},
     _sp(sp),
     _sl(sl),
     _st(st),
     _tt(tt),
     _tm(tm),
     _father(father) {
-    _pos = father.getPosition();
     _pvLineFollower.setPVline(pvToBeFollowed);
     _initialTurn = _pos.getNextTurn();
 }
@@ -70,7 +70,6 @@ void Searcher::searchManager(std::vector<rootMove>& temporaryResults, unsigned i
     _cleanMemoryBeforeStartingNewSearch();
 	_idLoop(temporaryResults, index, toBeExcludedMove, 1, -SCORE_INFINITE, SCORE_INFINITE,  index == 0);
 	_finished = true;
-	_father._waitStopCV.notify_one();	
 }
 
 void Searcher::_cleanMemoryBeforeStartingNewSearch()
@@ -129,7 +128,11 @@ void Searcher::_idLoop(std::vector<rootMove>& temporaryResults, unsigned int ind
 			//----------------------------------
 			// aspiration window
 			//----------------------------------
+#ifdef LOG_SEARCH
+			rootMove res = _aspirationWindow<true>(depth, alpha, beta, masterThread);
+#else 
 			rootMove res = _aspirationWindow<false>(depth, alpha, beta, masterThread);
+#endif
 			if( res.firstMove != Move::NOMOVE )
 			{
 				bestMove = res;

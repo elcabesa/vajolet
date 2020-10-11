@@ -23,6 +23,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <set>
 
 #include "bitBoardIndex.h"
 #include "data.h"
@@ -30,6 +31,7 @@
 #include "hashKey.h"
 #include "movegen.h"
 #include "move.h"
+#include "nnue.h"
 #include "parameters.h"
 #include "score.h"
 #include "state.h"
@@ -136,7 +138,7 @@ public:
 	std::string getSymmetricFen() const;
 #endif
 
-	const Position& setupFromFen(const std::string& fenStr);
+	Position& setupFromFen(const std::string& fenStr);
 	const Position& setup(const std::string& code, const Color c);
 
 	void doNullMove();
@@ -367,6 +369,7 @@ public:
 	bool isChess960() const {return _isChess960;}
 
 	simdScore getPieceValue(const bitboardIndex b) const { return _eParm._pieceValue[b];}
+	NNUE& nnue() { return _nnue; };
 
 	//--------------------------------------------------------
 	// public members
@@ -501,7 +504,8 @@ private:
 	bool _evalKNPvsK(Score& res) const;
 
 	static std::string _printEpSquare( const state& st );
-
+    
+    mutable NNUE _nnue;
 };
 
 

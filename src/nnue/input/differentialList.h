@@ -1,6 +1,7 @@
 /*
 	This file is part of Vajolet.
-
+	Copyright (C) 2013-2018 Marco Belli
+	
     Vajolet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -14,41 +15,32 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef CLOCK_H_
-#define CLOCK_H_
 
-#include <chrono>
 
-class Clock {
-	using _time_t = std::chrono::time_point<std::chrono::high_resolution_clock>;
+#ifndef _DIFFERENTIAL_LIST_H
+#define _DIFFERENTIAL_LIST_H
+
+#include <array>
+
+class DifferentialList {
 public:
-	enum class turn {
-		white,
-		black
-	};
-	
-	Clock(float time, float increment);
-	
-	void reset();
-	int getWhiteTime() const;
-	int getBlackTime() const;
-	int getTimeIncrement() const;
-	bool isWhiteTurn() const;
-	bool isBlackTurn() const;
-	turn getTurn() const;
-	void start();
-	void stop();
-	void switchTurn();
+    void clear();
+    void add(unsigned int f);
+    void remove(unsigned int f);
+    unsigned int size() const;
+    unsigned int addList(unsigned int) const;
+    unsigned int removeList(unsigned int) const;
+    unsigned int addSize() const;
+    unsigned int removeSize() const;
 private:
-	turn _turn;
-	const int _time;
-	const int _increment;
-	int _whiteTime;
-	int _blackTime;
-	_time_t _begin;
-	
-	void _updateClock();
-	void _switchTurn();
+    static constexpr unsigned int _size = 500;
+    // TODO minimize size
+    // TODO save max element stored
+    std::array<unsigned int, _size> _addList;
+    std::array<unsigned int, _size> _removeList;
+    unsigned int _addPos = 0;
+    unsigned int _removePos = 0;
+
 };
 
-#endif /* CLOCK_H_ */
+#endif

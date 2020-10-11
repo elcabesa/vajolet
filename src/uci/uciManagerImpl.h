@@ -24,6 +24,7 @@
 #include <sstream>
 
 #include "command.h"
+#include "nnue.h"
 #include "position.h"
 #include "thread.h"
 
@@ -45,9 +46,11 @@ private:
 		\date 27/10/2013
 	*/
 	
-	void setTTSize(unsigned int size);
-	void clearHash();
-	void setTTPath( std::string s );
+	void _setTTSize(unsigned int size);
+	void _clearHash();
+	void _setSyzygyPath(std::string s);
+	void _useNnue(bool use);
+	void _setNnueFile(std::string s);
 	std::string unusedVersion;
 	unsigned int unusedSize;
 	
@@ -66,6 +69,7 @@ private:
 	bool _stop(std::istringstream& is, my_thread &thr);
 	bool _uciNewGame(std::istringstream& is, my_thread &thr);
 	bool _eval(std::istringstream& is, my_thread &thr);
+	bool _evalNN(std::istringstream& is, my_thread &thr);
 	bool _display(std::istringstream& is, my_thread &thr);
 	bool _position(std::istringstream& is, my_thread &thr);
 	
@@ -79,6 +83,7 @@ private:
 	bool _quit(std::istringstream& is, my_thread &thr);
 	Position _pos;
 	my_thread thr;
+
 };
 
 #endif

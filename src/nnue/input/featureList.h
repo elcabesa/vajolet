@@ -1,6 +1,7 @@
 /*
 	This file is part of Vajolet.
-
+	Copyright (C) 2013-2018 Marco Belli
+	
     Vajolet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -15,20 +16,24 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VAJOLET_H_
-#define VAJOLET_H_
 
-//---------------------------------------------
-//	include
-//---------------------------------------------
-#include <cassert>
-//---------------------------------------------
-//	configuration defines
-//---------------------------------------------
-//#define DEBUG_EVAL_SIMMETRY
-//#define DISABLE_TIME_DIPENDENT_OUTPUT
-//#define ENABLE_CHECK_CONSISTENCY
-//#define CHECK_NNUE_FEATURE_EXTRACTION
-//#define LOG_SEARCH 
+#ifndef _FEATURE_LIST_H
+#define _FEATURE_LIST_H
 
-#endif /* VAJOLET_H_ */
+#include <array>
+
+class FeatureList {
+public:
+    void clear();
+    void add(unsigned int f);
+    unsigned int get(unsigned int index) const;
+    unsigned int size() const;
+private:
+    static constexpr unsigned int _size = 100;
+    // TODO minimize size
+    // TODO save max element stored
+    std::array<unsigned int, _size> _list;
+    unsigned int _pos = 0;
+};
+
+#endif

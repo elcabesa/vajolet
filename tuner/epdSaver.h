@@ -14,21 +14,32 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#ifndef EPDSAVER_H_
+#define EPDSAVER_H_
 
-#ifndef VAJOLET_H_
-#define VAJOLET_H_
+#include <iostream>
+#include <fstream>
+#include <set>
 
-//---------------------------------------------
-//	include
-//---------------------------------------------
-#include <cassert>
-//---------------------------------------------
-//	configuration defines
-//---------------------------------------------
-//#define DEBUG_EVAL_SIMMETRY
-//#define DISABLE_TIME_DIPENDENT_OUTPUT
-//#define ENABLE_CHECK_CONSISTENCY
-//#define CHECK_NNUE_FEATURE_EXTRACTION
-//#define LOG_SEARCH 
+#include "searchLimits.h"
+#include "searchTimer.h"
+#include "search.h"
+#include "transposition.h"
 
-#endif /* VAJOLET_H_ */
+class Position;
+
+class EpdSaver {
+	
+public:
+	EpdSaver(unsigned int decimation, unsigned int n);
+	void save(const Position& pos);
+
+private:	
+	const unsigned int _decimation;
+	unsigned int _counter = 0;
+	std::ofstream _stream;
+	uint_fast64_t _saved = 0;
+	unsigned int _logDecimationCnt = 0;
+};
+
+#endif /* SELFPLAY_H_ */

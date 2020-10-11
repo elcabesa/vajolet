@@ -15,9 +15,12 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <random>
 #include <string>
 
 #include "book.h"
+#include "epdSaver.h"
+#include "movegen.h"
 #include "parameters.h"
 #include "player.h"
 #include "PGNGame.h"
@@ -32,18 +35,18 @@
 #include "tunerPars.h"
 #include "uciOutput.h"
 
-SelfPlay::SelfPlay(Player& white, Player& black, Book& b) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b) {
+SelfPlay::SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs) : _p(Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) {
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());
 	_sl.setBTime(_c.getBlackTime());
 	
-	_sl.setWInc(TunerParameters::gameTimeIncrement * 1000);
-	_sl.setBInc(TunerParameters::gameTimeIncrement * 1000);
+	_sl.setWInc(_c.getTimeIncrement());
+	_sl.setBInc(_c.getTimeIncrement());
 }
 
 pgn::Game SelfPlay::playGame(unsigned int round) {
-	
+	unsigned int randomMoveCounter = 0;
 	pgn::Game pgnGame;
 	_addGameTags(pgnGame, round);
 	
@@ -56,8 +59,10 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	// read book moves
 	auto bookMoves = _book.getLine();
 	auto it = bookMoves.begin();
+	Score score = 0;
 	
-	while (!_isGameFinished()) {
+	while (!_isGameFinished(score)) {
+		bool bookMove = false;
 		// set time limit
 		_sl.setWTime(_c.getWhiteTime());
 		_sl.setBTime(_c.getBlackTime());
@@ -67,12 +72,32 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		{
 			// make book moves
 			bestMove = *it;
+			bookMove = true;
 			++it;
 		}
 		else 
 		{	// out of book search
-			auto res = _c.isWhiteTurn()? _white.doSearch(_p, _sl): _black.doSearch(_p, _sl);
-			bestMove = res.PV.getMove(0);
+			if(randomMoveCounter == 0) {
+				std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    			std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    			
+				Movegen mg(_p);
+				MoveList<MAX_MOVE_PER_POSITION> ml;
+				mg.generateMoves<Movegen::genType::allMg>(ml);
+				std::uniform_int_distribution<> distrib(0, ml.size()-1);
+				bestMove = ml.get(distrib(gen));
+			}
+			else {
+				auto res = _c.isWhiteTurn()? _white.doSearch(_p, _sl): _black.doSearch(_p, _sl);
+				bestMove = res.PV.getMove(0);
+				score = res.Res;
+			}
+			
+			if( ++randomMoveCounter>=  TunerParameters::randomMoveEveryXPly) {
+				randomMoveCounter = 0;
+			}
+			
+			
 		}
 		
 		if(_c.isWhiteTurn()) {
@@ -87,6 +112,9 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		}
 		
 		_p.doMove(bestMove);
+		if(!bookMove && _fs) {
+			_fs->save(_p);
+		}
 		
 		_c.switchTurn();
 	}
@@ -95,12 +123,12 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
 	}
 	
-	_addGameResult(pgnGame,_getGameResult());
+	_addGameResult(pgnGame,_getGameResult(score));
 	
 	return pgnGame;
 }
 
-bool SelfPlay::_isGameFinished() {
+bool SelfPlay::_isGameFinished(Score res) {
 	// checkmate
 	if (_p.isCheckMate()) {
 		return true;
@@ -120,11 +148,14 @@ bool SelfPlay::_isGameFinished() {
 	// early stop
 	// near 0 for x moves after ply y
 	// abs(v) > x  for y moves
+	if(std::abs(res)>100000) {
+		return true;
+	}
 	
 	return false;
 }
 
-std::string SelfPlay::_getGameResult() {
+std::string SelfPlay::_getGameResult(Score res) {
 	// checkmate
 	if (_p.isCheckMate()) {
 		if(_p.isBlackTurn()) {
@@ -148,7 +179,13 @@ std::string SelfPlay::_getGameResult() {
 	// early stop
 	// near 0 for x moves after ply y
 	// abs(v) > x  for y moves
-	
+	if(res > 100000) {
+		return "1-0";
+	}
+	if(res < -100000) {
+		return "0-1";
+	}
+
 	return "*";
 }
 

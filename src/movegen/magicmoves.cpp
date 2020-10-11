@@ -1,5 +1,5 @@
 /**
- *magicmoves.h
+ *magicmoves.cpp
  *
  *Source file for magic move bitboard generation.
  *

@@ -14,13 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-#ifndef PLAYER_H_
-#define PLAYER_H_
+#ifndef FENSAVER_H_
+#define FENSAVER_H_
 
-#include <string>
-#include "parameters.h"
-#include "searchResult.h"
-//#include "thread.h"
+#include <iostream>
+#include <fstream>
+#include <set>
+
 #include "searchLimits.h"
 #include "searchTimer.h"
 #include "search.h"
@@ -28,33 +28,29 @@
 
 class Position;
 
-class Player {
-public:
-
-	Player(std::string name);
-	const SearchParameters& getSearchParametersConst() const;
-	SearchParameters& getSearchParameters();
-	const EvalParameters& getEvalParametersConst() const;
-	EvalParameters& getEvalParameters();
-	void insertResult(int res);
-	std::string print() const;
-	const std::string& getName() const;
-	double pointRatio() const;
-	SearchResult doSearch(const Position& p, SearchLimits& sl);
+class FenSaver {
 	
-private:
-	SearchParameters _sp;
-	EvalParameters _ep;
-	int _win = 0;
-	int _lost = 0;
-	int _draw = 0;
-	int _unknown = 0;
-	std::string _name;
+public:
+	FenSaver(unsigned int decimation, unsigned int n);
+	void save(Position& pos);
+
+private:	
+	const unsigned int _decimation;
+	unsigned int _counter = 0;
+	std::ofstream _stream;
 	SearchLimits _sl;
 	SearchTimer _st;
 	transpositionTable _tt;
 	Search _src;
-	//my_thread _thr;
+	uint_fast64_t _saved = 0;
+	unsigned int _logDecimationCnt = 0;
+    
+	void writeFeatures(Position& pos);
+	void writeRes(Score res);
+    
+    std::set<unsigned int> featuresIndex;
+	unsigned int _n;
+	double _totalError = 0.0;
 };
 
-#endif /* PLAYER_H_ */
+#endif /* SELFPLAY_H_ */

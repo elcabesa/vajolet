@@ -180,7 +180,6 @@ void my_thread::impl::_searchThread()
 			_limits.checkInfiniteSearch();
 			_limits.manageSkillLevel();
 			_timeMan = timeManagement::create(_limits, _src.getPosition().getNextTurn());
-			_src.resetStopCondition();
 			_st.resetTimers();
 			_timerCond.notify_all();
 			_srcRes = _src.manageNewSearch(getTimeMan());
@@ -313,4 +312,4 @@ const SearchResult& my_thread::synchronousSearch(const Position& p, SearchLimits
 
 bool my_thread::isSearchRunning() const { return pimpl->isSearchRunning(); }
 
-transpositionTable& my_thread::getTT() { return pimpl->getTT();}
+transpositionTable& my_thread::getTT() { return pimpl->getTT(); }

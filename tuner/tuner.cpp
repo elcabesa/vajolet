@@ -23,9 +23,6 @@
 #include "libchess.h"
 
 #include "spsa.h"
-#include "thread.h"
-#include "transposition.h"
-#include "uciOutput.h"
 
 void signalHandler(int signum)
 {

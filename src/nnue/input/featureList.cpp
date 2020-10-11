@@ -1,6 +1,7 @@
 /*
 	This file is part of Vajolet.
-
+	Copyright (C) 2013-2018 Marco Belli
+	
     Vajolet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -14,21 +15,26 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
-
-#ifndef VAJOLET_H_
-#define VAJOLET_H_
-
-//---------------------------------------------
-//	include
-//---------------------------------------------
 #include <cassert>
-//---------------------------------------------
-//	configuration defines
-//---------------------------------------------
-//#define DEBUG_EVAL_SIMMETRY
-//#define DISABLE_TIME_DIPENDENT_OUTPUT
-//#define ENABLE_CHECK_CONSISTENCY
-//#define CHECK_NNUE_FEATURE_EXTRACTION
-//#define LOG_SEARCH 
+#include "featureList.h"
 
-#endif /* VAJOLET_H_ */
+void FeatureList::clear() {
+	_pos = 0;
+}
+
+void FeatureList::add(unsigned int f) {
+    assert(_pos<_size);
+	// search in remove
+	_list[_pos++] = f;
+
+}
+
+unsigned int FeatureList::get(unsigned int index) const {
+    assert(index<_size);
+    assert(index<_pos);
+	return _list[index];
+}
+
+unsigned int FeatureList::size() const {
+	return _pos;
+}

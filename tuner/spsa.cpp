@@ -18,8 +18,8 @@
 #include <cmath>
 #include <iostream>
 #include <thread>
-#include<algorithm>
-#include<iterator>
+#include <algorithm>
+#include <iterator>
 
 #include <iostream>
 #include <fstream>

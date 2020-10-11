@@ -15,20 +15,16 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VAJOLET_H_
-#define VAJOLET_H_
+#ifndef NNUE_TYPE_H_
+#define NNUE_TYPE_H_ 
 
-//---------------------------------------------
-//	include
-//---------------------------------------------
-#include <cassert>
-//---------------------------------------------
-//	configuration defines
-//---------------------------------------------
-//#define DEBUG_EVAL_SIMMETRY
-//#define DISABLE_TIME_DIPENDENT_OUTPUT
-//#define ENABLE_CHECK_CONSISTENCY
-//#define CHECK_NNUE_FEATURE_EXTRACTION
-//#define LOG_SEARCH 
+using flOutType = int16_t;
+using flBiasType = int16_t;
+using flWeightType = int16_t;
 
-#endif /* VAJOLET_H_ */
+using outType = uint8_t;
+using accumulatorType = int32_t;
+using biasType = int32_t;
+using weightType = int8_t;
+
+#endif

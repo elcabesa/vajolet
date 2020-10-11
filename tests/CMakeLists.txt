@@ -10,6 +10,7 @@ add_executable(Vajolet_unit_test
 	MoveTest.cpp
 	MoveListTest.cpp
 	multiPVmanagerTest.cpp
+	nnueTest.cpp
 	perft-test.cpp
 	pvLineFollowerTest.cpp
 	positionTest.cpp

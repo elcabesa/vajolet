@@ -25,15 +25,16 @@
 namespace pgn { class Game;}
 class Book;
 class Player;
+class EpdSaver;
 
 class SelfPlay {
 	
 public:
-	SelfPlay(Player& white, Player& black, Book& b);
+	SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs = nullptr);
 	pgn::Game playGame(unsigned int round);
 private:	
-	bool _isGameFinished();
-	std::string _getGameResult();
+	bool _isGameFinished(Score res);
+	std::string _getGameResult(Score res);
 	void _addGameTags(pgn::Game& g, int round);
 	void _addGameResult(pgn::Game& g, const std::string & s);
 	Position _p;
@@ -42,6 +43,7 @@ private:
 	Player& _white;
 	Player& _black;
 	Book& _book;
+	EpdSaver * const _fs;
 };
 
 #endif /* SELFPLAY_H_ */

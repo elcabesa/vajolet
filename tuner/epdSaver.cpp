@@ -15,20 +15,27 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VAJOLET_H_
-#define VAJOLET_H_
+#include "epdSaver.h"
+#include "position.h"
+#include "searchResult.h"
+#include "timeManagement.h"
+#include "transposition.h"
 
-//---------------------------------------------
-//	include
-//---------------------------------------------
-#include <cassert>
-//---------------------------------------------
-//	configuration defines
-//---------------------------------------------
-//#define DEBUG_EVAL_SIMMETRY
-//#define DISABLE_TIME_DIPENDENT_OUTPUT
-//#define ENABLE_CHECK_CONSISTENCY
-//#define CHECK_NNUE_FEATURE_EXTRACTION
-//#define LOG_SEARCH 
 
-#endif /* VAJOLET_H_ */
+EpdSaver::EpdSaver(unsigned int decimation, unsigned int n): _decimation(decimation){
+	_stream.open("fen"+ std::to_string(n) + ".epd");
+}
+
+
+void EpdSaver::save(const Position& pos) {
+	if (++_counter >= _decimation) {
+		_counter = 0;
+		++_logDecimationCnt;
+		++_saved;
+		if(_logDecimationCnt>=10000) {
+				std::cout << "saved " << _saved << " FENs" <<std::endl;
+				_logDecimationCnt = 0;
+		}
+		_stream << pos.getFen()<< std::endl;		
+	}
+}

@@ -35,6 +35,8 @@ public:
 	static bool perftUseHash;
 	static bool limitStrength;
 	static unsigned int engineLevel;
+	static bool useNnue; 
+	static std::string nnueFile;
 
 	static bool isMultiPvSearch() {return multiPVLines > 1;}
 };

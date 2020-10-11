@@ -23,6 +23,7 @@
 #include "benchmark.h"
 #include "command.h"
 #include "movepicker.h"
+#include "nnue.h"
 #include "perft.h"
 #include "searchTimer.h"
 #include "searchLimits.h"
@@ -45,23 +46,25 @@ UciManager::impl::impl(): _pos(Position::pawnHash::off)
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
 	
-	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, this, &UciManager::impl::setTTSize, 1, 1, 262144));
+	_optionList.emplace_back( new SpinUciOption("Hash",unusedSize, this, &UciManager::impl::_setTTSize, 1, 1, 262144));
 	_optionList.emplace_back( new SpinUciOption("Threads", uciParameters::threads, this, nullptr, 1, 1, 256));
 	_optionList.emplace_back( new SpinUciOption("MultiPV", uciParameters::multiPVLines, this, nullptr, 1, 1, 500));
-	_optionList.emplace_back( new CheckUciOption("Ponder", uciParameters::Ponder, true));
-	_optionList.emplace_back( new CheckUciOption("OwnBook", uciParameters::useOwnBook, true));
-	_optionList.emplace_back( new CheckUciOption("BestMoveBook", uciParameters::bestMoveBook, false));
+	_optionList.emplace_back( new CheckUciOption("Ponder", uciParameters::Ponder, this, nullptr, true));
+	_optionList.emplace_back( new CheckUciOption("OwnBook", uciParameters::useOwnBook, this, nullptr, true));
+	_optionList.emplace_back( new CheckUciOption("BestMoveBook", uciParameters::bestMoveBook, this, nullptr, false));
 	_optionList.emplace_back( new StringUciOption("UCI_EngineAbout", unusedVersion, this, nullptr, _getProgramNameAndVersion() + " by Marco Belli (build date: " + __DATE__ + " " + __TIME__ + ")"));
-	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", uciParameters::showCurrentLine, false));
-	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath, this, &UciManager::impl::setTTPath, "<empty>"));
+	_optionList.emplace_back( new CheckUciOption("UCI_ShowCurrLine", uciParameters::showCurrentLine, this, nullptr, false));
+	_optionList.emplace_back( new StringUciOption("SyzygyPath", uciParameters::SyzygyPath, this, &UciManager::impl::_setSyzygyPath, "<empty>"));
 	_optionList.emplace_back( new SpinUciOption("SyzygyProbeDepth", uciParameters::SyzygyProbeDepth, this, nullptr, 1, 1, 100));
-	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, true));
-	_optionList.emplace_back( new ButtonUciOption("ClearHash", this, &UciManager::impl::clearHash));
-	_optionList.emplace_back( new CheckUciOption("PerftUseHash", uciParameters::perftUseHash, false));
-	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciOutput::reduceVerbosity, false));
-	_optionList.emplace_back( new CheckUciOption("UCI_Chess960", uciParameters::Chess960, false));
-	_optionList.emplace_back( new CheckUciOption("UCI_LimitStrength", uciParameters::limitStrength, false));
+	_optionList.emplace_back( new CheckUciOption("Syzygy50MoveRule", uciParameters::Syzygy50MoveRule, this, nullptr, true));
+	_optionList.emplace_back( new ButtonUciOption("ClearHash", this, &UciManager::impl::_clearHash));
+	_optionList.emplace_back( new CheckUciOption("PerftUseHash", uciParameters::perftUseHash, this, nullptr, false));
+	_optionList.emplace_back( new CheckUciOption("reduceVerbosity", UciOutput::reduceVerbosity, this, nullptr, false));
+	_optionList.emplace_back( new CheckUciOption("UCI_Chess960", uciParameters::Chess960, this, nullptr, false));
+	_optionList.emplace_back( new CheckUciOption("UCI_LimitStrength", uciParameters::limitStrength, this, nullptr, false));
 	_optionList.emplace_back( new SpinUciOption("Skill Level", uciParameters::engineLevel, this, nullptr, 20, 1, 20));
+	_optionList.emplace_back( new CheckUciOption("Use NNUE", uciParameters::useNnue, this, &UciManager::impl::_useNnue, true));
+	_optionList.emplace_back( new StringUciOption("EvalFile", uciParameters::nnueFile, this, &UciManager::impl::_setNnueFile, "nnue.par"));
 	
 	_pos.setupFromFen(_StartFEN);
 }
@@ -72,13 +75,34 @@ UciManager::impl::~impl()
 //---------------------------------------------
 //	function implementation
 //---------------------------------------------
-void UciManager::impl::setTTSize(unsigned int size)
+void UciManager::impl::_useNnue(bool) {
+	if(uciParameters::useNnue) {
+		_pos.nnue().load(uciParameters::nnueFile);
+	}
+	else {
+		_pos.nnue().clear();
+		
+	}
+
+}
+
+void UciManager::impl::_setNnueFile(std::string) {
+	if(uciParameters::useNnue) {
+		_pos.nnue().load(uciParameters::nnueFile);
+	}
+	else {
+		_pos.nnue().clear();
+	}
+	
+}
+
+void UciManager::impl::_setTTSize(unsigned int size)
 {
 	uint64_t elements = thr.getTT().setSize(size);
 	sync_cout<<"info string hash table allocated, "<<elements<<" elements ("<<size<<"MB)"<<sync_endl;
 }
-void UciManager::impl::clearHash() {thr.getTT().clear();}
-void UciManager::impl::setTTPath( std::string s ) {
+void UciManager::impl::_clearHash() {thr.getTT().clear();}
+void UciManager::impl::_setSyzygyPath( std::string s ) {
 	auto&  szg = Syzygy::getInstance();
 	szg.setPath(s);
 	sync_cout<<"info string "<<szg.getSize()<<" tables found"<<sync_endl;
@@ -174,6 +198,7 @@ bool UciManager::impl::_position(std::istringstream& is, my_thread &)
 	while( is >> token && (m = _moveFromUci(_pos, token) ) )
 	{
 		_pos.doMove(m);
+		_pos.nnue().clean();
 	}
 	return false;
 }
@@ -293,6 +318,17 @@ bool UciManager::impl::_eval(std::istringstream&, my_thread &) {
 	return false;
 }
 
+bool UciManager::impl::_evalNN(std::istringstream&, my_thread &) {
+	if(_pos.nnue().loaded()) {
+		Score s = _pos.nnue().eval();
+		sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
+		sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0 * 100 << "%" << sync_endl;
+	} else {
+		sync_cout << "NN not loaded" << sync_endl;
+	}
+	return false;
+}
+
 bool UciManager::impl::_readyOk(std::istringstream& , my_thread &) {
 	sync_cout << "readyok" << sync_endl;
 	return false;
@@ -352,6 +388,11 @@ bool UciManager::impl::_stop(std::istringstream&, my_thread &thr) {
 
 bool UciManager::impl::_display(std::istringstream&, my_thread &) {
 	_pos.display();
+	std::cout<<"FEATURES ";
+	for(auto f: _pos.nnue().createFeatures()) {
+		std::cout<<f<<" ";
+	}
+	std::cout<<std::endl;
 	return false;
 }
 
@@ -395,6 +436,7 @@ void UciManager::impl::uciLoop(std::istream& is)
 	commands["position"] = &UciManager::impl::_position;
 	commands["setoption"] = &UciManager::impl::_setoption;
 	commands["eval"] = &UciManager::impl::_eval;
+	commands["evalNN"] = &UciManager::impl::_evalNN;
 	commands["isready"] = &UciManager::impl::_readyOk;
 	commands["perft"] = &UciManager::impl::_perft;
 	commands["divide"] = &UciManager::impl::_divide;

@@ -15,20 +15,15 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef VAJOLET_H_
-#define VAJOLET_H_
+#include "tunerPars.h"
 
-//---------------------------------------------
-//	include
-//---------------------------------------------
-#include <cassert>
-//---------------------------------------------
-//	configuration defines
-//---------------------------------------------
-//#define DEBUG_EVAL_SIMMETRY
-//#define DISABLE_TIME_DIPENDENT_OUTPUT
-//#define ENABLE_CHECK_CONSISTENCY
-//#define CHECK_NNUE_FEATURE_EXTRACTION
-//#define LOG_SEARCH 
+int TunerParameters::parallelGames = 22;
+int TunerParameters::gameNumber = 20;
+unsigned int TunerParameters::randomMoveEveryXPly = 10;
+	
+float TunerParameters::gameTime = 10;
+float TunerParameters::gameTimeIncrement = 0.1;
 
-#endif /* VAJOLET_H_ */
+unsigned int TunerParameters::minDepth = 4;
+unsigned int TunerParameters::MaxDepth = 6;
+
