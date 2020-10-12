@@ -42,9 +42,7 @@ public:
 	//--------------------------------------------------------
 	// public methods
 	//--------------------------------------------------------
-	impl(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create()):_UOI(std::move(UOI)), _pos(), _sl(sl), _st(st), _tt(tt) {
-		std::cout<<"searcherConstructor"<<std::endl;
-	}
+	impl(SearchTimer& st, SearchLimits& sl, transpositionTable& tt, std::unique_ptr<UciOutput> UOI = UciOutput::create()):_UOI(std::move(UOI)), _pos(), _sl(sl), _st(st), _tt(tt) {}
 
 	impl(const impl& other) = delete;
 	impl& operator=(const impl& other) = delete;

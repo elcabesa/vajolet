@@ -1735,7 +1735,6 @@ Position::~Position() = default;
 
 Position::Position(const nnueConfig nnue, const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm), _nnue(nnue==nnueConfig::on?new NNUE(*this):nullptr)
 {
-	std::cout<<"constructor"<<std::endl;
 	_stateInfo.clear();
 	_stateInfo.emplace_back(state());
 	_stateInfo[0].setNextTurn( whiteTurn );
@@ -1762,7 +1761,6 @@ Position::Position(const nnueConfig nnue, const pawnHash usePawnHash, const Eval
 
 Position::Position(const Position& other, const nnueConfig nnue, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm), _nnue(nnue==nnueConfig::on?new NNUE(*this):nullptr)
 {
-	std::cout<<"copy constructor"<<std::endl;
 	_updateUsThem();
 	_castleRightsMask = other._castleRightsMask;
 	_castlePath = other._castlePath;

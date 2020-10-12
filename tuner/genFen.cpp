@@ -96,7 +96,7 @@ int main() {
 	//----------------------------------
 	//	setup hyperparameters
 	//----------------------------------
-	TunerParameters::parallelGames = 10;
+	TunerParameters::parallelGames = 1;
 	TunerParameters::gameNumber = 4e6;
 	TunerParameters::gameTime = 10;
 	TunerParameters::gameTimeIncrement = 0.1;

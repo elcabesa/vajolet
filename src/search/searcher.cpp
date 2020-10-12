@@ -15,8 +15,6 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include <iostream>
-
 #include "movepicker.h"
 #include "searcher.h"
 #include "searchImpl.h"
@@ -36,7 +34,6 @@ Searcher::Searcher(Search::impl& father, SearchTimer& st, SearchLimits& sl, tran
     _tm(tm),
     _father(father)
 {
-	std::cout<<"searcherConstructor"<<std::endl;
     _pvLineFollower.setPVline(pvToBeFollowed);
     _initialTurn = _pos.getNextTurn();
 }
@@ -53,9 +50,7 @@ Searcher::Searcher(const Searcher& other) :
     _tt(other._tt),
     _tm(other._tm),
     _father(other._father)
-{
-	std::cout<<"searcherCOPY"<<std::endl;
-}
+{}
 
 
 void Searcher::showLine() {
