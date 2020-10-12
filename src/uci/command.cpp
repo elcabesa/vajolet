@@ -198,6 +198,7 @@ bool UciManager::impl::_position(std::istringstream& is, my_thread &)
 	while( is >> token && (m = _moveFromUci(_pos, token) ) )
 	{
 		_pos.doMove(m);
+		_pos.nnue()->clean();
 	}
 	return false;
 }
