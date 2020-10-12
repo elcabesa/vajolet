@@ -278,7 +278,7 @@ std::string UciOutput::displayMove(const Position& pos, const Move& m)
 
 	// calc checkmate
 	{
-		Position p(pos, Position::pawnHash::off);
+		Position p(pos, Position::nnueConfig::off, Position::pawnHash::off);
 		p.doMove(m);
 		checkMate = p.isCheckMate();
 	}

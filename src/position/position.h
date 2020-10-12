@@ -31,7 +31,6 @@
 #include "hashKey.h"
 #include "movegen.h"
 #include "move.h"
-#include "nnue.h"
 #include "parameters.h"
 #include "score.h"
 #include "state.h"
@@ -41,6 +40,7 @@
 //---------------------------------------------------
 class pawnEntry;
 class pawnTable;
+class NNUE;
 
 //---------------------------------------------------
 //	class
@@ -52,6 +52,11 @@ public:
 	// enum definition
 	//--------------------------------------------------------
 	enum class pawnHash{
+		on,
+		off
+	};
+
+	enum class nnueConfig{
 		on,
 		off
 	};
@@ -70,8 +75,8 @@ public:
 		\version 1.0
 		\date 27/10/2013
 	*/
-	explicit Position(const pawnHash usePawnHash = pawnHash::on, const EvalParameters& eParm = EvalParameters());
-	explicit Position(const Position& other, const pawnHash usePawnHash = pawnHash::on);
+	explicit Position(const nnueConfig nnue = nnueConfig::off, const pawnHash usePawnHash = pawnHash::on, const EvalParameters& eParm = EvalParameters());
+	explicit Position(const Position& other, const nnueConfig nnue = nnueConfig::off, const pawnHash usePawnHash = pawnHash::on);
 	~Position();
 	Position& operator=(const Position& other);
 	
@@ -369,7 +374,7 @@ public:
 	bool isChess960() const {return _isChess960;}
 
 	simdScore getPieceValue(const bitboardIndex b) const { return _eParm._pieceValue[b];}
-	NNUE& nnue() { return _nnue; };
+	std::unique_ptr<NNUE>& nnue() { return _nnue; };
 
 	//--------------------------------------------------------
 	// public members
@@ -505,7 +510,7 @@ private:
 
 	static std::string _printEpSquare( const state& st );
     
-    mutable NNUE _nnue;
+    std::unique_ptr<NNUE> _nnue;
 };
 
 

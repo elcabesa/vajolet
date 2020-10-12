@@ -15,6 +15,8 @@
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <iostream>
+
 #include "movepicker.h"
 #include "searcher.h"
 #include "searchImpl.h"
@@ -26,13 +28,15 @@ std::mutex  Searcher::_mutex;
 Searcher::Searcher(Search::impl& father, SearchTimer& st, SearchLimits& sl, transpositionTable& tt, SearchParameters& sp, timeManagement& tm, rootMovesToBeSearched(rm), PVline pvToBeFollowed, UciOutput::type UOI):
     _UOI(UciOutput::create(UOI)),
     _rootMovesToBeSearched(rm),
-    _pos{father.getPosition()},
+    _pos{father.getPosition(), Position::nnueConfig::on},
     _sp(sp),
     _sl(sl),
     _st(st),
     _tt(tt),
     _tm(tm),
-    _father(father) {
+    _father(father)
+{
+	std::cout<<"searcherConstructor"<<std::endl;
     _pvLineFollower.setPVline(pvToBeFollowed);
     _initialTurn = _pos.getNextTurn();
 }
@@ -41,7 +45,7 @@ Searcher::Searcher(const Searcher& other) :
     _UOI(UciOutput::create(other._UOI->getType())),
     _pvLineFollower(other._pvLineFollower),
     _rootMovesToBeSearched(other._rootMovesToBeSearched),
-    _pos(other._pos),
+    _pos(other._pos, Position::nnueConfig::on),
     _initialTurn(other._initialTurn),
     _sp(other._sp),
     _sl(other._sl),
@@ -49,7 +53,9 @@ Searcher::Searcher(const Searcher& other) :
     _tt(other._tt),
     _tm(other._tm),
     _father(other._father)
-    {}
+{
+	std::cout<<"searcherCOPY"<<std::endl;
+}
 
 
 void Searcher::showLine() {

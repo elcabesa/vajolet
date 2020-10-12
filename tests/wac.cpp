@@ -312,9 +312,8 @@ int main(int argc, char ** argv) {
     my_thread thr;
     thr.setMute(true);
 	thr.getTT().setSize(64);
-
-    Position pos(Position::pawnHash::off);
-    pos.nnue().load("nnue.par");
+    Position pos(Position::nnueConfig::on, Position::pawnHash::off);
+    pos.nnue()->load("nnue.par");
 
     SearchLimits sl;
     sl.setMoveTime(time);

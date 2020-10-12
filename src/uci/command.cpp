@@ -41,7 +41,7 @@
 
 const std::string UciManager::impl::_StartFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-UciManager::impl::impl(): _pos(Position::pawnHash::off)
+UciManager::impl::impl(): _pos(Position::nnueConfig::on, Position::pawnHash::off)
 {
 	std::cout.rdbuf()->pubsetbuf( nullptr, 0 );
 	std::cin.rdbuf()->pubsetbuf( nullptr, 0 );
@@ -77,10 +77,10 @@ UciManager::impl::~impl()
 //---------------------------------------------
 void UciManager::impl::_useNnue(bool) {
 	if(uciParameters::useNnue) {
-		_pos.nnue().load(uciParameters::nnueFile);
+		_pos.nnue()->load(uciParameters::nnueFile);
 	}
 	else {
-		_pos.nnue().clear();
+		_pos.nnue()->clear();
 		
 	}
 
@@ -88,10 +88,10 @@ void UciManager::impl::_useNnue(bool) {
 
 void UciManager::impl::_setNnueFile(std::string) {
 	if(uciParameters::useNnue) {
-		_pos.nnue().load(uciParameters::nnueFile);
+		_pos.nnue()->load(uciParameters::nnueFile);
 	}
 	else {
-		_pos.nnue().clear();
+		_pos.nnue()->clear();
 	}
 	
 }
@@ -198,7 +198,6 @@ bool UciManager::impl::_position(std::istringstream& is, my_thread &)
 	while( is >> token && (m = _moveFromUci(_pos, token) ) )
 	{
 		_pos.doMove(m);
-		_pos.nnue().clean();
 	}
 	return false;
 }
@@ -319,8 +318,8 @@ bool UciManager::impl::_eval(std::istringstream&, my_thread &) {
 }
 
 bool UciManager::impl::_evalNN(std::istringstream&, my_thread &) {
-	if(_pos.nnue().loaded()) {
-		Score s = _pos.nnue().eval();
+	if(_pos.nnue()->loaded()) {
+		Score s = _pos.nnue()->eval();
 		sync_cout << "Eval:" <<  s / 10000.0 << sync_endl;
 		sync_cout << "gamePhase:"  << _pos.getGamePhase( _pos.getActualState() )/65536.0 * 100 << "%" << sync_endl;
 	} else {
@@ -389,7 +388,7 @@ bool UciManager::impl::_stop(std::istringstream&, my_thread &thr) {
 bool UciManager::impl::_display(std::istringstream&, my_thread &) {
 	_pos.display();
 	std::cout<<"FEATURES ";
-	for(auto f: _pos.nnue().createFeatures()) {
+	for(auto f: _pos.nnue()->createFeatures()) {
 		std::cout<<f<<" ";
 	}
 	std::cout<<std::endl;

@@ -771,8 +771,8 @@ Score Position::eval(void) const
     
 	// removing std::abs(res[1]) < 20000 speed 38kn/s
 	// with std::abs(res[1]) < 20000 speed 56kn/s
-    if(!trace && std::abs(res[1]) < 20000 && _nnue.loaded()) {
-        return _nnue.eval();
+    if(!trace && std::abs(res[1]) < 20000 && _nnue && _nnue->loaded()) {
+        return _nnue->eval();
     }
         
     /*****************

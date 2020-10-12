@@ -564,7 +564,7 @@ void Position::initMaterialKeys(void)
 	 ----------------------------------------------*/
 
 
-	Position p(Position::pawnHash::off);
+	Position p(Position::nnueConfig::off, Position::pawnHash::off);
 	static const struct{
 		std::string fen;
 		materialStruct::tType type;

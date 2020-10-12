@@ -59,7 +59,7 @@ void worker(int th) {
 
 void worker2(int th) {
 	FenSaver fs(1, th);
-	Position pos;
+	Position pos(Position::nnueConfig::on);
     std::string line;
     std::ifstream myfile ("fen" + std::to_string(th) + ".epd");
     if (myfile.is_open())

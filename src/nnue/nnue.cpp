@@ -26,7 +26,7 @@
 bool NNUE::_loaded = false;
 
 NNUE::NNUE(const Position& pos):_pos(pos){
-	//std::cout<<"creating NNUE model"<<std::endl;
+	std::cout<<"creating NNUE model"<<std::endl;
     //std::cout<<"done"<<std::endl;
 
 	whiteNoIncrementalEval = true;

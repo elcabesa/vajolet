@@ -259,8 +259,8 @@ Position& Position::setupFromFen(const std::string& fenStr)
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
 	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & _bitBoard[x.getPiecesOfOtherPlayer()] );
 	
-	if (NNUE::loaded()) {
-		_nnue.clean();
+	if (NNUE::loaded() && _nnue) {
+		_nnue->clean();
 	}
 
 #ifdef ENABLE_CHECK_CONSISTENCY
@@ -768,9 +768,9 @@ void Position::doMove(const Move & m)
 		}
 		_putPiece(rook, rTo);
 
-		if (NNUE::loaded()) {
-			_nnue.removePiece(rook, rFrom);
-			_nnue.addPiece(rook, rTo);
+		if (NNUE::loaded()&& _nnue) {
+			_nnue->removePiece(rook, rFrom);
+			_nnue->addPiece(rook, rTo);
 		}
 		
 		x.getKey().updatePiece( rFrom, rTo, rook );
@@ -798,8 +798,8 @@ void Position::doMove(const Move & m)
 
 			// remove piece
 			_removePiece(captured,captureSquare);
-			if (NNUE::loaded()) {
-				_nnue.removePiece(captured, captureSquare);
+			if (NNUE::loaded() && _nnue) {
+				_nnue->removePiece(captured, captureSquare);
 			}
 			// update material
 			x.removeMaterial( _eParm._pstValue[captured][captureSquare] );
@@ -817,9 +817,9 @@ void Position::doMove(const Move & m)
 		// update hashKey
 		x.getKey().updatePiece( from, to, piece );
 		_movePiece(piece, from, to);
-		if(!kingMove && NNUE::loaded()) {
-			_nnue.removePiece(piece, from);
-			_nnue.addPiece(piece, to);
+		if(!kingMove && NNUE::loaded() && _nnue) {
+			_nnue->removePiece(piece, from);
+			_nnue->addPiece(piece, to);
 		}
 
 		x.addMaterial( _eParm._pstValue[piece][to] - _eParm._pstValue[piece][from] );
@@ -853,9 +853,9 @@ void Position::doMove(const Move & m)
 			_removePiece(piece,to);
 			_putPiece(promotedPiece,to);
 
-			if (NNUE::loaded()) {
-				_nnue.removePiece(piece, to);
-				_nnue.addPiece(promotedPiece, to);
+			if (NNUE::loaded() && _nnue) {
+				_nnue->removePiece(piece, to);
+				_nnue->addPiece(promotedPiece, to);
 			}
 
 			x.addMaterial( _eParm._pstValue[promotedPiece][to] - _eParm._pstValue[piece][to] );
@@ -910,9 +910,9 @@ void Position::doMove(const Move & m)
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
 	if (NNUE::loaded()) {
-		if(kingMove) {
-			if(isBlackTurn()) _nnue.whiteNoIncrementalEval = true;
-			else _nnue.blackNoIncrementalEval = true;
+		if(kingMove && _nnue) {
+			if(isBlackTurn()) _nnue->whiteNoIncrementalEval = true;
+			else _nnue->blackNoIncrementalEval = true;
 		}
 	}
 }
@@ -964,9 +964,9 @@ void Position::undoMove()
 			_movePiece( kPiece, kTo, kFrom );
 		}
 		_putPiece(rook, rFrom);
-		if (NNUE::loaded()) {
-			_nnue.removePiece(rook, rTo);
-			_nnue.addPiece(rook, rFrom);
+		if (NNUE::loaded() && _nnue) {
+			_nnue->removePiece(rook, rTo);
+			_nnue->addPiece(rook, rFrom);
 		}
 		
 	} else {
@@ -975,15 +975,15 @@ void Position::undoMove()
 			bitboardIndex promotedPiece = piece;
 			piece = isBlackPiece(piece) ? blackPawns : whitePawns;
 			_putPiece(piece,to);
-			if (NNUE::loaded()) {
-				_nnue.removePiece(promotedPiece, to);
-				_nnue.addPiece(piece, to);
+			if (NNUE::loaded() && _nnue) {
+				_nnue->removePiece(promotedPiece, to);
+				_nnue->addPiece(piece, to);
 			}
 		}
 		_movePiece(piece, to, from);
-		if(!kingMove && NNUE::loaded()) {
-			_nnue.removePiece(piece, to);
-			_nnue.addPiece(piece, from);
+		if(!kingMove && NNUE::loaded() && _nnue) {
+			_nnue->removePiece(piece, to);
+			_nnue->addPiece(piece, from);
 		}
 
 		
@@ -997,8 +997,8 @@ void Position::undoMove()
 			}
 			assert( capSq < squareNumber );
 			_putPiece( p, capSq );
-			if (NNUE::loaded()) {
-				_nnue.addPiece(p, capSq);
+			if (NNUE::loaded() && _nnue) {
+				_nnue->addPiece(p, capSq);
 			}
 		}
 	}
@@ -1007,10 +1007,10 @@ void Position::undoMove()
 
 	std::swap(Us,Them);
 
-	if (NNUE::loaded()) {
+	if (NNUE::loaded() && _nnue) {
 		if(kingMove || m.isCastleMove()) {
-			if(isWhiteTurn()) _nnue.whiteNoIncrementalEval = true;
-			else _nnue.blackNoIncrementalEval = true;
+			if(isWhiteTurn()) _nnue->whiteNoIncrementalEval = true;
+			else _nnue->blackNoIncrementalEval = true;
 		}
 	}
 	
@@ -1733,8 +1733,9 @@ bool Position::isMoveLegal(const Move &m)const
 
 Position::~Position() = default;
 
-Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm), _nnue(*this)
+Position::Position(const nnueConfig nnue, const pawnHash usePawnHash, const EvalParameters& eParm):_ply(0), _mg(*this), _isChess960(false), _eParm(eParm), _nnue(nnue==nnueConfig::on?new NNUE(*this):nullptr)
 {
+	std::cout<<"constructor"<<std::endl;
 	_stateInfo.clear();
 	_stateInfo.emplace_back(state());
 	_stateInfo[0].setNextTurn( whiteTurn );
@@ -1752,12 +1753,16 @@ Position::Position(const pawnHash usePawnHash, const EvalParameters& eParm):_ply
 	if (usePawnHash == pawnHash::on) {
 		_pawnHashTable = std::make_unique<pawnTable>();
 	}
-	_nnue.clean();
+
+	if(_nnue) {
+		_nnue->clean();
+	}
 }
 
 
-Position::Position(const Position& other, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm), _nnue(*this)
+Position::Position(const Position& other, const nnueConfig nnue, const pawnHash usePawnHash): _ply(other._ply), _mg(*this), _stateInfo(other._stateInfo), _squares(other._squares), _bitBoard(other._bitBoard), _isChess960(other._isChess960), _eParm(other._eParm), _nnue(nnue==nnueConfig::on?new NNUE(*this):nullptr)
 {
+	std::cout<<"copy constructor"<<std::endl;
 	_updateUsThem();
 	_castleRightsMask = other._castleRightsMask;
 	_castlePath = other._castlePath;
@@ -1769,7 +1774,9 @@ Position::Position(const Position& other, const pawnHash usePawnHash): _ply(othe
 	if (usePawnHash == pawnHash::on) {
 		_pawnHashTable = std::make_unique<pawnTable>();
 	}
-	_nnue.clean();
+	if(_nnue) {
+		_nnue->clean();
+	}
 	
 }
 
@@ -1798,7 +1805,9 @@ Position& Position::operator=(const Position& other)
 	_castleRookFinalSquare = other._castleRookFinalSquare;
 	
 	_eParm = other._eParm;
-	_nnue.clean();
+	if(_nnue) {
+		_nnue->clean();
+	}
 
 	return *this;
 }
