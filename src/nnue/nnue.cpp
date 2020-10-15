@@ -338,7 +338,7 @@ Score NNUE::_incrementalEval() {
 	if(_pos.isWhiteTurn()) {
 		score2 = _m.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
 	} else {
-		score2 = _m.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);;
+		score2 = _m.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);
 	}
 	if(score2 != score) {
 		std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;

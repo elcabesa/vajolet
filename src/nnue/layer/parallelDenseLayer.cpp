@@ -184,6 +184,7 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
         ss.read(u.c, 8);
         b = (flBiasType)(std::round(u.d * _biasScale));
 #ifdef PRINTSTAT
+        if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
         if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
         min = std::min(min, u.d);
@@ -205,6 +206,7 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
         ss.read(u.c, 8);
         w = (flWeightType)(std::round(u.d * _weightScale));
 #ifdef PRINTSTAT
+        if (std::abs(w)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
         if(w == 0) { ++count;}
         //std::cout<<w<<std::endl;
         min = std::min(min, u.d);

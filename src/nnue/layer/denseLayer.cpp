@@ -104,6 +104,7 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
         ss.read(u.c, 8);
         b = (biasType)(round(u.d * _biasScale)); 
 #ifdef PRINTSTAT
+        if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning1"<<std::endl;}
         if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
         min = std::min(min, u.d);
@@ -129,6 +130,7 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
         ss.read(u.c, 8);
         (*_weight)[_calcWeightIndex(i, o)] = (weightType)(round(u.d * _weightScale)); 
 #ifdef PRINTSTAT
+        if (std::abs((*_weight)[_calcWeightIndex(i, o)])> 128) {std::cout<<"warningb"<<std::endl;}
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
         //std::cout<<w<<std::endl;
         min = std::min(min, u.d);
