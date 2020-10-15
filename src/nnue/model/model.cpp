@@ -38,7 +38,7 @@ Model::Model():
     // biasScaling = 255 * 2^outShift
     // weightScaling first layer = biasScaling
     // weightScaling other layers < 128 / maxWeight
-    _layer0(&bias00, &bias01, &weight00, &weight01, 65280, 65280, 8), //65280 = 255 *2^8
+    _layer0(&bias00, &bias01, &weight00, &weight01, 16320, 16320, 6), //16320 = 255 *2^6
     _layer1(&bias1, &weight1, 65280, 256, 8), //65280 = 255 *2^8
     _layer2(&bias2, &weight2, 16320, 64, 6), //16320 = 255 *2^6
     _layer3(&bias3, &weight3, 16320, 64, 0) //16320 = 255 *2^6

@@ -54,20 +54,20 @@ unsigned int ParallelDenseLayer<inputSize, outputSize>::_calcWeightIndex(const u
 
 }
 
-//#define _WARNING (100)
+//#define _WARNING (30000)
 template <unsigned int inputSize, unsigned int outputSize> 
 void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, const FeatureList& h) {
     //std::cout<<"biases"<<std::endl;
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
         _accumulator[o] = (*_bias0)[o];
         //std::cout<<double(_accumulator[o])/_biasScale<<std::endl;
-        //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+        //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
     }
 
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
         _accumulator[_layerOutputSize + o] = (*_bias1)[o];
         //std::cout<<double(_accumulator[_layerOutputSize + o])/_biasScale<<std::endl;
-        //if(std::abs(_output[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+        //if(std::abs(_accumulator[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
     }
     //std::cout<<"accumulate"<<std::endl;
     for (unsigned int idx = 0; idx < l.size(); ++idx) {
@@ -75,7 +75,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
             _accumulator[o] += (*_weight0)[_calcWeightIndex(in, o)];
             //std::cout<<double(_accumulator[o])/ _weightScale<<" "<<double((*_weight0)[_calcWeightIndex(in, o)])/_weightScale<<std::endl;
-            //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+            //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     } 
 
@@ -84,7 +84,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
             _accumulator[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
             //std::cout<<double(_accumulator[_layerOutputSize + o])/ _weightScale<<" "<<double((*_weight1)[_calcWeightIndex(in, o)])/_weightScale<<std::endl;
-            //if(std::abs(_output[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+            //if(std::abs(_accumulator[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
 
@@ -112,7 +112,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
         unsigned int in = l.addList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
             _accumulator[o] += (*_weight0)[_calcWeightIndex(in, o)];
-            //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+            //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
 
@@ -120,7 +120,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
         unsigned int in = l.removeList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
             _accumulator[o] -= (*_weight0)[_calcWeightIndex(in, o)];
-            //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+            //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
 
@@ -128,7 +128,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
         unsigned int in = h.addList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
             _accumulator[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
-            //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+            //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
 
@@ -136,7 +136,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
         unsigned int in = h.removeList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
             _accumulator[_layerOutputSize + o] -= (*_weight1)[_calcWeightIndex(in, o)];
-            //if(std::abs(_output[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+            //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
 
