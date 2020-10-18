@@ -29,7 +29,7 @@ template <typename inputType, unsigned int inputSize, unsigned int outputSize>
 class DenseLayer{
 public:
 
-    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift);
+    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int outShift);
     ~DenseLayer();
 
     void propagate(const std::vector<inputType>& input);
@@ -45,8 +45,6 @@ private:
     unsigned int _inputSize;
     unsigned int _outputSize;
 
-    unsigned int _biasScale;
-    unsigned int _weightScale;
     unsigned int _outShift;
     std::vector<biasType>* _bias;
     std::vector<weightType>* _weight;

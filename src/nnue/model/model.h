@@ -40,14 +40,12 @@ public:
     
 private:
 
-    static std::vector<flBiasType> bias00;
-    static std::vector<flBiasType> bias01;
+    static std::vector<flBiasType> bias0;
     static std::vector<biasType> bias1;
     static std::vector<biasType> bias2;
     static std::vector<biasType> bias3;
 
-    static std::vector<flWeightType> weight00;
-    static std::vector<flWeightType> weight01;
+    static std::vector<flWeightType> weight0;
     static std::vector<weightType> weight1;
     static std::vector<weightType> weight2;
     static std::vector<weightType> weight3;

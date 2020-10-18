@@ -25,11 +25,9 @@
 #include "differentialList.h"
 #include "featureList.h"
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-DenseLayer<inputType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int biasScale, unsigned int weightScale, unsigned int outShift):
+DenseLayer<inputType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int outShift):
     _inputSize(inputSize),
     _outputSize(outputSize),
-    _biasScale(biasScale),
-    _weightScale(weightScale),
     _outShift(outShift),
     _bias(bias),
     _weight(weight),
@@ -45,7 +43,7 @@ DenseLayer<inputType, inputSize, outputSize>::~DenseLayer() {
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
 int32_t DenseLayer<inputType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input, const unsigned int index, unsigned int o) {   
     int32_t out = (*_bias)[o];
-    for(unsigned int i = 0; i< _inputSize; ++i) {
+    for(unsigned int i = 0; i < _inputSize; ++i) {
         out += input[i] * (*_weight)[index + i];
     }
     return out;
@@ -102,9 +100,9 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *_bias) {
         ss.read(u.c, 8);
-        b = (biasType)(round(u.d * _biasScale)); 
+        b = (biasType)(floor(u.d)); 
 #ifdef PRINTSTAT
-        if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning1"<<std::endl;}
+        //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning1"<<std::endl;}
         if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
         min = std::min(min, u.d);
@@ -128,9 +126,9 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
         ss.read(u.c, 8);
-        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(round(u.d * _weightScale)); 
+        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(floor(u.d)); 
 #ifdef PRINTSTAT
-        if (std::abs((*_weight)[_calcWeightIndex(i, o)])> 128) {std::cout<<"warningb"<<std::endl;}
+        //if (std::abs((*_weight)[_calcWeightIndex(i, o)])> 128) {std::cout<<"warningb"<<std::endl;}
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
         //std::cout<<w<<std::endl;
         min = std::min(min, u.d);

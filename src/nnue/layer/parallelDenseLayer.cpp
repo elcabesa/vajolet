@@ -26,17 +26,13 @@
 #include "parallelDenseLayer.h"
 
 template <unsigned int inputSize, unsigned int outputSize> 
-ParallelDenseLayer<inputSize, outputSize>::ParallelDenseLayer(std::vector<flBiasType>* bias0, std::vector<flBiasType>* bias1, std::vector<flWeightType>* weight0, std::vector<flWeightType>* weight1, unsigned int biasScale, unsigned int weightScale, unsigned int outShift):
+ParallelDenseLayer<inputSize, outputSize>::ParallelDenseLayer(std::vector<flBiasType>* bias, std::vector<flWeightType>* weight, unsigned int outShift):
     _inputSize(2 * inputSize),
     _outputSize(2 * outputSize),
-    _biasScale(biasScale),
-    _weightScale(weightScale),
     _outShift(outShift),
     _layerOutputSize(outputSize),
-    _bias0(bias0),
-    _bias1(bias1),
-    _weight0(weight0),
-    _weight1(weight1),
+    _bias(bias),
+    _weight(weight),
     _accumulator(2 * outputSize),
     _output(2 * outputSize)
 {}
@@ -59,13 +55,13 @@ template <unsigned int inputSize, unsigned int outputSize>
 void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, const FeatureList& h) {
     //std::cout<<"biases"<<std::endl;
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-        _accumulator[o] = (*_bias0)[o];
+        _accumulator[o] = (*_bias)[o];
         //std::cout<<double(_accumulator[o])/_biasScale<<std::endl;
         //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
     }
 
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-        _accumulator[_layerOutputSize + o] = (*_bias1)[o];
+        _accumulator[_layerOutputSize + o] = (*_bias)[o];
         //std::cout<<double(_accumulator[_layerOutputSize + o])/_biasScale<<std::endl;
         //if(std::abs(_accumulator[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
     }
@@ -73,7 +69,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
     for (unsigned int idx = 0; idx < l.size(); ++idx) {
         unsigned int in = l.get(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _accumulator[o] += (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] += (*_weight)[_calcWeightIndex(in, o)];
             //std::cout<<double(_accumulator[o])/ _weightScale<<" "<<double((*_weight0)[_calcWeightIndex(in, o)])/_weightScale<<std::endl;
             //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
@@ -82,7 +78,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
     for (unsigned int idx = 0; idx < h.size(); ++idx) {
         unsigned int in = h.get(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _accumulator[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] += (*_weight)[_calcWeightIndex(in, o)];
             //std::cout<<double(_accumulator[_layerOutputSize + o])/ _weightScale<<" "<<double((*_weight1)[_calcWeightIndex(in, o)])/_weightScale<<std::endl;
             //if(std::abs(_accumulator[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
@@ -111,7 +107,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
         unsigned int in = l.addList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _accumulator[o] += (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] += (*_weight)[_calcWeightIndex(in, o)];
             //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
@@ -119,7 +115,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     for(unsigned int idx = 0; idx < l.removeSize(); ++idx) {
         unsigned int in = l.removeList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _accumulator[o] -= (*_weight0)[_calcWeightIndex(in, o)];
+            _accumulator[o] -= (*_weight)[_calcWeightIndex(in, o)];
             //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
@@ -127,7 +123,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     for(unsigned int idx = 0; idx < h.addSize(); ++idx) {
         unsigned int in = h.addList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _accumulator[_layerOutputSize + o] += (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] += (*_weight)[_calcWeightIndex(in, o)];
             //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
@@ -135,7 +131,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     for(unsigned int idx = 0; idx < h.removeSize(); ++idx) {
         unsigned int in = h.removeList(idx);
         for (unsigned int o = 0; o < _layerOutputSize; ++o) {
-            _accumulator[_layerOutputSize + o] -= (*_weight1)[_calcWeightIndex(in, o)];
+            _accumulator[_layerOutputSize + o] -= (*_weight)[_calcWeightIndex(in, o)];
             //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
         }
     }
@@ -153,13 +149,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
 template <unsigned int inputSize, unsigned int outputSize> 
 bool ParallelDenseLayer<inputSize, outputSize>::deserialize(std::ifstream& ss) {
     //std::cout<<"DESERIALIZE PARALLEL DENSE LAYER"<<std::endl;
-    if(ss.get() != '{') {std::cout<<"ParallelDenseLayer missing {"<<std::endl;return false;}
-    
-    if(!_deserialize(ss, _bias0, _weight0)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
-    if(!_deserialize(ss, _bias1, _weight1)) {std::cout<<"ParallelDenseLayer internal layer error"<<std::endl;return false;}
-    
-    if(ss.get() != '}') {std::cout<<"ParallelDenseLayer missing }"<<std::endl;return false;}
-    if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
+    if(!_deserialize(ss, _bias, _weight)) {std::cout<<"ParallelDenseLayer  layer error"<<std::endl;return false;}
     return true;
 }
 
@@ -182,9 +172,9 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
         ss.read(u.c, 8);
-        b = (flBiasType)(std::round(u.d * _biasScale));
+        b = (flBiasType)(std::floor(u.d));
 #ifdef PRINTSTAT
-        if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
+        //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
         if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
         min = std::min(min, u.d);
@@ -204,10 +194,8 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     for( auto & w: *weight) {
         ss.read(u.c, 8);
-        w = (flWeightType)(std::round(u.d * _weightScale));
-#ifdef PRINTSTAT
-        if (std::abs(w)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
-        if(w == 0) { ++count;}
+        w = (flWeightType)(std::floor(u.d));
+#ifdef PRINTSTATpropagate
         //std::cout<<w<<std::endl;
         min = std::min(min, u.d);
         max = std::max(max, u.d);

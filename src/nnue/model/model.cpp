@@ -22,35 +22,28 @@
 
 #include "model.h"
 
-std::vector<flBiasType> Model::bias00;
-std::vector<flBiasType> Model::bias01;
+std::vector<flBiasType> Model::bias0;
 std::vector<biasType> Model::bias1;
 std::vector<biasType> Model::bias2;
 std::vector<biasType> Model::bias3;
 
-std::vector<flWeightType> Model::weight00;
-std::vector<flWeightType> Model::weight01;
+std::vector<flWeightType> Model::weight0;
 std::vector<weightType> Model::weight1;
 std::vector<weightType> Model::weight2;
 std::vector<weightType> Model::weight3;
 
 Model::Model():
-    // biasScaling = 255 * 2^outShift
-    // weightScaling first layer = biasScaling
-    // weightScaling other layers < 128 / maxWeight
-    _layer0(&bias00, &bias01, &weight00, &weight01, 16320, 16320, 6), //16320 = 255 *2^6
-    _layer1(&bias1, &weight1, 65280, 256, 8), //65280 = 255 *2^8
-    _layer2(&bias2, &weight2, 16320, 64, 6), //16320 = 255 *2^6
-    _layer3(&bias3, &weight3, 16320, 64, 0) //16320 = 255 *2^6
+    _layer0(&bias0, &weight0, 0),
+    _layer1(&bias1, &weight1, 6),
+    _layer2(&bias2, &weight2, 6),
+    _layer3(&bias3, &weight3, 0)
 {
-    bias00.resize(256, 0.0);
-	bias01.resize(256, 0.0);
+    bias0.resize(256, 0.0);
 	bias1.resize(32, 0.0);
 	bias2.resize(32, 0.0);
 	bias3.resize(1, 0.0);
 	
-	weight00.resize(40960 * 256, 1.0);
-	weight01.resize(40960 * 256, 1.0);
+	weight0.resize(40960 * 256, 1.0);
 	weight1.resize(512 * 32, 1.0);
 	weight2.resize(32 * 32, 1.0);
 	weight3.resize(32 * 1, 1.0);
@@ -60,17 +53,17 @@ accumulatorType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     _layer0.propagate(l, h);
     _layer1.propagate(_layer0.output());
     _layer2.propagate(_layer1.output());
-    return _layer3.propagateOut(_layer2.output(), 0, 0) * 0.612745; // 10000 / 16320
+    return _layer3.propagateOut(_layer2.output(), 0, 0);
 }
 
 accumulatorType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
     _layer0.incrementalPropagate(l, h);
     _layer1.propagate(_layer0.output());
     _layer2.propagate(_layer1.output());
-    return _layer3.propagateOut(_layer2.output(), 0, 0) * 0.612745; // 10000 / 16320
+    return _layer3.propagateOut(_layer2.output(), 0, 0);
 }
 
-#define VERSION "0001"
+#define VERSION "0002"
 bool Model::deserialize(std::ifstream& ss) {
     ss.clear();
     ss.seekg(0);
