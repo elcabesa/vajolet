@@ -58,6 +58,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
         _accumulator[o] = (*_bias)[o];
         //std::cout<<double(_accumulator[o])/_biasScale<<std::endl;
         //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+
     }
 
     for (unsigned int o = 0; o < _layerOutputSize; ++o) {
@@ -65,6 +66,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
         //std::cout<<double(_accumulator[_layerOutputSize + o])/_biasScale<<std::endl;
         //if(std::abs(_accumulator[_layerOutputSize + o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
     }
+    
     //std::cout<<"accumulate"<<std::endl;
     for (unsigned int idx = 0; idx < l.size(); ++idx) {
         unsigned int in = l.get(idx);
@@ -90,8 +92,9 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
 
     /*std::cout<<"-----------------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        std::cout<< _output[o] / double(255) <<std::endl;
+        std::cout<< _output[o]<<std::endl;
     }*/
+    
     /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
         std::cout<<_accumulator[o] /1024.0 <<std::endl;
@@ -172,7 +175,7 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
         ss.read(u.c, 8);
-        b = (flBiasType)(std::floor(u.d));
+        b = (flBiasType)(std::trunc(u.d));
 #ifdef PRINTSTAT
         //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
         if (b == 0) { ++count;}
@@ -194,7 +197,7 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     for( auto & w: *weight) {
         ss.read(u.c, 8);
-        w = (flWeightType)(std::floor(u.d));
+        w = (flWeightType)(std::trunc(u.d));
 #ifdef PRINTSTAT
         //std::cout<<w<<std::endl;
         min = std::min(min, u.d);

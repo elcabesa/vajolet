@@ -65,7 +65,7 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<i
 
     /*std::cout<<"----------------"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        std::cout<<_output[o] /1024.0 <<std::endl;
+        std::cout<<(int)(_output[o])<<std::endl;
     }*/
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {
@@ -100,7 +100,7 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *_bias) {
         ss.read(u.c, 8);
-        b = (biasType)(floor(u.d)); 
+        b = (biasType)(trunc(u.d)); 
 #ifdef PRINTSTAT
         //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning1"<<std::endl;}
         if (b == 0) { ++count;}
@@ -126,7 +126,7 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
         ss.read(u.c, 8);
-        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(floor(u.d)); 
+        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(trunc(u.d)); 
 #ifdef PRINTSTAT
         //if (std::abs((*_weight)[_calcWeightIndex(i, o)])> 128) {std::cout<<"warningb"<<std::endl;}
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
