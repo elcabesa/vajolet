@@ -195,7 +195,7 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
     for( auto & w: *weight) {
         ss.read(u.c, 8);
         w = (flWeightType)(std::floor(u.d));
-#ifdef PRINTSTATpropagate
+#ifdef PRINTSTAT
         //std::cout<<w<<std::endl;
         min = std::min(min, u.d);
         max = std::max(max, u.d);
