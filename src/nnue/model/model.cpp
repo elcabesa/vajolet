@@ -63,7 +63,7 @@ accumulatorType Model::incrementalPass(const DifferentialList& l, const Differen
     return _layer3.propagateOut(_layer2.output(), 0, 0) * 10;
 }
 
-#define VERSION "0002"
+#define VERSION "0003"
 bool Model::deserialize(std::ifstream& ss) {
     ss.clear();
     ss.seekg(0);

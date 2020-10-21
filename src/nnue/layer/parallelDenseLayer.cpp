@@ -165,17 +165,22 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
     double max = -1e8;
 #endif
     //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
-    union un{
-        double d;
-        char c[8];
-    }u;
+    union _bb{
+        int32_t d;
+        char c[4];
+    }bb;
+
+    union _ww{
+        int8_t d;
+        char c[1];
+    }ww;
 #ifdef PRINTSTAT
     std::cout<<"-----------------------------"<<std::endl;
 #endif
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
-        ss.read(u.c, 8);
-        b = (flBiasType)(std::trunc(u.d));
+        ss.read(bb.c, 4);
+        b = (flBiasType)(bb.d);
 #ifdef PRINTSTAT
         //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
         if (b == 0) { ++count;}
@@ -196,8 +201,8 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
 #endif
     if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     for( auto & w: *weight) {
-        ss.read(u.c, 8);
-        w = (flWeightType)(std::trunc(u.d));
+        ss.read(ww.c, 1);
+        w = (flWeightType)(ww.d);
 #ifdef PRINTSTAT
         //std::cout<<w<<std::endl;
         min = std::min(min, u.d);
