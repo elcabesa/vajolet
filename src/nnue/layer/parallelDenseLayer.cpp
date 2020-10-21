@@ -185,8 +185,8 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
         //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
         if (b == 0) { ++count;}
         //std::cout<<b<<std::endl;
-        min = std::min(min, u.d);
-        max = std::max(max, u.d);
+        min = std::min(min, (double)b);
+        max = std::max(max, (double)b);
 #endif
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
@@ -205,8 +205,8 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
         w = (flWeightType)(ww.d);
 #ifdef PRINTSTAT
         //std::cout<<w<<std::endl;
-        min = std::min(min, u.d);
-        max = std::max(max, u.d);
+        min = std::min(min, (double)w);
+        max = std::max(max, (double)w);
 #endif
         if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
