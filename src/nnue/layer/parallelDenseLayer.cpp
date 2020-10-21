@@ -166,8 +166,8 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
 #endif
     //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
     union _bb{
-        int32_t d;
-        char c[4];
+        int16_t d;
+        char c[2];
     }bb;
 
     union _ww{
@@ -179,7 +179,7 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
 #endif
     if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *bias) {
-        ss.read(bb.c, 4);
+        ss.read(bb.c, 2);
         b = (flBiasType)(bb.d);
 #ifdef PRINTSTAT
         //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning"<<std::endl;}
@@ -188,8 +188,8 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
         min = std::min(min, (double)b);
         max = std::max(max, (double)b);
 #endif
-        if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
-        if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
+        //if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
+        //if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
 #ifdef PRINTSTAT
     std::cout<<"b min "<<min<<std::endl;
@@ -208,8 +208,8 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
         min = std::min(min, (double)w);
         max = std::max(max, (double)w);
 #endif
-        if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
-        if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
+        //if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
+        //if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
 #ifdef PRINTSTAT
     std::cout<<"w min "<<min<<std::endl;
