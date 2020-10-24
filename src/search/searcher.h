@@ -55,7 +55,7 @@ public:
 
 
     void searchManager(std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove);
-	Score performQsearch();
+	SearchResult performQsearch();
 
 private:
 	//--------------------------------------------------------

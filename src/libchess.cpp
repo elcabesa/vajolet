@@ -19,6 +19,7 @@
 #include "position.h"
 #include "search.h"
 #include "syzygy/syzygy.h"
+#include "model.h"
 
 
 void libChessInit()
@@ -28,4 +29,5 @@ void libChessInit()
 	Movegen::initMovegenConstant();
 	Position::initMaterialKeys();
 	Syzygy::getInstance();
+    Model::init();
 }

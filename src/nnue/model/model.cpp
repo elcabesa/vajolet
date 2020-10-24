@@ -32,12 +32,7 @@ std::vector<weightType> Model::weight1;
 std::vector<weightType> Model::weight2;
 std::vector<weightType> Model::weight3;
 
-Model::Model():
-    _layer0(&bias0, &weight0, 0),
-    _layer1(&bias1, &weight1, 6),
-    _layer2(&bias2, &weight2, 6),
-    _layer3(&bias3, &weight3, 0)
-{
+void Model::init() {
     bias0.resize(256, 0.0);
 	bias1.resize(32, 0.0);
 	bias2.resize(32, 0.0);
@@ -48,6 +43,13 @@ Model::Model():
 	weight2.resize(32 * 32, 1.0);
 	weight3.resize(32 * 1, 1.0);
 }
+
+Model::Model():
+    _layer0(&bias0, &weight0, 0),
+    _layer1(&bias1, &weight1, 6),
+    _layer2(&bias2, &weight2, 6),
+    _layer3(&bias3, &weight3, 0)
+{}
 
 accumulatorType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     _layer0.propagate(l, h);

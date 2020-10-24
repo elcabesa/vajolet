@@ -35,7 +35,7 @@ void FenSaver::save(Position& pos) {
 		//std::cout<<"THREAD "<<_n<<" start search"<<std::endl;
 
 		// do a low depth search to find a quiet position
-		_sl.setDepth(4);
+		_sl.setDepth(0);
 		//std::cout<<"start search"<<std::endl;
 		//std::cout<<"fen "<<pos.getFen()<<std::endl;
 		_src.getPosition() = pos;
@@ -73,7 +73,7 @@ void FenSaver::save(Position& pos) {
 			return;
 		}
 
-		_sl.setDepth(10);
+		_sl.setDepth(4);
 		//std::cout<<"start search2"<<std::endl;
 		_src.getPosition() = pos;
 		auto res2 = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn()));

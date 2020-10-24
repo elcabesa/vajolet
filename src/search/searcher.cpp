@@ -18,6 +18,7 @@
 #include "movepicker.h"
 #include "searcher.h"
 #include "searchImpl.h"
+#include "searchResult.h"
 #include "syzygy/syzygy.h"
 #include "vajo_io.h"
 
@@ -1590,7 +1591,8 @@ void Searcher::_testSimmetry() const
 }
 #endif
 
-Score Searcher::performQsearch() {
+SearchResult Searcher::performQsearch() {
 	PVline pv;
-	return _qsearch<nodeType::PV_NODE, false>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, pv);
+	Score res =_qsearch<nodeType::PV_NODE, false>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, pv);
+	return SearchResult(-SCORE_INFINITE, SCORE_INFINITE, 0, pv, res);
 }

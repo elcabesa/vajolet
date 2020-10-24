@@ -37,6 +37,7 @@ public:
     accumulatorType incrementalPass(const DifferentialList& l, const DifferentialList& h);
     
     bool deserialize(std::ifstream& ss);
+    static void init();
     
 private:
 

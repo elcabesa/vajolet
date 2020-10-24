@@ -146,11 +146,11 @@ SearchResult Search::impl::_manageQsearch(timeManagement & tm)
 	PVline pvLine;
 	Searcher s(*this, _st, _sl, _tt, _sp, tm, _rootMovesToBeSearched, pvLine, UciOutput::type::mute );
 
-	Score res = s.performQsearch();
+	SearchResult res = s.performQsearch();
 	
-	_UOI->printScore( res/100 );
+	_UOI->printScore( res.Res/100 );
 	
-	return SearchResult( -SCORE_INFINITE, SCORE_INFINITE, 0, pvLine, res );
+	return res;
 }
 
 
@@ -422,14 +422,15 @@ SearchResult Search::impl::manageNewSearch(timeManagement & tm)
 
 	_UOI->printGeneralInfo( _tt.getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime());
 	
-	Move bestMove = PV.getMove(0);
-	Move ponderMove = PV.getMove(1);
-	if( !ponderMove )
-	{
-		ponderMove = _getPonderMoveFromHash( bestMove );
+	if (PV.size()>0) {
+		Move bestMove = PV.getMove(0);
+		Move ponderMove = PV.getMove(1);
+		if (!ponderMove) {
+			ponderMove = _getPonderMoveFromHash(bestMove);
+		}
+		
+		_UOI->printBestMove(bestMove, ponderMove, _pos.isChess960());
 	}
-	
-	_UOI->printBestMove( bestMove, ponderMove, _pos.isChess960() );
 
 	_game.savePV(PV, res.depth, res.alpha, res.beta);
 	
