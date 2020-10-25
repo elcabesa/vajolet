@@ -23,7 +23,7 @@ using flAccumulatorType = int16_t;
 using flBiasType = int16_t;
 using flWeightType = int16_t;
 
-using outType = uint8_t;
+using outType = int8_t;
 using accumulatorType = int32_t;
 using biasType = int32_t;
 using weightType = int8_t;
