@@ -28,7 +28,7 @@
 template <unsigned int inputSize, unsigned int outputSize> 
 class ParallelDenseLayer {
 public:
-    ParallelDenseLayer(std::vector<flBiasType>* bias,std::vector<flWeightType>* weight, unsigned int outShift);
+    ParallelDenseLayer(std::vector<flBiasType>* bias,std::vector<flWeightType>* weight);
     ~ParallelDenseLayer();
 
     void propagate(const FeatureList& l, const FeatureList& h);
@@ -45,8 +45,6 @@ private:
     const unsigned int _inputSize;
     const unsigned int _outputSize;
 
-    const unsigned int _outShift;
-
     const unsigned int _layerOutputSize;
 
     std::vector<flBiasType>* _bias;
@@ -54,7 +52,7 @@ private:
 
     /*double _max = -127;
     double _min = 127;*/
-    std::vector<flOutType> _accumulator;
+    std::vector<flAccumulatorType> _accumulator;
     std::vector<flOutType> _output;
 
     

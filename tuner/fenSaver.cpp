@@ -73,7 +73,7 @@ void FenSaver::save(Position& pos) {
 			return;
 		}
 
-		_sl.setDepth(4);
+		_sl.setDepth(5);
 		//std::cout<<"start search2"<<std::endl;
 		_src.getPosition() = pos;
 		auto res2 = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn()));

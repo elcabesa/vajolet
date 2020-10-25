@@ -26,10 +26,9 @@
 #include "parallelDenseLayer.h"
 
 template <unsigned int inputSize, unsigned int outputSize> 
-ParallelDenseLayer<inputSize, outputSize>::ParallelDenseLayer(std::vector<flBiasType>* bias, std::vector<flWeightType>* weight, unsigned int outShift):
+ParallelDenseLayer<inputSize, outputSize>::ParallelDenseLayer(std::vector<flBiasType>* bias, std::vector<flWeightType>* weight):
     _inputSize(2 * inputSize),
     _outputSize(2 * outputSize),
-    _outShift(outShift),
     _layerOutputSize(outputSize),
     _bias(bias),
     _weight(weight),
@@ -87,7 +86,7 @@ void ParallelDenseLayer<inputSize, outputSize>::propagate(const FeatureList& l, 
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        _output[o] = std::min(std::max(flOutType(_accumulator[o] >> _outShift), flOutType(0)), flOutType(127));
+        _output[o] = std::min(std::max(flAccumulatorType(_accumulator[o]), flAccumulatorType(0)), flAccumulatorType(127));
     }
 
     /*std::cout<<"-----------------------"<<std::endl;
@@ -140,7 +139,7 @@ void ParallelDenseLayer<inputSize, outputSize>::incrementalPropagate(const Diffe
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        _output[o] = std::min(std::max(flOutType(_accumulator[o] >> _outShift), flOutType(0)), flOutType(127));
+        _output[o] = std::min(std::max(flAccumulatorType(_accumulator[o]), flAccumulatorType(0)), flAccumulatorType(127));
     }
 
     /*for (unsigned int o = 0; o < _outputSize; ++o) {

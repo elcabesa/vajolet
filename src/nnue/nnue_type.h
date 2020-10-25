@@ -19,6 +19,7 @@
 #define NNUE_TYPE_H_ 
 
 using flOutType = int16_t;
+using flAccumulatorType = int16_t;
 using flBiasType = int16_t;
 using flWeightType = int16_t;
 

@@ -45,7 +45,7 @@ void Model::init() {
 }
 
 Model::Model():
-    _layer0(&bias0, &weight0, 0),
+    _layer0(&bias0, &weight0),
     _layer1(&bias1, &weight1, 6),
     _layer2(&bias2, &weight2, 6),
     _layer3(&bias3, &weight3, 0)
