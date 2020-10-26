@@ -51,9 +51,10 @@ public:
     static unsigned int mapWhitePiece(const bitboardIndex piece);
     static unsigned int mapBlackPiece(const bitboardIndex piece);
 
-    bool whiteNoIncrementalEval;
-    bool blackNoIncrementalEval;
-
+    void disableWhiteIncrementalEval();
+    void disableBlackIncrementalEval();
+    bool incrementalEvalDisabled() const;
+    
     void removePiece(bitboardIndex piece, tSquare sq);
     void addPiece(bitboardIndex piece, tSquare sq);
 
@@ -78,6 +79,10 @@ private:
     //unsigned int incrementalCount = 0;
     //unsigned int completeCount = 0;
     //unsigned int incrementalMaxSize = 0;
+
+    void _resetCompleteEvalCondition();
+    bool _whiteNoIncrementalEval;
+    bool _blackNoIncrementalEval;
 
     Score _completeEval();
     Score _incrementalEval();
