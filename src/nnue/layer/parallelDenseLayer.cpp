@@ -44,7 +44,7 @@ ParallelDenseLayer<inputSize, outputSize>::~ParallelDenseLayer() {
 
 template <unsigned int inputSize, unsigned int outputSize> 
 unsigned int ParallelDenseLayer<inputSize, outputSize>::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
-    assert(o + i * _layerOutputSize < _weight0->size());
+    assert(o + i * _layerOutputSize < _weight->size());
     return o + i * _layerOutputSize;
 
 }
