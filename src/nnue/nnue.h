@@ -35,21 +35,12 @@ class Position;
 class NNUE {
 public:
     NNUE(const Position& pos);
+
     bool load(std::string path);
-    void clear();
-    Score eval();
+    void close();
     static bool loaded();
-    std::set<unsigned int> createFeatures();
-    void createWhiteFeatures(FeatureList& fl);
-    void createBlackFeatures(FeatureList& fl);
-    static unsigned int calcWhiteFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
-    static unsigned int calcBlackFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
-    static unsigned int whiteFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
-    static unsigned int blackFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
-    static unsigned int turnOffset(bool myturn);
-    //void concatenateFeature(FeatureList f1, FeatureList f2, FeatureList& complete);
-    static unsigned int mapWhitePiece(const bitboardIndex piece);
-    static unsigned int mapBlackPiece(const bitboardIndex piece);
+
+    Score eval();
 
     void disableWhiteIncrementalEval();
     void disableBlackIncrementalEval();
@@ -59,6 +50,8 @@ public:
     void addPiece(bitboardIndex piece, tSquare sq);
 
     void clean();
+    
+    std::set<unsigned int> features();
 private:
     Model _modelW;
     Model _modelB;
@@ -74,11 +67,21 @@ private:
 
     FeatureList _completeWhiteFeatureList;
     FeatureList _completeBlackFeatureList;
-    //FeatureList _completeFeatureList;
 
     //unsigned int incrementalCount = 0;
     //unsigned int completeCount = 0;
     //unsigned int incrementalMaxSize = 0;
+
+    void _createWhiteFeatures(FeatureList& fl);
+    void _createBlackFeatures(FeatureList& fl);
+
+    //static unsigned int _calcWhiteFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
+    //static unsigned int _calcBlackFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
+    static unsigned int _whiteFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
+    static unsigned int _blackFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
+    static unsigned int _turnOffset(bool myturn);
+    static unsigned int _mapWhitePiece(const bitboardIndex piece);
+    static unsigned int _mapBlackPiece(const bitboardIndex piece);
 
     void _resetCompleteEvalCondition();
     bool _whiteNoIncrementalEval;

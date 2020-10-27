@@ -78,10 +78,8 @@ UciManager::impl::~impl()
 void UciManager::impl::_useNnue(bool) {
 	if(uciParameters::useNnue) {
 		_pos.nnue()->load(uciParameters::nnueFile);
-	}
-	else {
-		_pos.nnue()->clear();
-		
+	} else {
+		_pos.nnue()->close();
 	}
 
 }
@@ -89,9 +87,8 @@ void UciManager::impl::_useNnue(bool) {
 void UciManager::impl::_setNnueFile(std::string) {
 	if(uciParameters::useNnue) {
 		_pos.nnue()->load(uciParameters::nnueFile);
-	}
-	else {
-		_pos.nnue()->clear();
+	} else {
+		_pos.nnue()->close();
 	}
 	
 }
@@ -198,7 +195,6 @@ bool UciManager::impl::_position(std::istringstream& is, my_thread &)
 	while( is >> token && (m = _moveFromUci(_pos, token) ) )
 	{
 		_pos.doMove(m);
-		_pos.nnue()->clean();
 	}
 	return false;
 }
@@ -389,7 +385,7 @@ bool UciManager::impl::_stop(std::istringstream&, my_thread &thr) {
 bool UciManager::impl::_display(std::istringstream&, my_thread &) {
 	_pos.display();
 	std::cout<<"FEATURES ";
-	for(auto f: _pos.nnue()->createFeatures()) {
+	for(auto f: _pos.nnue()->features()) {
 		std::cout<<f<<" ";
 	}
 	std::cout<<std::endl;

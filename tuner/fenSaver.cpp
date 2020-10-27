@@ -49,7 +49,6 @@ void FenSaver::save(Position& pos) {
 			}
 			//std::cout<<"move "<<UciOutput::displayUci(m, false)<<std::endl;
 			pos.doMove(m);
-			pos.nnue()->clean();
 		}
 		//std::cout<<"RESULT "<<res.Res<<std::endl;
 		//std::cout<<"check is drawn"<<std::endl;
@@ -73,7 +72,7 @@ void FenSaver::save(Position& pos) {
 			return;
 		}
 
-		_sl.setDepth(5);
+		_sl.setDepth(6);
 		//std::cout<<"start search2"<<std::endl;
 		_src.getPosition() = pos;
 		auto res2 = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn()));
@@ -85,7 +84,6 @@ void FenSaver::save(Position& pos) {
 			}
 			//std::cout<<"move "<<UciOutput::displayUci(m, false)<<std::endl;
 			pos.doMove(m);
-			pos.nnue()->clean();
 		}
 
 		//std::cout<<"RESULT "<<res2.Res<<std::endl;
@@ -115,7 +113,6 @@ void FenSaver::save(Position& pos) {
 		//std::cout<<"undo PV2"<<std::endl;
 		for(unsigned int i = 0; i < res2.PV.size(); ++i) {
 			pos.undoMove();
-			pos.nnue()->clean();
 		}
 
 		_totalError += std::pow((res2.Res - eval), 2.0) / 2.0;
@@ -139,7 +136,7 @@ void FenSaver::save(Position& pos) {
 }
 
 void FenSaver::writeFeatures(Position& pos) {
-	auto features = pos.nnue()->createFeatures();
+	auto features = pos.nnue()->features();
 	_stream <<'{';
 
 	unsigned int i = 0;
