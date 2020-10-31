@@ -25,12 +25,14 @@
 
 FenSaver::FenSaver(unsigned int decimation, unsigned int n): _decimation(decimation), _src(_st, _sl, _tt, UciOutput::create(UciOutput::type::mute)),_n(n){
 	_stream.open("fen"+ std::to_string(n) + ".csv");
+	_sl.setInfiniteSearch();
 	_sl.setDepth(6);
 	_tt.setSize(64);
 }
 
 
 void FenSaver::save(Position& pos) {
+	unsigned int searchDepth = 7;
 	if (++_counter >= _decimation) {
 		//std::cout<<"THREAD "<<_n<<" start search"<<std::endl;
 
@@ -45,6 +47,8 @@ void FenSaver::save(Position& pos) {
 		for(unsigned int i = 0; i < res.PV.size(); ++i) {
 			Move m = res.PV.getMove(i);
 			if(m == Move::NOMOVE) {
+				/*std::cout<<res.PV.size()<<" "<<i<<std::endl;
+				std::cout<<"ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRORE1"<<std::endl;*/
 				break;
 			}
 			//std::cout<<"move "<<UciOutput::displayUci(m, false)<<std::endl;
@@ -72,16 +76,19 @@ void FenSaver::save(Position& pos) {
 			return;
 		}
 
-		_sl.setDepth(6);
+		_sl.setDepth(searchDepth);
 		//std::cout<<"start search2"<<std::endl;
 		_src.getPosition() = pos;
 		auto res2 = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn()));
 		//std::cout<<"follow pv2"<<std::endl;
+		unsigned int resPvLength = 0;
 		for(unsigned int i = 0; i < res2.PV.size(); ++i) {
 			Move m = res2.PV.getMove(i);
 			if(m == Move::NOMOVE) {
+				/*std::cout<<"ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRORE2"<<std::endl;*/
 				break;
 			}
+			++resPvLength;
 			//std::cout<<"move "<<UciOutput::displayUci(m, false)<<std::endl;
 			pos.doMove(m);
 		}
@@ -111,12 +118,20 @@ void FenSaver::save(Position& pos) {
 
 		//undo PV
 		//std::cout<<"undo PV2"<<std::endl;
-		for(unsigned int i = 0; i < res2.PV.size(); ++i) {
+		for(unsigned int i = 0; i < resPvLength; ++i) {
 			pos.undoMove();
+		}
+
+		++_totalCnt;
+
+		if(std::pow((res2.Res - eval), 2.0) / 2.0>1e8) {
+			++_highDiffCnt;
+			return;
 		}
 
 		_totalError += std::pow((res2.Res - eval), 2.0) / 2.0;
 		_counter = 0;
+		
 
 		++_logDecimationCnt;
 		++_saved;
@@ -124,6 +139,7 @@ void FenSaver::save(Position& pos) {
 		if(_logDecimationCnt>=1000) {
 				std::cout << "thread "<<_n<<" saved " << _saved << " FENs" <<std::endl;
 				std::cout << "avg cost "<< _totalError/_saved<<std::endl;
+				std::cout << "highDiff "<< _highDiffCnt<<"/"<<_totalCnt<<std::endl;
 		}
 		
 		//std::cout<<"save pos"<<std::endl;

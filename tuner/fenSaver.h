@@ -51,6 +51,8 @@ private:
     std::set<unsigned int> featuresIndex;
 	unsigned int _n;
 	double _totalError = 0.0;
+	unsigned long long _totalCnt = 0;
+	unsigned long long _highDiffCnt = 0;
 };
 
 #endif /* SELFPLAY_H_ */
