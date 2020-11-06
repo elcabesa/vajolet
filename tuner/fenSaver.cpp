@@ -126,7 +126,7 @@ void FenSaver::save(Position& pos) {
 
 		if(std::pow((res2.Res - eval), 2.0) / 2.0>1e8) {
 			++_highDiffCnt;
-			return;
+			//return;
 		}
 
 		_totalError += std::pow((res2.Res - eval), 2.0) / 2.0;
