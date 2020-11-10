@@ -34,102 +34,6 @@ FenSaver::FenSaver(unsigned int decimation, unsigned int n): _decimation(decimat
 void FenSaver::save(Position& pos) {
 	unsigned int searchDepth = 7;
 	if (++_counter >= _decimation) {
-		//std::cout<<"THREAD "<<_n<<" start search"<<std::endl;
-
-		// do a low depth search to find a quiet position
-		_sl.setDepth(0);
-		//std::cout<<"start search"<<std::endl;
-		//std::cout<<"fen "<<pos.getFen()<<std::endl;
-		_src.getPosition() = pos;
-		auto res = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn()));
-		
-		//std::cout<<"follow pv"<<std::endl;
-		for(unsigned int i = 0; i < res.PV.size(); ++i) {
-			Move m = res.PV.getMove(i);
-			if(m == Move::NOMOVE) {
-				/*std::cout<<res.PV.size()<<" "<<i<<std::endl;
-				std::cout<<"ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRORE1"<<std::endl;*/
-				break;
-			}
-			//std::cout<<"move "<<UciOutput::displayUci(m, false)<<std::endl;
-			pos.doMove(m);
-		}
-		//std::cout<<"RESULT "<<res.Res<<std::endl;
-		//std::cout<<"check is drawn"<<std::endl;
-		// exclude draw position
-		if (pos.isDraw(false)) {
-			return;
-		}
-
-		//std::cout<<"check eval"<<std::endl;
-		Score eval = pos.eval<false>();
-		if (eval == 0) {
-			return;
-		}
-		//std::cout<<"eval "<<eval<<std::endl;
-
-		if (std::abs(eval) > 200000) {
-			return;
-		}
-
-		if (std::abs(res.Res) > 200000) {
-			return;
-		}
-
-		_sl.setDepth(searchDepth);
-		//std::cout<<"start search2"<<std::endl;
-		_src.getPosition() = pos;
-		auto res2 = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn()));
-		//std::cout<<"follow pv2"<<std::endl;
-		unsigned int resPvLength = 0;
-		for(unsigned int i = 0; i < res2.PV.size(); ++i) {
-			Move m = res2.PV.getMove(i);
-			if(m == Move::NOMOVE) {
-				/*std::cout<<"ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRORE2"<<std::endl;*/
-				break;
-			}
-			++resPvLength;
-			//std::cout<<"move "<<UciOutput::displayUci(m, false)<<std::endl;
-			pos.doMove(m);
-		}
-
-		//std::cout<<"RESULT "<<res2.Res<<std::endl;
-
-		//std::cout<<"check is drawn"<<std::endl;
-		// exclude draw position
-		if (pos.isDraw(false)) {
-			return;
-		}
-		
-		//std::cout<<"check eval"<<std::endl;
-		Score eval2 = pos.eval<false>();
-		//std::cout<<"eval "<<eval2<<std::endl;
-		if (eval2 == 0) {
-			return;
-		}
-
-		if (std::abs(eval2) > 200000) {
-			return;
-		}
-		//std::cout<<"THREAD "<<_n<<" done search"<<std::endl;
-        if (std::abs(res2.Res) > 200000) {
-			return;
-		}
-
-		//undo PV
-		//std::cout<<"undo PV2"<<std::endl;
-		for(unsigned int i = 0; i < resPvLength; ++i) {
-			pos.undoMove();
-		}
-
-		++_totalCnt;
-
-		if(std::pow((res2.Res - eval), 2.0) / 2.0>1e8) {
-			++_highDiffCnt;
-			//return;
-		}
-
-		_totalError += std::pow((res2.Res - eval), 2.0) / 2.0;
 		_counter = 0;
 		
 
@@ -138,14 +42,14 @@ void FenSaver::save(Position& pos) {
 
 		if(_logDecimationCnt>=1000) {
 				std::cout << "thread "<<_n<<" saved " << _saved << " FENs" <<std::endl;
-				std::cout << "avg cost "<< _totalError/_saved<<std::endl;
-				std::cout << "highDiff "<< _highDiffCnt<<"/"<<_totalCnt<<std::endl;
+				//std::cout << "avg cost "<< _totalError/_saved<<std::endl;
+				//std::cout << "highDiff "<< _highDiffCnt<<"/"<<_totalCnt<<std::endl;
 		}
 		
 		//std::cout<<"save pos"<<std::endl;
 		writeFeatures(pos);
 		//std::cout<<"save res"<<std::endl;
-		writeRes(res2.Res);
+		writeRes(pos.eval<false>());
 		_stream << std::endl;
 		//_stream << pos.getFen()<< std::endl;
 	}

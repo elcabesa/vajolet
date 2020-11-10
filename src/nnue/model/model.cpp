@@ -55,17 +55,17 @@ accumulatorType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
     _layer0.propagate(l, h);
     _layer1.propagate(_layer0.output());
     _layer2.propagate(_layer1.output());
-    return _layer3.propagateOut(_layer2.output(), 0, 0) * 10;
+    return _layer3.propagateOut(_layer2.output(), 0, 0) * 20;
 }
 
 accumulatorType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
     _layer0.incrementalPropagate(l, h);
     _layer1.propagate(_layer0.output());
     _layer2.propagate(_layer1.output());
-    return _layer3.propagateOut(_layer2.output(), 0, 0) * 10;
+    return _layer3.propagateOut(_layer2.output(), 0, 0) * 20;
 }
 
-#define VERSION "0003"
+#define VERSION "0004"
 bool Model::deserialize(std::ifstream& ss) {
     ss.clear();
     ss.seekg(0);
