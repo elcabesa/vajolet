@@ -53,6 +53,8 @@ private:
 	double _totalError = 0.0;
 	unsigned long long _totalCnt = 0;
 	unsigned long long _highDiffCnt = 0;
+
+	Position _getQuiescentPos(Position p);
 };
 
 #endif /* SELFPLAY_H_ */

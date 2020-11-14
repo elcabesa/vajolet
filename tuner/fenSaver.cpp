@@ -30,9 +30,17 @@ FenSaver::FenSaver(unsigned int decimation, unsigned int n): _decimation(decimat
 	_tt.setSize(64);
 }
 
+Position FenSaver::_getQuiescentPos(Position p) {
+	Position pos(Position::nnueConfig::off, Position::pawnHash::off);
+	
+	_sl.setDepth(0);
+	_src.getPosition() = p;
+	auto res = _src.manageNewSearch(*timeManagement::create(_sl, p.getNextTurn()));
+}
+
 
 void FenSaver::save(Position& pos) {
-	unsigned int searchDepth = 7;
+	unsigned int searchDepth = 4;
 	if (++_counter >= _decimation) {
 		//std::cout<<"THREAD "<<_n<<" start search"<<std::endl;
 
