@@ -23,124 +23,77 @@
 #include "transposition.h"
 
 
-FenSaver::FenSaver(unsigned int decimation, unsigned int n): _decimation(decimation), _src(_st, _sl, _tt, UciOutput::create(UciOutput::type::mute)),_n(n){
+FenSaver::FenSaver(unsigned int decimation, unsigned int n): _decimation(decimation), _src(_st, _sl, _tt, UciOutput::create(UciOutput::type::mute)),_pos(Position::nnueConfig::on, Position::pawnHash::off),_n(n){
 	_stream.open("fen"+ std::to_string(n) + ".csv");
 	_sl.setInfiniteSearch();
 	_sl.setDepth(6);
 	_tt.setSize(64);
 }
 
-Position FenSaver::_getQuiescentPos(Position p) {
-	Position pos(Position::nnueConfig::off, Position::pawnHash::off);
-	
+FenSaver::QsearchRes FenSaver::_getQuiescentPosFeatures(const Position& p) {
+	QsearchRes res;
+
+	_pos = p;
+	unsigned int pvLen = 0;
 	_sl.setDepth(0);
+	_src.getPosition() = _pos;
+	auto srcRes = _src.manageNewSearch(*timeManagement::create(_sl, p.getNextTurn()));
+	for(unsigned int i = 0; i < srcRes.PV.size(); ++i) {
+		Move m = srcRes.PV.getMove(i);
+		if(m == Move::NOMOVE) {
+			/*std::cout<<res.PV.size()<<" "<<i<<std::endl;
+			std::cout<<"ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRORE1"<<std::endl;*/
+			break;
+		}
+		++pvLen;
+		_pos.doMove(m);
+	}
+	res.features = _pos.nnue()->features();
+	res.invertRes = ((pvLen % 2) == 1); // odd pv
+	res.res = srcRes.Res;
+
+	return res;
+}
+
+Score FenSaver::_getSearchRes(const Position& p) {
+	unsigned int searchDepth = 4;
+
+	_sl.setDepth(searchDepth);
 	_src.getPosition() = p;
 	auto res = _src.manageNewSearch(*timeManagement::create(_sl, p.getNextTurn()));
+	return res.Res;
 }
 
 
 void FenSaver::save(Position& pos) {
-	unsigned int searchDepth = 4;
 	if (++_counter >= _decimation) {
-		//std::cout<<"THREAD "<<_n<<" start search"<<std::endl;
 
-		// do a low depth search to find a quiet position
-		_sl.setDepth(0);
-		//std::cout<<"start search"<<std::endl;
-		//std::cout<<"fen "<<pos.getFen()<<std::endl;
-		_src.getPosition() = pos;
-		auto res = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn()));
-		
-		//std::cout<<"follow pv"<<std::endl;
-		for(unsigned int i = 0; i < res.PV.size(); ++i) {
-			Move m = res.PV.getMove(i);
-			if(m == Move::NOMOVE) {
-				/*std::cout<<res.PV.size()<<" "<<i<<std::endl;
-				std::cout<<"ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRORE1"<<std::endl;*/
-				break;
-			}
-			//std::cout<<"move "<<UciOutput::displayUci(m, false)<<std::endl;
-			pos.doMove(m);
-		}
-		//std::cout<<"RESULT "<<res.Res<<std::endl;
-		//std::cout<<"check is drawn"<<std::endl;
-		// exclude draw position
 		if (pos.isDraw(false)) {
 			return;
 		}
 
-		//std::cout<<"check eval"<<std::endl;
 		Score eval = pos.eval<false>();
-		if (eval == 0) {
-			return;
-		}
-		//std::cout<<"eval "<<eval<<std::endl;
-
 		if (std::abs(eval) > 200000) {
 			return;
 		}
 
-		if (std::abs(res.Res) > 200000) {
-			return;
-		}
+		auto qres = _getQuiescentPosFeatures(pos);
+		Score res = _getSearchRes(pos);
 
-		_sl.setDepth(searchDepth);
-		//std::cout<<"start search2"<<std::endl;
-		_src.getPosition() = pos;
-		auto res2 = _src.manageNewSearch(*timeManagement::create(_sl, pos.getNextTurn()));
-		//std::cout<<"follow pv2"<<std::endl;
-		unsigned int resPvLength = 0;
-		for(unsigned int i = 0; i < res2.PV.size(); ++i) {
-			Move m = res2.PV.getMove(i);
-			if(m == Move::NOMOVE) {
-				/*std::cout<<"ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRORE2"<<std::endl;*/
-				break;
-			}
-			++resPvLength;
-			//std::cout<<"move "<<UciOutput::displayUci(m, false)<<std::endl;
-			pos.doMove(m);
-		}
-
-		//std::cout<<"RESULT "<<res2.Res<<std::endl;
-
-		//std::cout<<"check is drawn"<<std::endl;
-		// exclude draw position
-		if (pos.isDraw(false)) {
+		if (std::abs(res) > 200000) {
 			return;
-		}
-		
-		//std::cout<<"check eval"<<std::endl;
-		Score eval2 = pos.eval<false>();
-		//std::cout<<"eval "<<eval2<<std::endl;
-		if (eval2 == 0) {
-			return;
-		}
-
-		if (std::abs(eval2) > 200000) {
-			return;
-		}
-		//std::cout<<"THREAD "<<_n<<" done search"<<std::endl;
-        if (std::abs(res2.Res) > 200000) {
-			return;
-		}
-
-		//undo PV
-		//std::cout<<"undo PV2"<<std::endl;
-		for(unsigned int i = 0; i < resPvLength; ++i) {
-			pos.undoMove();
 		}
 
 		++_totalCnt;
 
-		if(std::pow((res2.Res - eval), 2.0) / 2.0>1e8) {
+		if(std::abs(res - qres.res) > 1e4) {
 			++_highDiffCnt;
 			//return;
 		}
 
-		_totalError += std::pow((res2.Res - eval), 2.0) / 2.0;
+		_totalError += std::pow((res - qres.res), 2.0);
 		_counter = 0;
 		
-
 		++_logDecimationCnt;
 		++_saved;
 
@@ -150,17 +103,13 @@ void FenSaver::save(Position& pos) {
 				std::cout << "highDiff "<< _highDiffCnt<<"/"<<_totalCnt<<std::endl;
 		}
 		
-		//std::cout<<"save pos"<<std::endl;
-		writeFeatures(pos);
-		//std::cout<<"save res"<<std::endl;
-		writeRes(res2.Res);
+		writeFeatures(qres.features);
+		writeRes(qres.invertRes ? -res : res);
 		_stream << std::endl;
-		//_stream << pos.getFen()<< std::endl;
 	}
 }
 
-void FenSaver::writeFeatures(Position& pos) {
-	auto features = pos.nnue()->features();
+void FenSaver::writeFeatures(std::set<unsigned int> features) {
 	_stream <<'{';
 
 	unsigned int i = 0;
@@ -173,7 +122,7 @@ void FenSaver::writeFeatures(Position& pos) {
 
 	if(_logDecimationCnt>=1000) {
 		_logDecimationCnt = 0;
-		std::cout<<"thread "<<_n<<"features "<<featuresIndex.size() <<"/81920 ("<< featuresIndex.size() *100.0/81920<<"%)"<<std::endl; 
+		std::cout<<"thread "<<_n<<" features "<<featuresIndex.size() <<"/81920 ("<< featuresIndex.size() *100.0/81920<<"%)"<<std::endl; 
 	}
 }
 
