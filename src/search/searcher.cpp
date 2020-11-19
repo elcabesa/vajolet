@@ -399,6 +399,9 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 	{
 		if (_pvLineFollower.getNextMove(ply, ttMove))
 		{
+			if (ttMove == excludedMove) {
+				_pvLineFollower.clear();
+			}
 			assert(_pos.isMoveLegal(ttMove));
 		}
 		
@@ -1137,10 +1140,11 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 		ttMove = Move::NOMOVE;
 	}
 	
+	bool followPV = false;
 	// overwrite ttMove with move from move from PVlineToBeFollowed
 	if constexpr ( PVnode )
 	{
-		if (_pvLineFollower.getNextMove(ply, ttMove))
+		if ((followPV = _pvLineFollower.getNextMove(ply, ttMove)))
 		{
 			assert(_pos.isMoveLegal(ttMove));
 		}
@@ -1153,7 +1157,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 	Score ttValue = transpositionTable::scoreFromTT(tte->getValue(), ply);
 
 	if (log) ln->test("CanUseTT");
-	if( _canUseTTeValue( PVnode, beta, ttValue, tte, TTdepth ) )
+	if(!followPV && _canUseTTeValue( PVnode, beta, ttValue, tte, TTdepth ) )
 	{
 		_tt.refresh(*tte);
 		if constexpr (PVnode)
@@ -1199,7 +1203,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 		}
 		if (log) ln->calcBestScore(bestScore);
 
-		if(bestScore > alpha)
+		if (!followPV && bestScore > alpha)
 		{
 			assert(!inCheck);
 
@@ -1210,7 +1214,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 			}
 
 			if (log) ln->test("StandPat");
-			if( bestScore >= beta)
+			if (bestScore >= beta)
 			{
 				if( !_pos.isCaptureMoveOrPromotion(ttMove) )
 				{
@@ -1251,6 +1255,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 	Move bestMove(Move::NOMOVE);
 
 	PVline childPV;
+	unsigned int moveCounter = 0;
 
 	while ( ( m = mp.getNextMove() ) )
 	{
@@ -1260,7 +1265,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 		assert( m );
 
 
-		if(!inCheck)
+		if(!inCheck && (!followPV || moveCounter != 0))
 		{
 			// allow only queen promotion at deeper search
 			if( (TTdepth < -1 * ONE_PLY) && ( m.isPromotionMove() ) && (m.getPromotionType() != Move::promQueen))
@@ -1337,7 +1342,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 			//}
 
 		}
-		
+		++moveCounter;
 		_pos.doMove(m);
 		__builtin_prefetch(_tt.findCluster(_pos.getKey().getKey()));
 		if (log) ln->doMove(m);

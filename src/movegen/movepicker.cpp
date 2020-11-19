@@ -280,12 +280,7 @@ short int MovePicker::setupQuiescentSearch( const bool inCheck, const int depth 
 		}
 		else
 		{
-			
 			_stagedGeneratorState = eStagedGeneratorState::getQsearchTT;
-			if( _ttMove && /*_pos.isMoveLegal(ttMove)&& */ !_pos.isCaptureMove( _ttMove ) )
-			{
-				_ttMove = Move::NOMOVE;
-			}
 			return -2;
 		}
 	}
