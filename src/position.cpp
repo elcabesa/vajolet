@@ -1672,7 +1672,7 @@ bool Position::isMoveLegal(const Move &m)const
 				while (path)
 				{
 					tSquare sq = iterateBit(path);
-					if(getAttackersTo(sq, _bitBoard[occupiedSquares] & ~Us[King]) & Them[Pieces])
+					if(getAttackersTo(sq, _bitBoard[occupiedSquares] ^ bitSet(rookSq)) & Them[Pieces])
 					{
 						return false;
 					}
