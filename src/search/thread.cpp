@@ -119,7 +119,7 @@ void my_thread::impl::_printTimeDependentOutput(long long int time) {
 	{
 		_lastHasfullMessageTime = time;
 
-		_UOI->printGeneralInfo(_tt.getFullness(),	_src.getTbHits(), _src.getVisitedNodes(), time);
+		_UOI->printGeneralInfo(_tt.getFullness(), _src.getTbHits(), _src.getVisitedNodes(), time);
 
 		if(uciParameters::showCurrentLine)
 		{
