@@ -278,14 +278,13 @@ Score NNUE::_completeEval() {
     _whiteB.clear();
     _blackB.clear();
 
-    Score scoreW = _modelW.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
-    Score scoreB = _modelB.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);
-
     Score score;
     if(_pos.isWhiteTurn()) {
-        score = scoreW;
+        _modelB.calcFirstLayer(_completeBlackFeatureList, _completeWhiteFeatureList);
+        score = _modelW.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
     } else {
-        score = scoreB;
+        _modelW.calcFirstLayer(_completeWhiteFeatureList, _completeBlackFeatureList);
+        score = _modelB.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);
     }
     score = std::min(highSat,score);
     score = std::max(lowSat,score);

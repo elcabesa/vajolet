@@ -34,6 +34,7 @@ public:
     Model();
     
     accumulatorType forwardPass(const FeatureList& l, const FeatureList& h);
+    void calcFirstLayer(const FeatureList& l, const FeatureList& h);
     accumulatorType incrementalPass(const DifferentialList& l, const DifferentialList& h);
     
     bool deserialize(std::ifstream& ss);
