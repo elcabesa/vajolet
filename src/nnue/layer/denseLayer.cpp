@@ -41,8 +41,8 @@ DenseLayer<inputType, inputSize, outputSize>::~DenseLayer() {
 }
 
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-int32_t DenseLayer<inputType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input, const unsigned int index, unsigned int o) {   
-    int32_t out = (*_bias)[o];
+accumulatorType DenseLayer<inputType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input, const unsigned int index, unsigned int o) {   
+    accumulatorType out = (*_bias)[o];
     for(unsigned int i = 0; i < _inputSize; ++i) {
         out += input[i] * (*_weight)[index + i];
     }
@@ -53,7 +53,7 @@ template <typename inputType, unsigned int inputSize, unsigned int outputSize>
 void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<inputType>& input) {
     unsigned int index = 0;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
-        int32_t out = propagateOut(input, index, o);
+        accumulatorType out = propagateOut(input, index, o);
         _output[o] = std::min(std::max(out >> _outShift, 0), 127);
         index += _inputSize;
     }

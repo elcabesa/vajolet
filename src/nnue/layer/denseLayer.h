@@ -33,7 +33,7 @@ public:
     ~DenseLayer();
 
     void propagate(const std::vector<inputType>& input);
-    int32_t propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
+    accumulatorType propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
 
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
