@@ -48,6 +48,7 @@ FenSaver::QsearchRes FenSaver::_getQuiescentPosFeatures(const Position& p) {
 		++pvLen;
 		_pos.doMove(m);
 	}
+	res.fen = _pos.getFen();
 	res.features = _pos.nnue()->features();
 	res.invertRes = ((pvLen % 2) == 1); // odd pv
 	res.res = srcRes.Res;
@@ -103,19 +104,16 @@ void FenSaver::save(Position& pos) {
 				std::cout << "highDiff "<< _highDiffCnt<<"/"<<_totalCnt<<std::endl;
 		}
 		
-		writeFeatures(qres.features);
+		writeFen(qres);
 		writeRes(qres.invertRes ? -res : res);
 		_stream << std::endl;
 	}
 }
 
-void FenSaver::writeFeatures(std::set<unsigned int> features) {
+void FenSaver::writeFen(QsearchRes& res) {
 	_stream <<'{';
-
-	unsigned int i = 0;
-	for(auto& f: features) {
-		_stream<<f;
-		if(i++ < features.size() -1) {_stream <<',';}
+	_stream<<res.fen;
+	for(auto& f: res.features) {
 		featuresIndex.insert(f);
 	}
     _stream <<'}';

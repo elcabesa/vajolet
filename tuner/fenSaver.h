@@ -37,6 +37,7 @@ public:
 private:	
 
 	struct QsearchRes{
+		std::string fen;
 		std::set<unsigned int> features;
 		bool invertRes;
 		Score res;
@@ -53,7 +54,7 @@ private:
 	uint_fast64_t _saved = 0;
 	unsigned int _logDecimationCnt = 0;
     
-	void writeFeatures(std::set<unsigned int>);
+	void writeFen(QsearchRes& res);
 	void writeRes(Score res);
     
     std::set<unsigned int> featuresIndex;
