@@ -21,6 +21,7 @@
 #include "searchResult.h"
 #include "timeManagement.h"
 #include "transposition.h"
+#include "vajo_io.h"
 
 
 FenSaver::FenSaver(unsigned int decimation, unsigned int n): _decimation(decimation), _src(_st, _sl, _tt, UciOutput::create(UciOutput::type::mute)),_pos(Position::nnueConfig::on, Position::pawnHash::off),_n(n){
@@ -48,10 +49,11 @@ FenSaver::QsearchRes FenSaver::_getQuiescentPosFeatures(const Position& p) {
 		++pvLen;
 		_pos.doMove(m);
 	}
+	;
 	res.fen = _pos.getFen();
 	res.features = _pos.nnue()->features();
 	res.invertRes = ((pvLen % 2) == 1); // odd pv
-	res.res = srcRes.Res;
+	res.res = _pos.eval<false>();
 
 	return res;
 }
@@ -79,7 +81,11 @@ void FenSaver::save(Position& pos) {
 		}
 
 		auto qres = _getQuiescentPosFeatures(pos);
-		Score res = _getSearchRes(pos);
+		
+		if (std::abs(qres.res) > 200000) {
+			return;
+		}
+		Score res = _getSearchRes(_pos);
 
 		if (std::abs(res) > 200000) {
 			return;
@@ -89,8 +95,12 @@ void FenSaver::save(Position& pos) {
 
 		if(std::abs(res - qres.res) > 1e4) {
 			++_highDiffCnt;
-			//return;
+			//sync_cout<<pos.getFen()<<", "<<qres.fen<<", "<<res<<", "<<qres.res<<sync_endl;
+			return;
 		}
+		/*if (res == qres.res) {
+			sync_cout<<pos.getFen()<<", "<<qres.fen<<", "<<res<<", "<<qres.res<<sync_endl;
+		}*/
 
 		_totalError += std::pow((res - qres.res), 2.0);
 		_counter = 0;
@@ -105,7 +115,7 @@ void FenSaver::save(Position& pos) {
 		}
 		
 		writeFen(qres);
-		writeRes(qres.invertRes ? -res : res);
+		writeRes(/*qres.invertRes ? -res : */res);
 		_stream << std::endl;
 	}
 }
