@@ -1,5 +1,5 @@
-export CC=clang-10
-export CXX=clang++-10
+export CC=gcc
+export CXX=g++
 
 mkdir build-rel
 cd build-rel

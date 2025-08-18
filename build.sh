@@ -1,5 +1,5 @@
-export CC=clang-9
-export CXX=clang++-9
+export CC=gcc
+export CXX=g++
 
 mkdir build
 cd build
