@@ -59,7 +59,7 @@ FenSaver::QsearchRes FenSaver::_getQuiescentPosFeatures(const Position& p) {
 }
 
 Score FenSaver::_getSearchRes(const Position& p) {
-	unsigned int searchDepth = 4;
+	unsigned int searchDepth = 5;
 
 	_sl.setDepth(searchDepth);
 	_src.getPosition() = p;

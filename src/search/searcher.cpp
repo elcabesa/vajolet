@@ -1477,7 +1477,7 @@ void Searcher::_appendTTmoveIfLegal(const Move& ttm, PVline& pvLine) const
 inline bool Searcher::_canUseTTeValue(const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte, short int depth) const
 {
 	return
-		( tte->getDepth() >= depth )
+		( tte->getDepth() >= depth - 2)
 		&& ( ttValue != SCORE_NONE )// Only in case of TT access race
 		&& (
 			PVnode ?
