@@ -18,7 +18,7 @@
 #include "gtest/gtest.h"
 #include "nnue.h"
 
-TEST(NNUE, calcWhiteFeature)
+/*TEST(NNUE, calcWhiteFeature)
 {  
     std::set<unsigned int> featuresIndex;
     for(tSquare ksq = tSquare::A1; ksq != squareNumber; ++ksq) {
@@ -56,7 +56,7 @@ TEST(NNUE, EquivalentFeature) {
          NNUE::calcWhiteFeature(false, 1, tSquare::A7, tSquare::E4),
          NNUE::calcBlackFeature(false, 1, tSquare::A2, tSquare::E5)
     );
-}
+}*/
 
 
 

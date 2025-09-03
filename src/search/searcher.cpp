@@ -18,6 +18,7 @@
 #include "movepicker.h"
 #include "searcher.h"
 #include "searchImpl.h"
+#include "searchResult.h"
 #include "syzygy/syzygy.h"
 #include "vajo_io.h"
 
@@ -1481,7 +1482,7 @@ void Searcher::_appendTTmoveIfLegal(const Move& ttm, PVline& pvLine) const
 inline bool Searcher::_canUseTTeValue(const bool PVnode, const Score beta, const Score ttValue, const ttEntry * const tte, short int depth) const
 {
 	return
-		( tte->getDepth() >= depth )
+		( tte->getDepth() >= depth - 2)
 		&& ( ttValue != SCORE_NONE )// Only in case of TT access race
 		&& (
 			PVnode ?
@@ -1595,7 +1596,8 @@ void Searcher::_testSimmetry() const
 }
 #endif
 
-Score Searcher::performQsearch() {
+SearchResult Searcher::performQsearch() {
 	PVline pv;
-	return _qsearch<nodeType::PV_NODE, false>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, pv);
+	Score res =_qsearch<nodeType::PV_NODE, false>(0, 0, -SCORE_INFINITE,SCORE_INFINITE, pv);
+	return SearchResult(-SCORE_INFINITE, SCORE_INFINITE, 0, pv, res);
 }

@@ -125,13 +125,13 @@ NormalTimeManagement::NormalTimeManagement(SearchLimits& limits, const eNextMove
 
 	if( _limits.getMovesToGo() > 0 )
 	{
-		_allocatedTime = time / _limits.getMovesToGo();
+		_allocatedTime = time / _limits.getMovesToGo() + 0.8 * increment;
 		_maxAllocatedTime = std::min( 10.0 * _allocatedTime, 0.8 * time);
 		_maxAllocatedTime = std::max( _maxAllocatedTime, _allocatedTime );
 	}
 	else
 	{
-		_allocatedTime = time / 35.0 + increment * 0.98;
+		_allocatedTime = time / 30.0 + increment * 2.0;
 		_maxAllocatedTime = 10 * _allocatedTime;
 	}
 

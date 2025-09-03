@@ -768,7 +768,7 @@ void Position::doMove(const Move & m)
 		}
 		_putPiece(rook, rTo);
 
-		if (NNUE::loaded()&& _nnue) {
+		if (NNUE::loaded()&& _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(rook, rFrom);
 			_nnue->addPiece(rook, rTo);
 		}
@@ -798,7 +798,7 @@ void Position::doMove(const Move & m)
 
 			// remove piece
 			_removePiece(captured,captureSquare);
-			if (NNUE::loaded() && _nnue) {
+			if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 				_nnue->removePiece(captured, captureSquare);
 			}
 			// update material
@@ -817,7 +817,7 @@ void Position::doMove(const Move & m)
 		// update hashKey
 		x.getKey().updatePiece( from, to, piece );
 		_movePiece(piece, from, to);
-		if(!kingMove && NNUE::loaded() && _nnue) {
+		if(!kingMove && NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(piece, from);
 			_nnue->addPiece(piece, to);
 		}
@@ -853,7 +853,7 @@ void Position::doMove(const Move & m)
 			_removePiece(piece,to);
 			_putPiece(promotedPiece,to);
 
-			if (NNUE::loaded() && _nnue) {
+			if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 				_nnue->removePiece(piece, to);
 				_nnue->addPiece(promotedPiece, to);
 			}
@@ -911,8 +911,8 @@ void Position::doMove(const Move & m)
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
 	if (NNUE::loaded()) {
 		if(kingMove && _nnue) {
-			if(isBlackTurn()) _nnue->whiteNoIncrementalEval = true;
-			else _nnue->blackNoIncrementalEval = true;
+			if(isBlackTurn()) _nnue->disableWhiteIncrementalEval();
+			else _nnue->disableBlackIncrementalEval();
 		}
 	}
 }
@@ -964,7 +964,7 @@ void Position::undoMove()
 			_movePiece( kPiece, kTo, kFrom );
 		}
 		_putPiece(rook, rFrom);
-		if (NNUE::loaded() && _nnue) {
+		if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(rook, rTo);
 			_nnue->addPiece(rook, rFrom);
 		}
@@ -975,13 +975,13 @@ void Position::undoMove()
 			bitboardIndex promotedPiece = piece;
 			piece = isBlackPiece(piece) ? blackPawns : whitePawns;
 			_putPiece(piece,to);
-			if (NNUE::loaded() && _nnue) {
+			if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 				_nnue->removePiece(promotedPiece, to);
 				_nnue->addPiece(piece, to);
 			}
 		}
 		_movePiece(piece, to, from);
-		if(!kingMove && NNUE::loaded() && _nnue) {
+		if(!kingMove && NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(piece, to);
 			_nnue->addPiece(piece, from);
 		}
@@ -997,7 +997,7 @@ void Position::undoMove()
 			}
 			assert( capSq < squareNumber );
 			_putPiece( p, capSq );
-			if (NNUE::loaded() && _nnue) {
+			if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 				_nnue->addPiece(p, capSq);
 			}
 		}
@@ -1009,8 +1009,8 @@ void Position::undoMove()
 
 	if (NNUE::loaded() && _nnue) {
 		if(kingMove || m.isCastleMove()) {
-			if(isWhiteTurn()) _nnue->whiteNoIncrementalEval = true;
-			else _nnue->blackNoIncrementalEval = true;
+			if(isWhiteTurn()) _nnue->disableWhiteIncrementalEval();
+			else _nnue->disableBlackIncrementalEval();
 		}
 	}
 	

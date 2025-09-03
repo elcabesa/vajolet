@@ -40,8 +40,8 @@ else()
 		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static")
 		set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static --coverage")
 	elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}  -lpthread")
-		set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -lpthread")
+		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lpthread -static")
+		set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lpthread -static")
 	else()
 		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static")
 		set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static --coverage")
@@ -53,29 +53,21 @@ SET(BUILD_GMOCK OFF CACHE BOOL "don't build GMOCK")
 
 set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 
-# Download and unpack googletest at configure time
-configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
-endif()
+# GoogleTest requires at least C++17
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  DOWNLOAD_EXTRACT_TIMESTAMP ON
+  URL https://github.com/google/googletest/archive/52eb8108c5bdec04579160ae17225d66034bd723.zip
+
+
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# Add googletest directly to our build. This defines
-# the gtest and gtest_main targets.
-add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
-				 ${CMAKE_BINARY_DIR}/googletest-build)
+FetchContent_MakeAvailable(googletest)
 
 # The gtest/gtest_main targets carry header search path
 # dependencies automatically when using CMake 2.8.11 or
