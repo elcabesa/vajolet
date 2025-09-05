@@ -23,6 +23,7 @@ public:
 	static int parallelGames;
 	static int gameNumber;
     static unsigned int randomMoveEveryXPly;
+    static unsigned int initialRandomMoves;
 	
 	static float gameTime;
 	static float gameTimeIncrement;

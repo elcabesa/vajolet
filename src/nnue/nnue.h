@@ -42,8 +42,8 @@ public:
 
     Score eval();
 
-    void disableWhiteIncrementalEval();
-    void disableBlackIncrementalEval();
+    void disableWhiteIncrementalEval(); // evaluate if it's still necessary for king move and castling
+    void disableBlackIncrementalEval(); // evaluate if it's still necessary for king move and castling
     bool incrementalEvalDisabled() const;
     
     void removePiece(bitboardIndex piece, tSquare sq);

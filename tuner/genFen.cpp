@@ -96,10 +96,10 @@ int main() {
 	//----------------------------------
 	//	setup hyperparameters
 	//----------------------------------
-	TunerParameters::parallelGames = 10;
+	/*TunerParameters::parallelGames = 1;
 	TunerParameters::gameNumber = 4e6;
-	TunerParameters::gameTime = 10;
-	TunerParameters::gameTimeIncrement = 0.1;
+	TunerParameters::gameTime = 100;
+	TunerParameters::gameTimeIncrement = 0.1;*/
 
 	/*Book book("book.pgn");
 	Player p1("p1");
@@ -124,7 +124,7 @@ int main() {
     }*/
 	std::vector<std::thread> helperThread;
 	for(int i = 0; i < TunerParameters::parallelGames; ++i){
-		helperThread.emplace_back(std::thread(&worker2, i + 1));
+		helperThread.emplace_back(std::thread(&worker, i + 1));
 	}
 
 	for(auto &t : helperThread)

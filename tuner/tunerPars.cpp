@@ -17,13 +17,14 @@
 
 #include "tunerPars.h"
 
-int TunerParameters::parallelGames = 22;
-int TunerParameters::gameNumber = 20;
-unsigned int TunerParameters::randomMoveEveryXPly = 10;
+int TunerParameters::parallelGames = 4;
+int TunerParameters::gameNumber = 4e6;
+unsigned int TunerParameters::randomMoveEveryXPly = 0;
+unsigned int TunerParameters::initialRandomMoves = 10;
 	
-float TunerParameters::gameTime = 10;
-float TunerParameters::gameTimeIncrement = 0.1;
+float TunerParameters::gameTime = 100;
+float TunerParameters::gameTimeIncrement = 1;
 
-unsigned int TunerParameters::minDepth = 4;
-unsigned int TunerParameters::MaxDepth = 6;
+unsigned int TunerParameters::minDepth = 7;
+unsigned int TunerParameters::MaxDepth = 7;
 

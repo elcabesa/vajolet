@@ -44,6 +44,11 @@ private:
 	Player& _black;
 	Book& _book;
 	EpdSaver * const _fs;
+	unsigned int winCount = 0;
+	unsigned int drawCount = 0;
+	const int pawnValue = 10000;
+	const int wonGame = 20 * pawnValue;
+	const int drawGame = 0.04 * pawnValue;
 };
 
 #endif /* SELFPLAY_H_ */

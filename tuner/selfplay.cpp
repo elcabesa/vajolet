@@ -47,6 +47,7 @@ SelfPlay::SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs) :
 
 pgn::Game SelfPlay::playGame(unsigned int round) {
 	unsigned int randomMoveCounter = 0;
+	unsigned int initialRandomMoveCounter = 0;
 	pgn::Game pgnGame;
 	_addGameTags(pgnGame, round);
 	
@@ -55,6 +56,9 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	
 	pgn::Ply whitePly;
 	pgn::Ply blackPly;
+
+	winCount = 0;
+	drawCount = 0;
 	
 	// read book moves
 	auto bookMoves = _book.getLine();
@@ -63,6 +67,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	
 	while (!_isGameFinished(score)) {
 		bool bookMove = false;
+		bool randomMove = false;
 		// set time limit
 		_sl.setWTime(_c.getWhiteTime());
 		_sl.setBTime(_c.getBlackTime());
@@ -70,14 +75,35 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		Move bestMove;
 		if(it != bookMoves.end())
 		{
+			//std::cout<<"BOOK MOVE"<<std::endl;
 			// make book moves
 			bestMove = *it;
 			bookMove = true;
 			++it;
+			drawCount = 0;
+			winCount = 0;
 		}
 		else 
 		{	// out of book search
-			if(randomMoveCounter == 0) {
+			if(initialRandomMoveCounter < TunerParameters::initialRandomMoves) {
+				//std::cout<<"INITIAL RANDOM "<<initialRandomMoveCounter<<std::endl;
+				randomMove = true;
+				++initialRandomMoveCounter;
+				std::random_device rd;  //Will be used to obtain a seed for the random number engine
+				std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+
+				Movegen mg(_p);
+				MoveList<MAX_MOVE_PER_POSITION> ml;
+				mg.generateMoves<Movegen::genType::allMg>(ml);
+				std::uniform_int_distribution<> distrib(0, ml.size()-1);
+				bestMove = ml.get(distrib(gen));
+
+				drawCount = 0;
+				winCount = 0;
+
+			} else if(TunerParameters::randomMoveEveryXPly != 0 && randomMoveCounter == 0) {
+				//std::cout<<"RANDOM"<<std::endl;
+				randomMove = true;
 				std::random_device rd;  //Will be used to obtain a seed for the random number engine
     			std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
     			
@@ -86,8 +112,12 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 				mg.generateMoves<Movegen::genType::allMg>(ml);
 				std::uniform_int_distribution<> distrib(0, ml.size()-1);
 				bestMove = ml.get(distrib(gen));
+
+				drawCount = 0;
+				winCount = 0;
 			}
 			else {
+				//std::cout<<"SEARCH"<<std::endl;
 				auto res = _c.isWhiteTurn()? _white.doSearch(_p, _sl): _black.doSearch(_p, _sl);
 				bestMove = res.PV.getMove(0);
 				score = res.Res;
@@ -111,10 +141,11 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			blackPly = pgn::Ply();
 		}
 		
-		_p.doMove(bestMove);
-		if(!bookMove && _fs) {
-			_fs->save(_p);
+		if(!bookMove && !randomMove && _fs && _p.getNumberOfLegalMoves() > 1) {
+			_fs->save(_p, score);
 		}
+		_p.doMove(bestMove);
+
 		
 		_c.switchTurn();
 	}
@@ -144,11 +175,23 @@ bool SelfPlay::_isGameFinished(Score res) {
 	if (_p.isStaleMate()) {
 		return true;
 	}
+	auto absScore = std::abs(res);
+	if (absScore >= wonGame) {
+		winCount++;
+		drawCount = 0;
+	} else if (absScore <= drawGame) {
+		drawCount++;
+		winCount = 0;
+	} else {
+		drawCount = 0;
+		winCount = 0;
+	}
 	
 	// early stop
-	// near 0 for x moves after ply y
-	// abs(v) > x  for y moves
-	if(std::abs(res)>100000) {
+	if(winCount >= 4)
+	{
+		return true;
+	} else if (drawCount >= 12) {
 		return true;
 	}
 	
@@ -179,11 +222,13 @@ std::string SelfPlay::_getGameResult(Score res) {
 	// early stop
 	// near 0 for x moves after ply y
 	// abs(v) > x  for y moves
-	if(res > 100000) {
+	if(winCount >= 4 && res >= wonGame) {
 		return "1-0";
 	}
-	if(res < -100000) {
+	if(winCount >= 4 && res <= -wonGame) {
 		return "0-1";
+	} if (drawCount >= 12) {
+		return "1/2-1/2";
 	}
 
 	return "*";

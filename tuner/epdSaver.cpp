@@ -27,7 +27,7 @@ EpdSaver::EpdSaver(unsigned int decimation, unsigned int n): _decimation(decimat
 }
 
 
-void EpdSaver::save(const Position& pos) {
+void EpdSaver::save(const Position& pos, Score res) {
 	if (++_counter >= _decimation) {
 		_counter = 0;
 		++_logDecimationCnt;
@@ -36,6 +36,6 @@ void EpdSaver::save(const Position& pos) {
 				std::cout << "saved " << _saved << " FENs" <<std::endl;
 				_logDecimationCnt = 0;
 		}
-		_stream << pos.getFen()<< std::endl;		
+		_stream << pos.getFen()<<";"<<res<< std::endl;
 	}
 }

@@ -32,7 +32,7 @@ class EpdSaver {
 	
 public:
 	EpdSaver(unsigned int decimation, unsigned int n);
-	void save(const Position& pos);
+	void save(const Position& pos, Score res);
 
 private:	
 	const unsigned int _decimation;
