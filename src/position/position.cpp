@@ -909,12 +909,6 @@ void Position::doMove(const Move & m)
 	_calcCheckingSquares();
 	x.setHiddenCheckers( _getHiddenCheckers<true>() );
 	x.setPinnedPieces( _getHiddenCheckers<false>() );
-	if (NNUE::loaded()) {
-		if(kingMove && _nnue) {
-			if(isBlackTurn()) _nnue->disableWhiteIncrementalEval();
-			else _nnue->disableBlackIncrementalEval();
-		}
-	}
 }
 
 /*! \brief undo a move
@@ -1006,13 +1000,6 @@ void Position::undoMove()
 	_removeState();
 
 	std::swap(Us,Them);
-
-	if (NNUE::loaded() && _nnue) {
-		if(kingMove || m.isCastleMove()) {
-			if(isWhiteTurn()) _nnue->disableWhiteIncrementalEval();
-			else _nnue->disableBlackIncrementalEval();
-		}
-	}
 	
 }
 

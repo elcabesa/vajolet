@@ -222,5 +222,3 @@ bool ParallelDenseLayer<inputSize, outputSize>::_deserialize(std::ifstream& ss, 
 
 template <unsigned int inputSize, unsigned int outputSize> 
 const std::vector<flOutType>& ParallelDenseLayer<inputSize, outputSize>::output() const {return _output;}
-
-template class ParallelDenseLayer<40960, 256>;

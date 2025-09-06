@@ -64,92 +64,98 @@ bool NNUE::loaded() {
 
 Score NNUE::eval() {
     //std::cout<<"inc: "<<incrementalCount<< " complete: "<<completeCount<<std::endl;
-    
+    Score s;
     if (incrementalEvalDisabled()) {
         _resetCompleteEvalCondition();
-        return _completeEval();
+        s =  _completeEval();
+    } else {
+        s = _incrementalEval();
     }
-    return _incrementalEval();
+    if(_pos.isBlackTurn()) {
+        return -s;
+    } else {
+        return s;
+    }
 }
 
 std::set<unsigned int> NNUE::features() {
     std::set<unsigned int> features;
     FeatureList white;
-    FeatureList black;
+    //FeatureList black;
 
-    bool whiteTurn = _pos.isWhiteTurn();
-    bool blackTurn = _pos.isBlackTurn();
+    /*bool whiteTurn = _pos.isWhiteTurn();
+    bool blackTurn = _pos.isBlackTurn();*/
 
     _createWhiteFeatures(white);
-    _createBlackFeatures(black);
+    //_createBlackFeatures(black);
 
 
     for(unsigned int i = 0; i< white.size(); ++i) {
-        features.insert(_turnOffset(whiteTurn) + white.get(i));
+        features.insert(/*_turnOffset(whiteTurn) + */white.get(i));
     }
 
-    for(unsigned int i = 0; i< black.size(); ++i) {
+    /*for(unsigned int i = 0; i< black.size(); ++i) {
         features.insert(_turnOffset(blackTurn) + black.get(i));
-    }
+    }*/
     return features;
 }
 
 void NNUE::clean() {
     disableWhiteIncrementalEval();
-    disableBlackIncrementalEval();
+    //disableBlackIncrementalEval();
 
     _whiteW.clear();
-    _blackW.clear();
-    _whiteB.clear();
-    _blackB.clear();
+    //_blackW.clear();
+    //_whiteB.clear();
+    //_blackB.clear();
 
     _completeWhiteFeatureList.clear();
-    _completeBlackFeatureList.clear();
+    //_completeBlackFeatureList.clear();
 }
 
 void NNUE::disableWhiteIncrementalEval() {
     _whiteNoIncrementalEval = true;
 }
 
-void NNUE::disableBlackIncrementalEval() {
+/*void NNUE::disableBlackIncrementalEval() {
     _blackNoIncrementalEval = true;
-}
+}*/
 
 bool NNUE::incrementalEvalDisabled() const {
-    return _whiteNoIncrementalEval || _blackNoIncrementalEval;
+    return _whiteNoIncrementalEval/* || _blackNoIncrementalEval*/;
 }
 
 void NNUE::removePiece(bitboardIndex piece, tSquare sq) {
     const unsigned int CompleteEvalThreshold = 50;
 
-    auto wf = _whiteFeature(_mapWhitePiece(piece), sq, _pos.getSquareOfThePiece(bitboardIndex::whiteKing));
-    auto bf = _blackFeature(_mapBlackPiece(piece), sq, _pos.getSquareOfThePiece(bitboardIndex::blackKing));
+    auto wf = _whiteFeature(_mapWhitePiece(piece), sq);
+    //auto bf = _blackFeature(_mapBlackPiece(piece), sq, _pos.getSquareOfThePiece(bitboardIndex::blackKing));
 
     _whiteW.remove(wf);
-    _blackW.remove(bf);
-    _whiteB.remove(wf);
-    _blackB.remove(bf);
+    //_blackW.remove(bf);
+    //_whiteB.remove(wf);
+    //_blackB.remove(bf);
 
-    if (_whiteW.size() + _blackW.size() > CompleteEvalThreshold) { disableWhiteIncrementalEval(); }
-    if (_whiteB.size() + _blackB.size() > CompleteEvalThreshold) { disableBlackIncrementalEval(); }
+    if (_whiteW.size() /*+ _blackW.size() */> CompleteEvalThreshold) { disableWhiteIncrementalEval(); }
+    //if (_whiteB.size() + _blackB.size() > CompleteEvalThreshold) { disableBlackIncrementalEval(); }
 }
 
 void NNUE::addPiece(bitboardIndex piece, tSquare sq) {
     const unsigned int CompleteEvalThreshold = 50;
 
-    auto wf = _whiteFeature(_mapWhitePiece(piece), sq, _pos.getSquareOfThePiece(bitboardIndex::whiteKing));
-    auto bf = _blackFeature(_mapBlackPiece(piece), sq, _pos.getSquareOfThePiece(bitboardIndex::blackKing));
+    auto wf = _whiteFeature(_mapWhitePiece(piece), sq);
+    //auto bf = _blackFeature(_mapBlackPiece(piece), sq, _pos.getSquareOfThePiece(bitboardIndex::blackKing));
 
     _whiteW.add(wf);
-    _blackW.add(bf);
-    _whiteB.add(wf);
-    _blackB.add(bf);
+    //_blackW.add(bf);
+    //_whiteB.add(wf);
+    //_blackB.add(bf);
 
-    if (_whiteW.size() + _blackW.size() > CompleteEvalThreshold) { disableWhiteIncrementalEval(); }
-    if (_whiteB.size() + _blackB.size() > CompleteEvalThreshold) { disableBlackIncrementalEval(); }
+    if (_whiteW.size() /*+ _blackW.size()*/ > CompleteEvalThreshold) { disableWhiteIncrementalEval(); }
+    //if (_whiteB.size() + _blackB.size() > CompleteEvalThreshold) { disableBlackIncrementalEval(); }
 }
 
-void NNUE::_createBlackFeatures(FeatureList& fl){
+/*void NNUE::_createBlackFeatures(FeatureList& fl){
     bitboardIndex blackPow[10] = {
         blackQueens,
         blackRooks,
@@ -173,15 +179,17 @@ void NNUE::_createBlackFeatures(FeatureList& fl){
             fl.add(_blackFeature(piece, pieceSq, bkSq));
         }
     }
-}
+}*/
 
 void NNUE::_createWhiteFeatures(FeatureList& fl){
-    bitboardIndex whitePow[10] = {
+    bitboardIndex whitePow[12] = {
+        whiteKing,
         whiteQueens,
         whiteRooks,
         whiteBishops,
         whiteKnights,
         whitePawns,
+        blackKing,
         blackQueens,
         blackRooks,
         blackBishops,
@@ -189,56 +197,55 @@ void NNUE::_createWhiteFeatures(FeatureList& fl){
         blackPawns
     };
 
-    tSquare wkSq = _pos.getSquareOfThePiece(bitboardIndex::whiteKing);
-    for(unsigned int piece = 0; piece < 10; ++piece) {
+    for(unsigned int piece = 0; piece < 12; ++piece) {
 
         bitMap b = _pos.getBitmap(whitePow[piece]);
         while(b)
         {
             tSquare pieceSq = iterateBit(b);
-            fl.add(_whiteFeature(piece, pieceSq, wkSq));
+            fl.add(_whiteFeature(piece, pieceSq));
         }
     }
 }
 
-unsigned int NNUE::_whiteFeature(unsigned int  piece, tSquare pSquare, tSquare ksq) {
-    unsigned int f = piece + (10 * pSquare) + (640 * ksq);
+unsigned int NNUE::_whiteFeature(unsigned int  piece, tSquare pSquare) {
+    unsigned int f = piece + (12 * pSquare);
     return f;
 }
 
-unsigned int NNUE::_blackFeature(unsigned int  piece, tSquare pSquare, tSquare ksq) {
+/*unsigned int NNUE::_blackFeature(unsigned int  piece, tSquare pSquare, tSquare ksq) {
     unsigned int f = piece + (10 * (pSquare ^ 56)) + (640 * (ksq ^ 56));
     return f;
-}
+}*/
 
-unsigned int NNUE::_turnOffset(bool myTurn) {
+/*unsigned int NNUE::_turnOffset(bool myTurn) {
     return myTurn ? 0 : 40960;
-}
+}*/
 
 unsigned int NNUE::_mapWhitePiece(const bitboardIndex piece) {
     unsigned int n[] = {
         0, //occupiedSquares,			//0		00000000
         0, //whiteKing,					//1		00000001
-        0, //whiteQueens,				//2		00000010
-        1, //whiteRooks,				//3		00000011
-        2, //whiteBishops,				//4		00000100
-        3, //whiteKnights,				//5		00000101
-        4, //whitePawns,				//6		00000110
+        1, //whiteQueens,				//2		00000010
+        2, //whiteRooks,				//3		00000011
+        3, //whiteBishops,				//4		00000100
+        4, //whiteKnights,				//5		00000101
+        5, //whitePawns,				//6		00000110
         0, //whitePieces,				//7		00000111
 
         0, //separationBitmap,			//8
-        0, //blackKing,					//9		00001001
-        5, //blackQueens,				//10	00001010
-        6, //blackRooks,				//11	00001011
-        7, //blackBishops,				//12	00001100
-        8, //blackKnights,				//13	00001101
-        9, //blackPawns,				//14	00001110
+        6, //blackKing,					//9		00001001
+        7, //blackQueens,				//10	00001010
+        8, //blackRooks,				//11	00001011
+        9, //blackBishops,				//12	00001100
+        10, //blackKnights,				//13	00001101
+        11, //blackPawns,				//14	00001110
         0  //blackPieces,				//15	00001111
     };
     return n[piece];
 }
 
-unsigned int NNUE::_mapBlackPiece(const bitboardIndex piece) {
+/*unsigned int NNUE::_mapBlackPiece(const bitboardIndex piece) {
     unsigned int n[] = {
         0, //occupiedSquares,			//0		00000000
         0, //whiteKing,					//1		00000001
@@ -259,7 +266,7 @@ unsigned int NNUE::_mapBlackPiece(const bitboardIndex piece) {
         0  //blackPieces,				//15	00001111
     };
     return n[piece];
-}
+}*/
 
 Score NNUE::_completeEval() {
     Score lowSat = -SCORE_INFINITE;
@@ -269,23 +276,17 @@ Score NNUE::_completeEval() {
     // TODO if we move one king calculate everything from scratch
     // can we do it faster??
     _completeWhiteFeatureList.clear();
-    _completeBlackFeatureList.clear();
+    //_completeBlackFeatureList.clear();
     _createWhiteFeatures(_completeWhiteFeatureList);
-    _createBlackFeatures(_completeBlackFeatureList);
+    //_createBlackFeatures(_completeBlackFeatureList);
 
     _whiteW.clear();
-    _blackW.clear();
-    _whiteB.clear();
-    _blackB.clear();
+    //_blackW.clear();
+    //_whiteB.clear();
+    //_blackB.clear();
 
-    Score score;
-    if(_pos.isWhiteTurn()) {
-        _modelB.calcFirstLayer(_completeBlackFeatureList, _completeWhiteFeatureList);
-        score = _modelW.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
-    } else {
-        _modelW.calcFirstLayer(_completeWhiteFeatureList, _completeBlackFeatureList);
-        score = _modelB.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);
-    }
+    Score score = _modelW.forwardPass(_completeWhiteFeatureList);
+
     score = std::min(highSat,score);
     score = std::max(lowSat,score);
     return score;
@@ -297,20 +298,12 @@ Score NNUE::_incrementalEval() {
     Score lowSat = -SCORE_INFINITE;
     Score highSat = SCORE_INFINITE;
     Score score;
-    if(_pos.isWhiteTurn()) {
-        if(_whiteW.size() + _blackW.size() > CompleteEvalThreshold) {return _completeEval();}
 
-        score = _modelW.incrementalPass(_whiteW, _blackW);
-        _whiteW.clear();
-        _blackW.clear();
-    } else {
-        if(_whiteB.size() + _blackB.size() > CompleteEvalThreshold) {return _completeEval();}
+    if(_whiteW.size() /*+ _blackW.size()*/ > CompleteEvalThreshold) {return _completeEval();}
+    score = _modelW.incrementalPass(_whiteW);
+    _whiteW.clear();
+    //_blackW.clear();
 
-        score = _modelB.incrementalPass(_blackB, _whiteB);
-        _whiteB.clear();
-        _blackB.clear();
-
-    }
 
 //std::cout<<"incrementalMaxSize " << incrementalMaxSize << std::endl;
 	
@@ -318,13 +311,9 @@ Score NNUE::_incrementalEval() {
     _completeWhiteFeatureList.clear();
     _completeBlackFeatureList.clear();
     createWhiteFeatures(_completeWhiteFeatureList);
-    createBlackFeatures(_completeBlackFeatureList);
-    Score score2;
-    if(_pos.isWhiteTurn()) {
-        score2 = _m.forwardPass(_completeWhiteFeatureList, _completeBlackFeatureList);
-    } else {
-        score2 = _m.forwardPass(_completeBlackFeatureList, _completeWhiteFeatureList);
-    }
+    //createBlackFeatures(_completeBlackFeatureList);
+    Score score2 = _m.forwardPass(_completeWhiteFeatureList;
+
     if(score2 != score) {
         std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
 }
@@ -337,5 +326,5 @@ Score NNUE::_incrementalEval() {
 
 void NNUE::_resetCompleteEvalCondition() {
     _whiteNoIncrementalEval = false;
-    _blackNoIncrementalEval = false;
+    //_blackNoIncrementalEval = false;
 }

@@ -22,51 +22,39 @@
 
 #include "model.h"
 
-std::vector<flBiasType> Model::bias0;
+std::vector<biasType> Model::bias0;
 std::vector<biasType> Model::bias1;
-std::vector<biasType> Model::bias2;
-std::vector<biasType> Model::bias3;
 
-std::vector<flWeightType> Model::weight0;
+
+std::vector<weightType> Model::weight0;
 std::vector<weightType> Model::weight1;
-std::vector<weightType> Model::weight2;
-std::vector<weightType> Model::weight3;
 
 void Model::init() {
-    bias0.resize(256, 0.0);
-	bias1.resize(32, 0.0);
-	bias2.resize(32, 0.0);
-	bias3.resize(1, 0.0);
+    bias0.resize(32, 0.0);
+	bias1.resize(1, 0.0);
 	
-	weight0.resize(40960 * 256, 1.0);
-	weight1.resize(512 * 32, 1.0);
-	weight2.resize(32 * 32, 1.0);
-	weight3.resize(32 * 1, 1.0);
+	weight0.resize(768 * 32, 1.0);
+	weight1.resize(32 * 1, 1.0);
+
 }
 
 Model::Model():
-    _layer0(&bias0, &weight0),
-    _layer1(&bias1, &weight1, 6),
-    _layer2(&bias2, &weight2, 6),
-    _layer3(&bias3, &weight3, 0)
+    _layer0(&bias0, &weight0, 0),
+    _layer1(&bias1, &weight1, 0)
 {}
 
-accumulatorType Model::forwardPass(const FeatureList& l, const FeatureList& h) {
-    _layer0.propagate(l, h);
-    _layer1.propagate(_layer0.output());
-    _layer2.propagate(_layer1.output());
-    return _layer3.propagateOut(_layer2.output(), 0, 0) * 4;
+accumulatorType Model::forwardPass(const FeatureList& l) {
+    _layer0.propagate(l);
+    return _layer1.propagateOut(_layer0.output(), 0, 0);
 }
 
-void Model::calcFirstLayer(const FeatureList& l, const FeatureList& h) {
+/*void Model::calcFirstLayer(const FeatureList& l, const FeatureList& h) {
     _layer0.propagate(l, h);
-}
+}*/
 
-accumulatorType Model::incrementalPass(const DifferentialList& l, const DifferentialList& h) {
-    _layer0.incrementalPropagate(l, h);
-    _layer1.propagate(_layer0.output());
-    _layer2.propagate(_layer1.output());
-    return _layer3.propagateOut(_layer2.output(), 0, 0) * 4;
+accumulatorType Model::incrementalPass(const DifferentialList& l) {
+    _layer0.incrementalPropagate(l);
+    return _layer1.propagateOut(_layer0.output(), 0, 0);
 }
 
 #define VERSION "0004"
@@ -87,8 +75,6 @@ bool Model::deserialize(std::ifstream& ss) {
 
     if(!_layer0.deserialize(ss)) {std::cout<<"MODEL internal layer0 error"<<std::endl;return false;}
     if(!_layer1.deserialize(ss)) {std::cout<<"MODEL internal layer1 error"<<std::endl;return false;}
-    if(!_layer2.deserialize(ss)) {std::cout<<"MODEL internal layer2 error"<<std::endl;return false;}
-    if(!_layer3.deserialize(ss)) {std::cout<<"MODEL internal layer3 error"<<std::endl;return false;}
 
     if(ss.get() != '}') {std::cout<<"MODEL missing }"<<std::endl;return false;} 
     return true;

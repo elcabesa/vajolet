@@ -43,7 +43,7 @@ public:
     Score eval();
 
     void disableWhiteIncrementalEval(); // evaluate if it's still necessary for king move and castling
-    void disableBlackIncrementalEval(); // evaluate if it's still necessary for king move and castling
+    //void disableBlackIncrementalEval(); // evaluate if it's still necessary for king move and castling
     bool incrementalEvalDisabled() const;
     
     void removePiece(bitboardIndex piece, tSquare sq);
@@ -61,31 +61,31 @@ private:
     static bool _loaded;
 
     DifferentialList _whiteW;
-    DifferentialList _blackW;
-    DifferentialList _whiteB;
-    DifferentialList _blackB;
+    //DifferentialList _blackW;
+    //DifferentialList _whiteB;
+    //DifferentialList _blackB;
 
     FeatureList _completeWhiteFeatureList;
-    FeatureList _completeBlackFeatureList;
+    //FeatureList _completeBlackFeatureList;
 
     //unsigned int incrementalCount = 0;
     //unsigned int completeCount = 0;
     //unsigned int incrementalMaxSize = 0;
 
     void _createWhiteFeatures(FeatureList& fl);
-    void _createBlackFeatures(FeatureList& fl);
+    //void _createBlackFeatures(FeatureList& fl);
 
     //static unsigned int _calcWhiteFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
     //static unsigned int _calcBlackFeature(bool whiteTurn, unsigned int piece, tSquare pSquare, tSquare ksq);
-    static unsigned int _whiteFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
-    static unsigned int _blackFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
-    static unsigned int _turnOffset(bool myturn);
+    static unsigned int _whiteFeature(unsigned int piece, tSquare pSquare);
+    //static unsigned int _blackFeature(unsigned int piece, tSquare pSquare, tSquare ksq);
+    //static unsigned int _turnOffset(bool myturn);
     static unsigned int _mapWhitePiece(const bitboardIndex piece);
-    static unsigned int _mapBlackPiece(const bitboardIndex piece);
+    //static unsigned int _mapBlackPiece(const bitboardIndex piece);
 
     void _resetCompleteEvalCondition();
     bool _whiteNoIncrementalEval;
-    bool _blackNoIncrementalEval;
+    //bool _blackNoIncrementalEval;
 
     Score _completeEval();
     Score _incrementalEval();

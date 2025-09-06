@@ -33,30 +33,23 @@ class Model {
 public:
     Model();
     
-    accumulatorType forwardPass(const FeatureList& l, const FeatureList& h);
-    void calcFirstLayer(const FeatureList& l, const FeatureList& h);
-    accumulatorType incrementalPass(const DifferentialList& l, const DifferentialList& h);
+    accumulatorType forwardPass(const FeatureList& l);
+    //void calcFirstLayer(const FeatureList& l, const FeatureList& h);
+    accumulatorType incrementalPass(const DifferentialList& l);
     
     bool deserialize(std::ifstream& ss);
     static void init();
     
 private:
 
-    static std::vector<flBiasType> bias0;
+    static std::vector<biasType> bias0;
     static std::vector<biasType> bias1;
-    static std::vector<biasType> bias2;
-    static std::vector<biasType> bias3;
 
-    static std::vector<flWeightType> weight0;
+    static std::vector<weightType> weight0;
     static std::vector<weightType> weight1;
-    static std::vector<weightType> weight2;
-    static std::vector<weightType> weight3;
 
-    //std::vector<std::unique_ptr<Layer>> _layers;
-    ParallelDenseLayer<40960, 256> _layer0;
-    DenseLayer<flOutType, 512, 32> _layer1;
-    DenseLayer<outType, 32, 32> _layer2;
-    DenseLayer<outType, 32, 1> _layer3;
+    DenseLayer<outType, 768, 32> _layer0;
+    DenseLayer<outType, 32, 1> _layer1;
 };
 
 #endif

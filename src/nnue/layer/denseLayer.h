@@ -35,6 +35,9 @@ public:
     void propagate(const std::vector<inputType>& input);
     accumulatorType propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
 
+    void propagate(const FeatureList& l);
+    void incrementalPropagate(const DifferentialList& l);
+
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
     bool deserialize(std::ifstream& ss);
@@ -50,6 +53,7 @@ private:
     std::vector<weightType>* _weight;
 
     std::vector<outType> _output;
+    std::vector<outType> _outputRelu;
 
     /*double _max = -1e9;
     double _min = 1e9;*/

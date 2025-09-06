@@ -31,7 +31,8 @@ DenseLayer<inputType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* 
     _outShift(outShift),
     _bias(bias),
     _weight(weight),
-    _output(outputSize)
+    _output(outputSize),
+    _outputRelu(outputSize)
 {}
 
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
@@ -54,7 +55,8 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<i
     unsigned int index = 0;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
         accumulatorType out = propagateOut(input, index, o);
-        _output[o] = std::min(std::max(out >> _outShift, 0), 127);
+        _output[o] = out >> _outShift;
+        _outputRelu[o] = std::min(std::max(_output[o], 0), 127);
         index += _inputSize;
     }
 
@@ -72,6 +74,56 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<i
         _max = std::max(_max, double(_output[o]));
         _min = std::min(_min, double(_output[o]));
     }*/
+}
+
+template <typename inputType, unsigned int inputSize, unsigned int outputSize>
+void DenseLayer<inputType, inputSize, outputSize>::propagate(const FeatureList& l) {
+    //std::cout<<"biases"<<std::endl;
+    for (unsigned int o = 0; o < _outputSize; ++o) {
+        _output[o] = (*_bias)[o];
+    }
+
+    //std::cout<<"accumulate"<<std::endl;
+    for (unsigned int idx = 0; idx < l.size(); ++idx) {
+        unsigned int in = l.get(idx);
+        for (unsigned int o = 0; o < _outputSize; ++o) {
+            _output[o] += (*_weight)[_calcWeightIndex(in, o)];
+        }
+    }
+
+    for (unsigned int o = 0; o < _outputSize; ++o) {
+        _outputRelu[o] = std::min(std::max(_output[o], 0), 127);
+    }
+
+
+}
+
+template <typename inputType, unsigned int inputSize, unsigned int outputSize>
+void DenseLayer<inputType, inputSize, outputSize>::incrementalPropagate(const DifferentialList& l) {
+    for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
+        unsigned int in = l.addList(idx);
+        for (unsigned int o = 0; o < _outputSize; ++o) {
+            _output[o] += (*_weight)[_calcWeightIndex(in, o)];
+            //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+        }
+    }
+
+    for(unsigned int idx = 0; idx < l.removeSize(); ++idx) {
+        unsigned int in = l.removeList(idx);
+        for (unsigned int o = 0; o < _outputSize; ++o) {
+            _output[o] -= (*_weight)[_calcWeightIndex(in, o)];
+            //if(std::abs(_accumulator[o])>_WARNING) {std::cout<<"WARNING"<<std::endl;}
+        }
+    }
+
+    for (unsigned int o = 0; o < _outputSize; ++o) {
+        _outputRelu[o] = std::min(std::max(_output[o], 0), 127);
+    }
+
+    /*for (unsigned int o = 0; o < _outputSize; ++o) {
+     * _max = std::max(_max, double(_output[o]));
+     * _min = std::min(_min, double(_output[o]));
+}*/
 }
 
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
@@ -157,6 +209,5 @@ template <typename inputType, unsigned int inputSize, unsigned int outputSize>
 const std::vector<outType>& DenseLayer<inputType, inputSize, outputSize>::output() const {return _output;}
 
 
-template class DenseLayer<flOutType, 512, 32>;
-template class DenseLayer<outType, 32, 32>;
+template class DenseLayer<outType, 768, 32>;
 template class DenseLayer<outType, 32, 1>;
