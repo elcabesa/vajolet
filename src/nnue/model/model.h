@@ -22,7 +22,6 @@
 #include <memory>
 #include <vector>
 
-#include "parallelDenseLayer.h"
 #include "denseLayer.h"
 #include "nnue_type.h"
 
@@ -34,7 +33,6 @@ public:
     Model();
     
     accumulatorType forwardPass(const FeatureList& l);
-    //void calcFirstLayer(const FeatureList& l, const FeatureList& h);
     accumulatorType incrementalPass(const DifferentialList& l);
     
     bool deserialize(std::ifstream& ss);

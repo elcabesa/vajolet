@@ -54,10 +54,6 @@ private:
 
     std::vector<outType> _output;
     std::vector<outType> _outputRelu;
-
-    /*double _max = -1e9;
-    double _min = 1e9;*/
-
     
 };
 

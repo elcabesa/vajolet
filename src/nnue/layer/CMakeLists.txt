@@ -1,5 +1,4 @@
 target_sources(libChess PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/parallelDenseLayer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/denseLayer.cpp
     )
 

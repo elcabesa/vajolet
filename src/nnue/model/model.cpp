@@ -48,10 +48,6 @@ accumulatorType Model::forwardPass(const FeatureList& l) {
     return _layer1.propagateOut(_layer0.output(), 0, 0);
 }
 
-/*void Model::calcFirstLayer(const FeatureList& l, const FeatureList& h) {
-    _layer0.propagate(l, h);
-}*/
-
 accumulatorType Model::incrementalPass(const DifferentialList& l) {
     _layer0.incrementalPropagate(l);
     return _layer1.propagateOut(_layer0.output(), 0, 0);
