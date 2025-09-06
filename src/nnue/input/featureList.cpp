@@ -24,7 +24,7 @@ void FeatureList::clear() {
 
 void FeatureList::add(unsigned int f) {
     assert(_pos<_size);
-	// search in remove
+	// TODO search in remove
 	_list[_pos++] = f;
 
 }

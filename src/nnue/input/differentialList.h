@@ -33,9 +33,7 @@ public:
     unsigned int addSize() const;
     unsigned int removeSize() const;
 private:
-    static constexpr unsigned int _size = 500;
-    // TODO minimize size
-    // TODO save max element stored
+    static constexpr unsigned int _size = 20;
     std::array<unsigned int, _size> _addList;
     std::array<unsigned int, _size> _removeList;
     unsigned int _addPos = 0;

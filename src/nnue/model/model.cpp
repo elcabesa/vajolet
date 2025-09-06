@@ -30,11 +30,11 @@ std::vector<weightType> Model::weight0;
 std::vector<weightType> Model::weight1;
 
 void Model::init() {
-    bias0.resize(32, 0.0);
+    bias0.resize(512, 0.0);
 	bias1.resize(1, 0.0);
 	
-	weight0.resize(768 * 32, 1.0);
-	weight1.resize(32 * 1, 1.0);
+	weight0.resize(768 * 512, 1.0);
+	weight1.resize(512 * 1, 1.0);
 
 }
 

@@ -31,6 +31,8 @@
 
 class Position;
 
+//#define CHECK_NNUE_FEATURE_EXTRACTION
+
 
 class NNUE {
 public:
@@ -59,6 +61,7 @@ private:
     Model _m;
 #endif
     static bool _loaded;
+    const unsigned int _completeEvalThreshold = 20;
 
     DifferentialList _whiteW;
     //DifferentialList _blackW;

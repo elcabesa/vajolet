@@ -48,8 +48,8 @@ private:
     static std::vector<weightType> weight0;
     static std::vector<weightType> weight1;
 
-    DenseLayer<outType, 768, 32> _layer0;
-    DenseLayer<outType, 32, 1> _layer1;
+    DenseLayer<outType, 768, 512> _layer0;
+    DenseLayer<outType, 512, 1> _layer1;
 };
 
 #endif

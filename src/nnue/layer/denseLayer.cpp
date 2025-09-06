@@ -55,7 +55,7 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<i
     unsigned int index = 0;
     for (unsigned int o = 0; o < _outputSize; ++o) {        
         accumulatorType out = propagateOut(input, index, o);
-        _output[o] = out >> _outShift;
+        _output[o] = out/* >> _outShift*/;
         _outputRelu[o] = std::min(std::max(_output[o], 0), 127);
         index += _inputSize;
     }
@@ -209,5 +209,5 @@ template <typename inputType, unsigned int inputSize, unsigned int outputSize>
 const std::vector<outType>& DenseLayer<inputType, inputSize, outputSize>::output() const {return _output;}
 
 
-template class DenseLayer<outType, 768, 32>;
-template class DenseLayer<outType, 32, 1>;
+template class DenseLayer<outType, 768, 512>;
+template class DenseLayer<outType, 512, 1>;

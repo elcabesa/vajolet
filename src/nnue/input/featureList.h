@@ -29,9 +29,7 @@ public:
     unsigned int get(unsigned int index) const;
     unsigned int size() const;
 private:
-    static constexpr unsigned int _size = 100;
-    // TODO minimize size
-    // TODO save max element stored
+    static constexpr unsigned int _size = 32; // max number of pieces on the board
     std::array<unsigned int, _size> _list;
     unsigned int _pos = 0;
 };
