@@ -20,27 +20,27 @@ add_executable(Vajolet_unit_test
 	timeManagement-test.cpp
 	UciOutput-test.cpp)
 
-target_link_libraries(Vajolet_unit_test gtest libChess)
+target_link_libraries(Vajolet_unit_test gtest libChess doublefann_static ${OpenMP_CXX_FLAGS})
 target_include_directories (Vajolet_unit_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_executable(Vajolet_syzygy_test main.cpp)
-target_link_libraries(Vajolet_syzygy_test gtest libChess)
+target_link_libraries(Vajolet_syzygy_test gtest libChess doublefann_static ${OpenMP_CXX_FLAGS})
 target_include_directories (Vajolet_syzygy_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_executable(Vajolet_long_tests main.cpp perft-test-long.cpp)
-target_link_libraries(Vajolet_long_tests gtest libChess)
+target_link_libraries(Vajolet_long_tests gtest libChess doublefann_static ${OpenMP_CXX_FLAGS})
 target_include_directories (Vajolet_long_tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_executable(Vajolet_search_integration_test main.cpp search-integration-test.cpp )
-target_link_libraries(Vajolet_search_integration_test gtest libChess)
+target_link_libraries(Vajolet_search_integration_test gtest libChess doublefann_static ${OpenMP_CXX_FLAGS})
 target_include_directories (Vajolet_search_integration_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_executable(Vajolet_perft_validation main.cpp perft-test-very-long.cpp )
-target_link_libraries(Vajolet_perft_validation gtest libChess)
+target_link_libraries(Vajolet_perft_validation gtest libChess doublefann_static ${OpenMP_CXX_FLAGS})
 target_include_directories (Vajolet_perft_validation PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_executable(Vajolet_wac wac.cpp )
-target_link_libraries(Vajolet_wac libChess)
+target_link_libraries(Vajolet_wac libChess doublefann_static ${OpenMP_CXX_FLAGS})
 target_include_directories (Vajolet_wac PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_subdirectory(syzygyTests)

@@ -28,10 +28,11 @@
 #include "model.h"
 #include "tSquare.h"
 #include "vajolet.h"
+#include "../fann/src/include/fann.h"
 
 class Position;
 
-//#define CHECK_NNUE_FEATURE_EXTRACTION
+#define CHECK_NNUE_FEATURE_EXTRACTION
 
 
 class NNUE {
@@ -79,6 +80,11 @@ private:
     Score _incrementalEval();
 
     const Position& _pos;
+
+    Score FannEval();
+    static struct fann *_ann;
+    fann_type *calc_out;
+    fann_type input[64*12];
 };
 
 

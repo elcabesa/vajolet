@@ -64,7 +64,7 @@ UciManager::impl::impl(): _pos(Position::nnueConfig::on, Position::pawnHash::off
 	_optionList.emplace_back( new CheckUciOption("UCI_LimitStrength", uciParameters::limitStrength, this, nullptr, false));
 	_optionList.emplace_back( new SpinUciOption("Skill Level", uciParameters::engineLevel, this, nullptr, 20, 1, 20));
 	_optionList.emplace_back( new CheckUciOption("Use NNUE", uciParameters::useNnue, this, &UciManager::impl::_useNnue, true));
-	_optionList.emplace_back( new StringUciOption("EvalFile", uciParameters::nnueFile, this, &UciManager::impl::_setNnueFile, "nnue.par"));
+	_optionList.emplace_back( new StringUciOption("EvalFile", uciParameters::nnueFile, this, &UciManager::impl::_setNnueFile, "eval_float.net"));
 	
 	_pos.setupFromFen(_StartFEN);
 }
@@ -75,21 +75,24 @@ UciManager::impl::~impl()
 //---------------------------------------------
 //	function implementation
 //---------------------------------------------
-void UciManager::impl::_useNnue(bool) {
-	if(uciParameters::useNnue) {
-		_pos.nnue()->load(uciParameters::nnueFile);
-	} else {
+void UciManager::impl::_useNnue(bool) { // TODO why 2 identical function??
+	if(_pos.nnue()->loaded()) {
 		_pos.nnue()->close();
+	}
+	if(uciParameters::useNnue) {
+
+		_pos.nnue()->load(uciParameters::nnueFile);
 	}
 
 }
 
 void UciManager::impl::_setNnueFile(std::string) {
-	if(uciParameters::useNnue) {
-		_pos.nnue()->load(uciParameters::nnueFile);
-	} else {
+	/*if(_pos.nnue()->loaded()) {
 		_pos.nnue()->close();
 	}
+	if(uciParameters::useNnue) {
+		_pos.nnue()->load(uciParameters::nnueFile);
+	}*/
 	
 }
 

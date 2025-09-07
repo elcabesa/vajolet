@@ -18,11 +18,13 @@
 #include <fstream>
 #include <iostream>
 
+
 #include "nnue.h"
 #include "position.h"
 
 
-bool NNUE::_loaded = true;
+bool NNUE::_loaded = false;
+struct fann *NNUE::_ann = nullptr;
 
 NNUE::NNUE(const Position& pos):_pos(pos){
     //std::cout<<"done"<<std::endl;
@@ -34,7 +36,17 @@ bool NNUE::load(std::string path) {
     std::cout<<"reload NNUE parameters"<<std::endl;    
     std::cout<<"deserialize"<<std::endl;
 
-    std::ifstream nnFile;
+    std::cout<<"load"<<std::endl;
+    _ann = fann_create_from_file(path.c_str());
+    //std::cout<<_ann<<std::endl;
+    if(_ann) {
+        _loaded = true;
+        return true;
+    } else {
+        return false;
+    }
+
+    /*std::ifstream nnFile;
     nnFile.open(path);
     if(nnFile.is_open()) {
         if(_model.deserialize(nnFile)
@@ -50,11 +62,13 @@ bool NNUE::load(std::string path) {
     } else {
         std::cout<<"error deserializing NNUE file"<<std::endl;
         return false;
-    }
+    }*/
 }
 
 void NNUE::close() {
+    std::cout<<"destroy"<<std::endl;
     _loaded = false;
+    fann_destroy(_ann);
 }
 
 bool NNUE::loaded() {
@@ -62,6 +76,7 @@ bool NNUE::loaded() {
 }
 
 Score NNUE::eval() {
+
     //std::cout<<"inc: "<<incrementalCount<< " complete: "<<completeCount<<std::endl;
     Score s;
     if (incrementalEvalDisabled()) {
@@ -110,13 +125,13 @@ bool NNUE::incrementalEvalDisabled() const {
 void NNUE::removePiece(bitboardIndex piece, tSquare sq) {
     auto f = _feature(_mapPiece(piece), sq);
     _diffFeatureList.remove(f);
-    if (_diffFeatureList.size() > _completeEvalThreshold) { disableIncrementalEval(); }
+    if (_diffFeatureList.size() >= _completeEvalThreshold) { disableIncrementalEval(); }
 }
 
 void NNUE::addPiece(bitboardIndex piece, tSquare sq) {
     auto f = _feature(_mapPiece(piece), sq);
     _diffFeatureList.add(f);
-    if (_diffFeatureList.size() > _completeEvalThreshold) { disableIncrementalEval(); }
+    if (_diffFeatureList.size() >= _completeEvalThreshold) { disableIncrementalEval(); }
 }
 
 void NNUE::_createFeatures(FeatureList& fl){
@@ -175,15 +190,32 @@ unsigned int NNUE::_mapPiece(const bitboardIndex piece) {
 }
 
 Score NNUE::_completeEval() {
+
     Score lowSat = -SCORE_INFINITE;
     Score highSat = SCORE_INFINITE;
+
+    _diffFeatureList.clear();// todo remove?? da verificare se è più veloce o meno, non dovrebbe cambioare il numero di nodi ma solo nps
 
     _completeFeatureList.clear();
     _createFeatures(_completeFeatureList);
 
-    _diffFeatureList.clear();// todo remove?? da verificare se è più veloce o meno, non dovrebbe cambioare il numero di nodi ma solo nps
+    //Score score = _model.forwardPass(_completeFeatureList);
 
-    Score score = _model.forwardPass(_completeFeatureList);
+    for(unsigned int i= 0; i< 64*12; ++i) {
+        input[i] = 0;
+    }
+    for(unsigned int i = 0; i< _completeFeatureList.size(); ++i) {
+        input[_completeFeatureList.get(i)] = 1;
+    }
+    /*for(unsigned int i= 0; i< 64*12; ++i) {
+        std::cout<<input[i];
+    }
+    std::cout<<std::endl;*/
+
+    calc_out = fann_run(_ann, input);
+    float s = *calc_out;
+    std::cout<<s<<std::endl;
+    Score score = *calc_out *10000;
 
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
@@ -195,21 +227,45 @@ Score NNUE::_incrementalEval() {
     //++incrementalCount;
     Score lowSat = -SCORE_INFINITE;
     Score highSat = SCORE_INFINITE;
-    Score score;
 
-    if(_diffFeatureList.size() > _completeEvalThreshold) {return _completeEval();}
-    score = _model.incrementalPass(_diffFeatureList);
+    if(_diffFeatureList.size() >= _completeEvalThreshold) {return _completeEval();}
+
+
+    //Score score = _model.incrementalPass(_diffFeatureList);
+    for(unsigned int i = 0; i< _diffFeatureList.addSize(); ++i) {
+
+        input[_diffFeatureList.addList(i)] = 1;
+    }
+    for(unsigned int i = 0; i< _diffFeatureList.removeSize(); ++i) {
+
+        input[_diffFeatureList.removeList(i)] = 0;
+    }
+    /*std::cout<<"---------START--------"<<std::endl;
+    for(unsigned int i= 0; i< 64*12; ++i) {
+        std::cout<<input[i];
+    }
+    std::cout<<std::endl;*/
+
+    calc_out = fann_run(_ann, input);
+    float s = *calc_out;
+    std::cout<<s<<std::endl;
+    Score score = *calc_out *10000;
+
     _diffFeatureList.clear();
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
-    _completeFeatureList.clear();
-    _createFeatures(_completeFeatureList);
-    Score score2 = _m.forwardPass(_completeFeatureList);
 
-    if(score2 != score) {
+    /*_completeFeatureList.clear();
+    _createFeatures(_completeFeatureList);
+    Score score2 = _m.forwardPass(_completeFeatureList);*/
+
+    Score score2 = _completeEval();
+
+    if(std::abs(score2 - score) >0.1) {
         std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
 }
 #endif
+    /*std::cout<<"---------END--------"<<std::endl;*/
 
     score = std::min(highSat,score);
     score = std::max(lowSat,score);

@@ -142,7 +142,11 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		}
 		
 		if(!bookMove && !randomMove && _fs && _p.getNumberOfLegalMoves() > 1) {
-			_fs->save(_p, score);
+			if(_c.isWhiteTurn()) {
+				_fs->save(_p, score);
+			} else {
+				_fs->save(_p, -score);
+			}
 		}
 		_p.doMove(bestMove);
 

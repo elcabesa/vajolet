@@ -30,6 +30,6 @@ bool uciParameters::perftUseHash = false;
 bool uciParameters::limitStrength = false;
 unsigned int uciParameters::engineLevel = 20;
 bool uciParameters::useNnue = true; 
-std::string uciParameters::nnueFile = "nnue.par";
+std::string uciParameters::nnueFile = "eval_float.net";
 
 
