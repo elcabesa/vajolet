@@ -37,6 +37,9 @@ public:
     
     bool deserialize(std::ifstream& ss);
     static void init();
+
+    void setBias(unsigned int layer, unsigned int n, float bias);
+    void setWeight(unsigned int layer, unsigned int inN, unsigned int outN, float bias);
     
 private:
 

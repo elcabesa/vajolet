@@ -18,7 +18,7 @@
 #include "tunerPars.h"
 
 int TunerParameters::parallelGames = 4;
-int TunerParameters::gameNumber = 4e6;
+int TunerParameters::gameNumber = 1000;
 unsigned int TunerParameters::randomMoveEveryXPly = 0;
 unsigned int TunerParameters::initialRandomMoves = 10;
 	

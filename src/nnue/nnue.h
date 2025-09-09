@@ -28,11 +28,11 @@
 #include "model.h"
 #include "tSquare.h"
 #include "vajolet.h"
-#include "../fann/src/include/fann.h"
+#include "../fann/src/include/floatfann.h"
 
 class Position;
 
-#define CHECK_NNUE_FEATURE_EXTRACTION
+//#define CHECK_NNUE_FEATURE_EXTRACTION
 
 
 class NNUE {

@@ -43,6 +43,24 @@ Model::Model():
     _layer1(&bias1, &weight1, 0)
 {}
 
+void Model::setBias(unsigned int layer, unsigned int n, float bias) {
+    std::vector<biasType>* l;
+    if(layer == 0) {
+        l = &bias0;
+    } else {
+        l = &bias1;
+    }
+    (*l)[n] = bias;
+}
+
+void Model::setWeight(unsigned int layer, unsigned int inN, unsigned int outN, float weight) {
+    if(layer == 0) {
+        weight0[_layer0._calcWeightIndex(inN, outN)] = weight;
+    } else {
+        weight1[_layer1._calcWeightIndex(inN, outN)] = weight;
+    }
+}
+
 accumulatorType Model::forwardPass(const FeatureList& l) {
     _layer0.propagate(l);
     return _layer1.propagateOut(_layer0.output(), 0, 0);

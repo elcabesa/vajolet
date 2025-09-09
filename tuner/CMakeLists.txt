@@ -13,7 +13,7 @@ add_executable(Vajolet_tuner
 	tuner.cpp
 	tunerPars.cpp)
 
-target_link_libraries(Vajolet_tuner  libChess doublefann_static ${OpenMP_CXX_FLAGS})
+target_link_libraries(Vajolet_tuner  libChess floatfann_static ${OpenMP_CXX_FLAGS})
 
 add_executable(Vajolet_genFen 
 	book.cpp
@@ -27,7 +27,7 @@ add_executable(Vajolet_genFen
 	tournament.cpp
 	tunerPars.cpp)
 
-target_link_libraries(Vajolet_genFen  libChess doublefann_static ${OpenMP_CXX_FLAGS})
+target_link_libraries(Vajolet_genFen  libChess floatfann_static ${OpenMP_CXX_FLAGS})
 
 add_executable(Vajolet_genTrainData
 	book.cpp
@@ -42,12 +42,12 @@ add_executable(Vajolet_genTrainData
 	tunerPars.cpp
 	)
 
-target_link_libraries(Vajolet_genTrainData  libChess doublefann_static ${OpenMP_CXX_FLAGS})
+target_link_libraries(Vajolet_genTrainData  libChess floatfann_static ${OpenMP_CXX_FLAGS})
 
 add_executable(Vajolet_train
 	FANNtrain.cpp)
 
-target_link_libraries(Vajolet_train  doublefann_static ${OpenMP_CXX_FLAGS})
+target_link_libraries(Vajolet_train  floatfann_static ${OpenMP_CXX_FLAGS})
 
 target_include_directories (Vajolet_unit_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 

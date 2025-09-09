@@ -54,7 +54,7 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<i
     for (unsigned int o = 0; o < _outputSize; ++o) {        
         accumulatorType out = propagateOut(input, index, o);
         _output[o] = out;
-        _outputRelu[o] = std::max(_output[o], 0);
+        _outputRelu[o] = std::max(_output[o], 0.0f);
         index += _inputSize;
     }
 }
@@ -75,7 +75,7 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const FeatureList& 
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _outputRelu[o] = std::max(_output[o], 0);
+        _outputRelu[o] = std::max(_output[o], 0.0f);
     }
 
 
@@ -98,7 +98,7 @@ void DenseLayer<inputType, inputSize, outputSize>::incrementalPropagate(const Di
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _outputRelu[o] = std::max(_output[o], 0);
+        _outputRelu[o] = std::max(_output[o], 0.0f);
     }
 }
 

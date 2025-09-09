@@ -41,7 +41,6 @@ bool NNUE::load(std::string path) {
     //std::cout<<_ann<<std::endl;
     if(_ann) {
         _loaded = true;
-        return true;
     } else {
         return false;
     }
@@ -63,6 +62,31 @@ bool NNUE::load(std::string path) {
         std::cout<<"error deserializing NNUE file"<<std::endl;
         return false;
     }*/
+
+    //deserialize first layer
+
+    for(unsigned int out = 0; out < 512; ++out) {
+        for(unsigned int in = 0; in < 64*12; ++in) {
+
+            _model.setWeight(0, in, out, 0.5*_ann->weights[in + out * (64 * 12 + 1)]);
+        }
+        _model.setBias(0, out, 0.5*_ann->weights[ 64*12 + out * (64 * 12 + 1)]);
+    }
+    //deserialize second layer
+    //std::cout<<"---------SECOND LAYER-----------"<<std::endl;
+    for(unsigned int out = 0; out < 1; ++out) {
+        //std::cout<<"OUT "<<out<<std::endl;
+        for(unsigned int in = 0; in < 512; ++in) {
+            //std::cout<<"  IN "<<in<<std::endl;
+            //std::cout<<"    w "<<0.5*_ann->weights[in + out * (512 + 1) + (64 * 12 + 1)*(512)]<<std::endl;
+            _model.setWeight(1, in, out, 0.5*_ann->weights[in + out * (512 + 1) + (64 * 12 + 1)*(512)]);
+        }
+        //std::cout<<"    w "<<0.5*_ann->weights[ 512 + out * (512 + 1) + (64 * 12 + 1)*(512)]<<std::endl;
+        _model.setBias(1, out, 0.5*_ann->weights[ 512 + out * (512 + 1) + (64 * 12 + 1)*(512)]);
+    }
+
+    return true;
+
 }
 
 void NNUE::close() {
@@ -162,7 +186,7 @@ void NNUE::_createFeatures(FeatureList& fl){
 }
 
 unsigned int NNUE::_feature(unsigned int  piece, tSquare pSquare) {
-    unsigned int f = piece + (12 * pSquare);
+    unsigned int f = (piece * 64) + pSquare;
     return f;
 }
 
@@ -190,6 +214,7 @@ unsigned int NNUE::_mapPiece(const bitboardIndex piece) {
 }
 
 Score NNUE::_completeEval() {
+    std::cout<< "complete eval"<<std::endl;
 
     Score lowSat = -SCORE_INFINITE;
     Score highSat = SCORE_INFINITE;
@@ -199,23 +224,26 @@ Score NNUE::_completeEval() {
     _completeFeatureList.clear();
     _createFeatures(_completeFeatureList);
 
-    //Score score = _model.forwardPass(_completeFeatureList);
+    Score score1 = _model.forwardPass(_completeFeatureList) * 10000;
+    std::cout<<"scoreVAJO "<<score1<<std::endl;
 
     for(unsigned int i= 0; i< 64*12; ++i) {
         input[i] = 0;
     }
     for(unsigned int i = 0; i< _completeFeatureList.size(); ++i) {
+        std::cout <<_completeFeatureList.get(i)<<" ";
         input[_completeFeatureList.get(i)] = 1;
-    }
+    }std::cout <<std::endl;
     /*for(unsigned int i= 0; i< 64*12; ++i) {
         std::cout<<input[i];
     }
     std::cout<<std::endl;*/
 
     calc_out = fann_run(_ann, input);
-    float s = *calc_out;
-    std::cout<<s<<std::endl;
-    Score score = *calc_out *10000;
+    //float s = *calc_out;
+    //std::cout<<s<<std::endl;
+    Score score = *calc_out * 10000;
+    std::cout<<"scoreFANN "<<score<<std::endl;
 
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
@@ -247,8 +275,8 @@ Score NNUE::_incrementalEval() {
     std::cout<<std::endl;*/
 
     calc_out = fann_run(_ann, input);
-    float s = *calc_out;
-    std::cout<<s<<std::endl;
+    //float s = *calc_out;
+    //std::cout<<s<<std::endl;
     Score score = *calc_out *10000;
 
     _diffFeatureList.clear();

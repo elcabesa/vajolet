@@ -1,4 +1,4 @@
-#include "../fann/src/include/fann.h"
+#include "../fann/src/include/floatfann.h"
 
 int main()
 {
@@ -7,7 +7,7 @@ int main()
 
     const unsigned int num_layers = 3;
     const unsigned int num_neurons_hidden = 512;
-    const float desired_error = (const float) 0.1f;//0.001;
+    const float desired_error = (const float) 0.01f;//0.001;
     const unsigned int max_epochs = 10000;
     const unsigned int epochs_between_reports = 1;
 
