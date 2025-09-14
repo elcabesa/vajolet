@@ -6,4 +6,5 @@ eval_float40.net <- train su 333980 FEN, rete (768 512 1), train 10 epoche, erro
 eval_float50.net <- train su 333980 FEN, rete (768 512 1), train 10 epoche, errore finale ??; eval_float50 vs Vajolet V0-P30-N0
 ******eval_float230.net <- train su ?????? FEN, rete (768 512 1), train 10 epoche, errore finale ??; eval_float230 vs eval_float50 V180-P0-N0
 eval_float300.net <- train su 170k FEN, rete (768 512 1), train 230 epoche, errore finale 2.55 posizioni non tattiche; eval_float vs eval_float230 V6-P11-N2
+******eval_float30-20050914.net <- train su 1.63M FEN, rete (768 512 1), train minibatch 30 epoche, errore finale 1.55 posizioni non tattiche; eval_float30-20050914 vs eval_float230 V16-P1-N1, eval_float30-20050914 vs Vajo V0-P28-N1 prima patta!!
 
