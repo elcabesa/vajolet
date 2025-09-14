@@ -116,7 +116,7 @@ float fann_train_epoch_quickprop(struct fann *ann, struct fann_train_data *data)
 /*
  * Internal train function
  */
-float fann_train_epoch_irpropm(struct fann *ann, struct fann_train_data *data) {
+float fann_train_epoch_irpropm(struct fann *ann, struct fann_train_data *data, int verbose) {
   unsigned int i;
 
   if (ann->prev_train_slopes == NULL) {
@@ -125,13 +125,22 @@ float fann_train_epoch_irpropm(struct fann *ann, struct fann_train_data *data) {
 
   fann_reset_MSE(ann);
 
+  unsigned int mini_batch_size = (data->num_data/20) + 1;
+
   for (i = 0; i < data->num_data; i++) {
     fann_run(ann, data->input[i]);
+    if(verbose && abs(ann->output[0] - data->output[i][0]) > 5 ) {
+      printf("%d: %f %f\n",i, ann->output[0], data->output[i][0]);
+    }
     fann_compute_MSE(ann, data->output[i]);
     fann_backpropagate_MSE(ann);
     fann_update_slopes_batch(ann, ann->first_layer + 1, ann->last_layer - 1);
+    if((i % mini_batch_size)== mini_batch_size - 1) {
+      //printf("minibatch i = %i\n", i);
+      fann_update_weights_irpropm(ann, 0, ann->total_connections);
+    }
   }
-
+  //printf("minibatch i = %i\n", data->num_data-1);
   fann_update_weights_irpropm(ann, 0, ann->total_connections);
 
   return fann_get_MSE(ann);
@@ -201,14 +210,14 @@ float fann_train_epoch_incremental(struct fann *ann, struct fann_train_data *dat
 /*
  * Train for one epoch with the selected training algorithm
  */
-FANN_EXTERNAL float FANN_API fann_train_epoch(struct fann *ann, struct fann_train_data *data) {
+FANN_EXTERNAL float FANN_API fann_train_epoch(struct fann *ann, struct fann_train_data *data, int verbose) {
   if (fann_check_input_output_sizes(ann, data) == -1) return 0;
 
   switch (ann->training_algorithm) {
     case FANN_TRAIN_QUICKPROP:
       return fann_train_epoch_quickprop(ann, data);
     case FANN_TRAIN_RPROP:
-      return fann_train_epoch_irpropm(ann, data);
+      return fann_train_epoch_irpropm(ann, data,verbose);
     case FANN_TRAIN_SARPROP:
       return fann_train_epoch_sarprop(ann, data);
     case FANN_TRAIN_BATCH:
@@ -239,7 +248,7 @@ FANN_EXTERNAL void FANN_API fann_train_on_data(struct fann *ann, struct fann_tra
     /*
      * train
      */
-    error = fann_train_epoch(ann, data);
+    error = fann_train_epoch(ann, data, i > 2);
     desired_error_reached = fann_desired_error_reached(ann, desired_error);
 
     /*

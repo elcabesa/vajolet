@@ -63,12 +63,12 @@ void Model::setWeight(unsigned int layer, unsigned int inN, unsigned int outN, f
 
 accumulatorType Model::forwardPass(const FeatureList& l) {
     _layer0.propagate(l);
-    return _layer1.propagateOut(_layer0.output(), 0, 0);
+    return std::min(std::max(_layer1.propagateOut(_layer0.outputRelu(), 0, 0), -300.0f), 300.0f);
 }
 
 accumulatorType Model::incrementalPass(const DifferentialList& l) {
     _layer0.incrementalPropagate(l);
-    return _layer1.propagateOut(_layer0.output(), 0, 0);
+    return std::min(std::max(_layer1.propagateOut(_layer0.outputRelu(), 0, 0), -300.0f), 300.0f);
 }
 
 #define VERSION "0004"

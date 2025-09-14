@@ -32,6 +32,7 @@
 
 class Position;
 
+//#define CHECK_NNUE_VS_FANN
 //#define CHECK_NNUE_FEATURE_EXTRACTION
 
 
@@ -81,7 +82,6 @@ private:
 
     const Position& _pos;
 
-    Score FannEval();
     static struct fann *_ann;
     fann_type *calc_out;
     fann_type input[64*12];

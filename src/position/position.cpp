@@ -722,7 +722,7 @@ void Position::doMove(const Move & m)
 	tSquare to = m.getTo();
 	const bitboardIndex piece = getPieceAt(from);
 	assert( isValidPiece( piece ));
-	bool kingMove = isKing(piece);
+	//bool kingMove = isKing(piece);
 
 	bitboardIndex captured = ( m.isEnPassantMove() ? (x.isBlackTurn() ? whitePawns : blackPawns ) : getPieceAt(to) );
 	assert( isValidPiece( captured ) || captured == empty );
@@ -767,10 +767,11 @@ void Position::doMove(const Move & m)
 			_movePiece( piece, kFrom, kTo );
 		}
 		_putPiece(rook, rTo);
-
 		if (NNUE::loaded()&& _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(rook, rFrom);
 			_nnue->addPiece(rook, rTo);
+			_nnue->removePiece(piece, kFrom);
+			_nnue->addPiece(piece, kTo);
 		}
 		
 		x.getKey().updatePiece( rFrom, rTo, rook );
@@ -817,7 +818,7 @@ void Position::doMove(const Move & m)
 		// update hashKey
 		x.getKey().updatePiece( from, to, piece );
 		_movePiece(piece, from, to);
-		if(!kingMove && NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
+		if(NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(piece, from);
 			_nnue->addPiece(piece, to);
 		}
@@ -929,7 +930,7 @@ void Position::undoMove()
 	tSquare to = m.getTo();
 	const tSquare from = m.getFrom();
 	bitboardIndex piece = getPieceAt(to);
-	bool kingMove = isKing(piece); // pay attenction this code don't take in account castle
+	//bool kingMove = isKing(piece); // pay attenction this code don't take in account castle
 	assert( isValidPiece( piece ) || m.isCastleMove() );
 
 	
@@ -961,6 +962,8 @@ void Position::undoMove()
 		if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(rook, rTo);
 			_nnue->addPiece(rook, rFrom);
+			_nnue->removePiece(kPiece, kTo);
+			_nnue->addPiece(kPiece, kFrom);
 		}
 		
 	} else {
@@ -975,7 +978,7 @@ void Position::undoMove()
 			}
 		}
 		_movePiece(piece, to, from);
-		if(!kingMove && NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
+		if(NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(piece, to);
 			_nnue->addPiece(piece, from);
 		}

@@ -141,11 +141,26 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			blackPly = pgn::Ply();
 		}
 		
-		if(!bookMove && !randomMove && _fs && _p.getNumberOfLegalMoves() > 1) {
+		if(!bookMove
+			&& !randomMove
+			&& _fs
+			&& _p.getNumberOfLegalMoves() > 1
+			&& !_p.isCaptureMove(bestMove)
+			&& !_p.isInCheck()
+			&& std::abs(score)<wonGame
+			&& (std::abs(score - _p.eval<false>()) <10000)
+		) {
+
+			//if(std::abs(score - _p.eval<false>()) >40000) {
+			//	std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
+			//}
 			if(_c.isWhiteTurn()) {
 				_fs->save(_p, score);
+
+				//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
 			} else {
 				_fs->save(_p, -score);
+				//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
 			}
 		}
 		_p.doMove(bestMove);

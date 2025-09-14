@@ -271,7 +271,7 @@ public:
 
 	inline const state& getState(unsigned int n)const
 	{
-		return _stateInfo[n];	
+		return _stateInfo[n];
 	}
 	
 	bool isMoveLegal(const Move &m) const;

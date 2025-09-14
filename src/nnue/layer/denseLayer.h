@@ -43,6 +43,7 @@ public:
     bool deserialize(std::ifstream& ss);
 
     const std::vector<outType>& output() const;
+    const std::vector<outType>& outputRelu() const;
     
 private:
     unsigned int _inputSize;

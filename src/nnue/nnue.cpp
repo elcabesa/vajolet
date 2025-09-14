@@ -214,26 +214,26 @@ unsigned int NNUE::_mapPiece(const bitboardIndex piece) {
 }
 
 Score NNUE::_completeEval() {
-    std::cout<< "complete eval"<<std::endl;
+    //std::cout<< "complete eval"<<std::endl;
 
-    Score lowSat = -SCORE_INFINITE;
-    Score highSat = SCORE_INFINITE;
+    Score lowSat = -SCORE_KNOWN_WIN;
+    Score highSat = SCORE_KNOWN_WIN;
 
     _diffFeatureList.clear();// todo remove?? da verificare se è più veloce o meno, non dovrebbe cambioare il numero di nodi ma solo nps
 
     _completeFeatureList.clear();
     _createFeatures(_completeFeatureList);
 
-    Score score1 = _model.forwardPass(_completeFeatureList) * 10000;
-    std::cout<<"scoreVAJO "<<score1<<std::endl;
-
+    Score score = _model.forwardPass(_completeFeatureList) * 10000;
+//std::cout<<"scoreVAJO "<<score1<<std::endl;
+#ifdef CHECK_NNUE_VS_FANN
     for(unsigned int i= 0; i< 64*12; ++i) {
         input[i] = 0;
     }
     for(unsigned int i = 0; i< _completeFeatureList.size(); ++i) {
-        std::cout <<_completeFeatureList.get(i)<<" ";
+        //std::cout <<_completeFeatureList.get(i)<<" ";
         input[_completeFeatureList.get(i)] = 1;
-    }std::cout <<std::endl;
+    }//std::cout <<std::endl;
     /*for(unsigned int i= 0; i< 64*12; ++i) {
         std::cout<<input[i];
     }
@@ -242,8 +242,12 @@ Score NNUE::_completeEval() {
     calc_out = fann_run(_ann, input);
     //float s = *calc_out;
     //std::cout<<s<<std::endl;
-    Score score = *calc_out * 10000;
-    std::cout<<"scoreFANN "<<score<<std::endl;
+    Score scoreFann = *calc_out * 10000;
+    //std::cout<<"scoreFANN "<<score<<std::endl;
+    if(std::abs(scoreFann - score) > 1) {
+        std::cout<<"AHH HHHH HHHHHHHH HHHHH "<< scoreFann<<" "<< score<<std::endl;
+    }
+#endif
 
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
@@ -253,33 +257,36 @@ Score NNUE::_completeEval() {
 Score NNUE::_incrementalEval() {
 
     //++incrementalCount;
-    Score lowSat = -SCORE_INFINITE;
-    Score highSat = SCORE_INFINITE;
+    Score lowSat = -SCORE_KNOWN_WIN;
+    Score highSat = SCORE_KNOWN_WIN;
 
     if(_diffFeatureList.size() >= _completeEvalThreshold) {return _completeEval();}
 
 
-    //Score score = _model.incrementalPass(_diffFeatureList);
-    for(unsigned int i = 0; i< _diffFeatureList.addSize(); ++i) {
+    Score score = _model.incrementalPass(_diffFeatureList) * 10000;
+    /*for(unsigned int i = 0; i< _diffFeatureList.addSize(); ++i) {
 
         input[_diffFeatureList.addList(i)] = 1;
     }
     for(unsigned int i = 0; i< _diffFeatureList.removeSize(); ++i) {
 
         input[_diffFeatureList.removeList(i)] = 0;
-    }
+    }*/
     /*std::cout<<"---------START--------"<<std::endl;
     for(unsigned int i= 0; i< 64*12; ++i) {
         std::cout<<input[i];
     }
     std::cout<<std::endl;*/
 
-    calc_out = fann_run(_ann, input);
+    //calc_out = fann_run(_ann, input);
     //float s = *calc_out;
     //std::cout<<s<<std::endl;
-    Score score = *calc_out *10000;
+    //Score score = *calc_out *10000;
 
     _diffFeatureList.clear();
+
+    score = std::min(highSat,score);
+    score = std::max(lowSat,score);
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
 
@@ -289,14 +296,15 @@ Score NNUE::_incrementalEval() {
 
     Score score2 = _completeEval();
 
-    if(std::abs(score2 - score) >0.1) {
-        std::cout<<"AHHHHHHHHHHHHHHHHHHHHH"<<std::endl;
+    if(std::abs((score2 - score)*100.0f/score) > 1.0) {
+        std::cout<<"AHHHHHHHHHHHHHHHHHHHHH "<<std::abs(score2 - score)<<" "<< std::abs((score2 - score)*100.0f/score)<<std::endl;
+        std::cout<<score2 <<" "<<score <<std::endl;
+        //std::cout<<score2 <<" "<<score <<std::endl;
 }
 #endif
     /*std::cout<<"---------END--------"<<std::endl;*/
 
-    score = std::min(highSat,score);
-    score = std::max(lowSat,score);
+
     return score;
 }
 
