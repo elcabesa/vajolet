@@ -731,7 +731,7 @@ class neural_net {
   float train_epoch(const training_data &data) {
     float mse = 0.0f;
     if ((ann != NULL) && (data.train_data != NULL)) {
-      mse = fann_train_epoch(ann, data.train_data);
+      mse = fann_train_epoch(ann, data.train_data,false);
     }
     return mse;
   }

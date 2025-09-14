@@ -46,6 +46,16 @@ static void printStartInfo(void)
 	std::cout <<"Vajolet train data generator"<< std::endl;
 }
 
+unsigned int v01 = 0;
+unsigned int v02 = 0;
+unsigned int v03 = 0;
+unsigned int v04 = 0;
+unsigned int v05 = 0;
+unsigned int v06 = 0;
+unsigned int v07 = 0;
+unsigned int v08 = 0;
+unsigned int v09 = 0;
+unsigned int v10 = 0;
 
 void worker2() {
 	double max = 0;
@@ -81,11 +91,24 @@ void worker2() {
 							_stream <<0<<" ";
 						}
 					}
-					double dval = std::stoi(val)/10000.0;
-					dval = std::max(-20.0, dval);
-					dval = std::min(dval, 20.0);
+					double dval = std::stoi(val)/50000.0;
+					//dval = std::max(-20.0, dval);
+					//dval = std::min(dval, 20.0);
+					dval = 2.0/(1 + std::exp(-2.0 * dval)) - 1.0;
 					_stream<<std::endl<<dval<<std::endl;
-					max = std::max(std::abs(dval),max);
+					double abs = std::abs(dval);
+					max = std::max(abs,max);
+					if(abs <= 0.1) {++v01;}
+					else if(abs <= 0.1) {++v01;}
+					else if(abs <= 0.2) {++v02;}
+					else if(abs <= 0.3) {++v03;}
+					else if(abs <= 0.4) {++v04;}
+					else if(abs <= 0.5) {++v05;}
+					else if(abs <= 0.6) {++v06;}
+					else if(abs <= 0.7) {++v07;}
+					else if(abs <= 0.8) {++v08;}
+					else if(abs <= 0.9) {++v09;}
+					else {++v10;}
 
 				}
 	//            fs.save(pos.setupFromFen(line));
@@ -106,6 +129,17 @@ void worker2() {
 	}
 
 	std::cout<<"MAX "<<max<<std::endl;
+	std::cout<<"<=0,1 "<<v01<<std::endl;
+	std::cout<<"<=0,2 "<<v02<<std::endl;
+	std::cout<<"<=0,3 "<<v03<<std::endl;
+	std::cout<<"<=0,4 "<<v04<<std::endl;
+	std::cout<<"<=0,5 "<<v05<<std::endl;
+	std::cout<<"<=0,6 "<<v06<<std::endl;
+	std::cout<<"<=0,7 "<<v07<<std::endl;
+	std::cout<<"<=0,8 "<<v08<<std::endl;
+	std::cout<<"<=0,9 "<<v09<<std::endl;
+	std::cout<<"<=1,0 "<<v10<<std::endl;
+
 
 }
 

@@ -32,7 +32,7 @@ int main()
     fann_set_callback(ann, &test_callback);
 
     fann_set_activation_function_hidden(ann, FANN_LINEAR_PIECE_RECT_LEAKY);
-    fann_set_activation_function_output(ann, FANN_LINEAR);
+    fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
 
     fann_train_on_file(ann, "train.data", max_epochs, epochs_between_reports, desired_error);
 

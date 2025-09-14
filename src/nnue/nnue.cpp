@@ -224,7 +224,7 @@ Score NNUE::_completeEval() {
     _completeFeatureList.clear();
     _createFeatures(_completeFeatureList);
 
-    Score score = _model.forwardPass(_completeFeatureList) * 10000;
+    auto s  = _model.forwardPass(_completeFeatureList);
 //std::cout<<"scoreVAJO "<<score1<<std::endl;
 #ifdef CHECK_NNUE_VS_FANN
     for(unsigned int i= 0; i< 64*12; ++i) {
@@ -242,13 +242,16 @@ Score NNUE::_completeEval() {
     calc_out = fann_run(_ann, input);
     //float s = *calc_out;
     //std::cout<<s<<std::endl;
-    Score scoreFann = *calc_out * 10000;
+    double scoreFann = *calc_out;
     //std::cout<<"scoreFANN "<<score<<std::endl;
-    if(std::abs(scoreFann - score) > 1) {
-        std::cout<<"AHH HHHH HHHHHHHH HHHHH "<< scoreFann<<" "<< score<<std::endl;
+    double sigmoid = 2.0/(1 + std::exp(-2.0 * s)) - 1.0;
+
+    if(std::abs(scoreFann - sigmoid) > 0.01) {
+        std::cout<<"AHH HHHH HHHHHHHH HHHHH "<< scoreFann<<" "<< sigmoid<<std::endl;
     }
 #endif
 
+    Score score = s * 50000;
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
     return score;
