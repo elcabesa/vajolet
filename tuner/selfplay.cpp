@@ -145,10 +145,10 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			&& !randomMove
 			&& _fs
 			&& _p.getNumberOfLegalMoves() > 1
-			&& !_p.isCaptureMove(bestMove)
+			&& !_p.isCaptureMoveOrPromotion(bestMove)
 			&& !_p.isInCheck()
 			&& std::abs(score)<wonGame
-			&& (std::abs(score - _p.eval<false>()) <10000)
+			//&& (std::abs(score - _p.eval<false>()) <10000)
 		) {
 
 			//if(std::abs(score - _p.eval<false>()) >40000) {

@@ -28,7 +28,7 @@
 #include "model.h"
 #include "tSquare.h"
 #include "vajolet.h"
-#include "../fann/src/include/floatfann.h"
+//#include "../fann/src/include/floatfann.h"
 
 class Position;
 
@@ -82,9 +82,9 @@ private:
 
     const Position& _pos;
 
-    static struct fann *_ann;
-    fann_type *calc_out;
-    fann_type input[64*12];
+    //static struct fann *_ann;
+    //fann_type *calc_out;
+    //fann_type input[64*12];
 };
 
 

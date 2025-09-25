@@ -23,7 +23,7 @@ int main()
 
     const unsigned int num_layers = 3;
     const unsigned int num_neurons_hidden = 512;
-    const float desired_error = (const float) 0.01f;//0.001;
+    const float desired_error = (const float) 0.0004f;//0.001;
     const unsigned int max_epochs = 10000;
     const unsigned int epochs_between_reports = 1;
 
@@ -34,7 +34,14 @@ int main()
     fann_set_activation_function_hidden(ann, FANN_LINEAR_PIECE_RECT_LEAKY);
     fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
 
-    fann_train_on_file(ann, "train.data", max_epochs, epochs_between_reports, desired_error);
+    struct fann_train_data *data = fann_read_train_from_file("train.data");
+
+    if (data == NULL) {
+        return 0;
+    }
+    fann_randomize_weights(ann, -0.001, 0.001);
+    fann_train_on_data(ann, data, max_epochs, epochs_between_reports, desired_error);
+    fann_destroy_train(data);
 
     fann_save(ann, "eval_float.net");
 

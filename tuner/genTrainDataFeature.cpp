@@ -19,14 +19,15 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <map>
 #include <cmath>
 
-#include "book.h"
-#include "epdSaver.h"
-#include "fenSaver.h"
-#include "player.h"
+//#include "book.h"
+//#include "epdSaver.h"
+//#include "fenSaver.h"
+//#include "player.h"
 #include "position.h"
-#include "tournament.h"
+//#include "tournament.h"
 #include "nnue.h"
 
 #include "libchess.h"
@@ -84,19 +85,23 @@ void worker2() {
 					auto val = line.substr(sep+1);
 					pos.setupFromFen(fen);
 					auto f = pos.nnue()->features();
-					for(unsigned int i = 0; i< 64*12; ++i) {
+					for(auto& idx: f) {
+						stats[idx]++;
+						_stream <<idx<<" ";
+					}
+					/*for(unsigned int i = 0; i< 64*12; ++i) {
 						if(std::find(f.begin(), f.end(),i)!= f.end()) {
 							stats[i]++;
 							_stream <<1<<" ";
 						}else {
 							_stream <<0<<" ";
 						}
-					}
+					}*/
 					double dval = std::stoi(val)/50000.0;
 					//dval = std::max(-20.0, dval);
 					//dval = std::min(dval, 20.0);
-					dval = 2.0/(1 + std::exp(-2.0 * dval)) - 1.0;
-					_stream<<std::endl<<dval<<std::endl;
+					dval = 1.0/(1 + std::exp(-1.0 * dval)) ;
+					_stream<<";"<<dval<<std::endl;
 					double abs = std::abs(dval);
 					max = std::max(abs,max);
 					if(abs <= 0.1) {++v01;}

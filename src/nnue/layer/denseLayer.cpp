@@ -24,6 +24,10 @@
 #include "denseLayer.h"
 #include "differentialList.h"
 #include "featureList.h"
+
+
+#define FASTER_CODE
+
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
 DenseLayer<inputType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int outShift):
     _inputSize(inputSize),
@@ -40,24 +44,31 @@ DenseLayer<inputType, inputSize, outputSize>::~DenseLayer() {
 }
 
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-accumulatorType DenseLayer<inputType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input, const unsigned int index, unsigned int o) {   
+accumulatorType DenseLayer<inputType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input, const unsigned int index, unsigned int o) {
     accumulatorType out = (*_bias)[o];
-    //std::cout<<"BIAS["<<o<<"] = "<<out<<std::endl;
+#ifdef FASTER_CODE
+    auto* ref = &(_weight->data()[index]);
+    auto *in = input.data();
+#endif
     for(unsigned int i = 0; i < _inputSize; ++i) {
-        out += input[i] * (*_weight)[index + i];
-        //std::cout<<"i IN W OUT "<<i<<" "<<input[i] <<" "<<(*_weight)[index + i]<< " " << out<<std::endl;
+#ifndef FASTER_CODE
+        out += input[i] * (*_weight)[index + i]; // SBAGLIATO funziona solo per l'uscita'
+#else
+        out += *in * *ref;
+        ++in;
+        ++ref;
+#endif
     }
-    //std::cout<<"outVAJO["<<o<<"] = "<<out<<std::endl;
     return out;
 }
 
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<inputType>& input) {
+void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<inputType>& input) { //TODO REWRITE è sbagliata
     unsigned int index = 0;
-    for (unsigned int o = 0; o < _outputSize; ++o) {        
+    for (unsigned int o = 0; o < _outputSize; ++o) {
         accumulatorType out = propagateOut(input, index, o);
         _output[o] = out;
-        _outputRelu[o] = std::min(std::max(_output[o], 0.0f), 300.0f);
+        _outputRelu[o] = std::max(_output[o], 0.0f);
         index += _inputSize;
     }
 }
@@ -72,51 +83,77 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const FeatureList& 
     //std::cout<<"accumulate"<<std::endl;
     for (unsigned int idx = 0; idx < l.size(); ++idx) {
         unsigned int in = l.get(idx);
+#ifdef FASTER_CODE
+        auto offset = _calcWeightIndex(in, 0);
+        auto* ref = &(_weight->data()[offset]);
+#endif
         for (unsigned int o = 0; o < _outputSize; ++o) {
+#ifndef FASTER_CODE
             _output[o] += (*_weight)[_calcWeightIndex(in, o)];
+#else
+            _output[o] += *ref;
+            ++ref;
+#endif
         }
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _outputRelu[o] = std::min(std::max(_output[o], 0.0f), 300.0f);
-        //if(o<10)
-        //{
-        //  std::cout<<"outVAJO["<<o<<"] = "<<_outputRelu[o]<<std::endl;
-        //}
+        _outputRelu[o] = std::max(_output[o], 0.0f);
     }
 
 
 }
 
+
 template <typename inputType, unsigned int inputSize, unsigned int outputSize>
 void DenseLayer<inputType, inputSize, outputSize>::incrementalPropagate(const DifferentialList& l) {
     for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
         unsigned int in = l.addList(idx);
+
+#ifdef FASTER_CODE
+        auto offset = _calcWeightIndex(in, 0);
+        auto* ref = &(_weight->data()[offset]);
+#endif
+
         for (unsigned int o = 0; o < _outputSize; ++o) {
+#ifndef FASTER_CODE
             _output[o] += (*_weight)[_calcWeightIndex(in, o)];
+#else
+            _output[o] += *ref;
+            ++ref;
+#endif
         }
     }
 
     for(unsigned int idx = 0; idx < l.removeSize(); ++idx) {
         unsigned int in = l.removeList(idx);
+#ifdef FASTER_CODE
+        auto offset = _calcWeightIndex(in, 0);
+        auto* ref = &(_weight->data()[offset]);
+#endif
         for (unsigned int o = 0; o < _outputSize; ++o) {
+#ifndef FASTER_CODE
             _output[o] -= (*_weight)[_calcWeightIndex(in, o)];
+#else
+            _output[o] -= *ref;
+            ++ref;
+#endif
         }
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _outputRelu[o] = std::min(std::max(_output[o], 0.0f), 300.0f);
+        _outputRelu[o] = std::max(_output[o], 0.0f);
     }
 }
 
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
 unsigned int DenseLayer<inputType, inputSize, outputSize>::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
     assert(o + i * _outputSize < _weight->size());
-    return o * _inputSize + i;
+    return o + i * _outputSize;
 
 }
 
-#define PRINTSTAT
+//#define PRINTSTAT
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
 bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss) {
 #ifdef PRINTSTAT
@@ -126,33 +163,33 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
 #endif
     //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
     union _bb{
-        int32_t d;
+        biasType d;
         char c[4];
     }bb;
 
     union _ww{
-        int8_t d;
-        char c[1];
+        weightType d;
+        char c[4];
     }ww;
 
 #ifdef PRINTSTAT
     std::cout<<"-----------------------------"<<std::endl;
 #endif
-    if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
+    //if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *_bias) {
         ss.read(bb.c, 4);
         b = (biasType)(bb.d);
 #ifdef PRINTSTAT
         //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning1"<<std::endl;}
         if (b == 0) { ++count;}
-        //std::cout<<b<<std::endl;
+        std::cout<<b<<std::endl;
         min = std::min(min, double(b));
         max = std::max(max,  double(b));
 #endif
         //if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
         //if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
-    if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
+    //if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
 #ifdef PRINTSTAT
     std::cout<<"b min "<<min<<std::endl;
     std::cout<<"b MAX "<<max<<std::endl;
@@ -166,7 +203,9 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
     {
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
-        ss.read(ww.c, 1);
+        //unsigned int i = idx % _inputSize;
+        //unsigned int o = idx / _inputSize;
+        ss.read(ww.c, 4);
         (*_weight)[_calcWeightIndex(i, o)] = (weightType)(ww.d); 
 #ifdef PRINTSTAT
         //if (std::abs((*_weight)[_calcWeightIndex(i, o)])> 128) {std::cout<<"warningb"<<std::endl;}
@@ -183,8 +222,8 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss
     std::cout<<"w MAX "<<max<<std::endl;
     std::cout<<"w=0 :#"<<count<<std::endl;
 #endif
-    if(ss.get() != '}') {std::cout<<"DenseLayer missing }"<<std::endl;return false;} 
-    if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
+    //if(ss.get() != '}') {std::cout<<"DenseLayer missing }"<<std::endl;return false;}
+    //if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     return true;
 }
 

@@ -129,9 +129,9 @@ float fann_train_epoch_irpropm(struct fann *ann, struct fann_train_data *data, i
 
   for (i = 0; i < data->num_data; i++) {
     fann_run(ann, data->input[i]);
-    if(verbose && abs(ann->output[0] - data->output[i][0]) > 0.5 ) {
+    /*if(verbose && abs(ann->output[0] - data->output[i][0]) > 0.5 ) {
       printf("%d: %f %f\n",i, ann->output[0], data->output[i][0]);
-    }
+    }*/
     fann_compute_MSE(ann, data->output[i]);
     fann_backpropagate_MSE(ann);
     fann_update_slopes_batch(ann, ann->first_layer + 1, ann->last_layer - 1);

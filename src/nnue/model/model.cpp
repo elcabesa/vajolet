@@ -63,12 +63,12 @@ void Model::setWeight(unsigned int layer, unsigned int inN, unsigned int outN, f
 
 accumulatorType Model::forwardPass(const FeatureList& l) {
     _layer0.propagate(l);
-    return std::min(std::max(_layer1.propagateOut(_layer0.outputRelu(), 0, 0), -300.0f), 300.0f);
+    return _layer1.propagateOut(_layer0.outputRelu(), 0, 0);
 }
 
 accumulatorType Model::incrementalPass(const DifferentialList& l) {
     _layer0.incrementalPropagate(l);
-    return std::min(std::max(_layer1.propagateOut(_layer0.outputRelu(), 0, 0), -300.0f), 300.0f);
+    return _layer1.propagateOut(_layer0.outputRelu(), 0, 0);
 }
 
 #define VERSION "0004"
@@ -76,20 +76,20 @@ bool Model::deserialize(std::ifstream& ss) {
     ss.clear();
     ss.seekg(0);
     //std::cout<<"DESERIALIZE MODEL"<<std::endl;
-    if(ss.get() != '{') {std::cout<<"MODEL missing {"<<std::endl;return false;}
-    if(ss.get() != 'V') {std::cout<<"MODEL missing V"<<std::endl;return false;}
-    if(ss.get() != ':') {std::cout<<"MODEL missing :"<<std::endl;return false;}
-    char buffer[4];
-    ss.read(buffer, 4);
-    std::string v(buffer, 4);
-    if(v != VERSION) {std::cout<<"WRONG NETWORK VERSION: "<<v<<" expected: "<<VERSION<<std::endl;return false;}
-    if(ss.get() != '}') {std::cout<<"MODEL missing }"<<std::endl;return false;}
+    //if(ss.get() != '{') {std::cout<<"MODEL missing {"<<std::endl;return false;}
+    //if(ss.get() != 'V') {std::cout<<"MODEL missing V"<<std::endl;return false;}
+    //if(ss.get() != ':') {std::cout<<"MODEL missing :"<<std::endl;return false;}
+    //char buffer[4];
+    //ss.read(buffer, 4);
+    //std::string v(buffer, 4);
+    //if(v != VERSION) {std::cout<<"WRONG NETWORK VERSION: "<<v<<" expected: "<<VERSION<<std::endl;return false;}
+    //if(ss.get() != '}') {std::cout<<"MODEL missing }"<<std::endl;return false;}
 
-    if(ss.get() != '{') {std::cout<<"MODEL missing {"<<std::endl;return false;}
+    //if(ss.get() != '{') {std::cout<<"MODEL missing {"<<std::endl;return false;}
 
     if(!_layer0.deserialize(ss)) {std::cout<<"MODEL internal layer0 error"<<std::endl;return false;}
     if(!_layer1.deserialize(ss)) {std::cout<<"MODEL internal layer1 error"<<std::endl;return false;}
 
-    if(ss.get() != '}') {std::cout<<"MODEL missing }"<<std::endl;return false;} 
+    //if(ss.get() != '}') {std::cout<<"MODEL missing }"<<std::endl;return false;}
     return true;
 }

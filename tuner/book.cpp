@@ -32,6 +32,7 @@ Book::Book(const std::string& file)
 	std::ifstream pgnfile(file);
 	pgnfile >> _games;
 	_itr = _games.begin();
+	std::cout<<"read book"<<std::endl;
 	
 }
 

@@ -64,7 +64,7 @@ UciManager::impl::impl(): _pos(Position::nnueConfig::on, Position::pawnHash::off
 	_optionList.emplace_back( new CheckUciOption("UCI_LimitStrength", uciParameters::limitStrength, this, nullptr, false));
 	_optionList.emplace_back( new SpinUciOption("Skill Level", uciParameters::engineLevel, this, nullptr, 20, 1, 20));
 	_optionList.emplace_back( new CheckUciOption("Use NNUE", uciParameters::useNnue, this, &UciManager::impl::_useNnue, true));
-	_optionList.emplace_back( new StringUciOption("EvalFile", uciParameters::nnueFile, this, &UciManager::impl::_setNnueFile, "eval_float.net"));
+	_optionList.emplace_back( new StringUciOption("EvalFile", uciParameters::nnueFile, this, &UciManager::impl::_setNnueFile, "nnue.par"));
 	
 	_pos.setupFromFen(_StartFEN);
 }
