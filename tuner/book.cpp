@@ -63,6 +63,7 @@ std::list<Move> Book::getLine()
 		game = *_itr;
 		++_itr;
 		if(_itr == _games.end()) {
+			std::cout<<"rewind book"<<std::endl;
 			_itr = _games.begin();
 		}
 	}

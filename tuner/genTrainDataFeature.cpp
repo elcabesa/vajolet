@@ -26,9 +26,11 @@
 //#include "epdSaver.h"
 //#include "fenSaver.h"
 //#include "player.h"
+#include "move.h"
 #include "position.h"
 //#include "tournament.h"
 #include "nnue.h"
+#include "uciOutput.h"
 
 #include "libchess.h"
 #include "vajo_io.h"
@@ -83,7 +85,21 @@ void worker2() {
 				if(sep != std::string::npos) {
 					auto fen = line.substr(0, sep);
 					auto val = line.substr(sep+1);
-					pos.setupFromFen(fen);
+					Move m = Move::NOMOVE;
+					try {
+						if(fen.length() < 6) {
+							m = (unsigned short)std::stoi(fen);
+							//std::cout<<UciOutput::displayMove(pos, m)<<std::endl;
+						}
+					} catch(std::exception&){}
+
+					if(m != Move::NOMOVE) {
+						pos.doMove(m);
+					} else {
+						//std::cout<<"setup from FEN"<<std::endl;
+						pos.setupFromFen(fen);
+					}
+					pos.nnue()->clean();
 					auto f = pos.nnue()->features();
 					for(auto& idx: f) {
 						stats[idx]++;

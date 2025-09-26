@@ -64,15 +64,19 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	auto bookMoves = _book.getLine();
 	auto it = bookMoves.begin();
 	Score score = 0;
-	
+	bool firstMoveToBeSaved = true;
+	bool skippedMove = false;
+	Move previousBestMove;
 	while (!_isGameFinished(score)) {
 		bool bookMove = false;
 		bool randomMove = false;
+
 		// set time limit
 		_sl.setWTime(_c.getWhiteTime());
 		_sl.setBTime(_c.getBlackTime());
 		
 		Move bestMove;
+
 		if(it != bookMoves.end())
 		{
 			//std::cout<<"BOOK MOVE"<<std::endl;
@@ -132,9 +136,11 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		
 		if(_c.isWhiteTurn()) {
 			whitePly = pgn::Ply(UciOutput::displayMove(_p, bestMove));
+			//std::cout<<"prepare white move"<<std::endl;
 		} else {
 			blackPly = pgn::Ply(UciOutput::displayMove(_p, bestMove));
 			pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
+			//std::cout<<"add white/black move"<<std::endl;
 			
 			++moveCount;
 			whitePly = pgn::Ply();
@@ -151,19 +157,32 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			//&& (std::abs(score - _p.eval<false>()) <10000)
 		) {
 
-			//if(std::abs(score - _p.eval<false>()) >40000) {
-			//	std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
-			//}
-			if(_c.isWhiteTurn()) {
-				_fs->save(_p, score);
+			if(firstMoveToBeSaved || skippedMove) {
+				if(_c.isWhiteTurn()) {
+					_fs->save(_p, score);
 
-				//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
+					//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
+				} else {
+					_fs->save(_p, -score);
+					//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
+				}
+				firstMoveToBeSaved = false;
 			} else {
-				_fs->save(_p, -score);
-				//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
+				if(_c.isWhiteTurn()) {
+					_fs->save(previousBestMove, score);
+
+					//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
+				} else {
+					_fs->save(previousBestMove, -score);
+					//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
+				}
 			}
+			skippedMove = false;
+		} else {
+			skippedMove = true;
 		}
 		_p.doMove(bestMove);
+		previousBestMove = bestMove;
 
 		
 		_c.switchTurn();
@@ -171,6 +190,7 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	// white move still to be written
 	if(_c.isBlackTurn()) {
 		pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
+		//std::cout<<"add last white move move"<<std::endl;
 	}
 	
 	_addGameResult(pgnGame,_getGameResult(score));
@@ -221,8 +241,10 @@ std::string SelfPlay::_getGameResult(Score res) {
 	// checkmate
 	if (_p.isCheckMate()) {
 		if(_p.isBlackTurn()) {
+			//std::cout << "white mate"<<std::endl;
 			return "1-0";
 		} else {
+			//std::cout << "black mate"<<std::endl;
 			return "0-1";
 		}
 	}
@@ -230,23 +252,31 @@ std::string SelfPlay::_getGameResult(Score res) {
 	// patta ripetizione
 	// num mosse
 	if (_p.isDraw(true)) {
+		//std::cout << "draw"<<std::endl;
 		return "1/2-1/2";
 	}
 	
 	// stallo
 	if (_p.isStaleMate()) {
+		//std::cout << "draw"<<std::endl;
 		return "1/2-1/2";
 	}
 	
 	// early stop
 	// near 0 for x moves after ply y
 	// abs(v) > x  for y moves
-	if(winCount >= 4 && res >= wonGame) {
+
+	Score gameRes = _p.isBlackTurn() ? res : -res;
+
+	if(winCount >= 4 && gameRes >= wonGame) {
+		//std::cout << "white early win"<<std::endl;
 		return "1-0";
 	}
-	if(winCount >= 4 && res <= -wonGame) {
+	if(winCount >= 4 && gameRes <= -wonGame) {
+		//std::cout << "black early win"<<std::endl;
 		return "0-1";
 	} if (drawCount >= 12) {
+		//std::cout << "early draw"<<std::endl;
 		return "1/2-1/2";
 	}
 

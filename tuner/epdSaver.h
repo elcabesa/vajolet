@@ -27,12 +27,14 @@
 #include "transposition.h"
 
 class Position;
+class Move;
 
 class EpdSaver {
 	
 public:
 	EpdSaver(unsigned int decimation, unsigned int n);
 	void save(const Position& pos, Score res);
+        void save(const Move& m, Score res);
 
 private:	
 	const unsigned int _decimation;

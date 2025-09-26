@@ -17,13 +17,14 @@
 
 #include "epdSaver.h"
 #include "position.h"
+#include "move.h"
 #include "searchResult.h"
 #include "timeManagement.h"
 #include "transposition.h"
 
 
 EpdSaver::EpdSaver(unsigned int decimation, unsigned int n): _decimation(decimation){
-	_stream.open("fen"+ std::to_string(n) + ".epd");
+	_stream.open("fen"+ std::to_string(n) + ".epd", std::ios_base::app);
 }
 
 
@@ -37,5 +38,18 @@ void EpdSaver::save(const Position& pos, Score res) {
 				_logDecimationCnt = 0;
 		}
 		_stream << pos.getFen()<<";"<<res<< std::endl;
+	}
+}
+
+void EpdSaver::save(const Move& m, Score res) {
+	if (++_counter >= _decimation) {
+		_counter = 0;
+		++_logDecimationCnt;
+		++_saved;
+		if(_logDecimationCnt>=10000) {
+			std::cout << "saved " << _saved << " FENs" <<std::endl;
+			_logDecimationCnt = 0;
+		}
+		_stream << m.getPacked()<<";"<<res<< std::endl;
 	}
 }
