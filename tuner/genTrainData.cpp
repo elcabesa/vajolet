@@ -20,13 +20,9 @@
 #include <fstream>
 #include <string>
 #include <cmath>
+#include <map>
 
-#include "book.h"
-#include "epdSaver.h"
-#include "fenSaver.h"
-#include "player.h"
 #include "position.h"
-#include "tournament.h"
 #include "nnue.h"
 
 #include "libchess.h"

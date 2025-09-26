@@ -14,10 +14,10 @@ add_subdirectory(syzygy)
 
 
 add_executable(tuner tuner.cpp )
-target_link_libraries (tuner libChess floatfann_static ${OpenMP_CXX_FLAGS})
+target_link_libraries (tuner libChess)
 
 add_executable(Vajolet vajolet.cpp )
-target_link_libraries (Vajolet libChess floatfann_static ${OpenMP_CXX_FLAGS})
+target_link_libraries (Vajolet libChess)
 
 # Make sure the compiler can find include files for our libChess library
 # when other libraries or executables link to libChess

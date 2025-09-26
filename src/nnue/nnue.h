@@ -28,11 +28,9 @@
 #include "model.h"
 #include "tSquare.h"
 #include "vajolet.h"
-//#include "../fann/src/include/floatfann.h"
 
 class Position;
 
-//#define CHECK_NNUE_VS_FANN
 //#define CHECK_NNUE_FEATURE_EXTRACTION
 
 
@@ -81,10 +79,6 @@ private:
     Score _incrementalEval();
 
     const Position& _pos;
-
-    //static struct fann *_ann;
-    //fann_type *calc_out;
-    //fann_type input[64*12];
 };
 
 
