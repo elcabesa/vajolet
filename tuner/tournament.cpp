@@ -66,7 +66,7 @@ TournamentResult Tournament::play() {
 	Player* whitePlayer = &_p1;
 	Player* blackPlayer = &_p2;
 	
-	for(int i = 0; i < TunerParameters::gameNumber; ++i) {
+	for(int i = 0; i < TunerParameters::gameNumber || TunerParameters::gameNumber == -1; ++i) {
 		unsigned int round = i + 1;
 		
 		if(round % 2) {
