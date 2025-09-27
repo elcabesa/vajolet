@@ -46,8 +46,13 @@ SelfPlay::SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs) :
 }
 
 pgn::Game SelfPlay::playGame(unsigned int round) {
+
+	std::random_device rd;  // a seed source for the random number engine
+	std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
+	std::uniform_int_distribution<> distrib(0, 1);
+
 	unsigned int randomMoveCounter = 0;
-	unsigned int initialRandomMoveCounter = 0;
+	unsigned int initialRandomMoveCounter = distrib(gen);
 	pgn::Game pgnGame;
 	_addGameTags(pgnGame, round);
 	
@@ -169,11 +174,11 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 				firstMoveToBeSaved = false;
 			} else {
 				if(_c.isWhiteTurn()) {
-					_fs->save(previousBestMove, score);
+					_fs->save(_p, previousBestMove, score);
 
 					//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
 				} else {
-					_fs->save(previousBestMove, -score);
+					_fs->save(_p, previousBestMove, -score);
 					//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
 				}
 			}

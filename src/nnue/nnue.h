@@ -43,6 +43,7 @@ public:
     static bool loaded();
 
     Score eval();
+    Score eval(FeatureList fl);
 
     void disableIncrementalEval(); // evaluate if it's still necessary for king move and castling
     bool incrementalEvalDisabled() const;
@@ -70,6 +71,8 @@ private:
 
     static unsigned int _feature(unsigned int piece, tSquare pSquare);
     static unsigned int _mapPiece(const bitboardIndex piece);
+    static tSquare _getSquareFromFeature(unsigned int);
+    static bitboardIndex _getPieceFromFeature(unsigned int);
 
 
     void _resetCompleteEvalCondition();

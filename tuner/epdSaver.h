@@ -34,12 +34,13 @@ class EpdSaver {
 public:
 	EpdSaver(unsigned int decimation, unsigned int n);
 	void save(const Position& pos, Score res);
-        void save(const Move& m, Score res);
+	void save(const Position& pos, const Move& m, Score res);
 
 private:	
 	const unsigned int _decimation;
 	unsigned int _counter = 0;
 	std::ofstream _stream;
+	std::ofstream _stream2;
 	uint_fast64_t _saved = 0;
 	unsigned int _logDecimationCnt = 0;
 };

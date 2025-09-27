@@ -82,6 +82,19 @@ Score NNUE::eval() {
     }
 }
 
+Score NNUE::eval(FeatureList fl) {
+
+    Score lowSat = -SCORE_KNOWN_WIN;
+    Score highSat = SCORE_KNOWN_WIN;
+
+    auto s  = _model.forwardPass(fl);
+
+    Score score = s * 50000;
+    score = std::min(highSat, score);
+    score = std::max(lowSat, score);
+    return score;
+}
+
 std::set<unsigned int> NNUE::features() {
     std::set<unsigned int> features;
     FeatureList fl;
@@ -155,6 +168,25 @@ unsigned int NNUE::_feature(unsigned int  piece, tSquare pSquare) {
     unsigned int f = (piece * 64) + pSquare;
     return f;
 }
+
+tSquare NNUE::_getSquareFromFeature(unsigned int f) {return tSquare(f%64);}
+bitboardIndex NNUE::_getPieceFromFeature(unsigned int f) {
+    bitboardIndex whitePow[12] = {
+        whiteKing,
+        whiteQueens,
+        whiteRooks,
+        whiteBishops,
+        whiteKnights,
+        whitePawns,
+        blackKing,
+        blackQueens,
+        blackRooks,
+        blackBishops,
+        blackKnights,
+        blackPawns
+    };
+    return whitePow[f/64];}
+
 
 unsigned int NNUE::_mapPiece(const bitboardIndex piece) {
     unsigned int n[] = {

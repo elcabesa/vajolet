@@ -41,6 +41,12 @@ add_executable(Vajolet_genTrainDataFeature
 
 target_link_libraries(Vajolet_genTrainDataFeature  libChess)
 
+add_executable(Vajolet_verifyTrainDataFeature
+	verifyTrainDataFeature.cpp
+	)
+
+target_link_libraries(Vajolet_verifyTrainDataFeature  libChess)
+
 
 target_include_directories (Vajolet_unit_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
 

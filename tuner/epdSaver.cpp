@@ -22,26 +22,22 @@
 #include "timeManagement.h"
 #include "transposition.h"
 
+#define DEBUG_PROCESS
+
 
 EpdSaver::EpdSaver(unsigned int decimation, unsigned int n): _decimation(decimation){
 	_stream.open("fen"+ std::to_string(n) + ".epd", std::ios_base::app);
+#ifdef DEBUG_PROCESS
+	_stream2.open("fen"+ std::to_string(n) + "ver.epd", std::ios_base::app);
+#endif
 }
 
 
 void EpdSaver::save(const Position& pos, Score res) {
-	if (++_counter >= _decimation) {
-		_counter = 0;
-		++_logDecimationCnt;
-		++_saved;
-		if(_logDecimationCnt>=10000) {
-				std::cout << "saved " << _saved << " FENs" <<std::endl;
-				_logDecimationCnt = 0;
-		}
-		_stream << pos.getFen()<<";"<<res<< std::endl;
-	}
+	save(pos, Move::NOMOVE, res);
 }
 
-void EpdSaver::save(const Move& m, Score res) {
+void EpdSaver::save(const Position& pos, const Move& m, Score res) {
 	if (++_counter >= _decimation) {
 		_counter = 0;
 		++_logDecimationCnt;
@@ -50,6 +46,13 @@ void EpdSaver::save(const Move& m, Score res) {
 			std::cout << "saved " << _saved << " FENs" <<std::endl;
 			_logDecimationCnt = 0;
 		}
-		_stream << m.getPacked()<<";"<<res<< std::endl;
+		if(m != Move::NOMOVE) {
+			_stream << m.getPacked()<<";"<<res<< std::endl;
+		} else {
+			_stream << pos.getFen()<<";"<<res<< std::endl;
+		}
+#ifdef DEBUG_PROCESS
+		_stream2 << pos.getFen()<<";"<<res<< std::endl;
+#endif
 	}
 }
