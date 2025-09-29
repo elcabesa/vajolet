@@ -44,7 +44,10 @@ static void printStartInfo(void)
 
 void worker2() {
 
-	const double stateScale = 1.0;
+	std::map<int, unsigned long> count;
+	std::map<int, double> mse;
+	std::map<int, double> mseSigmoid;
+	//const double stateScale = 1.0;
 
 	Position pos(Position::nnueConfig::on);
 
@@ -53,21 +56,22 @@ void worker2() {
 		std::cout<<"error loading nnue.par"<<std::endl;
 		//exit(-1);
 	}
+	//unsigned long previousCount = 0;
 
-    std::string line;
+
+
+	std::string line;
 	std::ifstream myfile ("fenver.epd");
 
-	std::map<int, unsigned long> stat;
+	//std::map<int, unsigned long> stat;
 
-	unsigned long count = 0;
-	double mse = 0;
-	double mseSigmoid = 0;
+	//unsigned long count = 0;
+	//double mse = 0;
+	//double mseSigmoid = 0;
 
 	if (myfile.is_open()) {
 
 		while ( getline (myfile,line) ) {
-
-			++count;
 
 			auto sep = line.find_first_of(';');
 			if(sep != std::string::npos) {
@@ -113,13 +117,16 @@ void worker2() {
 
 				//std::cout<<dScore<<" "<<dval<<std::endl;
 
-				mse += std::pow(dScore-dval,2.0);
+				int diff = std::abs(dScore-dval)*10;
 
-				stat[(dScore-dval)/stateScale] ++;
 
-				if(std::abs(dScore-dval) > 15) {
-					std::cout<<fen <<" "<< dScore<<" "<<dval<<std::endl;
-				}
+				count[diff]++;
+
+				mse[diff] += std::pow(dScore-dval,2.0);
+
+				//stat[(dScore-dval)/stateScale] ++;
+
+
 
 				double dScoreSigmoid = dScore /5.0;
 				dScoreSigmoid = 1.0/(1 + std::exp(-1.0 * dScoreSigmoid));
@@ -127,7 +134,7 @@ void worker2() {
 				double dvalSigmoid = dval /5.0;
 				dvalSigmoid = 1.0/(1 + std::exp(-1.0 * dvalSigmoid));
 
-				mseSigmoid += std::pow(dScoreSigmoid-dvalSigmoid,2.0);
+				mseSigmoid[diff] += std::pow(dScoreSigmoid-dvalSigmoid,2.0);
 
 
 
@@ -136,14 +143,31 @@ void worker2() {
 
 		}
 		myfile.close();
-		std::cout<<"Positions: "<<count<<std::endl;
-		std::cout<<"MSE: "<<mse/count<<std::endl;
+		/*std::cout<<"limit: "<<limit*0.1<< " ";
+		std::cout<<"Positions: "<<count -previousCount<<" ";
+		std::cout<<"MSE: "<<mse/count<<" ";
 		std::cout<<"MSESigmoid: "<<mseSigmoid/count<<std::endl;
-		for(const auto& [key, value] :stat) {
-			std::cout<<key*stateScale<<" "<<value<<std::endl;
-		}
+		//for(const auto& [key, value] :stat) {
+		//	std::cout<<key*stateScale<<" "<<value<<std::endl;
+		//}
+		previousCount = count;*/
 	}
 	else std::cout << "Unable to open file"<<std::endl;
+
+
+	double totMse = 0;
+	double totMseSigmoid = 0;
+	unsigned long totCount = 0;
+	for(unsigned int i = 0; i<40; ++i) {
+		std::cout<<i*0.1<<" ";
+		std::cout<<"Positions: "<<count[i]<<" ";
+		totMse += mse[i];
+		totMseSigmoid += mseSigmoid[i];
+		totCount+= count[i];
+		std::cout<<"MSE: "<<totMse/totCount<<" ";
+		std::cout<<"MSESigmoid: "<<totMseSigmoid/totCount<<" ";
+		std::cout<<"totcount: "<<totCount<<std::endl;
+	}
 }
 
 int main() {
@@ -161,6 +185,7 @@ int main() {
 	//	init global data
 	//----------------------------------
 	libChessInit();
+
 
 	worker2();
 

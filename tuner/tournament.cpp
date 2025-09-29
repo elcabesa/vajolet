@@ -57,6 +57,11 @@ Tournament::Tournament(const std::string& pgnName, const std::string& debugName,
 }
 
 TournamentResult Tournament::play() {
+
+	for(unsigned int i = 0; i < ALREADYSEEN_SIZE; ++i) {
+		alreadySeen[i] = 0;
+	}
+
 	unsigned int logDecimation = 0;
 	std::ofstream myfile;
 	myfile.open (_debugName);
@@ -77,7 +82,7 @@ TournamentResult Tournament::play() {
 			blackPlayer = &_p1;
 		}
 		myfile<< "starting game " <<round  <<" of "<< TunerParameters::gameNumber << "(" << round * 100.0 / TunerParameters::gameNumber << "%) ";
-		auto g = SelfPlay(*whitePlayer, *blackPlayer, _book, _fs).playGame(round);
+		auto g = SelfPlay(*whitePlayer, *blackPlayer, _book, alreadySeen, _fs).playGame(round);
 		
 		stats.insert(g);
 		_updateResults(g, *whitePlayer, *blackPlayer);

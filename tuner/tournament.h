@@ -20,6 +20,7 @@
 #include <string>
 #include "player.h"
 #include "tunerPars.h"
+#include "hashKey.h"
 
 class Book;
 class EpdSaver;
@@ -48,6 +49,10 @@ private:
 	Book& _book;
 	EpdSaver * const _fs;
 	bool _verbose;
+#define ALREADYSEEN_SIZE (50000)
+	tKey alreadySeen[ALREADYSEEN_SIZE];
+
+
 };
 
 #endif /* TOURNAMENT_H_ */

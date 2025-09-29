@@ -26,11 +26,12 @@ namespace pgn { class Game;}
 class Book;
 class Player;
 class EpdSaver;
+class HashKey;
 
 class SelfPlay {
 	
 public:
-	SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs = nullptr);
+	SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, EpdSaver * const fs = nullptr);
 	pgn::Game playGame(unsigned int round);
 private:	
 	bool _isGameFinished(Score res);
@@ -49,6 +50,7 @@ private:
 	const int pawnValue = 10000;
 	const int wonGame = 20 * pawnValue;
 	const int drawGame = 0.04 * pawnValue;
+	tKey* _alreadySeenPosition;
 };
 
 #endif /* SELFPLAY_H_ */

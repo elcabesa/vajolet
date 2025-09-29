@@ -34,8 +34,9 @@
 #include "searchResult.h"
 #include "tunerPars.h"
 #include "uciOutput.h"
+#include "tournament.h"
 
-SelfPlay::SelfPlay(Player& white, Player& black, Book& b, EpdSaver * const fs) : _p(Position::nnueConfig::off, Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) {
+SelfPlay::SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, EpdSaver * const fs) : _p(Position::nnueConfig::off, Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) , _alreadySeenPosition(alreadySeenPosition){
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());
@@ -98,8 +99,6 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 				//std::cout<<"INITIAL RANDOM "<<initialRandomMoveCounter<<std::endl;
 				randomMove = true;
 				++initialRandomMoveCounter;
-				std::random_device rd;  //Will be used to obtain a seed for the random number engine
-				std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 
 				Movegen mg(_p);
 				MoveList<MAX_MOVE_PER_POSITION> ml;
@@ -159,8 +158,11 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			&& !_p.isCaptureMoveOrPromotion(bestMove)
 			&& !_p.isInCheck()
 			&& std::abs(score)<wonGame
-			//&& (std::abs(score - _p.eval<false>()) <10000)
+			&& (std::abs(score - _p.eval<false>()) <30000)
+			&& _alreadySeenPosition[_p.getKey().getKey() % ALREADYSEEN_SIZE] != _p.getKey().getKey()
+
 		) {
+
 
 			if(firstMoveToBeSaved || skippedMove) {
 				if(_c.isWhiteTurn()) {
@@ -176,14 +178,20 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 				if(_c.isWhiteTurn()) {
 					_fs->save(_p, previousBestMove, score);
 
-					//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
+					//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;alreadySeenPosition
 				} else {
 					_fs->save(_p, previousBestMove, -score);
 					//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
 				}
 			}
+
+			_alreadySeenPosition[_p.getKey().getKey()  % ALREADYSEEN_SIZE] = _p.getKey().getKey() ;
+
 			skippedMove = false;
 		} else {
+			/*if(_alreadySeenPosition[_p.getKey().getKey()  % ALREADYSEEN_SIZE] == _p.getKey().getKey() ) {
+				std::cout<<"skipping repeated position "<<_p.getFen()<<std::endl;
+			}*/
 			skippedMove = true;
 		}
 		_p.doMove(bestMove);
