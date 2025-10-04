@@ -491,8 +491,10 @@ private:
 	template<Color c> simdScore _evalKingSafety(Score kingSafety, unsigned int kingAttackersCount, unsigned int kingAdjacentZoneAttacksCount, unsigned int kingAttackersWeight, bitMap * const attackedSquares) const;
 	
 	simdScore _calcPawnValues(bitMap& weakPawns, bitMap& passedPawns, bitMap * const attackedSquares , bitMap * const weakSquares, bitMap * const holes) const;
-
+public:
 	const materialStruct* _getMaterialData() const;
+	bool isMaterialDataAKnownEndgame() const;
+private:
 	bool _evalKxvsK(Score& res) const;
 	bool _evalKBPsvsK(Score& res) const;
 	bool _evalKQvsKP(Score& res) const;

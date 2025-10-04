@@ -119,6 +119,7 @@ void worker2() {
 
 				int diff = std::abs(dScore-dval)*10;
 
+				//if(diff > 60 && dScore* dval <0) std::cout << fen << "; " << dScore << " " << dval<<std::endl;
 
 				count[diff]++;
 

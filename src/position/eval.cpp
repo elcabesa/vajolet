@@ -58,6 +58,22 @@ const Position::materialStruct * Position::_getMaterialData() const
 
 }
 
+bool Position::isMaterialDataAKnownEndgame() const
+{
+	tKey key = getMaterialKey().getKey();
+
+	auto got= _materialKeyMap.find(key);
+
+	if( got == _materialKeyMap.end())
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
 
 
 
