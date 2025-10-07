@@ -24,6 +24,7 @@
 //	MATERIAL KEYS
 //---------------------------------------------
 std::unordered_map<tKey, Position::materialStruct> Position::_materialKeyMap;
+std::unordered_map<tKey, std::string> Position::_materialStringMap;
 
 /**********************************************
 eval king and pieces vs lone king
@@ -708,6 +709,7 @@ void Position::initMaterialKeys(void)
 		t.pointer = eg.pointer;
 		t.val = eg.val;
 		_materialKeyMap.insert({key,t});
+		_materialStringMap.insert({key, eg.fen});
 	}
 
 	//------------------------------------------
@@ -732,6 +734,7 @@ void Position::initMaterialKeys(void)
 				t.pointer=&Position::_evalOppositeBishopEndgame;
 				t.val=0;
 				_materialKeyMap.insert({key,t});
+				_materialStringMap.insert({key, s});
 			}
 		}
 	}

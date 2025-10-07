@@ -71,10 +71,8 @@ accumulatorType Model::incrementalPass(const DifferentialList& l) {
     return _layer1.propagateOut(_layer0.outputRelu(), 0, 0);
 }
 
-#define VERSION "0004"
-bool Model::deserialize(std::ifstream& ss) {
+bool Model::deserialize(std::istream& ss) {
     ss.clear();
-    ss.seekg(0);
     //std::cout<<"DESERIALIZE MODEL"<<std::endl;
     //if(ss.get() != '{') {std::cout<<"MODEL missing {"<<std::endl;return false;}
     //if(ss.get() != 'V') {std::cout<<"MODEL missing V"<<std::endl;return false;}

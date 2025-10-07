@@ -155,7 +155,7 @@ unsigned int DenseLayer<inputType, inputSize, outputSize>::_calcWeightIndex(cons
 
 //#define PRINTSTAT
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::ifstream& ss) {
+bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss) {
 #ifdef PRINTSTAT
     unsigned int count = 0;
     double min = 1e8;

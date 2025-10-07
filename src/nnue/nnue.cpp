@@ -21,6 +21,9 @@
 
 #include "nnue.h"
 #include "position.h"
+#include "incbin.h"
+
+INCBIN(NnueInternalFile, "../../NN/nnue.par");
 
 
 bool NNUE::_loaded = false;
@@ -37,11 +40,22 @@ bool NNUE::load(std::string path) {
 
     std::cout<<"load"<<std::endl;
 
-    std::ifstream nnFile;
-    nnFile.open(path);
-    if(nnFile.is_open()) {
-        if(_model.deserialize(nnFile)
-        ){
+    if(path=="internal") {
+        std::cout<<"internal"<<std::endl;
+
+        class MemoryBuffer: public std::basic_streambuf<char> {
+        public:
+            MemoryBuffer(char* p, size_t n) {
+                setg(p, p, p + n);
+                setp(p, p + n);
+            }
+        };
+
+        MemoryBuffer buffer(const_cast<char*>(reinterpret_cast<const char*>(gNnueInternalFileData)),
+                            size_t(gNnueInternalFileSize));
+
+        std::istream nnFile(&buffer);
+        if(_model.deserialize(nnFile)){
             _loaded = true;
             std::cout<<"done"<<std::endl;
             return true;
@@ -49,10 +63,26 @@ bool NNUE::load(std::string path) {
             std::cout<<"FAIL"<<std::endl;
             return false;
         }
-        nnFile.close();
-    } else {
-        std::cout<<"error deserializing NNUE file"<<std::endl;
-        return false;
+    }
+    else
+    {
+        std::ifstream nnFile;
+        nnFile.open(path);
+        if(nnFile.is_open()) {
+            if(_model.deserialize(nnFile)
+            ){
+                _loaded = true;
+                std::cout<<"done"<<std::endl;
+                return true;
+            }else {
+                std::cout<<"FAIL"<<std::endl;
+                return false;
+            }
+            nnFile.close();
+        } else {
+            std::cout<<"error deserializing NNUE file"<<std::endl;
+            return false;
+        }
     }
 }
 

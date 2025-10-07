@@ -35,7 +35,7 @@ public:
     accumulatorType forwardPass(const FeatureList& l);
     accumulatorType incrementalPass(const DifferentialList& l);
     
-    bool deserialize(std::ifstream& ss);
+    bool deserialize(std::istream& ss);
     static void init();
 
     void setBias(unsigned int layer, unsigned int n, float bias);

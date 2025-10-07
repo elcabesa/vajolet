@@ -11,6 +11,8 @@ add_subdirectory(search)
 add_subdirectory(uci)
 add_subdirectory(utility)
 add_subdirectory(syzygy)
+add_subdirectory(incbin)
+
 
 
 add_executable(tuner tuner.cpp )

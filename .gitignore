@@ -11,3 +11,4 @@
 /build-rel/
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+/NN/trainingData/

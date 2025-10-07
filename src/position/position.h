@@ -376,6 +376,13 @@ public:
 	simdScore getPieceValue(const bitboardIndex b) const { return _eParm._pieceValue[b];}
 	std::unique_ptr<NNUE>& nnue() { return _nnue; };
 
+	std::string getStandardEgFenFromKey(tKey k) {
+		if(_materialStringMap.count(k) > 0) {
+			return _materialStringMap[k];
+		}
+		return "";
+	}
+
 	//--------------------------------------------------------
 	// public members
 	//--------------------------------------------------------
@@ -414,6 +421,7 @@ private:
 		\date 27/10/2013
 	*/
 	std::unordered_map<tKey, materialStruct> static _materialKeyMap;
+	std::unordered_map<tKey, std::string> static _materialStringMap;
 	
 	
 	//--------------------------------------------------------

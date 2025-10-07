@@ -40,7 +40,7 @@ public:
 
     unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
 
-    bool deserialize(std::ifstream& ss);
+    bool deserialize(std::istream& ss);
 
     const std::vector<outType>& output() const;
     const std::vector<outType>& outputRelu() const;

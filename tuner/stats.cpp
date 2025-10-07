@@ -132,7 +132,7 @@ void worker() {
 		}
 		std::cout<<"endgames"<<std::endl;
 		for(auto& [key, value]: endgames) {
-			std::cout<<key<<" "<<value<<std::endl;
+			std::cout<<pos.getStandardEgFenFromKey(key)<<" : "<<value<<std::endl;
 		}
 
 
