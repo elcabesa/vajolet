@@ -73,21 +73,9 @@ accumulatorType Model::incrementalPass(const DifferentialList& l) {
 
 bool Model::deserialize(std::istream& ss) {
     ss.clear();
-    //std::cout<<"DESERIALIZE MODEL"<<std::endl;
-    //if(ss.get() != '{') {std::cout<<"MODEL missing {"<<std::endl;return false;}
-    //if(ss.get() != 'V') {std::cout<<"MODEL missing V"<<std::endl;return false;}
-    //if(ss.get() != ':') {std::cout<<"MODEL missing :"<<std::endl;return false;}
-    //char buffer[4];
-    //ss.read(buffer, 4);
-    //std::string v(buffer, 4);
-    //if(v != VERSION) {std::cout<<"WRONG NETWORK VERSION: "<<v<<" expected: "<<VERSION<<std::endl;return false;}
-    //if(ss.get() != '}') {std::cout<<"MODEL missing }"<<std::endl;return false;}
-
-    //if(ss.get() != '{') {std::cout<<"MODEL missing {"<<std::endl;return false;}
 
     if(!_layer0.deserialize(ss)) {std::cout<<"MODEL internal layer0 error"<<std::endl;return false;}
     if(!_layer1.deserialize(ss)) {std::cout<<"MODEL internal layer1 error"<<std::endl;return false;}
 
-    //if(ss.get() != '}') {std::cout<<"MODEL missing }"<<std::endl;return false;}
     return true;
 }

@@ -75,7 +75,7 @@ UciManager::impl::~impl()
 //---------------------------------------------
 //	function implementation
 //---------------------------------------------
-void UciManager::impl::_useNnue(bool) { // TODO why 2 identical function??
+void UciManager::impl::_useNnue(bool) {
 	if(_pos.nnue()->loaded()) {
 		_pos.nnue()->close();
 	}
@@ -87,12 +87,12 @@ void UciManager::impl::_useNnue(bool) { // TODO why 2 identical function??
 }
 
 void UciManager::impl::_setNnueFile(std::string) {
-	/*if(_pos.nnue()->loaded()) {
+	if(_pos.nnue()->loaded()) {
 		_pos.nnue()->close();
 	}
 	if(uciParameters::useNnue) {
 		_pos.nnue()->load(uciParameters::nnueFile);
-	}*/
+	}
 	
 }
 

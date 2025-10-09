@@ -161,7 +161,6 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss)
     double min = 1e8;
     double max = -1e8;
 #endif
-    //std::cout<<"DESERIALIZE DENSE LAYER"<<std::endl;
     union _bb{
         biasType d;
         char c[4];
@@ -175,21 +174,15 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss)
 #ifdef PRINTSTAT
     std::cout<<"-----------------------------"<<std::endl;
 #endif
-    //if(ss.get() != '{') {std::cout<<"DenseLayer missing {"<<std::endl;return false;}
     for( auto & b: *_bias) {
         ss.read(bb.c, 4);
         b = (biasType)(bb.d);
 #ifdef PRINTSTAT
-        //if (std::abs(b)> (128<< _outShift)) {std::cout<<"warning1"<<std::endl;}
         if (b == 0) { ++count;}
-        std::cout<<b<<std::endl;
         min = std::min(min, double(b));
         max = std::max(max,  double(b));
 #endif
-        //if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
-        //if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
-    //if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
 #ifdef PRINTSTAT
     std::cout<<"b min "<<min<<std::endl;
     std::cout<<"b MAX "<<max<<std::endl;
@@ -199,31 +192,22 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss)
     count = 0;
 #endif
     for( size_t idx = 0; idx < (*_weight).size(); ++idx) 
-    //for( auto & w: *_weight)
     {
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
-        //unsigned int i = idx % _inputSize;
-        //unsigned int o = idx / _inputSize;
         ss.read(ww.c, 4);
         (*_weight)[_calcWeightIndex(i, o)] = (weightType)(ww.d); 
 #ifdef PRINTSTAT
-        //if (std::abs((*_weight)[_calcWeightIndex(i, o)])> 128) {std::cout<<"warningb"<<std::endl;}
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
-        //std::cout<<w<<std::endl;
         min = std::min(min,  double(ww.d));
         max = std::max(max,  double(ww.d));
 #endif
-        //if(ss.get() != ',') {std::cout<<"DenseLayer missing ,"<<std::endl;return false;} 
-        //if(ss.get() != ' ') {std::cout<<"DenseLayer missing space"<<std::endl;return false;}
     }
 #ifdef PRINTSTAT
     std::cout<<"w min "<<min<<std::endl;
     std::cout<<"w MAX "<<max<<std::endl;
     std::cout<<"w=0 :#"<<count<<std::endl;
 #endif
-    //if(ss.get() != '}') {std::cout<<"DenseLayer missing }"<<std::endl;return false;}
-    //if(ss.get() != '\n') {std::cout<<"DenseLayer missing line feed"<<std::endl;return false;}
     return true;
 }
 
