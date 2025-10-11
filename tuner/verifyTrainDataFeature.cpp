@@ -24,6 +24,7 @@
 
 #include "position.h"
 #include "nnue.h"
+#include "featureList.h"
 
 #include "libchess.h"
 
@@ -42,132 +43,115 @@ static void printStartInfo(void)
 	std::cout <<"Vajolet verify"<< std::endl;
 }
 
-void worker2() {
+struct Data {
+	FeatureList f;
+	float v;
+};
+
+Data getPosition(std::ifstream& f) {
+	Data d;
+	char buffer[10];
+	unsigned int featuresCount;
+
+	f.read(buffer,1);
+	featuresCount = buffer[0];
+
+	if(f.eof()) {
+		return d;
+	}
+
+	union _bb{
+		int16_t d;
+		char c[2];
+	}bb;
+
+	for(unsigned int i = 0; i < featuresCount; ++i) {
+		f.read(bb.c,2);
+		unsigned int feat = bb.d;
+		d.f.add(feat);
+	}
+	union _bbf{
+		float v;
+		char c[4];
+	}bbf;
+	f.read(bbf.c,4);
+	d.v = bbf.v;
+	return d;
+}
+
+void worker() {
 
 	std::map<int, unsigned long> count;
 	std::map<int, double> mse;
 	std::map<int, double> mseSigmoid;
-	//const double stateScale = 1.0;
 
 	Position pos(Position::nnueConfig::on);
 
 	auto& nnue = pos.nnue();
 	if(!nnue->load("nnue.par")) {
 		std::cout<<"error loading nnue.par"<<std::endl;
-		//exit(-1);
 	}
-	//unsigned long previousCount = 0;
-
-
 
 	std::string line;
-	std::ifstream myfile ("fenver.epd");
+	std::ifstream myfile ("fen.data");
 
-	//std::map<int, unsigned long> stat;
-
-	//unsigned long count = 0;
-	//double mse = 0;
-	//double mseSigmoid = 0;
-
+	unsigned long poscount = 0;
 	if (myfile.is_open()) {
 
-		while ( getline (myfile,line) ) {
+		Data d = getPosition(myfile);
 
-			auto sep = line.find_first_of(';');
-			if(sep != std::string::npos) {
-				auto val = line.substr(sep+1);
-
-				/*auto features = line.substr(0, sep);
-				std::istringstream stream(features);
-				// Temporary string to store each token
-				std::string token;
-
-				FeatureList fl;
-
-				// Read tokens from the string stream separated by the
-				// delimiter
-				while (getline(stream, token, ' ')) {
-					// Add the token to the array
-					fl.add(std::stoi(token));
-				}
-
-				auto s = nnue->eval(fl);
-				double dScore = s /50000.0;
-				dScore = 1.0/(1 + std::exp(-1.0 * dScore));
-
-				double dval = std::stof(val);
-
-				mse += std::pow(dScore-dval,2.0);
-
-				stat[std::abs(dScore-dval)/stateScale] ++;
-
-				if(std::abs(dScore-dval) > 0.7) {
-					std::cout<<dScore<<" "<<dval<<std::endl;
-				}*/
-
-				auto fen = line.substr(0, sep);
-				pos.setupFromFen(fen);
-
-				auto dScore = pos.eval<false>()/10000.0;
-				if(pos.isBlackTurn()) {
-					dScore = -dScore;
-				}
-
-				auto dval = std::stoi(val)/10000.0;
-
-				//std::cout<<dScore<<" "<<dval<<std::endl;
-
-				int diff = std::abs(dScore-dval)*10;
-
-				//if(diff > 60 && dScore* dval <0) std::cout << fen << "; " << dScore << " " << dval<<std::endl;
-
-				count[diff]++;
-
-				mse[diff] += std::pow(dScore-dval,2.0);
-
-				//stat[(dScore-dval)/stateScale] ++;
-
-
-
-				double dScoreSigmoid = dScore /5.0;
-				dScoreSigmoid = 1.0/(1 + std::exp(-1.0 * dScoreSigmoid));
-
-				double dvalSigmoid = dval /5.0;
-				dvalSigmoid = 1.0/(1 + std::exp(-1.0 * dvalSigmoid));
-
-				mseSigmoid[diff] += std::pow(dScoreSigmoid-dvalSigmoid,2.0);
-
-
-
-
+		while ( d.f.size() != 0 ) {
+			++poscount;
+			//std::cout<<poscount<<std::endl;
+//#define DEBUG_PARSER
+#ifdef DEBUG_PARSER
+			for(unsigned int i = 0; i < d.f.size(); ++i) {
+				std::cout <<d.f.get(i)<<" ";
 			}
+			std::cout<<";"<<d.v<<std::endl;
+#endif
+			auto dScore = pos.nnue()->eval(d.f)/10000.0;
+			auto dval = d.v/10000.0;
+			int diff = std::abs(dScore-dval)*10;
 
+			//std::cout<<dScore<<";"<<dval<<std::endl;
+
+			count[diff]++;
+
+			mse[diff] += std::pow(dScore-dval,2.0);
+
+			double dScoreSigmoid = dScore /5.0;
+			dScoreSigmoid = 1.0/(1 + std::exp(-1.0 * dScoreSigmoid));
+
+			double dvalSigmoid = dval /5.0;
+			dvalSigmoid = 1.0/(1 + std::exp(-1.0 * dvalSigmoid));
+
+			mseSigmoid[diff] += std::pow(dScoreSigmoid-dvalSigmoid,2.0);
+
+			d = getPosition(myfile);
 		}
 		myfile.close();
-		/*std::cout<<"limit: "<<limit*0.1<< " ";
-		std::cout<<"Positions: "<<count -previousCount<<" ";
-		std::cout<<"MSE: "<<mse/count<<" ";
-		std::cout<<"MSESigmoid: "<<mseSigmoid/count<<std::endl;
-		//for(const auto& [key, value] :stat) {
-		//	std::cout<<key*stateScale<<" "<<value<<std::endl;
-		//}
-		previousCount = count;*/
 	}
 	else std::cout << "Unable to open file"<<std::endl;
 
+	std::cout<<"count:"<<poscount<<std::endl;
 
 	double totMse = 0;
 	double totMseSigmoid = 0;
 	unsigned long totCount = 0;
-	for(unsigned int i = 0; i<40; ++i) {
-		std::cout<<i*0.1<<" ";
-		std::cout<<"Positions: "<<count[i]<<" ";
+	unsigned long prevCount = 0;
+	for(unsigned int i = 0; i<400; ++i) {
 		totMse += mse[i];
 		totMseSigmoid += mseSigmoid[i];
 		totCount+= count[i];
-		std::cout<<"MSE: "<<totMse/totCount<<" ";
-		std::cout<<"MSESigmoid: "<<totMseSigmoid/totCount<<" ";
-		std::cout<<"totcount: "<<totCount<<std::endl;
+		if((i<40) | (i ==399) ) {
+			std::cout<<i*0.1<<" ";
+			std::cout<<"Positions: "<<totCount - prevCount <<" ";
+			std::cout<<"MSE: "<<totMse/totCount<<" ";
+			std::cout<<"MSESigmoid: "<<totMseSigmoid/totCount<<" ";
+			std::cout<<"totcount: "<<totCount<<std::endl;
+			prevCount = totCount;
+		}
 	}
 }
 
@@ -187,8 +171,7 @@ int main() {
 	//----------------------------------
 	libChessInit();
 
-
-	worker2();
+	worker();
 
 	return 0;
 }

@@ -1,6 +1,7 @@
 
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(Vajolet_tuner 
+	binSaver.cpp
 	book.cpp
 	clock.cpp
 	elo.cpp
@@ -15,7 +16,8 @@ add_executable(Vajolet_tuner
 
 target_link_libraries(Vajolet_tuner  libChess)
 
-add_executable(Vajolet_genFen 
+add_executable(Vajolet_genFen
+	binSaver.cpp
 	book.cpp
 	clock.cpp
 	elo.cpp

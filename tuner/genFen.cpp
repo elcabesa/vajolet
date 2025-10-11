@@ -22,7 +22,7 @@
 #include <thread>
 
 #include "book.h"
-#include "epdSaver.h"
+#include "binSaver.h"
 #include "fenSaver.h"
 #include "player.h"
 #include "position.h"
@@ -47,7 +47,7 @@ static void printStartInfo(void)
 }
 
 void worker(int th) {
-	EpdSaver fs(1, th);
+	BinSaver fs(1, th);
 	Book book("book.pgn");
 	Player p1("p1");
 	Player p2("p2");

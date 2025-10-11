@@ -19,7 +19,7 @@
 #include <string>
 
 #include "book.h"
-#include "epdSaver.h"
+#include "binSaver.h"
 #include "movegen.h"
 #include "parameters.h"
 #include "player.h"
@@ -36,7 +36,7 @@
 #include "uciOutput.h"
 #include "tournament.h"
 
-SelfPlay::SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, EpdSaver * const fs) : _p(Position::nnueConfig::off, Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) , _alreadySeenPosition(alreadySeenPosition){
+SelfPlay::SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, BinSaver * const fs) : _p(Position::nnueConfig::on, Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) , _alreadySeenPosition(alreadySeenPosition){
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());
@@ -70,9 +70,6 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 	auto bookMoves = _book.getLine();
 	auto it = bookMoves.begin();
 	Score score = 0;
-	bool firstMoveToBeSaved = true;
-	bool skippedMove = false;
-	Move previousBestMove;
 	while (!_isGameFinished(score)) {
 		bool bookMove = false;
 		bool randomMove = false;
@@ -162,42 +159,18 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			&& _alreadySeenPosition[_p.getKey().getKey() % ALREADYSEEN_SIZE] != _p.getKey().getKey()
 
 		) {
+			if(_c.isWhiteTurn()) {
+				_fs->save(_p, score);
 
-
-			if(firstMoveToBeSaved || skippedMove) {
-				if(_c.isWhiteTurn()) {
-					_fs->save(_p, score);
-
-					//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;
-				} else {
-					_fs->save(_p, -score);
-					//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
-				}
-				firstMoveToBeSaved = false;
 			} else {
-				if(_c.isWhiteTurn()) {
-					_fs->save(_p, previousBestMove, score);
-
-					//std::cout<<_p.getFen()<<" "<<score<<" "<<_p.eval<false>()<<std::endl;alreadySeenPosition
-				} else {
-					_fs->save(_p, previousBestMove, -score);
-					//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
-				}
+				_fs->save(_p, -score);
+				//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
 			}
 
 			_alreadySeenPosition[_p.getKey().getKey()  % ALREADYSEEN_SIZE] = _p.getKey().getKey() ;
 
-			skippedMove = false;
-		} else {
-			/*if(_alreadySeenPosition[_p.getKey().getKey()  % ALREADYSEEN_SIZE] == _p.getKey().getKey() ) {
-				std::cout<<"skipping repeated position "<<_p.getFen()<<std::endl;
-			}*/
-			skippedMove = true;
 		}
 		_p.doMove(bestMove);
-		previousBestMove = bestMove;
-
-		
 		_c.switchTurn();
 	}
 	// white move still to be written

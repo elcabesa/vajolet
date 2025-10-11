@@ -73,12 +73,14 @@ bool NNUE::load(std::string path) {
             ){
                 _loaded = true;
                 std::cout<<"done"<<std::endl;
+                nnFile.close();
                 return true;
             }else {
                 std::cout<<"FAIL"<<std::endl;
+                nnFile.close();
                 return false;
             }
-            nnFile.close();
+
         } else {
             std::cout<<"error deserializing NNUE file"<<std::endl;
             return false;

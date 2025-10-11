@@ -53,7 +53,7 @@ private:
 	int _unknown = 0;
 };
 
-Tournament::Tournament(const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2, Book& b, EpdSaver * const fs,  bool verbose): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2), _book(b), _fs(fs),_verbose(verbose) {
+Tournament::Tournament(const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2, Book& b, BinSaver * const fs,  bool verbose): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2), _book(b), _fs(fs),_verbose(verbose) {
 }
 
 TournamentResult Tournament::play() {

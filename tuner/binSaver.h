@@ -14,17 +14,34 @@
     You should have received a copy of the GNU General Public License
     along with Vajolet.  If not, see <http://www.gnu.org/licenses/>
 */
+#ifndef BINSAVER_H_
+#define BINSAVER_H_
 
-#include "tunerPars.h"
+#include <iostream>
+#include <fstream>
+#include <set>
 
-int TunerParameters::parallelGames = 4;
-int TunerParameters::gameNumber = -1;
-unsigned int TunerParameters::randomMoveEveryXPly = 0;
-unsigned int TunerParameters::initialRandomMoves = 10;
+#include "searchLimits.h"
+#include "searchTimer.h"
+#include "search.h"
+#include "transposition.h"
+
+class Position;
+class Move;
+
+class BinSaver {
 	
-float TunerParameters::gameTime = 100;
-float TunerParameters::gameTimeIncrement = 1;
+public:
+	BinSaver(unsigned int decimation, unsigned int n);
+	void save(Position& pos, Score res);
 
-unsigned int TunerParameters::minDepth = 5;
-unsigned int TunerParameters::MaxDepth = 5;
+private:	
+	const unsigned int _decimation;
+	unsigned int _counter = 0;
+	std::ofstream _stream;
+	std::ofstream _stream2;
+	uint_fast64_t _saved = 0;
+	unsigned int _logDecimationCnt = 0;
+};
 
+#endif /* BINSAVER_H_ */

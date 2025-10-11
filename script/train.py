@@ -8,6 +8,8 @@ from tensorflow.keras import initializers
 from tensorflow.data import Dataset
 import tensorflow as tf
 import numpy as np
+import struct
+import math
 
 class SaveWeights(Callback):
     def __init__(self):
@@ -28,23 +30,26 @@ class SaveWeights(Callback):
 
 
 def read_train_data(filename):
-    #while True:
-        with open(filename, 'r') as f:
-            count = 0
-            for line in f.readlines():
-                count +=1
-                #print(count)
-                record = line.rstrip().split(';')
-                index_string = record[:-1]
-                indexes = index_string[0].rstrip().split(' ')
-                indexes = [int(n) for n in indexes]
-                feature = [0] *768
-
-                for n in indexes:
-                    feature[n] = 1
-
-                label= float(record[-1])
-                yield feature, label
+    with open(filename, 'rb') as f:
+        count = 0
+        while True:
+            fs =f.read(1)
+            if not fs:
+                break
+            count +=1
+            #print(count)
+            featuresSize = int.from_bytes(fs, byteorder='little')
+            feature = [0] * 768
+            for i in range(featuresSize):
+                idx = int.from_bytes(f.read(2), byteorder='little')
+                feature[idx] = 1
+                #print(idx)
+            label = struct.unpack('<f', f.read(4))[0] /50000.0
+            label = 1.0/(1 + math.exp(-1.0 * label)) ;
+            #float.from_bytes(f.read(4), byteorder='little')
+            #print(label)
+            yield feature, label
+            #exit(0)
 
 def get_dataset():
     filename = 'fen.data'
