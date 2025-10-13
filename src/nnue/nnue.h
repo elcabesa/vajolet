@@ -54,12 +54,13 @@ public:
     void clean();
     
     std::set<unsigned int> features();
+
+    static tSquare _getSquareFromFeature(unsigned int);
+    static bitboardIndex _getPieceFromFeature(unsigned int);
+
 private:
     Model _model;
 
-#ifdef CHECK_NNUE_FEATURE_EXTRACTION
-    Model _m;
-#endif
     static bool _loaded;
     const unsigned int _completeEvalThreshold = 20;
 
@@ -71,8 +72,7 @@ private:
 
     static unsigned int _feature(unsigned int piece, tSquare pSquare);
     static unsigned int _mapPiece(const bitboardIndex piece);
-    static tSquare _getSquareFromFeature(unsigned int);
-    static bitboardIndex _getPieceFromFeature(unsigned int);
+
 
 
     void _resetCompleteEvalCondition();

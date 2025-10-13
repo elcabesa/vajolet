@@ -35,6 +35,7 @@
 #include "score.h"
 #include "state.h"
 #include "vajolet.h"
+#include "featureList.h"
 //---------------------------------------------------
 // forward declarations
 //---------------------------------------------------
@@ -143,6 +144,7 @@ public:
 	std::string getSymmetricFen() const;
 #endif
 
+	Position& setupFromFeatureList(const FeatureList& fl);
 	Position& setupFromFen(const std::string& fenStr);
 	const Position& setup(const std::string& code, const Color c);
 

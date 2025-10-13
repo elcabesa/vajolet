@@ -80,7 +80,6 @@ Data getPosition(std::ifstream& f) {
 }
 
 void worker() {
-
 	std::map<int, unsigned long> count;
 	std::map<int, double> mse;
 	std::map<int, double> mseSigmoid;
@@ -110,7 +109,18 @@ void worker() {
 			}
 			std::cout<<";"<<d.v<<std::endl;
 #endif
-			auto dScore = pos.nnue()->eval(d.f)/10000.0;
+
+			double dScore;
+			pos.setupFromFeatureList(d.f);
+			dScore = pos.eval<false>()/10000.0;
+			if(pos.isBlackTurn()) {
+				dScore = -dScore;
+			}
+
+#ifdef DEBUG_SETUP_FROM_FEATURE_LIST
+			if(std::abs(dScore - dScore2)> 0.01) {std::cout<<"ERRORE "<<dScore<<" "<<dScore2<<std::endl;}
+#endif
+
 			auto dval = d.v/10000.0;
 			int diff = std::abs(dScore-dval)*10;
 

@@ -269,6 +269,60 @@ Position& Position::setupFromFen(const std::string& fenStr)
 	return *this;
 }
 
+Position& Position::setupFromFeatureList(const FeatureList& fl) {
+	_clear();
+	for(unsigned int i = 0; i < fl.size(); ++i){
+		unsigned feat = fl.get(i);
+		_putPiece(NNUE::_getPieceFromFeature(feat),NNUE::_getSquareFromFeature(feat));
+	}
+
+	state &x= getActualState();
+	x.setNextTurn(whiteTurn);
+
+	_updateUsThem();
+	x.clearCastleRight();
+
+	for (auto& cr : _castleRightsMask) {cr = (eCastle)0;}
+	for (auto& cp : _castlePath) {cp = 0ull;}
+	for (auto& ckp : _castleKingPath) {ckp = 0ull;}
+	for (auto& csq : _castleRookInvolved) {csq = squareNone;}
+	for (auto& csq : _castleKingFinalSquare) {csq = squareNone;}
+	for (auto& csq : _castleRookFinalSquare) {csq = squareNone;}
+
+	x.resetEpSquare();
+
+	x.setIrreversibleMoveCount(0);
+
+	_ply = 0;
+
+	x.resetPliesFromNullCount();
+	x.setCurrentMove( Move::NOMOVE );
+	x.resetCapturedPiece();
+
+	x.setMaterialValue( _calcMaterialValue() );
+	x.setNonPawnValue( _calcNonPawnMaterialValue() );
+
+	x.setKey( _calcKey() );
+	x.setPawnKey( _calcPawnKey() );
+	x.setMaterialKey( _calcMaterialKey() );
+
+	_calcCheckingSquares();
+
+	x.setHiddenCheckers( _getHiddenCheckers<true>() );
+	x.setPinnedPieces( _getHiddenCheckers<false>() );
+	x.setCheckers( getAttackersTo( getSquareOfOurKing() ) & _bitBoard[x.getPiecesOfOtherPlayer()] );
+
+	if (NNUE::loaded() && _nnue) {
+		_nnue->clean();
+	}
+
+
+	#ifdef ENABLE_CHECK_CONSISTENCY
+	_checkPosConsistency(checkPhase::setup);
+	#endif
+	return *this;
+}
+
 /// Position::setup() is an overload to initialize the position object with
 /// the given endgame code string like "KBPKN". It is mainly a helper to
 /// get the material key out of an endgame code.

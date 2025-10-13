@@ -53,7 +53,41 @@ unsigned long long pieceCount[tSquare::squareNumber] = {0};
 std::map<int,unsigned long long> imbalancies;
 std::map<tKey, unsigned long long> endgames;
 
+struct Data {
+	FeatureList f;
+	float v;
+};
 
+Data getPosition(std::ifstream& f) {
+	Data d;
+	char buffer[10];
+	unsigned int featuresCount;
+
+	f.read(buffer,1);
+	featuresCount = buffer[0];
+
+	if(f.eof()) {
+		return d;
+	}
+
+	union _bb{
+		int16_t d;
+		char c[2];
+	}bb;
+
+	for(unsigned int i = 0; i < featuresCount; ++i) {
+		f.read(bb.c,2);
+		unsigned int feat = bb.d;
+		d.f.add(feat);
+	}
+	union _bbf{
+		float v;
+		char c[4];
+	}bbf;
+	f.read(bbf.c,4);
+	d.v = bbf.v;
+	return d;
+}
 
 void worker() {
 
@@ -66,43 +100,39 @@ void worker() {
 	}
 
 	std::string line;
-	std::ifstream myfile ("fenver.epd");
+	std::ifstream myfile ("fen.data");
 
 	if (myfile.is_open()) {
 
-		while ( getline (myfile,line) ) {
+		Data d = getPosition(myfile);
 
-			auto sep = line.find_first_of(';');
-			if(sep != std::string::npos) {
-				auto val = line.substr(sep+1);
+		while ( d.f.size() != 0 ) {
 
-				auto fen = line.substr(0, sep);
-				pos.setupFromFen(fen);
-				//position counter;
-				posCounter++;
-				//ksquares
-				++wksquare[pos.getSquareOfThePiece(whiteKing)];
-				++bksquare[pos.getSquareOfThePiece(blackKing)];
-				//piececount
-				++pieceCount[pos.getPieceCount(occupiedSquares)];
-				//imbalancies
-				signed int imb = pos.getPieceCount(whiteQueens) * 9
-				+pos.getPieceCount(whiteRooks) * 5
-				+pos.getPieceCount(whiteBishops) * 3
-				+pos.getPieceCount(whiteKnights) * 3
-				+pos.getPieceCount(whitePawns) * 1
-				-pos.getPieceCount(blackQueens) * 9
-				-pos.getPieceCount(blackRooks) * 5
-				-pos.getPieceCount(blackBishops) * 3
-				-pos.getPieceCount(blackKnights) * 3
-				-pos.getPieceCount(blackPawns) * 1;
-				imbalancies[imb]++;
-				//endgames
-				if( pos.isMaterialDataAKnownEndgame() ) {
-					endgames[pos.getMaterialKey().getKey()]++;
-				}
-
+			pos.setupFromFeatureList(d.f);
+			//position counter;
+			posCounter++;
+			//ksquares
+			++wksquare[pos.getSquareOfThePiece(whiteKing)];
+			++bksquare[pos.getSquareOfThePiece(blackKing)];
+			//piececount
+			++pieceCount[pos.getPieceCount(occupiedSquares)];
+			//imbalancies
+			signed int imb = pos.getPieceCount(whiteQueens) * 9
+			+pos.getPieceCount(whiteRooks) * 5
+			+pos.getPieceCount(whiteBishops) * 3
+			+pos.getPieceCount(whiteKnights) * 3
+			+pos.getPieceCount(whitePawns) * 1
+			-pos.getPieceCount(blackQueens) * 9
+			-pos.getPieceCount(blackRooks) * 5
+			-pos.getPieceCount(blackBishops) * 3
+			-pos.getPieceCount(blackKnights) * 3
+			-pos.getPieceCount(blackPawns) * 1;
+			imbalancies[imb]++;
+			//endgames
+			if( pos.isMaterialDataAKnownEndgame() ) {
+				endgames[pos.getMaterialKey().getKey()]++;
 			}
+			d = getPosition(myfile);
 		}
 		myfile.close();
 

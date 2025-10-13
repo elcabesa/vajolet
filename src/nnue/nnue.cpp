@@ -270,7 +270,6 @@ Score NNUE::_incrementalEval() {
 
     if(_diffFeatureList.size() >= _completeEvalThreshold) {return _completeEval();}
 
-
     Score score = _model.incrementalPass(_diffFeatureList) * 50000;
     _diffFeatureList.clear();
 
@@ -278,14 +277,14 @@ Score NNUE::_incrementalEval() {
     score = std::max(lowSat,score);
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
+    FeatureList fl;
+    fl.clear();
+    _createFeatures(fl);
+    Score score2 = _model.forwardPass(fl) *50000;
+    score2 = std::min(highSat, score2);
+    score2 = std::max(lowSat, score2);
 
-    /*_completeFeatureList.clear();
-    _createFeatures(_completeFeatureList);
-    Score score2 = _m.forwardPass(_completeFeatureList);*/
-
-    Score score2 = _completeEval();
-
-    if(std::abs((score2 - score)*100.0f/score) > 1.0) {
+    if(std::abs(score2 - score) > 1.0) {
         std::cout<<"AHHHHHHHHHHHHHHHHHHHHH "<<std::abs(score2 - score)<<" "<< std::abs((score2 - score)*100.0f/score)<<std::endl;
         std::cout<<score2 <<" "<<score <<std::endl;
         //std::cout<<score2 <<" "<<score <<std::endl;
