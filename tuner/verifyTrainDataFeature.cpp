@@ -80,6 +80,7 @@ Data getPosition(std::ifstream& f) {
 }
 
 void worker() {
+	bool loaded = false;
 	std::map<int, unsigned long> count;
 	std::map<int, double> mse;
 	std::map<int, double> mseSigmoid;
@@ -89,6 +90,8 @@ void worker() {
 	auto& nnue = pos.nnue();
 	if(!nnue->load("nnue.par")) {
 		std::cout<<"error loading nnue.par"<<std::endl;
+	} else {
+		loaded = true;
 	}
 
 	std::string line;
@@ -112,19 +115,23 @@ void worker() {
 
 			double dScore;
 			pos.setupFromFeatureList(d.f);
-			dScore = pos.eval<false>()/10000.0;
+			if(loaded) {
+				dScore = pos.nnue()->eval()/10000.0;
+			} else {
+				dScore = pos.eval<false>()/10000.0;
+			}
+
 			if(pos.isBlackTurn()) {
 				dScore = -dScore;
 			}
 
-#ifdef DEBUG_SETUP_FROM_FEATURE_LIST
-			if(std::abs(dScore - dScore2)> 0.01) {std::cout<<"ERRORE "<<dScore<<" "<<dScore2<<std::endl;}
-#endif
-
 			auto dval = d.v/10000.0;
 			int diff = std::abs(dScore-dval)*10;
+			/*if(diff >=40) {
+				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<std::endl;
+			}*/
 
-			//std::cout<<dScore<<";"<<dval<<std::endl;
+
 
 			count[diff]++;
 
