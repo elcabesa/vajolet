@@ -19,7 +19,9 @@
 
 #include <iostream>
 #include <fstream>
-#include <set>
+#include <vector>
+#include <mutex>
+
 
 #include "searchLimits.h"
 #include "searchTimer.h"
@@ -32,16 +34,24 @@ class Move;
 class BinSaver {
 	
 public:
-	BinSaver(unsigned int decimation, unsigned int n);
+	BinSaver(unsigned int decimation);
+    ~BinSaver();
 	void save(Position& pos, Score res);
+    unsigned long long getSavedPosition() const {
+        const std::lock_guard<std::mutex> lock(_mutex);
+        return _savedPositions;
 
-private:	
+    }
+
+private:
+    mutable std::mutex _mutex;
 	const unsigned int _decimation;
 	unsigned int _counter = 0;
 	std::ofstream _stream;
-	std::ofstream _stream2;
 	uint_fast64_t _saved = 0;
 	unsigned int _logDecimationCnt = 0;
+    std::vector<char> _buffer;
+    unsigned long long _savedPositions = 0;
 };
 
 #endif /* BINSAVER_H_ */

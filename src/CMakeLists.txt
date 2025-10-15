@@ -14,10 +14,6 @@ add_subdirectory(syzygy)
 add_subdirectory(incbin)
 
 
-
-add_executable(tuner tuner.cpp )
-target_link_libraries (tuner libChess)
-
 add_executable(Vajolet vajolet.cpp )
 target_link_libraries (Vajolet libChess)
 

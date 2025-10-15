@@ -53,7 +53,7 @@ private:
 	int _unknown = 0;
 };
 
-Tournament::Tournament(const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2, Book& b, BinSaver * const fs,  bool verbose): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2), _book(b), _fs(fs),_verbose(verbose) {
+Tournament::Tournament(bool& stop, const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2, Book& b, BinSaver * const fs,  bool verbose): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2), _book(b), _fs(fs),_verbose(verbose), _stop(stop) {
 }
 
 TournamentResult Tournament::play() {
@@ -71,7 +71,7 @@ TournamentResult Tournament::play() {
 	Player* whitePlayer = &_p1;
 	Player* blackPlayer = &_p2;
 	
-	for(int i = 0; i < TunerParameters::gameNumber || TunerParameters::gameNumber == -1; ++i) {
+	for(int i = 0; (i < TunerParameters::gameNumber || TunerParameters::gameNumber == -1) && !_stop; ++i) {
 		unsigned int round = i + 1;
 		
 		if(round % 2) {
@@ -108,6 +108,7 @@ TournamentResult Tournament::play() {
 		return TournamentResult::draw;
 	}
 	myfile.close();
+	_finished = true;
 }
 
 void Tournament::_saveGamePgn(const pgn::Game& g) {

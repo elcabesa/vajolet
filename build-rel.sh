@@ -1,5 +1,5 @@
-export CC=gcc
-export CXX=g++
+export CC=gcc-13
+export CXX=g++-13
 
 mkdir build-rel
 cd build-rel

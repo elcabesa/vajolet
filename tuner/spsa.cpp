@@ -114,7 +114,8 @@ void SPSA::_generateParamters(std::vector<variable>& localPars, Player& p1, Play
 TournamentResult SPSA::_runTournament(Player& p1, Player& p2, int k, int th)
 {
 	sync_cout<<"\tThread "<<th<<" RUN TOURNAMENT"<<sync_endl;
-	Tournament t("tournament" + std::to_string(k) + "-" + std::to_string(th) + ".pgn", "tournament" + std::to_string(k) + "-" + std::to_string(th) + ".txt",p1, p2, _book);
+	bool stop =false;
+	Tournament t(stop, "tournament" + std::to_string(k) + "-" + std::to_string(th) + ".pgn", "tournament" + std::to_string(k) + "-" + std::to_string(th) + ".txt",p1, p2, _book);
 	auto res = t.play();
 	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;
 	sync_cout<<"\tThread "<<th<<" FINISHED"<<sync_endl;

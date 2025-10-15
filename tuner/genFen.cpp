@@ -20,10 +20,11 @@
 #include <fstream>
 #include <string>
 #include <thread>
+#include <chrono>
+#include <future>
 
 #include "book.h"
 #include "binSaver.h"
-#include "fenSaver.h"
 #include "player.h"
 #include "position.h"
 #include "tournament.h"
@@ -31,9 +32,12 @@
 #include "libchess.h"
 #include "vajo_io.h"
 
+bool stop = false;
+
 void signalHandler(int signum)
 {
-	exit(signum);
+	std::cout<<"STOP"<<std::endl;
+	stop = true;
 }
 
 /*!	\brief	print the startup information
@@ -46,39 +50,20 @@ static void printStartInfo(void)
 	std::cout <<"Vajolet fen generator"<< std::endl;
 }
 
+BinSaver fs(1);
+
 void worker(int th) {
-	BinSaver fs(1, th);
 	Book book("book.pgn");
 	Player p1("p1");
 	Player p2("p2");
-	Tournament t("tournament-" + std::to_string(th) + ".pgn", "tournament-" + std::to_string(th) + ".txt",p1, p2, book, &fs, true);
+	Tournament t(stop, "tournament-" + std::to_string(th) + ".pgn", "tournament-" + std::to_string(th) + ".txt",p1, p2, book, &fs, true);
 	auto res = t.play();
 	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;
 
 }
 
-void worker2(int th) {
-	FenSaver fs(1, th);
-	Position pos;
-    std::string line;
-    std::ifstream myfile ("fen" + std::to_string(th) + ".epd");
-    if (myfile.is_open())
-    {
-        //unsigned int x = 0;
-        while ( getline (myfile,line) )
-        {
-            //std::cout <<"THREAD "<<th<< " got line "<< std::endl;
-            fs.save(pos.setupFromFen(line));
-        }
-		//std::cout <<"THREAD "<<th<<  "FINISHED "<< std::endl;
-        myfile.close();
-    }
-    else std::cout << "Unable to open file"<<std::endl;
-
-}
-
 int main() {
-	
+	using namespace std::chrono_literals;
 	signal(SIGINT, signalHandler); 
 #ifdef SIGBREAK	
 	signal(SIGBREAK, signalHandler); 
@@ -94,43 +79,30 @@ int main() {
 	libChessInit();
 
 	//----------------------------------
-	//	setup hyperparameters
-	//----------------------------------
-	/*TunerParameters::parallelGames = 1;
-	TunerParameters::gameNumber = 4e6;
-	TunerParameters::gameTime = 100;
-	TunerParameters::gameTimeIncrement = 0.1;*/
-
-	/*Book book("book.pgn");
-	Player p1("p1");
-	Player p2("p2");
-	Tournament t("tournament.pgn", "tournament.txt",p1, p2, book, nullptr, true);
-	auto res = t.play();
-	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;*/
-    
-    /*FenSaver fs(1);
-    Position pos;
-    std::string line;
-    std::ifstream myfile ("quiet.epd");
-    if (myfile.is_open())
-    {
-        //unsigned int x = 0;
-        while ( getline (myfile,line) )
-        {
-            //std::cout << (++x) << std::endl;
-            fs.save(pos.setupFromFen(line));
-        }
-        myfile.close();
-    }*/
-	std::vector<std::thread> helperThread;
+	const auto start = std::chrono::high_resolution_clock::now();
+	std::vector<std::future<void>> helperThread;
 	for(int i = 0; i < TunerParameters::parallelGames; ++i){
-		helperThread.emplace_back(std::thread(&worker, i + 1));
+		helperThread.emplace_back(std::async(std::launch::async, worker, i + 1));
 	}
 
-	for(auto &t : helperThread)
-	{
-		t.join();
+	while(!stop) {
+		int stoppedCount = 0;
+		for(auto &t : helperThread) {
+			stoppedCount += (t.wait_for(0ms) == std::future_status::ready);
+		}
+		if(stoppedCount == TunerParameters::parallelGames)  {
+			break;
+		}
+		std::this_thread::sleep_for(10000ms);
+		const auto end = std::chrono::high_resolution_clock::now();
+		const std::chrono::duration<double, std::milli> elapsed = end - start;
+		std::cout<<std::chrono::duration_cast<std::chrono::minutes>(elapsed).count()<<" saved "<<fs.getSavedPosition()<<" positions "<< fs.getSavedPosition()/std::chrono::duration_cast<std::chrono::seconds>(elapsed).count()<<" positions per second"<<std::endl;
+
 	}
+
+
+
+	std::cout<<"saved "<<fs.getSavedPosition()<<" positions"<<std::endl;
 
 	return 0;
 }

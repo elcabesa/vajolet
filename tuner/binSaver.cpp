@@ -24,32 +24,34 @@
 #include "timeManagement.h"
 #include "transposition.h"
 
-#define DEBUG_PROCESS
 
 
-BinSaver::BinSaver(unsigned int decimation, unsigned int n): _decimation(decimation){
-	_stream.open("fen"+ std::to_string(n) + ".epd", std::ios_base::app);
-#ifdef DEBUG_PROCESS
-	_stream2.open("fen"+ std::to_string(n) + "ver.epd", std::ios_base::app);
-#endif
+BinSaver::BinSaver(unsigned int decimation): _decimation(decimation){
+	_stream.open("fen.data", std::ios_base::app);
+}
+
+BinSaver::~BinSaver() {
+	const std::lock_guard<std::mutex> lock(_mutex);
+	_stream.write(_buffer.data(), _buffer.size());
+	_stream.flush();
+	_buffer.clear();
+	_savedPositions = _saved;
 }
 
 
 void BinSaver::save(Position& pos, Score res) {
-	char buffer[10];
 	if (++_counter >= _decimation) {
 		_counter = 0;
-		++_logDecimationCnt;
+		//++_logDecimationCnt;
 		++_saved;
-		if(_logDecimationCnt>=10000) {
+		/*if(_logDecimationCnt>=10000) {
 			std::cout << "saved " << _saved << " FENs" <<std::endl;
 			_logDecimationCnt = 0;
-		}
+		}*/
 
 		pos.nnue()->clean();
 		auto f = pos.nnue()->features();
-		buffer[0] = f.size();
-		_stream.write(buffer,1);
+		_buffer.push_back(f.size());
 		for(auto& idx: f) {
 			//std::cout <<idx<<" ";
 			union _bb{
@@ -57,7 +59,8 @@ void BinSaver::save(Position& pos, Score res) {
 				char c[2];
 			}bb;
 			bb.d = idx;
-			_stream.write(bb.c,2);
+			_buffer.push_back(bb.c[0]);
+			_buffer.push_back(bb.c[1]);
 
 		}
 		/*float dval = res/50000.0;
@@ -69,12 +72,17 @@ void BinSaver::save(Position& pos, Score res) {
 			char c[4];
 		}bb;
 		bb.d = dval;
-		_stream.write(bb.c,4);
-		_stream.flush();
+		_buffer.push_back(bb.c[0]);
+		_buffer.push_back(bb.c[1]);
+		_buffer.push_back(bb.c[2]);
+		_buffer.push_back(bb.c[3]);
+		if(_buffer.size()>1024) {
+			 const std::lock_guard<std::mutex> lock(_mutex);
+			_stream.write(_buffer.data(), _buffer.size());
+			_stream.flush();
+			_buffer.clear();
+			_savedPositions = _saved;
 
-
-#ifdef DEBUG_PROCESS
-		_stream2 << pos.getFen()<<";"<<res<< std::endl;
-#endif
+		}
 	}
 }
