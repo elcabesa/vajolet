@@ -40,6 +40,7 @@ BinSaver::~BinSaver() {
 
 
 void BinSaver::save(Position& pos, Score res) {
+	const std::lock_guard<std::mutex> lock(_mutex);
 	if (++_counter >= _decimation) {
 		_counter = 0;
 		//++_logDecimationCnt;
@@ -77,7 +78,7 @@ void BinSaver::save(Position& pos, Score res) {
 		_buffer.push_back(bb.c[2]);
 		_buffer.push_back(bb.c[3]);
 		if(_buffer.size()>1024) {
-			 const std::lock_guard<std::mutex> lock(_mutex);
+
 			_stream.write(_buffer.data(), _buffer.size());
 			_stream.flush();
 			_buffer.clear();
