@@ -25,9 +25,11 @@
 #include "transposition.h"
 
 
+unsigned long long BinSaver::_savedPositions = 0;
+std::mutex BinSaver::_mutex;
 
-BinSaver::BinSaver(unsigned int decimation): _decimation(decimation){
-	_stream.open("fen.data", std::ios_base::app);
+BinSaver::BinSaver(unsigned int decimation, std::ofstream& stream): _decimation(decimation), _stream(stream){
+
 }
 
 BinSaver::~BinSaver() {
@@ -40,7 +42,6 @@ BinSaver::~BinSaver() {
 
 
 void BinSaver::save(Position& pos, Score res) {
-	const std::lock_guard<std::mutex> lock(_mutex);
 	if (++_counter >= _decimation) {
 		_counter = 0;
 		//++_logDecimationCnt;
@@ -77,12 +78,14 @@ void BinSaver::save(Position& pos, Score res) {
 		_buffer.push_back(bb.c[1]);
 		_buffer.push_back(bb.c[2]);
 		_buffer.push_back(bb.c[3]);
-		if(_buffer.size()>1024) {
 
+		if(_buffer.size()>1024) {
+			const std::lock_guard<std::mutex> lock(_mutex);
 			_stream.write(_buffer.data(), _buffer.size());
 			_stream.flush();
 			_buffer.clear();
-			_savedPositions = _saved;
+			_savedPositions += _saved;
+			_saved = 0;
 
 		}
 	}

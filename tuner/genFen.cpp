@@ -50,9 +50,10 @@ static void printStartInfo(void)
 	std::cout <<"Vajolet fen generator"<< std::endl;
 }
 
-BinSaver fs(1);
+std::ofstream stream;
 
 void worker(int th) {
+	BinSaver fs(1, stream);
 	Book book("book.pgn");
 	Player p1("p1");
 	Player p2("p2");
@@ -81,6 +82,10 @@ int main() {
 	//----------------------------------
 	const auto start = std::chrono::high_resolution_clock::now();
 	std::vector<std::future<void>> helperThread;
+
+
+	stream.open("fen.data", std::ios_base::app);
+	BinSaver fs(1, stream);
 	for(int i = 0; i < TunerParameters::parallelGames; ++i){
 		helperThread.emplace_back(std::async(std::launch::async, worker, i + 1));
 	}
@@ -101,7 +106,7 @@ int main() {
 	}
 
 
-
+	stream.close();
 	std::cout<<"saved "<<fs.getSavedPosition()<<" positions"<<std::endl;
 
 	return 0;

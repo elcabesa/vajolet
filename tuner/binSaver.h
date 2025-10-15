@@ -34,24 +34,24 @@ class Move;
 class BinSaver {
 	
 public:
-	BinSaver(unsigned int decimation);
+	BinSaver(unsigned int decimation, std::ofstream& stream);
     ~BinSaver();
 	void save(Position& pos, Score res);
-    unsigned long long getSavedPosition() const {
+    static unsigned long long getSavedPosition() {
         const std::lock_guard<std::mutex> lock(_mutex);
         return _savedPositions;
 
     }
 
 private:
-    mutable std::mutex _mutex;
+    static std::mutex _mutex;
 	const unsigned int _decimation;
 	unsigned int _counter = 0;
-	std::ofstream _stream;
+	std::ofstream& _stream;
 	uint_fast64_t _saved = 0;
 	unsigned int _logDecimationCnt = 0;
     std::vector<char> _buffer;
-    unsigned long long _savedPositions = 0;
+    static unsigned long long _savedPositions;
 };
 
 #endif /* BINSAVER_H_ */
