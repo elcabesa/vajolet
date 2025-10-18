@@ -99,7 +99,7 @@ bool NNUE::loaded() {
 
 Score NNUE::eval() {
     Score s;
-    if (_incrementalEvalDisabled()) {
+    if (incrementalEvalDisabled()) {
         _resetCompleteEvalCondition();
         s =  _completeEval();
     } else {
@@ -146,7 +146,7 @@ void NNUE::_disableIncrementalEval() {
     _noIncrementalEval = true;
 }
 
-bool NNUE::_incrementalEvalDisabled() const {
+bool NNUE::incrementalEvalDisabled() const {
     return _noIncrementalEval;
 }
 

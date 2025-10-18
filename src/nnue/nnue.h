@@ -44,6 +44,8 @@ public:
 
     Score eval();
     Score eval(FeatureList fl);
+
+    bool incrementalEvalDisabled() const;
     
     void removePiece(bitboardIndex piece, tSquare sq);
     void addPiece(bitboardIndex piece, tSquare sq);
@@ -78,7 +80,7 @@ private:
     static unsigned int _mapPiece(const bitboardIndex piece, Model::perspective p);
 
     void _disableIncrementalEval(); // evaluate if it's still necessary for king move and castling
-    bool _incrementalEvalDisabled() const;
+
 
     void _resetCompleteEvalCondition();
     bool _noIncrementalEval;

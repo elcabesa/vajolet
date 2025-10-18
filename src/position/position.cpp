@@ -821,7 +821,7 @@ void Position::doMove(const Move & m)
 			_movePiece( piece, kFrom, kTo );
 		}
 		_putPiece(rook, rTo);
-		if (NNUE::loaded()&& _nnue/* && !_nnue->incrementalEvalDisabled()*/) {
+		if (NNUE::loaded()&& _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(rook, rFrom);
 			_nnue->addPiece(rook, rTo);
 			_nnue->removePiece(piece, kFrom);
@@ -853,7 +853,7 @@ void Position::doMove(const Move & m)
 
 			// remove piece
 			_removePiece(captured,captureSquare);
-			if (NNUE::loaded() && _nnue/* && !_nnue->incrementalEvalDisabled()*/) {
+			if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 				_nnue->removePiece(captured, captureSquare);
 			}
 			// update material
@@ -872,7 +872,7 @@ void Position::doMove(const Move & m)
 		// update hashKey
 		x.getKey().updatePiece( from, to, piece );
 		_movePiece(piece, from, to);
-		if(NNUE::loaded() && _nnue/* && !_nnue->incrementalEvalDisabled()*/) {
+		if(NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(piece, from);
 			_nnue->addPiece(piece, to);
 		}
@@ -908,7 +908,7 @@ void Position::doMove(const Move & m)
 			_removePiece(piece,to);
 			_putPiece(promotedPiece,to);
 
-			if (NNUE::loaded() && _nnue/* && !_nnue->incrementalEvalDisabled()*/) {
+			if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 				_nnue->removePiece(piece, to);
 				_nnue->addPiece(promotedPiece, to);
 			}
@@ -1013,7 +1013,7 @@ void Position::undoMove()
 			_movePiece( kPiece, kTo, kFrom );
 		}
 		_putPiece(rook, rFrom);
-		if (NNUE::loaded() && _nnue/* && !_nnue->incrementalEvalDisabled()*/) {
+		if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(rook, rTo);
 			_nnue->addPiece(rook, rFrom);
 			_nnue->removePiece(kPiece, kTo);
@@ -1026,13 +1026,13 @@ void Position::undoMove()
 			bitboardIndex promotedPiece = piece;
 			piece = isBlackPiece(piece) ? blackPawns : whitePawns;
 			_putPiece(piece,to);
-			if (NNUE::loaded() && _nnue/* && !_nnue->incrementalEvalDisabled()*/) {
+			if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 				_nnue->removePiece(promotedPiece, to);
 				_nnue->addPiece(piece, to);
 			}
 		}
 		_movePiece(piece, to, from);
-		if(NNUE::loaded() && _nnue/* && !_nnue->incrementalEvalDisabled()*/) {
+		if(NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 			_nnue->removePiece(piece, to);
 			_nnue->addPiece(piece, from);
 		}
@@ -1048,7 +1048,7 @@ void Position::undoMove()
 			}
 			assert( capSq < squareNumber );
 			_putPiece( p, capSq );
-			if (NNUE::loaded() && _nnue/* && !_nnue->incrementalEvalDisabled()*/) {
+			if (NNUE::loaded() && _nnue && !_nnue->incrementalEvalDisabled()) {
 				_nnue->addPiece(p, capSq);
 			}
 		}
