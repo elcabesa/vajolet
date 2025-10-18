@@ -70,20 +70,23 @@ Data getPosition(std::ifstream& f) {
 		return d;
 	}
 
+
 	union _bb{
-		int16_t d;
-		char c[2];
+		char c[64];
+		int16_t d[32];
+
 	}bb;
+	f.read(bb.c, 2 * featuresCount);
 
 	for(unsigned int i = 0; i < featuresCount; ++i) {
-		f.read(bb.c,2);
-		unsigned int feat = bb.d;
-		d.f.add(feat);
+		d.f.add(bb.d[i]);
 	}
+
 	union _bbf{
 		float v;
 		char c[4];
 	}bbf;
+
 	f.read(bbf.c,4);
 	d.v = bbf.v;
 	return d;
@@ -160,9 +163,15 @@ void worker() {
 		for(auto& [key, value]: imbalancies) {
 			std::cout<<key<<" "<<value<<std::endl;
 		}
+
+
 		std::cout<<"endgames"<<std::endl;
+		std::multimap<unsigned long long, tKey> sortedEndgames;
 		for(auto& [key, value]: endgames) {
-			std::cout<<pos.getStandardEgFenFromKey(key)<<" : "<<value<<std::endl;
+			sortedEndgames.insert({value, key});
+		}
+		for(auto& [key, value]: sortedEndgames) {
+			std::cout<<pos.getStandardEgFenFromKey(value)<<" : "<<key<<std::endl;
 		}
 
 

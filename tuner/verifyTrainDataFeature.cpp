@@ -60,20 +60,23 @@ Data getPosition(std::ifstream& f) {
 		return d;
 	}
 
+
 	union _bb{
-		int16_t d;
-		char c[2];
+		char c[64];
+		int16_t d[32];
+
 	}bb;
+	f.read(bb.c, 2 * featuresCount);
 
 	for(unsigned int i = 0; i < featuresCount; ++i) {
-		f.read(bb.c,2);
-		unsigned int feat = bb.d;
-		d.f.add(feat);
+		d.f.add(bb.d[i]);
 	}
+
 	union _bbf{
 		float v;
 		char c[4];
 	}bbf;
+
 	f.read(bbf.c,4);
 	d.v = bbf.v;
 	return d;
@@ -127,7 +130,7 @@ void worker() {
 
 			auto dval = d.v/10000.0;
 			int diff = std::abs(dScore-dval)*10;
-			/*if(diff >=40) {
+			/*if(diff >=100) {
 				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<std::endl;
 			}*/
 

@@ -201,7 +201,7 @@ unsigned int NNUE::_feature(unsigned int  piece, tSquare pSquare) {
     return f;
 }
 
-tSquare NNUE::_getSquareFromFeature(unsigned int f) {return tSquare(f%64);}
+tSquare NNUE::_getSquareFromFeature(unsigned int f) {return tSquare(f&63);}
 bitboardIndex NNUE::_getPieceFromFeature(unsigned int f) {
     bitboardIndex whitePow[12] = {
         whiteKing,
@@ -217,7 +217,7 @@ bitboardIndex NNUE::_getPieceFromFeature(unsigned int f) {
         blackKnights,
         blackPawns
     };
-    return whitePow[f/64];}
+    return whitePow[f>>6];}
 
 
 unsigned int NNUE::_mapPiece(const bitboardIndex piece) {
