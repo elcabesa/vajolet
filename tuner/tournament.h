@@ -24,28 +24,13 @@
 
 class Book;
 class BinSaver;
-
-namespace pgn { class Game;}
-
-enum class TournamentResult {
-	p1Won = 1,
-	p2Won = -1,
-	draw = 0
-};
-
 class Tournament {
 public:
-	Tournament(bool& stop, const std::string& pgnName, const std::string& debugName, Player& _p1, Player& _p2, Book &b, BinSaver * const fs = nullptr,  bool verbose = false);
-	TournamentResult play();
+	Tournament(bool& stop, Player& _p1, Player& _p2, Book &b, BinSaver * const fs = nullptr,  bool verbose = false);
+	void play();
 	bool isFinished() const { return _finished;}
 
 private:
-	void _saveGamePgn(const pgn::Game& g);
-	void _createNewTournamentPgn();
-	void _updateResults(const pgn::Game& g, Player& _p1, Player& _p2);
-
-	const std::string _pgnName;
-	const std::string _debugName;
 	Player &_p1, &_p2;
 	Book& _book;
 	BinSaver * const _fs;

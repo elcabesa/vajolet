@@ -32,12 +32,9 @@ class SelfPlay {
 	
 public:
 	SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, BinSaver * const fs = nullptr);
-	pgn::Game playGame(unsigned int round);
+	void playGame();
 private:	
 	bool _isGameFinished(Score res);
-	std::string _getGameResult(Score res);
-	void _addGameTags(pgn::Game& g, int round);
-	void _addGameResult(pgn::Game& g, const std::string & s);
 	Position _p;
 	Clock _c;
 	SearchLimits _sl;

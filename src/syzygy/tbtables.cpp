@@ -23,7 +23,7 @@
 #include "tbtables.h"
 #include "uciOutput.h"
 
-TBTables::TBTables(): MaxCardinality(0){}
+TBTables::TBTables(): MaxCardinality(0), _hashTable(0){}
 
 void TBTables::clear() {
 	_hashTable.clear();

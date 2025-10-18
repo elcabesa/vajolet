@@ -37,7 +37,8 @@ BinSaver::~BinSaver() {
 	_stream.write(_buffer.data(), _buffer.size());
 	_stream.flush();
 	_buffer.clear();
-	_savedPositions = _saved;
+	_savedPositions += _saved;
+	_saved = 0;
 }
 
 

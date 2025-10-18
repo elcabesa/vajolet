@@ -24,50 +24,17 @@
 #include "tournament.h"
 #include "tunerPars.h"
 
-class Stats {
-public:
-	Stats() {};
-	void insert(const pgn::Game& g) {
-		const auto& res = g.result();
-		_whiteWin += res.isWhiteWin();
-		_blackWin += res.isBlackWin();
-		_draw += res.isDrawn();
-		_unknown += res.isUnknown();
-	}
-	
-	std::string print() {
-		std::string s;
-		s += std::to_string(_whiteWin);
-		s += "/";
-		s += std::to_string(_blackWin);
-		s += "/";
-		s += std::to_string(_draw);
-		s += " ";
-		s += std::to_string(_unknown);
-		return s;
-	}
-private:
-	int _whiteWin = 0;
-	int _blackWin = 0;
-	int _draw = 0;
-	int _unknown = 0;
-};
 
-Tournament::Tournament(bool& stop, const std::string& pgnName, const std::string& debugName, Player& p1, Player& p2, Book& b, BinSaver * const fs,  bool verbose): _pgnName(pgnName), _debugName(debugName), _p1(p1), _p2(p2), _book(b), _fs(fs),_verbose(verbose), _stop(stop) {
+Tournament::Tournament(bool& stop, Player& p1, Player& p2, Book& b, BinSaver * const fs,  bool verbose): /*_pgnName(pgnName), _debugName(debugName),*/ _p1(p1), _p2(p2), _book(b), _fs(fs),_verbose(verbose), _stop(stop) {
 }
 
-TournamentResult Tournament::play() {
+void Tournament::play() {
 
 	for(unsigned int i = 0; i < ALREADYSEEN_SIZE; ++i) {
 		alreadySeen[i] = 0;
 	}
 
 	unsigned int logDecimation = 0;
-	std::ofstream myfile;
-	myfile.open (_debugName);
-	myfile<<"start tournament ("<< TunerParameters::gameNumber << " games)" << std::endl;
-	_createNewTournamentPgn();
-	Stats stats;
 	Player* whitePlayer = &_p1;
 	Player* blackPlayer = &_p2;
 	
@@ -81,61 +48,13 @@ TournamentResult Tournament::play() {
 			whitePlayer = &_p2;
 			blackPlayer = &_p1;
 		}
-		myfile<< "starting game " <<round  <<" of "<< TunerParameters::gameNumber << "(" << round * 100.0 / TunerParameters::gameNumber << "%) ";
-		auto g = SelfPlay(*whitePlayer, *blackPlayer, _book, alreadySeen, _fs).playGame(round);
+		SelfPlay(*whitePlayer, *blackPlayer, _book, alreadySeen, _fs).playGame();
 		
-		stats.insert(g);
-		_updateResults(g, *whitePlayer, *blackPlayer);
-		
-		myfile<< _p1.print()<<" ";
-		myfile<< stats.print()<<" ";
-		myfile<<std::endl;
 		if (_verbose) { 
 			if( ++logDecimation >= 100) {
 				logDecimation = 0;
 				std::cout << "game " << round << std::endl;}
 			}
-		
-		_saveGamePgn(g);
 	}
-	myfile<< std::endl << "finished tournament!" <<std::endl;
-	double res = _p1.pointRatio();
-	if(res > 0.51) {
-		return TournamentResult::p1Won;
-	} else if (res < 0.49) {
-		return TournamentResult::p2Won;
-	} else {
-		return TournamentResult::draw;
-	}
-	myfile.close();
 	_finished = true;
-}
-
-void Tournament::_saveGamePgn(const pgn::Game& g) {
-	std::ofstream myfile;
-	myfile.open(_pgnName, std::fstream::app);
-	myfile<<g<<std::endl;
-	myfile.close();
-}
-
-void Tournament::_createNewTournamentPgn() {
-	std::ofstream myfile;
-	myfile.open(_pgnName, std::fstream::out);
-	myfile.close();
-}
-
-void Tournament::_updateResults(const pgn::Game& g, Player& w, Player& b) {
-	if(g.result().isWhiteWin()) {
-		w.insertResult(1);
-		b.insertResult(-1);
-	} else if(g.result().isBlackWin()) {
-		w.insertResult(-1);
-		b.insertResult(1);
-	} else if(g.result().isDrawn()) {
-		w.insertResult(0);
-		b.insertResult(0);
-	} else {
-		w.insertResult(-2);
-		b.insertResult(-2);
-	}
 }

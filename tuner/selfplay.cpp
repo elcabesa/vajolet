@@ -46,7 +46,7 @@ SelfPlay::SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosit
 	_sl.setBInc(_c.getTimeIncrement());
 }
 
-pgn::Game SelfPlay::playGame(unsigned int round) {
+void SelfPlay::playGame() {
 
 	std::random_device rd;  // a seed source for the random number engine
 	std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
@@ -54,8 +54,6 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 
 	unsigned int randomMoveCounter = 0;
 	unsigned int initialRandomMoveCounter = distrib(gen);
-	pgn::Game pgnGame;
-	_addGameTags(pgnGame, round);
 	
 	int moveCount = 1;
 	_c.start();
@@ -140,7 +138,6 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 			//std::cout<<"prepare white move"<<std::endl;
 		} else {
 			blackPly = pgn::Ply(UciOutput::displayMove(_p, bestMove));
-			pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
 			//std::cout<<"add white/black move"<<std::endl;
 			
 			++moveCount;
@@ -173,15 +170,6 @@ pgn::Game SelfPlay::playGame(unsigned int round) {
 		_p.doMove(bestMove);
 		_c.switchTurn();
 	}
-	// white move still to be written
-	if(_c.isBlackTurn()) {
-		pgnGame.moves().push_back(pgn::Move(whitePly,blackPly, moveCount));
-		//std::cout<<"add last white move move"<<std::endl;
-	}
-	
-	_addGameResult(pgnGame,_getGameResult(score));
-	
-	return pgnGame;
 }
 
 bool SelfPlay::_isGameFinished(Score res) {
@@ -221,65 +209,4 @@ bool SelfPlay::_isGameFinished(Score res) {
 	}
 	
 	return false;
-}
-
-std::string SelfPlay::_getGameResult(Score res) {
-	// checkmate
-	if (_p.isCheckMate()) {
-		if(_p.isBlackTurn()) {
-			//std::cout << "white mate"<<std::endl;
-			return "1-0";
-		} else {
-			//std::cout << "black mate"<<std::endl;
-			return "0-1";
-		}
-	}
-	
-	// patta ripetizione
-	// num mosse
-	if (_p.isDraw(true)) {
-		//std::cout << "draw"<<std::endl;
-		return "1/2-1/2";
-	}
-	
-	// stallo
-	if (_p.isStaleMate()) {
-		//std::cout << "draw"<<std::endl;
-		return "1/2-1/2";
-	}
-	
-	// early stop
-	// near 0 for x moves after ply y
-	// abs(v) > x  for y moves
-
-	Score gameRes = _p.isBlackTurn() ? res : -res;
-
-	if(winCount >= 4 && gameRes >= wonGame) {
-		//std::cout << "white early win"<<std::endl;
-		return "1-0";
-	}
-	if(winCount >= 4 && gameRes <= -wonGame) {
-		//std::cout << "black early win"<<std::endl;
-		return "0-1";
-	} if (drawCount >= 12) {
-		//std::cout << "early draw"<<std::endl;
-		return "1/2-1/2";
-	}
-
-	return "*";
-}
-
-void SelfPlay::_addGameTags(pgn::Game& g, int round) {
-	g.tags().insert(pgn::Tag("Event","autplay"));
-	g.tags().insert(pgn::Tag("Site","Florence"));
-	g.tags().insert(pgn::Tag("Date","2019.11.01"));
-	g.tags().insert(pgn::Tag("Round",std::to_string(round)));
-	g.tags().insert(pgn::Tag("White",_white.getName()));
-	g.tags().insert(pgn::Tag("Black",_black.getName()));
-	g.tags().insert(pgn::Tag("Result","*"));	
-}
-
-void SelfPlay::_addGameResult(pgn::Game& g, const std::string & s) {
-	g.tags().insert(pgn::Tag("Result",s));
-	g.result() = s;
 }

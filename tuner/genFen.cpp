@@ -34,7 +34,7 @@
 
 bool stop = false;
 
-void signalHandler(int signum)
+void signalHandler(int /*signum*/)
 {
 	std::cout<<"STOP"<<std::endl;
 	stop = true;
@@ -52,14 +52,13 @@ static void printStartInfo(void)
 
 std::ofstream stream;
 
-void worker(int th) {
+void worker() {
 	BinSaver fs(1, stream);
 	Book book("book.pgn");
 	Player p1("p1");
 	Player p2("p2");
-	Tournament t(stop, "tournament-" + std::to_string(th) + ".pgn", "tournament-" + std::to_string(th) + ".txt",p1, p2, book, &fs, true);
-	auto res = t.play();
-	sync_cout<<"Tournament Result: "<<static_cast<int>(res)<<sync_endl;
+	Tournament t(stop, p1, p2, book, &fs, true);
+	t.play();
 
 }
 
@@ -87,7 +86,7 @@ int main() {
 	stream.open("fen.data", std::ios_base::app);
 	BinSaver fs(1, stream);
 	for(int i = 0; i < TunerParameters::parallelGames; ++i){
-		helperThread.emplace_back(std::async(std::launch::async, worker, i + 1));
+		helperThread.emplace_back(std::async(std::launch::async, worker));
 	}
 
 	while(!stop) {
