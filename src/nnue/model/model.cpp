@@ -39,7 +39,8 @@ void Model::init() {
 }
 
 Model::Model(outType scale):
-    _layer0(&bias0, &weight0, scale),
+    _layer0W(&bias0, &weight0, scale),
+    _layer0B(&bias0, &weight0, scale),
     _layer1(&bias1, &weight1, scale)
 {}
 
@@ -55,26 +56,29 @@ void Model::setBias(unsigned int layer, unsigned int n, float bias) {
 
 void Model::setWeight(unsigned int layer, unsigned int inN, unsigned int outN, float weight) {
     if(layer == 0) {
-        weight0[_layer0._calcWeightIndex(inN, outN)] = weight;
+        weight0[_layer0W._calcWeightIndex(inN, outN)] = weight;
     } else {
         weight1[_layer1._calcWeightIndex(inN, outN)] = weight;
     }
 }
 
-accumulatorTypeOut Model::forwardPass(const FeatureList& l) {
-    _layer0.propagate(l);
-    return _layer1.propagateOut(_layer0.outputRelu(), 0, 0);
+accumulatorTypeOut Model::forwardPass(const FeatureList& lw,const FeatureList& lb, perspective p) {
+    _layer0W.propagate(lw);
+    _layer0B.propagate(lb);
+
+    return _layer1.propagateOut(p == whitePow ? _layer0W.outputRelu() : _layer0B.outputRelu(), 0, 0);
 }
 
-accumulatorTypeOut Model::incrementalPass(const DifferentialList& l) {
-    _layer0.incrementalPropagate(l);
-    return _layer1.propagateOut(_layer0.outputRelu(), 0, 0);
+accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const DifferentialList& lb, perspective p) {
+    _layer0W.incrementalPropagate(lw);
+    _layer0B.incrementalPropagate(lb);
+     return _layer1.propagateOut(p == whitePow ? _layer0W.outputRelu() : _layer0B.outputRelu(), 0, 0);
 }
 
 bool Model::deserialize(std::istream& ss) {
     ss.clear();
 
-    if(!_layer0.deserialize(ss)) {std::cout<<"MODEL internal layer0 error"<<std::endl;return false;}
+    if(!_layer0W.deserialize(ss)) {std::cout<<"MODEL internal layer0 error"<<std::endl;return false;}
     if(!_layer1.deserialize(ss)) {std::cout<<"MODEL internal layer1 error"<<std::endl;return false;}
 
     return true;

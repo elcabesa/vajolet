@@ -55,7 +55,7 @@ bool NNUE::load(std::string path) {
                             size_t(gNnueInternalFileSize));
 
         std::istream nnFile(&buffer);
-        if(_modelW.deserialize(nnFile)){
+        if(_model.deserialize(nnFile)){
             _loaded = true;
             std::cout<<"done"<<std::endl;
             return true;
@@ -69,7 +69,7 @@ bool NNUE::load(std::string path) {
         std::ifstream nnFile;
         nnFile.open(path);
         if(nnFile.is_open()) {
-            if(_modelW.deserialize(nnFile)
+            if(_model.deserialize(nnFile)
             ){
                 _loaded = true;
                 std::cout<<"done"<<std::endl;
@@ -114,7 +114,7 @@ Score NNUE::eval(FeatureList fl) {
     Score highSat = SCORE_KNOWN_WIN;
 
 
-    auto s  = _modelW.forwardPass(fl); //Q24
+    auto s  = _model.forwardPass(fl, fl, Model::whitePow); //Q24
 
     Score score = s * (50000.0f / (_scale*_scale) );
     score = std::min(highSat, score);
@@ -125,7 +125,7 @@ Score NNUE::eval(FeatureList fl) {
 std::set<unsigned int> NNUE::features() {
     std::set<unsigned int> features;
     FeatureList fl;
-    _createFeatures(fl, (_pos.isBlackTurn()? blackPow: whitePow));
+    _createFeatures(fl, (_pos.isBlackTurn()? Model::blackPow: Model::whitePow));
 
     for(unsigned int i = 0; i< fl.size(); ++i) {
         features.insert(fl.get(i));
@@ -138,7 +138,8 @@ void NNUE::clean() {
     _disableIncrementalEval();
     _diffFeatureListW.clear();
     _diffFeatureListB.clear();
-    _completeFeatureList.clear();
+    _completeFeatureListW.clear();
+    _completeFeatureListB.clear();
 }
 
 void NNUE::_disableIncrementalEval() {
@@ -151,10 +152,10 @@ bool NNUE::_incrementalEvalDisabled() const {
 
 void NNUE::removePiece(bitboardIndex piece, tSquare sq) {
 
-    auto f = _feature(_mapPiece(piece, whitePow), sq, whitePow);
+    auto f = _feature(_mapPiece(piece, Model::whitePow), sq, Model::whitePow);
     _diffFeatureListW.remove(f);
 
-    f = _feature(_mapPiece(piece, blackPow), sq, blackPow);
+    f = _feature(_mapPiece(piece, Model::blackPow), sq, Model::blackPow);
     _diffFeatureListB.remove(f);
 
     if (_diffFeatureListW.size() >= _completeEvalThreshold) { _disableIncrementalEval(); }
@@ -162,17 +163,17 @@ void NNUE::removePiece(bitboardIndex piece, tSquare sq) {
 }
 
 void NNUE::addPiece(bitboardIndex piece, tSquare sq) {
-    auto f = _feature(_mapPiece(piece, whitePow), sq, whitePow);
+    auto f = _feature(_mapPiece(piece, Model::whitePow), sq, Model::whitePow);
     _diffFeatureListW.add(f);
 
-    f = _feature(_mapPiece(piece, blackPow), sq, blackPow);
+    f = _feature(_mapPiece(piece, Model::blackPow), sq, Model::blackPow);
     _diffFeatureListB.add(f);
 
     if (_diffFeatureListW.size() >= _completeEvalThreshold) { _disableIncrementalEval(); }
     if (_diffFeatureListB.size() >= _completeEvalThreshold) { _disableIncrementalEval(); }
 }
 
-void NNUE::_createFeatures(FeatureList& fl, perspective p){
+void NNUE::_createFeatures(FeatureList& fl, Model::perspective p){
 
     bitboardIndex bWhitePow[12] = {
         whiteKing,
@@ -204,7 +205,7 @@ void NNUE::_createFeatures(FeatureList& fl, perspective p){
     };
 
     for(unsigned int piece = 0; piece < 12; ++piece) {
-        bitMap b = _pos.getBitmap(p==whitePow? bWhitePow[piece] : bBlackPow[piece] );
+        bitMap b = _pos.getBitmap(p==Model::whitePow? bWhitePow[piece] : bBlackPow[piece] );
         while(b)
         {
             tSquare pieceSq = iterateBit(b);
@@ -213,8 +214,8 @@ void NNUE::_createFeatures(FeatureList& fl, perspective p){
     }
 }
 
-unsigned int NNUE::_feature(unsigned int  piece, tSquare pSquare, perspective p) {
-    if(p == whitePow) {
+unsigned int NNUE::_feature(unsigned int  piece, tSquare pSquare, Model::perspective p) {
+    if(p == Model::whitePow) {
         return (piece * 64) + (pSquare);
     } else {
         return (piece * 64) + (pSquare ^ 0b111000);
@@ -241,8 +242,8 @@ bitboardIndex NNUE::_getPieceFromFeature(unsigned int f) { // TODO SERVE FARE PO
     return whitePow[f>>6];}
 
 
-unsigned int NNUE::_mapPiece(const bitboardIndex piece, perspective p) {
-    if(p == whitePow) {
+unsigned int NNUE::_mapPiece(const bitboardIndex piece, Model::perspective p) {
+    if(p == Model::whitePow) {
         unsigned int n[] = {
             0, //occupiedSquares,			//0		00000000
             0, //whiteKing,					//1		00000001
@@ -296,15 +297,14 @@ Score NNUE::_completeEval() {
     _diffFeatureListW.clear();// TODO remove?? da verificare se è più veloce o meno, non dovrebbe cambioare il numero di nodi ma solo nps
     _diffFeatureListB.clear();// TODO remove?? da verificare se è più veloce o meno, non dovrebbe cambioare il numero di nodi ma solo nps
 
-    _completeFeatureList.clear();
-    _createFeatures(_completeFeatureList, whitePow);
-    auto sW  = _modelW.forwardPass(_completeFeatureList);
+    _completeFeatureListW.clear();
+    _completeFeatureListB.clear();
+    _createFeatures(_completeFeatureListW, Model::whitePow);
+    _createFeatures(_completeFeatureListB, Model::blackPow);
+    auto s  = _model.forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow);
 
-    _completeFeatureList.clear();
-    _createFeatures(_completeFeatureList, blackPow);
-    auto sB  = _modelB.forwardPass(_completeFeatureList);
+    Score score = s * (50000.0f / (_scale*_scale));
 
-    Score score = (_pos.isBlackTurn()? sB : sW) *  (50000.0f / (_scale*_scale));
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
     return score;
@@ -317,23 +317,23 @@ Score NNUE::_incrementalEval() {
     if(_diffFeatureListB.size() >= _completeEvalThreshold) {return _completeEval();}
     if(_diffFeatureListW.size() >= _completeEvalThreshold) {return _completeEval();}
 
-    Score score;
-    if(_pos.isBlackTurn()) {
-        score = _modelB.incrementalPass(_diffFeatureListB) * (50000.0f / (_scale*_scale));
-        _diffFeatureListB.clear();
-    } else {
-        score = _modelW.incrementalPass(_diffFeatureListW) * (50000.0f / (_scale*_scale));
-        _diffFeatureListW.clear();
-    }
+    Score score = _model.incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow) * (50000.0f / (_scale*_scale));
+    _diffFeatureListB.clear();
+    _diffFeatureListW.clear();
+
 
     score = std::min(highSat,score);
     score = std::max(lowSat,score);
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
-    FeatureList fl;
-    fl.clear();
-    _createFeatures(fl, (_pos.isBlackTurn() ? blackPow: whitePow));
-    Score score2 = _modelCheck.forwardPass(fl) * (50000.0f / (_scale*_scale));
+
+    FeatureList flw;
+    FeatureList flb;
+    flw.clear();
+    flb.clear();
+    _createFeatures(flw, Model::whitePow);
+    _createFeatures(flb, Model::blackPow);
+    Score score2 = _modelCheck.forwardPass(flw, flb, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow) * (50000.0f / (_scale*_scale));
     score2 = std::min(highSat, score2);
     score2 = std::max(lowSat, score2);
 

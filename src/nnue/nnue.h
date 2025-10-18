@@ -56,13 +56,9 @@ public:
     static bitboardIndex _getPieceFromFeature(unsigned int);
 
 private:
-    enum perspective {
-        whitePow,
-        blackPow
-    };
 
-    Model _modelW;
-    Model _modelB;
+    Model _model;
+
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
     Model _modelCheck;
 #endif
@@ -73,12 +69,13 @@ private:
     DifferentialList _diffFeatureListW;
     DifferentialList _diffFeatureListB;
 
-    FeatureList _completeFeatureList;
+    FeatureList _completeFeatureListW;
+    FeatureList _completeFeatureListB;
 
-    void _createFeatures(FeatureList& fl, perspective p);
+    void _createFeatures(FeatureList& fl, Model::perspective p);
 
-    static unsigned int _feature(unsigned int piece, tSquare pSquare, perspective p);
-    static unsigned int _mapPiece(const bitboardIndex piece, perspective p);
+    static unsigned int _feature(unsigned int piece, tSquare pSquare, Model::perspective p);
+    static unsigned int _mapPiece(const bitboardIndex piece, Model::perspective p);
 
     void _disableIncrementalEval(); // evaluate if it's still necessary for king move and castling
     bool _incrementalEvalDisabled() const;

@@ -156,14 +156,8 @@ void SelfPlay::playGame() {
 			&& _alreadySeenPosition[_p.getKey().getKey() % ALREADYSEEN_SIZE] != _p.getKey().getKey()
 
 		) {
-			if(_c.isWhiteTurn()) {
-				_fs->save(_p, score);
 
-			} else {
-				_fs->save(_p, -score);
-				//std::cout<<_p.getFen()<<" "<<-score<<" "<<-_p.eval<false>()<<std::endl;
-			}
-
+			_fs->save(_p, score);
 			_alreadySeenPosition[_p.getKey().getKey()  % ALREADYSEEN_SIZE] = _p.getKey().getKey() ;
 
 		}

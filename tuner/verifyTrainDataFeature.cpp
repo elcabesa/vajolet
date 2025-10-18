@@ -138,10 +138,6 @@ void worker() {
 			}
 #endif
 
-			if(pos.isBlackTurn()) {
-				dScore = -dScore;
-			}
-
 			auto dval = d.v/10000.0;
 			auto ddiff = std::abs(dScore-dval);
 /*			if(ddiff >=10) {
