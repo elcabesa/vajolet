@@ -44,9 +44,6 @@ public:
 
     Score eval();
     Score eval(FeatureList fl);
-
-    void disableIncrementalEval(); // evaluate if it's still necessary for king move and castling
-    bool incrementalEvalDisabled() const;
     
     void removePiece(bitboardIndex piece, tSquare sq);
     void addPiece(bitboardIndex piece, tSquare sq);
@@ -59,21 +56,32 @@ public:
     static bitboardIndex _getPieceFromFeature(unsigned int);
 
 private:
-    Model _model;
+    enum perspective {
+        whitePow,
+        blackPow
+    };
+
+    Model _modelW;
+    Model _modelB;
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+    Model _modelCheck;
+#endif
 
     static bool _loaded;
     const unsigned int _completeEvalThreshold = 20;
 
-    DifferentialList _diffFeatureList;
+    DifferentialList _diffFeatureListW;
+    DifferentialList _diffFeatureListB;
 
     FeatureList _completeFeatureList;
 
-    void _createFeatures(FeatureList& fl);
+    void _createFeatures(FeatureList& fl, perspective p);
 
-    static unsigned int _feature(unsigned int piece, tSquare pSquare);
-    static unsigned int _mapPiece(const bitboardIndex piece);
+    static unsigned int _feature(unsigned int piece, tSquare pSquare, perspective p);
+    static unsigned int _mapPiece(const bitboardIndex piece, perspective p);
 
-
+    void _disableIncrementalEval(); // evaluate if it's still necessary for king move and castling
+    bool _incrementalEvalDisabled() const;
 
     void _resetCompleteEvalCondition();
     bool _noIncrementalEval;
