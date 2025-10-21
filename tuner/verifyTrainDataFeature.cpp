@@ -107,7 +107,9 @@ void worker() {
 
 		while ( d.f.size() != 0 ) {
 			++poscount;
-			//std::cout<<poscount<<std::endl;
+			if(poscount%1000000 == 0) {
+				std::cout<<poscount/1e6<<"M"<<std::endl;
+			}
 //#define DEBUG_PARSER
 #ifdef DEBUG_PARSER
 			for(unsigned int i = 0; i < d.f.size(); ++i) {
@@ -117,12 +119,24 @@ void worker() {
 #endif
 
 			double dScore;
+#define FASTNN
+#ifdef FASTNN
+
+			if(loaded) {
+				dScore = pos.nnue()->eval(d.f)/10000.0;
+			} else {
+				pos.setupFromFeatureList(d.f);
+				dScore = pos.eval<false>()/10000.0;
+			}
+#else
+
 			pos.setupFromFeatureList(d.f);
 			if(loaded) {
 				dScore = pos.nnue()->eval()/10000.0;
 			} else {
 				dScore = pos.eval<false>()/10000.0;
 			}
+#endif
 
 			if(pos.isBlackTurn()) {
 				dScore = -dScore;

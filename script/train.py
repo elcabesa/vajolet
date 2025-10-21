@@ -76,7 +76,7 @@ data = get_dataset().batch(16348).repeat()
 
 
 backup = BackupAndRestore(backup_dir="./backup")
-reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.9, patience=5, verbose=1)
+reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, verbose=1)
 
 spe = int(10000000/16348)
 
