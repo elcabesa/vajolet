@@ -32,7 +32,7 @@ public:
     DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int outShift);
     ~DenseLayer();
 
-    void propagate(const std::vector<inputType>& input);
+    /*void propagate(const std::vector<inputType>& input);*/
     accumulatorType propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
 
     void propagate(const FeatureList& l);
@@ -44,6 +44,10 @@ public:
 
     const std::vector<outType>& output() const;
     const std::vector<outType>& outputRelu() const;
+#ifdef PRINTSTAT
+    double getMinOut() const {return _minOut;}
+    double getMaxOut() const {return _maxOut;}
+#endif
     
 private:
     unsigned int _inputSize;
@@ -55,6 +59,11 @@ private:
 
     std::vector<outType> _output;
     std::vector<outType> _outputRelu;
+
+#ifdef PRINTSTAT
+    static double _minOut;
+    static double _maxOut;
+#endif
     
 };
 

@@ -26,6 +26,13 @@
 #include "featureList.h"
 
 
+#ifdef PRINTSTAT
+template <typename inputType, unsigned int inputSize, unsigned int outputSize>
+double DenseLayer<inputType, inputSize, outputSize>::_minOut = 1e8;
+template <typename inputType, unsigned int inputSize, unsigned int outputSize>
+double DenseLayer<inputType, inputSize, outputSize>::_maxOut = -1e8;
+#endif
+
 #define FASTER_CODE
 
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
@@ -59,19 +66,27 @@ accumulatorType DenseLayer<inputType, inputSize, outputSize>::propagateOut(const
         ++ref;
 #endif
     }
+#ifdef PRINTSTAT
+    if(out < _minOut) {_minOut = out;}
+    if(out > _maxOut) {_maxOut = out;}
+#endif
     return out;
 }
-
+/*
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
 void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<inputType>& input) { //TODO REWRITE è sbagliata
     unsigned int index = 0;
     for (unsigned int o = 0; o < _outputSize; ++o) {
         accumulatorType out = propagateOut(input, index, o);
         _output[o] = out;
+#ifdef PRINTSTAT
+        if(out < _minOut) {_minOut = out;}
+        if(out > _maxOut) {_maxOut = out;}
+#endif
         _outputRelu[o] = std::max(_output[o], 0.0f);
         index += _inputSize;
     }
-}
+}*/
 
 template <typename inputType, unsigned int inputSize, unsigned int outputSize>
 void DenseLayer<inputType, inputSize, outputSize>::propagate(const FeatureList& l) {
@@ -98,10 +113,12 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const FeatureList& 
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
+#ifdef PRINTSTAT
+        if(_output[o] < _minOut) {_minOut = _output[o];}
+        if(_output[o] > _maxOut) {_maxOut = _output[o];}
+#endif
         _outputRelu[o] = std::max(_output[o], 0.0f);
     }
-
-
 }
 
 
@@ -142,6 +159,10 @@ void DenseLayer<inputType, inputSize, outputSize>::incrementalPropagate(const Di
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
+#ifdef PRINTSTAT
+        if(_output[o] < _minOut) {_minOut = _output[o];}
+        if(_output[o] > _maxOut) {_maxOut = _output[o];}
+#endif
         _outputRelu[o] = std::max(_output[o], 0.0f);
     }
 }
@@ -153,7 +174,6 @@ unsigned int DenseLayer<inputType, inputSize, outputSize>::_calcWeightIndex(cons
 
 }
 
-//#define PRINTSTAT
 template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
 bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss) {
 #ifdef PRINTSTAT

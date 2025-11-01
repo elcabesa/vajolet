@@ -18,6 +18,8 @@
 #ifndef NNUE_TYPE_H_
 #define NNUE_TYPE_H_ 
 
+#define PRINTSTAT
+
 //using flOutType = int32_t;
 //using flAccumulatorType = int32_t;
 //using flBiasType = int32_t;

@@ -52,6 +52,7 @@ public:
     void addPiece(bitboardIndex piece, tSquare sq);
 
     void clean();
+    void printStat() const;
     
     std::set<unsigned int> features();
 

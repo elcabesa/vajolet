@@ -79,3 +79,13 @@ bool Model::deserialize(std::istream& ss) {
 
     return true;
 }
+
+
+void Model::printMinMax() const {
+#ifdef PRINTSTAT
+    std::cout<<"NNUE_STATS:"<<std::endl;
+    std::cout<<_layer0.getMinOut() <<" "<< _layer0.getMaxOut()<<std::endl;
+    std::cout<<_layer1.getMinOut() <<" "<< _layer1.getMaxOut()<<std::endl;
+#endif
+}
+

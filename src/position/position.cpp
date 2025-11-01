@@ -2018,3 +2018,11 @@ bool Position::isStaleMate() const {
 	return !inCheck && !legalReplies;
 	
 }
+
+void Position::printNNUEstats() const {
+	if (NNUE::loaded() && _nnue) {
+		_nnue->printStat();
+	} else {
+		std::cout<<"PUPPA"<<std::endl;
+	}
+}

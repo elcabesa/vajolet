@@ -160,6 +160,7 @@ void Searcher::_idLoop(std::vector<rootMove>& temporaryResults, unsigned int ind
 		}
 	}
 	while(++depth <= (_sl.isDepthLimitedSearch() ? _sl.getDepth() : 100) && !_stop);
+	_pos.printNNUEstats();
 }
 
 void Searcher::_excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread )

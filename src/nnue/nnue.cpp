@@ -35,13 +35,13 @@ NNUE::NNUE(const Position& pos):_pos(pos){
 
 bool NNUE::load(std::string path) {
 
-    std::cout<<"reload NNUE parameters"<<std::endl;    
-    std::cout<<"deserialize"<<std::endl;
+    //std::cout<<"reload NNUE parameters"<<std::endl;
+    //std::cout<<"deserialize"<<std::endl;
 
-    std::cout<<"load"<<std::endl;
+    //std::cout<<"load "<< path<< std::endl;
 
     if(path=="internal") {
-        std::cout<<"internal"<<std::endl;
+        //std::cout<<"internal"<<std::endl;
 
         class MemoryBuffer: public std::basic_streambuf<char> {
         public:
@@ -57,10 +57,10 @@ bool NNUE::load(std::string path) {
         std::istream nnFile(&buffer);
         if(_model.deserialize(nnFile)){
             _loaded = true;
-            std::cout<<"done"<<std::endl;
+            //std::cout<<"done"<<std::endl;
             return true;
         }else {
-            std::cout<<"FAIL"<<std::endl;
+            //std::cout<<"FAIL"<<std::endl;
             return false;
         }
     }
@@ -72,17 +72,17 @@ bool NNUE::load(std::string path) {
             if(_model.deserialize(nnFile)
             ){
                 _loaded = true;
-                std::cout<<"done"<<std::endl;
+                //std::cout<<"done"<<std::endl;
                 nnFile.close();
                 return true;
             }else {
-                std::cout<<"FAIL"<<std::endl;
+                //std::cout<<"FAIL"<<std::endl;
                 nnFile.close();
                 return false;
             }
 
         } else {
-            std::cout<<"error deserializing NNUE file"<<std::endl;
+            //std::cout<<"error deserializing NNUE file"<<std::endl;
             return false;
         }
     }
@@ -95,6 +95,10 @@ void NNUE::close() {
 
 bool NNUE::loaded() {
     return _loaded;
+}
+
+void NNUE::printStat() const {
+    _model.printMinMax();
 }
 
 Score NNUE::eval() {
