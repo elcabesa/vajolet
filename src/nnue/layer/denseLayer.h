@@ -32,7 +32,7 @@ public:
     DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int outShift);
     ~DenseLayer();
 
-    void propagate(const std::vector<inputType>& input);
+    /*void propagate(const std::vector<inputType>& input);*/
     accumulatorType propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
 
     void propagate(const FeatureList& l);
@@ -42,7 +42,7 @@ public:
 
     bool deserialize(std::istream& ss);
 
-    const std::vector<outType>& output() const;
+    const std::vector<accumulatorType>& output() const;
     const std::vector<outType>& outputRelu() const;
     
 private:
@@ -53,7 +53,7 @@ private:
     std::vector<biasType>* _bias;
     std::vector<weightType>* _weight;
 
-    std::vector<outType> _output;
+    std::vector<accumulatorType> _output;
     std::vector<outType> _outputRelu;
     
 };

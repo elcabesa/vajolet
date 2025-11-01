@@ -23,9 +23,14 @@
 //using flBiasType = int32_t;
 //using flWeightType = int32_t;
 
-using outType = float;
+using outType = int16_t;
+using accumulatorType = int32_t;
+using biasType = int16_t;
+using weightType = int16_t;
+
+/*using outType = float;
 using accumulatorType = float;
 using biasType = float;
 using weightType = float;
-
+*/
 #endif

@@ -119,9 +119,9 @@ Score NNUE::eval(FeatureList fl) {
     Score lowSat = -SCORE_KNOWN_WIN;
     Score highSat = SCORE_KNOWN_WIN;
 
-    auto s  = _model.forwardPass(fl);
+    auto s  = _model.forwardPass(fl); //Q24
 
-    Score score = s * 50000;
+    Score score = s * (50000.0f / 16777216.0f);
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
     return score;
@@ -256,7 +256,7 @@ Score NNUE::_completeEval() {
 
     auto s  = _model.forwardPass(_completeFeatureList);
 
-    Score score = s * 50000;
+    Score score = s * (50000.0f / 16777216.0f);
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
     return score;
@@ -270,7 +270,7 @@ Score NNUE::_incrementalEval() {
 
     if(_diffFeatureList.size() >= _completeEvalThreshold) {return _completeEval();}
 
-    Score score = _model.incrementalPass(_diffFeatureList) * 50000;
+    Score score = _model.incrementalPass(_diffFeatureList) * (50000.0f / 16777216.0f);
     _diffFeatureList.clear();
 
     score = std::min(highSat,score);
@@ -280,7 +280,7 @@ Score NNUE::_incrementalEval() {
     FeatureList fl;
     fl.clear();
     _createFeatures(fl);
-    Score score2 = _model.forwardPass(fl) *50000;
+    Score score2 = _model.forwardPass(fl) (50000.0f / 16777216.0f);
     score2 = std::min(highSat, score2);
     score2 = std::max(lowSat, score2);
 
