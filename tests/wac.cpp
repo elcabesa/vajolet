@@ -294,9 +294,10 @@ Result test(const std::string& testName, my_thread& thr, Position& pos, SearchLi
     return results; 
 }
 
-void doTest(const std::string& testName, my_thread& thr, Position& pos, SearchLimits& sl) {
+unsigned int doTest(const std::string& testName, my_thread& thr, Position& pos, SearchLimits& sl) {
     const auto res = test(testName, thr, pos, sl);
-    std::cout<<testName<<": "<<res.getPercentual()<<"% ("<<res.getPartial()<<"/"<<res.getTotal()<<")"<<std::endl;
+    //std::cout<<testName<<": "<<res.getPercentual()<<"% ("<<res.getPartial()<<"/"<<res.getTotal()<<")"<<std::endl;
+    return res.getPartial();
 }
 
 int main(int argc, char ** argv) {
@@ -306,18 +307,19 @@ int main(int argc, char ** argv) {
     }
     
     std::cout<<"time for each position: "<<time<<" ms"<<std::endl;
-	
+
     libChessInit();
 
     my_thread thr;
     thr.setMute(true);
-	thr.getTT().setSize(64);
+    thr.getTT().setSize(64);
     Position pos(Position::nnueConfig::on, Position::pawnHash::off);
-    pos.nnue()->load("nnue.par");
-
     SearchLimits sl;
     sl.setMoveTime(time);
+    for(unsigned int i = 1; pos.nnue()->load(std::string("file")+ std::to_string(i) + std::string(".weight")); ++i) {
+        auto wac = doTest("wacnew.epd", thr, pos, sl);
+        auto sts = doTest("STS1-STS15_LAN_v3.epd", thr, pos, sl);
+        std::cout << i <<";" << wac <<";"<<sts<<std::endl;
 
-    doTest("STS1-STS15_LAN_v3.epd", thr, pos, sl);
-    doTest("wacnew.epd", thr, pos, sl);
+    }
 }

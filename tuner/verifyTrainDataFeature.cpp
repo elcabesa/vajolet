@@ -143,10 +143,12 @@ void worker() {
 			}
 
 			auto dval = d.v/10000.0;
-			int diff = std::abs(dScore-dval)*10;
-			/*if(diff >=100) {
+			auto ddiff = std::abs(dScore-dval);
+/*			if(ddiff >=10) {
+				pos.setupFromFeatureList(d.f);
 				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<std::endl;
 			}*/
+			int diff = ddiff * 10;
 
 
 
@@ -178,7 +180,8 @@ void worker() {
 		totMse += mse[i];
 		totMseSigmoid += mseSigmoid[i];
 		totCount+= count[i];
-		if((i<40) | (i ==399) ) {
+		if((i<40) | (i ==399) )
+		{
 			std::cout<<i*0.1<<" ";
 			std::cout<<"Positions: "<<totCount - prevCount <<" ";
 			std::cout<<"MSE: "<<totMse/totCount<<" ";
