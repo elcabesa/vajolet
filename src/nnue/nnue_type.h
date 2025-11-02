@@ -18,6 +18,8 @@
 #ifndef NNUE_TYPE_H_
 #define NNUE_TYPE_H_ 
 
+#include <cstdint>
+
 using outType = int16_t;
 using accumulatorTypeFL = int16_t;
 using accumulatorTypeOut = int32_t;
