@@ -38,9 +38,9 @@ void Model::init() {
 
 }
 
-Model::Model():
-    _layer0(&bias0, &weight0, 0),
-    _layer1(&bias1, &weight1, 0)
+Model::Model(outType scale):
+    _layer0(&bias0, &weight0, scale),
+    _layer1(&bias1, &weight1, scale)
 {}
 
 void Model::setBias(unsigned int layer, unsigned int n, float bias) {
@@ -61,12 +61,12 @@ void Model::setWeight(unsigned int layer, unsigned int inN, unsigned int outN, f
     }
 }
 
-accumulatorType Model::forwardPass(const FeatureList& l) {
+accumulatorTypeOut Model::forwardPass(const FeatureList& l) {
     _layer0.propagate(l);
     return _layer1.propagateOut(_layer0.outputRelu(), 0, 0);
 }
 
-accumulatorType Model::incrementalPass(const DifferentialList& l) {
+accumulatorTypeOut Model::incrementalPass(const DifferentialList& l) {
     _layer0.incrementalPropagate(l);
     return _layer1.propagateOut(_layer0.outputRelu(), 0, 0);
 }

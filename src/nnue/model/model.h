@@ -30,10 +30,10 @@ class FeatureList;
 
 class Model {
 public:
-    Model();
+    Model(outType scale);
     
-    accumulatorType forwardPass(const FeatureList& l);
-    accumulatorType incrementalPass(const DifferentialList& l);
+    accumulatorTypeOut forwardPass(const FeatureList& l);
+    accumulatorTypeOut incrementalPass(const DifferentialList& l);
     
     bool deserialize(std::istream& ss);
     static void init();
@@ -49,8 +49,8 @@ private:
     static std::vector<weightType> weight0;
     static std::vector<weightType> weight1;
 
-    DenseLayer<outType, 768, 512> _layer0;
-    DenseLayer<outType, 512, 1> _layer1;
+    DenseLayer<outType, accumulatorTypeFL, 768, 512> _layer0;
+    DenseLayer<outType, accumulatorTypeOut, 512, 1> _layer1;
 };
 
 #endif

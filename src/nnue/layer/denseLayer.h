@@ -25,15 +25,15 @@
 class FeatureList;
 class DifferentialList;
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 class DenseLayer{
 public:
 
-    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int outShift);
+    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scale);
     ~DenseLayer();
 
-    /*void propagate(const std::vector<inputType>& input);*/
-    accumulatorType propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
+
+    accType propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
 
     void propagate(const FeatureList& l);
     void incrementalPropagate(const DifferentialList& l);
@@ -42,7 +42,7 @@ public:
 
     bool deserialize(std::istream& ss);
 
-    const std::vector<accumulatorType>& output() const;
+    const std::vector<accType>& output() const;
     const std::vector<outType>& outputRelu() const;
     
 private:
@@ -53,8 +53,10 @@ private:
     std::vector<biasType>* _bias;
     std::vector<weightType>* _weight;
 
-    std::vector<accumulatorType> _output;
+    std::vector<accType> _output;
     std::vector<outType> _outputRelu;
+
+    outType _scale;
     
 };
 

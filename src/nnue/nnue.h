@@ -82,6 +82,7 @@ private:
     Score _incrementalEval();
 
     const Position& _pos;
+    constexpr static outType _scale = 4096; //Q12
 };
 
 

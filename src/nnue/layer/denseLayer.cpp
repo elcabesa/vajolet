@@ -28,24 +28,24 @@
 
 #define FASTER_CODE
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-DenseLayer<inputType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, unsigned int outShift):
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scale):
     _inputSize(inputSize),
     _outputSize(outputSize),
-    _outShift(outShift),
     _bias(bias),
     _weight(weight),
     _output(outputSize),
-    _outputRelu(outputSize)
+    _outputRelu(outputSize),
+    _scale(scale)
 {}
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-DenseLayer<inputType, inputSize, outputSize>::~DenseLayer() {
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+DenseLayer<inputType, accType, inputSize, outputSize>::~DenseLayer() {
 }
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-accumulatorType DenseLayer<inputType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input, const unsigned int index, unsigned int o) {
-    accumulatorType out = (*_bias)[o] * 4096; //Q12*Q12
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input, const unsigned int index, unsigned int o) {
+    accType out = (*_bias)[o] * _scale; //Q12*Q12
 #ifdef FASTER_CODE
     auto* ref = &(_weight->data()[index]);
     auto *in = input.data();
@@ -61,20 +61,9 @@ accumulatorType DenseLayer<inputType, inputSize, outputSize>::propagateOut(const
     }
     return out;
 }
-/*
-template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-void DenseLayer<inputType, inputSize, outputSize>::propagate(const std::vector<inputType>& input) { //TODO REWRITE è sbagliata
-    unsigned int index = 0;
-    for (unsigned int o = 0; o < _outputSize; ++o) {
-        accumulatorType out = propagateOut(input, index, o);
-        _output[o] = out;
-        _outputRelu[o] = std::max(_output[o], (accumulatorType)(0.0f));
-        index += _inputSize;
-    }
-}*/
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize>
-void DenseLayer<inputType, inputSize, outputSize>::propagate(const FeatureList& l) {
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const FeatureList& l) {
     //std::cout<<"biases"<<std::endl;
     for (unsigned int o = 0; o < _outputSize; ++o) {
         _output[o] = (*_bias)[o];
@@ -98,15 +87,13 @@ void DenseLayer<inputType, inputSize, outputSize>::propagate(const FeatureList& 
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _outputRelu[o] = std::max(_output[o], (accumulatorType)(0.0f));  //Q12
+        _outputRelu[o] = std::max(_output[o], (accType)(0.0f));  //Q12
     }
-
-
 }
 
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize>
-void DenseLayer<inputType, inputSize, outputSize>::incrementalPropagate(const DifferentialList& l) {
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate(const DifferentialList& l) {
     for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
         unsigned int in = l.addList(idx);
 
@@ -142,20 +129,20 @@ void DenseLayer<inputType, inputSize, outputSize>::incrementalPropagate(const Di
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _outputRelu[o] = std::max(_output[o], (accumulatorType)(0.0f)); //Q12
+        _outputRelu[o] = std::max(_output[o], (accType)(0.0f)); //Q12
     }
 }
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-unsigned int DenseLayer<inputType, inputSize, outputSize>::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+unsigned int DenseLayer<inputType, accType, inputSize, outputSize>::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
     assert(o + i * _outputSize < _weight->size());
     return o + i * _outputSize;
 
 }
 
 #define PRINTSTAT
-template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss) {
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::istream& ss) {
 #ifdef PRINTSTAT
     unsigned int count = 0;
     double min = 1e8;
@@ -176,7 +163,7 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss)
 #endif
     for( auto & b: *_bias) {
         ss.read(bb.c, 4);
-        b = (biasType)(std::round(bb.d * 4096)); // Q12
+        b = (biasType)(std::round(bb.d * _scale)); // Q12
 #ifdef PRINTSTAT
         if (b == 0) { ++count;}
         min = std::min(min, double(b));
@@ -196,7 +183,7 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss)
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
         ss.read(ww.c, 4);
-        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(std::round(ww.d * 4096)); // Q12
+        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(std::round(ww.d * _scale)); // Q12
 #ifdef PRINTSTAT
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
         min = std::min(min,  double((*_weight)[_calcWeightIndex(i, o)]));
@@ -211,12 +198,12 @@ bool DenseLayer<inputType, inputSize, outputSize>::deserialize(std::istream& ss)
     return true;
 }
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize> 
-const std::vector<accumulatorType>& DenseLayer<inputType, inputSize, outputSize>::output() const {return _output;}
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+const std::vector<accType>& DenseLayer<inputType, accType, inputSize, outputSize>::output() const {return _output;}
 
-template <typename inputType, unsigned int inputSize, unsigned int outputSize>
-const std::vector<outType>& DenseLayer<inputType, inputSize, outputSize>::outputRelu() const {return _outputRelu;}
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+const std::vector<outType>& DenseLayer<inputType, accType, inputSize, outputSize>::outputRelu() const {return _outputRelu;}
 
 
-template class DenseLayer<outType, 768, 512>;
-template class DenseLayer<outType, 512, 1>;
+template class DenseLayer<outType, accumulatorTypeFL, 768, 512>;
+template class DenseLayer<outType, accumulatorTypeOut, 512, 1>;

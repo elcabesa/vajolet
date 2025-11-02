@@ -18,17 +18,14 @@
 #ifndef NNUE_TYPE_H_
 #define NNUE_TYPE_H_ 
 
-//using flOutType = int32_t;
-//using flAccumulatorType = int32_t;
-//using flBiasType = int32_t;
-//using flWeightType = int32_t;
-
 using outType = int16_t;
-using accumulatorType = int32_t;
+using accumulatorTypeFL = int16_t;
+using accumulatorTypeOut = int32_t;
 using biasType = int16_t;
 using weightType = int16_t;
 
-/*using outType = float;
+/*
+using outType = float;
 using accumulatorType = float;
 using biasType = float;
 using weightType = float;
