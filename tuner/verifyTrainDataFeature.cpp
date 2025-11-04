@@ -161,8 +161,17 @@ void worker() {
 
 			double dvalSigmoid = dval /5.0;
 			dvalSigmoid = 1.0/(1 + std::exp(-1.0 * dvalSigmoid));
+			double err = std::pow(dScoreSigmoid-dvalSigmoid,2.0);
+			mseSigmoid[diff] += err;
 
-			mseSigmoid[diff] += std::pow(dScoreSigmoid-dvalSigmoid,2.0);
+			if(
+				ddiff >=4
+				&& err > 0.04
+				&& dScore * dval <0
+			) {
+				pos.setupFromFeatureList(d.f);
+				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<" "<<err<<std::endl;
+			}
 
 			d = getPosition(myfile);
 		}
