@@ -150,6 +150,7 @@ void SelfPlay::playGame() {
 			&& _fs
 			&& _p.getNumberOfLegalMoves() > 1
 			&& !_p.isCaptureMoveOrPromotion(bestMove)
+			&& !_p.moveGivesCheck(bestMove)
 			&& !_p.isInCheck()
 			&& std::abs(score)<wonGame
 			&& (std::abs(score - _p.eval<false>()) <30000)
