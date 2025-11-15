@@ -28,7 +28,7 @@
 
 
 #define FASTER_CODE
-#define CHECK_LIMITS
+//#define CHECK_LIMITS
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scale):
