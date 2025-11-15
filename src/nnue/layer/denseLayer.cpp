@@ -20,6 +20,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <limits>
 
 #include "denseLayer.h"
 #include "differentialList.h"
@@ -27,6 +28,7 @@
 
 
 #define FASTER_CODE
+#define CHECK_LIMITS
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scale):
@@ -54,6 +56,16 @@ accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(cons
 #ifndef FASTER_CODE
         out += input[i] * (*_weight)[index + i]; // SBAGLIATO funziona solo per l'uscita' Q12*Q12 = Q24
 #else
+#ifdef CHECK_LIMITS
+        if(out > 0 && (*in * *ref) > 0 && std::numeric_limits<accType>::max() - *in * *ref < out) {
+            std::cout<<"OVERFLOW OUT "<< out << " " <<(*in * *ref) <<std::endl;
+            exit(0);
+        }
+        if(out < 0 && (*in * *ref) < 0 && std::numeric_limits<accType>::max() + *in * *ref < -out) {
+            std::cout<<"OVERFLOW OUT "<< out << " " <<(*in * *ref) <<std::endl;
+            exit(0);
+        }
+#endif
         out += *in * *ref;
         ++in;
         ++ref;
@@ -80,6 +92,16 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
 #ifndef FASTER_CODE
             _output[o] += (*_weight)[_calcWeightIndex(in, o)];
 #else
+#ifdef CHECK_LIMITS
+            if(_output[o] > 0 && (*ref) > 0 &&  std::numeric_limits<accType>::max() - *ref < _output[o]) {
+                std::cout<<"OVERFLOW prop "<< _output[o] << " " <<(*ref) <<std::endl;
+                exit(0);
+            }
+            if(_output[o] < 0 && (*ref) < 0 &&  std::numeric_limits<accType>::max() + *ref < -_output[o]) {
+                std::cout<<"OVERFLOW prop "<< _output[o] << " " <<(*ref) <<std::endl;
+                exit(0);
+            }
+#endif
             _output[o] += *ref;
             ++ref;
 #endif
@@ -122,6 +144,16 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
 #ifndef FASTER_CODE
             _output[o] -= (*_weight)[_calcWeightIndex(in, o)];
 #else
+#ifdef CHECK_LIMITS
+            if(_output[o] > 0 && (*ref) > 0 &&  std::numeric_limits<accType>::max() - *ref < _output[o]) {
+                std::cout<<"OVERFLOW incr prop "<< _output[o] << " " <<(*ref) <<std::endl;
+                exit(0);
+            }
+            if(_output[o] < 0 && (*ref) < 0 &&  std::numeric_limits<accType>::max() + *ref < -_output[o]) {
+                std::cout<<"OVERFLOW incr prop "<< _output[o] << " " <<(*ref) <<std::endl;
+                exit(0);
+            }
+#endif
             _output[o] -= *ref;
             ++ref;
 #endif
