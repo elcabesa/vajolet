@@ -31,6 +31,7 @@ class SaveWeights(Callback):
 
 def read_train_data(filename):
     with open(filename, 'rb') as f:
+        #print("RESTART")
         count = 0
         while True:
             fs =f.read(1)
@@ -43,7 +44,7 @@ def read_train_data(filename):
             for i in range(featuresSize):
                 idx = int.from_bytes(f.read(2), byteorder='little')
                 feature[idx] = 1
-                #print(idx)
+            #    #print(idx)
             label = struct.unpack('<f', f.read(4))[0] /50000.0
             label = 1.0/(1 + math.exp(-1.0 * label)) ;
             #float.from_bytes(f.read(4), byteorder='little')
@@ -80,7 +81,7 @@ reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, verbose=1
 
 spe = int(10000000/16348)
 
-model.fit(data, epochs=100, verbose=1,steps_per_epoch= spe, callbacks=[backup, SaveWeights(), reduce_lr])
+model.fit(data, epochs=200, verbose=1,steps_per_epoch= spe, callbacks=[backup, SaveWeights(), reduce_lr])
 
 
 print("*** Training done! ***")
