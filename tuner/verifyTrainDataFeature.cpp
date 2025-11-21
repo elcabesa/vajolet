@@ -101,15 +101,17 @@ void worker() {
 	std::ifstream myfile ("fen.data");
 
 	unsigned long poscount = 0;
+	unsigned long errcount = 0;
+
 	if (myfile.is_open()) {
 
 		Data d = getPosition(myfile);
 
 		while ( d.f.size() != 0 ) {
 			++poscount;
-			if(poscount%1000000 == 0) {
+			/*if(poscount%1000000 == 0) {
 				std::cout<<poscount/1e6<<"M"<<std::endl;
-			}
+			}*/
 //#define DEBUG_PARSER
 #ifdef DEBUG_PARSER
 			for(unsigned int i = 0; i < d.f.size(); ++i) {
@@ -165,8 +167,9 @@ void worker() {
 				&& err > 0.04
 				&& dScore * dval <0
 			) {
-				pos.setupFromFeatureList(d.f);
-				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<" "<<err<<std::endl;
+				errcount++;
+				/*pos.setupFromFeatureList(d.f);
+				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<" "<<err<<std::endl;*/
 			}
 
 			d = getPosition(myfile);
@@ -175,7 +178,7 @@ void worker() {
 	}
 	else std::cout << "Unable to open file"<<std::endl;
 
-	std::cout<<"count:"<<poscount<<std::endl;
+	std::cout<<"count:"<<poscount<<" err:"<<errcount<<std::endl;
 
 	double totMse = 0;
 	double totMseSigmoid = 0;

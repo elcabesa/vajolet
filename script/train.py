@@ -40,9 +40,13 @@ def read_train_data(filename):
             count +=1
             #print(count)
             featuresSize = int.from_bytes(fs, byteorder='little')
-            feature = [0] * 768
+
+            feature = np.zeros(768)
+            ff = f.read(2*featuresSize)
             for i in range(featuresSize):
-                idx = int.from_bytes(f.read(2), byteorder='little')
+                bites = ff[2*i:2*i+2]
+                #bites = f.read(2)
+                idx = int.from_bytes(bites, byteorder='little')
                 feature[idx] = 1
             #    #print(idx)
             label = struct.unpack('<f', f.read(4))[0] /50000.0
