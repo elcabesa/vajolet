@@ -102,6 +102,8 @@ void worker() {
 
 	unsigned long poscount = 0;
 	unsigned long errcount = 0;
+	double mseError = 0;
+	double mseErrorSigmoid = 0;
 
 	if (myfile.is_open()) {
 
@@ -109,9 +111,9 @@ void worker() {
 
 		while ( d.f.size() != 0 ) {
 			++poscount;
-			/*if(poscount%1000000 == 0) {
+			if(poscount%1000000 == 0) {
 				std::cout<<poscount/1e6<<"M"<<std::endl;
-			}*/
+			}
 //#define DEBUG_PARSER
 #ifdef DEBUG_PARSER
 			for(unsigned int i = 0; i < d.f.size(); ++i) {
@@ -152,7 +154,8 @@ void worker() {
 
 			count[diff]++;
 
-			mse[diff] += std::pow(dScore-dval,2.0);
+			double se  = std::pow(dScore-dval,2.0);
+			mse[diff] += se;
 
 			double dScoreSigmoid = dScore /5.0;
 			dScoreSigmoid = 1.0/(1 + std::exp(-1.0 * dScoreSigmoid));
@@ -168,6 +171,8 @@ void worker() {
 				&& dScore * dval <0
 			) {
 				errcount++;
+				mseError+= se;
+				mseErrorSigmoid+= err;
 				/*pos.setupFromFeatureList(d.f);
 				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<" "<<err<<std::endl;*/
 			}
@@ -198,6 +203,19 @@ void worker() {
 			prevCount = totCount;
 		}
 	}
+	for(unsigned int i = 0; i<400; ++i) {
+		if((i<40) | (i ==399) )
+		{
+			std::cout<<i*0.1<<" ";
+			std::cout<<"Positions: "<<totCount - prevCount <<" ";
+			std::cout<<"MSE: "<<mse[i]<<" ";
+			std::cout<<"MSESigmoid: "<<mseSigmoid[i]<<" ";
+			std::cout<<"totcount: "<<totCount<<std::endl;
+			prevCount = totCount;
+		}
+	}
+	std::cout<<"filtered error "<<mseError/totCount <<" "<<mseErrorSigmoid/totCount<<std::endl;
+
 }
 
 int main() {

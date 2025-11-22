@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from array import array
 
-from keras.callbacks import ModelCheckpoint, BackupAndRestore, Callback, ReduceLROnPlateau
+from keras.callbacks import ModelCheckpoint, BackupAndRestore, Callback, ReduceLROnPlateau, CSVLogger
 from keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Input
 from tensorflow.keras import initializers
@@ -10,6 +10,19 @@ import tensorflow as tf
 import numpy as np
 import struct
 import math
+import os
+import json
+
+FEN_FILENAME = 'fen.data'
+
+BATCH_SIZE = 16384
+
+EPOCH_SIZE = 10000000
+EPOCHS = 300
+
+INPUT_SIZE = 768
+ACCUMULATOR_SIZE = 512
+SCALING = 50000.0
 
 class SaveWeights(Callback):
     def __init__(self):
@@ -29,7 +42,7 @@ class SaveWeights(Callback):
         output_file.close()
 
 
-def read_train_data(filename):
+def get_train_data_size(filename):
     with open(filename, 'rb') as f:
         #print("RESTART")
         count = 0
@@ -40,8 +53,41 @@ def read_train_data(filename):
             count +=1
             #print(count)
             featuresSize = int.from_bytes(fs, byteorder='little')
+            ff = f.read(2*featuresSize)
+            ff = f.read(4)
+        return count
 
-            feature = np.zeros(768)
+firstRun = True
+def read_train_data(filename, skip):
+    global firstRun
+
+    with open(filename, 'rb') as f:
+        print("RESTART")
+        count = 0
+        if firstRun:
+            print("skipping {} positions".format(skip))
+            firstRun = False
+            while True:
+                fs =f.read(1)
+                if not fs:
+                    break
+                count +=1
+                #print(count)
+                featuresSize = int.from_bytes(fs, byteorder='little')
+                ff = f.read(2*featuresSize)
+                ff = f.read(4)
+                if count > skip:
+                    break
+
+        while True:
+            fs = f.read(1)
+            if not fs:
+                break
+            count +=1
+            #print(count)
+            featuresSize = int.from_bytes(fs, byteorder='little')
+
+            feature = np.zeros(INPUT_SIZE)
             ff = f.read(2*featuresSize)
             for i in range(featuresSize):
                 bites = ff[2*i:2*i+2]
@@ -49,47 +95,57 @@ def read_train_data(filename):
                 idx = int.from_bytes(bites, byteorder='little')
                 feature[idx] = 1
             #    #print(idx)
-            label = struct.unpack('<f', f.read(4))[0] /50000.0
+            label = struct.unpack('<f', f.read(4))[0] / SCALING
             label = 1.0/(1 + math.exp(-1.0 * label)) ;
             #float.from_bytes(f.read(4), byteorder='little')
             #print(label)
             yield feature, label
             #exit(0)
 
-def get_dataset():
-    filename = 'fen.data'
-    generator = lambda: read_train_data(filename)
+def get_dataset(skip):
+    filename = FEN_FILENAME
+    generator = lambda: read_train_data(filename, skip)
     return Dataset.from_generator(
-        generator, (tf.int32, tf.float32), ((768,), ()))
+        generator, (tf.int32, tf.float32), ((INPUT_SIZE,), ()))
 
 
 model = Sequential()
-model.add(Input(shape=(768,),dtype='int32'))
-model.add(Dense(512, activation='relu'))
+model.add(Input(shape=(INPUT_SIZE,),dtype='int32'))
+model.add(Dense(ACCUMULATOR_SIZE, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(loss='mean_squared_error',
-              optimizer='adamw',
-              metrics=['accuracy'])
+              optimizer='adamw')
 
 model.summary()
 
+size = get_train_data_size(FEN_FILENAME)
+print("training data positions {}".format(size))
+
 print("*** Training... ***")
 
-data = get_dataset().batch(16348).repeat()
+spe = int(EPOCH_SIZE/BATCH_SIZE)
 
+skip = 0
+epoch = 0
 
+path = os.path.join(os.getcwd(), 'backup', 'training_metadata.json')
+if os.path.exists(path):
+    with open(path, 'r') as file:
+        epoch = json.load(file)['epoch']
+
+print("epoch {}".format(epoch))
+
+skip = epoch * spe * BATCH_SIZE
+skip = skip % size
+
+data = get_dataset(skip).batch(BATCH_SIZE).repeat()
 
 backup = BackupAndRestore(backup_dir="./backup")
 reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, verbose=1)
+csv_logger = CSVLogger('training.log', separator=",", append=True)
 
-spe = int(10000000/16348)
-
-model.fit(data, epochs=200, verbose=1,steps_per_epoch= spe, callbacks=[backup, SaveWeights(), reduce_lr])
+model.fit(data, epochs=EPOCHS, verbose=1,steps_per_epoch= spe, callbacks=[backup, SaveWeights(), reduce_lr, csv_logger])
 
 
 print("*** Training done! ***")
-
-
-
-
