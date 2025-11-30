@@ -97,8 +97,11 @@ accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(cons
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const FeatureList& l) {
     //std::cout<<"biases"<<std::endl;
+    auto out = _output.data();
+    auto outRelu = _outputRelu.data();
+    auto bias = _bias->data();
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _output[o] = (*_bias)[o];
+        out[o] = bias[o];
     }
 
     //std::cout<<"accumulate"<<std::endl;
@@ -110,26 +113,26 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
 #endif
         for (unsigned int o = 0; o < _outputSize; ++o) {
 #ifndef FASTER_CODE
-            _output[o] += (*_weight)[_calcWeightIndex(in, o)];
+            out[o] += (*_weight)[_calcWeightIndex(in, o)];
 #else
 #ifdef CALC_DEBUG_DATA
-            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < _output[o]) {_overflow = true; exit(1);}
-            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > _output[o]) {_overflow = true; exit(1);}
+            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < out[o]) {_overflow = true; exit(1);}
+            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > out[o]) {_overflow = true; exit(1);}
 #endif
-            _output[o] += *ref;
+            out[o] += *ref;
             ++ref;
 #endif
 #ifdef CALC_DEBUG_DATA
-            if(_output[o] > _max ) _max = _output[o];
-            if(_output[o] < _min ) _min = _output[o];
+            if(out[o] > _max ) _max = out[o];
+            if(out[o] < _min ) _min = out[o];
 #endif
         }
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _outputRelu[o] = std::max(_output[o], (accType)(0.0f));  //Q12
+        outRelu[o] = std::max(out[o], (accType)(0.0f));  //Q12
 #ifdef CALC_DEBUG_DATA
-        if(_outputRelu[o] > 0.0f) {
+        if(outRelu[o] > 0.0f) {
             _deadAccumulator[o] = false;
             //std::cout<<"ALIVE"<<std::endl;
         }
@@ -140,6 +143,10 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate(const DifferentialList& l) {
+
+    auto out = _output.data();
+    auto outRelu = _outputRelu.data();
+
     for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
         unsigned int in = l.addList(idx);
 
@@ -150,18 +157,18 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
 
         for (unsigned int o = 0; o < _outputSize; ++o) {
 #ifndef FASTER_CODE
-            _output[o] += (*_weight)[_calcWeightIndex(in, o)];
+            out[o] += (*_weight)[_calcWeightIndex(in, o)];
 #else
 #ifdef CALC_DEBUG_DATA
-            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < _output[o]) {_overflow = true; exit(1);}
-            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > _output[o]) {_overflow = true; exit(1);}
+            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < out[o]) {_overflow = true; exit(1);}
+            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > out[o]) {_overflow = true; exit(1);}
 #endif
-            _output[o] += *ref;
+            out[o] += *ref;
             ++ref;
 #endif
 #ifdef CALC_DEBUG_DATA
-            if(_output[o] > _max ) _max = _output[o];
-            if(_output[o] < _min ) _min = _output[o];
+            if(out[o] > _max ) _max = out[o];
+            if(out[o] < _min ) _min = out[o];
 #endif
         }
     }
@@ -174,26 +181,26 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
 #endif
         for (unsigned int o = 0; o < _outputSize; ++o) {
 #ifndef FASTER_CODE
-            _output[o] -= (*_weight)[_calcWeightIndex(in, o)];
+            out[o] -= (*_weight)[_calcWeightIndex(in, o)];
 #else
 #ifdef CALC_DEBUG_DATA
-            if((*ref) < 0 && std::numeric_limits<accType>::max() + *ref < _output[o]) {_overflow = true; exit(1);}
-            if((*ref) > 0 && std::numeric_limits<accType>::min() + *ref > _output[o]) {_overflow = true; exit(1);}
+            if((*ref) < 0 && std::numeric_limits<accType>::max() + *ref < out[o]) {_overflow = true; exit(1);}
+            if((*ref) > 0 && std::numeric_limits<accType>::min() + *ref > out[o]) {_overflow = true; exit(1);}
 #endif
-            _output[o] -= *ref;
+            out[o] -= *ref;
             ++ref;
 #endif
 #ifdef CALC_DEBUG_DATA
-            if(_output[o] > _max ) _max = _output[o];
-            if(_output[o] < _min ) _min = _output[o];
+            if(out[o] > _max ) _max = out[o];
+            if(out[o] < _min ) _min = out[o];
 #endif
         }
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        _outputRelu[o] = std::max(_output[o], (accType)(0.0f)); //Q12
+        outRelu[o] = std::max(out[o], (accType)(0.0f)); //Q12
 #ifdef CALC_DEBUG_DATA
-        if(_outputRelu[o] > 0.0f) {
+        if(outRelu[o] > 0.0f) {
             _deadAccumulator[o] = false;
             //std::cout<<"ALIVE"<<std::endl;
         }
