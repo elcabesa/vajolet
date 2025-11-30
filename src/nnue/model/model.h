@@ -45,6 +45,7 @@ public:
 
     void setBias(unsigned int layer, unsigned int n, float bias);
     void setWeight(unsigned int layer, unsigned int inN, unsigned int outN, float bias);
+    void printStats() const;
     
 private:
 
@@ -54,9 +55,9 @@ private:
     static std::vector<weightType> weight0;
     static std::vector<weightType> weight1;
 
-    DenseLayer<outType, accumulatorTypeFL, 768, 512> _layer0W;
-    DenseLayer<outType, accumulatorTypeFL, 768, 512> _layer0B;
-    DenseLayer<outType, accumulatorTypeOut, 512, 1> _layer1;
+    DenseLayer<outType, accumulatorTypeFL, inputSize, accumulatorSize> _layer0W;
+    DenseLayer<outType, accumulatorTypeFL, inputSize, accumulatorSize> _layer0B;
+    DenseLayer<outType, accumulatorTypeOut, accumulatorSize, outSize> _layer1;
 };
 
 #endif

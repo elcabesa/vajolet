@@ -20,11 +20,20 @@
 
 #include <cstdint>
 
+//#define CALC_DEBUG_DATA
+
 using outType = int16_t;
 using accumulatorTypeFL = int16_t;
 using accumulatorTypeOut = int32_t;
 using biasType = int16_t;
 using weightType = int16_t;
+
+constexpr int inputSize = 768;
+constexpr int accumulatorSize = 512;
+constexpr int outSize = 1;
+
+constexpr int scale = 4096; //Q8
+constexpr float evalScale = 50000.0f;
 
 /*
 using outType = float;

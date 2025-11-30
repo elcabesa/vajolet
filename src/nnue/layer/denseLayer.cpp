@@ -29,6 +29,18 @@
 #define FASTER_CODE
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+double DenseLayer<inputType, accType, inputSize, outputSize>::_min = 1e8;
+
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+double DenseLayer<inputType, accType, inputSize, outputSize>::_max = -1e8;
+
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+bool DenseLayer<inputType, accType, inputSize, outputSize>::_overflow = false;
+
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+std::vector<bool> DenseLayer<inputType, accType, inputSize, outputSize>::_deadAccumulator;
+
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scale):
     _inputSize(inputSize),
     _outputSize(outputSize),
@@ -37,7 +49,16 @@ DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<bi
     _output(outputSize),
     _outputRelu(outputSize),
     _scale(scale)
-{}
+{
+#ifdef CALC_DEBUG_DATA
+    _deadAccumulator.resize(outputSize, true);
+    for (std::size_t t{}; t != _deadAccumulator.size(); ++t) {
+        std::cout << (t ? ", " : "") << _deadAccumulator[t];
+    }
+    std::cout<<std::endl;
+#endif
+
+}
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 DenseLayer<inputType, accType, inputSize, outputSize>::~DenseLayer() {
@@ -54,11 +75,22 @@ accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(cons
 #ifndef FASTER_CODE
         out += input[i] * (*_weight)[index + i]; // SBAGLIATO funziona solo per l'uscita' Q12*Q12 = Q24
 #else
+#ifdef CALC_DEBUG_DATA
+        if((*in * *ref) > 0 && std::numeric_limits<accType>::max() - (*in * *ref) < out) {_overflow = true; exit(1);}
+        if((*in * *ref) < 0 && std::numeric_limits<accType>::min() - (*in * *ref) > out) {_overflow = true; exit(1);}
+#endif
         out += *in * *ref;
         ++in;
         ++ref;
 #endif
+#ifdef CALC_DEBUG_DATA
+        if(out > _max ) _max = out;
+        if(out < _min ) _min = out;
+#endif
     }
+#ifdef CALC_DEBUG_DATA
+    _deadAccumulator[o] = false;
+#endif
     return out;
 }
 
@@ -80,14 +112,28 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
 #ifndef FASTER_CODE
             _output[o] += (*_weight)[_calcWeightIndex(in, o)];
 #else
+#ifdef CALC_DEBUG_DATA
+            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < _output[o]) {_overflow = true; exit(1);}
+            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > _output[o]) {_overflow = true; exit(1);}
+#endif
             _output[o] += *ref;
             ++ref;
+#endif
+#ifdef CALC_DEBUG_DATA
+            if(_output[o] > _max ) _max = _output[o];
+            if(_output[o] < _min ) _min = _output[o];
 #endif
         }
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
         _outputRelu[o] = std::max(_output[o], (accType)(0.0f));  //Q12
+#ifdef CALC_DEBUG_DATA
+        if(_outputRelu[o] > 0.0f) {
+            _deadAccumulator[o] = false;
+            //std::cout<<"ALIVE"<<std::endl;
+        }
+#endif
     }
 }
 
@@ -106,8 +152,16 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
 #ifndef FASTER_CODE
             _output[o] += (*_weight)[_calcWeightIndex(in, o)];
 #else
+#ifdef CALC_DEBUG_DATA
+            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < _output[o]) {_overflow = true; exit(1);}
+            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > _output[o]) {_overflow = true; exit(1);}
+#endif
             _output[o] += *ref;
             ++ref;
+#endif
+#ifdef CALC_DEBUG_DATA
+            if(_output[o] > _max ) _max = _output[o];
+            if(_output[o] < _min ) _min = _output[o];
 #endif
         }
     }
@@ -122,15 +176,42 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
 #ifndef FASTER_CODE
             _output[o] -= (*_weight)[_calcWeightIndex(in, o)];
 #else
+#ifdef CALC_DEBUG_DATA
+            if((*ref) < 0 && std::numeric_limits<accType>::max() + *ref < _output[o]) {_overflow = true; exit(1);}
+            if((*ref) > 0 && std::numeric_limits<accType>::min() + *ref > _output[o]) {_overflow = true; exit(1);}
+#endif
             _output[o] -= *ref;
             ++ref;
+#endif
+#ifdef CALC_DEBUG_DATA
+            if(_output[o] > _max ) _max = _output[o];
+            if(_output[o] < _min ) _min = _output[o];
 #endif
         }
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
         _outputRelu[o] = std::max(_output[o], (accType)(0.0f)); //Q12
+#ifdef CALC_DEBUG_DATA
+        if(_outputRelu[o] > 0.0f) {
+            _deadAccumulator[o] = false;
+            //std::cout<<"ALIVE"<<std::endl;
+        }
+#endif
     }
+}
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+void DenseLayer<inputType, accType, inputSize, outputSize>::printStat() const {
+#ifdef CALC_DEBUG_DATA
+    std::cout<<"min:"<<_min<<" max:"<<_max<<" overflow:"<<_overflow<<std::endl;
+    int count = 0 ;
+    for (std::size_t t{}; t != _deadAccumulator.size(); ++t) {
+        if(_deadAccumulator[t]) ++count;
+        //std::cout << (t ? ", " : "") << _deadAccumulator[t];
+    }
+
+    std::cout<<count<<std::endl;
+#endif
 }
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
@@ -166,8 +247,8 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
         b = (biasType)(std::round(bb.d * _scale)); // Q12
 #ifdef PRINTSTAT
         if (b == 0) { ++count;}
-        min = std::min(min, double(b));
-        max = std::max(max,  double(b));
+        min = std::min(min, double(bb.d));
+        max = std::max(max,  double(bb.d));
 #endif
     }
 #ifdef PRINTSTAT
@@ -186,8 +267,8 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
         (*_weight)[_calcWeightIndex(i, o)] = (weightType)(std::round(ww.d * _scale)); // Q12
 #ifdef PRINTSTAT
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
-        min = std::min(min,  double((*_weight)[_calcWeightIndex(i, o)]));
-        max = std::max(max,  double((*_weight)[_calcWeightIndex(i, o)]));
+        min = std::min(min,  double(ww.d));
+        max = std::max(max,  double(ww.d));
 #endif
     }
 #ifdef PRINTSTAT
@@ -205,5 +286,5 @@ template <typename inputType, typename accType, unsigned int inputSize, unsigned
 const std::vector<outType>& DenseLayer<inputType, accType, inputSize, outputSize>::outputRelu() const {return _outputRelu;}
 
 
-template class DenseLayer<outType, accumulatorTypeFL, 768, 512>;
-template class DenseLayer<outType, accumulatorTypeOut, 512, 1>;
+template class DenseLayer<outType, accumulatorTypeFL, inputSize, accumulatorSize>;
+template class DenseLayer<outType, accumulatorTypeOut, accumulatorSize, outSize>;

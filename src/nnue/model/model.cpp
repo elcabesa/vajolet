@@ -30,11 +30,11 @@ std::vector<weightType> Model::weight0;
 std::vector<weightType> Model::weight1;
 
 void Model::init() {
-    bias0.resize(512, 0.0);
-	bias1.resize(1, 0.0);
+    bias0.resize(accumulatorSize, 0.0);
+	bias1.resize(outSize, 0.0);
 	
-	weight0.resize(768 * 512, 1.0);
-	weight1.resize(512 * 1, 1.0);
+	weight0.resize(inputSize * accumulatorSize, 1.0);
+	weight1.resize(accumulatorSize * outSize, 1.0);
 
 }
 
@@ -43,6 +43,15 @@ Model::Model(outType scale):
     _layer0B(&bias0, &weight0, scale),
     _layer1(&bias1, &weight1, scale)
 {}
+
+void Model::printStats() const {
+#ifdef CALC_DEBUG_DATA
+    _layer0W.printStat();
+    _layer0B.printStat();
+    _layer1.printStat();
+#endif
+}
+
 
 void Model::setBias(unsigned int layer, unsigned int n, float bias) {
     std::vector<biasType>* l;

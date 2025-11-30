@@ -44,6 +44,7 @@ public:
 
     const std::vector<accType>& output() const;
     const std::vector<outType>& outputRelu() const;
+    void printStat() const;
     
 private:
     unsigned int _inputSize;
@@ -55,8 +56,12 @@ private:
 
     std::vector<accType> _output;
     std::vector<outType> _outputRelu;
+    static std::vector<bool> _deadAccumulator;
 
     outType _scale;
+    static double _min;
+    static double _max;
+    static bool _overflow;
     
 };
 

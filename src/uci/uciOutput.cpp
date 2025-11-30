@@ -22,6 +22,7 @@
 #include "rootMove.h"
 #include "uciOutput.h"
 #include "vajo_io.h"
+#include "nnue.h"
 
 /*****************************
 uci concrete output definitions
@@ -36,7 +37,7 @@ public:
 	void printDepth() const override;
 	void printScore(const signed int cp) const override;
 	void printBestMove( const Move& m, const Move& ponder, bool isChess960) const override;
-	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const override;
+	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time, Position& pos) const override;
 	UciMuteOutput() {
 		_type = type::mute;
 	}
@@ -53,7 +54,7 @@ public:
 	void printDepth() const override;
 	void printScore(const signed int cp) const override;
 	void printBestMove( const Move& m, const Move& ponder, bool isChess960) const override;
-	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const override;
+	void printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time, Position& pos) const override;
 	UciStandardOutput() {
 		_type = type::standard;
 	}
@@ -164,12 +165,14 @@ void UciStandardOutput::printBestMove( const Move& bm, const Move& ponder, bool 
 	std::cout<< sync_endl;
 }
 
-void UciStandardOutput::printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time) const
+void UciStandardOutput::printGeneralInfo( const unsigned int fullness, const unsigned long long int thbits, const unsigned long long int nodes, const long long int time, Position& pos) const
 {
 	if( !reduceVerbosity )
 	{
 		long long int localtime = std::max(time,1ll);
 		sync_cout<<"info hashfull " << fullness << " tbhits " << thbits << " nodes " << nodes <<" time "<< time << " nps " << (unsigned int)((double)nodes*1000/(double)localtime) << sync_endl;
+		Position p(pos, Position::nnueConfig::on, Position::pawnHash::off);
+		p.nnue()->printStats();
 	}
 }
 
@@ -183,7 +186,7 @@ void UciMuteOutput::showCurrLine(const Position & , const unsigned int ) const{}
 void UciMuteOutput::printDepth() const{}
 void UciMuteOutput::printScore(const signed int ) const{}
 void UciMuteOutput::printBestMove( const Move&, const Move&, bool ) const{}
-void UciMuteOutput::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int ) const{}
+void UciMuteOutput::printGeneralInfo( const unsigned int , const unsigned long long int , const unsigned long long int , const long long int, Position&) const{}
 
 
 

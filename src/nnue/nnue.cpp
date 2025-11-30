@@ -97,6 +97,10 @@ bool NNUE::loaded() {
     return _loaded;
 }
 
+void NNUE::printStats() {
+    _model.printStats();
+}
+
 Score NNUE::eval() {
     Score s;
     if (incrementalEvalDisabled()) {
@@ -116,7 +120,7 @@ Score NNUE::eval(FeatureList fl) {
 
     auto s  = _model.forwardPass(fl, fl, Model::whitePow); //Q24
 
-    Score score = s * (50000.0f / (_scale*_scale) );
+    Score score = s * (evalScale / (_scale*_scale) );
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
     return score;
@@ -303,7 +307,7 @@ Score NNUE::_completeEval() {
     _createFeatures(_completeFeatureListB, Model::blackPow);
     auto s  = _model.forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow);
 
-    Score score = s * (50000.0f / (_scale*_scale));
+    Score score = s * (evalScale / (_scale*_scale));
 
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
@@ -317,7 +321,7 @@ Score NNUE::_incrementalEval() {
     if(_diffFeatureListB.size() >= _completeEvalThreshold) {return _completeEval();}
     if(_diffFeatureListW.size() >= _completeEvalThreshold) {return _completeEval();}
 
-    Score score = _model.incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow) * (50000.0f / (_scale*_scale));
+    Score score = _model.incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow) * (evalScale / (_scale*_scale));
     _diffFeatureListB.clear();
     _diffFeatureListW.clear();
 
@@ -333,7 +337,7 @@ Score NNUE::_incrementalEval() {
     flb.clear();
     _createFeatures(flw, Model::whitePow);
     _createFeatures(flb, Model::blackPow);
-    Score score2 = _modelCheck.forwardPass(flw, flb, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow) * (50000.0f / (_scale*_scale));
+    Score score2 = _modelCheck.forwardPass(flw, flb, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow) * (evalScale / (_scale*_scale));
     score2 = std::min(highSat, score2);
     score2 = std::max(lowSat, score2);
 

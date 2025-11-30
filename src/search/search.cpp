@@ -420,7 +420,7 @@ SearchResult Search::impl::manageNewSearch(timeManagement & tm)
 	// print out the choosen line
 	//-----------------------------
 
-	_UOI->printGeneralInfo( _tt.getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime());
+	_UOI->printGeneralInfo( _tt.getFullness(), getTbHits(), getVisitedNodes(), _st.getElapsedTime(), _pos);
 	
 	if (PV.size()>0) {
 		Move bestMove = PV.getMove(0);

@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 #include "uciOutput.h"
 #include "move.h"
+#include "position.h"
 #include "tSquare.h"
 
 class UciOutputTest : public ::testing::Test {
@@ -123,8 +124,9 @@ TEST_F(UciOutputTest, printBestMoveCastle2) {
 TEST_F(UciOutputTest, printGeneralInfo) {
 	std::unique_ptr<UciOutput> UOI;
 	UOI = UciOutput::create();
+	Position pos;
 
-	UOI->printGeneralInfo( 32, 966644, 132759, 9576);
+	UOI->printGeneralInfo( 32, 966644, 132759, 9576, pos);
 	EXPECT_EQ(buffer.str(), "info hashfull 32 tbhits 966644 nodes 132759 time 9576 nps 13863\n");
 }
 

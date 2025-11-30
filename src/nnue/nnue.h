@@ -57,6 +57,8 @@ public:
     static tSquare _getSquareFromFeature(unsigned int);
     static bitboardIndex _getPieceFromFeature(unsigned int);
 
+    void printStats();
+
 private:
 
     Model _model;
@@ -89,7 +91,7 @@ private:
     Score _incrementalEval();
 
     const Position& _pos;
-    constexpr static outType _scale = 4096; //Q12
+    constexpr static outType _scale = scale; //Q12
 };
 
 

@@ -82,7 +82,8 @@ Data getPosition(std::ifstream& f) {
 	return d;
 }
 
-void worker() {
+bool worker(int i) {
+	std::string path = std::string("file")+ std::to_string(i) + std::string(".weight");
 	bool loaded = false;
 	std::map<int, unsigned long> count;
 	std::map<int, double> mse;
@@ -91,8 +92,9 @@ void worker() {
 	Position pos(Position::nnueConfig::on);
 
 	auto& nnue = pos.nnue();
-	if(!nnue->load("nnue.par")) {
-		std::cout<<"error loading nnue.par"<<std::endl;
+	if(!nnue->load(path)) {
+		std::cout<<"error loading "<<path<<std::endl;
+		return false;
 	} else {
 		loaded = true;
 	}
@@ -215,6 +217,9 @@ void worker() {
 		}
 	}
 	std::cout<<"filtered error "<<mseError/totCount <<" "<<mseErrorSigmoid/totCount<<std::endl;
+	std::cerr<<i<<";"<<totMse/totCount<<";"<<totMseSigmoid/totCount<<";"<<errcount<<std::endl;
+
+	return true;
 
 }
 
@@ -234,7 +239,8 @@ int main() {
 	//----------------------------------
 	libChessInit();
 
-	worker();
+	for(unsigned int i = 1; worker(i); ++i) {
+	}
 
 	return 0;
 }
