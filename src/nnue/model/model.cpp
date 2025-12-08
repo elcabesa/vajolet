@@ -86,9 +86,10 @@ accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const Diff
 
 bool Model::deserialize(std::istream& ss) {
     ss.clear();
-
-    if(!_layer0W.deserialize(ss)) {std::cout<<"MODEL internal layer0 error"<<std::endl;return false;}
-    if(!_layer1.deserialize(ss)) {std::cout<<"MODEL internal layer1 error"<<std::endl;return false;}
+    unsigned long changedCount = 0;
+    if(!_layer0W.deserialize(ss, changedCount)) {std::cout<<"MODEL internal layer0 error"<<std::endl;return false;}
+    if(!_layer1.deserialize(ss, changedCount)) {std::cout<<"MODEL internal layer1 error"<<std::endl;return false;}
+    std::cout<<"changed parameters:"<<changedCount<<std::endl;
 
     return true;
 }

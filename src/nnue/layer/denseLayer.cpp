@@ -230,9 +230,9 @@ unsigned int DenseLayer<inputType, accType, inputSize, outputSize>::_calcWeightI
 
 //#define PRINTSTAT
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
-bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::istream& ss) {
+bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::istream& ss, unsigned long &changed) {
 #ifdef PRINTSTAT
-    unsigned int count = 0;
+    unsigned int zeroCount = 0;
     double min = 1e8;
     double max = -1e8;
 #endif
@@ -251,9 +251,11 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
 #endif
     for( auto & b: *_bias) {
         ss.read(bb.c, 4);
-        b = (biasType)(std::round(bb.d * _scale)); // Q12
+        biasType t = (biasType)(std::round(bb.d * _scale)); // Q12
+        if(b != t) {++changed;}
+        b = t;
 #ifdef PRINTSTAT
-        if (b == 0) { ++count;}
+        if (b == 0) { ++zeroCount;}
         min = std::min(min, double(bb.d));
         max = std::max(max,  double(bb.d));
 #endif
@@ -261,19 +263,21 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
 #ifdef PRINTSTAT
     std::cout<<"b min "<<min<<std::endl;
     std::cout<<"b MAX "<<max<<std::endl;
-    std::cout<<"B=0 :#"<<count<<std::endl;
+    std::cout<<"B=0 :#"<<zeroCount<<std::endl;
     min = 1e8;
     max = -1e8;
-    count = 0;
+    zeroCount = 0;
 #endif
     for( size_t idx = 0; idx < (*_weight).size(); ++idx) 
     {
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
         ss.read(ww.c, 4);
-        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(std::round(ww.d * _scale)); // Q12
+        weightType t = (weightType)(std::round(ww.d * _scale)); // Q12
+        if((*_weight)[_calcWeightIndex(i, o)] != t) {++changed;}
+        (*_weight)[_calcWeightIndex(i, o)] = t;
 #ifdef PRINTSTAT
-        if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
+        if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++zeroCount;}
         min = std::min(min,  double(ww.d));
         max = std::max(max,  double(ww.d));
 #endif
@@ -281,7 +285,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
 #ifdef PRINTSTAT
     std::cout<<"w min "<<min<<std::endl;
     std::cout<<"w MAX "<<max<<std::endl;
-    std::cout<<"w=0 :#"<<count<<std::endl;
+    std::cout<<"w=0 :#"<<zeroCount<<std::endl;
 #endif
     return true;
 }
