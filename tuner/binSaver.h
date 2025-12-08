@@ -31,6 +31,16 @@
 class Position;
 class Move;
 
+class BitWriter {
+public:
+    size_t size() const {return _buffer.size() / 8;}
+    void add(int32_t number, unsigned int bits);
+    std::vector<char> get() const;
+    void clear() {_buffer.clear();}
+private:
+    std::vector<char> _buffer;
+};
+
 class BinSaver {
 	
 public:
@@ -52,6 +62,7 @@ private:
 	unsigned int _logDecimationCnt = 0;
     std::vector<char> _buffer;
     static unsigned long long _savedPositions;
+    BitWriter _bw;
 };
 
 #endif /* BINSAVER_H_ */
