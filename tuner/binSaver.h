@@ -35,6 +35,7 @@ class BitWriter {
 public:
     size_t size() const {return _buffer.size() / 8;}
     void add(int32_t number, unsigned int bits);
+    void pad();
     std::vector<char> get() const;
     void clear() {_buffer.clear();}
 private:

@@ -29,6 +29,15 @@ void BitWriter::add(int32_t number, unsigned int bits) {
 		_buffer.push_back((number>>i)&1);
 	}
 }
+void BitWriter::pad() {
+	unsigned int b = _buffer.size() %8;
+	if( b!=0) {
+		unsigned int pad = 8 - b;
+		for(unsigned int i = 0; i < pad; ++i) {
+			_buffer.push_back(0);
+		}
+	}
+}
 
 std::vector<char> BitWriter::get() const {
 	unsigned int bitPosition = 0;
@@ -75,7 +84,7 @@ void BinSaver::save(Position& pos, Score res) {
 		auto f = pos.nnue()->features();
 		//_buffer.push_back(f.size());
 
-		_bw.add(f.size(), 7);
+		_bw.add(f.size(), 8);
 
 		for(auto& idx: f) {
 			//std::cout <<idx<<" ";
@@ -90,6 +99,7 @@ void BinSaver::save(Position& pos, Score res) {
 			_bw.add(idx, 10);
 
 		}
+		_bw.pad();
 		/*float dval = res/50000.0;
 		dval = 1.0/(1 + std::exp(-1.0 * dval)) ;*/
 		float dval = res;
