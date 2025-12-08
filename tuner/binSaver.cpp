@@ -75,7 +75,7 @@ void BinSaver::save(Position& pos, Score res) {
 		auto f = pos.nnue()->features();
 		//_buffer.push_back(f.size());
 
-		_bw.add(f.size(), 8);
+		_bw.add(f.size(), 7);
 
 		for(auto& idx: f) {
 			//std::cout <<idx<<" ";
@@ -87,7 +87,7 @@ void BinSaver::save(Position& pos, Score res) {
 			_buffer.push_back(bb.c[0]);
 			_buffer.push_back(bb.c[1]);*/
 
-			_bw.add(idx, 16);
+			_bw.add(idx, 10);
 
 		}
 		/*float dval = res/50000.0;
