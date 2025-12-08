@@ -57,7 +57,7 @@ private:
 
     DenseLayer<outType, accumulatorTypeFL, inputSize, accumulatorSize> _layer0W;
     DenseLayer<outType, accumulatorTypeFL, inputSize, accumulatorSize> _layer0B;
-    DenseLayer<outType, accumulatorTypeOut, accumulatorSize, outSize> _layer1;
+    DenseLayer<outType, accumulatorTypeOut, accumulatorSize * 2, outSize> _layer1;
 };
 
 #endif

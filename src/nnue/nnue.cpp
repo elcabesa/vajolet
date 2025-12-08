@@ -118,7 +118,17 @@ Score NNUE::eval(FeatureList fl) {
     Score highSat = SCORE_KNOWN_WIN;
 
 
-    auto s  = _model.forwardPass(fl, fl, Model::whitePow); //Q24
+    FeatureList fl2;
+
+    for(unsigned int i = 0; i< fl.size(); ++i) {
+        unsigned int  idx = fl.get(i);
+        if(idx < 384) {idx +=384;}
+        else {idx -=384;}
+        idx = idx ^ 0b111000;
+        fl2.add(idx);
+    }
+
+    auto s  = _model.forwardPass(fl, fl2, Model::whitePow); //Q24
 
     Score score = s * (evalScale / (_scale*_scale) );
     score = std::min(highSat, score);
@@ -128,12 +138,29 @@ Score NNUE::eval(FeatureList fl) {
 
 std::set<unsigned int> NNUE::features() {
     std::set<unsigned int> features;
-    FeatureList fl;
-    _createFeatures(fl, (_pos.isBlackTurn()? Model::blackPow: Model::whitePow));
+    //std::set<unsigned int> features2;
 
-    for(unsigned int i = 0; i< fl.size(); ++i) {
-        features.insert(fl.get(i));
+    {
+        FeatureList fl;
+        _createFeatures(fl, (_pos.isBlackTurn()? Model::blackPow: Model::whitePow));
+        for(unsigned int i = 0; i< fl.size(); ++i) {
+            features.insert(fl.get(i));
+        }
     }
+
+    /*{
+        FeatureList fl;
+        _createFeatures(fl, (_pos.isBlackTurn()? Model::whitePow : Model::blackPow));
+        for(unsigned int i = 0; i< fl.size(); ++i) {
+            features2.insert(fl.get(i));
+        }
+    }
+    std::cout<<"features A:";
+    for(auto f: features) std::cout<<f<<",";
+    std::cout<<std::endl;
+    std::cout<<"features b:";
+    for(auto f: features2) std::cout<<f<<",";
+    std::cout<<std::endl;*/
 
     return features;
 }

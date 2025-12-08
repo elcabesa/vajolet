@@ -33,7 +33,7 @@ public:
     ~DenseLayer();
 
 
-    accType propagateOut(const std::vector<inputType>& input, const unsigned int index = 0, unsigned int o = 0);
+    accType propagateOut(const std::vector<inputType>& input1, const std::vector<inputType>& input2);
 
     void propagate(const FeatureList& l);
     void incrementalPropagate(const DifferentialList& l);

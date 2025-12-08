@@ -34,7 +34,7 @@ void Model::init() {
 	bias1.resize(outSize, 0.0);
 	
 	weight0.resize(inputSize * accumulatorSize, 1.0);
-	weight1.resize(accumulatorSize * outSize, 1.0);
+	weight1.resize(accumulatorSize * 2 * outSize, 1.0);
 
 }
 
@@ -75,13 +75,18 @@ accumulatorTypeOut Model::forwardPass(const FeatureList& lw,const FeatureList& l
     _layer0W.propagate(lw);
     _layer0B.propagate(lb);
 
-    return _layer1.propagateOut(p == whitePow ? _layer0W.outputRelu() : _layer0B.outputRelu(), 0, 0);
+    return p == whitePow ?
+        _layer1.propagateOut(_layer0W.outputRelu(), _layer0B.outputRelu()) :
+        _layer1.propagateOut(_layer0B.outputRelu(), _layer0W.outputRelu());
 }
 
 accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const DifferentialList& lb, perspective p) {
     _layer0W.incrementalPropagate(lw);
     _layer0B.incrementalPropagate(lb);
-     return _layer1.propagateOut(p == whitePow ? _layer0W.outputRelu() : _layer0B.outputRelu(), 0, 0);
+
+    return p == whitePow ?
+        _layer1.propagateOut(_layer0W.outputRelu(), _layer0B.outputRelu()) :
+        _layer1.propagateOut(_layer0B.outputRelu(), _layer0W.outputRelu());
 }
 
 bool Model::deserialize(std::istream& ss) {
