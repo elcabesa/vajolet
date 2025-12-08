@@ -2,8 +2,9 @@
 from array import array
 
 from keras.callbacks import ModelCheckpoint, BackupAndRestore, Callback, ReduceLROnPlateau, CSVLogger
-from keras.models import Sequential
-from tensorflow.keras.layers import Dense, Activation, Input
+from keras.models import Model
+from keras import layers
+import keras
 from tensorflow.keras import initializers
 from tensorflow.data import Dataset
 import tensorflow as tf
@@ -30,10 +31,11 @@ class SaveWeights(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
 
-        first_layer_weights = self.model.layers[0].get_weights()[0]
-        first_layer_biases  = self.model.layers[0].get_weights()[1]
-        second_layer_weights = self.model.layers[1].get_weights()[0]
-        second_layer_biases  = self.model.layers[1].get_weights()[1]
+        first_layer_weights = self.model.layers[2].get_weights()[0]
+        first_layer_biases  = self.model.layers[2].get_weights()[1]
+        second_layer_weights = self.model.layers[4].get_weights()[0]
+        second_layer_biases  = self.model.layers[4].get_weights()[1]
+
         output_file = open('file' + str(epoch+1) +'.weight' , 'wb')
         first_layer_biases.tofile(output_file)
         first_layer_weights.tofile(output_file)
@@ -67,7 +69,7 @@ def read_train_data(filename, skip):
         if firstRun:
             print("skipping {} positions".format(skip))
             firstRun = False
-            while True:
+            while skip>0:
                 fs =f.read(1)
                 if not fs:
                     break
@@ -76,8 +78,7 @@ def read_train_data(filename, skip):
                 featuresSize = int.from_bytes(fs, byteorder='little')
                 ff = f.read(2*featuresSize)
                 ff = f.read(4)
-                if count > skip:
-                    break
+                skip -= 1
 
         while True:
             fs = f.read(1)
@@ -88,31 +89,54 @@ def read_train_data(filename, skip):
             featuresSize = int.from_bytes(fs, byteorder='little')
 
             feature = np.zeros(INPUT_SIZE)
+            feature2 = np.zeros(INPUT_SIZE)
+
+            #debugf = []
+            #debugf2 = []
+
             ff = f.read(2*featuresSize)
             for i in range(featuresSize):
                 bites = ff[2*i:2*i+2]
                 #bites = f.read(2)
                 idx = int.from_bytes(bites, byteorder='little')
                 feature[idx] = 1
+                #debugf.append(idx)
+
+                if idx <384:
+                    idx +=384
+                else:
+                    idx -=384
+                idx = idx ^ 0b111000
+                feature2[idx] = 1
+                #debugf2.append(idx)
+
             #    #print(idx)
+            #print(debugf)
+            #debugf2.sort()
+            #print(debugf2)
+
             label = struct.unpack('<f', f.read(4))[0] / SCALING
             label = 1.0/(1 + math.exp(-1.0 * label)) ;
             #float.from_bytes(f.read(4), byteorder='little')
             #print(label)
-            yield feature, label
+            yield (feature, feature2), label
             #exit(0)
 
 def get_dataset(skip):
     filename = FEN_FILENAME
     generator = lambda: read_train_data(filename, skip)
     return Dataset.from_generator(
-        generator, (tf.int32, tf.float32), ((INPUT_SIZE,), ()))
+        generator, ((tf.int32,tf.int32), tf.float32), (((INPUT_SIZE,),(INPUT_SIZE,)), ()))
 
 
-model = Sequential()
-model.add(Input(shape=(INPUT_SIZE,),dtype='int32'))
-model.add(Dense(ACCUMULATOR_SIZE, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
+input1 = keras.Input(shape=(INPUT_SIZE,),dtype='int32')
+input2 = keras.Input(shape=(INPUT_SIZE,),dtype='int32')
+dense = layers.Dense(ACCUMULATOR_SIZE, activation='relu')
+x = dense(input1)
+y = dense(input2)
+merged = layers.Concatenate(axis=1)([x, y])
+output = layers.Dense(1, activation='sigmoid')(merged)
+model = Model(inputs=[input1, input2], outputs=output)
 
 model.compile(loss='mean_squared_error',
               optimizer='adamw')
