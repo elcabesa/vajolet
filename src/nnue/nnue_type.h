@@ -32,7 +32,7 @@ constexpr int inputSize = 768;
 constexpr int accumulatorSize = 512;
 constexpr int outSize = 1;
 
-constexpr int scale = 4096; //Q8
+constexpr int scale = 1024; //Q10
 constexpr float evalScale = 50000.0f;
 
 /*

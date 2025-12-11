@@ -255,6 +255,7 @@ unsigned int DenseLayer<inputType, accType, inputSize, outputSize>::_calcWeightI
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::istream& ss) {
 #ifdef PRINTSTAT
+    unsigned int totcount = 0;
     unsigned int count = 0;
     double min = 1e8;
     double max = -1e8;
@@ -276,6 +277,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
         ss.read(bb.c, 4);
         b = (biasType)(std::round(bb.d * _scale)); // Q12
 #ifdef PRINTSTAT
+        ++totcount;
         if (b == 0) { ++count;}
         min = std::min(min, double(bb.d));
         max = std::max(max,  double(bb.d));
@@ -285,9 +287,11 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
     std::cout<<"b min "<<min<<std::endl;
     std::cout<<"b MAX "<<max<<std::endl;
     std::cout<<"B=0 :#"<<count<<std::endl;
+    std::cout<<"tot :#"<<totcount<<std::endl;
     min = 1e8;
     max = -1e8;
     count = 0;
+    totcount = 0;
 #endif
     for( size_t idx = 0; idx < (*_weight).size(); ++idx)
     {
@@ -296,6 +300,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
         ss.read(ww.c, 4);
         (*_weight)[_calcWeightIndex(i, o)] = (weightType)(std::round(ww.d * _scale)); // Q12
 #ifdef PRINTSTAT
+        ++totcount;
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
         min = std::min(min,  double(ww.d));
         max = std::max(max,  double(ww.d));
@@ -305,6 +310,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
     std::cout<<"w min "<<min<<std::endl;
     std::cout<<"w MAX "<<max<<std::endl;
     std::cout<<"w=0 :#"<<count<<std::endl;
+    std::cout<<"tot :#"<<totcount<<std::endl;
 #endif
     return true;
 }

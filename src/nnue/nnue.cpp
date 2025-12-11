@@ -28,7 +28,11 @@ INCBIN(NnueInternalFile, "../../NN/nnue.par");
 
 bool NNUE::_loaded = false;
 
-NNUE::NNUE(const Position& pos):_model(_scale),_pos(pos) {
+NNUE::NNUE(const Position& pos):_model(_scale),
+#ifdef CHECK_NNUE_FEATURE_EXTRACTION
+_modelCheck(_scale),
+#endif
+_pos(pos) {
     //std::cout<<"done"<<std::endl;
     clean();
 }
