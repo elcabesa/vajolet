@@ -291,6 +291,7 @@ Result test(const std::string& testName, my_thread& thr, Position& pos, SearchLi
             results.addResult(1);
         }
     }
+    pos.nnue()->printStats();
     return results; 
 }
 

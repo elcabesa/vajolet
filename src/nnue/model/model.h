@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "denseLayer.h"
+#include "nnue.h"
 #include "nnue_type.h"
 
 class DifferentialList;
@@ -32,13 +33,9 @@ class Model {
 public:
     Model(outType scale);
 
-    enum perspective {
-        whitePow,
-        blackPow
-    };
 
-    accumulatorTypeOut forwardPass(const FeatureList& lw,const FeatureList& lb, perspective p);
-    accumulatorTypeOut incrementalPass(const DifferentialList& lw, const DifferentialList& lb, perspective p);
+    accumulatorTypeOut forwardPass(const FeatureList& lw,const FeatureList& lb, NNUE::perspective p);
+    accumulatorTypeOut incrementalPass(const DifferentialList& lw, const DifferentialList& lb, NNUE::perspective p);
     
     bool deserialize(std::istream& ss);
     static void init();

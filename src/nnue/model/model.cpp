@@ -71,20 +71,20 @@ void Model::setWeight(unsigned int layer, unsigned int inN, unsigned int outN, f
     }
 }
 
-accumulatorTypeOut Model::forwardPass(const FeatureList& lw,const FeatureList& lb, perspective p) {
+accumulatorTypeOut Model::forwardPass(const FeatureList& lw,const FeatureList& lb, NNUE::perspective p) {
     _layer0W.propagate(lw);
     _layer0B.propagate(lb);
 
-    return p == whitePow ?
+    return p == NNUE::whitePow ?
         _layer1.propagateOut(_layer0W.outputRelu(), _layer0B.outputRelu()) :
         _layer1.propagateOut(_layer0B.outputRelu(), _layer0W.outputRelu());
 }
 
-accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const DifferentialList& lb, perspective p) {
+accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const DifferentialList& lb, NNUE::perspective p) {
     _layer0W.incrementalPropagate(lw);
     _layer0B.incrementalPropagate(lb);
 
-    return p == whitePow ?
+    return p == NNUE::whitePow ?
         _layer1.propagateOut(_layer0W.outputRelu(), _layer0B.outputRelu()) :
         _layer1.propagateOut(_layer0B.outputRelu(), _layer0W.outputRelu());
 }

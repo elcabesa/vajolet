@@ -22,15 +22,18 @@
 #include "nnue.h"
 #include "position.h"
 #include "incbin.h"
+#include "model.h"
 
 INCBIN(NnueInternalFile, "../../NN/nnue.par");
+
+constexpr static outType _scale = scale; //Q12
 
 
 bool NNUE::_loaded = false;
 
-NNUE::NNUE(const Position& pos):_model(_scale),
+NNUE::NNUE(const Position& pos):_model(std::make_shared<Model>(_scale)),
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
-_modelCheck(_scale),
+_modelCheck(std::make_shared<Model>(_scale)),
 #endif
 _pos(pos) {
     //std::cout<<"done"<<std::endl;
@@ -59,7 +62,7 @@ bool NNUE::load(std::string path) {
                             size_t(gNnueInternalFileSize));
 
         std::istream nnFile(&buffer);
-        if(_model.deserialize(nnFile)){
+        if(_model->deserialize(nnFile)){
             _loaded = true;
             std::cout<<"done"<<std::endl;
             return true;
@@ -73,7 +76,7 @@ bool NNUE::load(std::string path) {
         std::ifstream nnFile;
         nnFile.open(path);
         if(nnFile.is_open()) {
-            if(_model.deserialize(nnFile)
+            if(_model->deserialize(nnFile)
             ){
                 _loaded = true;
                 std::cout<<"done"<<std::endl;
@@ -102,7 +105,7 @@ bool NNUE::loaded() {
 }
 
 void NNUE::printStats() {
-    _model.printStats();
+    _model->printStats();
 }
 
 Score NNUE::eval() {
@@ -132,7 +135,7 @@ Score NNUE::eval(FeatureList fl) {
         fl2.add(idx);
     }
 
-    auto s  = _model.forwardPass(fl, fl2, Model::whitePow); //Q24
+    auto s  = _model->forwardPass(fl, fl2, whitePow); //Q24
 
     Score score = s * (evalScale / (_scale*_scale) );
     score = std::min(highSat, score);
@@ -146,7 +149,7 @@ std::set<unsigned int> NNUE::features() {
 
     {
         FeatureList fl;
-        _createFeatures(fl, (_pos.isBlackTurn()? Model::blackPow: Model::whitePow));
+        _createFeatures(fl, (_pos.isBlackTurn()? blackPow: whitePow));
         for(unsigned int i = 0; i< fl.size(); ++i) {
             features.insert(fl.get(i));
         }
@@ -154,7 +157,7 @@ std::set<unsigned int> NNUE::features() {
 
     /*{
         FeatureList fl;
-        _createFeatures(fl, (_pos.isBlackTurn()? Model::whitePow : Model::blackPow));
+        _createFeatures(fl, (_pos.isBlackTurn()? whitePow : blackPow));
         for(unsigned int i = 0; i< fl.size(); ++i) {
             features2.insert(fl.get(i));
         }
@@ -187,10 +190,10 @@ bool NNUE::incrementalEvalDisabled() const {
 
 void NNUE::removePiece(bitboardIndex piece, tSquare sq) {
 
-    auto f = _feature(_mapPiece(piece, Model::whitePow), sq, Model::whitePow);
+    auto f = _feature(_mapPiece(piece, whitePow), sq, whitePow);
     _diffFeatureListW.remove(f);
 
-    f = _feature(_mapPiece(piece, Model::blackPow), sq, Model::blackPow);
+    f = _feature(_mapPiece(piece, blackPow), sq, blackPow);
     _diffFeatureListB.remove(f);
 
     if (_diffFeatureListW.size() >= _completeEvalThreshold) { _disableIncrementalEval(); }
@@ -198,17 +201,17 @@ void NNUE::removePiece(bitboardIndex piece, tSquare sq) {
 }
 
 void NNUE::addPiece(bitboardIndex piece, tSquare sq) {
-    auto f = _feature(_mapPiece(piece, Model::whitePow), sq, Model::whitePow);
+    auto f = _feature(_mapPiece(piece, whitePow), sq, whitePow);
     _diffFeatureListW.add(f);
 
-    f = _feature(_mapPiece(piece, Model::blackPow), sq, Model::blackPow);
+    f = _feature(_mapPiece(piece, blackPow), sq, blackPow);
     _diffFeatureListB.add(f);
 
     if (_diffFeatureListW.size() >= _completeEvalThreshold) { _disableIncrementalEval(); }
     if (_diffFeatureListB.size() >= _completeEvalThreshold) { _disableIncrementalEval(); }
 }
 
-void NNUE::_createFeatures(FeatureList& fl, Model::perspective p){
+void NNUE::_createFeatures(FeatureList& fl, perspective p){
 
     bitboardIndex bWhitePow[12] = {
         whiteKing,
@@ -240,7 +243,7 @@ void NNUE::_createFeatures(FeatureList& fl, Model::perspective p){
     };
 
     for(unsigned int piece = 0; piece < 12; ++piece) {
-        bitMap b = _pos.getBitmap(p==Model::whitePow? bWhitePow[piece] : bBlackPow[piece] );
+        bitMap b = _pos.getBitmap(p==whitePow? bWhitePow[piece] : bBlackPow[piece] );
         while(b)
         {
             tSquare pieceSq = iterateBit(b);
@@ -249,8 +252,8 @@ void NNUE::_createFeatures(FeatureList& fl, Model::perspective p){
     }
 }
 
-unsigned int NNUE::_feature(unsigned int  piece, tSquare pSquare, Model::perspective p) {
-    if(p == Model::whitePow) {
+unsigned int NNUE::_feature(unsigned int  piece, tSquare pSquare, perspective p) {
+    if(p == whitePow) {
         return (piece * 64) + (pSquare);
     } else {
         return (piece * 64) + (pSquare ^ 0b111000);
@@ -277,8 +280,8 @@ bitboardIndex NNUE::_getPieceFromFeature(unsigned int f) { // TODO SERVE FARE PO
     return whitePow[f>>6];}
 
 
-unsigned int NNUE::_mapPiece(const bitboardIndex piece, Model::perspective p) {
-    if(p == Model::whitePow) {
+unsigned int NNUE::_mapPiece(const bitboardIndex piece, perspective p) {
+    if(p == whitePow) {
         unsigned int n[] = {
             0, //occupiedSquares,			//0		00000000
             0, //whiteKing,					//1		00000001
@@ -334,9 +337,9 @@ Score NNUE::_completeEval() {
 
     _completeFeatureListW.clear();
     _completeFeatureListB.clear();
-    _createFeatures(_completeFeatureListW, Model::whitePow);
-    _createFeatures(_completeFeatureListB, Model::blackPow);
-    auto s  = _model.forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow);
+    _createFeatures(_completeFeatureListW, whitePow);
+    _createFeatures(_completeFeatureListB, blackPow);
+    auto s  = _model->forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow);
 
     Score score = s * (evalScale / (_scale*_scale));
 
@@ -352,7 +355,7 @@ Score NNUE::_incrementalEval() {
     if(_diffFeatureListB.size() >= _completeEvalThreshold) {return _completeEval();}
     if(_diffFeatureListW.size() >= _completeEvalThreshold) {return _completeEval();}
 
-    Score score = _model.incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow) * (evalScale / (_scale*_scale));
+    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scale*_scale));
     _diffFeatureListB.clear();
     _diffFeatureListW.clear();
 
@@ -366,9 +369,9 @@ Score NNUE::_incrementalEval() {
     FeatureList flb;
     flw.clear();
     flb.clear();
-    _createFeatures(flw, Model::whitePow);
-    _createFeatures(flb, Model::blackPow);
-    Score score2 = _modelCheck.forwardPass(flw, flb, _pos.isBlackTurn() ? Model::blackPow : Model::whitePow) * (evalScale / (_scale*_scale));
+    _createFeatures(flw, whitePow);
+    _createFeatures(flb, blackPow);
+    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scale*_scale));
     score2 = std::min(highSat, score2);
     score2 = std::max(lowSat, score2);
 

@@ -20,16 +20,17 @@
 
 #include <set>
 #include <array>
+#include <memory>
 
 #include "bitBoardIndex.h"
 #include "differentialList.h"
 #include "featureList.h"
 #include "score.h"
-#include "model.h"
 #include "tSquare.h"
 #include "vajolet.h"
 
 class Position;
+class Model;
 
 //#define CHECK_NNUE_FEATURE_EXTRACTION
 
@@ -37,6 +38,11 @@ class Position;
 class NNUE {
 public:
     NNUE(const Position& pos);
+
+    enum perspective {
+        whitePow,
+        blackPow
+    };
 
     bool load(std::string path);
     void close();
@@ -61,10 +67,10 @@ public:
 
 private:
 
-    Model _model;
+    std::shared_ptr<Model> _model;
 
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
-    Model _modelCheck;
+    std::shared_ptr<Model> _modelCheck;
 #endif
 
     static bool _loaded;
@@ -76,10 +82,10 @@ private:
     FeatureList _completeFeatureListW;
     FeatureList _completeFeatureListB;
 
-    void _createFeatures(FeatureList& fl, Model::perspective p);
+    void _createFeatures(FeatureList& fl, perspective p);
 
-    static unsigned int _feature(unsigned int piece, tSquare pSquare, Model::perspective p);
-    static unsigned int _mapPiece(const bitboardIndex piece, Model::perspective p);
+    static unsigned int _feature(unsigned int piece, tSquare pSquare, perspective p);
+    static unsigned int _mapPiece(const bitboardIndex piece, perspective p);
 
     void _disableIncrementalEval(); // evaluate if it's still necessary for king move and castling
 
@@ -91,7 +97,6 @@ private:
     Score _incrementalEval();
 
     const Position& _pos;
-    constexpr static outType _scale = scale; //Q12
 };
 
 
