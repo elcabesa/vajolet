@@ -153,9 +153,9 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        outRelu[o] = std::max(out[o], (accType)(0.0f));  //Q12
+        outRelu[o] = std::max(out[o], (accType)(0));  //Q12
 #ifdef CALC_DEBUG_DATA
-        if(outRelu[o] > 0.0f) {
+        if(outRelu[o] > 0) {
             _deadAccumulator[o] = false;
             //std::cout<<"ALIVE"<<std::endl;
         }
@@ -221,9 +221,9 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        outRelu[o] = std::max(out[o], (accType)(0.0f)); //Q12
+        outRelu[o] = std::max(out[o], (accType)(0)); //Q12
 #ifdef CALC_DEBUG_DATA
-        if(outRelu[o] > 0.0f) {
+        if(outRelu[o] > 0) {
             _deadAccumulator[o] = false;
             //std::cout<<"ALIVE"<<std::endl;
         }
