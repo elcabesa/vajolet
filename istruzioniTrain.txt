@@ -1,19 +1,8 @@
-#genera posizioni in formato compresso e in formato non compresso
+#genera posizioni,crea fen.data
 ./Vajolet_genFen
-#crea fen.data
-./Vajolet_genTrainDataFeature
 
-cat fen?ver.epd > fenverDATA.epd
-mv fen.data fenDATA.data
-
-cp fenverDATA.epd ../../NN/trainingData/
-cp fenDATA.data ../../NN/trainingData/
-
-#todo remove all past files
-
-#concatena i file e mescola
-cat fen*.data | ./terashuf >  ../../../keras-trainer/fen.data
-cat fenver*.epd > ../../build-rel/tuner/fenver.epd
+#concatenare i vari fen.data generati nel tempo
+cat fen*.data >fen.data
 
 #nella cartella trainer -> train
 ./train.py
