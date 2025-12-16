@@ -82,8 +82,12 @@ Data getPosition(std::ifstream& f) {
 	return d;
 }
 
+//#define PRINT_BIG_ERROR2
 bool worker(int i) {
 	std::string path = std::string("file")+ std::to_string(i) + std::string(".weight");
+	if( i == 0) {
+		path = "internal";
+	}
 	bool loaded = false;
 	std::map<int, unsigned long> count;
 	std::map<int, double> mse;
@@ -146,10 +150,12 @@ bool worker(int i) {
 
 			auto dval = d.v/10000.0;
 			auto ddiff = std::abs(dScore-dval);
-/*			if(ddiff >=10) {
+#ifdef PRINT_BIG_ERROR
+			if(ddiff >=10) {
 				pos.setupFromFeatureList(d.f);
 				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<std::endl;
-			}*/
+			}
+#endif
 			int diff = ddiff * 10;
 
 
@@ -175,8 +181,10 @@ bool worker(int i) {
 				errcount++;
 				mseError+= se;
 				mseErrorSigmoid+= err;
-				/*pos.setupFromFeatureList(d.f);
-				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<" "<<err<<std::endl;*/
+#ifdef PRINT_BIG_ERROR2
+				pos.setupFromFeatureList(d.f);
+				std::cout<<pos.getFen()<< " "<<dScore<<";"<<dval<<" "<<err<<std::endl;
+#endif
 			}
 
 			d = getPosition(myfile);
@@ -210,13 +218,14 @@ bool worker(int i) {
 		{
 			std::cout<<i*0.1<<" ";
 			std::cout<<"Positions: "<<totCount - prevCount <<" ";
-			std::cout<<"MSE: "<<mse[i]<<" ";
-			std::cout<<"MSESigmoid: "<<mseSigmoid[i]<<" ";
+			std::cout<<"MSE: "<<mse[i]/ totCount<<" ";
+			std::cout<<"MSESigmoid: "<<mseSigmoid[i]/totCount<<" ";
 			std::cout<<"totcount: "<<totCount<<std::endl;
 			prevCount = totCount;
 		}
 	}
 	std::cout<<"filtered error "<<mseError/totCount <<" "<<mseErrorSigmoid/totCount<<std::endl;
+	std::cout<<i<<";"<<(totMse-mseError)/totCount<<";"<<(totMseSigmoid-mseErrorSigmoid)/totCount<<";"<<errcount<<std::endl;
 	std::cerr<<i<<";"<<totMse/totCount<<";"<<totMseSigmoid/totCount<<";"<<errcount<<std::endl;
 
 	return true;
@@ -239,7 +248,7 @@ int main() {
 	//----------------------------------
 	libChessInit();
 
-	for(unsigned int i = 1; worker(i); ++i) {
+	for(unsigned int i = 0; worker(i); ++i) {
 	}
 
 	return 0;
