@@ -1,7 +1,8 @@
 -------------------------------------------------------------------------
-Release note 2.9
+Release note 3.0
 
 New feature:
+  NNUE 768*2 -> 512*2 -> 1
   Increase limits
     256 threads
     256GB of ram
