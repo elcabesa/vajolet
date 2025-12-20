@@ -1,0 +1,10 @@
+1) train with more positions
+2) use SCrelu (trainer e code)
+  - trainer -> define lambda for screlu
+  - code -> define screlu and change scaling, bias multiiplicate ofr _scale^2 then divide reult by /scale^3
+3) split scale in scaleA e scaleB ( input layer, output layer)
+4) increase accumulator size??
+5) train with position rescored with NNUE searcher
+6) halfkp
+7) totally remove HCE
+8) restore spsa for training search paramers?
