@@ -8,3 +8,4 @@
 6) halfkp
 7) totally remove HCE
 8) restore spsa for training search paramers?
+9) completaly remove HCE code
