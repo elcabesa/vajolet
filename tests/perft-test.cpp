@@ -29,28 +29,33 @@ static const std::vector<positions> perftPos = {
 
 TEST(PerftTest, perft) {
 	Position pos;
+	transpositionTable tt;
+	PerftTranspositionTable ptt(tt);
 	for (auto & p : perftPos)
 	{
 		pos.setupFromFen(p.Fen); 
 		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
 		{
-			EXPECT_EQ(Perft(pos).perft(i+1), p.PerftValue[i]);
+			EXPECT_EQ(Perft(pos, ptt).perft(i+1), p.PerftValue[i]);
 		}
 	}
 }
 
 TEST(PerftTest, perftHash) {
-	transpositionTable::getInstance().setSize(1);
+	
+	transpositionTable tt;
+	PerftTranspositionTable ptt(tt);
+	tt.setSize(1);
 	Position pos;
 	for (auto & p : perftPos)
 	{
 		pos.setupFromFen(p.Fen); 
 		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
 		{
-			Perft pft(pos);
+			Perft pft(pos, ptt);
 			pft.perftUseHash = true;
 			
-			EXPECT_EQ(Perft(pos).perft(i+1), p.PerftValue[i]);
+			EXPECT_EQ(pft.perft(i+1), p.PerftValue[i]);
 		}
 	}
 }
@@ -61,13 +66,15 @@ TEST(PerftTest, divide) {
 	std::ostringstream strCout;
 	std::cout.rdbuf( strCout.rdbuf() );
 	
+	transpositionTable tt;
+	PerftTranspositionTable ptt(tt);
 	Position pos;
 	for (auto & p : perftPos)
 	{
 		pos.setupFromFen(p.Fen); 
 		for( unsigned int i = 0; i < 4 && i < p.PerftValue.size(); i++)
 		{
-			EXPECT_EQ(Perft(pos).divide(i+1), p.PerftValue[i]);
+			EXPECT_EQ(Perft(pos, ptt).divide(i+1), p.PerftValue[i]);
 		}
 	}
 	

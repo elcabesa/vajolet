@@ -19,15 +19,15 @@
 #include "position.h"
 #include "search.h"
 #include "syzygy/syzygy.h"
+#include "model.h"
 
 
 void libChessInit()
 {
 	initData();
 	HashKey::init();
-	Position::initScoreValues();
 	Movegen::initMovegenConstant();
-	Search::initSearchParameters();
 	Position::initMaterialKeys();
 	Syzygy::getInstance();
+    Model::init();
 }

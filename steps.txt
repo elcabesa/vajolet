@@ -1,0 +1,14 @@
+./Vajolet_genFen
+genera 4 file fen1.epd ... fen4.epd
+
+cat fen1.epd fen2.epd fen3.epd fen4.epd > fenTot.epd
+
+creare un file per test???
+
+./Vajolet_genTrainData
+
+genera file fen.data & header.data
+
+cat header.data fen.data  > train.data
+
+./Vajolet_train

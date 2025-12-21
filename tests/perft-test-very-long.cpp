@@ -27,7 +27,9 @@ TEST(PerftTest, frcTest) {
 			found=line.find_first_of(",",found + 1 );
 			
 			unsigned long long ull = std::stoull (line.substr(start, found-start));
-			unsigned long long int res = Perft(pos).perft(6);
+			transpositionTable tt;
+			PerftTranspositionTable ptt(tt);
+			unsigned long long int res = Perft(pos, ptt).perft(6);
 			std::cout<<++n<<" perft(6) = "<<res<<std::endl;
 			ASSERT_EQ(ull, res);
 		}
@@ -57,7 +59,9 @@ TEST(PerftTest, perft) {
 			found=line.find_first_of(",",found + 1 );
 			
 			unsigned long long ull = std::stoull (line.substr(start, found-start));
-			unsigned long long int res = Perft(pos).perft(++i);
+			transpositionTable tt;
+			PerftTranspositionTable ptt(tt);
+			unsigned long long int res = Perft(pos, ptt).perft(++i);
 			std::cout<<n<<" perft("<<i<<") = "<<res<<std::endl;
 			ASSERT_EQ(ull, res);
 		}

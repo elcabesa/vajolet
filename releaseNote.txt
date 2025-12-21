@@ -1,4 +1,29 @@
 -------------------------------------------------------------------------
+Release note 3.0
+
+New feature:
+  NNUE 768*2 -> 512*2 -> 1
+  Increase limits
+    256 threads
+    256GB of ram
+  UCI skill level
+  SPSA autotuner
+
+Improvements:
+  tweak time management
+  simplyfy razor code
+  search parameters tuning
+  speedup TT initialization
+  prefetch
+
+bug Fixes:
+  disable setting option while searching
+  king pawn vs king endgame
+  
+testing
+  automatic test suites (WAC & STS)
+  
+-------------------------------------------------------------------------
 Release note 2.8
 
 New feature:

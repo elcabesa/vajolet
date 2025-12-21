@@ -30,4 +30,4 @@ script:
   - cd ..
   
 after_success:
-  - coveralls --gcov llvm-cov --root .. --gcov-options '\gcov -lp' -e tests -e build/CMakeFiles -e build/googletest-src 
+  - coveralls --gcov llvm-cov --root .. --gcov-options '\gcov -lp' -e tests -e build/CMakeFiles -e build/googletest-src  -e tuner

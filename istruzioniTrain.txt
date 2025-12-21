@@ -1,0 +1,10 @@
+#genera posizioni,crea fen.data
+./Vajolet_genFen
+
+#concatenare i vari fen.data generati nel tempo
+cat fen*.data >fen.data
+
+#nella cartella trainer -> train
+./train.py
+
+

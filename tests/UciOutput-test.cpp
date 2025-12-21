@@ -2,8 +2,9 @@
 #include <sstream>
 
 #include "gtest/gtest.h"
-#include "command.h"
+#include "uciOutput.h"
 #include "move.h"
+#include "position.h"
 #include "tSquare.h"
 
 class UciOutputTest : public ::testing::Test {
@@ -123,8 +124,9 @@ TEST_F(UciOutputTest, printBestMoveCastle2) {
 TEST_F(UciOutputTest, printGeneralInfo) {
 	std::unique_ptr<UciOutput> UOI;
 	UOI = UciOutput::create();
+	Position pos;
 
-	UOI->printGeneralInfo( 32, 966644, 132759, 9576);
+	UOI->printGeneralInfo( 32, 966644, 132759, 9576, pos);
 	EXPECT_EQ(buffer.str(), "info hashfull 32 tbhits 966644 nodes 132759 time 9576 nps 13863\n");
 }
 
@@ -132,8 +134,14 @@ TEST_F(UciOutputTest, printCurrMoveNumber) {
 	std::unique_ptr<UciOutput> UOI;
 	UOI = UciOutput::create();
 	
-	Move m(tSquare::D8,tSquare::C4);
+	;
 
-	UOI->printCurrMoveNumber( 3, m, 75234, 12, false);
-	EXPECT_EQ(buffer.str(), "info currmovenumber 3 currmove d8c4 nodes 75234 time 12\n");
+	UOI->printCurrMoveNumber( 1, Move(tSquare::D8,tSquare::C4), 75234, 1200, false);
+	EXPECT_EQ(buffer.str(), "info currmovenumber 1 currmove d8c4 nodes 75234 time 1200\n");
+	buffer.str("");
+	UOI->printCurrMoveNumber( 2, Move(tSquare::D2,tSquare::D4), 78234, 1220, false);
+	EXPECT_EQ(buffer.str(), "info currmovenumber 2 currmove d2d4 nodes 78234 time 1220\n");
+	buffer.str("");
+	UOI->printCurrMoveNumber( 1, Move(tSquare::D2,tSquare::D4), 75234, 1240, false);
+	EXPECT_EQ(buffer.str(), "");
 }
