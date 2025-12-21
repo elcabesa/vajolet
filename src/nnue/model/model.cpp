@@ -58,8 +58,8 @@ accumulatorTypeOut Model::forwardPass(const FeatureList& lw,const FeatureList& l
     _layer0B.propagate(lb);
 
     return p == NNUE::whitePow ?
-        _layer1.propagateOut(_layer0W.outputRelu(), _layer0B.outputRelu()) :
-        _layer1.propagateOut(_layer0B.outputRelu(), _layer0W.outputRelu());
+        _layer1.propagateOut(_layer0W.outputScRelu(), _layer0B.outputScRelu()) :
+        _layer1.propagateOut(_layer0B.outputScRelu(), _layer0W.outputScRelu());
 }
 
 accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const DifferentialList& lb, NNUE::perspective p) {
@@ -67,8 +67,8 @@ accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const Diff
     _layer0B.incrementalPropagate(lb);
 
     return p == NNUE::whitePow ?
-        _layer1.propagateOut(_layer0W.outputRelu(), _layer0B.outputRelu()) :
-        _layer1.propagateOut(_layer0B.outputRelu(), _layer0W.outputRelu());
+        _layer1.propagateOut(_layer0W.outputScRelu(), _layer0B.outputScRelu()) :
+        _layer1.propagateOut(_layer0B.outputScRelu(), _layer0W.outputScRelu());
 }
 
 bool Model::deserialize(std::istream& ss) {

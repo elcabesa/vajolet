@@ -43,7 +43,7 @@ public:
     bool deserialize(std::istream& ss);
 
     const std::vector<accType>& output() const;
-    const std::vector<outType>& outputRelu() const;
+    const std::vector<outType>& outputScRelu() const;
     void printStat() const;
     
 private:
@@ -55,7 +55,7 @@ private:
     std::vector<weightType>* _weight;
 
     std::vector<accType> _output;
-    std::vector<outType> _outputRelu;
+    std::vector<outType> _outputScRelu;
     static std::vector<bool> _deadAccumulator;
 
     outType _scale;

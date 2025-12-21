@@ -20,6 +20,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 #include "denseLayer.h"
 #include "differentialList.h"
@@ -47,7 +48,7 @@ DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<bi
     _bias(bias),
     _weight(weight),
     _output(outputSize),
-    _outputRelu(outputSize),
+    _outputScRelu(outputSize),
     _scale(scale)
 {
 #ifdef CALC_DEBUG_DATA
@@ -121,7 +122,7 @@ template <typename inputType, typename accType, unsigned int inputSize, unsigned
 void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const FeatureList& l) {
     //std::cout<<"biases"<<std::endl;
     auto out = _output.data();
-    auto outRelu = _outputRelu.data();
+    auto outScRelu = _outputScRelu.data();
     auto bias = _bias->data();
     for (unsigned int o = 0; o < _outputSize; ++o) {
         out[o] = bias[o];
@@ -153,9 +154,12 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        outRelu[o] = std::max(out[o], (accType)(0));  //Q12
+        int32_t t = std::clamp(out[o], (accType)(0), (accType)(_scale));  //Q12;
+        t = t * t / scale;
+        outScRelu[o] = t;
+
 #ifdef CALC_DEBUG_DATA
-        if(outRelu[o] > 0) {
+        if(outScRelu[o] > 0) {
             _deadAccumulator[o] = false;
             //std::cout<<"ALIVE"<<std::endl;
         }
@@ -168,7 +172,7 @@ template <typename inputType, typename accType, unsigned int inputSize, unsigned
 void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate(const DifferentialList& l) {
 
     auto out = _output.data();
-    auto outRelu = _outputRelu.data();
+    auto outScRelu = _outputScRelu.data();
 
     for(unsigned int idx = 0; idx < l.addSize(); ++idx) {
         unsigned int in = l.addList(idx);
@@ -221,9 +225,11 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        outRelu[o] = std::max(out[o], (accType)(0)); //Q12
+        int32_t t = std::clamp(out[o], (accType)(0), (accType)(_scale));  //Q12;
+        t = t * t / scale;
+        outScRelu[o] = t;
 #ifdef CALC_DEBUG_DATA
-        if(outRelu[o] > 0) {
+        if(outScRelu[o] > 0) {
             _deadAccumulator[o] = false;
             //std::cout<<"ALIVE"<<std::endl;
         }
@@ -319,7 +325,7 @@ template <typename inputType, typename accType, unsigned int inputSize, unsigned
 const std::vector<accType>& DenseLayer<inputType, accType, inputSize, outputSize>::output() const {return _output;}
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
-const std::vector<outType>& DenseLayer<inputType, accType, inputSize, outputSize>::outputRelu() const {return _outputRelu;}
+const std::vector<outType>& DenseLayer<inputType, accType, inputSize, outputSize>::outputScRelu() const {return _outputScRelu;}
 
 
 template class DenseLayer<outType, accumulatorTypeFL, inputSize, accumulatorSize>;
