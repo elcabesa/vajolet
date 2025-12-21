@@ -1,3 +1,7 @@
+DONE
+9) completaly remove HCE code
+
+TODO
 1) train with more positions
 2) use SCrelu (trainer e code)
   - trainer -> define lambda for screlu
@@ -8,4 +12,4 @@
 6) halfkp
 7) totally remove HCE
 8) restore spsa for training search paramers?
-9) completaly remove HCE code
+9) create a new generator ,saving complete fens  ( always from white perspective, with castling rights, with ep... complete :D ), update trainer, regenerate lots of data
