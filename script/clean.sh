@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-rm fen*.epd
-rm tournament*
+pushd .. 
+rm -r "build"
+popd

@@ -10,6 +10,7 @@ New feature:
   SPSA autotuner
 
 Improvements:
+  tweak time management
   simplyfy razor code
   search parameters tuning
   speedup TT initialization
