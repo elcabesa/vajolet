@@ -21,6 +21,7 @@
 #include <cstdint>
 
 //#define CALC_DEBUG_DATA
+//#define PRINTSTAT
 
 using outType = int16_t;
 using accumulatorTypeFL = int16_t;

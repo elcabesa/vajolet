@@ -257,7 +257,6 @@ unsigned int DenseLayer<inputType, accType, inputSize, outputSize>::_calcWeightI
 
 }
 
-//#define PRINTSTAT
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::istream& ss) {
 #ifdef PRINTSTAT
