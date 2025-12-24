@@ -78,8 +78,8 @@ accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(cons
         out += input1[i] * (*_weight)[i];
 #else
 #ifdef CALC_DEBUG_DATA
-        if((*in * *ref) > 0 && std::numeric_limits<accType>::max() - (*in * *ref) < out) {_overflow = true; exit(1);}
-        if((*in * *ref) < 0 && std::numeric_limits<accType>::min() - (*in * *ref) > out) {_overflow = true; exit(1);}
+        if((*in * *ref) > 0 && std::numeric_limits<accType>::max() - (*in * *ref) < out) {_overflow = true; std::cout<<"overflow1"<<std::endl;exit(1);}
+        if((*in * *ref) < 0 && std::numeric_limits<accType>::min() - (*in * *ref) > out) {_overflow = true; std::cout<<"overflow2"<<std::endl;exit(1);}
 #endif
         out += *in * *ref;
         ++in;
@@ -99,8 +99,8 @@ accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(cons
         out += input2[i] * (*_weight)[i + _inputSize / 2];
 #else
 #ifdef CALC_DEBUG_DATA
-        if((*in * *ref) > 0 && std::numeric_limits<accType>::max() - (*in * *ref) < out) {_overflow = true; exit(1);}
-        if((*in * *ref) < 0 && std::numeric_limits<accType>::min() - (*in * *ref) > out) {_overflow = true; exit(1);}
+        if((*in * *ref) > 0 && std::numeric_limits<accType>::max() - (*in * *ref) < out) {_overflow = true; std::cout<<"overflow3"<<std::endl;exit(1);}
+        if((*in * *ref) < 0 && std::numeric_limits<accType>::min() - (*in * *ref) > out) {_overflow = true; std::cout<<"overflow4"<<std::endl;exit(1);}
 #endif
         out += *in * *ref;
         ++in;
@@ -140,8 +140,8 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
             out[o] += (*_weight)[_calcWeightIndex(in, o)];
 #else
 #ifdef CALC_DEBUG_DATA
-            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < out[o]) {_overflow = true; exit(1);}
-            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > out[o]) {_overflow = true; exit(1);}
+            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < out[o]) {_overflow = true; std::cout<<"overflow5"<<std::endl;exit(1);}
+            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > out[o]) {_overflow = true; std::cout<<"overflow6"<<std::endl;exit(1);}
 #endif
             out[o] += *ref;
             ++ref;
@@ -187,8 +187,8 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
             out[o] += (*_weight)[_calcWeightIndex(in, o)];
 #else
 #ifdef CALC_DEBUG_DATA
-            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < out[o]) {_overflow = true; exit(1);}
-            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > out[o]) {_overflow = true; exit(1);}
+            if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < out[o]) {_overflow = true; std::cout<<"overflow7"<<std::endl;exit(1);}
+            if((*ref) < 0 && std::numeric_limits<accType>::min() - *ref > out[o]) {_overflow = true; std::cout<<"overflow8"<<std::endl;exit(1);}
 #endif
             out[o] += *ref;
             ++ref;
@@ -211,8 +211,8 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
             out[o] -= (*_weight)[_calcWeightIndex(in, o)];
 #else
 #ifdef CALC_DEBUG_DATA
-            if((*ref) < 0 && std::numeric_limits<accType>::max() + *ref < out[o]) {_overflow = true; exit(1);}
-            if((*ref) > 0 && std::numeric_limits<accType>::min() + *ref > out[o]) {_overflow = true; exit(1);}
+            if((*ref) < 0 && std::numeric_limits<accType>::max() + *ref < out[o]) {_overflow = true; std::cout<<"overflow1"<<std::endl;exit(1);}
+            if((*ref) > 0 && std::numeric_limits<accType>::min() + *ref > out[o]) {_overflow = true; std::cout<<"overflow1"<<std::endl;exit(1);}
 #endif
             out[o] -= *ref;
             ++ref;
