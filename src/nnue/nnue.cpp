@@ -26,14 +26,15 @@
 
 INCBIN(NnueInternalFile, "../../NN/nnue.par");
 
-constexpr static outType _scale = scale; //Q12
+constexpr static outType _scaleFl = scaleFL; //Q12
+constexpr static outType _scaleSl = scaleSL; //Q12
 
 
 bool NNUE::_loaded = false;
 
-NNUE::NNUE(const Position& pos):_model(std::make_shared<Model>(_scale)),
+NNUE::NNUE(const Position& pos):_model(std::make_shared<Model>(_scaleFl, _scaleSl)),
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
-_modelCheck(std::make_shared<Model>(_scale)),
+_modelCheck(std::make_shared<Model>(_scaleFl, _scaleSl)),
 #endif
 _pos(pos) {
     //std::cout<<"done"<<std::endl;
@@ -137,7 +138,7 @@ Score NNUE::eval(FeatureList fl) {
 
     auto s  = _model->forwardPass(fl, fl2, whitePow); //Q24
 
-    Score score = s * (evalScale / (_scale*_scale) );
+    Score score = s * (evalScale / (_scaleFl*_scaleSl) );
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
     return score;
@@ -341,7 +342,7 @@ Score NNUE::_completeEval() {
     _createFeatures(_completeFeatureListB, blackPow);
     auto s  = _model->forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow);
 
-    Score score = s * (evalScale / (_scale*_scale));
+    Score score = s * (evalScale / (_scaleFl*_scaleSl));
 
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
@@ -355,7 +356,7 @@ Score NNUE::_incrementalEval() {
     if(_diffFeatureListB.size() >= _completeEvalThreshold) {return _completeEval();}
     if(_diffFeatureListW.size() >= _completeEvalThreshold) {return _completeEval();}
 
-    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scale*_scale));
+    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleSl));
     _diffFeatureListB.clear();
     _diffFeatureListW.clear();
 
@@ -371,7 +372,7 @@ Score NNUE::_incrementalEval() {
     flb.clear();
     _createFeatures(flw, whitePow);
     _createFeatures(flb, blackPow);
-    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scale*_scale));
+    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleSl));
     score2 = std::min(highSat, score2);
     score2 = std::max(lowSat, score2);
 

@@ -42,14 +42,15 @@ template <typename inputType, typename accType, unsigned int inputSize, unsigned
 std::vector<bool> DenseLayer<inputType, accType, inputSize, outputSize>::_deadAccumulator;
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
-DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scale):
+DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scaleIn, outType scaleOut):
     _inputSize(inputSize),
     _outputSize(outputSize),
     _bias(bias),
     _weight(weight),
     _output(outputSize),
     _outputScRelu(outputSize),
-    _scale(scale)
+    _scaleIn(scaleIn),
+    _scaleOut(scaleOut)
 {
 #ifdef CALC_DEBUG_DATA
     _deadAccumulator.resize(outputSize, true);
@@ -67,7 +68,7 @@ DenseLayer<inputType, accType, inputSize, outputSize>::~DenseLayer() {
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input1, const std::vector<inputType>& input2) {
-    accType out = (*_bias)[0] * _scale; //Q12*Q12
+    accType out = (*_bias)[0] * _scaleIn; //Q12*Q12
 
 #ifdef FASTER_CODE
     auto* ref = &(_weight->data()[0]);
@@ -154,8 +155,8 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        int32_t t = std::clamp(out[o], (accType)(0), (accType)(_scale));  //Q12;
-        t = t * t / scale;
+        int32_t t = std::clamp(out[o], (accType)(0), (accType)(scaleFL));  //Q12;
+        t = t * t / scaleFL;
         outScRelu[o] = t;
 
 #ifdef CALC_DEBUG_DATA
@@ -225,8 +226,8 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
     }
 
     for (unsigned int o = 0; o < _outputSize; ++o) {
-        int32_t t = std::clamp(out[o], (accType)(0), (accType)(_scale));  //Q12;
-        t = t * t / scale;
+        int32_t t = std::clamp(out[o], (accType)(0), (accType)(scaleFL));  //Q12;
+        t = t * t / scaleFL;
         outScRelu[o] = t;
 #ifdef CALC_DEBUG_DATA
         if(outScRelu[o] > 0) {
@@ -280,7 +281,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
 #endif
     for( auto & b: *_bias) {
         ss.read(bb.c, 4);
-        b = (biasType)(std::round(bb.d * _scale)); // Q12
+        b = (biasType)(std::round(bb.d * _scaleOut)); // Q12
 #ifdef PRINTSTAT
         ++totcount;
         if (b == 0) { ++count;}
@@ -303,7 +304,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
         unsigned int i = idx / _outputSize;
         unsigned int o = idx % _outputSize;
         ss.read(ww.c, 4);
-        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(std::round(ww.d * _scale)); // Q12
+        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(std::round(ww.d * _scaleOut)); // Q12
 #ifdef PRINTSTAT
         ++totcount;
         if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}

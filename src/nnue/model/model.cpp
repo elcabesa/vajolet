@@ -38,10 +38,10 @@ void Model::init() {
 
 }
 
-Model::Model(outType scale):
-    _layer0W(&bias0, &weight0, scale),
-    _layer0B(&bias0, &weight0, scale),
-    _layer1(&bias1, &weight1, scale)
+Model::Model(outType scaleFl, outType scaleSl):
+    _layer0W(&bias0, &weight0, 1, scaleFl),
+    _layer0B(&bias0, &weight0, 1, scaleFl),
+    _layer1(&bias1, &weight1, scaleFl, scaleSl)
 {}
 
 void Model::printStats() const {

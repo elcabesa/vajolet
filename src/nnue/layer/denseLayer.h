@@ -29,7 +29,7 @@ template <typename inputType, typename accType, unsigned int inputSize, unsigned
 class DenseLayer{
 public:
 
-    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scale);
+    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scaleIn, outType scaleOut);
     ~DenseLayer();
 
 
@@ -58,7 +58,8 @@ private:
     std::vector<outType> _outputScRelu;
     static std::vector<bool> _deadAccumulator;
 
-    outType _scale;
+    outType _scaleIn;
+    outType _scaleOut;
     static double _min;
     static double _max;
     static bool _overflow;
