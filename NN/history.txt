@@ -1,0 +1,4 @@
+date     md5sum                           #pos    epoch   generator           net
+
+20251221 Vajolet 3.0                      309M    115     selfplay HCE d7     768*2 -> 512*2 -> 1
+20251227 d5e2d4aa5235a7e288ae1603de4d37c4 309M    191     selfplay HCE d7     768*2 -> 512*2 -> 1

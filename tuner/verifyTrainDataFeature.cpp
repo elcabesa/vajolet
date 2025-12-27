@@ -232,7 +232,7 @@ bool worker(int i) {
 
 }
 
-int main() {
+int main(int argc, char** argv) {
 	
 	signal(SIGINT, signalHandler); 
 #ifdef SIGBREAK	
@@ -247,8 +247,16 @@ int main() {
 	//	init global data
 	//----------------------------------
 	libChessInit();
+	unsigned int start = 1;
+	unsigned int stop = 300;
 
-	for(unsigned int i = 0; worker(i); ++i) {
+	if(argc == 2) {
+		start = std::stoi(argv[1]);
+		stop = start + 1;
+	}
+
+	for(unsigned int i = start; i < stop; ++i) {
+		worker(i);
 	}
 
 	return 0;
