@@ -23,19 +23,19 @@
 //#define CALC_DEBUG_DATA
 //#define PRINTSTAT
 
-using outType = int16_t;
+using outType = uint16_t;
 using accumulatorTypeFL = int16_t;
 using accumulatorTypeOut = int32_t;
 using biasType = int16_t;
 using weightType = int16_t;
 
 constexpr int inputSize = 768;
-constexpr int accumulatorSize = 512;
+constexpr int accumulatorSize = 64;
 constexpr int outSize = 1;
 
-constexpr int scaleFL = 850; //Q10
-constexpr int scaleSL = 2048; //Q10
-constexpr float evalScale = 50000.0f;
+constexpr int scaleFL = 255; //Q10
+constexpr int scaleSL = 64; //Q10
+constexpr float evalScale = 40000.0f;
 
 /*
 using outType = float;

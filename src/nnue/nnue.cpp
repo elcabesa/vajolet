@@ -138,7 +138,7 @@ Score NNUE::eval(FeatureList fl) {
 
     auto s  = _model->forwardPass(fl, fl2, whitePow); //Q24
 
-    Score score = s * (evalScale / (_scaleFl*_scaleSl) );
+    Score score = s * (evalScale / (_scaleFl*_scaleFl*_scaleSl) );
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
     return score;
@@ -342,7 +342,7 @@ Score NNUE::_completeEval() {
     _createFeatures(_completeFeatureListB, blackPow);
     auto s  = _model->forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow);
 
-    Score score = s * (evalScale / (_scaleFl*_scaleSl));
+    Score score = s * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
 
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
@@ -356,7 +356,7 @@ Score NNUE::_incrementalEval() {
     if(_diffFeatureListB.size() >= _completeEvalThreshold) {return _completeEval();}
     if(_diffFeatureListW.size() >= _completeEvalThreshold) {return _completeEval();}
 
-    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleSl));
+    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
     _diffFeatureListB.clear();
     _diffFeatureListW.clear();
 
@@ -372,7 +372,7 @@ Score NNUE::_incrementalEval() {
     flb.clear();
     _createFeatures(flw, whitePow);
     _createFeatures(flb, blackPow);
-    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleSl));
+    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
     score2 = std::min(highSat, score2);
     score2 = std::max(lowSat, score2);
 
