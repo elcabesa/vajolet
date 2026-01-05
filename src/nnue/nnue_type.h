@@ -30,7 +30,7 @@ using biasType = int16_t;
 using weightType = int16_t;
 
 constexpr int inputSize = 768;
-constexpr int accumulatorSize = 64;
+constexpr int accumulatorSize = 512;
 constexpr int outSize = 1;
 
 constexpr int scaleFL = 255; //Q10
