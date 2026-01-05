@@ -68,7 +68,7 @@ DenseLayer<inputType, accType, inputSize, outputSize>::~DenseLayer() {
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
 accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input1, const std::vector<inputType>& input2) {
-    accType out = (*_bias)[0]* scaleFL; //Q12*Q12
+    accType out = (*_bias)[0]* _scaleIn; //Q12*Q12
 
 #ifdef FASTER_CODE
     auto* ref = &(_weight->data()[0]);
