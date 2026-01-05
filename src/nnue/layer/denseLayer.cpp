@@ -160,7 +160,7 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
         outScRelu[o] = t;
 
 #ifdef CALC_DEBUG_DATA
-        if(outScRelu[o] > 0) {
+        if(outScRelu[o] > 0 && outScRelu[o] < scaleFL) {
             _deadAccumulator[o] = false;
             //std::cout<<"ALIVE"<<std::endl;
         }
@@ -230,7 +230,7 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
         t = t * t / scaleFL;
         outScRelu[o] = t;
 #ifdef CALC_DEBUG_DATA
-        if(outScRelu[o] > 0) {
+        if(outScRelu[o] > 0 && outScRelu[o] < scaleFL) {
             _deadAccumulator[o] = false;
             //std::cout<<"ALIVE"<<std::endl;
         }
