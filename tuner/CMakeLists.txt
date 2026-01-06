@@ -7,7 +7,8 @@ add_executable(Vajolet_genFen
 	player.cpp
 	selfplay.cpp
 	tournament.cpp
-	tunerPars.cpp)
+	tunerPars.cpp
+	txtSaver.cpp)
 
 target_link_libraries(Vajolet_genFen  libChess)
 

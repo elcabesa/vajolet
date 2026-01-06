@@ -25,13 +25,13 @@
 namespace pgn { class Game;}
 class Book;
 class Player;
-class BinSaver;
+class TxtSaver;
 class HashKey;
 
 class SelfPlay {
 	
 public:
-	SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, BinSaver * const fs = nullptr);
+	SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, TxtSaver * const fs = nullptr);
 	void playGame();
 private:	
 	bool _isGameFinished(Score res);
@@ -41,7 +41,7 @@ private:
 	Player& _white;
 	Player& _black;
 	Book& _book;
-	BinSaver * const _fs;
+	TxtSaver * const _fs;
 	unsigned int winCount = 0;
 	unsigned int drawCount = 0;
 	const int pawnValue = 10000;
