@@ -1,4 +1,5 @@
-date     md5sum                           #pos    epoch   generator           net
+date     md5sum                           #pos    epoch   generator           net                         trainer
 
-20251221 Vajolet 3.0                      309M    115     selfplay HCE d7     768*2 -> 512*2 -> 1
-20251227 d5e2d4aa5235a7e288ae1603de4d37c4 309M    191     selfplay HCE d7     768*2 -> 512*2 -> 1
+20251221 Vajolet 3.0                      309M    115     selfplay HCE d7     768*2 -> 512*2 -> 1         custom
+20251227 d5e2d4aa5235a7e288ae1603de4d37c4 309M    191     selfplay HCE d7     768*2 -> 512*2 -> 1         custom
+20251301 c8e5db6f571298ec9deebf41de717727 136M    110     selfplay HCE d7     768*2 -> 512*2 -> 1 255,64  bullet
