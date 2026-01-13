@@ -1,11 +1,11 @@
 DONE
-9) completaly remove HCE code
-
-TODO
-1) train with more positions
+1) completaly remove HCE code OK, NO REGRESSION
 2) use SCrelu (trainer e code)
   - trainer -> define lambda for screlu
   - code -> define screlu and change scaling, bias multiiplicate ofr _scale^2 then divide reult by /scale^3
+
+TODO
+1) train with more positions
 3) split scale in scaleA e scaleB ( input layer, output layer)
 4) increase accumulator size??
 5) train with position rescored with NNUE searcher
@@ -13,3 +13,6 @@ TODO
 7) totally remove HCE
 8) restore spsa for training search paramers?
 9) create a new generator ,saving complete fens  ( always from white perspective, with castling rights, with ep... complete :D ), update trainer, regenerate lots of data
+10) trainer use parse vectors
+11) test vast.
+12) output bucket

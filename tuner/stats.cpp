@@ -114,6 +114,11 @@ void worker() {
 			pos.setupFromFeatureList(d.f);
 			//position counter;
 			posCounter++;
+
+			if(posCounter%1000000 == 0) {
+				std::cout<<posCounter/1e6<<"M"<<std::endl;
+			}
+
 			//ksquares
 			++wksquare[pos.getSquareOfThePiece(whiteKing)];
 			++bksquare[pos.getSquareOfThePiece(blackKing)];

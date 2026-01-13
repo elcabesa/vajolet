@@ -31,7 +31,7 @@ class FeatureList;
 
 class Model {
 public:
-    Model(outType scale);
+    Model(outType scaleFl, outType scaleSl);
 
 
     accumulatorTypeOut forwardPass(const FeatureList& lw,const FeatureList& lb, NNUE::perspective p);

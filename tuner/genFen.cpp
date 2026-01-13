@@ -24,7 +24,7 @@
 #include <future>
 
 #include "book.h"
-#include "binSaver.h"
+#include "txtSaver.h"
 #include "player.h"
 #include "position.h"
 #include "tournament.h"
@@ -53,7 +53,7 @@ static void printStartInfo(void)
 std::ofstream stream;
 
 void worker() {
-	BinSaver fs(1, stream);
+	TxtSaver fs(1, stream);
 	Book book("book.pgn");
 	Player p1("p1");
 	Player p2("p2");
@@ -84,7 +84,7 @@ int main() {
 
 
 	stream.open("fen.data", std::ios_base::app);
-	BinSaver fs(1, stream);
+	TxtSaver fs(1, stream);
 	for(int i = 0; i < TunerParameters::parallelGames; ++i){
 		helperThread.emplace_back(std::async(std::launch::async, worker));
 	}
