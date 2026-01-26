@@ -94,6 +94,7 @@ bool NNUE::load(std::string path) {
             return false;
         }
     }
+    clean();
 }
 
 void NNUE::close() {
