@@ -37,6 +37,8 @@ constexpr int scaleFL = 255; //Q10
 constexpr int scaleSL = 64; //Q10
 constexpr float evalScale = 40000.0f;
 
+constexpr int outpuBuckets = 1;
+
 /*
 using outType = float;
 using accumulatorType = float;

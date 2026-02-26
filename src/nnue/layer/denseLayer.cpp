@@ -42,9 +42,10 @@ template <typename inputType, typename accType, unsigned int inputSize, unsigned
 std::vector<bool> DenseLayer<inputType, accType, inputSize, outputSize>::_deadAccumulator;
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
-DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scaleIn, outType scaleOut):
+DenseLayer<inputType, accType, inputSize, outputSize>::DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scaleIn, outType scaleOut, unsigned int outputBucket):
     _inputSize(inputSize),
     _outputSize(outputSize),
+    _outputBucket(outputBucket),
     _bias(bias),
     _weight(weight),
     _output(outputSize),
@@ -137,12 +138,12 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::propagate(const Feat
     for (unsigned int idx = 0; idx < l.size(); ++idx) {
         unsigned int in = l.get(idx);
 #ifdef FASTER_CODE
-        auto offset = _calcWeightIndex(in, 0);
+        auto offset = _calcWeightIndex(in, 0, 0);
         auto* ref = &(_weight->data()[offset]);
 #endif
         for (unsigned int o = 0; o < _outputSize; ++o) {
 #ifndef FASTER_CODE
-            out[o] += (*_weight)[_calcWeightIndex(in, o)];
+            out[o] += (*_weight)[_calcWeightIndex(in, o, 0)];
 #else
 #ifdef CALC_DEBUG_DATA
             if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < out[o]) {_overflow = true; std::cout<<"overflow5"<<std::endl;exit(1);}
@@ -184,13 +185,13 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
         unsigned int in = l.addList(idx);
 
 #ifdef FASTER_CODE
-        auto offset = _calcWeightIndex(in, 0);
+        auto offset = _calcWeightIndex(in, 0, 0);
         auto* ref = &(_weight->data()[offset]);
 #endif
 
         for (unsigned int o = 0; o < _outputSize; ++o) {
 #ifndef FASTER_CODE
-            out[o] += (*_weight)[_calcWeightIndex(in, o)];
+            out[o] += (*_weight)[_calcWeightIndex(in, o, 0)];
 #else
 #ifdef CALC_DEBUG_DATA
             if((*ref) > 0 && std::numeric_limits<accType>::max() - *ref < out[o]) {_overflow = true; std::cout<<"overflow7"<<std::endl;exit(1);}
@@ -209,12 +210,12 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::incrementalPropagate
     for(unsigned int idx = 0; idx < l.removeSize(); ++idx) {
         unsigned int in = l.removeList(idx);
 #ifdef FASTER_CODE
-        auto offset = _calcWeightIndex(in, 0);
+        auto offset = _calcWeightIndex(in, 0, 0);
         auto* ref = &(_weight->data()[offset]);
 #endif
         for (unsigned int o = 0; o < _outputSize; ++o) {
 #ifndef FASTER_CODE
-            out[o] -= (*_weight)[_calcWeightIndex(in, o)];
+            out[o] -= (*_weight)[_calcWeightIndex(in, o, 0)];
 #else
 #ifdef CALC_DEBUG_DATA
             if((*ref) < 0 && std::numeric_limits<accType>::max() + *ref < out[o]) {_overflow = true; std::cout<<"overflow1"<<std::endl;exit(1);}
@@ -257,9 +258,15 @@ void DenseLayer<inputType, accType, inputSize, outputSize>::printStat() const {
 }
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
-unsigned int DenseLayer<inputType, accType, inputSize, outputSize>::_calcWeightIndex(const unsigned int i, const unsigned int o) const {
-    assert(o + i * _outputSize < _weight->size());
-    return o + i * _outputSize;
+unsigned int DenseLayer<inputType, accType, inputSize, outputSize>::_calcWeightIndex(const unsigned int i, const unsigned int o, const unsigned int outputBucket) const {
+    assert(o + i * _outputSize + outputBucket * _inputSize * _outputSize < _weight->size());
+    return o + i * _outputSize + outputBucket * _inputSize * _outputSize;
+}
+
+template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
+unsigned int DenseLayer<inputType, accType, inputSize, outputSize>::_calcBiasIndex(const unsigned int o, const unsigned int outputBucket) const {
+    assert(o + outputBucket *  _outputSize < _bias->size());
+    return o + outputBucket *  _outputSize;
 }
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
@@ -283,19 +290,19 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
 #ifdef PRINTSTAT
     std::cout<<"-----------------------------"<<std::endl;
 #endif
-    for( size_t idx = 0; idx < (*_weight).size(); ++idx)
-    {
-        unsigned int i = idx / _outputSize;
-        unsigned int o = idx % _outputSize;
-        ss.read(ww.c, 2);
-        (*_weight)[_calcWeightIndex(i, o)] = (weightType)(std::round(ww.d)); // Q12
-        //std::cout<<"w "<<ww.d<<std::endl;
+    for (size_t i = 0; i < _inputSize && ss.good(); ++i) {
+        for (size_t b = 0; b < _outputBucket; ++b) {
+            for (size_t o = 0; o < _outputSize && ss.good(); ++o) {
+                 ss.read(ww.c, 2);
+                 (*_weight)[_calcWeightIndex(i, o, b)] = (weightType)(std::round(ww.d)); // Q12
 #ifdef PRINTSTAT
-        ++totcount;
-        if((*_weight)[_calcWeightIndex(i, o)] == 0) { ++count;}
-        min = std::min(min,  double(ww.d));
-        max = std::max(max,  double(ww.d));
+                 ++totcount;
+                 if((*_weight)[_calcWeightIndex(i, o, b)] == 0) { ++count;}
+                 min = std::min(min,  double(ww.d));
+                 max = std::max(max,  double(ww.d));
 #endif
+            }
+        }
     }
 #ifdef PRINTSTAT
     std::cout<<"w min "<<min<<std::endl;
@@ -308,16 +315,17 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
     totcount = 0;
 #endif
 
-    for( auto & b: *_bias) {
-        ss.read(bb.c, 2);
-        b = (biasType)(std::round(bb.d)); // Q12
-        //std::cout<<"b "<<bb.d<<std::endl;
+    for (size_t o = 0; o < _outputSize && ss.good(); ++o) {
+        for (size_t b = 0; b < _outputBucket; ++b) {
+            ss.read(bb.c, 2);
+            (*_bias)[_calcBiasIndex(o, b)] = (biasType)(std::round(ww.d)); // Q12
 #ifdef PRINTSTAT
-        ++totcount;
-        if (b == 0) { ++count;}
-        min = std::min(min, double(bb.d));
-        max = std::max(max,  double(bb.d));
+            ++totcount;
+            if ( (*_bias)[_calcBiasIndex(o, b)] == 0) { ++count;}
+            min = std::min(min, double(bb.d));
+            max = std::max(max,  double(bb.d));
 #endif
+        }
     }
 #ifdef PRINTSTAT
     std::cout<<"b min "<<min<<std::endl;

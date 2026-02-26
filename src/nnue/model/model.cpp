@@ -31,17 +31,17 @@ std::vector<weightType> Model::weight1;
 
 void Model::init() {
     bias0.resize(accumulatorSize, 0.0);
-	bias1.resize(outSize, 0.0);
+    bias1.resize(outSize * outpuBuckets, 0.0);
 	
-	weight0.resize(inputSize * accumulatorSize, 1.0);
-	weight1.resize(accumulatorSize * 2 * outSize, 1.0);
+    weight0.resize(inputSize * accumulatorSize, 1.0);
+    weight1.resize(accumulatorSize * 2 * outSize * outpuBuckets, 1.0);
 
 }
 
 Model::Model(outType scaleFl, outType scaleSl):
-    _layer0W(&bias0, &weight0, 1, scaleFl),
-    _layer0B(&bias0, &weight0, 1, scaleFl),
-    _layer1(&bias1, &weight1, scaleFl, scaleSl)
+    _layer0W(&bias0, &weight0, 1, scaleFl, 1),
+    _layer0B(&bias0, &weight0, 1, scaleFl, 1),
+    _layer1(&bias1, &weight1, scaleFl, scaleSl, outpuBuckets)
 {}
 
 void Model::printStats() const {

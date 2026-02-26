@@ -29,7 +29,7 @@ template <typename inputType, typename accType, unsigned int inputSize, unsigned
 class DenseLayer{
 public:
 
-    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scaleIn, outType scaleOut);
+    DenseLayer(std::vector<biasType>* bias, std::vector<weightType>* weight, outType scaleIn, outType scaleOut, unsigned int outputBucket);
     ~DenseLayer();
 
 
@@ -38,7 +38,8 @@ public:
     void propagate(const FeatureList& l);
     void incrementalPropagate(const DifferentialList& l);
 
-    unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o) const;
+    unsigned int _calcWeightIndex(const unsigned int i, const unsigned int o, const unsigned int outpuBucket) const;
+    unsigned int _calcBiasIndex(const unsigned int o, const unsigned int outputBucket) const;
 
     bool deserialize(std::istream& ss);
 
@@ -49,6 +50,7 @@ public:
 private:
     unsigned int _inputSize;
     unsigned int _outputSize;
+    unsigned int _outputBucket;
 
     unsigned int _outShift;
     std::vector<biasType>* _bias;
