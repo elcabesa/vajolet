@@ -45,49 +45,44 @@ static void printStartInfo(void)
 }
 
 struct Data {
-	FeatureList f;
-	float v;
+	std::string fen;
+	int v;
 };
 
 //todo create saver
 
 Data getPosition(std::ifstream& f) {
 	//TODO insert mutex
-	Data d;
-	char buffer[10];
-	unsigned int featuresCount;
-
-	f.read(buffer,1);
-	featuresCount = buffer[0];
+	Data d ={"",0};
+	std::string line;
+	std::getline(f, line);
 
 	if(f.eof()) {
 		return d;
 	}
 
+	int n = 0;
 
-	union _bb{
-		char c[64];
-		int16_t d[32];
+	std::stringstream test(line);
+	std::string segment;
+	while(std::getline(test, segment, '|'))
+	{
+		if( n == 0) {
+			d.fen = segment;
+		} else {
+			d.v = std::stoi(segment);
+			break;
 
-	}bb;
-	f.read(bb.c, 2 * featuresCount);
-
-	for(unsigned int i = 0; i < featuresCount; ++i) {
-		d.f.add(bb.d[i]);
+		}
+		++n;
 	}
 
-	union _bbf{
-		float v;
-		char c[4];
-	}bbf;
-
-	f.read(bbf.c,4);
-	d.v = bbf.v;
 	return d;
 }
 
 bool worker() {
 	SearchLimits sl;
+
 	Player p("white");
 	std::string path = "internal";
 
@@ -109,17 +104,22 @@ bool worker() {
 
 		Data d = getPosition(myfile);
 
-		while ( d.f.size() != 0 ) {
+		while ( d.fen != "") {
 			++poscount;
 			if(poscount%1000 == 0) {
 				std::cout<<poscount/1e6<<"M maxError "<<maxError<<std::endl;
 			}
 
-			pos.setupFromFeatureList(d.f);
+			pos.setupFromFen(d.fen);
 			auto res = p.doSearch(pos, sl);
 			Score score = res.Res;
+			if(pos.isBlackTurn()) {
+				score = -score;
+			}
 
-			auto dval = d.v;
+
+			auto dval = d.v*100;
+
 
 			if(std::abs(score) < SCORE_KNOWN_WIN) {
 				float error = std::abs(score - dval);
@@ -127,7 +127,6 @@ bool worker() {
 				if(error > maxError) {
 					maxError = error;
 					std::cout<<"new "<<score<<" old "<<dval<<std::endl;
-
 				}
 			} else {
 				std::cout<<"found win "<<score<<std::endl;
