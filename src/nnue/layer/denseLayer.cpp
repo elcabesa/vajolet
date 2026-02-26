@@ -68,16 +68,16 @@ DenseLayer<inputType, accType, inputSize, outputSize>::~DenseLayer() {
 }
 
 template <typename inputType, typename accType, unsigned int inputSize, unsigned int outputSize>
-accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input1, const std::vector<inputType>& input2) {
-    accType out = (*_bias)[0]* _scaleIn; //Q12*Q12
+accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(const std::vector<inputType>& input1, const std::vector<inputType>& input2, const unsigned int bucket) {
+    accType out = (*_bias)[_calcBiasIndex(0,bucket)]* _scaleIn; //Q12*Q12
 
 #ifdef FASTER_CODE
-    auto* ref = &(_weight->data()[0]);
+    auto* ref = &(_weight->data()[_calcWeightIndex(0, 0, bucket)]);
     auto *in = input1.data();
 #endif
     for(unsigned int i = 0; i < _inputSize / 2; ++i) {
 #ifndef FASTER_CODE
-        out += input1[i] * (*_weight)[i];
+        out += input1[i] * (*_weight)[_calcWeightIndex(i, 0, bucket)];
 #else
 #ifdef CALC_DEBUG_DATA
         if((*in * *ref) > 0 && std::numeric_limits<accType>::max() - (*in * *ref) < out) {_overflow = true; std::cout<<"overflow1"<<std::endl;exit(1);}
@@ -99,7 +99,7 @@ accType DenseLayer<inputType, accType, inputSize, outputSize>::propagateOut(cons
 #endif
     for(unsigned int i = 0; i < _inputSize / 2; ++i) {
 #ifndef FASTER_CODE
-        out += input2[i] * (*_weight)[i + _inputSize / 2];
+        out += input2[i] * (*_weight)[_calcWeightIndex(i + _inputSize / 2, 0, bucket)];
 #else
 #ifdef CALC_DEBUG_DATA
         if((*in * *ref) > 0 && std::numeric_limits<accType>::max() - (*in * *ref) < out) {_overflow = true; std::cout<<"overflow3"<<std::endl;exit(1);}
@@ -295,6 +295,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
             for (size_t o = 0; o < _outputSize && ss.good(); ++o) {
                  ss.read(ww.c, 2);
                  (*_weight)[_calcWeightIndex(i, o, b)] = (weightType)(std::round(ww.d)); // Q12
+                 std::cout<<"w i "<<i<<" o "<<o<<" b "<<b<<" idx "<<_calcBiasIndex(o, b)<<" "<<(*_weight)[_calcWeightIndex(i, o, b)]<<std::endl;
 #ifdef PRINTSTAT
                  ++totcount;
                  if((*_weight)[_calcWeightIndex(i, o, b)] == 0) { ++count;}
@@ -315,10 +316,11 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
     totcount = 0;
 #endif
 
-    for (size_t o = 0; o < _outputSize && ss.good(); ++o) {
-        for (size_t b = 0; b < _outputBucket; ++b) {
+    for (size_t b = 0; b < _outputBucket; ++b) {
+        for (size_t o = 0; o < _outputSize && ss.good(); ++o) {
             ss.read(bb.c, 2);
-            (*_bias)[_calcBiasIndex(o, b)] = (biasType)(std::round(ww.d)); // Q12
+            (*_bias)[_calcBiasIndex(o, b)] = (biasType)(std::round(bb.d)); // Q12
+            std::cout<<"b o "<<o<<" b "<<b<<" idx "<<_calcBiasIndex(o, b)<<" "<<(biasType)(std::round(bb.d))<<std::endl;
 #ifdef PRINTSTAT
             ++totcount;
             if ( (*_bias)[_calcBiasIndex(o, b)] == 0) { ++count;}

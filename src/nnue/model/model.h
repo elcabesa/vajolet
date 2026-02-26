@@ -34,8 +34,9 @@ public:
     Model(outType scaleFl, outType scaleSl);
 
 
-    accumulatorTypeOut forwardPass(const FeatureList& lw,const FeatureList& lb, NNUE::perspective p);
-    accumulatorTypeOut incrementalPass(const DifferentialList& lw, const DifferentialList& lb, NNUE::perspective p);
+    accumulatorTypeOut forwardPass(const FeatureList& lw,const FeatureList& lb, NNUE::perspective p, unsigned int pieceCount);
+    accumulatorTypeOut incrementalPass(const DifferentialList& lw, const DifferentialList& lb, NNUE::perspective p, unsigned int pieceCount);
+    static unsigned int calcBucket(unsigned int popNumber);
     
     bool deserialize(std::istream& ss);
     static void init();
@@ -53,6 +54,8 @@ private:
     DenseLayer<outType, accumulatorTypeFL, inputSize, accumulatorSize> _layer0W;
     DenseLayer<outType, accumulatorTypeFL, inputSize, accumulatorSize> _layer0B;
     DenseLayer<outType, accumulatorTypeOut, accumulatorSize * 2, outSize> _layer1;
+
+    static constexpr unsigned int _bucketDivisor =  (32 + outputBuckets - 1) / outputBuckets;
 };
 
 #endif

@@ -31,18 +31,22 @@ std::vector<weightType> Model::weight1;
 
 void Model::init() {
     bias0.resize(accumulatorSize, 0.0);
-    bias1.resize(outSize * outpuBuckets, 0.0);
+    bias1.resize(outSize * outputBuckets, 0.0);
 	
     weight0.resize(inputSize * accumulatorSize, 1.0);
-    weight1.resize(accumulatorSize * 2 * outSize * outpuBuckets, 1.0);
+    weight1.resize(accumulatorSize * 2 * outSize * outputBuckets, 1.0);
 
 }
 
 Model::Model(outType scaleFl, outType scaleSl):
     _layer0W(&bias0, &weight0, 1, scaleFl, 1),
     _layer0B(&bias0, &weight0, 1, scaleFl, 1),
-    _layer1(&bias1, &weight1, scaleFl, scaleSl, outpuBuckets)
+    _layer1(&bias1, &weight1, scaleFl, scaleSl, outputBuckets)
 {}
+
+unsigned int Model::calcBucket(unsigned int pieceCount) {
+    return (pieceCount - 2) / _bucketDivisor;
+}
 
 void Model::printStats() const {
 #ifdef CALC_DEBUG_DATA
@@ -53,22 +57,22 @@ void Model::printStats() const {
 }
 
 
-accumulatorTypeOut Model::forwardPass(const FeatureList& lw,const FeatureList& lb, NNUE::perspective p) {
+accumulatorTypeOut Model::forwardPass(const FeatureList& lw,const FeatureList& lb, NNUE::perspective p, unsigned int pieceCount) {
     _layer0W.propagate(lw);
     _layer0B.propagate(lb);
 
     return p == NNUE::whitePow ?
-        _layer1.propagateOut(_layer0W.outputScRelu(), _layer0B.outputScRelu()) :
-        _layer1.propagateOut(_layer0B.outputScRelu(), _layer0W.outputScRelu());
+        _layer1.propagateOut(_layer0W.outputScRelu(), _layer0B.outputScRelu(), calcBucket(pieceCount)) :
+        _layer1.propagateOut(_layer0B.outputScRelu(), _layer0W.outputScRelu(), calcBucket(pieceCount));
 }
 
-accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const DifferentialList& lb, NNUE::perspective p) {
+accumulatorTypeOut Model::incrementalPass(const DifferentialList& lw, const DifferentialList& lb, NNUE::perspective p, unsigned int pieceCount) {
     _layer0W.incrementalPropagate(lw);
     _layer0B.incrementalPropagate(lb);
 
     return p == NNUE::whitePow ?
-        _layer1.propagateOut(_layer0W.outputScRelu(), _layer0B.outputScRelu()) :
-        _layer1.propagateOut(_layer0B.outputScRelu(), _layer0W.outputScRelu());
+        _layer1.propagateOut(_layer0W.outputScRelu(), _layer0B.outputScRelu(), calcBucket(pieceCount)) :
+        _layer1.propagateOut(_layer0B.outputScRelu(), _layer0W.outputScRelu(), calcBucket(pieceCount));
 }
 
 bool Model::deserialize(std::istream& ss) {

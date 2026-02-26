@@ -137,7 +137,7 @@ Score NNUE::eval(FeatureList fl) {
         fl2.add(idx);
     }
 
-    auto s  = _model->forwardPass(fl, fl2, whitePow); //Q24
+    auto s  = _model->forwardPass(fl, fl2, whitePow, fl.size()); //Q24
 
     Score score = s * (evalScale / (_scaleFl*_scaleFl*_scaleSl) );
     score = std::min(highSat, score);
@@ -341,7 +341,7 @@ Score NNUE::_completeEval() {
     _completeFeatureListB.clear();
     _createFeatures(_completeFeatureListW, whitePow);
     _createFeatures(_completeFeatureListB, blackPow);
-    auto s  = _model->forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow);
+    auto s  = _model->forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow, _pos.getPieceCount(occupiedSquares));
 
     Score score = s * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
 
@@ -357,7 +357,7 @@ Score NNUE::_incrementalEval() {
     if(_diffFeatureListB.size() >= _completeEvalThreshold) {return _completeEval();}
     if(_diffFeatureListW.size() >= _completeEvalThreshold) {return _completeEval();}
 
-    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
+    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow, _pos.getPieceCount(occupiedSquares)) * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
     _diffFeatureListB.clear();
     _diffFeatureListW.clear();
 
@@ -373,7 +373,7 @@ Score NNUE::_incrementalEval() {
     flb.clear();
     _createFeatures(flw, whitePow);
     _createFeatures(flb, blackPow);
-    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
+    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow, _pos.getPieceCount(occupiedSquares)) * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
     score2 = std::min(highSat, score2);
     score2 = std::max(lowSat, score2);
 
