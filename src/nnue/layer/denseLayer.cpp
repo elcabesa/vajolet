@@ -295,7 +295,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
             for (size_t o = 0; o < _outputSize && ss.good(); ++o) {
                  ss.read(ww.c, 2);
                  (*_weight)[_calcWeightIndex(i, o, b)] = (weightType)(std::round(ww.d)); // Q12
-                 std::cout<<"w i "<<i<<" o "<<o<<" b "<<b<<" idx "<<_calcBiasIndex(o, b)<<" "<<(*_weight)[_calcWeightIndex(i, o, b)]<<std::endl;
+                 //std::cout<<"w i "<<i<<" o "<<o<<" b "<<b<<" idx "<<_calcBiasIndex(o, b)<<" "<<(*_weight)[_calcWeightIndex(i, o, b)]<<std::endl;
 #ifdef PRINTSTAT
                  ++totcount;
                  if((*_weight)[_calcWeightIndex(i, o, b)] == 0) { ++count;}
@@ -320,7 +320,7 @@ bool DenseLayer<inputType, accType, inputSize, outputSize>::deserialize(std::ist
         for (size_t o = 0; o < _outputSize && ss.good(); ++o) {
             ss.read(bb.c, 2);
             (*_bias)[_calcBiasIndex(o, b)] = (biasType)(std::round(bb.d)); // Q12
-            std::cout<<"b o "<<o<<" b "<<b<<" idx "<<_calcBiasIndex(o, b)<<" "<<(biasType)(std::round(bb.d))<<std::endl;
+            //std::cout<<"b o "<<o<<" b "<<b<<" idx "<<_calcBiasIndex(o, b)<<" "<<(biasType)(std::round(bb.d))<<std::endl;
 #ifdef PRINTSTAT
             ++totcount;
             if ( (*_bias)[_calcBiasIndex(o, b)] == 0) { ++count;}
