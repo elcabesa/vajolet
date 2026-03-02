@@ -153,7 +153,7 @@ void SelfPlay::playGame() {
 			&& !_p.moveGivesCheck(bestMove)
 			&& !_p.isInCheck()
 			&& std::abs(score)<wonGame
-			&& (std::abs(score - _p.eval<false>()) <30000)
+			//&& (std::abs(score - _p.eval<false>()) <30000)
 			&& _alreadySeenPosition[_p.getKey().getKey() % ALREADYSEEN_SIZE] != _p.getKey().getKey()
 
 		) {

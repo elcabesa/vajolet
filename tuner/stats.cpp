@@ -21,6 +21,7 @@
 #include <fstream>
 #include <cmath>
 #include <map>
+#include <iomanip>
 
 #include "position.h"
 #include "nnue.h"
@@ -55,63 +56,84 @@ std::map<tKey, unsigned long long> endgames;
 
 struct Data {
 	FeatureList f;
+	std::string fen;
 	float v;
 };
 
 Data getPosition(std::ifstream& f) {
-	Data d;
-	char buffer[10];
-	unsigned int featuresCount;
 
-	f.read(buffer,1);
-	featuresCount = buffer[0];
+	Data d;
 
 	if(f.eof()) {
 		return d;
 	}
 
+	std::string line;
+	std::getline(f, line);
+	//std::cout<<line<<std::endl;
 
-	union _bb{
-		char c[64];
-		int16_t d[32];
+	std::vector<std::string> output;
 
-	}bb;
-	f.read(bb.c, 2 * featuresCount);
+	std::string::size_type prev_pos = 0, pos = 0;
 
-	for(unsigned int i = 0; i < featuresCount; ++i) {
-		d.f.add(bb.d[i]);
+	while((pos = line.find('|', pos)) != std::string::npos)
+	{
+		std::string substring( line.substr(prev_pos, pos-prev_pos) );
+
+		output.push_back(substring);
+
+		prev_pos = ++pos;
 	}
 
-	union _bbf{
-		float v;
-		char c[4];
-	}bbf;
+	output.push_back(line.substr(prev_pos, pos-prev_pos)); // Last word
+	if(output.size() <3) {
+		return d;
+	}
 
-	f.read(bbf.c,4);
-	d.v = bbf.v;
+	//std::cout<<output[0]<<std::endl;
+	//std::cout<<output[1]<<std::endl;
+	d.fen = output[0];
+	d.v = std::stoi(output[1])/100.0;
+
+
 	return d;
 }
 
-void worker() {
+bool worker(unsigned int i) {
 
 	Position pos(Position::nnueConfig::on);
 
 	auto& nnue = pos.nnue();
-	if(!nnue->load("nnue.par")) {
+	if(!nnue->load("internal")) {
 		std::cout<<"error loading nnue.par"<<std::endl;
 
 	}
 
 	std::string line;
-	std::ifstream myfile ("fen.data");
+
+	std::stringstream ss;
+	ss << std::setw(3) << std::setfill('0') << i;
+	std::string s = ss.str();
+	std::string fileName = "fen-";
+	fileName += s;
+	fileName += ".data";
+	std::cout<<fileName<<std::endl;
+
+
+	std::ifstream myfile (fileName);
+
+	pos.setupFromFen("kp6/8/8/8/8/8/8/7K w - -");
+	auto kpk = pos.getMaterialKey().getKey();
+	//std::cout<<kpk<<std::endl;
+	//return;
 
 	if (myfile.is_open()) {
 
 		Data d = getPosition(myfile);
 
-		while ( d.f.size() != 0 ) {
+		while ( d.fen.size() != 0 ) {
+			pos.setupFromFen(d.fen);
 
-			pos.setupFromFeatureList(d.f);
 			//position counter;
 			posCounter++;
 
@@ -139,6 +161,10 @@ void worker() {
 			//endgames
 			if( pos.isMaterialDataAKnownEndgame() ) {
 				endgames[pos.getMaterialKey().getKey()]++;
+				/*if(pos.getMaterialKey().getKey() == kpk) {
+					//if(d.v )
+					std::cout<<"fen "<<d.fen<<" value "<<d.v<<std::endl;
+				}*/
 			}
 			d = getPosition(myfile);
 		}
@@ -178,11 +204,11 @@ void worker() {
 		for(auto& [key, value]: sortedEndgames) {
 			std::cout<<pos.getStandardEgFenFromKey(value)<<" : "<<key<<std::endl;
 		}
-
-
-
+		std::cout<<"return true"<<std::endl;
+		return true;
 	}
 	else std::cout << "Unable to open file"<<std::endl;
+	return false;
 }
 
 int main() {
@@ -201,7 +227,7 @@ int main() {
 	//----------------------------------
 	libChessInit();
 
-	worker();
+	for(unsigned int i = 1; worker(i);++i) {}
 
 	return 0;
 }

@@ -16,3 +16,13 @@ TODO
 10) trainer use parse vectors
 11) test vast.
 12) output bucket
+
+
+
+
+
+
+------------------------------------
+1) generate game without filtering
+2) save to viriformat
+3) modifica
