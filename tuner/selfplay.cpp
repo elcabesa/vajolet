@@ -158,8 +158,10 @@ void SelfPlay::playGame() {
 
 		) {
 
+			if(std::abs(score - _p.eval<false>()) >=30000) {
 			_fs->save(_p, score);
 			_alreadySeenPosition[_p.getKey().getKey()  % ALREADYSEEN_SIZE] = _p.getKey().getKey() ;
+			}
 
 		}
 		_p.doMove(bestMove);
