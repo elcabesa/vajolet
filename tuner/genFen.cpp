@@ -28,6 +28,7 @@
 #include "player.h"
 #include "position.h"
 #include "tournament.h"
+#include "nnue.h"
 
 #include "libchess.h"
 #include "vajo_io.h"
@@ -77,6 +78,14 @@ int main() {
 	//	init global data
 	//----------------------------------
 	libChessInit();
+
+	Position pos(Position::nnueConfig::on);
+
+	auto& nnue = pos.nnue();
+	if(!nnue->load("internal")) {
+		std::cout<<"error loading "<<"internal"<<std::endl;
+		return 1;
+	}
 
 	//----------------------------------
 	const auto start = std::chrono::high_resolution_clock::now();
