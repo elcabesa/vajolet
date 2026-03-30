@@ -7,3 +7,4 @@ date     md5sum                           #pos    epoch   generator             
 20260128 c7b43578ddc88de1c32b11953b89bf29 524M    590     selfplay HCE d7             768*2 -> 512*2 -> 1 255,64  bullet
 20260312 fff816e29c5c183e50fed381ec4b71d9 1,005T  730     selfplay HCE d7 tactic pos  768*2 -> 512*2 -> 1 255,64  bullet
 20260313 50a3abe5646376dbe24a1b1f46a3d4b8 1,005T  890     selfplay HCE d7 tactic pos  768*2 -> 512*2 -> 1 255,64  bullet
+20260330 6ca45bfe7579e937307c16e14c9105e1 1,050T  900     selfplay HCE d7 tactic pos  768*2 -> 512*2 -> 1 255,64  bullet
