@@ -13,6 +13,7 @@ import struct
 import math
 import os
 import json
+from keras import backend
 
 FEN_FILENAME = 'fen.data'
 
@@ -129,9 +130,13 @@ def get_dataset(skip):
         generator, ((tf.int32,tf.int32), tf.float32), (((INPUT_SIZE,),(INPUT_SIZE,)), ()))
 
 
+def screlu(x):
+    y = keras.ops.clip(x, 0, 1)
+    return y*y
+
 input1 = keras.Input(shape=(INPUT_SIZE,),dtype='int32')
 input2 = keras.Input(shape=(INPUT_SIZE,),dtype='int32')
-dense = layers.Dense(ACCUMULATOR_SIZE, activation='relu')
+dense = layers.Dense(ACCUMULATOR_SIZE, activation=screlu)
 x = dense(input1)
 y = dense(input2)
 merged = layers.Concatenate(axis=1)([x, y])

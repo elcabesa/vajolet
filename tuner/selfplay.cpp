@@ -19,7 +19,7 @@
 #include <string>
 
 #include "book.h"
-#include "binSaver.h"
+#include "txtSaver.h"
 #include "movegen.h"
 #include "parameters.h"
 #include "player.h"
@@ -36,7 +36,7 @@
 #include "uciOutput.h"
 #include "tournament.h"
 
-SelfPlay::SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, BinSaver * const fs) : _p(Position::nnueConfig::on, Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) , _alreadySeenPosition(alreadySeenPosition){
+SelfPlay::SelfPlay(Player& white, Player& black, Book& b, tKey* alreadySeenPosition, TxtSaver * const fs) : _p(Position::nnueConfig::on, Position::pawnHash::off), _c(TunerParameters::gameTime, TunerParameters::gameTimeIncrement), _white(white), _black(black), _book(b), _fs(fs) , _alreadySeenPosition(alreadySeenPosition){
 	_p.setupFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	
 	_sl.setWTime(_c.getWhiteTime());
@@ -153,14 +153,11 @@ void SelfPlay::playGame() {
 			&& !_p.moveGivesCheck(bestMove)
 			&& !_p.isInCheck()
 			&& std::abs(score)<wonGame
-			&& (std::abs(score - _p.eval<false>()) <30000)
 			&& _alreadySeenPosition[_p.getKey().getKey() % ALREADYSEEN_SIZE] != _p.getKey().getKey()
 
 		) {
-
 			_fs->save(_p, score);
 			_alreadySeenPosition[_p.getKey().getKey()  % ALREADYSEEN_SIZE] = _p.getKey().getKey() ;
-
 		}
 		_p.doMove(bestMove);
 		_c.switchTurn();

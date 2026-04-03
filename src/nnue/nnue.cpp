@@ -26,14 +26,15 @@
 
 INCBIN(NnueInternalFile, "../../NN/nnue.par");
 
-constexpr static outType _scale = scale; //Q12
+constexpr static outType _scaleFl = scaleFL; //Q12
+constexpr static outType _scaleSl = scaleSL; //Q12
 
 
 bool NNUE::_loaded = false;
 
-NNUE::NNUE(const Position& pos):_model(std::make_shared<Model>(_scale)),
+NNUE::NNUE(const Position& pos):_model(std::make_shared<Model>(_scaleFl, _scaleSl)),
 #ifdef CHECK_NNUE_FEATURE_EXTRACTION
-_modelCheck(std::make_shared<Model>(_scale)),
+_modelCheck(std::make_shared<Model>(_scaleFl, _scaleSl)),
 #endif
 _pos(pos) {
     //std::cout<<"done"<<std::endl;
@@ -93,6 +94,7 @@ bool NNUE::load(std::string path) {
             return false;
         }
     }
+    clean();
 }
 
 void NNUE::close() {
@@ -137,7 +139,7 @@ Score NNUE::eval(FeatureList fl) {
 
     auto s  = _model->forwardPass(fl, fl2, whitePow); //Q24
 
-    Score score = s * (evalScale / (_scale*_scale) );
+    Score score = s * (evalScale / (_scaleFl*_scaleFl*_scaleSl) );
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
     return score;
@@ -214,32 +216,32 @@ void NNUE::addPiece(bitboardIndex piece, tSquare sq) {
 void NNUE::_createFeatures(FeatureList& fl, perspective p){
 
     bitboardIndex bWhitePow[12] = {
-        whiteKing,
-        whiteQueens,
-        whiteRooks,
-        whiteBishops,
-        whiteKnights,
         whitePawns,
-        blackKing,
-        blackQueens,
-        blackRooks,
-        blackBishops,
+        whiteKnights,
+        whiteBishops,
+        whiteRooks,
+        whiteQueens,
+        whiteKing,
+        blackPawns,
         blackKnights,
-        blackPawns
+        blackBishops,
+        blackRooks,
+        blackQueens,
+        blackKing,
     };
     bitboardIndex bBlackPow[12] = {
-        blackKing,
-        blackQueens,
-        blackRooks,
-        blackBishops,
-        blackKnights,
         blackPawns,
-        whiteKing,
-        whiteQueens,
-        whiteRooks,
-        whiteBishops,
+        blackKnights,
+        blackBishops,
+        blackRooks,
+        blackQueens,
+        blackKing,
+        whitePawns,
         whiteKnights,
-        whitePawns
+        whiteBishops,
+        whiteRooks,
+        whiteQueens,
+        whiteKing
     };
 
     for(unsigned int piece = 0; piece < 12; ++piece) {
@@ -264,18 +266,18 @@ tSquare NNUE::_getSquareFromFeature(unsigned int f) {return tSquare(f&63);} // T
 
 bitboardIndex NNUE::_getPieceFromFeature(unsigned int f) { // TODO SERVE FARE POW?
     bitboardIndex whitePow[12] = {
-        whiteKing,
-        whiteQueens,
-        whiteRooks,
-        whiteBishops,
-        whiteKnights,
         whitePawns,
-        blackKing,
-        blackQueens,
-        blackRooks,
-        blackBishops,
+        whiteKnights,
+        whiteBishops,
+        whiteRooks,
+        whiteQueens,
+        whiteKing,
+        blackPawns,
         blackKnights,
-        blackPawns
+        blackBishops,
+        blackRooks,
+        blackQueens,
+        blackKing
     };
     return whitePow[f>>6];}
 
@@ -284,42 +286,42 @@ unsigned int NNUE::_mapPiece(const bitboardIndex piece, perspective p) {
     if(p == whitePow) {
         unsigned int n[] = {
             0, //occupiedSquares,			//0		00000000
-            0, //whiteKing,					//1		00000001
-            1, //whiteQueens,				//2		00000010
-            2, //whiteRooks,				//3		00000011
-            3, //whiteBishops,				//4		00000100
-            4, //whiteKnights,				//5		00000101
-            5, //whitePawns,				//6		00000110
+            5, //whiteKing,					//1		00000001
+            4, //whiteQueens,				//2		00000010
+            3, //whiteRooks,				//3		00000011
+            2, //whiteBishops,				//4		00000100
+            1, //whiteKnights,				//5		00000101
+            0, //whitePawns,				//6		00000110
             0, //whitePieces,				//7		00000111
 
             0, //separationBitmap,			//8
-            6, //blackKing,					//9		00001001
-            7, //blackQueens,				//10	00001010
-            8, //blackRooks,				//11	00001011
-            9, //blackBishops,				//12	00001100
-            10,//blackKnights,				//13	00001101
-            11,//blackPawns,				//14	00001110
+            11, //blackKing,				//9		00001001
+            10, //blackQueens,				//10	00001010
+            9, //blackRooks,				//11	00001011
+            8, //blackBishops,				//12	00001100
+            7,//blackKnights,				//13	00001101
+            6,//blackPawns,					//14	00001110
             0  //blackPieces,				//15	00001111
         };
         return n[piece];
     } else {
         unsigned int n[] = {
             0, //separationBitmap,			//8
-            6, //blackKing,					//9		00001001
-            7, //blackQueens,				//10	00001010
-            8, //blackRooks,				//11	00001011
-            9, //blackBishops,				//12	00001100
-            10,//blackKnights,				//13	00001101
-            11,//blackPawns,				//14	00001110
+            11, //blackKing,				//9		00001001
+            10, //blackQueens,				//10	00001010
+            9, //blackRooks,				//11	00001011
+            8, //blackBishops,				//12	00001100
+            7,//blackKnights,				//13	00001101
+            6,//blackPawns,					//14	00001110
             0, //blackPieces,				//15	00001111
 
             0, //occupiedSquares,			//0		00000000
-            0, //whiteKing,					//1		00000001
-            1, //whiteQueens,				//2		00000010
-            2, //whiteRooks,				//3		00000011
-            3, //whiteBishops,				//4		00000100
-            4, //whiteKnights,				//5		00000101
-            5, //whitePawns,				//6		00000110
+            5, //whiteKing,					//1		00000001
+            4, //whiteQueens,				//2		00000010
+            3, //whiteRooks,				//3		00000011
+            2, //whiteBishops,				//4		00000100
+            1, //whiteKnights,				//5		00000101
+            0, //whitePawns,				//6		00000110
             0  //whitePieces,				//7		00000111
         };
         return n[piece];
@@ -341,7 +343,7 @@ Score NNUE::_completeEval() {
     _createFeatures(_completeFeatureListB, blackPow);
     auto s  = _model->forwardPass(_completeFeatureListW, _completeFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow);
 
-    Score score = s * (evalScale / (_scale*_scale));
+    Score score = s * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
 
     score = std::min(highSat, score);
     score = std::max(lowSat, score);
@@ -355,7 +357,7 @@ Score NNUE::_incrementalEval() {
     if(_diffFeatureListB.size() >= _completeEvalThreshold) {return _completeEval();}
     if(_diffFeatureListW.size() >= _completeEvalThreshold) {return _completeEval();}
 
-    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scale*_scale));
+    Score score = _model->incrementalPass(_diffFeatureListW, _diffFeatureListB, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
     _diffFeatureListB.clear();
     _diffFeatureListW.clear();
 
@@ -371,7 +373,7 @@ Score NNUE::_incrementalEval() {
     flb.clear();
     _createFeatures(flw, whitePow);
     _createFeatures(flb, blackPow);
-    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scale*_scale));
+    Score score2 = _modelCheck->forwardPass(flw, flb, _pos.isBlackTurn() ? blackPow : whitePow) * (evalScale / (_scaleFl*_scaleFl*_scaleSl));
     score2 = std::min(highSat, score2);
     score2 = std::max(lowSat, score2);
 

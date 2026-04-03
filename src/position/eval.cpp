@@ -787,8 +787,11 @@ Score Position::eval(void) const
     
 	// removing std::abs(res[1]) < 20000 speed 38kn/s
 	// with std::abs(res[1]) < 20000 speed 56kn/s
-    if(!trace && std::abs(res[1]) < 200000 && _nnue && _nnue->loaded()) {
-        return _nnue->eval();
+    if(!trace && _nnue && _nnue->loaded()) {
+		Score eval = _nnue->eval();
+		eval = std::min(SCORE_INFINITE,eval);
+		eval = std::max(-SCORE_INFINITE,eval);
+        return eval;
     }
         
     /*****************

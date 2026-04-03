@@ -237,7 +237,7 @@ TEST(timeManagement, normalSearch)
 	s.setWInc(0);
 	s.checkInfiniteSearch();
 
-	unsigned int allocatedTime = 571;
+	unsigned int allocatedTime = 666;
 
 	auto tm = timeManagement::create(s, whiteTurn);
 
@@ -304,7 +304,7 @@ TEST(timeManagement, normalSearchBlack)
 	s.setWInc(0);
 	s.checkInfiniteSearch();
 
-	unsigned int allocatedTime = 571;
+	unsigned int allocatedTime = 666;
 
 	auto tm = timeManagement::create(s, blackTurn);
 
@@ -337,7 +337,7 @@ TEST(timeManagement, normalSearchEarlyStop)
 	s.setWInc(0);
 	s.checkInfiniteSearch();
 
-	unsigned int shortAllocatedTime = 571 * 0.7;
+	unsigned int shortAllocatedTime = 666 * 0.7;
 
 	auto tm = timeManagement::create(s, whiteTurn);
 
@@ -359,7 +359,7 @@ TEST(timeManagement, normalSearchStop)
 	s.setWInc(0);
 	s.checkInfiniteSearch();
 
-	unsigned int allocatedTime = 571;
+	unsigned int allocatedTime = 666;
 
 	auto tm = timeManagement::create(s, whiteTurn);
 
@@ -381,7 +381,7 @@ TEST(timeManagement, normalSearchNoExtend)
 	s.setWInc(0);
 	s.checkInfiniteSearch();
 
-	unsigned int allocatedTime = 571;
+	unsigned int allocatedTime = 666;
 
 	auto tm = timeManagement::create(s, whiteTurn);
 
@@ -416,7 +416,7 @@ TEST(timeManagement, normalSearchExtend)
 	s.setWInc(0);
 	s.checkInfiniteSearch();
 
-	unsigned int allocatedTime = 571;
+	unsigned int allocatedTime = 666;
 
 	auto tm = timeManagement::create(s, whiteTurn);
 
@@ -451,8 +451,8 @@ TEST(timeManagement, normalSearchExtend2)
 	s.setWInc(0);
 	s.checkInfiniteSearch();
 
-	unsigned int allocatedTime = 571;
-	unsigned int maxAllocatedTime = 5710;
+	unsigned int allocatedTime = 666;
+	unsigned int maxAllocatedTime = 6660;
 
 	auto tm = timeManagement::create(s, whiteTurn);
 
@@ -529,7 +529,7 @@ TEST(timeManagement, PonderSearch)
 	s.setPonder(true);
 	s.checkInfiniteSearch();
 
-	unsigned int allocatedTime = 571;
+	unsigned int allocatedTime = 666;
 
 	auto tm = timeManagement::create(s, whiteTurn);
 

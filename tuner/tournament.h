@@ -23,17 +23,17 @@
 #include "hashKey.h"
 
 class Book;
-class BinSaver;
+class TxtSaver;
 class Tournament {
 public:
-	Tournament(bool& stop, Player& _p1, Player& _p2, Book &b, BinSaver * const fs = nullptr,  bool verbose = false);
+	Tournament(bool& stop, Player& _p1, Player& _p2, Book &b, TxtSaver * const fs = nullptr,  bool verbose = false);
 	void play();
 	bool isFinished() const { return _finished;}
 
 private:
 	Player &_p1, &_p2;
 	Book& _book;
-	BinSaver * const _fs;
+	TxtSaver * const _fs;
 	bool _verbose;
 	bool& _stop;
 	bool _finished= false;

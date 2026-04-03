@@ -1,4 +1,12 @@
 -------------------------------------------------------------------------
+Release note 3.1
+
+New Feature:
+  update NUE NET
+  switch to bullet trainer
+  update datagen
+
+-------------------------------------------------------------------------
 Release note 3.0
 
 New feature:

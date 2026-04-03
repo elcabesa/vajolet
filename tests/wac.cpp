@@ -317,10 +317,11 @@ int main(int argc, char ** argv) {
     Position pos(Position::nnueConfig::on, Position::pawnHash::off);
     SearchLimits sl;
     sl.setMoveTime(time);
-    for(unsigned int i = 1; pos.nnue()->load(std::string("file")+ std::to_string(i) + std::string(".weight")); ++i) {
+    pos.nnue()->load(std::string("internal"));
+    //for(unsigned int i = 1; pos.nnue()->load(std::string("file")+ std::to_string(i) + std::string(".weight")); ++i) {
         auto wac = doTest("wacnew.epd", thr, pos, sl);
         auto sts = doTest("STS1-STS15_LAN_v3.epd", thr, pos, sl);
-        std::cerr << i <<";" << wac <<";"<<sts<<std::endl;
+        std::cerr /*<< i <<";" */<< wac <<";"<<sts<<std::endl;
 
-    }
+    //}
 }

@@ -24,10 +24,11 @@
 #include <future>
 
 #include "book.h"
-#include "binSaver.h"
+#include "txtSaver.h"
 #include "player.h"
 #include "position.h"
 #include "tournament.h"
+#include "nnue.h"
 
 #include "libchess.h"
 #include "vajo_io.h"
@@ -53,7 +54,7 @@ static void printStartInfo(void)
 std::ofstream stream;
 
 void worker() {
-	BinSaver fs(1, stream);
+	TxtSaver fs(1, stream);
 	Book book("book.pgn");
 	Player p1("p1");
 	Player p2("p2");
@@ -78,13 +79,21 @@ int main() {
 	//----------------------------------
 	libChessInit();
 
+	Position pos(Position::nnueConfig::on);
+
+	auto& nnue = pos.nnue();
+	if(!nnue->load("internal")) {
+		std::cout<<"error loading "<<"internal"<<std::endl;
+		return 1;
+	}
+
 	//----------------------------------
 	const auto start = std::chrono::high_resolution_clock::now();
 	std::vector<std::future<void>> helperThread;
 
 
 	stream.open("fen.data", std::ios_base::app);
-	BinSaver fs(1, stream);
+	TxtSaver fs(1, stream);
 	for(int i = 0; i < TunerParameters::parallelGames; ++i){
 		helperThread.emplace_back(std::async(std::launch::async, worker));
 	}
