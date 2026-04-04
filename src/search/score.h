@@ -31,12 +31,12 @@ using Score = int32_t;
 //SCORE DEFINITION
 //---------------------------------------------
 
-const Score SCORE_NONE = 1700001;
-const Score SCORE_INFINITE = 1700000;
-const Score SCORE_MATE = 1699990;
+const Score SCORE_NONE = 230001;
+const Score SCORE_INFINITE = 230000;
+const Score SCORE_MATE = 210000;
 const Score SCORE_MATED = -SCORE_MATE;
 const Score SCORE_MATE_IN_MAX_PLY = SCORE_MATE - 200;
-const Score SCORE_KNOWN_WIN = 1500000; // 150 pedoni
+const Score SCORE_KNOWN_WIN = 200000; // 20 pedoni
 const Score SCORE_MATED_IN_MAX_PLY = -SCORE_MATE_IN_MAX_PLY;
 
 inline Score mateIn(int ply) { return SCORE_MATE - ply; }
