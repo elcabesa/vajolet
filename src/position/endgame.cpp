@@ -60,7 +60,7 @@ bool Position::_evalKxvsK(Score& res) const
 	}
 
 
-	res = SCORE_KNOWN_WIN + 50000;
+	res = SCORE_KNOWN_WIN + 5000;
 	res -= 10 * distance(winKingSquare,losKingSquare);// devo tenere il re vicino
 	res += 20 * centerDistance(losKingSquare);// devo portare il re avversario vicino al bordo
 	res += 50 * bitCnt(getBitmap(pieces));
@@ -252,7 +252,7 @@ bool Position::_evalKBNvsK( Score& res) const
 		mateSquare2 = H1;
 	}
 
-	res = SCORE_KNOWN_WIN + 20000;
+	res = SCORE_KNOWN_WIN + 2000;
 
 	res -= 5 * distance(enemySquare,kingSquare);// devo tenere il re vicino
 	res -= 10 * std::min( distance(enemySquare,mateSquare1), distance(enemySquare,mateSquare2));// devo portare il re avversario nel giusto angolo
@@ -288,7 +288,7 @@ bool Position::_evalKQvsK(Score& res) const
 		enemySquare = getSquareOfThePiece(whiteKing);
 	}
 
-	res = SCORE_KNOWN_WIN + 40000;
+	res = SCORE_KNOWN_WIN + 4000;
 	res -= 10 * distance(enemySquare,kingSquare);// devo tenere il re vicino
 	res += 20 * centerDistance(enemySquare);// devo portare il re avversario vicino al bordo
 
@@ -323,7 +323,7 @@ bool Position::_evalKRvsK(Score& res) const
 		enemySquare = getSquareOfThePiece(whiteKing);
 	}
 
-	res = SCORE_KNOWN_WIN + 30000;
+	res = SCORE_KNOWN_WIN + 3000;
 	res -= 10 * distance(enemySquare,kingSquare);// devo tenere il re vicino
 	res += 20 * centerDistance(enemySquare);// devo portare il re avversario vicino al bordo
 
