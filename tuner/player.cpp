@@ -91,7 +91,8 @@ SearchResult Player::doSearch(const Position& p, SearchLimits&)
 	std::uniform_int_distribution<> distrib(TunerParameters::minDepth, TunerParameters::MaxDepth);
 	_src.getPosition() = p;
 	int depth = distrib(gen);
-	//_sl.setDepth(depth);
-	_sl.setNodeLimit(5000);
+	_sl.setDepth(depth);
+	_sl.setInfiniteSearch();
+	_sl.setNodeLimit(TunerParameters::nodes);
 	return _src.manageNewSearch(*timeManagement::create(_sl, p.getNextTurn()));
 }
