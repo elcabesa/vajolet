@@ -159,7 +159,7 @@ void Searcher::_idLoop(std::vector<rootMove>& temporaryResults, unsigned int ind
 			_tm.notifyIterationHasBeenFinished();
 		}
 	}
-	while((++depth <= (_sl.isDepthLimitedSearch() ? _sl.getDepth() : 100) && (_sl.isNodeLimitedSearch() && getVisitedNodes() < _sl.getNodeLimit())) && !_stop);
+	while((++depth <= (_sl.isDepthLimitedSearch() ? _sl.getDepth() : 100) && (!_sl.isNodeLimitedSearch() || getVisitedNodes() < _sl.getNodeLimit())) && !_stop);
 }
 
 void Searcher::_excludeRootMoves( std::vector<rootMove>& temporaryResults, unsigned int index, std::vector<Move>& toBeExcludedMove, bool masterThread )
