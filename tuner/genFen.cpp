@@ -109,7 +109,7 @@ int main() {
 		std::this_thread::sleep_for(10000ms);
 		const auto end = std::chrono::high_resolution_clock::now();
 		const std::chrono::duration<double, std::milli> elapsed = end - start;
-		std::cout<<std::chrono::duration_cast<std::chrono::minutes>(elapsed).count()<<" saved "<<fs.getSavedPosition()<<" positions "<< fs.getSavedPosition()/std::chrono::duration_cast<std::chrono::seconds>(elapsed).count()<<" positions per second"<<std::endl;
+		std::cout<<std::chrono::duration_cast<std::chrono::minutes>(elapsed).count()<<" saved "<<fs.getSavedPosition()/1000000.0<<"M positions "<< fs.getSavedPosition()/std::chrono::duration_cast<std::chrono::seconds>(elapsed).count()<<" positions per second"<<std::endl;
 
 	}
 
