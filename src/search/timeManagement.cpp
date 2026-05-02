@@ -131,7 +131,11 @@ NormalTimeManagement::NormalTimeManagement(SearchLimits& limits, const eNextMove
 	}
 	else
 	{
-		_allocatedTime = time / 30.0 + increment * 2.0;
+		float inGain = 2.0;
+		if(increment * 10 > time) {
+			inGain = 0.98;
+		}
+		_allocatedTime = time / 30.0 + increment * inGain;
 		_maxAllocatedTime = 10 * _allocatedTime;
 	}
 
