@@ -1235,7 +1235,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 
 		}
 		
-		futilityBase = bestScore + 5050;
+		futilityBase = bestScore + 20000;
 
 
 	}
