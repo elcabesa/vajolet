@@ -1,8 +1,16 @@
+Release note 3.2
+
+Improvements:
+  update NNUE NET
+  datagen with 5000 sofnode limit
+  improve futility pruning
+  less aggressive time management
+
 -------------------------------------------------------------------------
 Release note 3.1
 
 New Feature:
-  update NUE NET
+  update NNUE NET
   switch to bullet trainer
   update datagen
 

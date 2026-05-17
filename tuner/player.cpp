@@ -92,5 +92,7 @@ SearchResult Player::doSearch(const Position& p, SearchLimits&)
 	_src.getPosition() = p;
 	int depth = distrib(gen);
 	_sl.setDepth(depth);
+	_sl.setInfiniteSearch();
+	_sl.setNodeLimit(TunerParameters::nodes);
 	return _src.manageNewSearch(*timeManagement::create(_sl, p.getNextTurn()));
 }
