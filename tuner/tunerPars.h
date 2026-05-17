@@ -30,6 +30,7 @@ public:
 
     static unsigned int minDepth;
     static unsigned int MaxDepth;
+    static unsigned int nodes;
 };
 
 #endif

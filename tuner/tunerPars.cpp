@@ -25,6 +25,8 @@ unsigned int TunerParameters::initialRandomMoves = 10;
 float TunerParameters::gameTime = 100;
 float TunerParameters::gameTimeIncrement = 1;
 
-unsigned int TunerParameters::minDepth = 7;
-unsigned int TunerParameters::MaxDepth = 7;
+unsigned int TunerParameters::minDepth = 15;
+unsigned int TunerParameters::MaxDepth = 15;
+
+unsigned int TunerParameters::nodes = 5000;
 
