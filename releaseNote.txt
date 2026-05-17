@@ -2,7 +2,7 @@ Release note 3.2
 
 Improvements:
   update NNUE NET
-  datagen with 5000 sofnode limit
+  datagen with 5000 softnode limit
   improve futility pruning
   less aggressive time management
 
