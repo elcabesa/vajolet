@@ -10,4 +10,4 @@ V3.0   20251221 Vajolet 3.0                      309M    115     selfplay HCE d7
 V3.1   20260330 6ca45bfe7579e937307c16e14c9105e1 1,050T  900     selfplay HCE d7 tactic pos     768*2 -> 512*2 -> 1 255,64  bullet
        20260424 44165bded48ee8da9829e16b10af0f4e 295M    900     selfplay v3.1 5000n tactic     768*2 -> 512*2 -> 1 255,64  bullet
 V3.1.1 20260429 60088de5c7815dfcbb985f68aedaf2fa 385M    900     selfplay v3.1 5000n tactic     768*2 -> 512*2 -> 1 255,64  bullet
-
+V3.1.3 20260517 72c7465fd036d6f2e951986d015b3ba0 388M    900     selfplay v3.1.1 5000n tactic   768*2 -> 512*2 -> 1 255,64  bullet
