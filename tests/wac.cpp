@@ -271,6 +271,7 @@ Result test(const std::string& testName, my_thread& thr, Position& pos, SearchLi
 
     bool usePointSystem = PointList::containPointList(*epd.cbegin());
 
+    unsigned int i = 0;
     Result results(epd.getSize() * (usePointSystem ? 10 : 1));
     for (const auto & record: epd) {
         
@@ -290,6 +291,8 @@ Result test(const std::string& testName, my_thread& thr, Position& pos, SearchLi
         else if (Movelist(pos, record.getOperations().get("bm")).contains(r.PV.getMove(0))) {
             results.addResult(1);
         }
+
+        std::cout<<testName<<" "<<(++i) <<": "<<results.getPercentual()<<"% ("<<results.getPartial()<<"/"<<results.getTotal()<<")"<<std::endl;
     }
     pos.nnue()->printStats();
     return results; 
@@ -297,7 +300,7 @@ Result test(const std::string& testName, my_thread& thr, Position& pos, SearchLi
 
 unsigned int doTest(const std::string& testName, my_thread& thr, Position& pos, SearchLimits& sl) {
     const auto res = test(testName, thr, pos, sl);
-    //std::cout<<testName<<": "<<res.getPercentual()<<"% ("<<res.getPartial()<<"/"<<res.getTotal()<<")"<<std::endl;
+    std::cout<<testName<<": "<<res.getPercentual()<<"% ("<<res.getPartial()<<"/"<<res.getTotal()<<")"<<std::endl;
     return res.getPartial();
 }
 

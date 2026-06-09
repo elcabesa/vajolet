@@ -1190,7 +1190,6 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 	if(!inCheck)
 	{
 		bestScore = staticEval;
-		// todo trovare un valore buono per il futility
 
 		if( /*!PVnode && */ttValue != SCORE_NONE)
 		{
@@ -1258,6 +1257,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 	PVline childPV;
 	unsigned int moveCounter = 0;
 
+	Move previousMove = _pos.getActualState().getCurrentMove();
 	while ( ( m = mp.getNextMove() ) )
 	{
 		assert(alpha < beta);
@@ -1276,7 +1276,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 			}
 
 			// at very deep search allow only recapture
-			if(depth < -7 * ONE_PLY && _pos.getActualState().getCurrentMove().getTo() != m.getTo())
+			if(depth < -7 * ONE_PLY && previousMove.getTo() != m.getTo())
 			{
 				if (log) ln->skipMove(m, "only allowed recapture");
 				continue;
@@ -1300,6 +1300,11 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 						&& futilityBase>-SCORE_KNOWN_WIN
 					)
 					{
+
+						if(moveCounter > 1 && previousMove.getTo() != m.getTo()) {
+							continue;
+						}
+
 						Score futilityValue = futilityBase
 								+ _pos.getPieceValue(_pos.getPieceAt(m.getTo()))[1]
 								+ ( m.isEnPassantMove() ? _pos.getPieceValue(whitePawns)[1] : 0);
