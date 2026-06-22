@@ -1044,13 +1044,14 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 	// save killer move & update history
 	if (bestScore >= beta && !inCheck)
 	{
+		int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
+		Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY * ONE_PLY);
+
 		if (!_pos.isCaptureMoveOrPromotion(bestMove))
 		{
 			_sd.saveKillers(ply, bestMove);
 
-			// update history
-			int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
-			Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY * ONE_PLY);
+			// update history;
 
 			auto& history = _sd.getHistory();
 			history.update( _pos.isWhiteTurn() ? white: black, bestMove, bonus);
@@ -1061,25 +1062,20 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 			
 			_updateCounterMove( bestMove );
 		}
-		else
+
+		// update capture history
+
+		auto & capt= _sd.getCaptureHistory();
+		if(_pos.isCaptureMove(bestMove)) {
+			capt.update( _pos.getPieceAt(bestMove.getFrom()), bestMove, _pos.getPieceAt(bestMove.getTo()), bonus);
+		}
+
+		for (unsigned int i = 0; i < captureMoveCount; i++)
 		{
-			//if( _pos.isCaptureMove( bestMove ) )
+			Move mm = captureMoveList[i];
+			//if( _pos.isCaptureMove( mm ) )
 			{
-				// update capture history
-				int loc_depth = (depth > ( 17 * ONE_PLY) ) ? 0 : depth;
-				Score bonus = Score(loc_depth * loc_depth)/(ONE_PLY * ONE_PLY);
-
-				auto & capt= _sd.getCaptureHistory();
-				capt.update( _pos.getPieceAt(bestMove.getFrom()), bestMove, _pos.getPieceAt(bestMove.getTo()), bonus);
-
-				for (unsigned int i = 0; i < captureMoveCount; i++)
-				{
-					Move mm = captureMoveList[i];
-					//if( _pos.isCaptureMove( mm ) )
-					{
-						capt.update( _pos.getPieceAt(mm.getFrom()), mm, _pos.getPieceAt(mm.getTo()), -bonus);
-					}
-				}
+				capt.update( _pos.getPieceAt(mm.getFrom()), mm, _pos.getPieceAt(mm.getTo()), -bonus);
 			}
 		}
 	}
