@@ -230,8 +230,8 @@ void SearchParameters::_updatePars()
 			double    PVRed = -1.5 + 0.33 * log(dd) * log(double(mc));
 			double nonPVRed = -1.2 + 0.37 * log(dd) * log(double(mc));
 
-			PVreduction[1][d][mc] = (Score)(PVRed >= 1.0 ? floor(PVRed * int(16)) : 0);
-			nonPVreduction[1][d][mc] = (Score)(nonPVRed >= 1.0 ? floor(nonPVRed * int(16)) : 0);
+			PVreduction[1][d][mc] = (Score)(PVRed >= 0.0 ? floor(PVRed * int(16)) : 0);
+			nonPVreduction[1][d][mc] = (Score)(nonPVRed >= 0.0 ? floor(nonPVRed * int(16)) : 0);
 
 			PVreduction[0][d][mc] = PVreduction[1][d][mc];
 			nonPVreduction[0][d][mc] = nonPVreduction[1][d][mc];

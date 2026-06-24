@@ -69,6 +69,7 @@ public:
 	const typename std::array<extMove,N >::iterator end() const;
 	const typename std::array<extMove,N >::iterator actualPosition();
 	const Move& findNextBestMove(void);
+	const Move& findNextBestMove(Score& score);
 	const Move& getNextMove(void);
 	void ignoreMove( const Move& m );
 	
@@ -149,12 +150,25 @@ const typename std::array<extMove,N >::iterator MoveList<N>::actualPosition()
 	return _moveListPosition;
 }
 template <std::size_t N>
-inline const Move& MoveList<N>::findNextBestMove(void)
+inline const Move& MoveList<N>::findNextBestMove()
 {
 	const auto max = std::max_element( _moveListPosition, _moveListEnd );
 	if( max != _moveListEnd )
 	{
 		std::swap( *max, *_moveListPosition );
+		return *( _moveListPosition++ );
+	}
+	return Move::NOMOVE;
+}
+
+template <std::size_t N>
+inline const Move& MoveList<N>::findNextBestMove(Score& score)
+{
+	const auto max = std::max_element( _moveListPosition, _moveListEnd );
+	if( max != _moveListEnd )
+	{
+		std::swap( *max, *_moveListPosition );
+		score = _moveListPosition->getScore();
 		return *( _moveListPosition++ );
 	}
 	return Move::NOMOVE;

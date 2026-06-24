@@ -25,6 +25,7 @@
 #include <array>
 
 #include "bitBoardIndex.h"
+#include "hashKey.h"
 #include "move.h"
 #include "score.h"
 #include "tSquare.h"
@@ -58,6 +59,37 @@ public :
 	}
 
 	explicit History(){}
+
+};
+
+class PawnHistory
+{
+
+private:
+	static constexpr int _size = 512;
+	Score _table[_size][lastBitboard][squareNumber] = {};
+public :
+
+	inline void clear() { std::memset(_table, 0, sizeof(_table)); }
+
+	inline void update( HashKey k, const bitboardIndex piece, const Move& m, const Score v)
+	{
+		const int W = 32;
+		const int D = 500;
+
+		//assert(c<=black);
+
+		Score & e = _table[k.getKey()&(_size-1)][piece][m.getTo()];
+		e += v * W - e * std::abs(v)/ D;
+	}
+
+	inline Score getValue( HashKey k, const bitboardIndex piece, const Move& m) const
+	{
+		//assert(c<=black);
+		return _table[k.getKey()&(_size-1)][piece][m.getTo()];
+	}
+
+	explicit PawnHistory(){}
 
 };
 
@@ -143,6 +175,40 @@ public :
 
 
 	explicit CounterMove(){}
+
+};
+
+class ContinuationHistory
+{
+private:
+	// piece, to, piece, to
+	Score _table[squareNumber][lastBitboard][squareNumber][lastBitboard] = {};
+public :
+
+	inline void clear()
+	{
+		std::memset(_table, 0, sizeof(_table));
+	}
+
+
+	inline void update(const bitboardIndex p1, const tSquare to1, const bitboardIndex p2, const tSquare to2, const Score v)
+	{
+		const int W = 32;
+		const int D = 500;
+
+		assert(c<=black);
+
+		Score & e = _table[p1][to1][p2][to2];
+		e += v * W - e * std::abs(v)/ D;
+	}
+
+	inline Score getValue(const bitboardIndex p1, const tSquare to1, const bitboardIndex p2, const tSquare to2) const
+	{
+		assert(c<=black);
+		return _table[p1][to1][p2][to2];
+	}
+
+	explicit ContinuationHistory(){}
 
 };
 

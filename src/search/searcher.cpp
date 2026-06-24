@@ -1052,12 +1052,18 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 			_sd.saveKillers(ply, bestMove);
 
 			// update history;
-
 			auto& history = _sd.getHistory();
 			history.update( _pos.isWhiteTurn() ? white: black, bestMove, bonus);
 
 			for (unsigned int i = 0; i < quietMoveCount; ++i) {
 				history.update( _pos.isWhiteTurn() ? white: black, quietMoveList[i], -bonus);
+			}
+
+			auto& pawnHistory = _sd.getPawnHistory();
+			pawnHistory.update( _pos.getPawnKey(), _pos.getPieceAt(bestMove.getFrom()), bestMove, bonus);
+
+			for (unsigned int i = 0; i < quietMoveCount; ++i) {
+				pawnHistory.update( _pos.getPawnKey() , _pos.getPieceAt(quietMoveList[i].getFrom()), quietMoveList[i], -bonus);
 			}
 			
 			_updateCounterMove( bestMove );
@@ -1426,6 +1432,7 @@ inline void Searcher::_updateCounterMove(const Move& m)
 	if( const Move& previousMove = _pos.getActualState().getCurrentMove() )
 	{
 		_sd.getCounterMove().update( _pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
+		_sd.getContinuationHistory().update(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo(), 1);
 	}
 }
 

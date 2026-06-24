@@ -62,6 +62,7 @@ public:
 		generateQuietMoves,
 		iterateQuietMoves,
 		iterateBadCaptureMoves,
+		iterateBadQuietMoves,
 		finishedNormalStage,
 
 		getTTevasion,
@@ -98,6 +99,7 @@ private:
 	
 	MoveList<MAX_MOVE_PER_POSITION> _moveList;
 	MoveList<MAX_BAD_MOVE_PER_POSITION> _badCaptureList;
+	MoveList<MAX_MOVE_PER_POSITION> _badQuietList;
 	
 	unsigned int _killerPos;
 	Score _captureThreshold;

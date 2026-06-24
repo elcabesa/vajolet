@@ -29,8 +29,10 @@ void SearchData::clearKillers(unsigned int ply)
 void SearchData::cleanData(void)
 {
 	_history.clear();
+	_pawnHistory.clear();
 	_captureHistory.clear();
 	_counterMoves.clear();
+	_continuationHistory.clear();
 	for( auto&x: _story)
 	{
 		

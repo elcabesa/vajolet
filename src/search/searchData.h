@@ -38,6 +38,8 @@ private:
 	CounterMove _counterMoves;
 	CaptureHistory _captureHistory;
 	History _history;
+	PawnHistory _pawnHistory;
+	ContinuationHistory _continuationHistory;
 public:
 
 	void clearKillers(unsigned int ply);
@@ -47,11 +49,15 @@ public:
 	const Move& getExcludedMove(unsigned int ply);
 	
 	History& getHistory(){return _history;}
+	PawnHistory& getPawnHistory(){return _pawnHistory;}
 	CaptureHistory& getCaptureHistory(){return _captureHistory;}
 	CounterMove& getCounterMove(){return _counterMoves;}
+	ContinuationHistory& getContinuationHistory(){return _continuationHistory;}
 	const History& getHistory()const {return _history;}
+	const PawnHistory& getPawnHistory()const {return _pawnHistory;}
 	const CaptureHistory& getCaptureHistory()const {return _captureHistory;}
 	const CounterMove& getCounterMove()const {return _counterMoves;}
+	const ContinuationHistory& getContinuationHistory()const {return _continuationHistory;}
 	const Move& getKillers(unsigned int ply, unsigned int n) const {
 		assert(ply < STORY_LENGTH);
 		assert(n < Sd::KILLER_SIZE);

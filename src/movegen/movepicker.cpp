@@ -106,6 +106,25 @@ Move MovePicker::getNextMove()
 			break;
 
 		case eStagedGeneratorState::iterateQuietMoves:
+		{
+			Score score = 0;
+			if( Move mm; ( mm = _moveList.findNextBestMove(score) ) )
+			{
+				if(score >= 0)
+				{
+					return mm;
+				}
+				else
+				{
+					_badQuietList.insert( mm );
+				}
+			}
+			else
+			{
+				++_stagedGeneratorState;
+			}
+			break;
+		}
 		case eStagedGeneratorState::iterateQuiescentCaptures:
 		case eStagedGeneratorState::iterateCaptureEvasionMoves:
 		case eStagedGeneratorState::iterateQuiescentMoves:
@@ -172,7 +191,17 @@ Move MovePicker::getNextMove()
 			break;
 			
 		case eStagedGeneratorState::iterateBadCaptureMoves:
-			return _badCaptureList.getNextMove();
+			if( Move mm; ( mm = _badCaptureList.getNextMove() ) )
+			{
+				return mm;
+			}
+			else
+			{
+				++_stagedGeneratorState;
+			}
+			break;
+		case eStagedGeneratorState::iterateBadQuietMoves:
+			return _badQuietList.getNextMove();
 			break;
 			
 		case eStagedGeneratorState::getKillers:
@@ -238,9 +267,16 @@ inline void MovePicker::_scoreCaptureMoves()
 
 inline void MovePicker::_scoreQuietMoves()
 {
+	const Move& previousMove = _pos.getActualState().getCurrentMove();
 	for( auto& m : _moveList )
 	{
-		m.setScore( _sd.getHistory().getValue( Color( _pos.isBlackTurn() ), m ) );
+		Score s = _sd.getHistory().getValue( _pos.isWhiteTurn() ? white: black, m )
+		+ _sd.getPawnHistory().getValue( _pos.getPawnKey(), _pos.getPieceAt( m.getFrom()), m) * 3;
+
+		if(previousMove) {
+			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
+		}
+		m.setScore(s);
 	}
 }
 
