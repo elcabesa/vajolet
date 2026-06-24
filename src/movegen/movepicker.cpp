@@ -276,6 +276,12 @@ inline void MovePicker::_scoreQuietMoves()
 		if(previousMove) {
 			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
 		}
+		if(_pos.getStateSize() >=2) {
+			const Move& previousMove = _pos.getState(_pos.getStateSize() - 2 ).getCurrentMove();
+			//attenzione alcune volte il pezzo è catturato e non c'è.. per questo andrebbe salvato in _sd
+			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
+
+		}
 		m.setScore(s);
 	}
 }

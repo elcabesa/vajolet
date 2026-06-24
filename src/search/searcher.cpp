@@ -1434,6 +1434,14 @@ inline void Searcher::_updateCounterMove(const Move& m)
 		_sd.getCounterMove().update( _pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
 		_sd.getContinuationHistory().update(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo(), 1);
 	}
+
+	if(_pos.getStateSize() >=2) {
+		const Move& previousMove = _pos.getState(_pos.getStateSize() - 2 ).getCurrentMove();
+		//attenzione alcune volte il pezzo è catturato e non c'è.. per questo andrebbe salvato in _sd
+		_sd.getContinuationHistory().update(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo(), 1);
+
+	}
+
 }
 
 inline void Searcher::_updateNodeStatistics(const unsigned int ply)
