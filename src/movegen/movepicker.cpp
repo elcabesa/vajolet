@@ -268,6 +268,10 @@ inline void MovePicker::_scoreCaptureMoves()
 inline void MovePicker::_scoreQuietMoves()
 {
 	const Move& previousMove = _pos.getActualState().getCurrentMove();
+	Move previousMove2(0);
+	if(_pos.getStateSize() >=2) {
+		previousMove2 = _pos.getState(_pos.getStateSize() - 2 ).getCurrentMove();
+	}
 	for( auto& m : _moveList )
 	{
 		Score s = _sd.getHistory().getValue( _pos.isWhiteTurn() ? white: black, m )
@@ -276,11 +280,10 @@ inline void MovePicker::_scoreQuietMoves()
 		if(previousMove) {
 			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
 		}
-		if(_pos.getStateSize() >=2) {
-			const Move& previousMove = _pos.getState(_pos.getStateSize() - 2 ).getCurrentMove();
-			//attenzione alcune volte il pezzo è catturato e non c'è.. per questo andrebbe salvato in _sd
-			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
 
+		if(previousMove2 != Move(0)) {
+			//attenzione alcune volte il pezzo è catturato e non c'è.. per questo andrebbe salvato in _sd
+			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove2.getTo()), previousMove2.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
 		}
 		m.setScore(s);
 	}
