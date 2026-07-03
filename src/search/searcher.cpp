@@ -502,7 +502,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 			)
 			{
 				PVline childPV;
-				Score v = _qsearch<nodeType::CUT_NODE, log>(ply,0 , alpha, alpha + 1, childPV);
+				Score v = _qsearch<nodeType::ALL_NODE, log>(ply,0 , alpha, alpha + 1, childPV);
 				if (v <= alpha || _sp.razorReturn)
 				{
 					if (log) ln->logReturnValue(v);
@@ -562,11 +562,11 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 				PVline childPV;
 				if( depth - red < ONE_PLY )
 				{
-					nullVal = -_qsearch<childNodesType, log>(newPly, 0, -beta, -beta + 1, childPV);
+					nullVal = -_qsearch<nodeType::CUT_NODE, log>(newPly, 0, -beta, -beta + 1, childPV);
 				}
 				else
 				{
-					nullVal = -_alphaBeta<childNodesType, log>(newPly, depth - red, -beta, -beta + 1, childPV);
+					nullVal = -_alphaBeta<nodeType::CUT_NODE, log>(newPly, depth - red, -beta, -beta + 1, childPV);
 				}
 
 				_pos.undoNullMove();
@@ -594,7 +594,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 					_sd.setSkipNullMove(ply, true);
 					assert(depth - red >= ONE_PLY);
 					Score val;
-					val = _alphaBeta<childNodesType, log>(ply, depth - red, beta - 1, beta, childPV);
+					val = _alphaBeta<type, log>(ply, depth - red, beta - 1, beta, childPV);
 					_sd.setSkipNullMove(ply, false);
 					if (val >= beta)
 					{
