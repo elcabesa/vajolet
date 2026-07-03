@@ -1067,6 +1067,11 @@ template<Searcher::nodeType type, bool log> Score Searcher::_alphaBeta(unsigned 
 			}
 			
 			_updateCounterMove( bestMove );
+
+			_updateCounterMoveHistory(bestMove, bonus);
+			for (unsigned int i = 0; i < quietMoveCount; ++i) {
+				_updateCounterMoveHistory(quietMoveList[i], -bonus);
+			}
 		}
 
 		// update capture history
@@ -1299,6 +1304,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 					if(
 						!moveGiveCheck
 						&& !_pos.isPassedPawnMove(m)
+						//&& !m.isPromotionMove()
 						&& futilityBase>-SCORE_KNOWN_WIN
 					)
 					{
@@ -1382,6 +1388,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 					}
 					if(!_stop)
 					{
+						if (log) ln->saveTTMove();
 						_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply), typeScoreHigherThanBeta,(short int)TTdepth, bestMove, staticEval);
 					}
 					if (log) ln->logReturnValue(bestScore);
@@ -1409,6 +1416,7 @@ template<Searcher::nodeType type, bool log> Score Searcher::_qsearch(unsigned in
 
 	if( !_stop )
 	{
+		if (log) ln->saveTTMove();
 		_tt.store(posKey, transpositionTable::scoreToTT(bestScore, ply), TTtype, (short int)TTdepth, bestMove, staticEval);
 	}
 	if (log) ln->logReturnValue(bestScore);
@@ -1432,16 +1440,20 @@ inline void Searcher::_updateCounterMove(const Move& m)
 	if( const Move& previousMove = _pos.getActualState().getCurrentMove() )
 	{
 		_sd.getCounterMove().update( _pos.getPieceAt( previousMove.getTo() ), previousMove.getTo(), m );
-		_sd.getContinuationHistory().update(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo(), 1);
 	}
+}
 
-	if(_pos.getStateSize() >=2) {
-		const Move& previousMove = _pos.getState(_pos.getStateSize() - 2 ).getCurrentMove();
-		//attenzione alcune volte il pezzo è catturato e non c'è.. per questo andrebbe salvato in _sd
-		_sd.getContinuationHistory().update(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo(), 1);
+void Searcher::_updateCounterMoveHistory(const Move& m, Score bonus) {
 
+	const Move& previousMove = _pos.getActualState().getCurrentMove();
+	_sd.getContinuationHistory().update(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo(), bonus);
+
+
+	for(unsigned int i = 0; i < SearchParameters::continuationHistorysize; ++i) {
+		if(_pos.getStateSize() >=2 + i) {
+			_sd.getContinuationHistory().update(_pos.getState(_pos.getStateSize() - 2 -i ).getMovedPiece(), _pos.getState(_pos.getStateSize() - 2 -i ).getCurrentMove().getTo(), _pos.getPieceAt(m.getFrom()), m.getTo(), bonus*(1024-(signed int)i*80)/1024);
+		}
 	}
-
 }
 
 inline void Searcher::_updateNodeStatistics(const unsigned int ply)

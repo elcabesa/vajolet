@@ -198,3 +198,8 @@ void logNode::doFullWidthSearchSearch() {
 	_indentate(_ply);
 	_lw.writeString("do full width search");
 }
+
+void logNode::saveTTMove() {
+	_indentate(_ply);
+	_lw.writeString("saveTTmove");
+}

@@ -129,6 +129,7 @@ private:
 	Score _futility(int depth, bool improving);
 	Score _getDrawValue() const;
 	void _updateCounterMove(const Move& m);
+	void _updateCounterMoveHistory(const Move& m, Score bonus);
 	void _updateNodeStatistics(const unsigned int ply);
 	bool _manageDraw(const bool PVnode, PVline& pvLine);
 	void _showCurrenLine(const unsigned int ply, const int depth);

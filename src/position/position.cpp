@@ -298,6 +298,7 @@ Position& Position::setupFromFeatureList(const FeatureList& fl) {
 	x.resetPliesFromNullCount();
 	x.setCurrentMove( Move::NOMOVE );
 	x.resetCapturedPiece();
+	x.resetMovedPiece();
 
 	x.setMaterialValue( _calcMaterialValue() );
 	x.setNonPawnValue( _calcNonPawnMaterialValue() );
@@ -739,6 +740,7 @@ void Position::doNullMove()
 
 	++_ply;
 	x.resetCapturedPiece();
+	x.resetMovedPiece();
 
 	std::swap(Us,Them);
 
@@ -775,6 +777,7 @@ void Position::doMove(const Move & m)
 	const tSquare from = m.getFrom();
 	tSquare to = m.getTo();
 	const bitboardIndex piece = getPieceAt(from);
+	x.setMovedPiece(piece);
 	assert( isValidPiece( piece ));
 	//bool kingMove = isKing(piece);
 

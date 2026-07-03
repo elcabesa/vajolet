@@ -272,6 +272,7 @@ public:
 	static constexpr unsigned int LmrLimitMove = 64;
 	Score PVreduction[2][LmrLimit * 16][LmrLimitMove];
 	Score nonPVreduction[2][LmrLimit * 16][LmrLimitMove];
+	static constexpr int continuationHistorysize = 1;
 private:
 	void _updatePars();
 };

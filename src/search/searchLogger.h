@@ -60,6 +60,7 @@ public:
 	void logReturnValue(Score val);
 	void test(const std::string& s);
 	void startSection(const std::string& s);
+	void saveTTMove();
 	void endSection();
 private:
 	void _indentate(unsigned int ply);

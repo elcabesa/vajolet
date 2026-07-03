@@ -48,6 +48,7 @@ public:
 	// cppcheck-suppress uninitMemberVar symbolName=state::_pliesFromNull
 	// cppcheck-suppress uninitMemberVar symbolName=state::_checkingSquares
 	// cppcheck-suppress uninitMemberVar symbolName=state::_capturedPiece
+	// cppcheck-suppress uninitMemberVar symbolName=state::_movedPiece
 	// cppcheck-suppress uninitMemberVar symbolName=state::_epSquare
 	explicit state(){}
 
@@ -386,11 +387,33 @@ public:
 	{
 		_capturedPiece = p;
 	}
-	
+
 	inline void resetCapturedPiece()
 	{
 		_capturedPiece = empty;
 	}
+
+	inline bool isCapture() const
+	{
+		return _capturedPiece != empty;
+	}
+
+	inline const bitboardIndex& getMovedPiece() const
+	{
+		return _movedPiece;
+	}
+
+	inline void setMovedPiece( const bitboardIndex p )
+	{
+		_movedPiece = p;
+	}
+
+	inline void resetMovedPiece()
+	{
+		_movedPiece = empty;
+	}
+	
+
 
 private:
 	eCastle _castleRights; /*!<  actual castle rights*/
@@ -405,6 +428,7 @@ private:
 	unsigned int _pliesFromNull;	/*!<  plies from null move*/
 	bitMap _checkingSquares[lastBitboard]; /*!< squares of the board from where a king can be checked*/
 	bitboardIndex _capturedPiece; /*!<  index of the captured piece for unmakeMove*/
+	bitboardIndex _movedPiece; /*!<  index of the moved piece*/
 	tSquare _epSquare;	/*!<  en passant square*/
 	HashKey _key,		/*!<  hashkey identifying the position*/
 			_pawnKey,	/*!<  hashkey identifying the pawn formation*/

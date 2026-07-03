@@ -268,22 +268,30 @@ inline void MovePicker::_scoreCaptureMoves()
 inline void MovePicker::_scoreQuietMoves()
 {
 	const Move& previousMove = _pos.getActualState().getCurrentMove();
-	Move previousMove2(0);
-	if(_pos.getStateSize() >=2) {
-		previousMove2 = _pos.getState(_pos.getStateSize() - 2 ).getCurrentMove();
+	Move previousMoves[SearchParameters::continuationHistorysize];
+	bitboardIndex previousMovesPieces[SearchParameters::continuationHistorysize];
+
+	for(unsigned int i = 0; i < SearchParameters::continuationHistorysize; ++i) {
+		previousMoves[i] = Move::NOMOVE;
+		previousMovesPieces[i] = empty;
+		if(_pos.getStateSize() >=2 + i) {
+			previousMoves[i] = _pos.getState(_pos.getStateSize() - 2 -i ).getCurrentMove();
+			previousMovesPieces[i] = _pos.getState(_pos.getStateSize() - 2 -i ).getMovedPiece();
+		}
 	}
 	for( auto& m : _moveList )
 	{
 		Score s = _sd.getHistory().getValue( _pos.isWhiteTurn() ? white: black, m )
 		+ _sd.getPawnHistory().getValue( _pos.getPawnKey(), _pos.getPieceAt( m.getFrom()), m) * 3;
 
-		if(previousMove) {
+		if(_pos.getActualState().getMovedPiece()  != empty) {
 			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
 		}
 
-		if(previousMove2 != Move(0)) {
-			//attenzione alcune volte il pezzo è catturato e non c'è.. per questo andrebbe salvato in _sd
-			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove2.getTo()), previousMove2.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
+		for(unsigned int i = 0; i < SearchParameters::continuationHistorysize; ++i) {
+			if(previousMovesPieces[i] != empty) {
+				s += _sd.getContinuationHistory().getValue(previousMovesPieces[i] , previousMoves[i].getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
+			}
 		}
 		m.setScore(s);
 	}
