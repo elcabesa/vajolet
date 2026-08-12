@@ -196,15 +196,12 @@ public :
 		const int W = 32;
 		const int D = 500;
 
-		assert(c<=black);
-
 		Score & e = _table[p1][to1][p2][to2];
 		e += v * W - e * std::abs(v)/ D;
 	}
 
 	inline Score getValue(const bitboardIndex p1, const tSquare to1, const bitboardIndex p2, const tSquare to2) const
 	{
-		assert(c<=black);
 		return _table[p1][to1][p2][to2];
 	}
 

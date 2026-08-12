@@ -268,10 +268,10 @@ inline void MovePicker::_scoreCaptureMoves()
 inline void MovePicker::_scoreQuietMoves()
 {
 	const Move& previousMove = _pos.getActualState().getCurrentMove();
-	Move previousMoves[SearchParameters::continuationHistorysize];
-	bitboardIndex previousMovesPieces[SearchParameters::continuationHistorysize];
+	Move previousMoves[SearchParameters::continuationHistorySize];
+	bitboardIndex previousMovesPieces[SearchParameters::continuationHistorySize];
 
-	for(unsigned int i = 0; i < SearchParameters::continuationHistorysize; ++i) {
+	for(unsigned int i = 0; i < SearchParameters::continuationHistorySize; ++i) {
 		previousMoves[i] = Move::NOMOVE;
 		previousMovesPieces[i] = empty;
 		if(_pos.getStateSize() >=2 + i) {
@@ -288,7 +288,7 @@ inline void MovePicker::_scoreQuietMoves()
 			s += _sd.getContinuationHistory().getValue(_pos.getPieceAt( previousMove.getTo()), previousMove.getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
 		}
 
-		for(unsigned int i = 0; i < SearchParameters::continuationHistorysize; ++i) {
+		for(unsigned int i = 0; i < SearchParameters::continuationHistorySize; ++i) {
 			if(previousMovesPieces[i] != empty) {
 				s += _sd.getContinuationHistory().getValue(previousMovesPieces[i] , previousMoves[i].getTo(), _pos.getPieceAt(m.getFrom()), m.getTo());
 			}
